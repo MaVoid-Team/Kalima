@@ -218,6 +218,18 @@ export const useAdminProducts = () => {
             return res;
         }));
 
+    // ─── Coupons ───────────────────────────────────────────────────────────
+
+    const getProductCoupons = useCallback((productId) =>
+        handleAction(() => fetchApi({
+            endpoint: `/products/${productId}/coupons`,
+            method: 'get',
+        }).then(res => {
+            if (res?.success) return res.data ?? [];
+            return res;
+        })),
+    [handleAction, fetchApi]);
+
     // ─── Required Fields ─────────────────────────────────────────────────────
 
     const attachRequiredFields = (productId, fields) =>
@@ -306,6 +318,9 @@ export const useAdminProducts = () => {
         // Categories
         attachCategories,
         detachCategory,
+
+        // Coupons
+        getProductCoupons,
 
         // Required Fields
         attachRequiredFields,

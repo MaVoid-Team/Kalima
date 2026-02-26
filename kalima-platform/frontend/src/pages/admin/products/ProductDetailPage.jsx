@@ -1,8 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { arSA } from 'react-day-picker/locale';
 import { ChevronLeft, ChevronRight, Package, Pencil, Trash2 } from 'lucide-react';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
+import { useAdminCoupons } from '@/hooks/admin/useAdminCoupons';
 import { formatCurrency } from '@/lib/storeUtils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,12 +13,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
+import EditProductDialog from '@/components/admin/products/EditProductDialog';
+import EditCouponDialog from '@/components/admin/coupons/EditCouponDialog';
+import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
 import ThumbnailManager from '@/components/admin/products/ThumbnailManager';
 import GalleryManager from '@/components/admin/products/GalleryManager';
 import CategoriesManager from '@/components/admin/products/CategoriesManager';
 import RequiredFieldsManager from '@/components/admin/products/RequiredFieldsManager';
 import SampleManager from '@/components/admin/products/SampleManager';
-import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
+import { getDiscountType, getCouponId, isCouponActive } from '@/lib/couponUtils';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -41,9 +47,21 @@ export default function ProductDetailPage() {
         detachCategory,
         attachRequiredFields,
         detachRequiredField,
+        getProductCoupons
     } = useAdminProducts();
 
+    const {
+        updateCoupon,
+        generateCouponCode,
+        apiLoading: couponLoading,
+    } = useAdminCoupons();
+
+    const [editOpen, setEditOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
+    const [productCoupons, setProductCoupons] = useState([]);
+    const [couponsLoading, setCouponsLoading] = useState(false);
+    const [selectedCoupon, setSelectedCoupon] = useState(null);
+    const [editCouponOpen, setEditCouponOpen] = useState(false);
 
     const refresh = useCallback(() => {
         fetchProductById(id);
@@ -53,6 +71,24 @@ export default function ProductDetailPage() {
         refresh();
     }, [refresh]);
 
+    const loadProductCoupons = useCallback(async () => {
+        if (!id) return;
+
+        setCouponsLoading(true);
+        try {
+            const data = await getProductCoupons(id);
+            setProductCoupons(Array.isArray(data) ? data : []);
+        } catch {
+            setProductCoupons([]);
+        } finally {
+            setCouponsLoading(false);
+        }
+    }, [getProductCoupons, id]);
+
+    useEffect(() => {
+        loadProductCoupons();
+    }, [loadProductCoupons]);
+
     const handleDelete = () => {
         setDeleteOpen(true);
     };
@@ -60,6 +96,17 @@ export default function ProductDetailPage() {
     const handleDeleteConfirm = async () => {
         const res = await deleteProduct(id);
         if (res?.success) navigate('/admin/products');
+    };
+
+    const handleEditCoupon = (coupon) => {
+        setSelectedCoupon(coupon);
+        setEditCouponOpen(true);
+    };
+
+    const handleUpdateCoupon = async (couponId, payload) => {
+        const result = await updateCoupon(couponId, payload);
+        await loadProductCoupons();
+        return result ?? true;
     };
 
     if (loading && !selectedProduct) {
@@ -244,6 +291,84 @@ export default function ProductDetailPage() {
                     loading={actionLoading}
                 />
             </div>
+
+            <div className="rounded-xl border border-border p-5 space-y-3" data-testid="product-detail-coupons">
+                <h2 className="font-semibold text-foreground">{t('products.detail.coupons')}</h2>
+                <Separator />
+
+                {couponsLoading ? (
+                    <div className="space-y-2">
+                        <Skeleton className="h-12 w-full" />
+                        <Skeleton className="h-12 w-full" />
+                    </div>
+                ) : productCoupons.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">{t('products.detail.noCoupons')}</p>
+                ) : (
+                    <div className="space-y-2">
+                        {productCoupons.map((coupon) => {
+                            const couponId = getCouponId(coupon);
+                            const discountType = getDiscountType(coupon);
+                            const discountValue = discountType === 'PERCENTAGE'
+                                ? `${coupon.discount_percentage ?? 0}%`
+                                : `${coupon.discount_amount ?? 0} ${t('coupons.form.units.amount')}`;
+
+                            return (
+                                <Button
+                                    key={couponId}
+                                    variant="outline"
+                                    className="h-auto w-full justify-between px-3 py-2"
+                                    onClick={() => handleEditCoupon(coupon)}
+                                    data-testid={`product-detail-coupon-${couponId}`}
+                                >
+                                    <div className="text-start">
+                                        <p className="font-medium">{coupon.code || '—'}</p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {discountValue}
+                                            {coupon.expires_at && (
+                                                <span>{` • ${t('coupons.table.expiresAt')}: ${format(new Date(coupon.expires_at), 'PPP', { locale: isRtl ? arSA : undefined })}`}</span>
+                                            )}
+                                        </p>
+                                    </div>
+                                    <Badge variant={isCouponActive(coupon) ? 'default' : 'outline'}>
+                                        {isCouponActive(coupon) ? t('coupons.status.active') : t('coupons.status.inactive')}
+                                    </Badge>
+                                </Button>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
+            {/* Edit Dialog */}
+            <EditProductDialog
+                product={product}
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                onSuccess={refresh}
+                fieldDefinitions={fieldDefinitions}
+                onLoadDefinitions={fetchFieldDefinitions}
+                onAttachField={(productId, fields) => attachRequiredFields(productId, fields)}
+                onDetachField={(productId, fieldDefinitionId) => detachRequiredField(productId, fieldDefinitionId)}
+            />
+
+            <EditCouponDialog
+                open={editCouponOpen}
+                onOpenChange={(openState) => {
+                    setEditCouponOpen(openState);
+                    if (!openState) setSelectedCoupon(null);
+                }}
+                coupon={selectedCoupon}
+                loading={couponLoading}
+                onGenerateCode={generateCouponCode}
+                onSubmitCoupon={handleUpdateCoupon}
+                onSuccess={loadProductCoupons}
+                products={[product]}
+                productPagination={{ page: 1, pages: 1, total: 1, limit: 1 }}
+                productsLoading={false}
+                productSearch=""
+                onProductSearchChange={() => { }}
+                onProductPageChange={() => { }}
+            />
 
             {/* Delete Confirmation Dialog */}
             <DeleteProductDialog

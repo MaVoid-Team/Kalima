@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import MainLayout from "./layouts/MainLayout";
+import CouponsPage from "./pages/admin/coupons/CouponsPage";
 
 // Lazy-loaded pages
 const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
@@ -98,6 +99,7 @@ function App() {
               <Route path="/admin/users" element={<UsersPage />} />
               <Route path="/admin/users/:id" element={<UserDetailPage />} />
               <Route path="/admin/samples" element={<AdminSamplesPage />} />
+              <Route path="/admin/coupons" element={<CouponsPage />} />
             </Route>
           </Route >
 
