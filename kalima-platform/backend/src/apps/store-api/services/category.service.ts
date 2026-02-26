@@ -19,6 +19,9 @@ const CATEGORY_SELECT = {
   product_categories: {
     select: { product_id: true },
   },
+  sub_categories: {
+    select: { id: true, title: true },
+  },
   created_at: true,
   updated_at: true,
 };
@@ -30,6 +33,7 @@ interface CATEGORY_RETURN {
   description: string;
   parent: { id: number; title: string } | null;
   product_categories: { product_id: number }[];
+  sub_categories: { id: number; title: string }[];
   created_at: Date;
   updated_at: Date;
 }
