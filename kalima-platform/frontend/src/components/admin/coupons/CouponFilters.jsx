@@ -133,7 +133,7 @@ export default function CouponFilters({
         <div className="flex flex-wrap lg:flex-nowrap items-center gap-3 mb-6" data-testid="coupons-filters">
 
             {/* Search */}
-            <div className="relative w-2xl shrink-0">
+            <div className="relative md:w-2xl w-xs shrink-0">
                 <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                     placeholder={t('coupons.searchPlaceholder')}

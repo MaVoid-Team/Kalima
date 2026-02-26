@@ -1,8 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TicketPercent } from 'lucide-react';
+import { TicketPercent, Download } from 'lucide-react';
 
 import useAdminCoupons from '@/hooks/admin/useAdminCoupons';
+import useExport from '@/hooks/useExport';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import CouponFilters from '@/components/admin/coupons/CouponFilters';
 import CouponsTable from '@/components/admin/coupons/CouponsTable';
 import CouponsStatsCards from '@/components/admin/coupons/CouponsStatsCards';
@@ -34,6 +43,9 @@ export default function CouponsPage() {
         setPage: setProductPage,
         loading: productsLoading,
     } = useProducts();
+
+    const { exportData, loading: exportLoading, exportProgress } = useExport();
+    const [selectedIds, setSelectedIds] = useState([]);
 
     const [coupons, setCoupons] = useState([]);
     const [couponsStats, setCouponsStats] = useState(null);
@@ -146,6 +158,29 @@ export default function CouponsPage() {
         setPagination((prev) => ({ ...prev, page }));
     };
 
+    const handleSelect = (id, checked) => {
+        setSelectedIds((prev) =>
+            checked ? [...prev, id] : prev.filter((selectedId) => selectedId !== id)
+        );
+    };
+
+    const handleSelectAll = (checked) => {
+        if (checked) {
+            setSelectedIds(filteredCoupons.map((c) => getCouponId(c)));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleExport = (format) => {
+        exportData({
+            resource: 'coupons',
+            format,
+            ids: selectedIds,
+            filters,
+        });
+    };
+
     const handleCreate = async (payload) => {
         const result = await createCoupon(payload);
         await loadCoupons();
@@ -205,9 +240,23 @@ export default function CouponsPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    {/* <p className="text-sm text-muted-foreground sm:block">
-                        {t('coupons.totalCoupons', { count: pagination.total })}
-                    </p> */}
+                    {/* Export dropdown */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button disabled={exportLoading} variant="outline" data-testid="coupons-export-button">
+                                <Download className="me-2 h-4 w-4" />
+                                {t('coupons.export', 'Export')}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleExport('csv')} disabled={exportLoading} data-testid="coupons-export-csv">
+                                {t('coupons.exportCsv', 'Export as CSV')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleExport('xlsx')} disabled={exportLoading} data-testid="coupons-export-excel">
+                                {t('coupons.exportXlsx', 'Export as Excel')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     <CreateCouponDialog
                         onGenerateCode={generateCouponCode}
@@ -223,6 +272,16 @@ export default function CouponsPage() {
                     />
                 </div>
             </div>
+
+            {exportLoading && exportProgress > 0 && (
+                <div>
+                    <div className="flex justify-between text-sm mb-1 text-muted-foreground">
+                        <span>{exportProgress < 100 ? t('export.exporting', 'Exporting...') : t('export.processing', 'Processing...')}</span>
+                        <span>{exportProgress}%</span>
+                    </div>
+                    <Progress value={exportProgress} />
+                </div>
+            )}
 
             <CouponsStatsCards
                 stats={couponsStats}
@@ -254,6 +313,9 @@ export default function CouponsPage() {
                 onToggleActivation={handleToggleActivation}
                 pagination={pagination}
                 onPageChange={setPage}
+                selectedIds={selectedIds}
+                onSelect={handleSelect}
+                onSelectAll={handleSelectAll}
             />
 
             <EditCouponDialog

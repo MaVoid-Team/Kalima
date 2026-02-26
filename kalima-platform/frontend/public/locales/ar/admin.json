@@ -318,6 +318,9 @@
         "totalCoupons": "{{count}} قسائم",
         "searchPlaceholder": "ابحث بالكود...",
         "empty": "لا توجد قسائم.",
+        "export": "تصدير",
+        "exportCsv": "تصدير كـ CSV",
+        "exportXlsx": "تصدير كـ Excel",
         "filters": {
             "active": {
                 "label": "الحالة",
@@ -422,9 +425,9 @@
             "viewDetails": "عرض التفاصيل",
             "edit": "تعديل القسيمة"
         },
-        "details":{
-           "title":"تفاصيل القسيمة",
-           "description":"راجع معلومات القسيمة وصلاحيتها." 
+        "details": {
+            "title": "تفاصيل القسيمة",
+            "description": "راجع معلومات القسيمة وصلاحيتها."
         },
         "messages": {
             "codeCopied": "تم نسخ كود القسيمة",

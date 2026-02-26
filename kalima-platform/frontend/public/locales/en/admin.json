@@ -318,6 +318,9 @@
         "totalCoupons": "{{count}} coupons",
         "searchPlaceholder": "Search by code...",
         "empty": "No coupons found.",
+        "export": "Export",
+        "exportCsv": "Export as CSV",
+        "exportXlsx": "Export as Excel",
         "filters": {
             "active": {
                 "label": "Status",
@@ -422,9 +425,9 @@
             "viewDetails": "View Details",
             "edit": "Edit Coupon"
         },
-        "details":{
-            "title":"Coupon details",
-            "description":"Review coupon information and validity."
+        "details": {
+            "title": "Coupon details",
+            "description": "Review coupon information and validity."
         },
         "messages": {
             "codeCopied": "Coupon code copied",
