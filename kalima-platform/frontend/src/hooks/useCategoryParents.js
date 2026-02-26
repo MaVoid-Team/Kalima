@@ -37,6 +37,21 @@ export default function useCategoryParents(isOpen, category) {
         id: root.id.toString(),
         title: root.title,
       });
+
+      // Add sub_categories (depth 1)
+      if (root.sub_categories && root.sub_categories.length > 0) {
+        root.sub_categories.forEach((sub) => {
+          // If editing this sub_category, we cannot select it as parent
+          if (isEdit && String(sub.id) === String(category.id)) {
+            return; // skip this sub
+          }
+
+          options.push({
+            id: sub.id.toString(),
+            title: `— ${sub.title}`,
+          });
+        });
+      }
     });
 
     return options;

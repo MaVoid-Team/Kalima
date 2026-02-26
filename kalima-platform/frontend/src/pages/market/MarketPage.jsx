@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import HeroSection from "@/components/MarketPage/HeroSection";
 import CategorySidebar from "@/components/MarketPage/CategorySidebar";
@@ -24,91 +24,95 @@ export default function MarketPage() {
     setPage,
   } = useProducts();
 
-  const {
-    categories,
-    childCategories,
-    fetchChildCategories,
-    loading: categoriesLoading
-  } = useCategories();
+  const { categories, loading: categoriesLoading } = useCategories();
 
-  const [activeRootId, setActiveRootId] = useState(null);
-
-  useEffect(() => {
-    // If we have an active root category, fetch its children
-    if (activeRootId) {
-      fetchChildCategories(activeRootId);
+  // Helper to find a category in the nested tree
+  const findCategoryById = (id, list) => {
+    for (const cat of list) {
+      if (String(cat.id) === String(id)) return cat;
+      if (cat.sub_categories?.length) {
+        const found = findCategoryById(id, cat.sub_categories);
+        if (found) return found;
+      }
     }
-  }, [activeRootId, fetchChildCategories]);
-
-  // If a category from URL or external is set, try to find its parent if it's a child.
-  // For simplicity, we just sync root when the user clicks. 
-  // If `filters.category_id` is null, we unset active root.
-  useEffect(() => {
-    if (filters.category_id === null && activeRootId !== null) {
-      setActiveRootId(null);
-    }
-  }, [filters.category_id]); // eslint-disable-line
-
-  const handleSearch = (query) => {
-    setSearch(query);
+    return null;
   };
+
+  const selectedCategoryObj = filters.category_id
+    ? findCategoryById(filters.category_id, categories)
+    : null;
+  const pillsContext = selectedCategoryObj || null;
+  const currentPills = pillsContext?.sub_categories || [];
 
   const handleCategorySelect = (id) => {
-    setActiveRootId(id);
     setCategory(id);
+    // If it's a new root selection from sidebar, we should scroll or just let it update.
   };
 
-  const currentChildren = activeRootId ? childCategories[activeRootId] || [] : [];
+  const handleBackNavigation = () => {
+    if (selectedCategoryObj && selectedCategoryObj.parent_id) {
+      setCategory(selectedCategoryObj.parent_id);
+    } else {
+      setCategory(null);
+    }
+  };
 
   return (
     <>
       {/* Hero / Search */}
-      <HeroSection onSearch={handleSearch} />
+      <HeroSection onSearch={setSearch} />
 
       <div className="container pb-16">
         <div className="flex flex-col md:flex-row gap-8 md:gap-10">
           {/* Sidebar */}
           <CategorySidebar
             categories={categories}
-            selectedId={activeRootId}
+            selectedId={filters.category_id}
             onSelect={handleCategorySelect}
             loading={categoriesLoading}
           />
 
           {/* Product grid + pagination */}
           <div className="flex-1 min-w-0">
-            {/* Child Categories Pills */}
-            {activeRootId && currentChildren.length > 0 && (
-              <div className="flex items-center gap-2 overflow-x-auto pb-6 scrollbar-hide">
-                <button
-                  onClick={() => setCategory(activeRootId)}
-                  className={cn(
-                    "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
-                    filters.category_id === activeRootId
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground hover:bg-muted/80"
-                  )}
-                  data-testid="market-all-categories-button"
-                >
-                  {t("sidebar.allCategories", { defaultValue: "الكل" })}
-                </button>
-                {currentChildren.map((child) => (
+            {/* Navigation Header / Pills */}
+            <div className="flex flex-col gap-4 mb-6">
+              {/* Active Category Display & Back Button */}
+              {selectedCategoryObj && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <button
-                    key={child.id}
-                    onClick={() => setCategory(child.id)}
-                    className={cn(
-                      "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
-                      filters.category_id === child.id
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-foreground hover:bg-muted/80"
-                    )}
-                    data-testid={`market-child-category-${child.id}`}
+                    onClick={handleBackNavigation}
+                    className="hover:text-foreground transition-colors flex items-center gap-1"
                   >
-                    {child.title ?? child.name}
+                    <span>{t("common.back", "رجوع")}</span>
                   </button>
-                ))}
-              </div>
-            )}
+                  <span>/</span>
+                  <span className="font-semibold text-foreground">
+                    {selectedCategoryObj.title}
+                  </span>
+                </div>
+              )}
+
+              {/* Subcategory Pills */}
+              {currentPills.length > 0 && (
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  {currentPills.map((child) => (
+                    <button
+                      key={child.id}
+                      onClick={() => setCategory(child.id)}
+                      className={cn(
+                        "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
+                        filters.category_id === child.id
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-foreground hover:bg-muted/80",
+                      )}
+                      data-testid={`market-child-category-${child.id}`}
+                    >
+                      {child.title ?? child.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <ProductGrid
               products={products}
