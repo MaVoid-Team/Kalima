@@ -1,22 +1,47 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Users, LogOut, Home, Globe, ChevronLeft, ChevronRight, Menu, X, Package, FileText } from 'lucide-react';
+import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, ChevronRight, Menu, X, Package, FileText, Ticket } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 
+const ADMIN_THEME_STORAGE_KEY = 'adminTheme';
+
 export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
-    const { t, i18n } = useTranslation('admin');
+    const { t, i18n } = useTranslation(['admin', 'userManagement']);
     const { logout } = useAuth();
     const location = useLocation();
     const [isCollapsed, setIsCollapsed] = useState(true);
+    const [theme, setTheme] = useState('light');
 
     const isRtl = i18n.dir() === 'rtl';
+
+    useEffect(() => {
+        const savedTheme = localStorage.getItem(ADMIN_THEME_STORAGE_KEY);
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+        setTheme(initialTheme);
+        document.documentElement.classList.toggle('dark', initialTheme === 'dark');
+
+        return () => {
+            setTheme('light');
+            document.documentElement.classList.remove('dark');
+        };
+    }, []);
+
+    const toggleTheme = () => {
+        const nextTheme = theme === 'dark' ? 'light' : 'dark';
+        setTheme(nextTheme);
+        localStorage.setItem(ADMIN_THEME_STORAGE_KEY, nextTheme);
+        document.documentElement.classList.toggle('dark', nextTheme === 'dark');
+    };
 
     // Using userManagement namespace explicitly for the users translation
     const navigation = [
         { name: t('nav.orders'), href: '/admin/orders', icon: ShoppingCart },
         { name: t('nav.products'), href: '/admin/products', icon: Package },
         { name: t('nav.samples'), href: '/admin/samples', icon: FileText },
+        { name: t('nav.coupons'), href: '/admin/coupons', icon:  Ticket},
         { name: i18n.t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users },
     ];
 
@@ -91,6 +116,22 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                 >
                     <Globe className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
                     <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{i18n.language === 'ar' ? 'English' : 'العربية'}</span>
+                </button>
+
+                <button
+                    onClick={toggleTheme}
+                    title={isCollapsed ? t('nav.themeToggle') : undefined}
+                    className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
+                    data-testid="admin-sidebar-theme-toggle"
+                >
+                    {theme === 'dark' ? (
+                        <Sun className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
+                    ) : (
+                        <Moon className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
+                    )}
+                    <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>
+                        {theme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
+                    </span>
                 </button>
 
                 <Link

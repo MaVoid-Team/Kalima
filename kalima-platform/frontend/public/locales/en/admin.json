@@ -4,6 +4,10 @@
         "orders": "Orders",
         "products": "Products",
         "samples": "Samples",
+        "coupons": "Coupons",
+        "themeToggle": "Toggle Theme",
+        "darkMode": "Dark Mode",
+        "lightMode": "Light Mode",
         "backToStore": "Back to Store",
         "logout": "Logout"
     },
@@ -232,6 +236,22 @@
             "submit": "Save Changes",
             "saving": "Saving..."
         },
+        "quickCoupon": {
+            "title": "Quick Coupon",
+            "description": "Create and assign a coupon while saving this product.",
+            "enable": "Create coupon for this product",
+            "code": "Coupon Code",
+            "codePlaceholder": "KLM-XXXXXX",
+            "generate": "Generate",
+            "type": "Discount Type",
+            "percentageValue": "Discount Percentage",
+            "amountValue": "Discount Amount",
+            "validationComplete": "Please complete all quick coupon fields",
+            "validationPositive": "Coupon value must be greater than 0",
+            "validationPercentageMax": "Percentage cannot be greater than 100",
+            "validationAmountExceedsPrice": "Discount amount cannot exceed the product price",
+            "createFailed": "Product saved, but coupon creation failed"
+        },
         "delete": {
             "confirm": "Are you sure you want to delete this product? This action cannot be undone.",
             "confirmTitle": "Delete Product",
@@ -243,6 +263,7 @@
             "thumbnail": "Thumbnail",
             "gallery": "Gallery",
             "categories": "Categories",
+            "coupons": "Assigned Coupons",
             "requiredFields": "Required Fields",
             "noThumbnail": "No thumbnail uploaded",
             "uploadThumbnail": "Upload Thumbnail",
@@ -255,6 +276,7 @@
             "toggleVisibility": "Toggle Visibility",
             "removeImage": "Remove",
             "noCategories": "No categories attached",
+            "noCoupons": "No coupons assigned to this product",
             "attachCategory": "Attach Category",
             "selectCategory": "Select a category...",
             "detachCategory": "Remove",
@@ -288,6 +310,148 @@
             "size": "Size",
             "type": "Type",
             "actions": "Actions"
+        }
+    },
+    "coupons": {
+        "title": "Coupons Management",
+        "subtitle": "Create, edit, and manage product coupons",
+        "totalCoupons": "{{count}} coupons",
+        "searchPlaceholder": "Search by code...",
+        "empty": "No coupons found.",
+        "filters": {
+            "active": {
+                "label": "Status",
+                "all": "All statuses",
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "product": {
+                "placeholder": "Filter by product",
+                "clear": "Clear"
+            },
+            "type": {
+                "label": "Type",
+                "all": "All types",
+                "percentage": "Percentage",
+                "amount": "Amount"
+            },
+            "date": {
+                "start": "Start date",
+                "end": "End date"
+            }
+        },
+        "discountType": {
+            "percentage": "Percentage",
+            "amount": "Amount"
+        },
+        "status": {
+            "active": "Active",
+            "inactive": "Inactive"
+        },
+        "stats": {
+            "totalCoupons": "Total Coupons",
+            "activeCoupons": "Active Coupons",
+            "inactiveCoupons": "Inactive Coupons",
+            "percentageCoupons": "Percentage Coupons",
+            "amountCoupons": "Amount Coupons"
+        },
+        "table": {
+            "code": "Code",
+            "discountType": "Discount Type",
+            "discountValue": "Discount Value",
+            "productId": "Product ID",
+            "dates": "Dates",
+            "createdAt": "Created At",
+            "startsAt": "Starts At",
+            "expiresAt": "Expires At",
+            "status": "Status",
+            "actions": "Actions"
+        },
+        "form": {
+            "code": "Code",
+            "codePlaceholder": "KLM-XXXXXX",
+            "discountType": "Discount Type",
+            "discountPercentage": "Discount Percentage",
+            "discountAmount": "Discount Amount",
+            "units": {
+                "percentage": "%",
+                "amount": "L.E"
+            },
+            "productId": "Product ID",
+            "productIdPlaceholder": "Please click on 'Pick Product' to select a product",
+            "startsAt": "Starts At",
+            "startsAtPlaceholder": "Pick a start date",
+            "expiresAt": "Expires At",
+            "expiresAtPlaceholder": "Pick an expiration date",
+            "optional": "Optional",
+            "isActive": "Coupon Activity Status"
+        },
+        "create": {
+            "title": "Create Coupon",
+            "description": "Fill in coupon details and save."
+        },
+        "edit": {
+            "title": "Edit Coupon",
+            "description": "Update coupon details and status.",
+            "toggleHelp": "Use this toggle to activate or deactivate the coupon."
+        },
+        "productPicker": {
+            "open": "Pick Product",
+            "title": "Select Product",
+            "description": "Search products and select one for this coupon.",
+            "searchPlaceholder": "Search by title or serial...",
+            "empty": "No products found.",
+            "select": "Select",
+            "selected": "Selected",
+            "price": "Price",
+            "priceAfterDiscount": "Price After Discount"
+        },
+        "delete": {
+            "title": "Delete Coupon",
+            "confirm": "Are you sure you want to delete this coupon?",
+            "disclaimer": "Deleted coupons will not appear in the list, but they remain stored in history."
+        },
+        "actions": {
+            "create": "Create Coupon",
+            "save": "Save Changes",
+            "delete": "Delete",
+            "generateCode": "Generate Random Code",
+            "copyCode": "Copy Code",
+            "activate": "Activate",
+            "deactivate": "Deactivate",
+            "viewDetails": "View Details",
+            "edit": "Edit Coupon"
+        },
+        "details":{
+            "title":"Coupon details",
+            "description":"Review coupon information and validity."
+        },
+        "messages": {
+            "codeCopied": "Coupon code copied",
+            "codeCopyFailed": "Failed to copy coupon code"
+        },
+        "validation": {
+            "codeRequired": "Coupon code is required",
+            "codeMinLength": "Coupon code must be at least 6 characters",
+            "codeFormat": "Code must contain only uppercase letters, numbers, and hyphens",
+            "discountTypeRequired": "Discount type is required",
+            "productRequired": "Product ID is required",
+            "startsAtRequired": "Start date is required",
+            "startsAtBeforeExpiresAt": "Start date must be before expiration date",
+            "expiresAtRequired": "Expiration date is required",
+            "expiresAtNotPast": "Expiration date cannot be before today",
+            "discountPercentageRequired": "Percentage value is required",
+            "discountPercentageInvalid": "Percentage must be a valid number",
+            "discountPercentageMax": "Percentage cannot be greater than 100",
+            "discountAmountRequired": "Amount value is required",
+            "discountAmountInvalid": "Amount must be a valid number",
+            "discountAmountExceedsProductPrice": "Discount amount cannot exceed the selected product price",
+            "discountValuePositive": "Value must be greater than 0"
+        },
+        "api": {
+            "createSuccess": "Coupon created successfully!",
+            "updateSuccess": "Coupon updated successfully!",
+            "deleteSuccess": "Coupon deleted successfully!"
         }
     }
 }

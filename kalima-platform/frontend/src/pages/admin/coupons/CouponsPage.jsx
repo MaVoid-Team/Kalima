@@ -1,0 +1,290 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { TicketPercent } from 'lucide-react';
+
+import useAdminCoupons from '@/hooks/admin/useAdminCoupons';
+import CouponFilters from '@/components/admin/coupons/CouponFilters';
+import CouponsTable from '@/components/admin/coupons/CouponsTable';
+import CouponsStatsCards from '@/components/admin/coupons/CouponsStatsCards';
+import CreateCouponDialog from '@/components/admin/coupons/CreateCouponDialog';
+import EditCouponDialog from '@/components/admin/coupons/EditCouponDialog';
+import DeleteCouponDialog from '@/components/admin/coupons/DeleteCouponDialog';
+import { useProducts } from '@/hooks/useProducts';
+import { getCouponId, isCouponActive } from '@/lib/couponUtils';
+
+const getProductId = (product) => product?.id || product?._id;
+
+export default function CouponsPage() {
+    const { t } = useTranslation('admin');
+    const {
+        getAllCoupons,
+        getCouponsStats,
+        createCoupon,
+        updateCoupon,
+        deleteCoupon,
+        generateCouponCode,
+        apiLoading,
+    } = useAdminCoupons();
+
+    const {
+        products,
+        pagination: productPagination,
+        filters: productFilters,
+        setSearch: setProductSearch,
+        setPage: setProductPage,
+        loading: productsLoading,
+    } = useProducts();
+
+    const [coupons, setCoupons] = useState([]);
+    const [couponsStats, setCouponsStats] = useState(null);
+    const [pagination, setPagination] = useState({
+        total: 0,
+        page: 1,
+        pages: 1,
+        limit: 10,
+    });
+    const [filters, setFilters] = useState({
+        search: '',
+        active: 'all',
+        product_id: '',
+        discount_type: 'all',
+        startDate: '',
+        endDate: '',
+    });
+
+    const [editOpen, setEditOpen] = useState(false);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [selectedCoupon, setSelectedCoupon] = useState(null);
+
+    const loadCoupons = useCallback(async () => {
+        const response = await getAllCoupons({
+            page: pagination.page,
+            limit: pagination.limit,
+            active: filters.active === 'all' ? undefined : filters.active == "true" ? 1 : 0,
+            product_id: filters.product_id || undefined,
+            isAmount:
+                filters.discount_type === 'AMOUNT'
+                    ? 1
+                    : filters.discount_type === 'PERCENTAGE'
+                        ? 0
+                        : undefined,
+            startDate: filters.startDate || undefined,
+            endDate: filters.endDate || undefined,
+        });
+
+        setCoupons(response?.coupons || []);
+        setPagination((prev) => ({
+            ...prev,
+            ...(response?.pagination || {}),
+        }));
+    }, [getAllCoupons, pagination.page, pagination.limit, filters.active, filters.product_id, filters.discount_type, filters.startDate, filters.endDate]);
+
+    const filteredCoupons = useMemo(() => {
+        const normalizedSearch = (filters.search || '').trim().toLowerCase();
+        if (!normalizedSearch) return coupons;
+
+        return coupons.filter((coupon) =>
+            String(coupon?.code || '').toLowerCase().includes(normalizedSearch)
+        );
+    }, [coupons, filters.search]);
+
+    const loadCouponsStats = useCallback(async () => {
+        const stats = await getCouponsStats();
+        if (stats) {
+            setCouponsStats(stats);
+        }
+    }, [getCouponsStats]);
+
+    useEffect(() => {
+        loadCoupons();
+    }, [loadCoupons]);
+
+    useEffect(() => {
+        loadCouponsStats();
+    }, [loadCouponsStats]);
+
+    const setSearch = (search) => {
+        setFilters((prev) => ({ ...prev, search }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    };
+
+    const setActive = (active) => {
+        setFilters((prev) => ({ ...prev, active }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    };
+
+    const setDiscountType = (discountType) => {
+        setFilters((prev) => ({ ...prev, discount_type: discountType }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    };
+
+    const setProductFilter = (product) => {
+        const productId = getProductId(product);
+        setFilters((prev) => ({
+            ...prev,
+            product_id: productId !== null && productId !== undefined ? String(productId) : '',
+        }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    };
+
+    const setStartDate = (startDate) => {
+        setFilters((prev) => ({ ...prev, startDate }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    };
+
+    const setEndDate = (endDate) => {
+        setFilters((prev) => ({ ...prev, endDate }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    };
+
+    const clearProductFilter = () => {
+        setFilters((prev) => ({ ...prev, product_id: '' }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    };
+
+    const setPage = (page) => {
+        setPagination((prev) => ({ ...prev, page }));
+    };
+
+    const handleCreate = async (payload) => {
+        const result = await createCoupon(payload);
+        await loadCoupons();
+        await loadCouponsStats();
+        return result ?? true;
+    };
+
+    const handleEdit = (coupon) => {
+        setSelectedCoupon(coupon);
+        setEditOpen(true);
+    };
+
+    const handleUpdate = async (couponId, payload) => {
+        const result = await updateCoupon(couponId, payload);
+        await loadCoupons();
+        await loadCouponsStats();
+        return result ?? true;
+    };
+
+    const handleDelete = (coupon) => {
+        setSelectedCoupon(coupon);
+        setDeleteOpen(true);
+    };
+
+    const handleToggleActivation = async (coupon) => {
+        const couponId = getCouponId(coupon);
+        if (!couponId) return;
+
+        await updateCoupon(couponId, {
+            is_active: !isCouponActive(coupon),
+        });
+
+        await loadCoupons();
+        await loadCouponsStats();
+    };
+
+    const handleDeleteConfirm = async () => {
+        const couponId = getCouponId(selectedCoupon);
+        if (!couponId) return;
+
+        await deleteCoupon(couponId);
+        setDeleteOpen(false);
+        setSelectedCoupon(null);
+        await loadCoupons();
+        await loadCouponsStats();
+    };
+
+    return (
+        <div className="space-y-6 no-scrollbar" data-testid="coupons-page">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+                        <TicketPercent className="h-8 w-8 text-primary" />
+                        {t('coupons.title')}
+                    </h1>
+                    <p className="text-muted-foreground mt-1">{t('coupons.subtitle')}</p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    {/* <p className="text-sm text-muted-foreground sm:block">
+                        {t('coupons.totalCoupons', { count: pagination.total })}
+                    </p> */}
+
+                    <CreateCouponDialog
+                        onGenerateCode={generateCouponCode}
+                        onSubmitCoupon={handleCreate}
+                        loading={apiLoading}
+                        onSuccess={loadCoupons}
+                        products={products}
+                        productPagination={productPagination}
+                        productsLoading={productsLoading}
+                        productSearch={productFilters.search}
+                        onProductSearchChange={setProductSearch}
+                        onProductPageChange={setProductPage}
+                    />
+                </div>
+            </div>
+
+            <CouponsStatsCards
+                stats={couponsStats}
+                loading={apiLoading}
+            />
+
+            <CouponFilters
+                filters={filters}
+                onSearchChange={setSearch}
+                onActiveChange={setActive}
+                onDiscountTypeChange={setDiscountType}
+                onStartDateChange={setStartDate}
+                onEndDateChange={setEndDate}
+                products={products}
+                productPagination={productPagination}
+                productsLoading={productsLoading}
+                productSearch={productFilters.search}
+                onProductSearchChange={setProductSearch}
+                onProductPageChange={setProductPage}
+                onProductFilterChange={setProductFilter}
+                onProductFilterClear={clearProductFilter}
+            />
+
+            <CouponsTable
+                coupons={filteredCoupons}
+                loading={apiLoading}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onToggleActivation={handleToggleActivation}
+                pagination={pagination}
+                onPageChange={setPage}
+            />
+
+            <EditCouponDialog
+                open={editOpen}
+                onOpenChange={(open) => {
+                    setEditOpen(open);
+                    if (!open) setSelectedCoupon(null);
+                }}
+                coupon={selectedCoupon}
+                loading={apiLoading}
+                onGenerateCode={generateCouponCode}
+                onSubmitCoupon={handleUpdate}
+                onSuccess={loadCoupons}
+                products={products}
+                productPagination={productPagination}
+                productsLoading={productsLoading}
+                productSearch={productFilters.search}
+                onProductSearchChange={setProductSearch}
+                onProductPageChange={setProductPage}
+            />
+
+            <DeleteCouponDialog
+                open={deleteOpen}
+                onOpenChange={(open) => {
+                    setDeleteOpen(open);
+                    if (!open) setSelectedCoupon(null);
+                }}
+                onConfirm={handleDeleteConfirm}
+                loading={apiLoading}
+                couponCode={selectedCoupon?.code}
+            />
+        </div>
+    );
+}
