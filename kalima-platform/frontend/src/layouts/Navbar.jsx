@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Globe, Search, ShoppingCart, FileText } from "lucide-react";
+import { Menu, X, Globe, Search, ShoppingCart } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ export default function Navbar() {
   const location = useLocation();
   const { t, i18n } = useTranslation("landing");
   const [commandValue, setCommandValue] = useState("");
-
+  
   useEffect(() => {
     const down = (e) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -46,7 +46,7 @@ export default function Navbar() {
   useEffect(() => {
     if (!open) return;
 
-    const routeValues = ["/market", "/samples"];
+    const routeValues = ["/market"];
     const current = routeValues.find((route) => location.pathname.startsWith(route));
     setCommandValue(current || "");
   }, [open, location.pathname]);
@@ -75,7 +75,6 @@ export default function Navbar() {
 
   const NAV_LINKS = [
     { label: t("navbar.market"), href: "/market" },
-    { label: t("navbar.samples"), href: "/samples" },
   ];
 
 
@@ -124,21 +123,13 @@ export default function Navbar() {
                 </kbd>
               </Button> */}
               {/* Market Button */}
-              <Button
+              {!isAdmin && <Button
                 variant="default"
                 onClick={() => navigate("/market")}
               >
                 <ShoppingCart className="mr-2 h-4 w-4" />
                 {t("navbar.market")}
-              </Button>
-              {/* Samples Button */}
-              <Button
-                variant="default"
-                onClick={() => navigate("/samples")}
-              >
-                <FileText className="mr-2 h-4 w-4" />
-                {t("navbar.samples")}
-              </Button>
+              </Button>}
               {/* Language Toggle */}
               <Button
                 variant="ghost"
@@ -151,7 +142,7 @@ export default function Navbar() {
               </Button>
 
               {/* Cart Button Desktop */}
-              {isAuthenticated && <Button
+              {isAuthenticated && !isAdmin && <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleCartModal}
@@ -166,13 +157,13 @@ export default function Navbar() {
 
               {isAuthenticated ? (
                 <>
-                  <Button
+                  {!isAdmin && <Button
                     variant="ghost"
                     className="font-bold hover:bg-transparent hover:text-primary"
                     asChild
                   >
                     <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
-                  </Button>
+                  </Button>}
                   {isAdmin && <Button
                     variant="default"
                     size="default"
@@ -225,7 +216,7 @@ export default function Navbar() {
 
             {/* Cart Button */}
             {/* Note that this button will take the place of login/signup buttons after logging in */}
-            {isAuthenticated && <Button
+            {isAuthenticated && !isAdmin && <Button
               variant="ghost"
               size="icon"
               onClick={toggleCartModal}
@@ -285,14 +276,14 @@ export default function Navbar() {
                 <div className="flex flex-col gap-3 pt-4">
                   {isAuthenticated ? (
                     <>
-                      <Button
+                      {!isAdmin && <Button
                         variant="default"
                         className="w-full font-bold justify-center h-12 text-base"
                         onClick={() => setIsMenuOpen(false)}
                         asChild
                       >
                         <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
-                      </Button>
+                      </Button>}
                       {isAdmin && <Button
                         variant="default"
                         className="w-full font-bold justify-center h-12 text-base"

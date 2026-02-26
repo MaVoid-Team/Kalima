@@ -4,9 +4,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Loader2, X, Package } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, X, Package, PlusCircle, Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { arSA } from 'react-day-picker/locale';
 
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
+import { useAdminCoupons } from '@/hooks/admin/useAdminCoupons';
 import { useCategories } from '@/hooks/useCategories';
 
 import { Button } from '@/components/ui/button';
@@ -28,6 +31,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 // ─── Validation Schema ────────────────────────────────────────────────────────
 
@@ -66,6 +74,12 @@ export default function CreateProductPage() {
         actionLoading,
     } = useAdminProducts();
 
+    const {
+        createCoupon,
+        generateCouponCode,
+        apiLoading: couponLoading,
+    } = useAdminCoupons();
+
     const { categories: roots, childCategories, fetchChildCategories } = useCategories();
 
     const [thumbnail, setThumbnail] = useState(null);
@@ -80,6 +94,13 @@ export default function CreateProductPage() {
     // Required fields picker state
     const [selectedFieldDefId, setSelectedFieldDefId] = useState('');
     const [pickedFields, setPickedFields] = useState([]); // { id, label, field_type }[]
+
+    // Quick coupon state
+    const [quickCouponEnabled, setQuickCouponEnabled] = useState(false);
+    const [quickCouponCode, setQuickCouponCode] = useState('');
+    const [quickCouponType, setQuickCouponType] = useState('PERCENTAGE');
+    const [quickCouponValue, setQuickCouponValue] = useState('');
+    const [quickCouponExpiresAt, setQuickCouponExpiresAt] = useState('');
 
     // Fetch field definitions on mount
     useEffect(() => {
@@ -157,9 +178,58 @@ export default function CreateProductPage() {
         setPickedFields(prev => prev.filter(f => f.id !== id));
     };
 
+    // ─── Quick coupon helpers ────────────────────────────────────────────────
+
+    const handleGenerateQuickCouponCode = async () => {
+        const code = await generateCouponCode();
+        if (code) {
+            setQuickCouponCode(code);
+        }
+    };
+
+    const buildQuickCouponPayload = (productId) => {
+        if (!quickCouponEnabled) return null;
+
+        const code = quickCouponCode.trim().toUpperCase();
+        const numericValue = Number(quickCouponValue);
+
+        if (!code || !quickCouponValue || !quickCouponExpiresAt) {
+            toast.error(t('products.quickCoupon.validationComplete'));
+            return null;
+        }
+
+        if (!Number.isFinite(numericValue) || numericValue <= 0) {
+            toast.error(t('products.quickCoupon.validationPositive'));
+            return null;
+        }
+
+        if (quickCouponType === 'PERCENTAGE' && numericValue > 100) {
+            toast.error(t('products.quickCoupon.validationPercentageMax'));
+            return null;
+        }
+
+        return {
+            code,
+            discount_type: quickCouponType,
+            product_id: String(productId),
+            expires_at: new Date(quickCouponExpiresAt).toISOString(),
+            ...(quickCouponType === 'PERCENTAGE'
+                ? { discount_percentage: numericValue }
+                : { discount_amount: numericValue }),
+        };
+    };
+
     // ─── Submit ───────────────────────────────────────────────────────────────
 
     const onSubmit = async (values) => {
+        const quickCouponDraft = quickCouponEnabled
+            ? buildQuickCouponPayload('__PENDING_PRODUCT_ID__')
+            : null;
+
+        if (quickCouponEnabled && !quickCouponDraft) {
+            return;
+        }
+
         const formData = new FormData();
         formData.append('title', values.title);
         formData.append('price', values.price);
@@ -185,6 +255,19 @@ export default function CreateProductPage() {
                     pickedFields.map(f => ({ field_definition_id: f.id, is_required: true }))
                 );
             }
+
+            if (quickCouponEnabled && newProductId) {
+                try {
+                    const couponPayload = {
+                        ...quickCouponDraft,
+                        product_id: String(newProductId),
+                    };
+                    await createCoupon(couponPayload);
+                } catch {
+                    toast.error(t('products.quickCoupon.createFailed'));
+                }
+            }
+
             // Navigate to the new product's detail page
             if (newProductId) {
                 navigate(`/admin/products/${newProductId}`);
@@ -543,6 +626,127 @@ export default function CreateProductPage() {
                         </div>
                     </div>
 
+                    {/* ── Section: Quick Coupon ── */}
+                    <div className="rounded-xl border border-border p-5 space-y-4">
+                        <h2 className="font-semibold text-foreground">{t('products.quickCoupon.title')}</h2>
+                        <p className="text-sm text-muted-foreground">{t('products.quickCoupon.description')}</p>
+                        <Separator />
+
+                        <div className="flex items-center justify-between gap-3">
+                            <label htmlFor="create-product-quick-coupon-switch" className="text-sm font-medium">
+                                {t('products.quickCoupon.enable')}
+                            </label>
+                            <Switch
+                                id="create-product-quick-coupon-switch"
+                                checked={quickCouponEnabled}
+                                onCheckedChange={setQuickCouponEnabled}
+                                data-testid="create-product-quick-coupon-switch"
+                            />
+                        </div>
+
+                        {quickCouponEnabled && (
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium leading-none">{t('products.quickCoupon.code')}</label>
+                                        <Input
+                                            value={quickCouponCode}
+                                            onChange={(e) => setQuickCouponCode(e.target.value.toUpperCase())}
+                                            placeholder={t('products.quickCoupon.codePlaceholder')}
+                                            data-testid="create-product-quick-coupon-code-input"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="sm:self-end"
+                                        disabled={couponLoading}
+                                        onClick={handleGenerateQuickCouponCode}
+                                        data-testid="create-product-quick-coupon-generate-button"
+                                    >
+                                        {t('products.quickCoupon.generate')}
+                                    </Button>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium leading-none">{t('products.quickCoupon.type')}</label>
+                                        <Select value={quickCouponType} onValueChange={setQuickCouponType}>
+                                            <SelectTrigger data-testid="create-product-quick-coupon-type-select">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="PERCENTAGE">{t('coupons.discountType.percentage')}</SelectItem>
+                                                <SelectItem value="AMOUNT">{t('coupons.discountType.amount')}</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium leading-none">
+                                            {quickCouponType === 'PERCENTAGE'
+                                                ? t('products.quickCoupon.percentageValue')
+                                                : t('products.quickCoupon.amountValue')}
+                                        </label>
+                                        <div className="relative">
+                                            <Input
+                                                type="text"
+                                                inputMode="numeric"
+                                                pattern="[0-9]*"
+                                                className="pe-14"
+                                                value={quickCouponValue}
+                                                onChange={(e) => setQuickCouponValue(e.target.value)}
+                                                data-testid="create-product-quick-coupon-value-input"
+                                            />
+                                                <span
+                                                    className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-muted-foreground"
+                                                    data-testid="coupons-create-discount-amount-suffix"
+                                                >
+                                                    {quickCouponType === 'PERCENTAGE' ? t('coupons.form.units.percentage') : t('coupons.form.units.amount')} 
+
+                                                </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium leading-none">{t('coupons.form.expiresAt')}</label>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    className={cn(
+                                                        'w-full justify-start text-start font-normal',
+                                                        !quickCouponExpiresAt && 'text-muted-foreground'
+                                                    )}
+                                                    data-testid="create-product-quick-coupon-expires-at-input"
+                                                >
+                                                    <CalendarIcon className="me-2 h-4 w-4" />
+                                                    {quickCouponExpiresAt
+                                                        ? format(new Date(quickCouponExpiresAt), 'PPP', { locale: isRtl ? arSA : undefined })
+                                                        : t('coupons.form.expiresAtPlaceholder')}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="end">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={quickCouponExpiresAt ? new Date(quickCouponExpiresAt) : undefined}
+                                                    onSelect={(date) => {
+                                                        if (!date) return;
+                                                        setQuickCouponExpiresAt(date.toISOString());
+                                                    }}
+                                                    locale={isRtl ? arSA : undefined}
+                                                    dir={isRtl ? 'rtl' : 'ltr'}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     {/* ── Action Buttons ── */}
                     <div className="flex justify-end gap-3 pb-4">
                         <Button
@@ -555,7 +759,7 @@ export default function CreateProductPage() {
                         </Button>
                         <Button
                             type="submit"
-                            disabled={actionLoading}
+                            disabled={actionLoading || couponLoading}
                             data-testid="create-product-submit-button"
                         >
                             {actionLoading

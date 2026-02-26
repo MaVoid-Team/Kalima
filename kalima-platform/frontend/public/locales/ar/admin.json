@@ -4,6 +4,10 @@
         "orders": "الطلبات",
         "products": "المنتجات",
         "samples": "العينات",
+        "coupons": "القسائم",
+        "themeToggle": "تبديل المظهر",
+        "darkMode": "الوضع الداكن",
+        "lightMode": "الوضع الفاتح",
         "backToStore": "العودة للمتجر",
         "logout": "تسجيل الخروج"
     },
@@ -145,7 +149,7 @@
             "statusTimeline": "الجدول الزمني للحالة",
             "orderItems": "عناصر الطلب",
             "adminNotes": "ملاحظات الإدارة",
-            "couponInfo": "الكوبون المستخدم",
+            "couponInfo": "القسيمة المستخدمة",
             "dateCreated": "تاريخ الإنشاء",
             "itemsCount": "عدد العناصر",
             "subtotal": "المجموع الفرعي",
@@ -211,8 +215,8 @@
             "priceAfterDiscount": "السعر بعد الخصم (ج.م)",
             "serial": "الرقم التسلسلي",
             "serialPlaceholder": "مثل: ALG-101 (اختياري)",
-            "couponId": "معرف الكوبون",
-            "couponIdPlaceholder": "معرف الكوبون (اختياري)",
+            "couponId": "معرف القسيمة",
+            "couponIdPlaceholder": "معرف القسيمة (اختياري)",
             "thumbnail": "صورة الغلاف",
             "sample": "ملف النموذج (PDF)",
             "categories": "الفئات",
@@ -232,6 +236,21 @@
             "submit": "حفظ التغييرات",
             "saving": "جاري الحفظ..."
         },
+        "quickCoupon": {
+            "title": "قسيمة سريعة",
+            "description": "أنشئ قسيمة واربطها بهذا المنتج أثناء الحفظ.",
+            "enable": "إنشاء قسيمة لهذا المنتج",
+            "code": "كود القسيمة",
+            "codePlaceholder": "KLM-XXXXXX",
+            "generate": "توليد",
+            "type": "نوع الخصم",
+            "percentageValue": "نسبة الخصم",
+            "amountValue": "قيمة الخصم",
+            "validationComplete": "يرجى إكمال جميع حقول القسيمة السريعة",
+            "validationPositive": "يجب أن تكون قيمة القسيمة أكبر من 0",
+            "validationPercentageMax": "لا يمكن أن تزيد النسبة عن 100",
+            "createFailed": "تم حفظ المنتج ولكن فشل إنشاء القسيمة"
+        },
         "delete": {
             "confirm": "هل تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
             "confirmTitle": "حذف المنتج",
@@ -243,6 +262,7 @@
             "thumbnail": "صورة الغلاف",
             "gallery": "معرض الصور",
             "categories": "الفئات",
+            "coupons": "القسائم المرتبطة",
             "requiredFields": "الحقول المطلوبة",
             "noThumbnail": "لا توجد صورة غلاف",
             "uploadThumbnail": "رفع صورة الغلاف",
@@ -255,6 +275,7 @@
             "toggleVisibility": "تبديل الرؤية",
             "removeImage": "حذف",
             "noCategories": "لا توجد فئات مرتبطة",
+            "noCoupons": "لا توجد قسائم مرتبطة بهذا المنتج",
             "attachCategory": "إضافة فئة",
             "selectCategory": "اختر فئة...",
             "detachCategory": "حذف",
@@ -290,11 +311,145 @@
             "actions": "الإجراءات"
         }
     },
-    "coupons":{
-        "api":{
-            "createSuccess": "تم إنشاء الكوبون بنجاح",
-            "updateSuccess": "تم تحديث الكوبون بنجاح",
-            "deleteSuccess": "تم حذف الكوبون بنجاح"
+    "coupons": {
+        "title": "إدارة القسائم",
+        "subtitle": "إنشاء وتعديل وإدارة قسائم المنتجات",
+        "totalCoupons": "{{count}} قسائم",
+        "searchPlaceholder": "ابحث بالكود...",
+        "empty": "لا توجد قسائم.",
+        "filters": {
+            "active": {
+                "label": "الحالة",
+                "all": "جميع الحالات",
+                "active": "نشط",
+                "inactive": "غير نشط"
+            },
+            "product": {
+                "placeholder": "تصفية حسب المنتج",
+                "clear": "مسح"
+            },
+            "type": {
+                "label": "النوع",
+                "all": "كل الأنواع",
+                "percentage": "نسبة مئوية",
+                "amount": "قيمة ثابتة"
+            },
+            "date": {
+                "start": "تاريخ البداية",
+                "end": "تاريخ النهاية"
+            }
+        },
+        "discountType": {
+            "percentage": "نسبة مئوية",
+            "amount": "قيمة ثابتة"
+        },
+        "status": {
+            "active": "نشط",
+            "inactive": "غير نشط"
+        },
+        "stats": {
+            "totalCoupons": "إجمالي القسائم",
+            "activeCoupons": "القسائم النشطة",
+            "inactiveCoupons": "القسائم غير النشطة",
+            "percentageCoupons": "قسائم النسبة",
+            "amountCoupons": "قسائم القيمة الثابتة"
+        },
+        "table": {
+            "code": "الكود",
+            "discountType": "نوع الخصم",
+            "discountValue": "قيمة الخصم",
+            "productId": "معرف المنتج",
+            "dates": "التواريخ",
+            "createdAt": "تاريخ الإنشاء",
+            "startsAt": "تاريخ البداية",
+            "expiresAt": "تاريخ الانتهاء",
+            "status": "الحالة",
+            "actions": "الإجراءات"
+        },
+        "form": {
+            "code": "الكود",
+            "codePlaceholder": "KLM-XXXXXX",
+            "discountType": "نوع الخصم",
+            "discountPercentage": "نسبة الخصم",
+            "discountAmount": "قيمة الخصم",
+            "units": {
+                "percentage": "%",
+                "amount": "ج.م"
+            },
+            "productId": "معرف المنتج",
+            "productIdPlaceholder": "الرجاء النقر على 'اختيار منتج' لتحديد المنتج",
+            "startsAt": "تاريخ البداية",
+            "startsAtPlaceholder": "اختر تاريخ البداية",
+            "expiresAt": "تاريخ الانتهاء",
+            "expiresAtPlaceholder": "اختر تاريخ الانتهاء",
+            "optional": "اختياري",
+            "isActive": "حالة نشاط القسيمة"
+        },
+        "create": {
+            "title": "إنشاء قسيمة",
+            "description": "أدخل بيانات القسيمة ثم احفظ."
+        },
+        "edit": {
+            "title": "تعديل القسيمة",
+            "description": "حدّث بيانات القسيمة وحالتها.",
+            "toggleHelp": "استخدم هذا المفتاح لتفعيل أو تعطيل القسيمة."
+        },
+        "productPicker": {
+            "open": "اختيار منتج",
+            "title": "اختيار المنتج",
+            "description": "ابحث في المنتجات واختر منتجًا لهذه القسيمة.",
+            "searchPlaceholder": "ابحث بالعنوان أو الرقم التسلسلي...",
+            "empty": "لا توجد منتجات.",
+            "select": "اختيار",
+            "selected": "تم الاختيار",
+            "price": "السعر",
+            "priceAfterDiscount": "السعر بعد الخصم"
+        },
+        "delete": {
+            "title": "حذف القسيمة",
+            "confirm": "هل أنت متأكد من حذف هذه القسيمة؟",
+            "disclaimer": "القسائم المحذوفة لن تظهر في قائمة القسائم، لكنها تظل مخزنة في السجل."
+        },
+        "actions": {
+            "create": "إنشاء قسيمة",
+            "save": "حفظ التغييرات",
+            "delete": "حذف",
+            "generateCode": "توليد كود عشوائي",
+            "copyCode": "نسخ الكود",
+            "activate": "تفعيل",
+            "deactivate": "تعطيل",
+            "viewDetails": "عرض التفاصيل",
+            "edit": "تعديل القسيمة"
+        },
+        "details":{
+           "title":"تفاصيل القسيمة",
+           "description":"راجع معلومات القسيمة وصلاحيتها." 
+        },
+        "messages": {
+            "codeCopied": "تم نسخ كود القسيمة",
+            "codeCopyFailed": "تعذر نسخ كود القسيمة"
+        },
+        "validation": {
+            "codeRequired": "كود القسيمة مطلوب",
+            "codeMinLength": "يجب ألا يقل كود القسيمة عن 6 أحرف",
+            "codeFormat": "يجب أن يحتوي الكود على أحرف إنجليزية كبيرة وأرقام وشرطات فقط",
+            "discountTypeRequired": "نوع الخصم مطلوب",
+            "productRequired": "معرف المنتج مطلوب",
+            "startsAtRequired": "تاريخ البداية مطلوب",
+            "startsAtBeforeExpiresAt": "يجب أن يكون تاريخ البداية قبل تاريخ الانتهاء",
+            "expiresAtRequired": "تاريخ الانتهاء مطلوب",
+            "expiresAtNotPast": "لا يمكن أن يكون تاريخ الانتهاء قبل اليوم",
+            "discountPercentageRequired": "قيمة النسبة مطلوبة",
+            "discountPercentageInvalid": "يجب أن تكون النسبة رقمًا صالحًا",
+            "discountPercentageMax": "لا يمكن أن تزيد النسبة عن 100",
+            "discountAmountRequired": "قيمة الخصم مطلوبة",
+            "discountAmountInvalid": "يجب أن تكون قيمة الخصم رقمًا صالحًا",
+            "discountValuePositive": "يجب أن تكون القيمة أكبر من 0"
+        },
+        "api": {
+            "createSuccess": "تم إنشاء القسيمة بنجاح",
+            "updateSuccess": "تم تحديث القسيمة بنجاح",
+            "deleteSuccess": "تم حذف القسيمة بنجاح"
         }
     }
 }

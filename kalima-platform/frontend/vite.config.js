@@ -10,6 +10,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      crypto: path.resolve(__dirname, "./src/shims/crypto.js"),
     },
+  },
+  build: {
+    chunkSizeWarningLimit: 1600,
   },
 })
