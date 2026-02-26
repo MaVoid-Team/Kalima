@@ -236,7 +236,7 @@ export default function EditProductDialog({
         }
     };
 
-    const buildQuickCouponPayload = () => {
+    const buildQuickCouponPayload = (productPrice) => {
         if (!quickCouponEnabled) return null;
 
         const code = quickCouponCode.trim().toUpperCase();
@@ -257,6 +257,15 @@ export default function EditProductDialog({
             return null;
         }
 
+        if (
+            quickCouponType === 'AMOUNT'
+            && Number.isFinite(productPrice)
+            && numericValue > productPrice
+        ) {
+            toast.error(t('products.quickCoupon.validationAmountExceedsPrice'));
+            return null;
+        }
+
         return {
             code,
             discount_type: quickCouponType,
@@ -271,7 +280,9 @@ export default function EditProductDialog({
     // ─── Submit ───────────────────────────────────────────────────────────────
 
     const onSubmit = async (values) => {
-        const quickCouponPayload = quickCouponEnabled ? buildQuickCouponPayload() : null;
+        const quickCouponPayload = quickCouponEnabled
+            ? buildQuickCouponPayload(Number(values.price))
+            : null;
         if (quickCouponEnabled && !quickCouponPayload) {
             return;
         }
@@ -685,7 +696,6 @@ export default function EditProductDialog({
                                                         data-testid="coupons-create-discount-amount-suffix"
                                                     >
                                                         {quickCouponType === 'PERCENTAGE' ? t('coupons.form.units.percentage') : t('coupons.form.units.amount')} 
-
                                                 </span>
                                             </div>
                                         </div>

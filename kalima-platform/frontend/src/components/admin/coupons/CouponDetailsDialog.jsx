@@ -12,29 +12,13 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-
-const getDiscountType = (coupon) => {
-    if (coupon?.discount_type === 'PERCENTAGE' || coupon?.discount_type === 'AMOUNT') {
-        return coupon.discount_type;
-    }
-
-    const amount = Number(coupon?.discount_amount ?? 0);
-    return amount > 0 ? 'AMOUNT' : 'PERCENTAGE';
-};
+import { getDiscountType, formatDiscount } from '@/lib/couponUtils';
 
 const formatDateValue = (value, isRtl) => {
     if (!value) return '—';
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return '—';
     return format(date, 'PPP', { locale: isRtl ? arSA : undefined });
-};
-
-const formatDiscount = (coupon, t, i18n) => {
-    if (getDiscountType(coupon) === 'PERCENTAGE') {
-        return `${i18n.language === 'ar' ? '%' : ''}${coupon.discount_percentage ?? 0}${i18n.language === 'en' ? '%' : ''}`;
-    }
-
-    return `${coupon?.discount_amount ?? '—'} ${t('coupons.form.units.amount')}`;
 };
 
 export default function CouponDetailsDialog({ open, onOpenChange, coupon }) {

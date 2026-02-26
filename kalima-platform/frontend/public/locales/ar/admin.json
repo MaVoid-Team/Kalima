@@ -249,6 +249,7 @@
             "validationComplete": "يرجى إكمال جميع حقول القسيمة السريعة",
             "validationPositive": "يجب أن تكون قيمة القسيمة أكبر من 0",
             "validationPercentageMax": "لا يمكن أن تزيد النسبة عن 100",
+            "validationAmountExceedsPrice": "لا يمكن أن تتجاوز قيمة الخصم سعر المنتج",
             "createFailed": "تم حفظ المنتج ولكن فشل إنشاء القسيمة"
         },
         "delete": {
@@ -444,6 +445,7 @@
             "discountPercentageMax": "لا يمكن أن تزيد النسبة عن 100",
             "discountAmountRequired": "قيمة الخصم مطلوبة",
             "discountAmountInvalid": "يجب أن تكون قيمة الخصم رقمًا صالحًا",
+            "discountAmountExceedsProductPrice": "لا يمكن أن تتجاوز قيمة الخصم سعر المنتج المحدد",
             "discountValuePositive": "يجب أن تكون القيمة أكبر من 0"
         },
         "api": {

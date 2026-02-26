@@ -103,23 +103,24 @@ axiosInstance.interceptors.response.use(
         let errorMessage = i18n.t('auth:errors.default');
         let errorDetails = '';
 
+        const extractErrorMessage = (obj) => {
+            if (typeof obj === 'string') return obj;
+            if (typeof obj === 'object' && obj !== null) {
+                return obj.message || obj.msg || obj.error;
+            }
+            return null;
+        };
+
         const normalizeErrorDetails = (rawErrors) => {
             if (!rawErrors) return '';
 
             if (Array.isArray(rawErrors)) {
-                const firstError = rawErrors[0];
-                if (typeof firstError === 'string') return firstError;
-                if (typeof firstError === 'object') {
-                    return firstError.message || firstError.msg || firstError.error || JSON.stringify(firstError);
-                }
+                const detail = extractErrorMessage(rawErrors[0]);
+                if (detail) return detail;
             }
 
-            if (typeof rawErrors === 'string') return rawErrors;
-            if (typeof rawErrors === 'object') {
-                return rawErrors.message || rawErrors.msg || rawErrors.error || JSON.stringify(rawErrors);
-            }
-
-            return '';
+            const detail = extractErrorMessage(rawErrors);
+            return detail || '';
         };
 
         if (response) {

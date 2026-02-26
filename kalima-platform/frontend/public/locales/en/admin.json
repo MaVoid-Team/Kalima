@@ -249,6 +249,7 @@
             "validationComplete": "Please complete all quick coupon fields",
             "validationPositive": "Coupon value must be greater than 0",
             "validationPercentageMax": "Percentage cannot be greater than 100",
+            "validationAmountExceedsPrice": "Discount amount cannot exceed the product price",
             "createFailed": "Product saved, but coupon creation failed"
         },
         "delete": {
@@ -444,6 +445,7 @@
             "discountPercentageMax": "Percentage cannot be greater than 100",
             "discountAmountRequired": "Amount value is required",
             "discountAmountInvalid": "Amount must be a valid number",
+            "discountAmountExceedsProductPrice": "Discount amount cannot exceed the selected product price",
             "discountValuePositive": "Value must be greater than 0"
         },
         "api": {

@@ -187,7 +187,7 @@ export default function CreateProductPage() {
         }
     };
 
-    const buildQuickCouponPayload = (productId) => {
+    const buildQuickCouponPayload = (productId, productPrice) => {
         if (!quickCouponEnabled) return null;
 
         const code = quickCouponCode.trim().toUpperCase();
@@ -208,6 +208,15 @@ export default function CreateProductPage() {
             return null;
         }
 
+        if (
+            quickCouponType === 'AMOUNT'
+            && Number.isFinite(productPrice)
+            && numericValue > productPrice
+        ) {
+            toast.error(t('products.quickCoupon.validationAmountExceedsPrice'));
+            return null;
+        }
+
         return {
             code,
             discount_type: quickCouponType,
@@ -223,7 +232,7 @@ export default function CreateProductPage() {
 
     const onSubmit = async (values) => {
         const quickCouponDraft = quickCouponEnabled
-            ? buildQuickCouponPayload('__PENDING_PRODUCT_ID__')
+            ? buildQuickCouponPayload('__PENDING_PRODUCT_ID__', Number(values.price))
             : null;
 
         if (quickCouponEnabled && !quickCouponDraft) {
@@ -703,7 +712,6 @@ export default function CreateProductPage() {
                                                     data-testid="coupons-create-discount-amount-suffix"
                                                 >
                                                     {quickCouponType === 'PERCENTAGE' ? t('coupons.form.units.percentage') : t('coupons.form.units.amount')} 
-
                                                 </span>
                                         </div>
                                     </div>

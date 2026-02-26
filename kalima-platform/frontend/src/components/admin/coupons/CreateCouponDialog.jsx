@@ -27,6 +27,11 @@ import CreateCouponProductField from '@/components/admin/coupons/CreateCouponPro
 import CreateCouponDateFields from '@/components/admin/coupons/CreateCouponDateFields';
 
 const getProductId = (product) => product?.id || product?._id;
+const getProductPrice = (product) => {
+    if (!product) return undefined;
+    const parsed = Number(product.price);
+    return Number.isFinite(parsed) ? parsed : undefined;
+};
 
 export default function CreateCouponDialog({
     onGenerateCode,
@@ -108,6 +113,21 @@ export default function CreateCouponDialog({
                     path: ['discount_amount'],
                     message: t('coupons.validation.discountAmountRequired'),
                 });
+            }
+
+            if (values.discount_type === 'AMOUNT' && values.discount_amount !== undefined) {
+                const selectedProduct = products?.find(
+                    (product) => String(getProductId(product)) === String(values.product_id)
+                );
+                const productPrice = getProductPrice(selectedProduct);
+
+                if (productPrice !== undefined && values.discount_amount > productPrice) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ['discount_amount'],
+                        message: t('coupons.validation.discountAmountExceedsProductPrice'),
+                    });
+                }
             }
 
             const startsAtDate = values.starts_at ? new Date(values.starts_at) : null;

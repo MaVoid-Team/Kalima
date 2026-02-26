@@ -30,27 +30,18 @@ import EditCouponDiscountFields from '@/components/admin/coupons/EditCouponDisco
 import EditCouponProductField from '@/components/admin/coupons/EditCouponProductField';
 import EditCouponDateField from '@/components/admin/coupons/EditCouponDateField';
 import EditCouponActiveField from '@/components/admin/coupons/EditCouponActiveField';
+import { getDiscountType as inferDiscountType, getCouponId } from '@/lib/couponUtils';
 
-const getCouponId = (coupon) => coupon?.id || coupon?._id;
 const getProductId = (product) => product?.id || product?._id;
+const getProductPrice = (product) => {
+    if (!product) return undefined;
+    const parsed = Number(product.price);
+    return Number.isFinite(parsed) ? parsed : undefined;
+};
 const toNumberOrUndefined = (value) => {
     if (value === null || value === undefined || value === '') return undefined;
     const parsed = Number(value);
     return Number.isNaN(parsed) ? undefined : parsed;
-};
-
-const inferDiscountType = (coupon) => {
-    if (coupon?.discount_type === 'AMOUNT' || coupon?.discount_type === 'PERCENTAGE') {
-        return coupon.discount_type;
-    }
-
-    const amount = toNumberOrUndefined(coupon?.discount_amount);
-    const percentage = toNumberOrUndefined(coupon?.discount_percentage);
-
-    if (amount !== undefined && amount > 0) return 'AMOUNT';
-    if (percentage !== undefined && percentage > 0) return 'PERCENTAGE';
-
-    return 'PERCENTAGE';
 };
 
 export default function EditCouponDialog({
@@ -136,6 +127,21 @@ export default function EditCouponDialog({
                     path: ['discount_amount'],
                     message: t('coupons.validation.discountAmountRequired'),
                 });
+            }
+
+            if (values.discount_type === 'AMOUNT' && values.discount_amount !== undefined) {
+                const selectedProduct = products?.find(
+                    (product) => String(getProductId(product)) === String(values.product_id)
+                );
+                const productPrice = getProductPrice(selectedProduct);
+
+                if (productPrice !== undefined && values.discount_amount > productPrice) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ['discount_amount'],
+                        message: t('coupons.validation.discountAmountExceedsProductPrice'),
+                    });
+                }
             }
 
             const startsAtDate = values.starts_at ? new Date(values.starts_at) : null;

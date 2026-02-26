@@ -13,8 +13,8 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import CouponTableRow from '@/components/admin/coupons/CouponTableRow';
 import CouponMobileTableRow from '@/components/admin/coupons/CouponMobileTableRow';
 import CouponsTablePagination from '@/components/admin/coupons/CouponsTablePagination';
+import { getCouponId } from '@/lib/couponUtils';
 
-const getCouponId = (coupon) => coupon?.id || coupon?._id;
 
 export default function CouponsTable({ coupons, loading, onEdit, onDelete, onToggleActivation, pagination, onPageChange }) {
     const { t } = useTranslation('admin');
