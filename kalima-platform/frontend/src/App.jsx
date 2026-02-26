@@ -18,23 +18,37 @@ const ForgotPasswordPage = lazy(
 const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage"));
 const VerifyEmailPage = lazy(() => import("./pages/auth/VerifyEmailPage"));
 const MarketPage = lazy(() => import("./pages/market/MarketPage"));
-const WizardCheckoutPage = lazy(() => import("./pages/checkout/WizardCheckoutPage"));
+const WizardCheckoutPage = lazy(
+  () => import("./pages/checkout/WizardCheckoutPage"),
+);
 const CheckoutPage = lazy(() => import("./pages/checkout/CheckoutPage"));
-const FastBuyCheckoutPage = lazy(() => import("./pages/checkout/FastBuyCheckoutPage"));
-const ProductDetailsPage = lazy(() => import("./pages/product/ProductDetailsPage"));
-const BookletDetailsPage = lazy(() => import("./pages/booklet/BookletDetailsPage"));
+const FastBuyCheckoutPage = lazy(
+  () => import("./pages/checkout/FastBuyCheckoutPage"),
+);
+const ProductDetailsPage = lazy(
+  () => import("./pages/product/ProductDetailsPage"),
+);
+const BookletDetailsPage = lazy(
+  () => import("./pages/booklet/BookletDetailsPage"),
+);
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const CartPage = lazy(() => import("./pages/cart/CartPage"));
 
 // Admin lazy-loaded pages
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const OrdersPage = lazy(() => import("./pages/admin/orders/OrdersPage"));
-const OrderDetailPage = lazy(() => import("./pages/admin/orders/OrderDetailPage"));
+const OrderDetailPage = lazy(
+  () => import("./pages/admin/orders/OrderDetailPage"),
+);
 const ProductsPage = lazy(() => import("./pages/admin/products/ProductsPage"));
-const ProductDetailPage = lazy(() => import("./pages/admin/products/ProductDetailPage"));
+const ProductDetailPage = lazy(
+  () => import("./pages/admin/products/ProductDetailPage"),
+);
+const CategoriesPage = lazy(
+  () => import("./pages/admin/categories/CategoriesPage"),
+);
 const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
 const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
-
 
 // User lazy-loaded pages
 const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
@@ -71,27 +85,34 @@ function App() {
               <Route path="/orders" element={<MyOrdersPage />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/fast-buy/checkout" element={<FastBuyCheckoutPage />} />
-            </Route >
+              <Route
+                path="/fast-buy/checkout"
+                element={<FastBuyCheckoutPage />}
+              />
+            </Route>
 
             {/* 404 Fallback */}
-            < Route path="*" element={< NotFoundPage />} />
-          </Route >
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
 
           {/* Admin Routes */}
-          < Route element={< AdminRoute />}>
+          <Route element={<AdminRoute />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin/orders" element={<OrdersPage />} />
               <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
               <Route path="/admin/products" element={<ProductsPage />} />
-              <Route path="/admin/products/:id" element={<ProductDetailPage />} />
+              <Route
+                path="/admin/products/:id"
+                element={<ProductDetailPage />}
+              />
+              <Route path="/admin/categories" element={<CategoriesPage />} />
               <Route path="/admin/users" element={<UsersPage />} />
               <Route path="/admin/users/:id" element={<UserDetailPage />} />
             </Route>
-          </Route >
+          </Route>
 
           {/* Guest-only routes with AuthLayout (No Navbar/Footer) */}
-          < Route element={< MainLayout />}>
+          <Route element={<MainLayout />}>
             <Route element={<ProtectedRoute requireAuth={false} />}>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
@@ -102,10 +123,10 @@ function App() {
               />
               <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
             </Route>
-          </Route >
-        </Routes >
-      </Suspense >
-    </ErrorBoundary >
+          </Route>
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
