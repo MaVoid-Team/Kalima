@@ -8,7 +8,7 @@ import { BadRequestError, NotFoundError } from "../../../libs/errors";
 // CONSTANTS
 // ============================================
 
-const MAX_NESTING_DEPTH = 3;
+const MAX_NESTING_DEPTH = 1000;
 
 const CATEGORY_SELECT = {
   id: true,
