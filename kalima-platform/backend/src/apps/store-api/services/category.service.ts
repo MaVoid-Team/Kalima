@@ -147,17 +147,33 @@ class CategoryService {
    */
   async getRootCategories(filters?: {
     active?: boolean;
-  }): Promise<CATEGORY_RETURN[]> {
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    data: CATEGORY_RETURN[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const page = filters?.page ?? 1;
+    const limit = filters?.limit ?? 10;
+    const skip = (page - 1) * limit;
+
     const where: any = { parent_id: null };
     if (filters?.active !== undefined) where.active = filters.active;
 
-    const roots = await this.db.categories.findMany({
-      where,
-      select: CATEGORY_SELECT,
-      orderBy: { created_at: "desc" },
-    });
+    const [data, total] = await Promise.all([
+      this.db.categories.findMany({
+        where,
+        select: CATEGORY_SELECT,
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.categories.count({ where }),
+    ]);
 
-    return roots;
+    return { data, total, page, limit };
   }
 
   /**
@@ -166,8 +182,17 @@ class CategoryService {
    */
   async getChildrenByParent(
     parentId: number,
-    filters?: { active?: boolean },
-  ): Promise<CATEGORY_RETURN[]> {
+    filters?: { active?: boolean; page?: number; limit?: number },
+  ): Promise<{
+    data: CATEGORY_RETURN[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const page = filters?.page ?? 1;
+    const limit = filters?.limit ?? 10;
+    const skip = (page - 1) * limit;
+
     const parent = await this.db.categories.findUnique({
       where: { id: parentId },
       select: { id: true },
@@ -177,13 +202,18 @@ class CategoryService {
     const where: any = { parent_id: parentId };
     if (filters?.active !== undefined) where.active = filters.active;
 
-    const children = await this.db.categories.findMany({
-      where,
-      orderBy: { created_at: "desc" },
-      select: CATEGORY_SELECT,
-    });
+    const [data, total] = await Promise.all([
+      this.db.categories.findMany({
+        where,
+        orderBy: { created_at: "desc" },
+        select: CATEGORY_SELECT,
+        skip,
+        take: limit,
+      }),
+      this.db.categories.count({ where }),
+    ]);
 
-    return children;
+    return { data, total, page, limit };
   }
 
   // ============================================

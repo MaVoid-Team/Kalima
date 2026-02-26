@@ -112,11 +112,18 @@ export const categoryController = {
           ? req.query.active === "true"
           : undefined;
 
-      const categories = await categoryService.getRootCategories({ active });
+      const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+      const limit = req.query.limit
+        ? parseInt(req.query.limit as string, 10)
+        : 50;
 
-      res
-        .status(200)
-        .json({ success: true, results: categories.length, data: categories });
+      const categories = await categoryService.getRootCategories({
+        active,
+        page,
+        limit,
+      });
+
+      res.status(200).json({ success: true, ...categories });
     } catch (error) {
       _next(error);
     }
@@ -135,29 +142,35 @@ export const categoryController = {
       const id = parseInt(req.params.id as string, 10);
       if (isNaN(id)) throw new BadRequestError("Invalid category ID");
 
+      const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+      const limit = req.query.limit
+        ? parseInt(req.query.limit as string, 10)
+        : 50;
+
       const active =
         req.query.active !== undefined
           ? req.query.active === "true"
           : undefined;
 
+      let data = {};
       if (id === 0) {
-        const categories = await categoryService.getRootCategories({ active });
-        res.status(200).json({
-          success: true,
-          results: categories.length,
-          data: categories,
+        data = await categoryService.getRootCategories({
+          active,
+          page,
+          limit,
         });
       } else {
-        const children = await categoryService.getChildrenByParent(id, {
+        data = await categoryService.getChildrenByParent(id, {
           active,
-        });
-
-        res.status(200).json({
-          success: true,
-          results: children.length,
-          data: children,
+          page,
+          limit,
         });
       }
+
+      res.status(200).json({
+        success: true,
+        ...data,
+      });
     } catch (error) {
       _next(error);
     }
