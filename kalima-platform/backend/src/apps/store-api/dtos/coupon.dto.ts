@@ -20,8 +20,8 @@ import {
 // ============================================
 
 export enum DiscountType {
-  AMOUNT = "amount",
-  PERCENTAGE = "percentage",
+  AMOUNT = "AMOUNT",
+  PERCENTAGE = "PERCENTAGE",
 }
 
 // ============================================
@@ -47,7 +47,7 @@ export class CreateCouponDto {
   @IsNotEmpty()
   discount_type: DiscountType;
 
-  /** Required when discount_type is "amount" */
+  /** Required when discount_type is "AMOUNT" */
   @ValidateIf((o) => o.discount_type === DiscountType.AMOUNT)
   @IsNumber()
   @IsNotEmpty()
@@ -55,7 +55,7 @@ export class CreateCouponDto {
   @Max(999999)
   discount_amount: number;
 
-  /** Required when discount_type is "percentage" */
+  /** Required when discount_type is "PERCENTAGE" */
   @ValidateIf((o) => o.discount_type === DiscountType.PERCENTAGE)
   @IsNumber()
   @IsNotEmpty()
