@@ -101,6 +101,26 @@ axiosInstance.interceptors.response.use(
     (error) => {
         const { response } = error;
         let errorMessage = i18n.t('auth:errors.default');
+        let errorDetails = '';
+
+        const normalizeErrorDetails = (rawErrors) => {
+            if (!rawErrors) return '';
+
+            if (Array.isArray(rawErrors)) {
+                const firstError = rawErrors[0];
+                if (typeof firstError === 'string') return firstError;
+                if (typeof firstError === 'object') {
+                    return firstError.message || firstError.msg || firstError.error || JSON.stringify(firstError);
+                }
+            }
+
+            if (typeof rawErrors === 'string') return rawErrors;
+            if (typeof rawErrors === 'object') {
+                return rawErrors.message || rawErrors.msg || rawErrors.error || JSON.stringify(rawErrors);
+            }
+
+            return '';
+        };
 
         if (response) {
             switch (response.status) {
@@ -129,13 +149,20 @@ axiosInstance.interceptors.response.use(
                 default:
                     errorMessage = response.data.message || errorMessage;
             }
+            errorDetails = normalizeErrorDetails(
+                response?.data?.errors
+                || response?.data?.details
+                || response?.data?.error
+            );
         } else if (error.request) {
             // The request was made but no response was received
             errorMessage = i18n.t('auth:errors.network_error');
         }
 
         // in case of empy cart no need to show error toast, as this is a common scenario and we handle it gracefully in the UI
-        errorMessage !== "Active cart not found" && toast.error(errorMessage);
+        if (errorMessage !== 'Active cart not found') {
+            toast.error(errorMessage, errorDetails ? { description: errorDetails } : undefined);
+        }
         return Promise.reject(error);
     }
 );

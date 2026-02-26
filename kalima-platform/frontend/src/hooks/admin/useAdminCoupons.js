@@ -1,22 +1,48 @@
 import { useCallback } from 'react';
 import useApiMutation from '../useApiMutation';
-import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
 /**
  * @typedef {Object} CouponData
  * @property {string} code
- * @property {'percentage' | 'amount'} discount_type
- * @property {number} discount_percentage
- * @property {number} discount_amount
+ * @property {'PERCENTAGE' | 'AMOUNT'} discount_type
+ * @property {number} [discount_percentage]
+ * @property {number} [discount_amount]
  * @property {string} product_id
+ * @property {string} starts_at ISO-8601 date string (e.g. 2026-01-01T00:00:00.000Z)
  * @property {string} expires_at ISO-8601 date string (e.g. 2026-06-01T00:00:00.000Z)
- * @property {boolean} is_active
+ * @property {boolean} [is_active]
  */
 
 export const useAdminCoupons = () => {
     const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
     const { t } = useTranslation('admin');
+
+    const normalizeCouponsResponse = useCallback((rawData, params = {}) => {
+        const list = Array.isArray(rawData)
+            ? rawData
+            : rawData?.coupons || rawData?.items || rawData?.data || [];
+
+        const paginationSource = rawData?.pagination || {};
+        const total = paginationSource.total ?? rawData?.total ?? list.length ?? 0;
+        const limit = paginationSource.limit ?? rawData?.limit ?? params.limit ?? 10;
+        const page = paginationSource.page ?? rawData?.page ?? params.page ?? 1;
+        const pages =
+            paginationSource.totalPages ??
+            paginationSource.pages ??
+            rawData?.pages ??
+            Math.max(1, Math.ceil(total / Math.max(1, limit)));
+
+        return {
+            coupons: Array.isArray(list) ? list : [],
+            pagination: {
+                total,
+                page,
+                pages,
+                limit,
+            },
+        };
+    }, []);
 
 
     const generateCouponCode = useCallback(async () => {
@@ -34,20 +60,44 @@ export const useAdminCoupons = () => {
         }
     }, [fetchApi]);
 
-    const getAllCoupons = useCallback(async () => {
+    const getCouponsStats = useCallback(async () => {
         try {
             const res = await fetchApi({
-                endpoint: '/coupons',
+                endpoint: '/coupons/stats',
                 method: 'get'
             });
             if (res?.success) {
                 return res.data;
             }
         } catch (error) {
-            console.error('Failed to fetch coupons:', error);
+            console.error('Failed to get coupons stats:', error);
             throw error;
         }
     }, [fetchApi]);
+
+    const getAllCoupons = useCallback(async (params = {}) => {
+        try {
+            const { ...queryParams } = params;
+            const query = new URLSearchParams();
+
+            Object.entries(queryParams).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '' && value !== 'all') {
+                    query.append(key, String(value));
+                }
+            });
+
+            const res = await fetchApi({
+                endpoint: `/coupons${query.toString() ? `?${query.toString()}` : ''}`,
+                method: 'get',
+            });
+            if (res?.success) {
+                return normalizeCouponsResponse(res.data, params);
+            }
+        } catch (error) {
+            console.error('Failed to fetch coupons:', error);
+            throw error;
+        }
+    }, [fetchApi, normalizeCouponsResponse]);
 
 
     /**
@@ -55,9 +105,10 @@ export const useAdminCoupons = () => {
      * @example
      * {
      *   "code": "KLM-B685D6",
-     *   "discount_type": "percentage",
+     *   "discount_type": "PERCENTAGE",
      *   "discount_percentage": 20,
      *   "product_id": "{{productId}}",
+    *   "starts_at": "2026-01-01T00:00:00.000Z",
      *   "expires_at": "2026-06-01T00:00:00.000Z"
      * }
      */
@@ -69,7 +120,6 @@ export const useAdminCoupons = () => {
                 data: couponData
             });
             if (res?.success) {
-                toast.success(t('coupons.api.createSuccess'));
                 return res.data;
             }
         } catch (error) {
@@ -100,10 +150,11 @@ export const useAdminCoupons = () => {
      * @example
      * {
      *   "code": "KLM-B685D6",
-     *   "discount_type": "amount",
+     *   "discount_type": "AMOUNT",
      *   "discount_amount": 100,
      *   "product_id": "{{productId}}",
-     *   "expires_at": "2026-06-01T00:00:00.000Z"
+    *   "starts_at": "2026-01-01T00:00:00.000Z",
+    *   "expires_at": "2026-06-01T00:00:00.000Z",
      *   "is_active": true
      * }
      */
@@ -115,7 +166,6 @@ export const useAdminCoupons = () => {
                 data: couponData
             });
             if (res?.success) {
-                toast.success(t('coupons.api.updateSuccess'));
                 return res.data;
             }
         } catch (error) {
@@ -131,7 +181,6 @@ export const useAdminCoupons = () => {
                 method: 'delete'
             });
             if (res?.success) {
-                toast.success(t('coupons.api.deleteSuccess'));
                 return res.data;
             }
         } catch (error) {
@@ -157,6 +206,7 @@ export const useAdminCoupons = () => {
 
     return {
         generateCouponCode,
+        getCouponsStats,
         getAllCoupons,
         createCoupon,
         getCouponById,
