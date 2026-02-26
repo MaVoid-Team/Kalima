@@ -24,6 +24,7 @@ router.get("/generate-code", ...adminAuth, couponController.generateCode);
 // CRUD
 router.post("/", ...adminAuth, couponController.createCoupon);
 router.get("/", ...adminAuth, couponController.getAllCoupons);
+router.get("/stats", ...adminAuth, couponController.getCouponStats);
 router.get("/:id", ...adminAuth, couponController.getCouponById);
 router.patch("/:id", ...adminAuth, couponController.updateCoupon);
 router.delete("/:id", ...adminAuth, couponController.deleteCoupon);

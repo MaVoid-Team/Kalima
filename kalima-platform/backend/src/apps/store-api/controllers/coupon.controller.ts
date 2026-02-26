@@ -297,4 +297,21 @@ export const couponController = {
       _next(error);
     }
   },
+
+  async getCouponStats(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const stats = await couponService.getCouponStats();
+
+      res.status(200).json({
+        success: true,
+        data: stats,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
 };

@@ -425,6 +425,24 @@ class CouponService {
     return { isValid: true, coupon: coupon as coupons };
   }
 
+  async getCouponStats() {
+    const [total, active, inactive, expired, percentage, fixed] =
+      await Promise.all([
+        this.db.coupons.count(),
+        this.db.coupons.count({ where: { active: true } }),
+        this.db.coupons.count({ where: { active: false } }),
+        this.db.coupons.count({ where: { expires_at: { lt: new Date() } } }),
+        this.db.coupons.count({
+          where: { type: coupon_type.percentage },
+        }),
+        this.db.coupons.count({
+          where: { type: coupon_type.fixed },
+        }),
+      ]);
+
+    return { total, active, inactive, expired, percentage, fixed };
+  }
+
   /**
    * Records that a user has used a coupon (called when purchase completes).
    */
