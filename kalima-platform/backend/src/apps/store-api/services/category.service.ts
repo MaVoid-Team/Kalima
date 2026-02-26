@@ -107,7 +107,7 @@ class CategoryService {
     }
 
     // Get root categories (no parent) with 3 levels of nesting
-    where.parent_id = null;
+    // where.parent_id = null;
 
     const [data, total] = await Promise.all([
       this.db.categories.findMany({
