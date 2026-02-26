@@ -9,6 +9,7 @@ import {
   uploadSingleImage,
   uploadMultipleImages,
   uploadProductWithSample,
+  uploadProductUpdate,
 } from "../../middleware/upload.middleware";
 import { role_enum } from "../../generated/prisma/client";
 import { makeExportHandler } from "../../export";
@@ -43,7 +44,12 @@ router.post(
   productController.createProduct,
 );
 
-router.patch("/:id", ...adminAuth, productController.updateProduct);
+router.patch(
+  "/:id",
+  ...adminAuth,
+  uploadProductUpdate,
+  productController.updateProduct,
+);
 router.delete("/:id", ...adminAuth, productController.deleteProduct);
 
 // ============================================
