@@ -375,7 +375,8 @@ export const CouponsScalarFieldEnum = {
   created_at: 'created_at',
   updated_at: 'updated_at',
   deleted_at: 'deleted_at',
-  mongo_id: 'mongo_id'
+  mongo_id: 'mongo_id',
+  type: 'type'
 } as const
 
 export type CouponsScalarFieldEnum = (typeof CouponsScalarFieldEnum)[keyof typeof CouponsScalarFieldEnum]

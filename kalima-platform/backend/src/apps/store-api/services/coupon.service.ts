@@ -5,7 +5,7 @@ import {
   UpdateCouponDto,
   DiscountType,
 } from "../dtos/coupon.dto";
-import { coupons } from "../generated/prisma/client";
+import { coupons, coupon_type } from "../generated/prisma/client";
 import {
   BadRequestError,
   NotFoundError,
@@ -76,21 +76,27 @@ class CouponService {
     }
 
     if (dto.discount_type === DiscountType.PERCENTAGE) {
+      if (dto.discount_percentage <= 0) {
+        throw new BadRequestError("Discount percentage must be greater than 0");
+      }
       if (dto.discount_percentage > 100) {
         throw new BadRequestError("Discount percentage cannot exceed 100%");
       }
     }
 
-    let couponType = "percentage";
+    let couponType: coupon_type = coupon_type.percentage;
     // Fixed discount cannot exceed product price
     if (dto.discount_type === DiscountType.AMOUNT) {
+      if (dto.discount_amount <= 0) {
+        throw new BadRequestError("Discount amount must be greater than 0");
+      }
       const productPrice = Number(product.price);
       if (dto.discount_amount > productPrice) {
         throw new BadRequestError(
           `Discount amount (${dto.discount_amount}) cannot exceed product price (${productPrice})`,
         );
       }
-      couponType = "fixed";
+      couponType = coupon_type.fixed;
     }
 
     // Build data based on discount type
@@ -161,7 +167,9 @@ class CouponService {
     }
 
     if (filters?.isAmount !== undefined && filters?.isAmount !== null) {
-      where.type = filters.isAmount ? "fixed" : "percentage";
+      where.type = filters.isAmount
+        ? coupon_type.fixed
+        : coupon_type.percentage;
     }
 
     const [coupons, total] = await Promise.all([

@@ -3486,7 +3486,8 @@ export const CouponsScalarFieldEnum = {
   created_at: 'created_at',
   updated_at: 'updated_at',
   deleted_at: 'deleted_at',
-  mongo_id: 'mongo_id'
+  mongo_id: 'mongo_id',
+  type: 'type'
 } as const
 
 export type CouponsScalarFieldEnum = (typeof CouponsScalarFieldEnum)[keyof typeof CouponsScalarFieldEnum]
@@ -3864,6 +3865,20 @@ export type Enumlocation_type_enumFieldRefInput<$PrismaModel> = FieldRefInputTyp
  * Reference to a field of type 'location_type_enum[]'
  */
 export type ListEnumlocation_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'location_type_enum[]'>
+    
+
+
+/**
+ * Reference to a field of type 'coupon_type'
+ */
+export type Enumcoupon_typeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'coupon_type'>
+    
+
+
+/**
+ * Reference to a field of type 'coupon_type[]'
+ */
+export type ListEnumcoupon_typeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'coupon_type[]'>
     
 
 
