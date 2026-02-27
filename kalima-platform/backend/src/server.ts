@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import "dotenv/config";
+import { closeRedis } from "./libs/redis/client";
 import path from "path";
 import express from "express";
 import { createServer } from "http";
@@ -8,9 +9,7 @@ import authRoutes from "./apps/store-api/routes/v2/auth.routes";
 import adminRoutes from "./apps/store-api/routes/v2/admin.routes";
 import { errorHandler } from "./libs/errors";
 import { setupStoreSocket } from "./libs/socket/setupStoreSocket";
-import {
-  startPurchaseNotificationConsumer,
-} from "./apps/store-api/services/notificationStream.service";
+import { startPurchaseNotificationConsumer } from "./apps/store-api/services/notificationStream.service";
 import { emitStorePurchaseToAdmins } from "./libs/redis/socketNotificationEmitter";
 import cors from "cors";
 import corsOptions from "./config/corsOptions";
@@ -23,10 +22,7 @@ registerAllExportResources();
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "../uploads")),
-);
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.get("/health", (_, res) => {
   res.json({ status: "ok" });
@@ -69,6 +65,18 @@ async function start() {
     process.exit(1);
   }
 }
+
+function gracefulShutdown() {
+  console.log("\n🛑 Shutting down gracefully...");
+  httpServer.close(() => {
+    closeRedis().finally(() => process.exit(0));
+  });
+  // Force exit if graceful close takes too long (e.g. open connections)
+  setTimeout(() => process.exit(0), 1500);
+}
+
+process.on("SIGINT", gracefulShutdown);
+process.on("SIGTERM", gracefulShutdown);
 
 start();
 
