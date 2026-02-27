@@ -1,0 +1,114 @@
+{
+    "pagination": {
+        "previous": "السابق",
+        "next": "التالي"
+    },
+    "title": "إدارة المستخدمين",
+    "subtitle": "إدارة المستخدمين والأدوار وصلاحيات الوصول",
+    "usersList": "قائمة المستخدمين",
+    "totalUsers": "إجمالي المستخدمين: {{count}}",
+    "searchPlaceholder": "البحث بالاسم، البريد الإلكتروني، رقم الهاتف...",
+    "export": "تصدير",
+    "exportCsv": "تصدير كملف CSV",
+    "exportXlsx": "تصدير كملف Excel",
+    "filters": {
+        "allRoles": "جميع الأدوار",
+        "allPortals": "جميع البوابات"
+    },
+    "table": {
+        "name": "الاسم",
+        "email": "البريد الإلكتروني",
+        "phone": "الهاتف",
+        "role": "الدور الأساسي",
+        "status": "مفعل",
+        "joined": "تاريخ الانضمام",
+        "actions": "إجراءات"
+    },
+    "status": {
+        "verified": "حساب موثق",
+        "pending": "قيد الانتظار"
+    },
+    "actions": {
+        "view": "عرض الملف",
+        "confirm": "تأكيد",
+        "create": "إضافة مستخدم",
+        "close": "إغلاق",
+        "addRole": "إضافة دور",
+        "addRoleDescription": "تعيين دور جديد لهذا المستخدم في بوابة معينة.",
+        "revoke": "إلغاء",
+        "makeAdmin": "إضافة مدير",
+        "makeSubAdmin": "إضافة نائب مدير",
+        "makeModerator": "إضافة مشرف",
+        "makeAssistant": "إضافة مساعد",
+        "revokeRole": "إلغاء دور"
+    },
+    "details": {
+        "title": "ملف المستخدم",
+        "back": "العودة للمستخدمين",
+        "rolesTitle": "الأدوار والصلاحيات",
+        "personalInfo": "المعلومات الشخصية",
+        "portal": "البوابة",
+        "role": "الدور",
+        "teacherInfo": "بيانات المعلم",
+        "studentInfo": "بيانات الطالب",
+        "levelId": "معرف المستوى:",
+        "analytics": "النشاط والإحصائيات",
+        "views": "مشاهدات الملف",
+        "portalPlaceholder": "اختر بوابة...",
+        "rolePlaceholder": "اختر دور...",
+        "totalSpent": "إجمالي الإنفاق",
+        "purchases": "المشتريات",
+        "invites": "الدعوات الناجحة",
+        "teacherDetails": "تفاصيل المعلم",
+        "serial": "الرقم التسلسلي",
+        "subject": "المادة",
+        "government": "المحافظة",
+        "zone": "الإدارة",
+        "levels": "المراحل الدراسية",
+        "primary": "ابتدائي",
+        "preparatory": "إعدادي",
+        "secondary": "ثانوي",
+        "usersCreated": "المستخدمون المنشئون",
+        "currency": "جنيه"
+    },
+    "roles": {
+        "Admin": "مدير",
+        "SubAdmin": "نائب مدير",
+        "Teacher": "معلم",
+        "Student": "طالب",
+        "Parent": "ولي أمر",
+        "Lecturer": "محاضر",
+        "Moderator": "مشرف",
+        "Assistant": "مساعد"
+    },
+    "portals": {
+        "store": "المتجر",
+        "academy": "الأكاديمية"
+    },
+    "messages": {
+        "roleAssigned": "تم تعيين الدور بنجاح",
+        "roleRevoked": "تم إلغاء الدور بنجاح",
+        "userCreated": "تم إنشاء المستخدم بنجاح",
+        "revokeConfirm": "هل أنت متأكد من إلغاء هذا الدور؟",
+        "noRoles": "لا توجد أدوار معينة للمستخدم."
+    },
+    "createDialog": {
+        "title": "إنشاء مستخدم إداري",
+        "description": "إنشاء مستخدم جديد بصلاحيات إدارية.",
+        "type": "نوع المستخدم",
+        "name": "الاسم الكامل",
+        "email": "البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "phone": "رقم الهاتف",
+        "secondaryPhone": "رقم هاتف إضافي (اختياري)",
+        "gender": "الجنس",
+        "male": "ذكر",
+        "female": "أنثى"
+    },
+    "stats": {
+        "totalUsers": "إجمالي المستخدمين",
+        "verifiedUsers": "المستخدمون الموثقون",
+        "teachers": "المعلمون",
+        "admins": "المديرون"
+    }
+}

@@ -1,0 +1,114 @@
+{
+    "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+    },
+    "title": "User Management",
+    "subtitle": "Manage users, roles, and portal access",
+    "usersList": "Users List",
+    "totalUsers": "Total Users: {{count}}",
+    "searchPlaceholder": "Search by name, email, phone...",
+    "export": "Export",
+    "exportCsv": "Export as CSV",
+    "exportXlsx": "Export as Excel",
+    "filters": {
+        "allRoles": "All Roles",
+        "allPortals": "All Portals"
+    },
+    "table": {
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone",
+        "role": "Primary Role",
+        "status": "Verified",
+        "joined": "Joined",
+        "actions": "Actions"
+    },
+    "status": {
+        "verified": "Verified",
+        "pending": "Pending"
+    },
+    "actions": {
+        "view": "View Profile",
+        "create": "Create User",
+        "confirm": "Confirm",
+        "addRole": "Add Role",
+        "close": "Close",
+        "addRoleDescription": "Assign a new role to this user for a specific portal.",
+        "revoke": "Revoke",
+        "makeAdmin": "Create Admin",
+        "makeSubAdmin": "Create SubAdmin",
+        "makeModerator": "Create Moderator",
+        "makeAssistant": "Create Assistant",
+        "revokeRole": "Revoke Role"
+    },
+    "details": {
+        "title": "User Profile",
+        "back": "Back to Users",
+        "rolesTitle": "Roles & Access",
+        "personalInfo": "Personal Information",
+        "portal": "Portal",
+        "role": "Role",
+        "teacherInfo": "Teacher Info",
+        "studentInfo": "Student Info",
+        "levelId": "Level ID:",
+        "analytics": "Activity & Analytics",
+        "views": "Profile Views",
+        "totalSpent": "Total Spent",
+        "purchases": "Purchases",
+        "invites": "Successful Invites",
+        "portalPlaceholder": "Select portal...",
+        "rolePlaceholder": "Select role...",
+        "teacherDetails": "Teacher Details",
+        "serial": "Serial",
+        "subject": "Subject",
+        "government": "Government",
+        "zone": "Zone",
+        "levels": "Active Levels",
+        "primary": "Primary",
+        "preparatory": "Preparatory",
+        "secondary": "Secondary",
+        "usersCreated": "Users Created",
+        "currency": "EGP"
+    },
+    "roles": {
+        "Admin": "Admin",
+        "SubAdmin": "SubAdmin",
+        "Teacher": "Teacher",
+        "Student": "Student",
+        "Parent": "Parent",
+        "Lecturer": "Lecturer",
+        "Moderator": "Moderator",
+        "Assistant": "Assistant"
+    },
+    "portals": {
+        "store": "Store",
+        "academy": "Academy"
+    },
+    "messages": {
+        "roleAssigned": "Role assigned successfully",
+        "roleRevoked": "Role revoked successfully",
+        "userCreated": "User created successfully",
+        "revokeConfirm": "Are you sure you want to revoke this role?",
+        "noRoles": "User has no assigned roles."
+    },
+    "createDialog": {
+        "title": "Create Admin User",
+        "description": "Create a new user with administrative privileges.",
+        "type": "User Type",
+        "name": "Full Name",
+        "email": "Email Address",
+        "password": "Password",
+        "phone": "Phone Number",
+        "secondaryPhone": "Secondary Phone (Optional)",
+        "gender": "Gender",
+        "male": "Male",
+        "female": "Female"
+    },
+    "stats": {
+        "totalUsers": "Total Users",
+        "verifiedUsers": "Verified Users",
+        "teachers": "Teachers",
+        "admins": "Administrators"
+    }
+}
