@@ -18,7 +18,11 @@ import { useCategories } from '@/hooks/useCategories';
  */
 export default function CategoriesManager({ product, onAttach, onDetach, loading }) {
     const { t, i18n } = useTranslation('admin');
-    const { categories: roots, childCategories, fetchChildCategories } = useCategories();
+    const {
+        categories: roots = [],
+        childCategories = {},
+        fetchChildCategories = async () => [],
+    } = useCategories();
 
     const [selectedRootId, setSelectedRootId] = useState('');
     const [selectedChildId, setSelectedChildId] = useState('');
