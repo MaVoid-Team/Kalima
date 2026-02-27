@@ -8,6 +8,9 @@
     "usersList": "Users List",
     "totalUsers": "Total Users: {{count}}",
     "searchPlaceholder": "Search by name, email, phone...",
+    "export": "Export",
+    "exportCsv": "Export as CSV",
+    "exportXlsx": "Export as Excel",
     "filters": {
         "allRoles": "All Roles",
         "allPortals": "All Portals"
@@ -28,12 +31,16 @@
     "actions": {
         "view": "View Profile",
         "create": "Create User",
+        "confirm": "Confirm",
         "addRole": "Add Role",
+        "close": "Close",
+        "addRoleDescription": "Assign a new role to this user for a specific portal.",
         "revoke": "Revoke",
         "makeAdmin": "Create Admin",
         "makeSubAdmin": "Create SubAdmin",
         "makeModerator": "Create Moderator",
-        "makeAssistant": "Create Assistant"
+        "makeAssistant": "Create Assistant",
+        "revokeRole": "Revoke Role"
     },
     "details": {
         "title": "User Profile",
@@ -50,6 +57,8 @@
         "totalSpent": "Total Spent",
         "purchases": "Purchases",
         "invites": "Successful Invites",
+        "portalPlaceholder": "Select portal...",
+        "rolePlaceholder": "Select role...",
         "teacherDetails": "Teacher Details",
         "serial": "Serial",
         "subject": "Subject",
@@ -85,6 +94,7 @@
     },
     "createDialog": {
         "title": "Create Admin User",
+        "description": "Create a new user with administrative privileges.",
         "type": "User Type",
         "name": "Full Name",
         "email": "Email Address",
@@ -94,5 +104,11 @@
         "gender": "Gender",
         "male": "Male",
         "female": "Female"
+    },
+    "stats": {
+        "totalUsers": "Total Users",
+        "verifiedUsers": "Verified Users",
+        "teachers": "Teachers",
+        "admins": "Administrators"
     }
 }

@@ -38,6 +38,10 @@ export default function CouponFilters({
     const [searchValue, setSearchValue] = useState(filters.search || '');
     const [productDropdownOpen, setProductDropdownOpen] = useState(false);
     const [productSearchValue, setProductSearchValue] = useState(productSearch || '');
+    const [isMobile, setIsMobile] = useState(() => {
+        const viewportWidth = globalThis.window?.innerWidth;
+        return typeof viewportWidth === 'number' ? viewportWidth < 640 : false;
+    });
     const productSearchInputRef = useRef(null);
     const isRtl = i18n.language?.startsWith('ar');
 
@@ -79,6 +83,15 @@ export default function CouponFilters({
     useEffect(() => {
         setProductSearchValue(productSearch || '');
     }, [productSearch]);
+
+    useEffect(() => {
+        if (!globalThis.window) return undefined;
+
+        const handleResize = () => setIsMobile(globalThis.window.innerWidth < 640);
+        handleResize();
+        globalThis.window.addEventListener('resize', handleResize);
+        return () => globalThis.window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleProductSearchChange = (e) => {
         const value = e.target.value;
@@ -130,10 +143,10 @@ export default function CouponFilters({
     const totalPages = Math.max(1, Math.ceil((productPagination?.total || 0) / (productPagination?.limit || 1)));
 
     return (
-        <div className="flex flex-wrap lg:flex-nowrap items-center gap-3 mb-6" data-testid="coupons-filters">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap items-stretch sm:items-center gap-3 mb-6 w-full min-w-0" data-testid="coupons-filters">
 
             {/* Search */}
-            <div className="relative md:w-2xl w-xs shrink-0">
+            <div className="relative w-full sm:flex-1 lg:min-w-[20rem]">
                 <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                     placeholder={t('coupons.searchPlaceholder')}
@@ -146,7 +159,7 @@ export default function CouponFilters({
 
             {/* Active status */}
             <Select dir={i18n.dir()} value={filters.active || 'all'} onValueChange={onActiveChange}>
-                <SelectTrigger className="w-36 shrink-0" data-testid="coupons-filters-active-select-trigger">
+                <SelectTrigger className="w-full sm:w-36 shrink-0" data-testid="coupons-filters-active-select-trigger">
                     <SelectValue placeholder={t('coupons.filters.active.label')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -164,7 +177,7 @@ export default function CouponFilters({
 
             {/* Discount type */}
             <Select dir={i18n.dir()} value={filters.discount_type || 'all'} onValueChange={onDiscountTypeChange}>
-                <SelectTrigger className="w-36 shrink-0" data-testid="coupons-filters-type-select-trigger">
+                <SelectTrigger className="w-full sm:w-36 shrink-0" data-testid="coupons-filters-type-select-trigger">
                     <SelectValue placeholder={t('coupons.filters.type.label')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -181,7 +194,7 @@ export default function CouponFilters({
             </Select>
 
             {/* Date range — single popover with mode="range" */}
-            <div className="flex items-center gap-1 shrink-0" data-testid="coupons-filters-date-range">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] sm:flex items-center gap-1 min-w-0 w-full sm:w-auto sm:flex-none" data-testid="coupons-filters-date-range">
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button
@@ -189,7 +202,7 @@ export default function CouponFilters({
                             variant="outline"
                             id="coupon-date-range"
                             className={cn(
-                                'w-56 justify-start text-start font-normal',
+                                'w-full sm:w-56 max-w-full justify-start text-start font-normal',
                                 !filters.startDate && 'text-muted-foreground'
                             )}
                             data-testid="coupons-filters-date-range-button"
@@ -198,14 +211,14 @@ export default function CouponFilters({
                             <span className="truncate">{dateLabel}</span>
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="w-auto max-w-[calc(100vw-2rem)] p-0" align="start">
                         <Calendar
                             initialFocus
                             mode="range"
                             defaultMonth={dateRangeValue.from}
                             selected={dateRangeValue}
                             onSelect={handleDateRangeChange}
-                            numberOfMonths={2}
+                            numberOfMonths={isMobile ? 1 : 2}
                             locale={isRtl ? arSA : undefined}
                             dir={isRtl ? 'rtl' : 'ltr'}
                         />
@@ -226,14 +239,14 @@ export default function CouponFilters({
             </div>
 
             {/* Product picker — inline dropdown with search */}
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] sm:flex items-center gap-1 min-w-0 w-full sm:w-auto sm:flex-none">
                 <Popover open={productDropdownOpen} onOpenChange={setProductDropdownOpen}>
                     <PopoverTrigger asChild>
                         <Button
                             type="button"
                             variant="outline"
                             className={cn(
-                                'w-48 justify-between text-start font-normal',
+                                'w-full sm:w-48 max-w-full justify-between text-start font-normal',
                                 !selectedProductLabel && 'text-muted-foreground'
                             )}
                             data-testid="coupons-product-picker-open-button"
@@ -244,7 +257,7 @@ export default function CouponFilters({
                             <ChevronDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80 p-2" align="start" data-testid="coupons-product-picker-dropdown">
+                    <PopoverContent className="w-[min(20rem,calc(100vw-2rem))] p-2" align="start" data-testid="coupons-product-picker-dropdown">
                         {/* Search inside dropdown */}
                         <div className="relative mb-2">
                             <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -259,7 +272,7 @@ export default function CouponFilters({
                         </div>
 
                         {/* Product list */}
-                        <div className="rounded-md border max-h-64 overflow-y-auto" data-testid="coupons-product-picker-list">
+                        <div className="rounded-md border max-h-64 overflow-y-auto custom-scrollbar" data-testid="coupons-product-picker-list">
                             {productsLoading ? (
                                 <div className="h-24 flex items-center justify-center">
                                     <LoadingSpinner className="h-5 w-5 text-primary" />

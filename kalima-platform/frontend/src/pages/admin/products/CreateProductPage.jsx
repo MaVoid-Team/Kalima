@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -104,6 +104,8 @@ export default function CreateProductPage() {
     const [quickCouponType, setQuickCouponType] = useState('PERCENTAGE');
     const [quickCouponValue, setQuickCouponValue] = useState('');
     const [quickCouponExpiresAt, setQuickCouponExpiresAt] = useState('');
+    const thumbnailInputRef = useRef(null);
+    const sampleInputRef = useRef(null);
 
     // Fetch field definitions on mount
     useEffect(() => {
@@ -308,7 +310,7 @@ export default function CreateProductPage() {
                     className="hover:text-foreground transition-colors flex items-center gap-1"
                     data-testid="create-product-back-link"
                 >
-                    {isRtl ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                    <ChevronLeft className="h-4 w-4" />
                     {t('products.backToProducts')}
                 </Link>
             </div>
@@ -376,7 +378,7 @@ export default function CreateProductPage() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{t('products.form.type')}</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select dir={i18n.dir()} onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
                                                 <SelectTrigger data-testid="create-product-type-select">
                                                     <SelectValue />
@@ -502,6 +504,7 @@ export default function CreateProductPage() {
                         {/* Cascading root → child selects */}
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                             <Select
+                                dir={i18n.dir()}
                                 value={selectedRootId}
                                 onValueChange={handleRootChange}
                                 disabled={roots.length === 0}
@@ -526,6 +529,7 @@ export default function CreateProductPage() {
                                     </div>
                                 ) : hasChildren ? (
                                     <Select
+                                        dir={i18n.dir()}
                                         value={selectedChildId}
                                         onValueChange={handleChildChange}
                                         disabled={!currentChildren?.length}
@@ -581,7 +585,7 @@ export default function CreateProductPage() {
                         {/* Field picker */}
                         {availableFieldDefs.length > 0 && (
                             <div className="flex items-center gap-2">
-                                <Select value={selectedFieldDefId} onValueChange={setSelectedFieldDefId}>
+                                <Select dir={i18n.dir()} value={selectedFieldDefId} onValueChange={setSelectedFieldDefId}>
                                     <SelectTrigger className="flex-1" data-testid="create-product-field-def-select">
                                         <SelectValue placeholder={t('products.detail.selectField')} />
                                     </SelectTrigger>
@@ -619,28 +623,50 @@ export default function CreateProductPage() {
                             <div className="space-y-1.5">
                                 <span className="text-sm font-medium leading-none">{t('products.form.thumbnail')}</span>
                                 <Input
+                                    ref={thumbnailInputRef}
                                     type="file"
                                     accept="image/*"
                                     onChange={(e) => setThumbnail(e.target.files?.[0] ?? null)}
+                                    className="sr-only"
                                     data-testid="create-product-thumbnail-input"
                                 />
-                                {thumbnail && (
-                                    <p className="text-xs text-muted-foreground truncate">{thumbnail.name}</p>
-                                )}
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                    onClick={() => thumbnailInputRef.current?.click()}
+                                    data-testid="create-product-thumbnail-button"
+                                >
+                                    {t('products.form.chooseImage')}
+                                </Button>
+                                <p className="text-xs text-muted-foreground truncate">
+                                    {thumbnail?.name || t('products.form.noFileSelected')}
+                                </p>
                             </div>
 
                             {/* Sample */}
                             <div className="space-y-1.5">
                                 <span className="text-sm font-medium leading-none">{t('products.form.sample')}</span>
                                 <Input
+                                    ref={sampleInputRef}
                                     type="file"
                                     accept=".pdf,.doc,.docx"
                                     onChange={(e) => setSample(e.target.files?.[0] ?? null)}
+                                    className="sr-only"
                                     data-testid="create-product-sample-input"
                                 />
-                                {sample && (
-                                    <p className="text-xs text-muted-foreground truncate">{sample.name}</p>
-                                )}
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                    onClick={() => sampleInputRef.current?.click()}
+                                    data-testid="create-product-sample-button"
+                                >
+                                    {t('products.form.chooseSampleFile')}
+                                </Button>
+                                <p className="text-xs text-muted-foreground truncate">
+                                    {sample?.name || t('products.form.noFileSelected')}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -700,7 +726,7 @@ export default function CreateProductPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium leading-none">{t('products.quickCoupon.type')}</label>
-                                        <Select value={quickCouponType} onValueChange={setQuickCouponType}>
+                                        <Select dir={i18n.dir()} value={quickCouponType} onValueChange={setQuickCouponType}>
                                             <SelectTrigger data-testid="create-product-quick-coupon-type-select">
                                                 <SelectValue />
                                             </SelectTrigger>

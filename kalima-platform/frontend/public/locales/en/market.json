@@ -133,5 +133,12 @@
     "noSamples": "No samples found.",
     "view": "Preview",
     "download": "Download"
+  },
+  "samplePage": {
+    "notFound": "Sample not found",
+    "backToMarket": "Back to market",
+    "download": "Download",
+    "previewUnavailable": "Preview not available for this file type.",
+    "downloadFile": "Download file"
   }
 }

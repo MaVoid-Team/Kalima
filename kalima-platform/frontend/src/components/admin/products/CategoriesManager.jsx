@@ -17,7 +17,7 @@ import { useCategories } from '@/hooks/useCategories';
  * Uses only the data provided by useCategories — no nested trees beyond 2 levels.
  */
 export default function CategoriesManager({ product, onAttach, onDetach, loading }) {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
     const { categories: roots, childCategories, fetchChildCategories } = useCategories();
 
     const [selectedRootId, setSelectedRootId] = useState('');
@@ -89,6 +89,7 @@ export default function CategoriesManager({ product, onAttach, onDetach, loading
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                 {/* Root category select */}
                 <Select
+                    dir={i18n.dir()}
                     value={selectedRootId}
                     onValueChange={handleRootChange}
                     disabled={loading || availableRoots.length === 0}
@@ -114,6 +115,7 @@ export default function CategoriesManager({ product, onAttach, onDetach, loading
                         </div>
                     ) : hasChildren ? (
                         <Select
+                            dir={i18n.dir()}
                             value={selectedChildId}
                             onValueChange={setSelectedChildId}
                             disabled={loading || availableChildren.length === 0}

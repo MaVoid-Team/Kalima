@@ -7,7 +7,7 @@ import { ROLES, PORTALS } from '@/lib/adminConstants';
 import debounce from 'lodash/debounce';
 
 export default function UserFilters({ filters, onSearchChange, onRoleChange, onPortalChange }) {
-    const { t } = useTranslation('userManagement');
+    const { t, i18n } = useTranslation('userManagement');
     const [searchValue, setSearchValue] = useState(filters.search || '');
 
     // Debounce search to avoid spamming the API
@@ -43,7 +43,7 @@ export default function UserFilters({ filters, onSearchChange, onRoleChange, onP
             </div>
 
             <div className="flex gap-4">
-                <Select value={filters.role || 'all'} onValueChange={onRoleChange}>
+                <Select dir={i18n.dir()} value={filters.role || 'all'} onValueChange={onRoleChange}>
                     <SelectTrigger className="w-[160px]">
                         <SelectValue placeholder={t('filters.allRoles')} />
                     </SelectTrigger>
@@ -57,7 +57,7 @@ export default function UserFilters({ filters, onSearchChange, onRoleChange, onP
                     </SelectContent>
                 </Select>
 
-                <Select value={filters.portal || 'all'} onValueChange={onPortalChange}>
+                <Select dir={i18n.dir()} value={filters.portal || 'all'} onValueChange={onPortalChange}>
                     <SelectTrigger className="w-[160px]">
                         <SelectValue placeholder={t('filters.allPortals')} />
                     </SelectTrigger>

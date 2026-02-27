@@ -13,7 +13,7 @@ export default function SampleViewerDialog({ open, onOpenChange, sampleUrl, samp
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
-                className="max-w-5xl h-[85vh] flex flex-col p-0 gap-0"
+                className="max-w-5xl h-[85vh] flex flex-col p-0 gap-0  custom-scrollbar"
                 data-testid="sample-viewer-dialog"
             >
                 <DialogHeader className="px-4 pt-4 pb-2 shrink-0">

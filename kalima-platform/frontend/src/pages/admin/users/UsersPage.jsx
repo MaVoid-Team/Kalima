@@ -28,7 +28,7 @@ import CreateUserDialog from '@/components/admin/users/CreateUserDialog';
 import UserStatsCards from '@/components/admin/users/UserStatsCards';
 
 export default function UsersPage() {
-    const { t } = useTranslation('userManagement');
+    const { t, i18n } = useTranslation('userManagement');
 
     const {
         users,
@@ -91,7 +91,7 @@ export default function UsersPage() {
                     </p>
 
                     {/* Export dropdown */}
-                    <DropdownMenu>
+                    <DropdownMenu dir={i18n.dir()}>
                         <DropdownMenuTrigger asChild>
                             <Button disabled={exportLoading} variant="outline" data-testid="users-export-button">
                                 <Download className="me-2 h-4 w-4" />

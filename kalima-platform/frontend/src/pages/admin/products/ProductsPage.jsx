@@ -30,7 +30,7 @@ import EditProductDialog from '@/components/admin/products/EditProductDialog';
 import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
 
 export default function ProductsPage() {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
 
     const {
         products,
@@ -129,7 +129,7 @@ export default function ProductsPage() {
                     </p>
 
                     {/* Export dropdown */}
-                    <DropdownMenu>
+                    <DropdownMenu dir={i18n.dir()}>
                         <DropdownMenuTrigger asChild>
                             <Button disabled={exportLoading} variant="outline" data-testid="products-export-button">
                                 <Download className="me-2 h-4 w-4" />

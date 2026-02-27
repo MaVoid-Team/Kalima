@@ -136,7 +136,7 @@ export default function ProductDetailPage() {
             {/* Breadcrumb / Back */}
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Link to="/admin/products" className="hover:text-foreground transition-colors flex items-center gap-1" data-testid="product-detail-back-link">
-                    {isRtl ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                    <ChevronLeft className="h-4 w-4" />
                     {t('products.backToProducts')}
                 </Link>
             </div>

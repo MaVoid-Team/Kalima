@@ -125,7 +125,7 @@ export default function SampleManager({ product }) {
                     asChild
                     data-testid="sample-manager-page-link-button"
                 >
-                    <Link to={`/samples/${sample.id}`}>
+                    <Link to={`/samples/${sample.id}`} state={{ cameFromAdmin: false }}>
                         <ExternalLink className="me-2 h-4 w-4" />
                         {t('products.detail.openSamplePage')}
                     </Link>

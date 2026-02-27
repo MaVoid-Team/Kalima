@@ -80,7 +80,7 @@ export default function AdminSamplesPage() {
                     )}
 
                     {/* Export dropdown */}
-                    <DropdownMenu>
+                    <DropdownMenu dir={i18n.dir()}>
                         <DropdownMenuTrigger asChild>
                             <Button disabled={exportLoading} variant="outline" data-testid="samples-export-button">
                                 <Download className="me-2 h-4 w-4" />
@@ -206,8 +206,8 @@ export default function AdminSamplesPage() {
                                                 asChild
                                                 data-testid={`admin-samples-view-button-${sample.id}`}
                                             >
-                                                <Link to={`/samples/${sample.id}`}>
-                                                    {isRtl ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                                <Link to={`/samples/${sample.id}`} state={{ cameFromAdmin: true }}>
+                                                    <ChevronRight className="h-4 w-4" />
                                                     <ExternalLink className="h-4 w-4" />
                                                 </Link>
                                             </Button>

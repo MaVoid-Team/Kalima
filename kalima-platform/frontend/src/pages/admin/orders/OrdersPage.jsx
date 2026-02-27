@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function OrdersPage() {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
     const {
         orders,
         pagination,
@@ -91,7 +91,7 @@ export default function OrdersPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <DropdownMenu>
+                    <DropdownMenu dir={i18n.dir()}>
                         <DropdownMenuTrigger asChild>
                             <Button disabled={exportLoading} variant="outline" data-testid="orders-export-button">
                                 <Download className="mr-2 h-4 w-4" />

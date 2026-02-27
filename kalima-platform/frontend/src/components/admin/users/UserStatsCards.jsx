@@ -6,7 +6,7 @@ import { Users, UserCheck, GraduationCap, Shield } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function UserStatsCards() {
-    const { t } = useTranslation('userManagement');
+    const { t, i18n } = useTranslation('userManagement');
     const { userStats, loading, fetchUserStats } = useAnalytics();
 
     useEffect(() => {
@@ -55,7 +55,7 @@ export default function UserStatsCards() {
             color: "text-chart-2"
         },
         {
-            title: t('stats.administrators', 'Administrators'),
+            title: t('stats.admins', 'Administrators'),
             value: adminCount,
             icon: Shield,
             color: "text-chart-4"
@@ -70,7 +70,7 @@ export default function UserStatsCards() {
                         <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">
                             {stat.title}
                         </CardTitle>
-                        <stat.icon className={`h-4 w-4 shrink-0 ${stat.color}`} />
+                        <stat.icon className={`h-4 w-4 shrink-0 ${stat.color} ${i18n.language === 'ar' && 'scale-x-[-1]'}`} />
                     </CardHeader>
                     <CardContent>
                         <div className="text-lg sm:text-xl lg:text-2xl font-bold truncate" title={stat.value}>

@@ -78,16 +78,16 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
                         <DialogHeader>
                             <DialogTitle>{t('actions.addRole')}</DialogTitle>
                             <DialogDescription>
-                                Assign a new role to this user for a specific portal.
+                                {t('actions.addRoleDescription')}
                             </DialogDescription>
                         </DialogHeader>
 
                         <div className="grid gap-4 py-4">
                             <div className="grid gap-2">
                                 <label className="text-sm font-medium">{t('details.portal')}</label>
-                                <Select value={newPortal} onValueChange={setNewPortal}>
+                                <Select dir={i18n.dir()} value={newPortal} onValueChange={setNewPortal}>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select portal..." />
+                                        <SelectValue placeholder={t('details.portalPlaceholder')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {PORTALS.map(portal => (
@@ -101,9 +101,9 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
 
                             <div className="grid gap-2">
                                 <label className="text-sm font-medium">{t('details.role')}</label>
-                                <Select value={newRole} onValueChange={setNewRole}>
+                                <Select dir={i18n.dir()} value={newRole} onValueChange={setNewRole}>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select role..." />
+                                        <SelectValue placeholder={t('details.rolePlaceholder')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {ROLES.map(role => (
@@ -118,7 +118,7 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
 
                         <DialogFooter>
                             <Button variant="outline" onClick={() => setIsAddOpen(false)} disabled={actionLoading} data-testid="admin-users-roles-add-cancel">
-                                {t('common:cancel')}
+                                {t('actions.close')}
                             </Button>
                             <Button
                                 onClick={handleAddSubmit}
@@ -126,7 +126,7 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
                                 className="min-w-[100px]"
                                 data-testid="admin-users-roles-add-submit"
                             >
-                                {actionLoading ? <LoadingSpinner className="h-4 w-4" /> : t('common:confirm')}
+                                {actionLoading ? <LoadingSpinner className="h-4 w-4" /> : t('actions.confirm')}
                             </Button>
                         </DialogFooter>
                     </DialogContent>
@@ -189,7 +189,7 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={actionLoading} data-testid="admin-users-roles-revoke-cancel">{t('common:cancel')}</AlertDialogCancel>
+                        <AlertDialogCancel disabled={actionLoading} data-testid="admin-users-roles-revoke-cancel">{t('actions.close')}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault();

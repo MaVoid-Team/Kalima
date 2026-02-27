@@ -137,7 +137,8 @@
             "deleteItemWarning": "Are you sure you want to remove this item from the order?",
             "deleteOrderSuccess": "Order deleted successfully",
             "deleteItemSuccess": "Item removed successfully",
-            "noteSaved": "Admin note saved successfully"
+            "noteSaved": "Admin note saved successfully",
+            "noOrdersFound": "No orders found."
         },
         "details": {
             "title": "Order details",
@@ -174,6 +175,7 @@
         "noProductsDescription": "No products match your current filters.",
         "createProduct": "Create Product",
         "backToProducts": "Back to Products",
+        "backToProduct": "Back to Product",
         "filters": {
             "allCategories": "All Categories",
             "allStatuses": "All Statuses",
@@ -219,6 +221,9 @@
             "couponIdPlaceholder": "Coupon ID (optional)",
             "thumbnail": "Thumbnail Image",
             "sample": "Sample File (PDF)",
+            "chooseImage": "Choose image",
+            "chooseSampleFile": "Choose sample file",
+            "noFileSelected": "No file selected",
             "categories": "Categories",
             "isArchived": "Archived",
             "perks": "Perks (Features)",
@@ -340,7 +345,8 @@
             },
             "date": {
                 "start": "Start date",
-                "end": "End date"
+                "end": "End date",
+                "range": "Filter by date range"
             }
         },
         "discountType": {

@@ -37,7 +37,7 @@ import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
 import { useRole } from '@/hooks/useRole';
 
 export default function CreateUserDialog({ onSuccess }) {
-    const { t } = useTranslation('userManagement');
+    const { t, i18n } = useTranslation('userManagement');
     const { isAdmin } = useRole();
     const {
         createAdminUser,
@@ -108,11 +108,11 @@ export default function CreateUserDialog({ onSuccess }) {
                     {t('actions.create')}
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] overflow-y-auto max-h-[90vh]">
+            <DialogContent className="sm:max-w-[500px] overflow-y-auto max-h-[90vh] custom-scrollbar">
                 <DialogHeader>
                     <DialogTitle>{t('createDialog.title')}</DialogTitle>
                     <DialogDescription>
-                        Create a new user with administrative privileges.
+                        {t('createDialog.description')}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -124,7 +124,7 @@ export default function CreateUserDialog({ onSuccess }) {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{t('createDialog.type')}</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select dir={i18n.dir()} onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select type" />
@@ -218,7 +218,7 @@ export default function CreateUserDialog({ onSuccess }) {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{t('createDialog.gender')}</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select dir={i18n.dir()} onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select gender" />
@@ -237,7 +237,7 @@ export default function CreateUserDialog({ onSuccess }) {
 
                         <DialogFooter className="pt-4">
                             <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={actionLoading} data-testid="admin-users-create-cancel-button">
-                                {t('common:cancel')}
+                                {t('actions.close')}
                             </Button>
                             <Button
                                 type="submit"
@@ -245,7 +245,7 @@ export default function CreateUserDialog({ onSuccess }) {
                                 className="min-w-[100px]"
                                 data-testid="admin-users-create-submit-button"
                             >
-                                {actionLoading ? <LoadingSpinner className="h-4 w-4" /> : t('common:confirm')}
+                                {actionLoading ? <LoadingSpinner className="h-4 w-4" /> : t('actions.confirm')}
                             </Button>
                         </DialogFooter>
                     </form>

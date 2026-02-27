@@ -11,7 +11,7 @@ import {
 import { useCategories } from '@/hooks/useCategories';
 
 export default function ProductFilters({ filters, onSearchChange, onCategoryChange, onArchivedChange }) {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
     const { categories, loading: categoriesLoading } = useCategories();
 
     return (
@@ -33,6 +33,7 @@ export default function ProductFilters({ filters, onSearchChange, onCategoryChan
                 value={filters.category_id?.toString() ?? 'all'}
                 onValueChange={(val) => onCategoryChange(val === 'all' ? null : Number(val))}
                 disabled={categoriesLoading}
+                dir={i18n.dir()}
             >
                 <SelectTrigger className="w-full sm:w-48" data-testid="products-filter-category">
                     <SelectValue placeholder={t('products.filters.allCategories')} />
@@ -54,6 +55,7 @@ export default function ProductFilters({ filters, onSearchChange, onCategoryChan
                     if (val === 'all') onArchivedChange(null);
                     else onArchivedChange(val === 'true');
                 }}
+                dir={i18n.dir()}
             >
                 <SelectTrigger className="w-full sm:w-44" data-testid="products-filter-status">
                     <SelectValue placeholder={t('products.filters.allStatuses')} />

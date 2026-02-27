@@ -104,7 +104,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
           {(sampleId || sampleUrl) && (
             <Button variant="outline" className="w-full h-10" size="sm" asChild data-testid="product-actions-mobile-view-sample-button">
               {sampleId ? (
-                <Link to={`/samples/${sampleId}`}>
+                <Link to={`/samples/${sampleId}`} state={{ cameFromAdmin: false }}>
                   <Eye className="h-4 w-4" />
                   <span className="ms-2">{t("actions.viewSample")}</span>
                 </Link>
@@ -184,7 +184,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
               data-testid="product-actions-desktop-view-sample-button"
             >
               {sampleId ? (
-                <Link to={`/samples/${sampleId}`}>
+                <Link to={`/samples/${sampleId}`} state={{ cameFromAdmin: false }}>
                   {t("actions.viewSample")}
                 </Link>
               ) : (
