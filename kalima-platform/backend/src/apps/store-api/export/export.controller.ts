@@ -7,6 +7,8 @@
  * Query params accepted:
  *   format  – "csv" | "xlsx" (required)
  *   ids     – comma-separated integers (optional, for selected rows)
+ *   *       – any other query params are forwarded as dynamic filters
+ *            (each resource defines which filters it supports)
  */
 
 import { Request, Response, NextFunction } from "express";
@@ -31,6 +33,43 @@ function parseIds(raw: unknown): number[] | undefined {
 }
 
 /**
+ * Extracts all query params except `format` and `ids` as dynamic filters.
+ * Auto-coerces booleans and numbers so fetchers get typed values.
+ */
+function parseQueryFilters(
+  query: Record<string, unknown>,
+): Record<string, unknown> {
+  const reserved = new Set(["format", "ids"]);
+  const filters: Record<string, unknown> = {};
+
+  for (const [key, raw] of Object.entries(query)) {
+    if (reserved.has(key) || raw === undefined || raw === "") continue;
+    const val = String(raw);
+
+    // booleans
+    if (val === "true") {
+      filters[key] = true;
+      continue;
+    }
+    if (val === "false") {
+      filters[key] = false;
+      continue;
+    }
+
+    // numbers (integers and decimals)
+    if (/^\d+(\.\d+)?$/.test(val)) {
+      filters[key] = Number(val);
+      continue;
+    }
+
+    // everything else stays a string (dates, search text, status, etc.)
+    filters[key] = val;
+  }
+
+  return filters;
+}
+
+/**
  * Returns an Express handler that exports the given resource.
  */
 export function makeExportHandler(resourceName: string) {
@@ -44,11 +83,13 @@ export function makeExportHandler(resourceName: string) {
       }
 
       const ids = parseIds(req.query.ids);
+      const filters = parseQueryFilters(req.query as Record<string, unknown>);
 
       const result = await exportResource(
         resourceName,
         format as ExportFormat,
         ids,
+        filters,
       );
 
       res.setHeader("Content-Type", result.contentType);
