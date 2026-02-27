@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import useAdminCategories from "@/hooks/api/useAdminCategories";
+import useAdminCategories from "@/hooks/admin/useAdminCategories";
 
 export default function useCategoriesPage() {
   const {
