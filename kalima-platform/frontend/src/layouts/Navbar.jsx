@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Globe, Search, ShoppingCart } from "lucide-react";
+import { Menu, X, Globe, Search, ShoppingCart, FileText } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -123,13 +123,17 @@ export default function Navbar() {
                 </kbd>
               </Button> */}
               {/* Market Button */}
-              {!isAdmin && <Button
+              <Button
                 variant="default"
                 onClick={() => navigate("/market")}
               >
                 <ShoppingCart className="mr-2 h-4 w-4" />
                 {t("navbar.market")}
-              </Button>}
+              </Button>
+              <Button variant='default' onClick={() => navigate("/samples")}>
+                <FileText className="mr-2 h-4 w-4"></FileText>
+                {t("navbar.samples")}
+              </Button>
               {/* Language Toggle */}
               <Button
                 variant="ghost"
