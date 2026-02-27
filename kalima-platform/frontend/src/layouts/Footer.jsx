@@ -1,14 +1,12 @@
-import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logo from "../assets/Logo.png";
 
 const SOCIAL_LINKS = [
-  { Icon: Facebook, href: "#", label: "Facebook" },
-  { Icon: Twitter, href: "#", label: "Twitter" },
-  { Icon: Instagram, href: "#", label: "Instagram" },
-  { Icon: Linkedin, href: "#", label: "LinkedIn" },
+  { Icon: Facebook, href: "https://www.facebook.com/kalima010", label: "Facebook" },
+  { Icon: Youtube, href: "https://www.youtube.com/@kalima1", label: "Youtube" },
 ];
 
 export default function Footer() {
@@ -18,24 +16,8 @@ export default function Footer() {
     {
       title: t("footer.platform"),
       links: [
-        { label: t("footer.browseCourses"), href: "/courses" },
-        { label: t("footer.teachers"), href: "/teachers" },
-        { label: t("footer.pricing"), href: "/pricing" },
-      ],
-    },
-    {
-      title: t("footer.company"),
-      links: [
-        { label: t("footer.aboutUs"), href: "/about" },
-        { label: t("footer.contact"), href: "/contact" },
-        { label: t("footer.careers"), href: "/careers" },
-      ],
-    },
-    {
-      title: t("footer.legal"),
-      links: [
-        { label: t("footer.privacyPolicy"), href: "/privacy" },
-        { label: t("footer.termsOfService"), href: "/terms" },
+        { label: t("footer.market"), href: "/market" },
+        { label: t("footer.samples"), href: "/samples" },
       ],
     },
   ];
@@ -43,7 +25,7 @@ export default function Footer() {
   return (
     <footer className="bg-background border-t text-muted-foreground py-8 md:py-12">
       <div className="container px-6 md:px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8 text-left">
+        <div className="flex flex-row justify-between items-center">
           {/* Brand */}
           <div className="space-y-4 flex flex-col items-start">
             <div className="flex items-center gap-2 text-foreground">
@@ -53,7 +35,7 @@ export default function Footer() {
                 className="h-8 w-auto object-contain"
               />
             </div>
-            <p className="text-sm text-muted-foreground/80 max-w-xs text-start">
+            <p className="text-sm text-muted-foreground/80 max-w-xs text-start mb-4">
               {t("footer.description")}
             </p>
           </div>
