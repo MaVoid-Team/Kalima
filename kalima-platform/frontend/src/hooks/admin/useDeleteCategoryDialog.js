@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import useAdminCategories from "@/hooks/api/useAdminCategories";
 
 export default function useDeleteCategoryDialog({
   category,
