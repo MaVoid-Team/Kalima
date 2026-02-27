@@ -94,7 +94,11 @@ export default function EditProductDialog({
         apiLoading: couponLoading,
     } = useAdminCoupons();
 
-    const { categories: roots, childCategories, fetchChildCategories } = useCategories();
+    const {
+        categories: roots = [],
+        childCategories = {},
+        fetchChildCategories = async () => [],
+    } = useCategories();
 
     const fieldDefinitions = externalFieldDefs ?? internalFieldDefs;
     const loadDefinitions = onLoadDefinitions ?? fetchFieldDefinitions;
