@@ -73,7 +73,11 @@ export default function EditProductPage() {
         fieldDefinitions,
     } = useAdminProducts();
 
-    const { categories: roots, childCategories, fetchChildCategories } = useCategories();
+    const {
+        categories: roots = [],
+        childCategories = {},
+        fetchChildCategories = async () => [],
+    } = useCategories();
 
     const [selectedFieldDefId, setSelectedFieldDefId] = useState('');
 

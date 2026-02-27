@@ -81,7 +81,11 @@ export default function CreateProductPage() {
         apiLoading: couponLoading,
     } = useAdminCoupons();
 
-    const { categories: roots, childCategories, fetchChildCategories } = useCategories();
+    const {
+        categories: roots = [],
+        childCategories = {},
+        fetchChildCategories = async () => [],
+    } = useCategories();
 
     const [thumbnail, setThumbnail] = useState(null);
     const [sample, setSample] = useState(null);
@@ -254,6 +258,8 @@ export default function CreateProductPage() {
         if (values.coupon_id) formData.append('coupon_id', values.coupon_id);
         if (values.perks) formData.append('perks', values.perks);
         if (pickedCategory) {
+            // Keep backward compatibility (category_ids) and support new API contract (category_id)
+            formData.append('category_id', String(pickedCategory.id));
             formData.append('category_ids', JSON.stringify([pickedCategory.id]));
         }
         if (thumbnail) formData.append('thumbnail', thumbnail);
