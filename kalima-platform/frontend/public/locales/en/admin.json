@@ -1,466 +1,521 @@
 {
-    "dashboardTitle": "Admin Dashboard",
-    "nav": {
-        "orders": "Orders",
-        "products": "Products",
-        "samples": "Samples",
-        "coupons": "Coupons",
-        "themeToggle": "Toggle Theme",
-        "darkMode": "Dark Mode",
-        "lightMode": "Light Mode",
-        "backToStore": "Back to Store",
-        "logout": "Logout"
+  "dashboardTitle": "Admin Dashboard",
+  "nav": {
+    "orders": "Orders",
+    "products": "Products",
+    "samples": "Samples",
+    "coupons": "Coupons",
+    "themeToggle": "Toggle Theme",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "backToStore": "Back to Store",
+    "logout": "Logout",
+    "categories": "Categories"
+  },
+  "common": {
+    "currencyEGP": "EGP",
+    "na": "N/A",
+    "admin": "Admin",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "orders": {
+    "stats": {
+      "totalPurchases": "Total Purchases",
+      "totalRevenue": "Total Revenue",
+      "averagePrice": "Average Price",
+      "confirmedPurchases": "Confirmed Purchases",
+      "confirmedRevenue": "Confirmed Revenue",
+      "pendingPurchases": "Pending Purchases"
     },
-    "common": {
-        "currencyEGP": "EGP",
-        "na": "N/A",
-        "admin": "Admin",
-        "loading": "Loading...",
-        "cancel": "Cancel",
-        "confirm": "Confirm",
-        "pagination": {
-            "previous": "Previous",
-            "next": "Next"
-        }
+    "statsToday": {
+      "totalPurchases": "Total Purchases Today",
+      "totalRevenue": "Total Revenue Today",
+      "averagePrice": "Average price Today",
+      "confirmedPurchases": "Confirmed Purchases Today",
+      "confirmedRevenue": "Confirmed Revenue Today",
+      "pendingPurchases": "Pending Purchases Today"
     },
-    "orders": {
-        "stats": {
-            "totalPurchases": "Total Purchases",
-            "totalRevenue": "Total Revenue",
-            "averagePrice": "Average Price",
-            "confirmedPurchases": "Confirmed Purchases",
-            "confirmedRevenue": "Confirmed Revenue",
-            "pendingPurchases": "Pending Purchases"
-        },
-        "statsToday": {
-            "totalPurchases": "Total Purchases Today",
-            "totalRevenue": "Total Revenue Today",
-            "averagePrice": "Average price Today",
-            "confirmedPurchases": "Confirmed Purchases Today",
-            "confirmedRevenue": "Confirmed Revenue Today",
-            "pendingPurchases": "Pending Purchases Today"
-        },
-        "status": {
-            "label": "Status",
-            "all": "All Orders",
-            "pending": "Pending",
-            "received": "Received",
-            "confirmed": "Confirmed",
-            "returned": "Returned",
-            "created": "Created"
-        },
-        "total": "Total",
-        "subtotal": "Subtotal",
-        "discount": "Discount",
-        "createdAt": "Created at",
-        "itemPrice": "Item price",
-        "requiredFields": "Required fields",
-        "field": "Field",
-        "unknownProduct": "Unknown Product",
-        "sections": {
-            "summary": "Summary",
-            "customer": "Customer",
-            "payment": "Payment",
-            "notes": "Notes"
-        },
-        "customer": {
-            "name": "Name",
-            "email": "Email",
-            "phone": "Phone"
-        },
-        "payment": {
-            "method": "Method",
-            "methodPhone": "Payment phone",
-            "transferredFrom": "Transferred from",
-            "targetNumber": "Target number",
-            "screenshot": "Payment screenshot"
-        },
-        "notes": {
-            "customer": "Customer notes",
-            "admin": "Admin notes"
-        },
-        "title": "Orders Management",
-        "myOrders": "My Orders",
-        "subtitle": "Track, manage, and view your order history",
-        "noOrders": "No orders found",
-        "noOrdersForStatus": "You have no orders with this status.",
-        "noOrdersDescription": "Looks like you haven't placed any orders yet.",
-        "totalOrders": "{{count}} orders",
-        "searchPlaceholder": "Search by serial, name, email...",
-        "export": "Export",
-        "exportCsv": "Export as CSV",
-        "exportXlsx": "Export as Excel",
-        "statusAll": "All Statuses",
-        "statusPending": "Pending",
-        "statusReceived": "Received",
-        "statusConfirmed": "Confirmed",
-        "statusReturned": "Returned",
-        "statusCreated": "Created",
-        "clearFilters": "Clear",
-        "filterByDate": "Filter by date",
-        "table": {
-            "serial": "Serial",
-            "customer": "Customer",
-            "status": "Status",
-            "total": "Total",
-            "payment": "Payment Method",
-            "actions": "Actions"
-        },
-        "items": {
-            "items": "Items",
-            "empty": "No items",
-            "product": "Product",
-            "type": "Type",
-            "price": "Price",
-            "discount": "Discount",
-            "actions": "Actions",
-            "unknownProduct": "Unknown Product"
-        },
-        "actions": {
-            "view": "View Details",
-            "viewDetails": "View details",
-            "receive": "Mark Received",
-            "confirm": "Confirm Order",
-            "return": "Return Order",
-            "delete": "Delete Order",
-            "deleteItem": "Remove Item",
-            "whatsapp": "Contact WhatsApp",
-            "collapseItems": "Collapse",
-            "expandItems": "Expand"
-        },
-        "messages": {
-            "receiveSuccess": "Order marked as received",
-            "confirmSuccess": "Order marked as confirmed",
-            "returnSuccess": "Order marked as returned",
-            "saveNoteSuccess": "Admin note saved successfully",
-            "deleteOrderWarning": "Are you sure you want to delete this order? This action cannot be undone.",
-            "deleteItemWarning": "Are you sure you want to remove this item from the order?",
-            "deleteOrderSuccess": "Order deleted successfully",
-            "deleteItemSuccess": "Item removed successfully",
-            "noteSaved": "Admin note saved successfully",
+    "status": {
+      "label": "Status",
+      "all": "All Orders",
+      "pending": "Pending",
+      "received": "Received",
+      "confirmed": "Confirmed",
+      "returned": "Returned",
+      "created": "Created"
+    },
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "createdAt": "Created at",
+    "itemPrice": "Item price",
+    "requiredFields": "Required fields",
+    "field": "Field",
+    "unknownProduct": "Unknown Product",
+    "sections": {
+      "summary": "Summary",
+      "customer": "Customer",
+      "payment": "Payment",
+      "notes": "Notes"
+    },
+    "customer": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "payment": {
+      "method": "Method",
+      "methodPhone": "Payment phone",
+      "transferredFrom": "Transferred from",
+      "targetNumber": "Target number",
+      "screenshot": "Payment screenshot"
+    },
+    "notes": {
+      "customer": "Customer notes",
+      "admin": "Admin notes"
+    },
+    "title": "Orders Management",
+    "myOrders": "My Orders",
+    "subtitle": "Track, manage, and view your order history",
+    "noOrders": "No orders found",
+    "noOrdersForStatus": "You have no orders with this status.",
+    "noOrdersDescription": "Looks like you haven't placed any orders yet.",
+    "totalOrders": "{{count}} orders",
+    "searchPlaceholder": "Search by serial, name, email...",
+    "export": "Export",
+    "exportCsv": "Export as CSV",
+    "exportXlsx": "Export as Excel",
+    "statusAll": "All Statuses",
+    "statusPending": "Pending",
+    "statusReceived": "Received",
+    "statusConfirmed": "Confirmed",
+    "statusReturned": "Returned",
+    "statusCreated": "Created",
+    "clearFilters": "Clear",
+    "filterByDate": "Filter by date",
+    "table": {
+      "serial": "Serial",
+      "customer": "Customer",
+      "status": "Status",
+      "total": "Total",
+      "payment": "Payment Method",
+      "actions": "Actions"
+    },
+    "items": {
+      "items": "Items",
+      "empty": "No items",
+      "product": "Product",
+      "type": "Type",
+      "price": "Price",
+      "discount": "Discount",
+      "actions": "Actions",
+      "unknownProduct": "Unknown Product"
+    },
+    "actions": {
+      "view": "View Details",
+      "viewDetails": "View details",
+      "receive": "Mark Received",
+      "confirm": "Confirm Order",
+      "return": "Return Order",
+      "delete": "Delete Order",
+      "deleteItem": "Remove Item",
+      "whatsapp": "Contact WhatsApp",
+      "collapseItems": "Collapse",
+      "expandItems": "Expand"
+    },
+    "messages": {
+      "receiveSuccess": "Order marked as received",
+      "confirmSuccess": "Order marked as confirmed",
+      "returnSuccess": "Order marked as returned",
+      "saveNoteSuccess": "Admin note saved successfully",
+      "deleteOrderWarning": "Are you sure you want to delete this order? This action cannot be undone.",
+      "deleteItemWarning": "Are you sure you want to remove this item from the order?",
+      "deleteOrderSuccess": "Order deleted successfully",
+      "deleteItemSuccess": "Item removed successfully",
+      "noteSaved": "Admin note saved successfully",
             "noOrdersFound": "No orders found."
-        },
-        "details": {
-            "title": "Order details",
-            "backToOrders": "Back to Orders",
-            "customerInfo": "Customer Info",
-            "customerNotes": "Customer Notes",
-            "orderSummary": "Order Summary",
-            "paymentInfo": "Payment Info",
-            "statusTimeline": "Status Timeline",
-            "orderItems": "Order Items",
-            "adminNotes": "Admin Notes",
-            "couponInfo": "Applied Coupon",
-            "dateCreated": "Date Created",
-            "itemsCount": "Items Count",
-            "subtotal": "Subtotal",
-            "discount": "Discount",
-            "method": "Payment Method",
-            "transferFrom": "Transferred From",
-            "paymentNumber": "Payment Number",
-            "screenshot": "Payment Screenshot",
-            "saveNote": "Save Note",
-            "total": "Total",
-            "by": "by",
-            "lastNoteBy": "Last note by: {{name}}",
-            "contactWhatsApp": "Contact on WhatsApp"
-        }
     },
-    "products": {
-        "title": "Products Management",
-        "subtitle": "Manage your store products, media, and settings",
-        "totalProducts": "{{count}} products",
-        "searchPlaceholder": "Search by title, description, serial...",
-        "noProducts": "No products found",
-        "noProductsDescription": "No products match your current filters.",
-        "createProduct": "Create Product",
-        "backToProducts": "Back to Products",
+    "details": {
+      "title": "Order details",
+      "backToOrders": "Back to Orders",
+      "customerInfo": "Customer Info",
+      "customerNotes": "Customer Notes",
+      "orderSummary": "Order Summary",
+      "paymentInfo": "Payment Info",
+      "statusTimeline": "Status Timeline",
+      "orderItems": "Order Items",
+      "adminNotes": "Admin Notes",
+      "couponInfo": "Applied Coupon",
+      "dateCreated": "Date Created",
+      "itemsCount": "Items Count",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "method": "Payment Method",
+      "transferFrom": "Transferred From",
+      "paymentNumber": "Payment Number",
+      "screenshot": "Payment Screenshot",
+      "saveNote": "Save Note",
+      "total": "Total",
+      "by": "by",
+      "lastNoteBy": "Last note by: {{name}}",
+      "contactWhatsApp": "Contact on WhatsApp"
+    }
+  },
+  "products": {
+    "title": "Products Management",
+    "subtitle": "Manage your store products, media, and settings",
+    "totalProducts": "{{count}} products",
+    "searchPlaceholder": "Search by title, description, serial...",
+    "noProducts": "No products found",
+    "noProductsDescription": "No products match your current filters.",
+    "createProduct": "Create Product",
+    "backToProducts": "Back to Products",
         "backToProduct": "Back to Product",
-        "filters": {
-            "allCategories": "All Categories",
-            "allStatuses": "All Statuses",
-            "active": "Active",
-            "archived": "Archived",
-            "archivedToggle": "Show Archived"
-        },
-        "table": {
-            "thumbnail": "Image",
-            "title": "Title",
-            "type": "Type",
-            "price": "Price",
-            "categories": "Categories",
-            "status": "Status",
-            "actions": "Actions"
-        },
-        "status": {
-            "active": "Active",
-            "archived": "Archived"
-        },
-        "type": {
-            "Book": "Book",
-            "Product": "Product"
-        },
-        "actions": {
-            "view": "View Details",
-            "edit": "Edit Product",
-            "archive": "Archive",
-            "unarchive": "Restore",
-            "delete": "Delete Product"
-        },
-        "form": {
-            "title": "Title",
-            "titlePlaceholder": "Product title",
-            "description": "Description",
-            "descriptionPlaceholder": "Product description (optional)",
-            "type": "Type",
-            "price": "Price (EGP)",
-            "priceAfterDiscount": "Price After Discount (EGP)",
-            "serial": "Serial",
-            "serialPlaceholder": "e.g. ALG-101 (optional)",
-            "couponId": "Coupon ID",
-            "couponIdPlaceholder": "Coupon ID (optional)",
-            "thumbnail": "Thumbnail Image",
-            "sample": "Sample File (PDF)",
+    "filters": {
+      "allCategories": "All Categories",
+      "allStatuses": "All Statuses",
+      "active": "Active",
+      "archived": "Archived",
+      "archivedToggle": "Show Archived"
+    },
+    "table": {
+      "thumbnail": "Image",
+      "title": "Title",
+      "type": "Type",
+      "price": "Price",
+      "categories": "Categories",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "archived": "Archived"
+    },
+    "type": {
+      "Book": "Book",
+      "Product": "Product"
+    },
+    "actions": {
+      "view": "View Details",
+      "edit": "Edit Product",
+      "archive": "Archive",
+      "unarchive": "Restore",
+      "delete": "Delete Product"
+    },
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Product title",
+      "description": "Description",
+      "descriptionPlaceholder": "Product description (optional)",
+      "type": "Type",
+      "price": "Price (EGP)",
+      "priceAfterDiscount": "Price After Discount (EGP)",
+      "serial": "Serial",
+      "serialPlaceholder": "e.g. ALG-101 (optional)",
+      "couponId": "Coupon ID",
+      "couponIdPlaceholder": "Coupon ID (optional)",
+      "thumbnail": "Thumbnail Image",
+      "sample": "Sample File (PDF)",
             "chooseImage": "Choose image",
             "chooseSampleFile": "Choose sample file",
             "noFileSelected": "No file selected",
-            "categories": "Categories",
-            "isArchived": "Archived",
-            "perks": "Perks (Features)",
-            "perksPlaceholder": "e.g. Carton Cover, 200 pages, QR code"
-        },
-        "create": {
-            "dialogTitle": "Create New Product",
-            "dialogDescription": "Fill in the product details. You can manage media and fields from the detail page.",
-            "submit": "Create Product",
-            "creating": "Creating..."
-        },
-        "edit": {
-            "dialogTitle": "Edit Product",
-            "dialogDescription": "Update the product details.",
-            "submit": "Save Changes",
-            "saving": "Saving..."
-        },
-        "quickCoupon": {
-            "title": "Quick Coupon",
-            "description": "Create and assign a coupon while saving this product.",
-            "enable": "Create coupon for this product",
-            "code": "Coupon Code",
-            "codePlaceholder": "KLM-XXXXXX",
-            "generate": "Generate",
-            "type": "Discount Type",
-            "percentageValue": "Discount Percentage",
-            "amountValue": "Discount Amount",
-            "validationComplete": "Please complete all quick coupon fields",
-            "validationPositive": "Coupon value must be greater than 0",
-            "validationPercentageMax": "Percentage cannot be greater than 100",
-            "validationAmountExceedsPrice": "Discount amount cannot exceed the product price",
-            "createFailed": "Product saved, but coupon creation failed"
-        },
-        "delete": {
-            "confirm": "Are you sure you want to delete this product? This action cannot be undone.",
-            "confirmTitle": "Delete Product",
-            "success": "Product deleted successfully"
-        },
-        "detail": {
-            "info": "Product Info",
-            "media": "Media",
-            "thumbnail": "Thumbnail",
-            "gallery": "Gallery",
-            "categories": "Categories",
-            "coupons": "Assigned Coupons",
-            "requiredFields": "Required Fields",
-            "noThumbnail": "No thumbnail uploaded",
-            "uploadThumbnail": "Upload Thumbnail",
-            "replaceThumbnail": "Replace Thumbnail",
-            "removeThumbnail": "Remove Thumbnail",
-            "addGalleryImages": "Add Gallery Images",
-            "noGalleryImages": "No gallery images yet",
-            "galleryImageActive": "Active",
-            "galleryImageHidden": "Hidden",
-            "toggleVisibility": "Toggle Visibility",
-            "removeImage": "Remove",
-            "noCategories": "No categories attached",
-            "noCoupons": "No coupons assigned to this product",
-            "attachCategory": "Attach Category",
-            "selectCategory": "Select a category...",
-            "detachCategory": "Remove",
-            "noRequiredFields": "No required fields attached",
-            "attachField": "Attach Field",
-            "selectField": "Select a field...",
-            "detachField": "Remove",
-            "fieldLabel": "Field",
-            "fieldType": "Type",
-            "fieldRequired": "Required",
-            "yes": "Yes",
-            "no": "No",
-            "sample": "Sample File",
-            "noSample": "No sample file uploaded. Samples can be attached when creating a product.",
-            "viewSample": "View Full Screen",
-            "downloadSample": "Download",
-            "sampleFileName": "File",
-            "sampleFileSize": "Size",
-            "sampleFileType": "Type",
-            "openSamplePage": "Open Sample Page"
-        }
+      "categories": "Categories",
+      "isArchived": "Archived",
+      "perks": "Perks (Features)",
+      "perksPlaceholder": "e.g. Carton Cover, 200 pages, QR code"
     },
-    "samples": {
-        "title": "Samples Management",
-        "subtitle": "All product sample files across the store",
-        "count": "samples",
-        "noSamples": "No sample files found.",
-        "table": {
-            "file": "File",
-            "product": "Product",
-            "size": "Size",
-            "type": "Type",
-            "actions": "Actions"
-        }
+    "create": {
+      "dialogTitle": "Create New Product",
+      "dialogDescription": "Fill in the product details. You can manage media and fields from the detail page.",
+      "submit": "Create Product",
+      "creating": "Creating..."
     },
-    "coupons": {
-        "title": "Coupons Management",
-        "subtitle": "Create, edit, and manage product coupons",
-        "totalCoupons": "{{count}} coupons",
-        "searchPlaceholder": "Search by code...",
-        "empty": "No coupons found.",
-        "export": "Export",
-        "exportCsv": "Export as CSV",
-        "exportXlsx": "Export as Excel",
-        "filters": {
-            "active": {
-                "label": "Status",
-                "all": "All statuses",
-                "active": "Active",
-                "inactive": "Inactive"
-            },
-            "product": {
-                "placeholder": "Filter by product",
-                "clear": "Clear"
-            },
-            "type": {
-                "label": "Type",
-                "all": "All types",
-                "percentage": "Percentage",
-                "amount": "Amount"
-            },
-            "date": {
-                "start": "Start date",
-                "end": "End date",
-                "range": "Filter by date range"
-            }
-        },
-        "discountType": {
-            "percentage": "Percentage",
-            "amount": "Amount"
-        },
-        "status": {
-            "active": "Active",
-            "inactive": "Inactive"
-        },
-        "stats": {
-            "totalCoupons": "Total Coupons",
-            "activeCoupons": "Active Coupons",
-            "inactiveCoupons": "Inactive Coupons",
-            "percentageCoupons": "Percentage Coupons",
-            "amountCoupons": "Amount Coupons"
-        },
-        "table": {
-            "code": "Code",
-            "discountType": "Discount Type",
-            "discountValue": "Discount Value",
-            "productId": "Product ID",
-            "dates": "Dates",
-            "createdAt": "Created At",
-            "startsAt": "Starts At",
-            "expiresAt": "Expires At",
-            "status": "Status",
-            "actions": "Actions"
-        },
-        "form": {
-            "code": "Code",
-            "codePlaceholder": "KLM-XXXXXX",
-            "discountType": "Discount Type",
-            "discountPercentage": "Discount Percentage",
-            "discountAmount": "Discount Amount",
-            "units": {
-                "percentage": "%",
-                "amount": "L.E"
-            },
-            "productId": "Product ID",
-            "productIdPlaceholder": "Please click on 'Pick Product' to select a product",
-            "startsAt": "Starts At",
-            "startsAtPlaceholder": "Pick a start date",
-            "expiresAt": "Expires At",
-            "expiresAtPlaceholder": "Pick an expiration date",
-            "optional": "Optional",
-            "isActive": "Coupon Activity Status"
-        },
-        "create": {
-            "title": "Create Coupon",
-            "description": "Fill in coupon details and save."
-        },
-        "edit": {
-            "title": "Edit Coupon",
-            "description": "Update coupon details and status.",
-            "toggleHelp": "Use this toggle to activate or deactivate the coupon."
-        },
-        "productPicker": {
-            "open": "Pick Product",
-            "title": "Select Product",
-            "description": "Search products and select one for this coupon.",
-            "searchPlaceholder": "Search by title or serial...",
-            "empty": "No products found.",
-            "select": "Select",
-            "selected": "Selected",
-            "price": "Price",
-            "priceAfterDiscount": "Price After Discount"
-        },
-        "delete": {
-            "title": "Delete Coupon",
-            "confirm": "Are you sure you want to delete this coupon?",
-            "disclaimer": "Deleted coupons will not appear in the list, but they remain stored in history."
-        },
-        "actions": {
-            "create": "Create Coupon",
-            "save": "Save Changes",
-            "delete": "Delete",
-            "generateCode": "Generate Random Code",
-            "copyCode": "Copy Code",
-            "activate": "Activate",
-            "deactivate": "Deactivate",
-            "viewDetails": "View Details",
-            "edit": "Edit Coupon"
-        },
-        "details": {
-            "title": "Coupon details",
-            "description": "Review coupon information and validity."
-        },
-        "messages": {
-            "codeCopied": "Coupon code copied",
-            "codeCopyFailed": "Failed to copy coupon code"
-        },
-        "validation": {
-            "codeRequired": "Coupon code is required",
-            "codeMinLength": "Coupon code must be at least 6 characters",
-            "codeFormat": "Code must contain only uppercase letters, numbers, and hyphens",
-            "discountTypeRequired": "Discount type is required",
-            "productRequired": "Product ID is required",
-            "startsAtRequired": "Start date is required",
-            "startsAtBeforeExpiresAt": "Start date must be before expiration date",
-            "expiresAtRequired": "Expiration date is required",
-            "expiresAtNotPast": "Expiration date cannot be before today",
-            "discountPercentageRequired": "Percentage value is required",
-            "discountPercentageInvalid": "Percentage must be a valid number",
-            "discountPercentageMax": "Percentage cannot be greater than 100",
-            "discountAmountRequired": "Amount value is required",
-            "discountAmountInvalid": "Amount must be a valid number",
-            "discountAmountExceedsProductPrice": "Discount amount cannot exceed the selected product price",
-            "discountValuePositive": "Value must be greater than 0"
-        },
-        "api": {
-            "createSuccess": "Coupon created successfully!",
-            "updateSuccess": "Coupon updated successfully!",
-            "deleteSuccess": "Coupon deleted successfully!"
-        }
+    "edit": {
+      "dialogTitle": "Edit Product",
+      "dialogDescription": "Update the product details.",
+      "submit": "Save Changes",
+      "saving": "Saving..."
+    },
+    "quickCoupon": {
+      "title": "Quick Coupon",
+      "description": "Create and assign a coupon while saving this product.",
+      "enable": "Create coupon for this product",
+      "code": "Coupon Code",
+      "codePlaceholder": "KLM-XXXXXX",
+      "generate": "Generate",
+      "type": "Discount Type",
+      "percentageValue": "Discount Percentage",
+      "amountValue": "Discount Amount",
+      "validationComplete": "Please complete all quick coupon fields",
+      "validationPositive": "Coupon value must be greater than 0",
+      "validationPercentageMax": "Percentage cannot be greater than 100",
+      "validationAmountExceedsPrice": "Discount amount cannot exceed the product price",
+      "createFailed": "Product saved, but coupon creation failed"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete this product? This action cannot be undone.",
+      "confirmTitle": "Delete Product",
+      "success": "Product deleted successfully"
+    },
+    "detail": {
+      "info": "Product Info",
+      "media": "Media",
+      "thumbnail": "Thumbnail",
+      "gallery": "Gallery",
+      "categories": "Categories",
+      "coupons": "Assigned Coupons",
+      "requiredFields": "Required Fields",
+      "noThumbnail": "No thumbnail uploaded",
+      "uploadThumbnail": "Upload Thumbnail",
+      "replaceThumbnail": "Replace Thumbnail",
+      "removeThumbnail": "Remove Thumbnail",
+      "addGalleryImages": "Add Gallery Images",
+      "noGalleryImages": "No gallery images yet",
+      "galleryImageActive": "Active",
+      "galleryImageHidden": "Hidden",
+      "toggleVisibility": "Toggle Visibility",
+      "removeImage": "Remove",
+      "noCategories": "No categories attached",
+      "noCoupons": "No coupons assigned to this product",
+      "attachCategory": "Attach Category",
+      "selectCategory": "Select a category...",
+      "detachCategory": "Remove",
+      "noRequiredFields": "No required fields attached",
+      "attachField": "Attach Field",
+      "selectField": "Select a field...",
+      "detachField": "Remove",
+      "fieldLabel": "Field",
+      "fieldType": "Type",
+      "fieldRequired": "Required",
+      "yes": "Yes",
+      "no": "No",
+      "sample": "Sample File",
+      "noSample": "No sample file uploaded. Samples can be attached when creating a product.",
+      "viewSample": "View Full Screen",
+      "downloadSample": "Download",
+      "sampleFileName": "File",
+      "sampleFileSize": "Size",
+      "sampleFileType": "Type",
+      "openSamplePage": "Open Sample Page"
     }
+  },
+  "samples": {
+    "title": "Samples Management",
+    "subtitle": "All product sample files across the store",
+    "count": "samples",
+    "noSamples": "No sample files found.",
+    "table": {
+      "file": "File",
+      "product": "Product",
+      "size": "Size",
+      "type": "Type",
+      "actions": "Actions"
+    }
+  },
+  "coupons": {
+    "title": "Coupons Management",
+    "subtitle": "Create, edit, and manage product coupons",
+    "totalCoupons": "{{count}} coupons",
+    "searchPlaceholder": "Search by code...",
+    "empty": "No coupons found.",
+    "export": "Export",
+    "exportCsv": "Export as CSV",
+    "exportXlsx": "Export as Excel",
+    "filters": {
+      "active": {
+        "label": "Status",
+        "all": "All statuses",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "product": {
+        "placeholder": "Filter by product",
+        "clear": "Clear"
+      },
+      "type": {
+        "label": "Type",
+        "all": "All types",
+        "percentage": "Percentage",
+        "amount": "Amount"
+      },
+      "date": {
+        "start": "Start date",
+        "end": "End date",
+                "range": "Filter by date range"
+      }
+    },
+    "discountType": {
+      "percentage": "Percentage",
+      "amount": "Amount"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "stats": {
+      "totalCoupons": "Total Coupons",
+      "activeCoupons": "Active Coupons",
+      "inactiveCoupons": "Inactive Coupons",
+      "percentageCoupons": "Percentage Coupons",
+      "amountCoupons": "Amount Coupons"
+    },
+    "table": {
+      "code": "Code",
+      "discountType": "Discount Type",
+      "discountValue": "Discount Value",
+      "productId": "Product ID",
+      "dates": "Dates",
+      "createdAt": "Created At",
+      "startsAt": "Starts At",
+      "expiresAt": "Expires At",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "form": {
+      "code": "Code",
+      "codePlaceholder": "KLM-XXXXXX",
+      "discountType": "Discount Type",
+      "discountPercentage": "Discount Percentage",
+      "discountAmount": "Discount Amount",
+      "units": {
+        "percentage": "%",
+        "amount": "L.E"
+      },
+      "productId": "Product ID",
+      "productIdPlaceholder": "Please click on 'Pick Product' to select a product",
+      "startsAt": "Starts At",
+      "startsAtPlaceholder": "Pick a start date",
+      "expiresAt": "Expires At",
+      "expiresAtPlaceholder": "Pick an expiration date",
+      "optional": "Optional",
+      "isActive": "Coupon Activity Status"
+    },
+    "create": {
+      "title": "Create Coupon",
+      "description": "Fill in coupon details and save."
+    },
+    "edit": {
+      "title": "Edit Coupon",
+      "description": "Update coupon details and status.",
+      "toggleHelp": "Use this toggle to activate or deactivate the coupon."
+    },
+    "productPicker": {
+      "open": "Pick Product",
+      "title": "Select Product",
+      "description": "Search products and select one for this coupon.",
+      "searchPlaceholder": "Search by title or serial...",
+      "empty": "No products found.",
+      "select": "Select",
+      "selected": "Selected",
+      "price": "Price",
+      "priceAfterDiscount": "Price After Discount"
+    },
+    "delete": {
+      "title": "Delete Coupon",
+      "confirm": "Are you sure you want to delete this coupon?",
+      "disclaimer": "Deleted coupons will not appear in the list, but they remain stored in history."
+    },
+    "actions": {
+      "create": "Create Coupon",
+      "save": "Save Changes",
+      "delete": "Delete",
+      "generateCode": "Generate Random Code",
+      "copyCode": "Copy Code",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "viewDetails": "View Details",
+      "edit": "Edit Coupon"
+    },
+    "details": {
+      "title": "Coupon details",
+      "description": "Review coupon information and validity."
+    },
+    "messages": {
+      "codeCopied": "Coupon code copied",
+      "codeCopyFailed": "Failed to copy coupon code"
+    },
+    "validation": {
+      "codeRequired": "Coupon code is required",
+      "codeMinLength": "Coupon code must be at least 6 characters",
+      "codeFormat": "Code must contain only uppercase letters, numbers, and hyphens",
+      "discountTypeRequired": "Discount type is required",
+      "productRequired": "Product ID is required",
+      "startsAtRequired": "Start date is required",
+      "startsAtBeforeExpiresAt": "Start date must be before expiration date",
+      "expiresAtRequired": "Expiration date is required",
+      "expiresAtNotPast": "Expiration date cannot be before today",
+      "discountPercentageRequired": "Percentage value is required",
+      "discountPercentageInvalid": "Percentage must be a valid number",
+      "discountPercentageMax": "Percentage cannot be greater than 100",
+      "discountAmountRequired": "Amount value is required",
+      "discountAmountInvalid": "Amount must be a valid number",
+      "discountAmountExceedsProductPrice": "Discount amount cannot exceed the selected product price",
+      "discountValuePositive": "Value must be greater than 0"
+    },
+    "api": {
+      "createSuccess": "Coupon created successfully!",
+      "updateSuccess": "Coupon updated successfully!",
+      "deleteSuccess": "Coupon deleted successfully!"
+    }
+  },
+  "categories": {
+    "title": "Categories Management",
+    "subtitle": "Manage your store's category structure",
+    "totalCategories": "{{count}} categories",
+    "searchPlaceholder": "Search by title...",
+    "noCategories": "No categories found",
+    "noCategoriesDescription": "You haven't added any categories yet.",
+    "noSubCategories": "No subcategories found",
+    "createCategory": "Create Category",
+    "backToCategories": "Back to Categories",
+    "table": {
+      "title": "Title",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Category title",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "parentCategory": "Parent Category (Optional)",
+      "selectParentCategory": "Select Parent...",
+      "rootLevel": "Root Level",
+      "isArchived": "Archived",
+      "depthWarning": "Maximum category depth is 3 levels."
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "create": {
+      "dialogTitle": "Create New Category",
+      "dialogDescription": "Add a new category.",
+      "submit": "Create",
+      "creating": "Creating..."
+    },
+    "edit": {
+      "dialogTitle": "Edit Category",
+      "dialogDescription": "Update category details.",
+      "submit": "Save Changes",
+      "saving": "Saving..."
+    },
+    "delete": {
+      "confirmTitle": "Delete Category",
+      "confirm": "Are you sure you want to delete this category? This will also delete all its subcategories.",
+      "deleteProductsLabel": "Delete attached products",
+      "deleteProductsDescription": "If unchecked, products will only be unlinked.",
+      "success": "Category deleted successfully"
+    },
+    "messages": {
+      "archiveWarning": "Archiving this category will cascade to all subcategories.",
+      "depthLimitReached": "Cannot nest further. Maximum depth of 3 reached."
+    }
+  }
 }
