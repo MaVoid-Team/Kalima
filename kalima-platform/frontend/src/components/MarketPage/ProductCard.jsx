@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { calculateDiscountPercentage, formatPrice } from "@/lib/storeUtils";
 import useAuth from "@/hooks/auth/useAuth";
 import { useCart } from "@/contexts/CartContext";
+import useRole from "@/hooks/useRole";
 
 /**
  * ProductCard — renders a single product in the market grid.
@@ -17,6 +18,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   const { t, i18n } = useTranslation("market");
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { isAdmin } = useRole();
 
   let cartCtx = null;
   try {
@@ -118,7 +120,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
       </Link>
 
       {/* Action buttons — outside the Link to avoid nested interactive elements */}
-      {!isPurchased && (
+      {!isPurchased && !isAdmin && isAuthenticated && (
         <div className="flex items-center gap-2 mt-auto">
           <Button
             variant="outline"
