@@ -136,9 +136,24 @@
   },
   "samplePage": {
     "notFound": "Sample not found",
-    "backToMarket": "Back to market",
+    "backToMarket": "Back to Market",
     "download": "Download",
-    "previewUnavailable": "Preview not available for this file type.",
-    "downloadFile": "Download file"
+    "downloadFile": "Download File",
+    "previewUnavailable": "Preview unavailable for this file type",
+    "sampleInfo": "Sample Information",
+    "fileName": "File Name",
+    "fileSize": "File Size",
+    "fileType": "File Type",
+    "uploadDate": "Upload Date",
+    "productInfo": "Product Information",
+    "productName": "Product Name",
+    "productType": "Product Type",
+    "price": "Price",
+    "serial": "Serial",
+    "viewProduct": "View Product",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "fullPreview": "Full Preview",
+    "sampleDetails": "Sample Details"
   }
 }
