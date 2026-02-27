@@ -1,0 +1,129 @@
+{
+  "header": {
+    "secureCheckout": "دفع آمن",
+    "marketName": "سوق كلمة"
+  },
+  "steps": {
+    "information": "المعلومات",
+    "shipping": "الشحن",
+    "payment": "الدفع"
+  },
+  "contact": {
+    "title": "معلومات الاتصال",
+    "login": "تسجيل الدخول",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "you@example.com",
+    "newsOffers": "أرسل لي الأخبار والعروض"
+  },
+  "shipping": {
+    "title": "عنوان الشحن",
+    "countryLabel": "البلد / المنطقة",
+    "firstName": "الاسم الأول",
+    "lastName": "الاسم الأخير",
+    "addressLabel": "العنوان",
+    "apartmentPlaceholder": "شقة، جناح، إلخ (اختياري)",
+    "city": "المدينة",
+    "state": "المنطقة / المحافظة",
+    "zipCode": "الرمز البريدي"
+  },
+  "payment": {
+    "title": "الدفع",
+    "secureNotice": "معلومات الدفع الخاصة بك آمنة.",
+    "creditCard": "بطاقة الائتمان",
+    "paypal": "باي بال",
+    "applePay": "أبل باي",
+    "cardNumber": "رقم البطاقة",
+    "cardPlaceholder": "0000 0000 0000 0000",
+    "expiration": "تاريخ الانتهاء (شهر/سنة)",
+    "expirationPlaceholder": "شهر / سنة",
+    "securityCode": "رمز الحماية",
+    "cvcPlaceholder": "CVC",
+    "nameOnCard": "الاسم على البطاقة",
+    "phone": "رقم الهاتف",
+    "transferNumberRequired": "الرجاء إدخال رقم المحفظة المحول منها",
+    "screenshotRequired": "الرجاء رفع صورة التحويل",
+    "methodRequired": "الرجاء اختيار طريقة الدفع",
+    "transferNumber": "رقم المحفظة المحول منها",
+    "chooseMethod": "اختر طريقة الدفع",
+    "uploadScreenshotButton": "تحميل الصورة",
+    "removeScreenshot": "إزالة لقطة الشاشة",
+    "cancel": "إلغاء",
+    "preview": "معاينة",
+    "backToCart": "العودة إلى السلة",
+    "screenshot": "صورة الإيصال",
+    "upload": "رفع",
+    "notes": "ملاحظات (اختياري)",
+    "notesPlaceholder": "أي طلبات خاصة؟",
+    "bookDetails": "تفاصيل الكتاب",
+    "nameOnBook": "الاسم على الكتاب",
+    "numberOnBook": "الرقم التسلسلى على الكتاب",
+    "seriesName": "اسم السلسله",
+    "TeacherName": "اسم المعلم",
+    "method": "اختر طريقة الدفع",
+    "BookName": "اسم الكتاب",
+    "Image": "الصورة",
+    "enter": "أدخل",
+    "enterField": "أدخل {{field}}",
+    "notesLabel": "اضافه ملاحظات",
+    "uploadHint": "PNG للصور، بحجم أقصى 5 ميجا",
+    "optional": "اختياري",
+    "securePayment": "دفع آمن",
+    "encryptedCheckout": "إتمام شراء مشفر",
+    "transferNumberPlaceholder": "أدخل رقم المحفظة المحول منها"
+  },
+  "orderSummary": {
+    "title": "ملخص الطلب",
+    "discountPlaceholder": "كود الخصم",
+    "apply": "تطبيق",
+    "subtotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "taxes": "الضرائب (تقديري)",
+    "discount": "الخصم",
+    "total": "الإجمالي",
+    "currency": "دولار أمريكي",
+    "pay": "ادفع",
+    "qty": "الكمية"
+  },
+  "footer": {
+    "returnToCart": "العودة للسلة",
+    "copyright": "© 2023 سوق كلمة. جميع الحقوق محفوظة.",
+    "privacy": "سياسة الخصوصية",
+    "terms": "شروط الخدمة",
+    "refund": "سياسة الاسترداد"
+  },
+  "fastBuy": {
+    "checkoutSuccess": "تم الشراء بنجاح! إعادة التوجيه إلى السوق..."
+  },
+  "success":{
+    "copied": "تم النسخ إلى الحافظة"
+  },
+  "failed": "فشل في إتمام الدفع، يرجى المحاولة مرة أخرى",
+  "receipt": {
+    "title": "إيصال الشراء",
+    "serial": "الرقم التسلسلي",
+    "status": "الحالة",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
+    "total": "الإجمالي",
+    "items": "العناصر",
+    "item": "العنصر",
+    "type": "النوع",
+    "price": "السعر",
+    "paidOn": "تم الدفع في",
+    "paymentMethod": "طريقة الدفع",
+    "print": "طباعة",
+    "unableToPrint": "تعذر طباعة الإيصال",
+    "popupBlocked": "الرجاء السماح للنوافذ المنبثقة لطباعة الإيصال",
+    "statuses": {
+      "pending": "قيد الانتظار",
+      "completed": "مكتمل",
+      "failed": "فشل",
+      "refunded": "تم الاسترداد"
+    }
+  },
+  "wizard": {
+    "cart": "السلة",
+    "payment": "الدفع"
+  },
+  "L.E": " ج.م"
+}

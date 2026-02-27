@@ -1,0 +1,128 @@
+{
+  "header": {
+    "secureCheckout": "Secure Checkout",
+    "marketName": "Kalima Market"
+  },
+  "steps": {
+    "information": "Information",
+    "shipping": "Shipping",
+    "payment": "Payment"
+  },
+  "contact": {
+    "title": "Contact Information",
+    "login": "Log in",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "newsOffers": "Email me with news and offers"
+  },
+  "shipping": {
+    "title": "Shipping Address",
+    "countryLabel": "Country / Region",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "addressLabel": "Address",
+    "apartmentPlaceholder": "Apartment, suite, etc. (optional)",
+    "city": "City",
+    "state": "State",
+    "zipCode": "ZIP code"
+  },
+  "payment": {
+    "title": "Payment",
+    "secureNotice": "Your payment information is secure.",
+    "creditCard": "Credit Card",
+    "paypal": "PayPal",
+    "applePay": "Apple Pay",
+    "cardNumber": "CARD NUMBER",
+    "cardPlaceholder": "0000 0000 0000 0000",
+    "expiration": "EXPIRATION (MM/YY)",
+    "expirationPlaceholder": "MM / YY",
+    "securityCode": "SECURITY CODE",
+    "cvcPlaceholder": "CVC",
+    "nameOnCard": "NAME ON CARD",
+    "phone": "PHONE NUMBER",
+    "transferNumberRequired": "Please enter the number you transferred from",
+    "screenshotRequired": "Please upload payment screenshot",
+    "methodRequired": "Please select a payment method",
+    "transferNumber": "Transfer Number",
+    "screenshot": "Payment Screenshot",
+    "chooseMethod": "Choose Payment Method",
+    "uploadScreenshotButton": "Upload image",
+    "removeScreenshot": "Remove screenshot",
+    "cancel": "Cancel",
+    "preview": "Preview",
+    "backToCart": "Return to Cart",
+    "upload": "Upload",
+    "notes": "Notes (Optional)",
+    "notesPlaceholder": "Any special requests?",
+    "bookDetails": "Book Details",
+    "nameOnBook": "Name on Book",
+    "numberOnBook": "Number on Book",
+    "seriesName": "Series Name",
+    "teacherName": "Teacher Name",
+    "method": "Select Payment Method",
+    "bookName": "Book Name",
+    "image": "Image",
+    "enter": "Enter",
+    "enterField": "Enter {{field}}",
+    "notesLabel": "Delivery instructions or special requests",
+    "optional": "Optional",
+    "securePayment": "Secure Payment",
+    "encryptedCheckout": "Encrypted Checkout",
+    "transferNumberPlaceholder": "Enter transfer number"
+  },
+  "orderSummary": {
+    "title": "Order Summary",
+    "discountPlaceholder": "Discount code",
+    "apply": "Apply",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "taxes": "Taxes (estimated)",
+    "discount": "Discount",
+    "total": "Total",
+    "currency": "USD",
+    "pay": "Pay",
+    "qty": "Qty"
+  },
+  "footer": {
+    "returnToCart": "Return to Cart",
+    "copyright": "© 2023 Kalima Market. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "refund": "Refund Policy"
+  },
+  "fastBuy": {
+    "checkoutSuccess": "Checkout successful! Redirecting to market..."
+  },
+  "success":{
+    "copied": "Copied to clipboard"
+  },
+  "failed": "Checkout failed, please try again",
+  "receipt": {
+    "title": "Purchase Receipt",
+    "serial": "Serial",
+    "status": "Status",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "total": "Total",
+    "items": "Items",
+    "item": "Item",
+    "type": "Type",
+    "price": "Price",
+    "paidOn": "Paid on",
+    "paymentMethod": "Payment Method",
+    "print": "Print",
+    "unableToPrint": "Unable to print receipt",
+    "popupBlocked": "Please allow popups to print receipt",
+    "statuses": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "failed": "Failed",
+      "refunded": "Refunded"
+    }
+  },
+  "wizard": {
+    "cart": "Cart",
+    "payment": "Payment"
+  },
+  "L.E": " L.E"
+}
