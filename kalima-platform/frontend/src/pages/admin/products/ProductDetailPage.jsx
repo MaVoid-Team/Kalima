@@ -47,7 +47,9 @@ export default function ProductDetailPage() {
         detachCategory,
         attachRequiredFields,
         detachRequiredField,
-        getProductCoupons
+        getProductCoupons,
+        updateProductSample,
+        removeProductSample
     } = useAdminProducts();
 
     const {
@@ -263,7 +265,12 @@ export default function ProductDetailPage() {
             <div className="rounded-xl border border-border p-5 space-y-3" data-testid="product-detail-sample">
                 <h2 className="font-semibold text-foreground">{t('products.detail.sample')}</h2>
                 <Separator />
-                <SampleManager product={product} />
+                <SampleManager 
+                    product={product} 
+                    onUpdateSample={updateProductSample}
+                    onRemoveSample={removeProductSample}
+                    loading={actionLoading}
+                />
             </div>
 
             {/* Categories */}
