@@ -58,8 +58,8 @@ import {
 
 const RESET_TOKEN_EXPIRY_HOURS = 24;
 const VERIFICATION_TOKEN_EXPIRY_HOURS = 48;
-const APP_URL = process.env.APP_URL || "http://localhost:5173";
-const SUPPORT_URL = process.env.SUPPORT_URL || "http://localhost:5173/support";
+const APP_URL = process.env.APP_URL;
+const SUPPORT_URL = process.env.SUPPORT_URL;
 
 // ============================================
 // AUTH SERVICE CLASS
