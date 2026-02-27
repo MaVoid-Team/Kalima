@@ -90,10 +90,12 @@ export default function CreateProductPage() {
     const [thumbnail, setThumbnail] = useState(null);
     const [sample, setSample] = useState(null);
 
-    // Category picker state — single category only
+    // Category picker state — single category only (up to 3 levels)
     const [selectedRootId, setSelectedRootId] = useState('');
     const [selectedChildId, setSelectedChildId] = useState('');
+    const [selectedGrandchildId, setSelectedGrandchildId] = useState('');
     const [childrenLoading, setChildrenLoading] = useState(false);
+    const [grandchildrenLoading, setGrandchildrenLoading] = useState(false);
     const [pickedCategory, setPickedCategory] = useState(null); // { id, title } | null
 
     // Required fields picker state
@@ -135,9 +137,14 @@ export default function CreateProductPage() {
     const currentChildren = selectedRootId ? (childCategories[selectedRootId] ?? undefined) : undefined;
     const hasChildren = currentChildren && currentChildren.length > 0;
 
+    // Grandchildren: stored in childCategories keyed by the selected child id
+    const currentGrandchildren = selectedChildId ? (childCategories[selectedChildId] ?? undefined) : undefined;
+    const hasGrandchildren = currentGrandchildren && currentGrandchildren.length > 0;
+
     const handleRootChange = async (rootId) => {
         setSelectedRootId(rootId);
         setSelectedChildId('');
+        setSelectedGrandchildId('');
         if (rootId && !childCategories[rootId]) {
             setChildrenLoading(true);
             await fetchChildCategories(parseInt(rootId));
@@ -152,11 +159,18 @@ export default function CreateProductPage() {
         }
     };
 
-    const handleChildChange = (childId) => {
+    const handleChildChange = async (childId) => {
         setSelectedChildId(childId);
+        setSelectedGrandchildId('');
         if (childId) {
             const label = currentChildren?.find(c => c.id === parseInt(childId))?.title;
             setPickedCategory({ id: parseInt(childId), title: label });
+            // Fetch grandchildren if not already cached
+            if (!childCategories[childId]) {
+                setGrandchildrenLoading(true);
+                await fetchChildCategories(parseInt(childId));
+                setGrandchildrenLoading(false);
+            }
         } else {
             // Revert to root selection
             const label = roots.find(r => r.id === parseInt(selectedRootId))?.title;
@@ -164,10 +178,23 @@ export default function CreateProductPage() {
         }
     };
 
+    const handleGrandchildChange = (grandchildId) => {
+        setSelectedGrandchildId(grandchildId);
+        if (grandchildId) {
+            const label = currentGrandchildren?.find(g => g.id === parseInt(grandchildId))?.title;
+            setPickedCategory({ id: parseInt(grandchildId), title: label });
+        } else {
+            // Revert to child selection
+            const label = currentChildren?.find(c => c.id === parseInt(selectedChildId))?.title;
+            setPickedCategory(selectedChildId ? { id: parseInt(selectedChildId), title: label } : null);
+        }
+    };
+
     const handleClearCategory = () => {
         setPickedCategory(null);
         setSelectedRootId('');
         setSelectedChildId('');
+        setSelectedGrandchildId('');
     };
 
     // ─── Required field helpers ───────────────────────────────────────────────
@@ -507,15 +534,15 @@ export default function CreateProductPage() {
                             </div>
                         )}
 
-                        {/* Cascading root → child selects */}
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                        {/* Cascading root → child → grandchild selects */}
+                        <div className="flex flex-col gap-2">
                             <Select
                                 dir={i18n.dir()}
                                 value={selectedRootId}
                                 onValueChange={handleRootChange}
                                 disabled={roots.length === 0}
                             >
-                                <SelectTrigger className="flex-1" data-testid="create-product-category-root-select">
+                                <SelectTrigger data-testid="create-product-category-root-select">
                                     <SelectValue placeholder={t('products.detail.selectCategory')} />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -540,13 +567,40 @@ export default function CreateProductPage() {
                                         onValueChange={handleChildChange}
                                         disabled={!currentChildren?.length}
                                     >
-                                        <SelectTrigger className="flex-1" data-testid="create-product-category-child-select">
+                                        <SelectTrigger data-testid="create-product-category-child-select">
                                             <SelectValue placeholder={t('products.detail.selectChildCategory', 'Subcategory (optional)')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {currentChildren.map((child) => (
                                                 <SelectItem key={child.id} value={child.id.toString()}>
                                                     {child.title}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                ) : null
+                            )}
+
+                            {selectedChildId && (
+                                grandchildrenLoading ? (
+                                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <span>{t('common.loading')}</span>
+                                    </div>
+                                ) : hasGrandchildren ? (
+                                    <Select
+                                        dir={i18n.dir()}
+                                        value={selectedGrandchildId}
+                                        onValueChange={handleGrandchildChange}
+                                        disabled={!currentGrandchildren?.length}
+                                    >
+                                        <SelectTrigger data-testid="create-product-category-grandchild-select">
+                                            <SelectValue placeholder={t('products.detail.selectGrandchildCategory', 'Sub-subcategory (optional)')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {currentGrandchildren.map((gc) => (
+                                                <SelectItem key={gc.id} value={gc.id.toString()}>
+                                                    {gc.title}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
