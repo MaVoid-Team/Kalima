@@ -137,7 +137,8 @@
             "deleteItemWarning": "هل أنت متأكد من حذف هذا العنصر من الطلب؟",
             "deleteOrderSuccess": "تم حذف الطلب بنجاح",
             "deleteItemSuccess": "تم حذف العنصر بنجاح",
-            "noteSaved": "تم حفظ ملاحظة الإدارة بنجاح"
+            "noteSaved": "تم حفظ ملاحظة الإدارة بنجاح",
+            "noOrdersFound": "لم يتم العثور على طلبات."
         },
         "details": {
             "title": "تفاصيل الطلب",
@@ -174,6 +175,7 @@
         "noProductsDescription": "لا توجد منتجات تطابق الفلاتر الحالية.",
         "createProduct": "إنشاء منتج",
         "backToProducts": "العودة للمنتجات",
+        "backToProduct":"العودة للمنتج",
         "filters": {
             "allCategories": "جميع الفئات",
             "allStatuses": "جميع الحالات",
@@ -219,6 +221,9 @@
             "couponIdPlaceholder": "معرف القسيمة (اختياري)",
             "thumbnail": "صورة الغلاف",
             "sample": "ملف النموذج (PDF)",
+            "chooseImage": "اختر صورة",
+            "chooseSampleFile": "اختر ملف العينة",
+            "noFileSelected": "لم يتم اختيار ملف",
             "categories": "الفئات",
             "isArchived": "مؤرشف",
             "perks": "المميزات",
@@ -340,7 +345,8 @@
             },
             "date": {
                 "start": "تاريخ البداية",
-                "end": "تاريخ النهاية"
+                "end": "تاريخ النهاية",
+                "range": "تصفية حسب النطاق الزمني"
             }
         },
         "discountType": {

@@ -249,7 +249,7 @@ export default function EditProductPage() {
                     className="hover:text-foreground transition-colors flex items-center gap-1"
                     data-testid="edit-product-back-link"
                 >
-                    {isRtl ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                    <ChevronLeft className="h-4 w-4" />
                     {t('products.backToProduct', 'Back to Product')}
                 </Link>
             </div>
@@ -311,7 +311,7 @@ export default function EditProductPage() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{t('products.form.type')}</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
+                                        <Select  dir={i18n.dir()} onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger data-testid="edit-product-type-select">
                                                     <SelectValue />
@@ -456,6 +456,7 @@ export default function EditProductPage() {
                         {/* Cascading root → child selects */}
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                             <Select
+                                dir={i18n.dir()}
                                 value={selectedRootId}
                                 onValueChange={handleRootChange}
                                 disabled={actionLoading || roots.length === 0}
@@ -480,6 +481,7 @@ export default function EditProductPage() {
                                     </div>
                                 ) : hasChildren ? (
                                     <Select
+                                        dir={i18n.dir()}
                                         value={selectedChildId}
                                         onValueChange={handleChildChange}
                                         disabled={actionLoading || !currentChildren?.length}
@@ -536,7 +538,7 @@ export default function EditProductPage() {
 
                         {availableFieldDefs.length > 0 && (
                             <div className="flex items-center gap-2">
-                                <Select value={selectedFieldDefId} onValueChange={setSelectedFieldDefId}>
+                                <Select  dir={i18n.dir()} value={selectedFieldDefId} onValueChange={setSelectedFieldDefId}>
                                     <SelectTrigger className="flex-1" data-testid="edit-product-field-def-select">
                                         <SelectValue placeholder={t('products.detail.selectField')} />
                                     </SelectTrigger>

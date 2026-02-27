@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
+import { arSA } from 'date-fns/locale';
 import {
-    ArrowLeft, ArrowRight, User, Mail, Phone, Calendar,
+    ArrowLeft, User, Mail, Phone, Calendar,
     ShieldCheck, Eye, ShoppingBag, UserPlus, BookOpen,
     MapPin, Hash, GraduationCap, BarChart3, Users
 } from 'lucide-react';
@@ -20,11 +21,12 @@ import UserRolesSection from '@/components/admin/users/UserRolesSection';
 
 /* ─── helpers ────────────────────────────────────────────────────────────── */
 function StatCard({ icon: Icon, label, value, color = 'text-primary' }) {
+    const { i18n } = useTranslation('userManagement');
     return (
         <Card className="shadow-sm" data-testid={`user-detail-stat-${label}`}>
             <CardContent className="p-4 flex items-center gap-4">
                 <div className={`p-3 rounded-xl bg-muted/60 ${color}`}>
-                    <Icon className="h-5 w-5" />
+                    <Icon className={`h-5 w-5 ${i18n.language === 'ar' ? 'scale-x-[-1]' : ''}`} />
                 </div>
                 <div className="min-w-0">
                     <p className="text-xs text-muted-foreground leading-none mb-1 truncate">{label}</p>
@@ -159,9 +161,7 @@ export default function UserDetailPage() {
                         data-testid="user-detail-top-back-button"
                     >
                         <Link to="/admin/users">
-                            {isRtl
-                                ? <ArrowRight className="h-5 w-5" />
-                                : <ArrowLeft className="h-5 w-5" />}
+                            <ArrowLeft className="h-5 w-5" />
                         </Link>
                     </Button>
                     <div>
@@ -230,7 +230,7 @@ export default function UserDetailPage() {
                                 {selectedUser.created_at && (
                                     <span className="flex items-center gap-1.5">
                                         <Calendar className="h-3.5 w-3.5 shrink-0" />
-                                        {format(new Date(selectedUser.created_at), 'PPP')}
+                                        {format(new Date(selectedUser.created_at), 'PPP', { locale: isRtl ? arSA : undefined })}
                                     </span>
                                 )}
                             </div>

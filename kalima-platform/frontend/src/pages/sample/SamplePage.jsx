@@ -1,21 +1,27 @@
 import { PDFViewer } from '@embedpdf/react-pdf-viewer';
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, Download, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import useApiMutation from '@/hooks/useApiMutation';
 import { getImageUrl, formatFileSize } from '@/lib/storeUtils';
+import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
 
 /**
  * SamplePage — full-width PDF/file viewer for a single sample.
  * Route: /samples/:id (public)
  */
 export default function SamplePage() {
+    const { t, i18n } = useTranslation(['market', 'PDFViewer']);
+    const location = useLocation();
+    const cameFromAdmin = Boolean(location.state?.cameFromAdmin);
     const { id } = useParams();
     const { mutate: fetchApi, loading } = useApiMutation();
     const [sample, setSample] = useState(null);
     const [error, setError] = useState(false);
+    const viewerI18n = useMemo(() => getPdfViewerI18nConfig(i18n.language), [i18n.language]);
 
     useEffect(() => {
         if (!id) return;
@@ -39,9 +45,9 @@ export default function SamplePage() {
         return (
             <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background text-center px-4" data-testid="sample-page-error">
                 <AlertCircle className="h-12 w-12 text-destructive" />
-                <p className="text-lg font-semibold">Sample not found</p>
+                <p className="text-lg font-semibold">{t('samplePage.notFound')}</p>
                 <Button variant="ghost" asChild>
-                    <Link to="/market"><ArrowLeft className="me-2 h-4 w-4" />Back to market</Link>
+                    <Link to="/market"><ArrowLeft className="me-2 h-4 w-4" />{t('samplePage.backToMarket')}</Link>
                 </Button>
             </div>
         );
@@ -56,7 +62,7 @@ export default function SamplePage() {
             <div className="flex items-center justify-between gap-4 px-4 py-2 border-b border-border bg-background shrink-0">
                 <div className="flex items-center gap-3 min-w-0">
                     <Button variant="ghost" size="sm" asChild data-testid="sample-page-back-button">
-                        <Link to={sample?.products?.id ? `/product/${sample.products.id}` : '/market'}>
+                        <Link to={cameFromAdmin ? `/admin/samples` : (sample?.products?.id ? `/product/${sample.products.id}` : '/market')}>
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                     </Button>
@@ -74,7 +80,7 @@ export default function SamplePage() {
                 <Button variant="outline" size="sm" asChild data-testid="sample-page-download-button">
                     <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
                         <Download className="me-2 h-4 w-4" />
-                        Download
+                        {t('samplePage.download')}
                     </a>
                 </Button>
             </div>
@@ -86,6 +92,8 @@ export default function SamplePage() {
                         config={{
                             src: fileUrl,
                             theme: { preference: 'system' },
+                            i18n: viewerI18n,
+                            dir: i18n.dir(),
                             disabledCategories: ['annotation', 'redaction'],
                         }}
                         style={{ width: '100%', height: '100%' }}
@@ -93,11 +101,11 @@ export default function SamplePage() {
                 ) : (
                     /* Word / other — prompt download */
                     <div className="flex h-full flex-col items-center justify-center gap-4 text-muted-foreground">
-                        <p className="text-sm">Preview not available for this file type.</p>
+                        <p className="text-sm">{t('samplePage.previewUnavailable')}</p>
                         <Button asChild data-testid="sample-page-download-fallback-button">
                             <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
                                 <Download className="me-2 h-4 w-4" />
-                                Download file
+                                {t('samplePage.downloadFile')}
                             </a>
                         </Button>
                     </div>

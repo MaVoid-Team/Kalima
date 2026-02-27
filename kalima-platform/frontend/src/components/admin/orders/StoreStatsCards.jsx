@@ -7,7 +7,7 @@ import { ShoppingCart, DollarSign, Activity, CheckCircle, Clock } from 'lucide-r
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function StoreStatsCards() {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
     const { dailyStoreStats, loading, fetchDailyStoreStats } = useAnalytics();
 
     useEffect(() => {
@@ -81,7 +81,7 @@ export default function StoreStatsCards() {
                         <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">
                             {stat.title}
                         </CardTitle>
-                        <stat.icon className={`h-4 w-4 shrink-0 ${stat.color}`} />
+                        <stat.icon className={`h-4 w-4 shrink-0 ${stat.color} ${i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}`} />
                     </CardHeader>
                     <CardContent>
                         <div className="text-lg sm:text-xl lg:text-2xl font-bold truncate" title={stat.value}>

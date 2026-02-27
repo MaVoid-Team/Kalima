@@ -176,7 +176,7 @@ export default function ProductsTable({
 
                                 {/* Actions */}
                                 <TableCell className="text-end" onClick={(e) => e.stopPropagation()}>
-                                    <DropdownMenu>
+                                    <DropdownMenu dir={i18n.dir()}>
                                         <DropdownMenuTrigger asChild>
                                             <Button
                                                 variant="ghost"
@@ -223,7 +223,7 @@ export default function ProductsTable({
                                                 className="text-destructive focus:text-destructive"
                                                 data-testid={`products-action-delete-${product.id}`}
                                             >
-                                                <Trash2 className="me-2 h-4 w-4" />
+                                                <Trash2 className="me-2 h-4 w-4 text-destructive" />
                                                 {t('products.actions.delete')}
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

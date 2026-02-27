@@ -153,7 +153,7 @@ export default function SamplesDirectoryPage() {
                                                     className="flex-1"
                                                     asChild
                                                 >
-                                                    <Link to={`/samples/${sample.id}`}>
+                                                    <Link to={`/samples/${sample.id}`} state={{ cameFromAdmin: false }}>
                                                         <ExternalLink className={`${isRtl ? 'ml-2' : 'mr-2'} h-4 w-4`} />
                                                         {t("samples.view", "Preview")}
                                                     </Link>

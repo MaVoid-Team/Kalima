@@ -104,7 +104,7 @@ export default function OrdersToolbar({ filters, onSearchChange, onStatusChange,
                     </PopoverContent>
                 </Popover>
 
-                <DropdownMenu>
+                <DropdownMenu dir={i18n.dir()}>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="flex-1 sm:w-[180px] justify-start text-muted-foreground w-full" data-testid="admin-orders-toolbar-status-filter">
                             {filters.status && filters.status !== 'all'

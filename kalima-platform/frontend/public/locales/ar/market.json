@@ -133,5 +133,12 @@
     "noSamples": "لا توجد عينات متاحة.",
     "view": "معاينة",
     "download": "تنزيل"
+  },
+  "samplePage": {
+    "notFound": "العينة غير موجودة",
+    "backToMarket": "العودة إلى المتجر",
+    "download": "تنزيل",
+    "previewUnavailable": "المعاينة غير متاحة لهذا النوع من الملفات.",
+    "downloadFile": "تنزيل الملف"
   }
 }

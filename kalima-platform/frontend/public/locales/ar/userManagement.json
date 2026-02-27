@@ -8,6 +8,9 @@
     "usersList": "قائمة المستخدمين",
     "totalUsers": "إجمالي المستخدمين: {{count}}",
     "searchPlaceholder": "البحث بالاسم، البريد الإلكتروني، رقم الهاتف...",
+    "export": "تصدير",
+    "exportCsv": "تصدير كملف CSV",
+    "exportXlsx": "تصدير كملف Excel",
     "filters": {
         "allRoles": "جميع الأدوار",
         "allPortals": "جميع البوابات"
@@ -27,13 +30,17 @@
     },
     "actions": {
         "view": "عرض الملف",
+        "confirm": "تأكيد",
         "create": "إضافة مستخدم",
+        "close": "إغلاق",
         "addRole": "إضافة دور",
+        "addRoleDescription": "تعيين دور جديد لهذا المستخدم في بوابة معينة.",
         "revoke": "إلغاء",
         "makeAdmin": "إضافة مدير",
         "makeSubAdmin": "إضافة نائب مدير",
         "makeModerator": "إضافة مشرف",
-        "makeAssistant": "إضافة مساعد"
+        "makeAssistant": "إضافة مساعد",
+        "revokeRole": "إلغاء دور"
     },
     "details": {
         "title": "ملف المستخدم",
@@ -47,6 +54,8 @@
         "levelId": "معرف المستوى:",
         "analytics": "النشاط والإحصائيات",
         "views": "مشاهدات الملف",
+        "portalPlaceholder": "اختر بوابة...",
+        "rolePlaceholder": "اختر دور...",
         "totalSpent": "إجمالي الإنفاق",
         "purchases": "المشتريات",
         "invites": "الدعوات الناجحة",
@@ -85,6 +94,7 @@
     },
     "createDialog": {
         "title": "إنشاء مستخدم إداري",
+        "description": "إنشاء مستخدم جديد بصلاحيات إدارية.",
         "type": "نوع المستخدم",
         "name": "الاسم الكامل",
         "email": "البريد الإلكتروني",
@@ -94,5 +104,11 @@
         "gender": "الجنس",
         "male": "ذكر",
         "female": "أنثى"
+    },
+    "stats": {
+        "totalUsers": "إجمالي المستخدمين",
+        "verifiedUsers": "المستخدمون الموثقون",
+        "teachers": "المعلمون",
+        "admins": "المديرون"
     }
 }

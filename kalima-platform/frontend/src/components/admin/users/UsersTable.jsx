@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
+import { arSA } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { Eye } from 'lucide-react';
 
@@ -108,7 +109,9 @@ export default function UsersTable({ users, loading, selectedIds = [], onSelect,
                                 )}
                             </TableCell>
                             <TableCell>
-                                {user.created_at ? format(new Date(user.created_at), 'MMM d, yyyy') : '—'}
+                                {user.created_at
+                                    ? format(new Date(user.created_at), 'MMM d, yyyy', { locale: isRtl ? arSA : undefined })
+                                    : '—'}
                             </TableCell>
                             <TableCell>
                                 <Button
