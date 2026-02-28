@@ -195,7 +195,7 @@ export default function ProductsTable({
                                                 {t('products.actions.view')}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
-                                                onClick={() => onEdit(product)}
+                                                onClick={() => navigate(`/admin/products/${product.id}/edit`)}
                                                 data-testid={`products-action-edit-${product.id}`}
                                             >
                                                 <Pencil className="me-2 h-4 w-4" />
