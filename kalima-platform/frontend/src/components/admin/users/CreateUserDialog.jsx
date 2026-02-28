@@ -30,6 +30,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { PhoneInput, egyptPhoneSchema } from '@/components/ui/phone-input';
 import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { GENDERS } from '@/lib/adminConstants';
@@ -54,8 +55,8 @@ export default function CreateUserDialog({ onSuccess }) {
         name: z.string().min(1, { message: t('common:validation.required', 'Required') }),
         email: z.string().email({ message: t('common:validation.email', 'Invalid email') }),
         password: z.string().min(6, { message: t('common:validation.minLength', { min: 6, defaultValue: 'Min 6 chars' }) }),
-        phone: z.string().min(1, { message: t('common:validation.required', 'Required') }),
-        secondary_phone: z.string().optional().nullable(),
+        phone: egyptPhoneSchema,
+        secondary_phone: z.union([egyptPhoneSchema, z.literal(""), z.undefined(), z.null()]),
         gender: z.enum(['male', 'female'], { message: t('common:validation.required', 'Required') }),
     });
 
@@ -191,7 +192,7 @@ export default function CreateUserDialog({ onSuccess }) {
                                 <FormItem>
                                     <FormLabel>{t('createDialog.phone')}</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="010..." {...field} />
+                                        <PhoneInput dir="ltr" placeholder="010..." {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -205,7 +206,7 @@ export default function CreateUserDialog({ onSuccess }) {
                                 <FormItem>
                                     <FormLabel>{t('createDialog.secondaryPhone')}</FormLabel>
                                     <FormControl>
-                                        <Input {...field} value={field.value || ''} />
+                                        <PhoneInput dir="ltr" {...field} value={field.value || ''} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
