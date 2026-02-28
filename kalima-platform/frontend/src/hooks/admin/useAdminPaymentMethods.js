@@ -61,13 +61,16 @@ export const useAdminPaymentMethods = () => {
             });
 
             if (data?.success) {
-                setPaymentMethods(data.data ?? []);
+                const results = data.data?.data ?? [];
+                const meta = data.data ?? {};
+
+                setPaymentMethods(results);
                 setPagination(prev => ({
                     ...prev,
-                    total: data.total ?? prev.total,
-                    page: data.page ?? prev.page,
-                    pages: data.pages ?? Math.ceil((data.total ?? prev.total) / prev.limit) ?? prev.pages,
-                    limit: data.limit ?? prev.limit,
+                    total: meta.total ?? prev.total,
+                    page: meta.page ?? prev.page,
+                    pages: meta.pages ?? Math.ceil((meta.total ?? prev.total) / (meta.limit ?? prev.limit)) ?? prev.pages,
+                    limit: meta.limit ?? prev.limit,
                 }));
             } else {
                 setPaymentMethods([]);
@@ -142,7 +145,7 @@ export const useAdminPaymentMethods = () => {
 
     const bulkUpdateStatus = (paymentMethodIds, status) =>
         handleAction(() => Promise.all(
-            paymentMethodIds.map(id => 
+            paymentMethodIds.map(id =>
                 fetchApi({
                     endpoint: `/payment-methods/${id}`,
                     method: 'patch',
