@@ -93,6 +93,7 @@ export default function ProductGrid({
                     return (
                         <motion.div
                             key={product.id}
+                            className="h-full"
                             variants={{
                                 hidden: { opacity: 0, y: 30 },
                                 show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 200, damping: 20 } },

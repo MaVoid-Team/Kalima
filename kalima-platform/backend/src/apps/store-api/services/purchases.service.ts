@@ -205,7 +205,7 @@ class PurchasesService {
     const { page, limit } = filters;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.purchasesWhereInput = {};
+    const where: Prisma.purchasesWhereInput = { deleted_at: null };
 
     if (filters.status) {
       where.status = filters.status;
