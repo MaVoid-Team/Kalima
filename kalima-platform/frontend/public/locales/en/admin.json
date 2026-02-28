@@ -5,12 +5,13 @@
     "products": "Products",
     "samples": "Samples",
     "coupons": "Coupons",
+    "categories": "Categories",
+    "paymentMethods": "Payment Methods",
     "themeToggle": "Toggle Theme",
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
     "backToStore": "Back to Store",
     "logout": "Logout",
-    "categories": "Categories",
     "settings": "Settings"
   },
   "common": {
@@ -24,9 +25,16 @@
     "notSpecified": "Not specified",
     "file": "File",
     "select": "Select",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "openMenu": "Open menu",
     "pagination": {
       "previous": "Previous",
       "next": "Next"
+    },
+    "export": {
+      "success": "Export successful"
     }
   },
   "gender": {
@@ -652,6 +660,78 @@
       "cancelled": "Upload cancelled",
       "error": "Upload failed",
       "file": "File"
+    }
+  },
+  "paymentMethods": {
+    "title": "Payment Methods Management",
+    "subtitle": "Manage payment methods available in your store",
+    "totalMethods": "{{count}} payment methods",
+    "createMethod": "Create Payment Method",
+    "noMethodsFound": "No payment methods found",
+    "selectedCount": "{count} selected",
+    "bulkActivate": "Activate",
+    "bulkDeactivate": "Deactivate",
+    "filters": {
+      "searchPlaceholder": "Search by name...",
+      "statusFilter": "Status",
+      "allStatus": "All Status"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "phoneNumber": "Phone Number",
+      "status": "Status",
+      "image": "Image",
+      "createdAt": "Created"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "e.g., Vodafone Cash",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "e.g., 01012345678",
+      "status": "Status",
+      "statusDescription": "Enable or disable this payment method",
+      "image": "Image",
+      "imageOptional": "Leave empty to keep current image"
+    },
+    "create": {
+      "title": "Create Payment Method",
+      "description": "Add a new payment method to your store.",
+      "submit": "Create Payment Method"
+    },
+    "edit": {
+      "title": "Edit Payment Method",
+      "description": "Update payment method details.",
+      "submit": "Update Payment Method"
+    },
+    "delete": {
+      "title": "Delete Payment Method",
+      "description": "This action cannot be undone.",
+      "warning": "Are you sure you want to delete this payment method? This action is permanent and cannot be reversed.",
+      "methodName": "Payment Method",
+      "consequences": "Deleting this payment method will:",
+      "consequence1": "Remove it from available payment options",
+      "consequence2": "Affect any pending orders using this method",
+      "consequence3": "Require customers to use alternative payment methods",
+      "confirm": "Delete Payment Method"
+    },
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "creating": "Creating...",
+    "updating": "Updating...",
+    "deleting": "Deleting...",
+    "uploading": "Uploading...",
+    "image": {
+      "dragDrop": "Drag & drop image here",
+      "orClick": "or click to browse",
+      "supportedFormats": "JPEG, PNG, WebP (max 5MB)",
+      "invalidType": "Invalid file type. Please upload JPEG, PNG, or WebP images.",
+      "tooLarge": "File too large. Maximum size is 5MB.",
+      "uploading": "Uploading..."
     }
   }
 }

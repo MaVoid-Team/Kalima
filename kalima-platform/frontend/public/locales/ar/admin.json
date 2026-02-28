@@ -5,12 +5,13 @@
     "products": "المنتجات",
     "samples": "العينات",
     "coupons": "القسائم",
+    "categories": "الفئات",
+    "paymentMethods": "طرق الدفع",
     "themeToggle": "تبديل المظهر",
     "darkMode": "الوضع الداكن",
     "lightMode": "الوضع الفاتح",
     "backToStore": "العودة للمتجر",
     "logout": "تسجيل الخروج",
-    "categories": "الفئات",
     "settings": "الإعدادات"
   },
   "common": {
@@ -24,9 +25,16 @@
     "notSpecified": "غير محدد",
     "file": "ملف",
     "select": "اختر",
+    "actions": "إجراءات",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "openMenu": "فتح القائمة",
     "pagination": {
       "previous": "السابق",
       "next": "التالي"
+    },
+    "export": {
+      "success": "تم التصدير بنجاح"
     }
   },
   "gender": {
@@ -652,6 +660,78 @@
       "cancelled": "تم إلغاء الرفع",
       "error": "فشل الرفع",
       "file": "ملف"
+    }
+  },
+  "paymentMethods": {
+    "title": "إدارة طرق الدفع",
+    "subtitle": "إدارة طرق الدفع المتاحة في متجرك",
+    "totalMethods": "{{count}} طرق دفع",
+    "createMethod": "إنشاء طريقة دفع",
+    "noMethodsFound": "لم يتم العثور على طرق دفع",
+    "selectedCount": "{count} محدد",
+    "bulkActivate": "تفعيل",
+    "bulkDeactivate": "إلغاء التفعيل",
+    "filters": {
+      "searchPlaceholder": "البحث بالاسم...",
+      "statusFilter": "الحالة",
+      "allStatus": "كل الحالات"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "table": {
+      "id": "المعرف",
+      "name": "الاسم",
+      "phoneNumber": "رقم الهاتف",
+      "status": "الحالة",
+      "image": "الصورة",
+      "createdAt": "تاريخ الإنشاء"
+    },
+    "fields": {
+      "name": "الاسم",
+      "namePlaceholder": "مثال: فودافون كاش",
+      "phoneNumber": "رقم الهاتف",
+      "phoneNumberPlaceholder": "مثال: 01012345678",
+      "status": "الحالة",
+      "statusDescription": "تفعيل أو إلغاء تفعيل طريقة الدفع",
+      "image": "الصورة",
+      "imageOptional": "اترك فارغاً للاحتفاظ بالصورة الحالية"
+    },
+    "create": {
+      "title": "إنشاء طريقة دفع",
+      "description": "إضافة طريقة دفع جديدة لمتجرك.",
+      "submit": "إنشاء طريقة الدفع"
+    },
+    "edit": {
+      "title": "تعديل طريقة الدفع",
+      "description": "تحديث تفاصيل طريقة الدفع.",
+      "submit": "تحديث طريقة الدفع"
+    },
+    "delete": {
+      "title": "حذف طريقة الدفع",
+      "description": "لا يمكن التراجع عن هذا الإجراء.",
+      "warning": "هل أنت متأكد من حذف طريقة الدفع هذه؟ هذا الإجراء دائم ولا يمكن التراجع عنه.",
+      "methodName": "طريقة الدفع",
+      "consequences": "حذف طريقة الدفع هذه سيؤدي إلى:",
+      "consequence1": "إزالتها من خيارات الدفع المتاحة",
+      "consequence2": "التأثير على أي طلبات معلقة تستخدم هذه الطريقة",
+      "consequence3": "يتطلب من العملاء استخدام طرق دفع بديلة",
+      "confirm": "حذف طريقة الدفع"
+    },
+    "activate": "تفعيل",
+    "deactivate": "إلغاء التفعيل",
+    "creating": "جاري الإنشاء...",
+    "updating": "جاري التحديث...",
+    "deleting": "جاري الحذف...",
+    "uploading": "جاري الرفع...",
+    "image": {
+      "dragDrop": "اسحب وأفلت الصورة هنا",
+      "orClick": "أو انقر للاختيار",
+      "supportedFormats": "JPEG, PNG, WebP (الحد الأقصى 5 ميجابايت)",
+      "invalidType": "نوع الملف غير صالح. يرجى رفع صور JPEG, PNG, أو WebP.",
+      "tooLarge": "الملف كبير جداً. الحد الأقصى هو 5 ميجابايت.",
+      "uploading": "جاري الرفع..."
     }
   }
 }
