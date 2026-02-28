@@ -3,9 +3,13 @@ import { NotFoundError, BadRequestError } from "../../../libs/errors";
 import { prisma } from "../../../libs/db/prisma";
 import { imageService } from "./image.service";
 
-export type PaymentMethodResponse = Omit<payment_methods, "image_id"> & { image_url: string | null };
+export type PaymentMethodResponse = Omit<payment_methods, "image_id"> & {
+  image_url: string | null;
+};
 
-function formatPaymentMethod(pm: payment_methods & { images: images | null }): PaymentMethodResponse {
+function formatPaymentMethod(
+  pm: payment_methods & { images: images | null },
+): PaymentMethodResponse {
   const { image_id, images, ...rest } = pm;
   return {
     ...rest,
@@ -17,7 +21,21 @@ export const paymentMethodService = {
   /**
    * List all payment methods
    */
-  async listPaymentMethods(filters?: { status?: boolean; search?: string }): Promise<PaymentMethodResponse[]> {
+  async listPaymentMethods(filters?: {
+    status?: boolean;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    data: PaymentMethodResponse[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+    const skip = (page - 1) * limit;
+
     const where: Prisma.payment_methodsWhereInput = {};
 
     if (filters?.status !== undefined) {
@@ -28,15 +46,24 @@ export const paymentMethodService = {
       where.name = { contains: filters.search, mode: "insensitive" };
     }
 
-    const results = await prisma.payment_methods.findMany({
-      where,
-      orderBy: { created_at: "desc" },
-      include: {
-        images: true
-      }
-    });
+    const [data, count] = await Promise.all([
+      prisma.payment_methods.findMany({
+        where,
+        include: {
+          images: true,
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.payment_methods.count({ where }),
+    ]);
 
-    return results.map(formatPaymentMethod);
+    return {
+      data: data.map(formatPaymentMethod),
+      total: count,
+      page,
+      limit,
+    };
   },
 
   /**
@@ -46,8 +73,8 @@ export const paymentMethodService = {
     const paymentMethod = await prisma.payment_methods.findUnique({
       where: { id },
       include: {
-        images: true
-      }
+        images: true,
+      },
     });
 
     if (!paymentMethod) {
@@ -62,7 +89,7 @@ export const paymentMethodService = {
    */
   async createPaymentMethod(
     data: { name: string; phone_number: string; status?: boolean },
-    file?: Express.Multer.File
+    file?: Express.Multer.File,
   ): Promise<PaymentMethodResponse> {
     let image_id: number | null = null;
 
@@ -79,8 +106,8 @@ export const paymentMethodService = {
         image_id,
       },
       include: {
-        images: true
-      }
+        images: true,
+      },
     });
 
     return formatPaymentMethod(created);
@@ -92,7 +119,7 @@ export const paymentMethodService = {
   async updatePaymentMethod(
     id: number,
     data: { name?: string; phone_number?: string; status?: boolean },
-    file?: Express.Multer.File
+    file?: Express.Multer.File,
   ): Promise<PaymentMethodResponse> {
     const existing = await prisma.payment_methods.findUnique({ where: { id } });
     if (!existing) {
@@ -102,7 +129,9 @@ export const paymentMethodService = {
     let image_id = existing.image_id;
 
     if (file) {
-      const image = await imageService.replaceImage(existing.image_id, file, { compress: true });
+      const image = await imageService.replaceImage(existing.image_id, file, {
+        compress: true,
+      });
       image_id = image.id;
     }
 
@@ -115,8 +144,8 @@ export const paymentMethodService = {
         image_id,
       },
       include: {
-        images: true
-      }
+        images: true,
+      },
     });
 
     return formatPaymentMethod(updated);
@@ -140,5 +169,5 @@ export const paymentMethodService = {
     if (existing.image_id) {
       await imageService.deleteImage(existing.image_id).catch(() => {});
     }
-  }
+  },
 };

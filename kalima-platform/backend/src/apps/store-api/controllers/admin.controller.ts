@@ -2,10 +2,27 @@ import { Request, Response, NextFunction } from "express";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 import { userManagementService } from "../services/user-management.service";
-import { AssignRoleDto, RevokeRoleDto, SetRolesDto, CreateAdminDto, CreateSubAdminDto, CreateModeratorDto, CreateAssistantDto } from "../dtos/admin.dto";
+import {
+  AssignRoleDto,
+  RevokeRoleDto,
+  SetRolesDto,
+  CreateAdminDto,
+  CreateSubAdminDto,
+  CreateModeratorDto,
+  CreateAssistantDto,
+} from "../dtos/admin.dto";
 import { role_enum, portal_enum } from "../generated/prisma/client";
-import { ValidationError, BadRequestError, ForbiddenError } from "../../../libs/errors";
-import { TeacherRegistrationDto, StudentRegistrationDto, ParentRegistrationDto, LecturerRegistrationDto } from "../dtos/auth.dto";
+import {
+  ValidationError,
+  BadRequestError,
+  ForbiddenError,
+} from "../../../libs/errors";
+import {
+  TeacherRegistrationDto,
+  StudentRegistrationDto,
+  ParentRegistrationDto,
+  LecturerRegistrationDto,
+} from "../dtos/auth.dto";
 import { CreatorContext } from "../interfaces/auth.interface";
 
 // ============================================
@@ -90,7 +107,10 @@ export const adminController = {
           break;
         case role_enum.SubAdmin:
           const subAdminDto = await validateDto(CreateSubAdminDto, req.body);
-          result = await userManagementService.createSubAdmin(subAdminDto, creator);
+          result = await userManagementService.createSubAdmin(
+            subAdminDto,
+            creator,
+          );
           break;
         case role_enum.Moderator:
           const modDto = await validateDto(CreateModeratorDto, req.body);
@@ -98,34 +118,92 @@ export const adminController = {
           break;
         case role_enum.Assistant:
           const assistantDto = await validateDto(CreateAssistantDto, req.body);
-          result = await userManagementService.createAssistant(assistantDto, creator);
+          result = await userManagementService.createAssistant(
+            assistantDto,
+            creator,
+          );
           break;
         case role_enum.Teacher:
-          const hasPermTeacher = creator.roles.some((r) => ([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator] as role_enum[]).includes(r.role));
-          if (!hasPermTeacher) throw new ForbiddenError("Not allowed to create Teacher");
-          const teacherDto = await validateDto(TeacherRegistrationDto, req.body);
-          result = (await userManagementService.createTeacher(teacherDto, creator)).user;
+          const hasPermTeacher = creator.roles.some((r) =>
+            (
+              [
+                role_enum.Admin,
+                role_enum.SubAdmin,
+                role_enum.Moderator,
+              ] as role_enum[]
+            ).includes(r.role),
+          );
+          if (!hasPermTeacher)
+            throw new ForbiddenError("Not allowed to create Teacher");
+          const teacherDto = await validateDto(
+            TeacherRegistrationDto,
+            req.body,
+          );
+          result = (
+            await userManagementService.createTeacher(teacherDto, creator)
+          ).user;
           break;
         case role_enum.Student:
-          const hasPermStudent = creator.roles.some((r) => ([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator] as role_enum[]).includes(r.role));
-          if (!hasPermStudent) throw new ForbiddenError("Not allowed to create Student");
-          const studentDto = await validateDto(StudentRegistrationDto, req.body);
-          result = (await userManagementService.createStudent(studentDto, creator)).user;
+          const hasPermStudent = creator.roles.some((r) =>
+            (
+              [
+                role_enum.Admin,
+                role_enum.SubAdmin,
+                role_enum.Moderator,
+              ] as role_enum[]
+            ).includes(r.role),
+          );
+          if (!hasPermStudent)
+            throw new ForbiddenError("Not allowed to create Student");
+          const studentDto = await validateDto(
+            StudentRegistrationDto,
+            req.body,
+          );
+          result = (
+            await userManagementService.createStudent(studentDto, creator)
+          ).user;
           break;
         case role_enum.Parent:
-          const hasPermParent = creator.roles.some((r) => ([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator] as role_enum[]).includes(r.role));
-          if (!hasPermParent) throw new ForbiddenError("Not allowed to create Parent");
+          const hasPermParent = creator.roles.some((r) =>
+            (
+              [
+                role_enum.Admin,
+                role_enum.SubAdmin,
+                role_enum.Moderator,
+              ] as role_enum[]
+            ).includes(r.role),
+          );
+          if (!hasPermParent)
+            throw new ForbiddenError("Not allowed to create Parent");
           const parentDto = await validateDto(ParentRegistrationDto, req.body);
-          result = (await userManagementService.createParent(parentDto, creator)).user;
+          result = (
+            await userManagementService.createParent(parentDto, creator)
+          ).user;
           break;
         case role_enum.Lecturer:
-          const hasPermLecturer = creator.roles.some((r) => ([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator] as role_enum[]).includes(r.role));
-          if (!hasPermLecturer) throw new ForbiddenError("Not allowed to create Lecturer");
-          const lecturerDto = await validateDto(LecturerRegistrationDto, req.body);
-          result = (await userManagementService.createLecturer(lecturerDto, creator)).user;
+          const hasPermLecturer = creator.roles.some((r) =>
+            (
+              [
+                role_enum.Admin,
+                role_enum.SubAdmin,
+                role_enum.Moderator,
+              ] as role_enum[]
+            ).includes(r.role),
+          );
+          if (!hasPermLecturer)
+            throw new ForbiddenError("Not allowed to create Lecturer");
+          const lecturerDto = await validateDto(
+            LecturerRegistrationDto,
+            req.body,
+          );
+          result = (
+            await userManagementService.createLecturer(lecturerDto, creator)
+          ).user;
           break;
         default:
-          throw new BadRequestError(`Role ${role} creation is not supported via this endpoint.`);
+          throw new BadRequestError(
+            `Role ${role} creation is not supported via this endpoint.`,
+          );
       }
 
       res.status(201).json({
@@ -360,6 +438,48 @@ export const adminController = {
           roles: user.user_roles,
         },
       });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  // ============================================
+  // DELETE USER
+  // ============================================
+
+  /**
+   * DELETE /admin/users/:userId
+   * Admin/SubAdmin can delete any user except themselves.
+   */
+  async deleteUser(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const callerUserId = (req as any).user?.userId;
+      const targetUserId = Number(req.params.userId);
+
+      if (isNaN(targetUserId)) {
+        res.status(400).json({ success: false, message: "Invalid user ID" });
+        return;
+      }
+
+      if (callerUserId === targetUserId) {
+        res
+          .status(400)
+          .json({
+            success: false,
+            message:
+              "Cannot delete your own account via this endpoint. Use DELETE /auth/delete-account instead.",
+          });
+        return;
+      }
+
+      await userManagementService.deleteUser(targetUserId);
+      res
+        .status(200)
+        .json({ success: true, message: "User deleted successfully" });
     } catch (error) {
       _next(error);
     }

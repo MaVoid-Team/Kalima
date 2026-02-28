@@ -369,6 +369,16 @@ class AuthService {
   }
 
   // ============================================
+  // ACCOUNT DELETION
+  // ============================================
+
+  async deleteAccount(userId: number): Promise<{ message: string }> {
+    await revokeAllRefreshTokensForUser(userId);
+    await this.userService.deleteUser(userId);
+    return { message: "Account deleted successfully" };
+  }
+
+  // ============================================
   // PASSWORD MANAGEMENT
   // ============================================
 

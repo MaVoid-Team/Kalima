@@ -28,7 +28,11 @@ router.get("/users/export", ...adminAuth, makeExportHandler("users"));
 router.get("/users", ...adminAuth, adminController.listUsers);
 
 // Created Accounts Statistics
-router.get("/users/stats/created-accounts", ...adminAuth, adminUserStatsController.getCreatedAccountsStats);
+router.get(
+  "/users/stats/created-accounts",
+  ...adminAuth,
+  adminUserStatsController.getCreatedAccountsStats,
+);
 
 // Get single user with all roles
 router.get("/users/:userId", ...adminAuth, adminController.getUser);
@@ -48,5 +52,8 @@ router.put("/users/:userId/roles", ...adminAuth, adminController.setRoles);
 
 // Revoke a role from a user
 router.delete("/users/:userId/roles", ...adminAuth, adminController.revokeRole);
+
+// Delete a user
+router.delete("/users/:userId", ...adminAuth, adminController.deleteUser);
 
 export default router;

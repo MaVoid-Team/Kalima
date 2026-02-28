@@ -23,22 +23,24 @@ export const adminDashboardController = {
         };
       }
 
-      const [aggregates, confirmedAggregates, pendingCount] = await Promise.all([
-        prisma.purchases.aggregate({
-          _count: { id: true },
-          _sum: { total: true },
-          _avg: { total: true },
-          where: whereClause,
-        }),
-        prisma.purchases.aggregate({
-          _count: { id: true },
-          _sum: { total: true },
-          where: { ...whereClause, status: "confirmed" },
-        }),
-        prisma.purchases.count({
-          where: { ...whereClause, status: "pending" },
-        }),
-      ]);
+      const [aggregates, confirmedAggregates, pendingCount] = await Promise.all(
+        [
+          prisma.purchases.aggregate({
+            _count: { id: true },
+            _sum: { total: true },
+            _avg: { total: true },
+            where: whereClause,
+          }),
+          prisma.purchases.aggregate({
+            _count: { id: true },
+            _sum: { total: true },
+            where: { ...whereClause, status: "confirmed" },
+          }),
+          prisma.purchases.count({
+            where: { ...whereClause, status: "pending" },
+          }),
+        ],
+      );
 
       res.status(200).json({
         success: true,
@@ -69,26 +71,30 @@ export const adminDashboardController = {
   ): Promise<void> {
     try {
       const stats = await prisma.purchases.groupBy({
-        by: ['confirmed_by', 'status'],
+        by: ["confirmed_by", "status"],
         _count: {
           id: true,
         },
         where: {
           confirmed_by: {
             not: null,
-          }
+          },
         },
       });
 
-      const confirmerIds = [...new Set(stats.map(s => s.confirmed_by).filter(id => id !== null))] as number[];
-      
+      const confirmerIds = [
+        ...new Set(
+          stats.map((s) => s.confirmed_by).filter((id) => id !== null),
+        ),
+      ] as number[];
+
       const confirmers = await prisma.users.findMany({
         where: { id: { in: confirmerIds } },
         select: { id: true, name: true, email: true },
       });
 
       const confirmerMap = new Map();
-      confirmers.forEach(c => confirmerMap.set(c.id, c));
+      confirmers.forEach((c) => confirmerMap.set(c.id, c));
 
       const statsByConfirmer = new Map<number, any>();
 
@@ -97,7 +103,9 @@ export const adminDashboardController = {
         if (!statsByConfirmer.has(confirmerId)) {
           const confirmerInfo = confirmerMap.get(confirmerId);
           statsByConfirmer.set(confirmerId, {
-            user: confirmerInfo ? confirmerInfo : { id: confirmerId, name: 'Unknown' },
+            user: confirmerInfo
+              ? confirmerInfo
+              : { id: confirmerId, name: "Unknown" },
             byStatus: {},
             totalHandled: 0,
           });
@@ -108,7 +116,9 @@ export const adminDashboardController = {
         data.totalHandled += stat._count.id;
       });
 
-      const result = Array.from(statsByConfirmer.values()).sort((a, b) => b.totalHandled - a.totalHandled);
+      const result = Array.from(statsByConfirmer.values()).sort(
+        (a, b) => b.totalHandled - a.totalHandled,
+      );
 
       res.status(200).json({
         success: true,
@@ -131,14 +141,16 @@ export const adminDashboardController = {
     try {
       // Find top products based on purchase_items
       const items = await prisma.purchase_items.groupBy({
-        by: ['product_id'],
+        by: ["product_id"],
         _count: { id: true },
         _sum: {
           price_at_purchase: true, // Assuming price per item at time of purchase is stored
         },
       });
 
-      const productIds = items.map(i => i.product_id).filter(id => id !== null) as number[];
+      const productIds = items
+        .map((i) => i.product_id)
+        .filter((id) => id !== null) as number[];
 
       const products = await prisma.products.findMany({
         where: { id: { in: productIds } },
@@ -146,17 +158,23 @@ export const adminDashboardController = {
       });
 
       const productMap = new Map();
-      products.forEach(p => productMap.set(p.id, p));
+      products.forEach((p) => productMap.set(p.id, p));
 
-      const result = items.map(item => {
-        const prod = productMap.get(item.product_id);
-        return {
-          product: prod ? prod : { id: item.product_id, title: 'Unknown Product' },
-          timesPurchased: item._count.id,
-          // Calculate total value generated (this could vary based on how price is stored on purchase_items)
-          totalValue: item._sum.price_at_purchase ? Number(item._sum.price_at_purchase) : 0, 
-        };
-      }).sort((a, b) => b.totalValue - a.totalValue);
+      const result = items
+        .map((item) => {
+          const prod = productMap.get(item.product_id);
+          return {
+            product: prod
+              ? prod
+              : { id: item.product_id, title: "Unknown Product" },
+            timesPurchased: item._count.id,
+            // Calculate total value generated (this could vary based on how price is stored on purchase_items)
+            totalValue: item._sum.price_at_purchase
+              ? Number(item._sum.price_at_purchase)
+              : 0,
+          };
+        })
+        .sort((a, b) => b.totalValue - a.totalValue);
 
       res.status(200).json({
         success: true,
@@ -177,7 +195,7 @@ export const adminDashboardController = {
     _next: NextFunction,
   ): Promise<void> {
     try {
-      // Using raw query for time calculations across the table. 
+      // Using raw query for time calculations across the table.
       // PostgreSQL handles time intervals well.
       // This calculates the average difference in minutes between created_at and confirmed_at
       const timeStats: any[] = await prisma.$queryRaw`
@@ -232,18 +250,18 @@ export const adminDashboardController = {
         },
       });
 
-      // 2. We'll run raw queries to get accurate averages and counts per staff, 
+      // 2. We'll run raw queries to get accurate averages and counts per staff,
       //    since Prisma's native groupBy across multiple relation keys is complex.
       //    This is similar to how the legacy system's `getFullOrdersReport` worked.
 
-      const staffIds = staffMembers.map(s => s.id);
-      
+      const staffIds = staffMembers.map((s) => s.id);
+
       if (staffIds.length === 0) {
         res.status(200).json({ success: true, data: [] });
         return;
       }
 
-      const idList = staffIds.join(',');
+      const idList = staffIds.join(",");
 
       // Count Received
       const receivedCounts: any[] = await prisma.$queryRawUnsafe(`
@@ -286,11 +304,11 @@ export const adminDashboardController = {
       `);
 
       const getVal = (arr: any[], id: number, key: string) => {
-        const found = arr.find(item => Number(item.admin_id) === id);
+        const found = arr.find((item) => Number(item.admin_id) === id);
         return found ? Number(found[key]) : 0;
       };
 
-      const report = staffMembers.map(staff => {
+      const report = staffMembers.map((staff) => {
         return {
           staff: {
             id: staff.id,
@@ -299,11 +317,15 @@ export const adminDashboardController = {
             email: staff.email,
           },
           metrics: {
-            totalReceived: getVal(receivedCounts, staff.id, 'count'),
-            totalConfirmed: getVal(confirmedCounts, staff.id, 'count'),
-            totalReturned: getVal(returnedCounts, staff.id, 'count'),
-            avgResponseMinutes: getVal(responseTimes, staff.id, 'avg_minutes'),
-            avgConfirmationMinutes: getVal(confirmTimes, staff.id, 'avg_minutes'),
+            totalReceived: getVal(receivedCounts, staff.id, "count"),
+            totalConfirmed: getVal(confirmedCounts, staff.id, "count"),
+            totalReturned: getVal(returnedCounts, staff.id, "count"),
+            avgResponseMinutes: getVal(responseTimes, staff.id, "avg_minutes"),
+            avgConfirmationMinutes: getVal(
+              confirmTimes,
+              staff.id,
+              "avg_minutes",
+            ),
           },
         };
       });
@@ -312,7 +334,6 @@ export const adminDashboardController = {
         success: true,
         data: report,
       });
-
     } catch (error) {
       _next(error);
     }
@@ -331,16 +352,17 @@ export const adminDashboardController = {
       const [totalUsers, totalVerifiedUsers, countsByRole] = await Promise.all([
         prisma.users.count(),
         prisma.users.count({ where: { is_email_verified: true } }),
-        prisma.user_roles.groupBy({
+        prisma.users.groupBy({
           by: ["role"],
-          _count: { user_id: true },
-          orderBy: { role: "asc" },
+          _count: {
+            _all: true, // Count all records in each group
+          },
         }),
       ]);
 
       const byRole: Record<string, number> = {};
       countsByRole.forEach((row) => {
-        byRole[row.role] = row._count.user_id;
+        byRole[row.role] = row._count._all;
       });
 
       res.status(200).json({

@@ -14,6 +14,7 @@
 2. [User Management](#user-management)
    - [List Users](#list-users)
    - [Get User](#get-user)
+   - [Delete User](#delete-user)
 3. [Role Management](#role-management)
    - [Get User Roles](#get-user-roles)
    - [Assign Role](#assign-role)
@@ -164,6 +165,38 @@ Retrieve a single user with all their roles and profile data.
   "message": "User not found"
 }
 ```
+
+---
+
+### Delete User
+
+Permanently deletes a user account. Admin/SubAdmin cannot delete their own account via this endpoint.
+
+**Endpoint:** `DELETE /users/:userId`  
+**Auth Required:** Yes (Admin / SubAdmin)
+
+**Path Parameters:**
+
+| Parameter | Type   | Description   |
+| --------- | ------ | ------------- |
+| userId    | number | The user's ID |
+
+**Success Response:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "User deleted successfully"
+}
+```
+
+**Error Responses:**
+
+| Status | Message                                                                                      |
+| ------ | -------------------------------------------------------------------------------------------- |
+| 400    | `Invalid user ID`                                                                            |
+| 400    | `Cannot delete your own account via this endpoint. Use DELETE /auth/delete-account instead.` |
+| 404    | `User not found`                                                                             |
 
 ---
 
@@ -416,10 +449,10 @@ Overview of total purchases, confirmed purchases, revenue, pending purchases, an
 
 **Query Parameters:**
 
-| Parameter  | Type   | Required | Description |
-| ---------- | ------ | -------- | ----------- |
-| `startDate`| string | No       | ISO date string (e.g., `2026-01-01T00:00:00Z`) |
-| `endDate`  | string | No       | ISO date string (e.g., `2026-01-31T23:59:59Z`) |
+| Parameter   | Type   | Required | Description                                    |
+| ----------- | ------ | -------- | ---------------------------------------------- |
+| `startDate` | string | No       | ISO date string (e.g., `2026-01-01T00:00:00Z`) |
+| `endDate`   | string | No       | ISO date string (e.g., `2026-01-31T23:59:59Z`) |
 
 **Success Response (200):** Returns an overview object containing `totalPurchases`, `totalRevenue`, `averagePrice`, `confirmedPurchases`, `confirmedRevenue`, and `pendingPurchases`.
 
@@ -504,8 +537,8 @@ Returns total users, total verified users, and count of unique users per role.
 
 ---
 
-> **Planned Future Endpoints:**  
+> **Planned Future Endpoints:**
+>
 > - `POST /admin/users/:userId/ban` — Ban/suspend a user
 > - `POST /admin/users/:userId/unban` — Unban a user
-> - `DELETE /admin/users/:userId` — Delete a user account
 > - `GET /admin/audit-log` — Admin action audit trail
