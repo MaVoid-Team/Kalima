@@ -13,7 +13,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
-import EditProductDialog from '@/components/admin/products/EditProductDialog';
 import EditCouponDialog from '@/components/admin/coupons/EditCouponDialog';
 import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
 import ThumbnailManager from '@/components/admin/products/ThumbnailManager';
@@ -265,8 +264,8 @@ export default function ProductDetailPage() {
             <div className="rounded-xl border border-border p-5 space-y-3" data-testid="product-detail-sample">
                 <h2 className="font-semibold text-foreground">{t('products.detail.sample')}</h2>
                 <Separator />
-                <SampleManager 
-                    product={product} 
+                <SampleManager
+                    product={product}
                     onUpdateSample={updateProductSample}
                     onRemoveSample={removeProductSample}
                     loading={actionLoading}
