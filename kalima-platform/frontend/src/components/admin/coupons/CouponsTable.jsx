@@ -18,7 +18,7 @@ import { getCouponId } from '@/lib/couponUtils';
 
 
 export default function CouponsTable({ coupons, loading, onEdit, onDelete, onToggleActivation, pagination, onPageChange, selectedIds = [], onSelect, onSelectAll }) {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
 
     if (loading) {
         return (
@@ -44,6 +44,7 @@ export default function CouponsTable({ coupons, loading, onEdit, onDelete, onTog
                         <TableRow>
                             <TableHead className="w-10">
                                 <Checkbox
+                                    className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                     checked={coupons.length > 0 && selectedIds.length === coupons.length}
                                     onCheckedChange={(checked) => onSelectAll?.(!!checked)}
                                     aria-label="Select all coupons"

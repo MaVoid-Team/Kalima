@@ -20,6 +20,7 @@ export default function CouponTableRow({ coupon, onEdit, onDelete, onToggleActiv
         <TableRow data-testid={`coupons-table-row-${couponId}`} className={isSelected ? 'bg-muted/40' : ''}>
             <TableCell className="w-10">
                 <Checkbox
+                    className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                     checked={!!isSelected}
                     onCheckedChange={(checked) => onSelect?.(couponId, !!checked)}
                     aria-label={`Select coupon ${coupon.code}`}
