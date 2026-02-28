@@ -47,6 +47,8 @@ export type UsersMinAggregateOutputType = {
   is_email_verified: boolean | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
+  is_deleted: boolean | null
   secondary_phone: string | null
   profile_pic_url: string | null
   password_changed_at: Date | null
@@ -69,6 +71,8 @@ export type UsersMaxAggregateOutputType = {
   is_email_verified: boolean | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
+  is_deleted: boolean | null
   secondary_phone: string | null
   profile_pic_url: string | null
   password_changed_at: Date | null
@@ -91,6 +95,8 @@ export type UsersCountAggregateOutputType = {
   is_email_verified: number
   created_at: number
   updated_at: number
+  deleted_at: number
+  is_deleted: number
   secondary_phone: number
   profile_pic_url: number
   password_changed_at: number
@@ -125,6 +131,8 @@ export type UsersMinAggregateInputType = {
   is_email_verified?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
+  is_deleted?: true
   secondary_phone?: true
   profile_pic_url?: true
   password_changed_at?: true
@@ -147,6 +155,8 @@ export type UsersMaxAggregateInputType = {
   is_email_verified?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
+  is_deleted?: true
   secondary_phone?: true
   profile_pic_url?: true
   password_changed_at?: true
@@ -169,6 +179,8 @@ export type UsersCountAggregateInputType = {
   is_email_verified?: true
   created_at?: true
   updated_at?: true
+  deleted_at?: true
+  is_deleted?: true
   secondary_phone?: true
   profile_pic_url?: true
   password_changed_at?: true
@@ -278,6 +290,8 @@ export type UsersGroupByOutputType = {
   is_email_verified: boolean | null
   created_at: Date | null
   updated_at: Date | null
+  deleted_at: Date | null
+  is_deleted: boolean | null
   secondary_phone: string | null
   profile_pic_url: string | null
   password_changed_at: Date | null
@@ -323,6 +337,8 @@ export type usersWhereInput = {
   is_email_verified?: Prisma.BoolNullableFilter<"users"> | boolean | null
   created_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"users"> | boolean | null
   secondary_phone?: Prisma.StringNullableFilter<"users"> | string | null
   profile_pic_url?: Prisma.StringNullableFilter<"users"> | string | null
   password_changed_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
@@ -367,6 +383,8 @@ export type usersOrderByWithRelationInput = {
   is_email_verified?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   secondary_phone?: Prisma.SortOrderInput | Prisma.SortOrder
   profile_pic_url?: Prisma.SortOrderInput | Prisma.SortOrder
   password_changed_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -414,6 +432,8 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   is_email_verified?: Prisma.BoolNullableFilter<"users"> | boolean | null
   created_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"users"> | boolean | null
   secondary_phone?: Prisma.StringNullableFilter<"users"> | string | null
   profile_pic_url?: Prisma.StringNullableFilter<"users"> | string | null
   password_changed_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
@@ -458,6 +478,8 @@ export type usersOrderByWithAggregationInput = {
   is_email_verified?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   secondary_phone?: Prisma.SortOrderInput | Prisma.SortOrder
   profile_pic_url?: Prisma.SortOrderInput | Prisma.SortOrder
   password_changed_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -488,6 +510,8 @@ export type usersScalarWhereWithAggregatesInput = {
   is_email_verified?: Prisma.BoolNullableWithAggregatesFilter<"users"> | boolean | null
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"users"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"users"> | Date | string | null
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"users"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableWithAggregatesFilter<"users"> | boolean | null
   secondary_phone?: Prisma.StringNullableWithAggregatesFilter<"users"> | string | null
   profile_pic_url?: Prisma.StringNullableWithAggregatesFilter<"users"> | string | null
   password_changed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"users"> | Date | string | null
@@ -509,6 +533,8 @@ export type usersCreateInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -552,6 +578,8 @@ export type usersUncheckedCreateInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -594,6 +622,8 @@ export type usersUpdateInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -637,6 +667,8 @@ export type usersUncheckedUpdateInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -680,6 +712,8 @@ export type usersCreateManyInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -701,6 +735,8 @@ export type usersUpdateManyMutationInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -722,6 +758,8 @@ export type usersUncheckedUpdateManyInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -764,6 +802,8 @@ export type usersCountOrderByAggregateInput = {
   is_email_verified?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
   secondary_phone?: Prisma.SortOrder
   profile_pic_url?: Prisma.SortOrder
   password_changed_at?: Prisma.SortOrder
@@ -791,6 +831,8 @@ export type usersMaxOrderByAggregateInput = {
   is_email_verified?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
   secondary_phone?: Prisma.SortOrder
   profile_pic_url?: Prisma.SortOrder
   password_changed_at?: Prisma.SortOrder
@@ -813,6 +855,8 @@ export type usersMinOrderByAggregateInput = {
   is_email_verified?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
   secondary_phone?: Prisma.SortOrder
   profile_pic_url?: Prisma.SortOrder
   password_changed_at?: Prisma.SortOrder
@@ -1195,6 +1239,8 @@ export type usersCreateWithoutAuth_identitiesInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -1237,6 +1283,8 @@ export type usersUncheckedCreateWithoutAuth_identitiesInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -1294,6 +1342,8 @@ export type usersUpdateWithoutAuth_identitiesInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1336,6 +1386,8 @@ export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1377,6 +1429,8 @@ export type usersCreateWithoutUser_analyticsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -1419,6 +1473,8 @@ export type usersUncheckedCreateWithoutUser_analyticsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -1476,6 +1532,8 @@ export type usersUpdateWithoutUser_analyticsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1518,6 +1576,8 @@ export type usersUncheckedUpdateWithoutUser_analyticsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1559,6 +1619,8 @@ export type usersCreateWithoutUser_rolesInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -1601,6 +1663,8 @@ export type usersUncheckedCreateWithoutUser_rolesInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -1658,6 +1722,8 @@ export type usersUpdateWithoutUser_rolesInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1700,6 +1766,8 @@ export type usersUncheckedUpdateWithoutUser_rolesInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1741,6 +1809,8 @@ export type usersCreateWithoutCreated_usersInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -1783,6 +1853,8 @@ export type usersUncheckedCreateWithoutCreated_usersInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -1829,6 +1901,8 @@ export type usersCreateWithoutCreator_userInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -1871,6 +1945,8 @@ export type usersUncheckedCreateWithoutCreator_userInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -1933,6 +2009,8 @@ export type usersUpdateWithoutCreated_usersInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1975,6 +2053,8 @@ export type usersUncheckedUpdateWithoutCreated_usersInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2036,6 +2116,8 @@ export type usersScalarWhereInput = {
   is_email_verified?: Prisma.BoolNullableFilter<"users"> | boolean | null
   created_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"users"> | boolean | null
   secondary_phone?: Prisma.StringNullableFilter<"users"> | string | null
   profile_pic_url?: Prisma.StringNullableFilter<"users"> | string | null
   password_changed_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
@@ -2057,6 +2139,8 @@ export type usersCreateWithoutRefresh_tokensInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -2099,6 +2183,8 @@ export type usersUncheckedCreateWithoutRefresh_tokensInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -2156,6 +2242,8 @@ export type usersUpdateWithoutRefresh_tokensInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2198,6 +2286,8 @@ export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2239,6 +2329,8 @@ export type usersCreateWithoutAssistantsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -2281,6 +2373,8 @@ export type usersUncheckedCreateWithoutAssistantsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -2338,6 +2432,8 @@ export type usersUpdateWithoutAssistantsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2380,6 +2476,8 @@ export type usersUncheckedUpdateWithoutAssistantsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2421,6 +2519,8 @@ export type usersCreateWithoutLecturersInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -2463,6 +2563,8 @@ export type usersUncheckedCreateWithoutLecturersInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -2520,6 +2622,8 @@ export type usersUpdateWithoutLecturersInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2562,6 +2666,8 @@ export type usersUncheckedUpdateWithoutLecturersInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2603,6 +2709,8 @@ export type usersCreateWithoutParentsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -2645,6 +2753,8 @@ export type usersUncheckedCreateWithoutParentsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -2702,6 +2812,8 @@ export type usersUpdateWithoutParentsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2744,6 +2856,8 @@ export type usersUncheckedUpdateWithoutParentsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2785,6 +2899,8 @@ export type usersCreateWithoutSocial_mediaInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -2827,6 +2943,8 @@ export type usersUncheckedCreateWithoutSocial_mediaInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -2884,6 +3002,8 @@ export type usersUpdateWithoutSocial_mediaInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2926,6 +3046,8 @@ export type usersUncheckedUpdateWithoutSocial_mediaInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2967,6 +3089,8 @@ export type usersCreateWithoutStudentsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3009,6 +3133,8 @@ export type usersUncheckedCreateWithoutStudentsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3066,6 +3192,8 @@ export type usersUpdateWithoutStudentsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3108,6 +3236,8 @@ export type usersUncheckedUpdateWithoutStudentsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3149,6 +3279,8 @@ export type usersCreateWithoutTeachersInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3191,6 +3323,8 @@ export type usersUncheckedCreateWithoutTeachersInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3248,6 +3382,8 @@ export type usersUpdateWithoutTeachersInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3290,6 +3426,8 @@ export type usersUncheckedUpdateWithoutTeachersInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3331,6 +3469,8 @@ export type usersCreateWithoutTeaches_atInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3373,6 +3513,8 @@ export type usersUncheckedCreateWithoutTeaches_atInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3430,6 +3572,8 @@ export type usersUpdateWithoutTeaches_atInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3472,6 +3616,8 @@ export type usersUncheckedUpdateWithoutTeaches_atInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3513,6 +3659,8 @@ export type usersCreateWithoutEmail_verification_tokensInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3555,6 +3703,8 @@ export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3612,6 +3762,8 @@ export type usersUpdateWithoutEmail_verification_tokensInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3654,6 +3806,8 @@ export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3695,6 +3849,8 @@ export type usersCreateWithoutPassword_reset_tokensInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3737,6 +3893,8 @@ export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3794,6 +3952,8 @@ export type usersUpdateWithoutPassword_reset_tokensInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3836,6 +3996,8 @@ export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3877,6 +4039,8 @@ export type usersCreateWithoutCoupon_usagesInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3919,6 +4083,8 @@ export type usersUncheckedCreateWithoutCoupon_usagesInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -3976,6 +4142,8 @@ export type usersUpdateWithoutCoupon_usagesInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4018,6 +4186,8 @@ export type usersUncheckedUpdateWithoutCoupon_usagesInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4059,6 +4229,8 @@ export type usersCreateWithoutProduct_reviewsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4101,6 +4273,8 @@ export type usersUncheckedCreateWithoutProduct_reviewsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4158,6 +4332,8 @@ export type usersUpdateWithoutProduct_reviewsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4200,6 +4376,8 @@ export type usersUncheckedUpdateWithoutProduct_reviewsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4241,6 +4419,8 @@ export type usersCreateWithoutCartsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4283,6 +4463,8 @@ export type usersUncheckedCreateWithoutCartsInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4340,6 +4522,8 @@ export type usersUpdateWithoutCartsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4382,6 +4566,8 @@ export type usersUncheckedUpdateWithoutCartsInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4423,6 +4609,8 @@ export type usersCreateWithoutPurchasesInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4465,6 +4653,8 @@ export type usersUncheckedCreateWithoutPurchasesInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4511,6 +4701,8 @@ export type usersCreateWithoutPurchases_receivedInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4553,6 +4745,8 @@ export type usersUncheckedCreateWithoutPurchases_receivedInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4599,6 +4793,8 @@ export type usersCreateWithoutPurchases_confirmedInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4641,6 +4837,8 @@ export type usersUncheckedCreateWithoutPurchases_confirmedInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4687,6 +4885,8 @@ export type usersCreateWithoutPurchases_returnedInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4729,6 +4929,8 @@ export type usersUncheckedCreateWithoutPurchases_returnedInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -4786,6 +4988,8 @@ export type usersUpdateWithoutPurchasesInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4828,6 +5032,8 @@ export type usersUncheckedUpdateWithoutPurchasesInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4880,6 +5086,8 @@ export type usersUpdateWithoutPurchases_receivedInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4922,6 +5130,8 @@ export type usersUncheckedUpdateWithoutPurchases_receivedInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4974,6 +5184,8 @@ export type usersUpdateWithoutPurchases_confirmedInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5016,6 +5228,8 @@ export type usersUncheckedUpdateWithoutPurchases_confirmedInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5068,6 +5282,8 @@ export type usersUpdateWithoutPurchases_returnedInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5110,6 +5326,8 @@ export type usersUncheckedUpdateWithoutPurchases_returnedInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5152,6 +5370,8 @@ export type usersCreateManyCreator_userInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   secondary_phone?: string | null
   profile_pic_url?: string | null
   password_changed_at?: Date | string | null
@@ -5172,6 +5392,8 @@ export type usersUpdateWithoutCreator_userInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5214,6 +5436,8 @@ export type usersUncheckedUpdateWithoutCreator_userInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5256,6 +5480,8 @@ export type usersUncheckedUpdateManyWithoutCreator_userInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5425,6 +5651,8 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   is_email_verified?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
+  is_deleted?: boolean
   secondary_phone?: boolean
   profile_pic_url?: boolean
   password_changed_at?: boolean
@@ -5470,6 +5698,8 @@ export type usersSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   is_email_verified?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
+  is_deleted?: boolean
   secondary_phone?: boolean
   profile_pic_url?: boolean
   password_changed_at?: boolean
@@ -5493,6 +5723,8 @@ export type usersSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   is_email_verified?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
+  is_deleted?: boolean
   secondary_phone?: boolean
   profile_pic_url?: boolean
   password_changed_at?: boolean
@@ -5516,6 +5748,8 @@ export type usersSelectScalar = {
   is_email_verified?: boolean
   created_at?: boolean
   updated_at?: boolean
+  deleted_at?: boolean
+  is_deleted?: boolean
   secondary_phone?: boolean
   profile_pic_url?: boolean
   password_changed_at?: boolean
@@ -5527,7 +5761,7 @@ export type usersSelectScalar = {
   created_by?: boolean
 }
 
-export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mongo_id" | "name" | "email" | "password" | "phone" | "gender" | "is_email_verified" | "created_at" | "updated_at" | "secondary_phone" | "profile_pic_url" | "password_changed_at" | "confirmed" | "hasPromoCode" | "hasUsedPromoCode" | "email_verified_at" | "role" | "created_by", ExtArgs["result"]["users"]>
+export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mongo_id" | "name" | "email" | "password" | "phone" | "gender" | "is_email_verified" | "created_at" | "updated_at" | "deleted_at" | "is_deleted" | "secondary_phone" | "profile_pic_url" | "password_changed_at" | "confirmed" | "hasPromoCode" | "hasUsedPromoCode" | "email_verified_at" | "role" | "created_by", ExtArgs["result"]["users"]>
 export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assistants?: boolean | Prisma.users$assistantsArgs<ExtArgs>
   auth_identities?: boolean | Prisma.users$auth_identitiesArgs<ExtArgs>
@@ -5597,6 +5831,8 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     is_email_verified: boolean | null
     created_at: Date | null
     updated_at: Date | null
+    deleted_at: Date | null
+    is_deleted: boolean | null
     secondary_phone: string | null
     profile_pic_url: string | null
     password_changed_at: Date | null
@@ -6061,6 +6297,8 @@ export interface usersFieldRefs {
   readonly is_email_verified: Prisma.FieldRef<"users", 'Boolean'>
   readonly created_at: Prisma.FieldRef<"users", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"users", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"users", 'DateTime'>
+  readonly is_deleted: Prisma.FieldRef<"users", 'Boolean'>
   readonly secondary_phone: Prisma.FieldRef<"users", 'String'>
   readonly profile_pic_url: Prisma.FieldRef<"users", 'String'>
   readonly password_changed_at: Prisma.FieldRef<"users", 'DateTime'>
