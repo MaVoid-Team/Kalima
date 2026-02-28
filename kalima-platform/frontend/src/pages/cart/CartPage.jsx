@@ -1,38 +1,18 @@
 import React, { useState } from "react";
-import {
-  Minus,
-  Plus,
-  Lock,
-  MessageCircle,
-  ArrowLeft,
-  ArrowRight,
-  ShoppingCart,
-} from "lucide-react";
 import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CartHeader from "@/components/cart/CartHeader";
 import CartItemsTable from "@/components/cart/CartItemsTable";
 import CartOrderSummary from "@/components/cart/CartOrderSummary";
 import EmptyCartState from "@/components/cart/EmptyCartState";
 import { useCart } from "@/contexts/CartContext";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 
 export default function CartPage() {
-  const { t, i18n } = useTranslation("cart");
   const navigate = useNavigate();
-  const { cart, loading, error, updateQuantity, removeFromCart, applyCoupon, removeCoupon, updateCartItemRequiredFields, updateCartItemRequiredFieldsImage } = useCart();
+  const { cart, loading, updateQuantity, removeFromCart, applyCoupon, removeCoupon, updateCartItemRequiredFields, updateCartItemRequiredFieldsImage } = useCart();
   const [promoCode, setPromoCode] = useState("");
 
-  const localize = (item, base) => {
-    const langSuffix = i18n.language === "ar" ? "Ar" : "En";
-    return (
-      item[`${base}${langSuffix}`] ??
-      item[base] ??
-      item[`${base}En`] ??
-      item[`${base}Ar`] ??
-      ""
-    );
-  };
 
   // Use cart data from context
   const cartItems = cart?.cart_items || [];
@@ -86,6 +66,12 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10" data-testid="cart-page-loading-overlay">
+          <LoadingSpinner className="w-8 h-8" />
+        </div>
+      )}
     </motion.div>
   );
 }
