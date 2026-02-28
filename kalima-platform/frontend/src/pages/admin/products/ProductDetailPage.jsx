@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { arSA } from 'react-day-picker/locale';
-import { ChevronLeft, ChevronRight, Package, Pencil, Trash2 } from 'lucide-react';
+import { ChevronLeft, Package, Pencil, Trash2 } from 'lucide-react';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useAdminCoupons } from '@/hooks/admin/useAdminCoupons';
 import { formatCurrency } from '@/lib/storeUtils';
@@ -35,7 +35,6 @@ export default function ProductDetailPage() {
         actionLoading,
         fetchProductById,
         fetchFieldDefinitions,
-        updateProduct,
         deleteProduct,
         uploadThumbnail,
         removeThumbnail,
@@ -48,7 +47,7 @@ export default function ProductDetailPage() {
         detachRequiredField,
         getProductCoupons,
         updateProductSample,
-        removeProductSample
+        removeProductSample,
     } = useAdminProducts();
 
     const {
@@ -57,7 +56,6 @@ export default function ProductDetailPage() {
         apiLoading: couponLoading,
     } = useAdminCoupons();
 
-    const [editOpen, setEditOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [productCoupons, setProductCoupons] = useState([]);
     const [couponsLoading, setCouponsLoading] = useState(false);

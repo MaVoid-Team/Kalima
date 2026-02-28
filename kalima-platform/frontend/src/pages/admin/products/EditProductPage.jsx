@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Progress } from '@/components/ui/progress';
 import {
     Form,
     FormControl,
@@ -31,6 +32,9 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useCategories } from '@/hooks/useCategories';
+import GalleryManager from '@/components/admin/products/GalleryManager';
+import ThumbnailManager from '@/components/admin/products/ThumbnailManager';
+import FileUploadProgress from '@/components/admin/settings/FileUploadProgress';
 
 const editProductSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255),
@@ -71,6 +75,11 @@ export default function EditProductPage() {
         detachRequiredField,
         fetchFieldDefinitions,
         fieldDefinitions,
+        uploadThumbnail,
+        removeThumbnail,
+        addGalleryImages,
+        updateGalleryEntry,
+        removeGalleryEntry,
     } = useAdminProducts();
 
     const {
@@ -80,6 +89,13 @@ export default function EditProductPage() {
     } = useCategories();
 
     const [selectedFieldDefId, setSelectedFieldDefId] = useState('');
+
+    // Upload progress state
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadFileName, setUploadFileName] = useState('');
+    const [uploadError, setUploadError] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadAbortController, setUploadAbortController] = useState(null);
 
     // Category state
     const [pickedCategory, setPickedCategory] = useState(null);
@@ -194,6 +210,66 @@ export default function EditProductPage() {
         setSelectedRootId('');
         setSelectedChildId('');
         setSelectedGrandchildId('');
+    };
+
+    // ─── Upload Handlers ───────────────────────────────────────────────────────
+
+    const handleThumbnailUpload = async (formData) => {
+        const file = formData.get('thumbnail');
+        if (!file) return;
+
+        setIsUploading(true);
+        setUploadFileName(file.name);
+        setUploadError('');
+        setUploadProgress(0);
+
+        try {
+            const res = await uploadThumbnail(id, formData);
+            if (res?.success) {
+                fetchProductById(id);
+            } else {
+                setUploadError(res?.message || 'Upload failed');
+            }
+        } catch (error) {
+            setUploadError(error.message || 'Upload failed');
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadFileName('');
+        }
+    };
+
+    const handleGalleryUpload = async (formData) => {
+        setIsUploading(true);
+        setUploadFileName('Gallery images');
+        setUploadError('');
+        setUploadProgress(0);
+
+        try {
+            const res = await addGalleryImages(id, formData);
+            if (res?.success) {
+                // Product refresh is handled in the hook
+            } else {
+                setUploadError(res?.message || 'Upload failed');
+            }
+        } catch (error) {
+            setUploadError(error.message || 'Upload failed');
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadFileName('');
+        }
+    };
+
+    const handleUploadCancel = () => {
+        if (uploadAbortController) {
+            uploadAbortController.abort();
+            setUploadAbortController(null);
+        }
+        setIsUploading(false);
+        setUploadProgress(0);
+        setUploadFileName('');
+        setUploadError('');
     };
 
     // ─── Required field helpers ────────────────────────────────────────────────
@@ -467,6 +543,40 @@ export default function EditProductPage() {
                             )}
                         />
                     </div>
+
+                    {/* ── Section: Thumbnail ── */}
+                    <div className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-thumbnail">
+                        <h2 className="font-semibold text-foreground">{t('products.detail.thumbnail')}</h2>
+                        <Separator />
+                        <ThumbnailManager
+                            product={selectedProduct}
+                            onUpload={handleThumbnailUpload}
+                            onRemove={() => removeThumbnail(id)}
+                            loading={actionLoading || isUploading}
+                        />
+                    </div>
+
+                    {/* ── Section: Gallery ── */}
+                    <div className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-gallery">
+                        <h2 className="font-semibold text-foreground">{t('products.detail.gallery')}</h2>
+                        <Separator />
+                        <GalleryManager
+                            product={selectedProduct}
+                            onAddImages={handleGalleryUpload}
+                            onUpdateEntry={(galleryId, data) => updateGalleryEntry(id, galleryId, data)}
+                            onRemoveEntry={(galleryId) => removeGalleryEntry(id, galleryId)}
+                            loading={actionLoading || isUploading}
+                        />
+                    </div>
+
+                    {/* ── Upload Progress ── */}
+                    <FileUploadProgress
+                        progress={uploadProgress}
+                        isUploading={isUploading}
+                        onCancel={handleUploadCancel}
+                        fileName={uploadFileName}
+                        error={uploadError}
+                    />
 
                     {/* ── Section: Category ── */}
                     <div className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-category">
