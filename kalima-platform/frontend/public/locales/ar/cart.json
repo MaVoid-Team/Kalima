@@ -118,5 +118,8 @@
       "descriptionEn": "Stainless Steel • 12 Piece Kit",
       "descriptionAr": "مكونات من الفولاذ المقاوم للصدأ • 12 قطعة"
     }
+  },
+  "validation": {
+    "invalidEgyptPhone": "رقم هاتف مصري غير صالح. يجب أن يبدأ بـ +20 متبوعًا بـ 10 أرقام."
   }
 }

@@ -118,5 +118,8 @@
       "descriptionEn": "Stainless Steel • 12 Piece Kit",
       "descriptionAr": "مكونات من الفولاذ المقاوم للصدأ • 12 قطعة"
     }
+  },
+  "validation": {
+    "invalidEgyptPhone": "Invalid Egyptian phone number. Must start with +20 followed by 10 digits."
   }
 }
