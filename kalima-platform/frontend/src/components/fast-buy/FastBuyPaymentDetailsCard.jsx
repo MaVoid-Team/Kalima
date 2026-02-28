@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getImageUrl } from "@/lib/storeUtils";
 
 export default function FastBuyPaymentDetailsCard({
   state,
@@ -54,9 +55,9 @@ export default function FastBuyPaymentDetailsCard({
                       }`}
                     data-testid={`fastbuy-payment-method-${method.id}`}
                   >
-                    {method.images ? (
+                    {method.image_url ? (
                       <img
-                        src={method.images.url}
+                        src={getImageUrl(method.image_url)}
                         alt={method.name}
                         className="w-12 h-12 rounded-md object-contain  p-1 border shadow-sm"
                       />
