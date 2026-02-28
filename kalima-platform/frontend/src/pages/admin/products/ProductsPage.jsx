@@ -26,7 +26,6 @@ import {
 
 import ProductFilters from '@/components/admin/products/ProductFilters';
 import ProductsTable from '@/components/admin/products/ProductsTable';
-import EditProductDialog from '@/components/admin/products/EditProductDialog';
 import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
 
 export default function ProductsPage() {
