@@ -112,11 +112,6 @@ export default function PaymentMethodsPage() {
     };
 
     const handleExport = (format) => {
-        if (selectedIds.length === 0) {
-            toast.error('Please select at least one payment method to export');
-            return;
-        }
-        
         exportData({
             resource: 'payment-methods',
             format,
@@ -171,7 +166,7 @@ export default function PaymentMethodsPage() {
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <Button 
+                    <Button
                         onClick={() => setCreateOpen(true)}
                         data-testid="create-payment-method-button"
                     >

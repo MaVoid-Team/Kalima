@@ -68,7 +68,7 @@ export default function PaymentMethodFilters({
             {selectedCount > 0 && (
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
-                        {t('paymentMethods.selectedCount', '{count} selected', { count: selectedCount })}
+                        {t('paymentMethods.selectedCount', '{{count}} selected', { count: selectedCount })}
                     </span>
                     <Button
                         variant="outline"
