@@ -410,6 +410,7 @@ export const ModelName = {
   coupon_usages: 'coupon_usages',
   product_required_fields: 'product_required_fields',
   products: 'products',
+  product_reviews: 'product_reviews',
   samples: 'samples',
   required_field_definitions: 'required_field_definitions',
   carts: 'carts',
@@ -436,7 +437,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "images" | "product_gallery"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "images" | "product_gallery"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2364,6 +2365,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    product_reviews: {
+      payload: Prisma.$product_reviewsPayload<ExtArgs>
+      fields: Prisma.product_reviewsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.product_reviewsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.product_reviewsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        findFirst: {
+          args: Prisma.product_reviewsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.product_reviewsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        findMany: {
+          args: Prisma.product_reviewsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>[]
+        }
+        create: {
+          args: Prisma.product_reviewsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        createMany: {
+          args: Prisma.product_reviewsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.product_reviewsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>[]
+        }
+        delete: {
+          args: Prisma.product_reviewsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        update: {
+          args: Prisma.product_reviewsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        deleteMany: {
+          args: Prisma.product_reviewsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.product_reviewsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.product_reviewsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>[]
+        }
+        upsert: {
+          args: Prisma.product_reviewsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        aggregate: {
+          args: Prisma.Product_reviewsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProduct_reviews>
+        }
+        groupBy: {
+          args: Prisma.product_reviewsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Product_reviewsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.product_reviewsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Product_reviewsCountAggregateOutputType> | number
+        }
+      }
+    }
     samples: {
       payload: Prisma.$samplesPayload<ExtArgs>
       fields: Prisma.samplesFieldRefs
@@ -3536,6 +3611,19 @@ export const ProductsScalarFieldEnum = {
 export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum]
 
 
+export const Product_reviewsScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  user_id: 'user_id',
+  rating: 'rating',
+  review_text: 'review_text',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Product_reviewsScalarFieldEnum = (typeof Product_reviewsScalarFieldEnum)[keyof typeof Product_reviewsScalarFieldEnum]
+
+
 export const SamplesScalarFieldEnum = {
   id: 'id',
   product_id: 'product_id',
@@ -4058,6 +4146,7 @@ export type GlobalOmitConfig = {
   coupon_usages?: Prisma.coupon_usagesOmit
   product_required_fields?: Prisma.product_required_fieldsOmit
   products?: Prisma.productsOmit
+  product_reviews?: Prisma.product_reviewsOmit
   samples?: Prisma.samplesOmit
   required_field_definitions?: Prisma.required_field_definitionsOmit
   carts?: Prisma.cartsOmit

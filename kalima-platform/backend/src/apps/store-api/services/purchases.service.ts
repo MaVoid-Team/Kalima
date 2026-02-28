@@ -423,7 +423,18 @@ class PurchasesService {
           where: { purchase_id: purchaseId },
         });
       }
-      await tx.purchases.delete({ where: { id: purchaseId } });
+      await tx.purchases.update({
+        where: { id: purchaseId },
+        data: { deleted_at: new Date() },
+      });
+      await tx.user_analytics.update({
+        where: { user_id: purchase.user_id },
+        data: {
+          number_of_purchases: {
+            decrement: 1,
+          },
+        },
+      });
     });
   }
 
@@ -444,7 +455,10 @@ class PurchasesService {
       );
     }
 
-    await this.db.purchase_items.delete({ where: { id: itemId } });
+    await this.db.purchase_items.update({
+      where: { id: itemId },
+      data: { deleted_at: new Date() },
+    });
 
     const remaining = purchase.purchase_items.filter((i) => i.id !== itemId);
     const newSubtotal = remaining.reduce(

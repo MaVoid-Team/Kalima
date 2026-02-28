@@ -77,6 +77,7 @@ export const ModelName = {
   coupon_usages: 'coupon_usages',
   product_required_fields: 'product_required_fields',
   products: 'products',
+  product_reviews: 'product_reviews',
   samples: 'samples',
   required_field_definitions: 'required_field_definitions',
   carts: 'carts',
@@ -423,6 +424,19 @@ export const ProductsScalarFieldEnum = {
 } as const
 
 export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum]
+
+
+export const Product_reviewsScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  user_id: 'user_id',
+  rating: 'rating',
+  review_text: 'review_text',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Product_reviewsScalarFieldEnum = (typeof Product_reviewsScalarFieldEnum)[keyof typeof Product_reviewsScalarFieldEnum]
 
 
 export const SamplesScalarFieldEnum = {
