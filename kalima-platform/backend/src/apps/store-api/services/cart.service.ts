@@ -150,6 +150,7 @@ class CartService {
         cart_id: cart.id,
         id: { not: cart_item_id },
         coupon_id: coupon.id,
+        deleted_at: null,
       },
     });
     if (usedOnOther) {
@@ -222,8 +223,9 @@ class CartService {
   // ============================================
   async startFastBuy(user_id: number, product_id: number, quantity: number) {
     // 1. Delete any existing fastbuy carts for this user
-    await this.db.carts.deleteMany({
-      where: { user_id, status: "fastbuy" },
+    await this.db.carts.updateMany({
+      where: { user_id, status: "fastbuy", deleted_at: null },
+      data: { deleted_at: new Date() },
     });
     await invalidateCartCache(`fastbuy:${user_id}` as any);
 
@@ -263,7 +265,7 @@ class CartService {
     if (cached) return cached;
 
     const cart = await this.db.carts.findFirst({
-      where: { user_id, status: cartStatus },
+      where: { user_id, status: cartStatus, deleted_at: null },
       include: cartWithItemsQueryInclude,
       relationLoadStrategy: "join",
     });
@@ -497,13 +499,18 @@ class CartService {
   ) {
     const [cart, cartItem] = await Promise.all([
       this.getActiveCartByUser(user_id, cartStatus),
-      this.db.cart_items.findUnique({ where: { id: cart_item_id } }),
+      this.db.cart_items.findUnique({
+        where: { id: cart_item_id },
+      }),
     ]);
     if (!cartItem || cartItem.cart_id !== cart.id) {
       throw new NotFoundError("Cart item not found in user's cart");
     }
 
-    await this.db.cart_items.delete({ where: { id: cart_item_id } });
+    await this.db.cart_items.update({
+      where: { id: cart_item_id },
+      data: { deleted_at: new Date() },
+    });
 
     // Recalculate cart totals and persist
     const cacheKeyUserId =
@@ -642,7 +649,10 @@ class CartService {
   ): Promise<CartWithItems> {
     const cart = await this.getActiveCartByUser(user_id, cartStatus);
     await this.db.$transaction([
-      this.db.cart_items.deleteMany({ where: { cart_id: cart.id } }),
+      this.db.cart_items.updateMany({
+        where: { cart_id: cart.id },
+        data: { deleted_at: new Date() },
+      }),
       this.db.carts.update({
         where: { id: cart.id },
         data: {
@@ -909,7 +919,21 @@ class CartService {
           total,
         },
       });
-      await tx.cart_items.deleteMany({ where: { cart_id: cart.id } });
+      await tx.cart_items.deleteMany({
+        where: { cart_id: cart.id },
+      });
+
+      await tx.user_analytics.update({
+        where: { user_id },
+        data: {
+          total_spent: {
+            increment: Number(total),
+          },
+          number_of_purchases: {
+            increment: 1,
+          },
+        },
+      });
     });
 
     const cacheKeyUserId =
