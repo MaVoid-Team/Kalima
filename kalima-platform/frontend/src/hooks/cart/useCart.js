@@ -71,6 +71,7 @@ export default function useCart() {
                 endpoint: "/cart"
             });
             if (res.success) {
+                toast.success(t("cartCleared", "Cart cleared successfully"));
                 return res.data;
             }
             else {
