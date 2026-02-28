@@ -14,7 +14,7 @@ export function CartProvider({ children }) {
     getCart,
     addToCart,
     changeItemQuantity,
-    clearCart,
+    clearCart: clearCartNetwork,
     getPaymentMethods,
     checkout: checkoutNetwork,
     removeFromCart: removeItemNetwork,
@@ -111,6 +111,11 @@ export function CartProvider({ children }) {
     await updateCartItemRequiredFieldsNetwork(itemId, data);
     await loadCart();
   };
+
+  const clearCart = async () => {
+    await clearCartNetwork();
+    await loadCart();
+  }
 
   const updateCartItemRequiredFieldsImage = async (itemId, reqFieldDefId, imageData) => {
     await updateCartItemRequiredFieldsImageNetwork(itemId, reqFieldDefId, imageData);
