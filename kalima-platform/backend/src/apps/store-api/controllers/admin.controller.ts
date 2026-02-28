@@ -251,12 +251,17 @@ export const adminController = {
         );
       }
 
+      const isDeleted = req.query.isDeleted
+        ? req.query.isDeleted === "true"
+        : undefined;
+
       const result = await userManagementService.listUsers({
         page,
         limit,
         search,
         role: role as role_enum | undefined,
         portal: portal as portal_enum | undefined,
+        isDeleted,
       });
 
       res.status(200).json({ success: true, data: result });
@@ -466,13 +471,11 @@ export const adminController = {
       }
 
       if (callerUserId === targetUserId) {
-        res
-          .status(400)
-          .json({
-            success: false,
-            message:
-              "Cannot delete your own account via this endpoint. Use DELETE /auth/delete-account instead.",
-          });
+        res.status(400).json({
+          success: false,
+          message:
+            "Cannot delete your own account via this endpoint. Use DELETE /auth/delete-account instead.",
+        });
         return;
       }
 
