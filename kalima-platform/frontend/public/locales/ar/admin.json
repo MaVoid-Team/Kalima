@@ -10,7 +10,8 @@
     "lightMode": "الوضع الفاتح",
     "backToStore": "العودة للمتجر",
     "logout": "تسجيل الخروج",
-    "categories": "الفئات"
+    "categories": "الفئات",
+    "settings": "الإعدادات"
   },
   "common": {
     "currencyEGP": "ج.م",
@@ -19,10 +20,19 @@
     "loading": "جاري التحميل...",
     "cancel": "إلغاء",
     "confirm": "تأكيد",
+    "save": "حفظ",
+    "notSpecified": "غير محدد",
+    "file": "ملف",
+    "select": "اختر",
     "pagination": {
       "previous": "السابق",
       "next": "التالي"
     }
+  },
+  "gender": {
+    "male": "ذكر",
+    "female": "أنثى",
+    "other": "آخر"
   },
   "orders": {
     "stats": {
@@ -537,6 +547,111 @@
     "messages": {
       "archiveWarning": "أرشفة هذه الفئة سيؤدي لأرشفة جميع فئاتها الفرعية.",
       "depthLimitReached": "لا يمكن إضافة المزيد من المستويات المودعة. تم الوصول للحد الأقصى وهو 3."
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "description": "إدارة إعدادات الحساب والتفضيلات",
+    "profile": {
+      "title": "معلومات الملف الشخصي",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "secondaryPhone": "رقم الهاتف الثانوي",
+      "gender": "الجنس",
+      "uploadAvatar": "رفع الصورة الرمزية",
+      "avatarHint": "JPG، PNG أو GIF. الحد الأقصى للحجم 2MB.",
+      "editProfile": "تعديل الملف الشخصي",
+      "updateSuccess": "تم تحديث الملف الشخصي بنجاح"
+    },
+    "password": {
+      "title": "إدارة كلمة المرور",
+      "changePassword": "تغيير كلمة المرور",
+      "setPassword": "تعيين كلمة المرور",
+      "changeDescription": "تغيير كلمة المرور الحالية",
+      "setDescription": "تعيين كلمة مرور لتسجيل الدخول المحلي",
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "currentPasswordPlaceholder": "أدخل كلمة المرور الحالية",
+      "newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
+      "confirmPasswordPlaceholder": "أكد كلمة المرور الجديدة",
+      "passwordMismatch": "كلمات المرور غير متطابقة",
+      "confirmChangeTitle": "تغيير كلمة المرور",
+      "confirmChange": "هل أنت متأكد من تغيير كلمة المرور؟ سيتم تسجيل خروجك من جميع الأجهزة.",
+      "confirmSetTitle": "تعيين كلمة المرور",
+      "confirmSet": "هل أنت متأكد من تعيين كلمة مرور؟ هذا سيمكن تسجيل الدخول المحلي لحسابك."
+    },
+    "account": {
+      "title": "أمان الحساب",
+      "linkedProviders": "مزودو الخدمة المرتبطون",
+      "linkNewAccount": "ربط حساب جديد",
+      "linkDescription": "ربط حسابات إضافية لتمكين طرق تسجيل دخول متعددة.",
+      "linkFirebase": "ربط حساب Google",
+      "setPasswordFirst": "تعيين كلمة المرور أولاً",
+      "noLinkedProviders": "لا توجد حسابات مرتبطة",
+      "connected": "متصل",
+      "unlink": "إلغاء الربط",
+      "confirmUnlinkTitle": "إلغاء ربط مزود الخدمة",
+      "confirmUnlink": "هل أنت متأكد من إلغاء ربط هذا المزود؟ ستفقد الوصول إلى طريقة تسجيل الدخول هذه.",
+      "unlinkWarning": "ستفقد الوصول إلى طريقة تسجيل الدخول هذه وستحتاج إلى استخدام أحد حساباتك المتبقية لتسجيل الدخول.",
+      "providers": {
+        "local": "البريد الإلكتروني",
+        "google": "Google",
+        "facebook": "Facebook",
+        "firebase": "Firebase"
+      }
+    },
+    "email": {
+      "title": "التحقق من البريد الإلكتروني",
+      "verificationStatus": "حالة التحقق",
+      "verified": "تم التحقق من البريد الإلكتروني",
+      "notVerified": "لم يتم التحقق من البريد الإلكتروني",
+      "pending": "قيد الانتظار",
+      "verificationDescription": "تحقق من بريدك الإلكتروني لتأمين حسابك وتلقي الإشعارات المهمة.",
+      "sendVerification": "إرسال بريد التحقق",
+      "resendVerification": "إعادة إرسال التحقق",
+      "securityInfo": "معلومات الأمان",
+      "cooldown": "انتظر {{seconds}}ث",
+      "benefits": {
+        "title": "فوائد التحقق",
+        "security": "أمان محسّن للحساب",
+        "recovery": "الوصول إلى استعادة كلمة المرور",
+        "notifications": "الإشعارات المهمة"
+      },
+      "troubleshooting": {
+        "title": "استكشاف الأخطاء",
+        "spam": "تحقق من مجلد الرسائل غير المرغوب فيها",
+        "address": "تحقق من عنوان البريد الإلكتروني",
+        "contact": "اتصل بالدعم إذا لزم الأمر"
+      }
+    },
+    "session": {
+      "title": "إدارة الجلسات",
+      "activeSessions": "الجلسات النشطة",
+      "current": "الحالي",
+      "activeNow": "نشط الآن",
+      "minutesAgo": "منذ {{minutes}} دقيقة",
+      "hoursAgo": "منذ {{hours}} ساعة",
+      "daysAgo": "منذ {{days}} يوم",
+      "sessionActions": "إجراءات الجلسة",
+      "logoutCurrent": "تسجيل الخروج من الجهاز الحالي",
+      "logoutCurrentDescription": "تسجيل الخروج من هذا الجهاز",
+      "logoutAll": "تسجيل الخروج من جميع الأجهزة",
+      "logoutAllDescription": "تسجيل الخروج من جميع الأجهزة",
+      "logout": "تسجيل الخروج",
+      "confirmLogoutAllTitle": "تسجيل الخروج من جميع الأجهزة",
+      "confirmLogoutAll": "هل أنت متأكد من تسجيل الخروج من جميع الأجهزة؟",
+      "logoutWarning": "تسجيل الخروج من جميع الأجهزة يتطلب منك تسجيل الدخول مرة أخرى على كل جهاز.",
+      "logoutAllWarning1": "سيتم تسجيل خروجك من جميع الأجهزة فوراً.",
+      "logoutAllWarning2": "ستحتاج إلى تسجيل الدخول مرة أخرى على كل جهاز لمواصلة استخدام حسابك.",
+      "logoutAllWarning3": "سيتم فقدان أي عمل غير محفوظ."
+    },
+    "upload": {
+      "progress": "تقدم الرفع: {{progress}}%",
+      "cancelled": "تم إلغاء الرفع",
+      "error": "فشل الرفع",
+      "file": "ملف"
     }
   }
 }

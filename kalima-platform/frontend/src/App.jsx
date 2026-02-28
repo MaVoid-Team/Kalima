@@ -51,7 +51,7 @@ const CategoriesPage = lazy(
 const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
 const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
 const AdminSamplesPage = lazy(() => import("./pages/admin/samples/AdminSamplesPage"));
-
+const SettingsPage = lazy(() => import("./pages/admin/settings/SettingsPage"))
 // Public viewer (no layout)
 const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
 const SamplesDirectoryPage = lazy(() => import("./pages/sample/SamplesDirectoryPage"));
@@ -117,6 +117,7 @@ function App() {
               <Route path="/admin/users/:id" element={<UserDetailPage />} />
               <Route path="/admin/samples" element={<AdminSamplesPage />} />
               <Route path="/admin/coupons" element={<CouponsPage />} />
+              <Route path="/admin/settings" element={<SettingsPage />} />
             </Route>
           </Route>
 
