@@ -16,7 +16,7 @@ export const useAdminUsers = () => {
         search: '',
         role: '',
         portal: '',
-        is_deleted: 'all'
+        isDeleted: 'all'
     });
 
     // Detail State
@@ -37,7 +37,7 @@ export const useAdminUsers = () => {
         if (filters.search) query.append('search', filters.search);
         if (filters.role && filters.role !== 'all') query.append('role', filters.role);
         if (filters.portal && filters.portal !== 'all') query.append('portal', filters.portal);
-        if (filters.is_deleted && filters.is_deleted !== 'all') query.append('is_deleted', filters.is_deleted);
+        if (filters.isDeleted && filters.isDeleted !== 'all') query.append('isDeleted', filters.isDeleted);
 
         return query.toString();
     }, [pagination.page, pagination.limit, filters]);
@@ -203,8 +203,8 @@ export const useAdminUsers = () => {
         setPagination((prev) => ({ ...prev, page: 1 }));
     }, []);
 
-    const setIsDeleted = useCallback((is_deleted) => {
-        setFilters((prev) => ({ ...prev, is_deleted }));
+    const setIsDeleted = useCallback((isDeleted) => {
+        setFilters((prev) => ({ ...prev, isDeleted }));
         setPagination((prev) => ({ ...prev, page: 1 }));
     }, []);
 

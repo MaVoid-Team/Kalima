@@ -71,7 +71,7 @@ export default function UserFilters({ filters, onSearchChange, onRoleChange, onP
                     </SelectContent>
                 </Select>
 
-                <Select dir={i18n.dir()} value={String(filters.is_deleted || 'all')} onValueChange={onIsDeletedChange}>
+                <Select dir={i18n.dir()} value={String(filters.isDeleted || 'all')} onValueChange={onIsDeletedChange}>
                     <SelectTrigger className="w-[160px]">
                         <SelectValue placeholder={t('filters.allStatuses', 'All Statuses')} />
                     </SelectTrigger>
