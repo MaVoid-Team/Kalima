@@ -78,12 +78,15 @@ class UserManagementService {
 
   async createTeacher(
     input: TeacherRegistrationDto,
+    creator?: CreatorContext,
   ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
 
-    const passwordHash = await this.hashPassword(input.password);
-    const serial = await this.generateTeacherSerial(input.subject_id);
+    const [passwordHash, serial] = await Promise.all([
+      this.hashPassword(input.password),
+      this.generateTeacherSerial(input.subject_id),
+    ]);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -95,6 +98,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Teacher,
+          created_by: creator?.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -140,6 +144,7 @@ class UserManagementService {
 
   async createStudent(
     input: StudentRegistrationDto,
+    creator?: CreatorContext,
   ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
@@ -156,6 +161,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Student,
+          created_by: creator?.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -193,6 +199,7 @@ class UserManagementService {
 
   async createParent(
     input: ParentRegistrationDto,
+    creator?: CreatorContext,
   ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
@@ -209,6 +216,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Parent,
+          created_by: creator?.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -240,6 +248,7 @@ class UserManagementService {
 
   async createLecturer(
     input: LecturerRegistrationDto,
+    creator?: CreatorContext,
   ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
@@ -256,6 +265,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Lecturer,
+          created_by: creator?.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -296,9 +306,10 @@ class UserManagementService {
     input: TeacherFirebaseRegistrationDto,
     firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
-    await this.ensureEmailNotExists(firebaseUser.email);
-
-    const serial = await this.generateTeacherSerial(input.subject_id);
+    const [, serial] = await Promise.all([
+      this.ensureEmailNotExists(firebaseUser.email),
+      this.generateTeacherSerial(input.subject_id),
+    ]);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -308,7 +319,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true,
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Teacher,
           auth_identities: {
@@ -368,7 +379,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Student,
           auth_identities: {
@@ -420,7 +431,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Parent,
           auth_identities: {
@@ -466,7 +477,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Lecturer,
           auth_identities: {
@@ -527,6 +538,7 @@ class UserManagementService {
           password: passwordHash,
           role: role_enum.Admin,
           is_email_verified: true, // Admin-created users are pre-verified
+          created_by: creator.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -574,6 +586,7 @@ class UserManagementService {
           password: passwordHash,
           role: role_enum.SubAdmin,
           is_email_verified: true,
+          created_by: creator.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -621,6 +634,7 @@ class UserManagementService {
           password: passwordHash,
           role: role_enum.Moderator,
           is_email_verified: true,
+          created_by: creator.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -651,12 +665,14 @@ class UserManagementService {
     this.ensureCreatorCanCreateAssistant(creator, input.lecturer_user_id);
 
     const email = this.normalizeEmail(input.email);
-    await this.ensureEmailNotExists(email);
 
-    // Verify lecturer exists
-    const lecturer = await this.db.lecturers.findUnique({
-      where: { user_id: input.lecturer_user_id },
-    });
+    // Verify both email uniqueness and lecturer existence concurrently
+    const [, lecturer] = await Promise.all([
+      this.ensureEmailNotExists(email),
+      this.db.lecturers.findUnique({
+        where: { user_id: input.lecturer_user_id },
+      }),
+    ]);
 
     if (!lecturer) {
       throw new NotFoundError("Lecturer not found");
@@ -675,6 +691,7 @@ class UserManagementService {
           password: passwordHash,
           role: role_enum.Assistant,
           is_email_verified: true,
+          created_by: creator.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -858,6 +875,10 @@ class UserManagementService {
             profile_pic_url: true,
             created_at: true,
             role: true,
+            user_roles: {
+              select: { role: true },
+              take: 1,
+            },
           },
         },
       },
@@ -926,6 +947,23 @@ class UserManagementService {
       where: { id: tokenId },
       data: { used_at: new Date() },
     });
+  }
+
+  // ============================================
+  // DELETE USER
+  // ============================================
+
+  async deleteUser(userId: number): Promise<void> {
+    const user = await this.db.users.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    await this.db.users.delete({ where: { id: userId } });
   }
 
   // ============================================
@@ -1037,19 +1075,21 @@ class UserManagementService {
    * Will fail if the user already has this exact role+portal.
    */
   async assignRole(userId: number, portal: portal_enum, role: role_enum) {
-    // Verify user exists
-    const user = await this.db.users.findUnique({
-      where: { id: userId },
-      select: { id: true },
-    });
+    // Fetch user and check existing role concurrently
+    const [user, existing] = await Promise.all([
+      this.db.users.findUnique({
+        where: { id: userId },
+        select: { id: true },
+      }),
+      this.db.user_roles.findFirst({
+        where: { user_id: userId, portal, role },
+      }),
+    ]);
+
     if (!user) {
       throw new NotFoundError("User not found");
     }
 
-    // Check if role already exists
-    const existing = await this.db.user_roles.findFirst({
-      where: { user_id: userId, portal, role },
-    });
     if (existing) {
       throw new ConflictError(
         `User already has role ${role} on portal ${portal}`,
@@ -1069,10 +1109,16 @@ class UserManagementService {
    * Prevents removing the last role (user must have at least one).
    */
   async revokeRole(userId: number, portal: portal_enum, role: role_enum) {
-    // Find the specific role row
-    const existing = await this.db.user_roles.findFirst({
-      where: { user_id: userId, portal, role },
-    });
+    // Find the specific role row and count total roles concurrently
+    const [existing, totalRoles] = await Promise.all([
+      this.db.user_roles.findFirst({
+        where: { user_id: userId, portal, role },
+      }),
+      this.db.user_roles.count({
+        where: { user_id: userId },
+      }),
+    ]);
+
     if (!existing) {
       throw new NotFoundError(
         `User does not have role ${role} on portal ${portal}`,
@@ -1080,9 +1126,6 @@ class UserManagementService {
     }
 
     // Prevent removing the last role
-    const totalRoles = await this.db.user_roles.count({
-      where: { user_id: userId },
-    });
     if (totalRoles <= 1) {
       throw new BadRequestError(
         "Cannot remove the last role from a user. Delete the user instead.",
@@ -1174,16 +1217,28 @@ class UserManagementService {
       select: { title: true },
     });
 
-    const serialNo =
-      (await this.db.teachers.count({
-        where: { subject_id: subjectId },
-      })) + 1;
-
     if (!subject) {
       throw new NotFoundError("Subject not found");
     }
 
     let subjectPrefix = subject.title.substring(0, 2).toUpperCase();
+
+    // Find the highest existing serial number for this prefix
+    // Using max serial instead of count to avoid collisions when teachers are deleted
+    const lastTeacher = await this.db.teachers.findFirst({
+      where: { serial: { startsWith: subjectPrefix } },
+      orderBy: { serial: "desc" },
+      select: { serial: true },
+    });
+
+    let serialNo = 1;
+    if (lastTeacher?.serial) {
+      const numPart = parseInt(
+        lastTeacher.serial.slice(subjectPrefix.length),
+        10,
+      );
+      if (!isNaN(numPart)) serialNo = numPart + 1;
+    }
 
     return `${subjectPrefix}${String(serialNo).padStart(3, "0")}`;
   }

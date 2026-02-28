@@ -1,5 +1,5 @@
 import path from "path";
-import fs from "fs";
+import { promises as fsPromises } from "fs";
 import crypto from "crypto";
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
@@ -25,15 +25,61 @@ const MIME_TO_EXT: Record<string, string> = {
     ".docx",
 };
 
+const SAMPLE_LIST_SELECT = {
+  id: true,
+  url: true,
+  original_name: true,
+  mime_type: true,
+  size: true,
+  created_at: true,
+  products: {
+    select: {
+      id: true,
+      title: true,
+    },
+  },
+};
+
+interface SampleListFilters {
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+interface SampleResponse {
+  id: number;
+  url: string;
+  original_name: string;
+  mime_type: string;
+  size: number;
+  created_at: Date;
+  products: {
+    id: number;
+    title: string;
+  };
+}
+
+interface SampleListResponse {
+  data: SampleResponse[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 // ============================================
 // SAMPLE SERVICE
 // ============================================
 
 class SampleService {
-  constructor(private db: PrismaClient = prisma) {
-    if (!fs.existsSync(UPLOAD_DIR)) {
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  private initPromise: Promise<unknown> | null = null;
+
+  constructor(private db: PrismaClient = prisma) {}
+
+  private async ensureUploadDir(): Promise<void> {
+    if (!this.initPromise) {
+      this.initPromise = fsPromises.mkdir(UPLOAD_DIR, { recursive: true });
     }
+    await this.initPromise;
   }
 
   async uploadSample(
@@ -56,7 +102,8 @@ class SampleService {
     const filename = `${uniqueId}${ext}`;
     const filePath = path.join(UPLOAD_DIR, filename);
 
-    fs.writeFileSync(filePath, file.buffer);
+    await this.ensureUploadDir();
+    await fsPromises.writeFile(filePath, file.buffer);
 
     const url = `/uploads/samples/${filename}`;
 
@@ -73,11 +120,39 @@ class SampleService {
     return sample;
   }
 
-  async getAllSamples(): Promise<samples[]> {
-    return this.db.samples.findMany({
-      include: { products: true },
-      orderBy: { created_at: "desc" },
-    });
+  async getAllSamples(
+    filters?: SampleListFilters,
+  ): Promise<SampleListResponse> {
+    const page = filters?.page ?? 1;
+    const limit = filters?.limit ?? 20;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (filters?.search) {
+      where.OR = [
+        { title: { contains: filters.search, mode: "insensitive" } },
+        { description: { contains: filters.search, mode: "insensitive" } },
+      ];
+    }
+
+    const [data, total] = await Promise.all([
+      this.db.samples.findMany({
+        where,
+        select: SAMPLE_LIST_SELECT,
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.samples.count({ where }),
+    ]);
+
+    return {
+      data: data,
+      total: total,
+      page,
+      limit,
+    };
   }
 
   async getSampleById(id: number): Promise<samples> {
@@ -105,13 +180,7 @@ class SampleService {
       sample.url.startsWith("/") ? sample.url.slice(1) : sample.url,
     );
 
-    try {
-      if (fs.existsSync(absolutePath)) {
-        fs.unlinkSync(absolutePath);
-      }
-    } catch {
-      // Silently ignore if file already gone
-    }
+    await fsPromises.unlink(absolutePath).catch(() => {});
 
     await this.db.samples.delete({ where: { id } });
   }

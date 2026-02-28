@@ -530,7 +530,7 @@ export type $password_reset_tokensPayload<ExtArgs extends runtime.Types.Extensio
 export type password_reset_tokensGetPayload<S extends boolean | null | undefined | password_reset_tokensDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$password_reset_tokensPayload, S>
 
 export type password_reset_tokensCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<password_reset_tokensFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<password_reset_tokensFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Password_reset_tokensCountAggregateInputType | true
   }
 
@@ -977,6 +977,7 @@ export type password_reset_tokensFindUniqueArgs<ExtArgs extends runtime.Types.Ex
    * Filter, which password_reset_tokens to fetch.
    */
   where: Prisma.password_reset_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -999,6 +1000,7 @@ export type password_reset_tokensFindUniqueOrThrowArgs<ExtArgs extends runtime.T
    * Filter, which password_reset_tokens to fetch.
    */
   where: Prisma.password_reset_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1051,6 +1053,7 @@ export type password_reset_tokensFindFirstArgs<ExtArgs extends runtime.Types.Ext
    * Filter by unique combinations of password_reset_tokens.
    */
   distinct?: Prisma.Password_reset_tokensScalarFieldEnum | Prisma.Password_reset_tokensScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1103,6 +1106,7 @@ export type password_reset_tokensFindFirstOrThrowArgs<ExtArgs extends runtime.Ty
    * Filter by unique combinations of password_reset_tokens.
    */
   distinct?: Prisma.Password_reset_tokensScalarFieldEnum | Prisma.Password_reset_tokensScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1150,6 +1154,7 @@ export type password_reset_tokensFindManyArgs<ExtArgs extends runtime.Types.Exte
    */
   skip?: number
   distinct?: Prisma.Password_reset_tokensScalarFieldEnum | Prisma.Password_reset_tokensScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1172,6 +1177,7 @@ export type password_reset_tokensCreateArgs<ExtArgs extends runtime.Types.Extens
    * The data needed to create a password_reset_tokens.
    */
   data: Prisma.XOR<Prisma.password_reset_tokensCreateInput, Prisma.password_reset_tokensUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1232,6 +1238,7 @@ export type password_reset_tokensUpdateArgs<ExtArgs extends runtime.Types.Extens
    * Choose, which password_reset_tokens to update.
    */
   where: Prisma.password_reset_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1310,6 +1317,7 @@ export type password_reset_tokensUpsertArgs<ExtArgs extends runtime.Types.Extens
    * In case the password_reset_tokens was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.password_reset_tokensUpdateInput, Prisma.password_reset_tokensUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1332,6 +1340,7 @@ export type password_reset_tokensDeleteArgs<ExtArgs extends runtime.Types.Extens
    * Filter which password_reset_tokens to delete.
    */
   where: Prisma.password_reset_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -12,6 +12,9 @@ import sitesRoutes from "./sites.routes";
 import levelsRoutes from "./levels.routes";
 import subjectsRoutes from "./subjects.routes";
 import userProfileRoutes from "./user-profile.routes";
+import paymentMethodRoutes from "./payment-method.routes";
+import adminRoutes from "./admin.routes";
+import adminDashboardRoutes from "./admin-dashboard.routes";
 
 const router = Router();
 
@@ -32,6 +35,15 @@ router.use("/subjects", subjectsRoutes);
 
 // User profile (consolidated teaches-at, social-media, parent-children)
 router.use("/profile", userProfileRoutes);
+
+// Payment Methods
+router.use("/payment-methods", paymentMethodRoutes);
+
+// Admin Routes
+router.use("/admin", adminRoutes);
+
+// Admin Dashboard Analytics Routes
+router.use("/admin/dashboard", adminDashboardRoutes);
 
 export default router;
 

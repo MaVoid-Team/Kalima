@@ -139,7 +139,22 @@
     "notFound": "العينة غير موجودة",
     "backToMarket": "العودة إلى المتجر",
     "download": "تنزيل",
+    "downloadFile": "تنزيل الملف",
     "previewUnavailable": "المعاينة غير متاحة لهذا النوع من الملفات.",
-    "downloadFile": "تنزيل الملف"
+    "sampleInfo": "معلومات العينة",
+    "fileName": "اسم الملف",
+    "fileSize": "حجم الملف",
+    "fileType": "نوع الملف",
+    "uploadDate": "تاريخ الرفع",
+    "productInfo": "معلومات المنتج",
+    "productName": "اسم المنتج",
+    "productType": "نوع المنتج",
+    "price": "السعر",
+    "serial": "الرقم التسلسلي",
+    "viewProduct": "عرض المنتج",
+    "fullscreen": "ملء الشاشة",
+    "exitFullscreen": "خروج من ملء الشاشة",
+    "fullPreview": "معاينة كاملة",
+    "sampleDetails": "تفاصيل العينة"
   }
 }

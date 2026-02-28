@@ -85,3 +85,11 @@ export const location_type_enum = {
 } as const
 
 export type location_type_enum = (typeof location_type_enum)[keyof typeof location_type_enum]
+
+
+export const coupon_type = {
+  percentage: 'percentage',
+  fixed: 'fixed'
+} as const
+
+export type coupon_type = (typeof coupon_type)[keyof typeof coupon_type]

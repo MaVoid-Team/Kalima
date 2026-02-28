@@ -26,7 +26,6 @@ import {
 
 import ProductFilters from '@/components/admin/products/ProductFilters';
 import ProductsTable from '@/components/admin/products/ProductsTable';
-import EditProductDialog from '@/components/admin/products/EditProductDialog';
 import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
 
 export default function ProductsPage() {
@@ -241,14 +240,6 @@ export default function ProductsPage() {
                     </Pagination>
                 </div>
             )}
-
-            {/* Edit Dialog */}
-            <EditProductDialog
-                product={editProduct}
-                open={editOpen}
-                onOpenChange={setEditOpen}
-                onSuccess={load}
-            />
 
             {/* Delete Confirmation Dialog */}
             <DeleteProductDialog

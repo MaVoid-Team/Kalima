@@ -6,18 +6,20 @@ export interface PasswordChangedEmailData {
 }
 
 export function getPasswordChangedEmailSubject(): string {
-  return 'Your Password Has Been Changed - Kalima Platform';
+  return "Your Password Has Been Changed - Kalima Platform";
 }
 
-export function getPasswordChangedEmailHtml(data: PasswordChangedEmailData): string {
-  const formattedDate = data.changedAt.toLocaleString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short',
+export function getPasswordChangedEmailHtml(
+  data: PasswordChangedEmailData,
+): string {
+  const formattedDate = data.changedAt.toLocaleString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZoneName: "short",
   });
 
   return `
@@ -53,11 +55,15 @@ export function getPasswordChangedEmailHtml(data: PasswordChangedEmailData): str
                 Your password was successfully changed on <strong>${formattedDate}</strong>.
               </p>
               
-              ${data.ipAddress ? `
+              ${
+                data.ipAddress
+                  ? `
               <p style="margin: 0 0 20px; color: #666666; font-size: 14px; line-height: 1.6;">
                 <strong>IP Address:</strong> ${data.ipAddress}
               </p>
-              ` : ''}
+              `
+                  : ""
+              }
               
               <!-- Security Notice -->
               <div style="margin: 30px 0; padding: 20px; background-color: #FEE2E2; border-radius: 8px; border-left: 4px solid #DC2626;">
@@ -73,7 +79,7 @@ export function getPasswordChangedEmailHtml(data: PasswordChangedEmailData): str
                   <td align="center" style="padding: 20px 0;">
                     <a href="${data.supportUrl}" 
                        style="display: inline-block; padding: 16px 40px; background-color: #DC2626; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px;">
-                      Contact Support
+                      🆘 Contact Support Team
                     </a>
                   </td>
                 </tr>
@@ -101,15 +107,17 @@ export function getPasswordChangedEmailHtml(data: PasswordChangedEmailData): str
   `.trim();
 }
 
-export function getPasswordChangedEmailText(data: PasswordChangedEmailData): string {
-  const formattedDate = data.changedAt.toLocaleString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short',
+export function getPasswordChangedEmailText(
+  data: PasswordChangedEmailData,
+): string {
+  const formattedDate = data.changedAt.toLocaleString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZoneName: "short",
   });
 
   return `
@@ -118,7 +126,7 @@ Password Changed - Kalima Platform
 Hello ${data.name},
 
 Your password was successfully changed on ${formattedDate}.
-${data.ipAddress ? `IP Address: ${data.ipAddress}` : ''}
+${data.ipAddress ? `IP Address: ${data.ipAddress}` : ""}
 
 DIDN'T MAKE THIS CHANGE?
 If you didn't change your password, your account may have been compromised. Please contact our support team immediately and reset your password.

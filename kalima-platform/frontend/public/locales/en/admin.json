@@ -5,12 +5,15 @@
     "products": "Products",
     "samples": "Samples",
     "coupons": "Coupons",
+    "categories": "Categories",
+    "requiredFields": "Required Fields",
+    "paymentMethods": "Payment Methods",
     "themeToggle": "Toggle Theme",
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
     "backToStore": "Back to Store",
     "logout": "Logout",
-    "categories": "Categories"
+    "settings": "Settings"
   },
   "common": {
     "currencyEGP": "EGP",
@@ -19,10 +22,29 @@
     "loading": "Loading...",
     "cancel": "Cancel",
     "confirm": "Confirm",
+    "save": "Save",
+    "notSpecified": "Not specified",
+    "file": "File",
+    "select": "Select",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "openMenu": "Open menu",
+    "active": "Active",
+    "inactive": "Inactive",
+    "update": "Update",
     "pagination": {
       "previous": "Previous",
       "next": "Next"
+    },
+    "export": {
+      "success": "Export successful"
     }
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female",
+    "other": "Other"
   },
   "orders": {
     "stats": {
@@ -297,12 +319,33 @@
       "no": "No",
       "sample": "Sample File",
       "noSample": "No sample file uploaded. Samples can be attached when creating a product.",
+      "noSampleAvailable": "No sample file available for this product. Upload a PDF or Word document to provide a preview.",
       "viewSample": "View Full Screen",
+      "previewSample": "Preview Sample",
       "downloadSample": "Download",
+      "uploadSample": "Upload Sample",
+      "replaceSample": "Replace Sample",
+      "removeSample": "Remove Sample",
       "sampleFileName": "File",
       "sampleFileSize": "Size",
       "sampleFileType": "Type",
-      "openSamplePage": "Open Sample Page"
+      "openSamplePage": "Open Sample Page",
+      "shareLinkCopied": "Share link copied to clipboard!",
+      "copyShareLink": "Copy share link",
+      "copyLink": "Copy",
+      "copied": "Copied!",
+      "linkCopied": "Link copied!",
+      "shareLink": "Share Link",
+      "shareInstructions": "Share this link with customers to let them preview the sample before purchasing.",
+      "invalidSampleType": "Invalid file type. Please upload a PDF or Word document.",
+      "sampleUpdated": "Sample updated successfully!",
+      "sampleUpdateError": "Failed to update sample. Please try again.",
+      "sampleRemoved": "Sample removed successfully!",
+      "sampleRemoveError": "Failed to remove sample. Please try again.",
+      "confirmRemoveSampleTitle": "Remove Sample",
+      "confirmRemoveSampleDescription": "Are you sure you want to remove this sample file? This action cannot be undone and will permanently delete the sample from this product.",
+      "uploading": "Uploading...",
+      "processing": "Processing..."
     }
   },
   "samples": {
@@ -516,6 +559,232 @@
     "messages": {
       "archiveWarning": "Archiving this category will cascade to all subcategories.",
       "depthLimitReached": "Cannot nest further. Maximum depth of 3 reached."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account settings and preferences",
+    "profile": {
+      "title": "Profile Information",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "secondaryPhone": "Secondary Phone",
+      "gender": "Gender",
+      "uploadAvatar": "Upload Avatar",
+      "avatarHint": "JPG, PNG or GIF. Max size 2MB.",
+      "editProfile": "Edit Profile",
+      "updateSuccess": "Profile updated successfully"
+    },
+    "password": {
+      "title": "Password Management",
+      "changePassword": "Change Password",
+      "setPassword": "Set Password",
+      "changeDescription": "Change your existing password",
+      "setDescription": "Set a password for local login",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "currentPasswordPlaceholder": "Enter current password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "passwordMismatch": "Passwords do not match",
+      "confirmChangeTitle": "Change Password",
+      "confirmChange": "Are you sure you want to change your password? You will be logged out from all devices.",
+      "confirmSetTitle": "Set Password",
+      "confirmSet": "Are you sure you want to set a password? This will enable local login for your account."
+    },
+    "account": {
+      "title": "Account Security",
+      "linkedProviders": "Linked Providers",
+      "linkNewAccount": "Link New Account",
+      "linkDescription": "Link additional accounts to enable multiple login methods.",
+      "linkFirebase": "Link Google Account",
+      "setPasswordFirst": "Set password first",
+      "noLinkedProviders": "No linked accounts",
+      "connected": "Connected",
+      "unlink": "Unlink",
+      "confirmUnlinkTitle": "Unlink Account Provider",
+      "confirmUnlink": "Are you sure you want to unlink this provider? You will lose access to this login method.",
+      "unlinkWarning": "You will lose access to this login method and will need to use one of your remaining accounts to sign in.",
+      "providers": {
+        "local": "Email",
+        "google": "Google",
+        "facebook": "Facebook",
+        "firebase": "Firebase"
+      }
+    },
+    "email": {
+      "title": "Email Verification",
+      "verificationStatus": "Verification Status",
+      "verified": "Email Verified",
+      "notVerified": "Email Not Verified",
+      "pending": "Pending",
+      "verificationDescription": "Verify your email to secure your account and receive important notifications.",
+      "sendVerification": "Send Verification Email",
+      "resendVerification": "Resend Verification",
+      "securityInfo": "Security Information",
+      "cooldown": "Wait {{seconds}}s",
+      "benefits": {
+        "title": "Benefits of Verification",
+        "security": "Enhanced account security",
+        "recovery": "Password recovery access",
+        "notifications": "Important notifications"
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting",
+        "spam": "Check spam folder",
+        "address": "Verify email address",
+        "contact": "Contact support if needed"
+      }
+    },
+    "session": {
+      "title": "Session Management",
+      "activeSessions": "Active Sessions",
+      "current": "Current",
+      "activeNow": "Active now",
+      "minutesAgo": "{{minutes}}m ago",
+      "hoursAgo": "{{hours}}h ago",
+      "daysAgo": "{{days}}d ago",
+      "sessionActions": "Session Actions",
+      "logoutCurrent": "Logout Current Device",
+      "logoutCurrentDescription": "Logout from this device",
+      "logoutAll": "Logout All Devices",
+      "logoutAllDescription": "Logout from all devices",
+      "logout": "Logout",
+      "confirmLogoutAllTitle": "Logout All Devices",
+      "confirmLogoutAll": "Are you sure you want to logout from all devices?",
+      "logoutWarning": "Logging out from all devices will require you to sign in again on each device.",
+      "logoutAllWarning1": "You will be logged out from all devices immediately.",
+      "logoutAllWarning2": "You will need to sign in again on each device to continue using your account.",
+      "logoutAllWarning3": "Any unsaved work will be lost."
+    },
+    "upload": {
+      "progress": "Upload Progress: {{progress}}%",
+      "cancelled": "Upload cancelled",
+      "error": "Upload failed",
+      "file": "File"
+    }
+  },
+  "paymentMethods": {
+    "title": "Payment Methods Management",
+    "subtitle": "Manage payment methods available in your store",
+    "totalMethods": "{{count}} payment methods",
+    "createMethod": "Create Payment Method",
+    "noMethodsFound": "No payment methods found",
+    "selectedCount": "{count} selected",
+    "bulkActivate": "Activate",
+    "bulkDeactivate": "Deactivate",
+    "filters": {
+      "searchPlaceholder": "Search by name...",
+      "statusFilter": "Status",
+      "allStatus": "All Status"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "phoneNumber": "Phone Number",
+      "status": "Status",
+      "image": "Image",
+      "createdAt": "Created"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "e.g., Vodafone Cash",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "e.g., 01012345678",
+      "status": "Status",
+      "statusDescription": "Enable or disable this payment method",
+      "image": "Image",
+      "imageOptional": "Leave empty to keep current image"
+    },
+    "create": {
+      "title": "Create Payment Method",
+      "description": "Add a new payment method to your store.",
+      "submit": "Create Payment Method"
+    },
+    "edit": {
+      "title": "Edit Payment Method",
+      "description": "Update payment method details.",
+      "submit": "Update Payment Method"
+    },
+    "delete": {
+      "title": "Delete Payment Method",
+      "description": "This action cannot be undone.",
+      "warning": "Are you sure you want to delete this payment method? This action is permanent and cannot be reversed.",
+      "methodName": "Payment Method",
+      "consequences": "Deleting this payment method will:",
+      "consequence1": "Remove it from available payment options",
+      "consequence2": "Affect any pending orders using this method",
+      "consequence3": "Require customers to use alternative payment methods",
+      "confirm": "Delete Payment Method"
+    },
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "creating": "Creating...",
+    "updating": "Updating...",
+    "deleting": "Deleting...",
+    "uploading": "Uploading...",
+    "image": {
+      "dragDrop": "Drag & drop image here",
+      "orClick": "or click to browse",
+      "supportedFormats": "JPEG, PNG, WebP (max 5MB)",
+      "invalidType": "Invalid file type. Please upload JPEG, PNG, or WebP images.",
+      "tooLarge": "File too large. Maximum size is 5MB.",
+      "uploading": "Uploading..."
+    }
+  },
+  "requiredFields": {
+    "title": "Required Fields Management",
+    "subtitle": "Manage reusable field definitions for products",
+    "totalFields": "{{count}} fields",
+    "noFields": "No required fields found",
+    "createField": "Create Field",
+    "fields": {
+      "label": "Label",
+      "fieldType": "Field Type",
+      "active": "Active",
+      "createdAt": "Created At"
+    },
+    "types": {
+      "text": "Text",
+      "number": "Number",
+      "date": "Date",
+      "image": "Image"
+    },
+    "filters": {
+      "allStatuses": "All Statuses",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "create": {
+      "title": "Create Required Field",
+      "description": "Add a new reusable field definition.",
+      "labelPlaceholder": "Enter field label",
+      "fieldTypePlaceholder": "Select field type"
+    },
+    "edit": {
+      "title": "Edit Required Field",
+      "description": "Update field definition details.",
+      "labelPlaceholder": "Enter field label",
+      "fieldTypePlaceholder": "Select field type",
+      "activeDescription": "Enable or disable this field definition"
+    },
+    "delete": {
+      "title": "Delete Required Field",
+      "description": "Are you sure you want to delete the field \"{{label}}\"?",
+      "warning": "This action cannot be undone.",
+      "warningDescription": "Deleting this field will remove it from all products and cannot be recovered.",
+      "confirm": "Delete Field"
+    },
+    "messages": {
+      "createSuccess": "Field created successfully",
+      "updateSuccess": "Field updated successfully",
+      "deleteSuccess": "Field deleted successfully"
     }
   }
 }

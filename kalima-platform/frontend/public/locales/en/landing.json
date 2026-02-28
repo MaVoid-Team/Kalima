@@ -33,6 +33,8 @@
   },
   "footer": {
     "brand": "Kalima Platform",
+    "market": "Market",
+    "samples": "Samples",
     "description": "A comprehensive educational platform providing the best resources and courses.",
     "platform": "Platform",
     "browseCourses": "Browse Courses",
@@ -57,6 +59,8 @@
     "searchButton": "Search",
     "browseCourses": "Browse Courses",
     "teachers": "Teachers",
+    "samples": "See Book Samples",
+    "market": "Browse Our Products",
     "stats": {
       "students": "Students",
       "teachers": "Teachers",

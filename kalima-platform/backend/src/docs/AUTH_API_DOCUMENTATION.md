@@ -16,10 +16,11 @@
 4. [Password Management](#password-management)
 5. [Email Verification](#email-verification)
 6. [Account Linking](#account-linking)
-7. [Admin User Creation](#admin-user-creation)
-8. [Portal & Role Assignment](#portal--role-assignment)
-9. [Common Response Types](#common-response-types)
-10. [Error Codes](#error-codes)
+7. [Account Deletion](#account-deletion)
+8. [Admin User Creation](#admin-user-creation)
+9. [Portal & Role Assignment](#portal--role-assignment)
+10. [Common Response Types](#common-response-types)
+11. [Error Codes](#error-codes)
 
 ---
 
@@ -725,6 +726,38 @@ Returns all linked authentication providers.
   ]
 }
 ```
+
+---
+
+## Account Deletion
+
+### Delete Account (Self)
+
+Deletes the authenticated user's account. Revokes all refresh tokens and permanently removes the user.
+
+**Endpoint:** `DELETE /delete-account`  
+**Auth Required:** Yes (any authenticated user)
+
+**Request Body:** None
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Account deleted successfully"
+}
+```
+
+**Error Responses:**
+
+- `401 Unauthorized` - Not authenticated
+- `404 Not Found` - User not found
+
+**Side Effects:**
+
+- All refresh tokens are revoked
+- User record and all related data are permanently deleted
 
 ---
 

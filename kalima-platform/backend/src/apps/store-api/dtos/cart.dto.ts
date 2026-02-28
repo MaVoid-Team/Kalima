@@ -8,6 +8,7 @@ import {
   ValidateNested,
   Min,
   MaxLength,
+  IsNotEmpty,
 } from "class-validator";
 import { Type } from "class-transformer";
 
@@ -60,27 +61,24 @@ export class UpdateCartItemDto {
 export class CheckoutDto {
   @IsInt()
   @IsPositive()
-  user_id: number;
-
-  @IsInt()
-  @IsPositive()
+  @Type(() => Number)
   payment_method_id: number;
 
-  @IsOptional()
   @IsString()
-  numberTransferredFrom?: string;
+  @IsNotEmpty()
+  numberTransferredFrom: string;
 
-  @IsOptional()
-  @IsString()
-  nameOnBook?: string;
+  // @IsOptional()
+  // @IsString()
+  // nameOnBook?: string;
 
-  @IsOptional()
-  @IsString()
-  numberOnBook?: string;
+  // @IsOptional()
+  // @IsString()
+  // numberOnBook?: string;
 
-  @IsOptional()
-  @IsString()
-  seriesName?: string;
+  // @IsOptional()
+  // @IsString()
+  // seriesName?: string;
 
   @IsOptional()
   @IsString()
@@ -96,15 +94,40 @@ export class CheckoutDto {
   // Add more fields as needed for checkout (e.g., address)
 }
 
+// DTO for fast buy (checkout single item directly)
+export class FastBuyDto extends CheckoutDto {
+  @IsInt()
+  @IsPositive()
+  product_id: number;
+
+  @IsInt()
+  @IsPositive()
+  @Min(1)
+  quantity: number;
+}
+
 // DTO for updating required fields of a cart item
 
 export class UpdateCartItemRequiredFieldsDto {
   @IsInt()
   @IsPositive()
+  @Type(() => Number)
   cart_item_id: number;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CartItemRequiredFieldDto)
   required_fields: CartItemRequiredFieldDto[];
+}
+
+export class UpdateCartItemRequiredFieldImageDto {
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  cart_item_id: number;
+
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  required_field_definition_id: number;
 }

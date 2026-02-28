@@ -449,7 +449,7 @@ export type $sitesPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type sitesGetPayload<S extends boolean | null | undefined | sitesDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$sitesPayload, S>
 
 export type sitesCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<sitesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<sitesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: SitesCountAggregateInputType | true
   }
 
@@ -893,6 +893,7 @@ export type sitesFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter, which sites to fetch.
    */
   where: Prisma.sitesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -915,6 +916,7 @@ export type sitesFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter, which sites to fetch.
    */
   where: Prisma.sitesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -967,6 +969,7 @@ export type sitesFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter by unique combinations of sites.
    */
   distinct?: Prisma.SitesScalarFieldEnum | Prisma.SitesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1019,6 +1022,7 @@ export type sitesFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter by unique combinations of sites.
    */
   distinct?: Prisma.SitesScalarFieldEnum | Prisma.SitesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1066,6 +1070,7 @@ export type sitesFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   skip?: number
   distinct?: Prisma.SitesScalarFieldEnum | Prisma.SitesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1088,6 +1093,7 @@ export type sitesCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * The data needed to create a sites.
    */
   data: Prisma.XOR<Prisma.sitesCreateInput, Prisma.sitesUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1144,6 +1150,7 @@ export type sitesUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Choose, which sites to update.
    */
   where: Prisma.sitesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1218,6 +1225,7 @@ export type sitesUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * In case the sites was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.sitesUpdateInput, Prisma.sitesUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1240,6 +1248,7 @@ export type sitesDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Filter which sites to delete.
    */
   where: Prisma.sitesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

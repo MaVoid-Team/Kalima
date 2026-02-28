@@ -3228,6 +3228,14 @@ export const Auth_identitiesScalarFieldEnum = {
 export type Auth_identitiesScalarFieldEnum = (typeof Auth_identitiesScalarFieldEnum)[keyof typeof Auth_identitiesScalarFieldEnum]
 
 
+export const RelationLoadStrategy = {
+  query: 'query',
+  join: 'join'
+} as const
+
+export type RelationLoadStrategy = (typeof RelationLoadStrategy)[keyof typeof RelationLoadStrategy]
+
+
 export const User_analyticsScalarFieldEnum = {
   user_id: 'user_id',
   views: 'views',
@@ -3269,7 +3277,8 @@ export const UsersScalarFieldEnum = {
   hasPromoCode: 'hasPromoCode',
   hasUsedPromoCode: 'hasUsedPromoCode',
   email_verified_at: 'email_verified_at',
-  role: 'role'
+  role: 'role',
+  created_by: 'created_by'
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
@@ -3468,6 +3477,7 @@ export type Product_categoriesScalarFieldEnum = (typeof Product_categoriesScalar
 export const CouponsScalarFieldEnum = {
   id: 'id',
   code: 'code',
+  product_id: 'product_id',
   discount_amount: 'discount_amount',
   discount_percentage: 'discount_percentage',
   active: 'active',
@@ -3476,7 +3486,8 @@ export const CouponsScalarFieldEnum = {
   created_at: 'created_at',
   updated_at: 'updated_at',
   deleted_at: 'deleted_at',
-  mongo_id: 'mongo_id'
+  mongo_id: 'mongo_id',
+  type: 'type'
 } as const
 
 export type CouponsScalarFieldEnum = (typeof CouponsScalarFieldEnum)[keyof typeof CouponsScalarFieldEnum]
@@ -3514,12 +3525,12 @@ export const ProductsScalarFieldEnum = {
   serial: 'serial',
   thumbnail_id: 'thumbnail_id',
   sample_url: 'sample_url',
-  coupon_id: 'coupon_id',
   is_archived: 'is_archived',
   mongo_id: 'mongo_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  perks: 'perks'
 } as const
 
 export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum]
@@ -3633,6 +3644,9 @@ export const Purchase_itemsScalarFieldEnum = {
   price_at_purchase: 'price_at_purchase',
   discount: 'discount',
   required_fields_filled: 'required_fields_filled',
+  final_price: 'final_price',
+  quantity: 'quantity',
+  coupon_id: 'coupon_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
   deleted_at: 'deleted_at'
@@ -3851,6 +3865,20 @@ export type Enumlocation_type_enumFieldRefInput<$PrismaModel> = FieldRefInputTyp
  * Reference to a field of type 'location_type_enum[]'
  */
 export type ListEnumlocation_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'location_type_enum[]'>
+    
+
+
+/**
+ * Reference to a field of type 'coupon_type'
+ */
+export type Enumcoupon_typeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'coupon_type'>
+    
+
+
+/**
+ * Reference to a field of type 'coupon_type[]'
+ */
+export type ListEnumcoupon_typeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'coupon_type[]'>
     
 
 

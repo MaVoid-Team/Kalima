@@ -20,13 +20,23 @@
    - [Apply Coupon to Cart Item](#apply-coupon-to-cart-item)
    - [Remove Coupon from Cart Item](#remove-coupon-from-cart-item)
 3. [Required Fields](#required-fields)
-   - [Update Cart Item Required Fields](#update-cart-item-required-fields)
+   - [Update Cart Item Required Fields (Text Data)](#update-cart-item-required-fields-text-data)
+   - [Update Cart Item Required Field Image (Image Data)](#update-cart-item-required-field-image-image-data)
 4. [Checkout](#checkout)
    - [Get Checkout Preview](#get-checkout-preview)
    - [Checkout](#checkout-1)
-5. [Enums & Types](#enums--types)
-6. [Business Rules](#business-rules)
-7. [Error Codes](#error-codes)
+5. [Fast Buy Cart](#fast-buy-cart)
+   - [Start Fast Buy](#start-fast-buy)
+   - [Get Fast Buy Cart](#get-fast-buy-cart)
+   - [Clear Fast Buy Cart](#clear-fast-buy-cart)
+   - [Update Fast Buy Item Required Fields (Text Data)](#update-fast-buy-item-required-fields-text-data)
+   - [Update Fast Buy Item Required Field Image (Image Data)](#update-fast-buy-item-required-field-image-image-data)
+   - [Apply Coupon to Fast Buy](#apply-coupon-to-fast-buy)
+   - [Get Fast Buy Checkout Preview](#get-fast-buy-checkout-preview)
+   - [Fast Buy Checkout](#fast-buy-checkout)
+6. [Enums & Types](#enums--types)
+7. [Business Rules](#business-rules)
+8. [Error Codes](#error-codes)
 
 ---
 
@@ -330,13 +340,13 @@ Removes the coupon from a cart item and resets the discount to 0.
 
 ---
 
-### Update Cart Item Required Fields
+### Update Cart Item Required Fields (Text Data)
 
-Updates the required field values for a cart item. Supports an image upload for image-type fields. Replaces all existing required fields for the item.
+Updates the required field values for a cart item (excluding images). Replaces all existing required text fields for the item with the provided array.
 
 **Endpoint:** `PATCH /items/required-fields`  
 **Auth Required:** Yes  
-**Content-Type:** `multipart/form-data` (if uploading image) or `application/json`
+**Content-Type:** `application/json`
 
 **Request Body:**
 
@@ -352,12 +362,6 @@ Updates the required field values for a cart item. Supports an image upload for 
 }
 ```
 
-**File Fields:**
-
-| Field   | Type  | Description                                     |
-| ------- | ----- | ----------------------------------------------- |
-| `image` | image | Image for image-type required fields (optional) |
-
 **Success Response (200):**
 
 ```json
@@ -371,8 +375,45 @@ Updates the required field values for a cart item. Supports an image upload for 
 | Status | Message                                          | Condition                       |
 | ------ | ------------------------------------------------ | ------------------------------- |
 | 400    | `Cart item does not belong to user's cart`       | Wrong user                      |
+| 400    | `Field X requires an image upload via...`        | Trying to upload image via JSON |
 | 404    | `Cart item not found`                            | Invalid cart_item_id            |
 | 422    | Validation errors                                | Invalid body                    |
+
+---
+
+### Update Cart Item Required Field Image (Image Data)
+
+Uploads and sets a single required image field for a cart item.
+
+**Endpoint:** `PATCH /items/required-fields/image`  
+**Auth Required:** Yes  
+**Content-Type:** `multipart/form-data`
+
+**Form Data Fields:**
+
+| Field                          | Type   | Description                                     |
+| ------------------------------ | ------ | ----------------------------------------------- |
+| `cart_item_id`                 | number | The ID of the cart item (required)              |
+| `required_field_definition_id` | number | The field definition ID for this image (required)|
+| `image`                        | File   | The actual image file (required)                |
+
+**Success Response (200):**
+
+```json
+{
+  "success": true
+}
+```
+
+**Error Responses:**
+
+| Status | Message                                          | Condition                       |
+| ------ | ------------------------------------------------ | ------------------------------- |
+| 400    | `Image file is required`                         | No file uploaded                |
+| 400    | `Field X is not an image type`                   | Target field is text            |
+| 404    | `Required field definition not found`            | Invalid definition ID           |
+| 404    | `Cart item not found`                            | Invalid cart item ID            |
+
 
 ---
 
@@ -382,7 +423,7 @@ Updates the required field values for a cart item. Supports an image upload for 
 
 ### Get Checkout Preview
 
-Returns checkout requirements based on the cart contents (e.g., whether books require extra fields).
+Returns checkout requirements based on the cart contents. It checks all items against the database to determine which exact products are missing which specific required fields. Returns an `isCheckoutReady` boolean that must be true to proceed to checkout.
 
 **Endpoint:** `GET /checkout/preview`  
 **Auth Required:** Yes
@@ -395,9 +436,26 @@ Returns checkout requirements based on the cart contents (e.g., whether books re
   "data": {
     "hasBooks": true,
     "requiredFields": {
-      "common": ["numberTransferredFrom", "paymentScreenShot"],
-      "books": ["nameOnBook", "numberOnBook", "seriesName"]
-    }
+      "common": [
+        "numberTransferredFrom",
+        "paymentScreenShot"
+      ],
+      "itemsMissingFields": [
+        {
+          "cart_item_id": 35,
+          "product_id": 10,
+          "product_name": "Algebra Book",
+          "missing_fields": [
+            {
+              "id": 7,
+              "label": "nameOnBook",
+              "field_type": "text"
+            }
+          ]
+        }
+      ]
+    },
+    "isCheckoutReady": false
   }
 }
 ```
@@ -423,7 +481,7 @@ Processes the cart checkout: validates items & required fields, uploads payment 
 ```json
 {
   "payment_method_id": "number (required)",
-  "numberTransferredFrom": "string (optional)",
+  "numberTransferredFrom": "string (required)",
   "notes": "string (optional)"
 }
 ```
@@ -458,8 +516,17 @@ Processes the cart checkout: validates items & required fields, uploads payment 
         {
           "id": 30,
           "product_id": 10,
-          "price_at_purchase": "250.00",
-          "discount": "25.00",
+          "price_at_purchase": "125.00",
+          "discount": "12.50",
+          "purchase_item_required_fields": [
+            { "field_definition_id": 7, "value": "Mohamed Ali" }
+          ]
+        },
+        {
+          "id": 31,
+          "product_id": 10,
+          "price_at_purchase": "125.00",
+          "discount": "12.50",
           "purchase_item_required_fields": [
             { "field_definition_id": 7, "value": "Mohamed Ali" }
           ]
@@ -485,6 +552,103 @@ Processes the cart checkout: validates items & required fields, uploads payment 
 | 400    | `Invalid or inactive payment method`                                      | Payment method not found or inactive   |
 | 404    | `Active cart not found`                                                   | No active cart                         |
 | 404    | `User not found`                                                          | Invalid user                           |
+
+---
+
+## Fast Buy Cart
+
+The Fast Buy Cart is a parallel, standalone cart designed for immediate single-item checkout without disrupting the user's regular active cart. It shares the exact same capabilities, business rules, and response shapes as the regular cart, but operates under a segregated `fastbuy` status.
+
+### Start Fast Buy
+
+Clears any existing `fastbuy` cart for the user, creates a fresh one, and adds the specified product to it.
+
+**Endpoint:** `POST /fast-buy/start`  
+**Auth Required:** Yes  
+**Content-Type:** `application/json`
+
+**Request Body:**
+
+```json
+{
+  "product_id": "number (required)",
+  "quantity": "number (required, >= 1)"
+}
+```
+
+> **Note:** `productId` is also accepted as an alias for `product_id`.
+
+**Success Response (201):** Returns a standard Cart object.
+
+---
+
+### Get Fast Buy Cart
+
+Retrieves the current Fast Buy cart and its items.
+
+**Endpoint:** `GET /fast-buy`  
+**Auth Required:** Yes  
+**Success Response (200):** Returns a standard Cart object.
+
+---
+
+### Clear Fast Buy Cart
+
+Deletes all items from the Fast Buy cart.
+
+**Endpoint:** `DELETE /fast-buy`  
+**Auth Required:** Yes  
+**Success Response (200):** Returns a standard empty Cart object.
+
+---
+
+### Update Fast Buy Item Required Fields (Text Data)
+
+Fills out required text fields for the item in the Fast Buy cart. Identical to the regular endpoint.
+
+**Endpoint:** `PATCH /fast-buy/items/required-fields`  
+**Auth Required:** Yes  
+**Content-Type:** `application/json`
+
+---
+
+### Update Fast Buy Item Required Field Image (Image Data)
+
+Uploads a required image field for the item in the Fast Buy cart. Identical to the regular endpoint.
+
+**Endpoint:** `PATCH /fast-buy/items/required-fields/image`  
+**Auth Required:** Yes  
+**Content-Type:** `multipart/form-data`
+
+
+---
+
+### Apply Coupon to Fast Buy
+
+Applies a coupon to the item in the Fast Buy cart.
+
+**Endpoint:** `POST /fast-buy/items/coupon`  
+**Auth Required:** Yes  
+
+---
+
+### Get Fast Buy Checkout Preview
+
+Retrieves the checkout readiness preview for the Fast Buy cart.
+
+**Endpoint:** `GET /fast-buy/checkout/preview`  
+**Auth Required:** Yes  
+**Success Response (200):** Returns a standard Checkout Preview object.
+
+---
+
+### Fast Buy Checkout
+
+Processes the final checkout for the Fast Buy cart.
+
+**Endpoint:** `POST /fast-buy/checkout`  
+**Auth Required:** Yes  
+**Content-Type:** `multipart/form-data`
 
 ---
 

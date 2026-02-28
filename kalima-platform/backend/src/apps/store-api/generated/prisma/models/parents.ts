@@ -794,7 +794,7 @@ export type $parentsPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type parentsGetPayload<S extends boolean | null | undefined | parentsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$parentsPayload, S>
 
 export type parentsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<parentsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<parentsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: ParentsCountAggregateInputType | true
   }
 
@@ -1241,6 +1241,7 @@ export type parentsFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter, which parents to fetch.
    */
   where: Prisma.parentsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1263,6 +1264,7 @@ export type parentsFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which parents to fetch.
    */
   where: Prisma.parentsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1315,6 +1317,7 @@ export type parentsFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of parents.
    */
   distinct?: Prisma.ParentsScalarFieldEnum | Prisma.ParentsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1367,6 +1370,7 @@ export type parentsFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of parents.
    */
   distinct?: Prisma.ParentsScalarFieldEnum | Prisma.ParentsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1414,6 +1418,7 @@ export type parentsFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   skip?: number
   distinct?: Prisma.ParentsScalarFieldEnum | Prisma.ParentsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1436,6 +1441,7 @@ export type parentsCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * The data needed to create a parents.
    */
   data: Prisma.XOR<Prisma.parentsCreateInput, Prisma.parentsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1496,6 +1502,7 @@ export type parentsUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which parents to update.
    */
   where: Prisma.parentsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1574,6 +1581,7 @@ export type parentsUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * In case the parents was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.parentsUpdateInput, Prisma.parentsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1596,6 +1604,7 @@ export type parentsDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter which parents to delete.
    */
   where: Prisma.parentsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

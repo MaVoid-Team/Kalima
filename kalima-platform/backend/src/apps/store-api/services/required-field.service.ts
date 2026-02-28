@@ -33,11 +33,25 @@ class RequiredFieldService {
   async createDefinition(
     dto: CreateFieldDefinitionDto,
   ): Promise<required_field_definitions> {
-    // Check label uniqueness (among non-deleted)
+    // Check label uniqueness (both active and soft-deleted)
     const existing = await this.db.required_field_definitions.findFirst({
-      where: { label: dto.label, deleted_at: null },
+      where: { label: dto.label },
     });
+
     if (existing) {
+      if (existing.deleted_at !== null) {
+        // Restore the soft-deleted definition and update its details
+        return this.db.required_field_definitions.update({
+          where: { id: existing.id },
+          data: {
+            deleted_at: null,
+            active: true,
+            field_type: dto.field_type as field_type_enum,
+            updated_at: new Date(),
+          },
+        });
+      }
+
       throw new ConflictError(
         `Field definition with label "${dto.label}" already exists`,
       );
@@ -58,16 +72,36 @@ class RequiredFieldService {
    */
   async getAllDefinitions(filters?: {
     active?: boolean;
-  }): Promise<required_field_definitions[]> {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<{
+    data: required_field_definitions[];
+    page: number;
+    limit: number;
+    count: number;
+  }> {
     const where: any = { deleted_at: null };
     if (filters?.active !== undefined) where.active = filters.active;
+    if (filters?.search) {
+      where.label = { contains: filters.search, mode: "insensitive" };
+    }
 
-    const definitions = await this.db.required_field_definitions.findMany({
-      where,
-      orderBy: { created_at: "desc" },
-    });
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+    const skip = (page - 1) * limit;
 
-    return definitions;
+    const [data, count] = await Promise.all([
+      prisma.required_field_definitions.findMany({
+        where,
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.required_field_definitions.count({ where }),
+    ]);
+
+    return { data, page, limit, count };
   }
 
   /**
@@ -100,11 +134,15 @@ class RequiredFieldService {
     // If label is being changed, check uniqueness
     if (dto.label && dto.label !== definition.label) {
       const existing = await this.db.required_field_definitions.findFirst({
-        where: { label: dto.label, deleted_at: null },
+        where: { label: dto.label },
       });
       if (existing) {
         throw new ConflictError(
-          `Field definition with label "${dto.label}" already exists`,
+          `Field definition with label "${dto.label}" already exists${
+            existing.deleted_at
+              ? " (it is currently deleted, please reuse or restore it)"
+              : ""
+          }`,
         );
       }
     }

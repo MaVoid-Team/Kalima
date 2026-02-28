@@ -80,6 +80,13 @@ router.get(
   authController.getLinkedProviders,
 );
 
+// Account Deletion (Protected)
+router.delete(
+  "/delete-account",
+  authenticateToken,
+  authController.deleteAccount,
+);
+
 // ============================================
 // ADMIN ROUTES - Admin authentication required
 // ============================================

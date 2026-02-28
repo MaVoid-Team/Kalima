@@ -449,7 +449,7 @@ export type $subjectsPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type subjectsGetPayload<S extends boolean | null | undefined | subjectsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$subjectsPayload, S>
 
 export type subjectsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<subjectsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<subjectsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: SubjectsCountAggregateInputType | true
   }
 
@@ -893,6 +893,7 @@ export type subjectsFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter, which subjects to fetch.
    */
   where: Prisma.subjectsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -915,6 +916,7 @@ export type subjectsFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which subjects to fetch.
    */
   where: Prisma.subjectsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -967,6 +969,7 @@ export type subjectsFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter by unique combinations of subjects.
    */
   distinct?: Prisma.SubjectsScalarFieldEnum | Prisma.SubjectsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1019,6 +1022,7 @@ export type subjectsFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of subjects.
    */
   distinct?: Prisma.SubjectsScalarFieldEnum | Prisma.SubjectsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1066,6 +1070,7 @@ export type subjectsFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   skip?: number
   distinct?: Prisma.SubjectsScalarFieldEnum | Prisma.SubjectsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1088,6 +1093,7 @@ export type subjectsCreateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data needed to create a subjects.
    */
   data: Prisma.XOR<Prisma.subjectsCreateInput, Prisma.subjectsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1144,6 +1150,7 @@ export type subjectsUpdateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Choose, which subjects to update.
    */
   where: Prisma.subjectsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1218,6 +1225,7 @@ export type subjectsUpsertArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * In case the subjects was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.subjectsUpdateInput, Prisma.subjectsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1240,6 +1248,7 @@ export type subjectsDeleteArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter which subjects to delete.
    */
   where: Prisma.subjectsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

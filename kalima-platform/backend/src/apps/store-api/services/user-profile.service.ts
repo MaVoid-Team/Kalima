@@ -10,7 +10,7 @@ import { teachesAtService } from "./teaches-at.service";
 import { socialMediaService } from "./social-media.service";
 import { parentChildrenService } from "./parent-children.service";
 import type { UpdateProfileDto } from "../dtos/user-profile.dto";
-import type { gender_enum } from "../generated/prisma/client";
+import { gender_enum, role_enum } from "../generated/prisma/client";
 
 // ============================================
 // Includes for getProfile query
@@ -85,14 +85,56 @@ class UserProfileService {
       },
     });
     if (!user) throw new NotFoundError("User not found");
-    return user;
+
+    let data: any = user;
+    if (
+      user.user_roles.some(
+        (role) =>
+          role.role === role_enum.Admin ||
+          role.role === role_enum.SubAdmin ||
+          role.role === role_enum.Moderator,
+      )
+    ) {
+      const userCreatedRaw = await this.db.users.groupBy({
+        by: ["role"],
+        where: { created_by: userId },
+        _count: {
+          id: true,
+        },
+      });
+
+      const userCreated = {
+        Admin: 0,
+        SubAdmin: 0,
+        Moderator: 0,
+        Teacher: 0,
+        Student: 0,
+        Parent: 0,
+        Lecturer: 0,
+        Assistant: 0,
+      };
+
+      userCreatedRaw.forEach((item) => {
+        if (item.role in userCreated) {
+          (userCreated as any)[item.role] = item._count.id;
+        }
+      });
+
+      data = { ...data, userCreated: userCreated };
+    }
+
+    return data;
   }
 
   // ==========================================
   // UPDATE PROFILE
   // ==========================================
 
-  async updateProfile(userId: number, dto: UpdateProfileDto, userRoles: string[]) {
+  async updateProfile(
+    userId: number,
+    dto: UpdateProfileDto,
+    userRoles: string[],
+  ) {
     const user = await this.db.users.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundError("User not found");
 
@@ -102,8 +144,7 @@ class UserProfileService {
     if (dto.phone !== undefined) userData.phone = dto.phone;
     if (dto.secondary_phone !== undefined)
       userData.secondary_phone = dto.secondary_phone;
-    if (dto.gender !== undefined)
-      userData.gender = dto.gender as gender_enum;
+    if (dto.gender !== undefined) userData.gender = dto.gender as gender_enum;
     userData.updated_at = new Date();
 
     await this.db.users.update({ where: { id: userId }, data: userData });
@@ -111,28 +152,30 @@ class UserProfileService {
     // ── Teacher-specific ──
     if (userRoles.includes("Teacher")) {
       const teacherData: Record<string, unknown> = {};
-      let hasTeacherUpdate = false;
+      const [subj, gov, zone] = await Promise.all([
+        dto.subject_id != null
+          ? this.db.subjects.findUnique({ where: { id: dto.subject_id } })
+          : null,
+        dto.government_id != null
+          ? this.db.government.findUnique({ where: { id: dto.government_id } })
+          : null,
+        dto.zone_id != null
+          ? this.db.zones.findUnique({ where: { id: dto.zone_id } })
+          : null,
+      ]);
 
+      let hasTeacherUpdate = false;
       if (dto.subject_id !== undefined) {
-        const subj = await this.db.subjects.findUnique({
-          where: { id: dto.subject_id },
-        });
         if (!subj) throw new NotFoundError("Subject not found");
         teacherData.subject_id = dto.subject_id;
         hasTeacherUpdate = true;
       }
       if (dto.government_id !== undefined) {
-        const gov = await this.db.government.findUnique({
-          where: { id: dto.government_id },
-        });
         if (!gov) throw new NotFoundError("Government not found");
         teacherData.government_id = dto.government_id;
         hasTeacherUpdate = true;
       }
       if (dto.zone_id !== undefined) {
-        const zone = await this.db.zones.findUnique({
-          where: { id: dto.zone_id },
-        });
         if (!zone) throw new NotFoundError("Zone not found");
         teacherData.zone_id = dto.zone_id;
         hasTeacherUpdate = true;
@@ -231,6 +274,22 @@ class UserProfileService {
     });
 
     return { profile_pic_url: image.url };
+  }
+
+  // ==========================================
+  // DELETE PROFILE PICTURE
+  // ==========================================
+
+  async deleteProfilePic(userId: number) {
+    const user = await this.db.users.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundError("User not found");
+
+    await this.db.users.update({
+      where: { id: userId },
+      data: { profile_pic_url: null, updated_at: new Date() },
+    });
+
+    return { success: true };
   }
 
   // ==========================================

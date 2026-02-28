@@ -5,12 +5,15 @@
     "products": "المنتجات",
     "samples": "العينات",
     "coupons": "القسائم",
+    "categories": "الفئات",
+    "requiredFields": "الحقول المطلوبة",
+    "paymentMethods": "طرق الدفع",
     "themeToggle": "تبديل المظهر",
     "darkMode": "الوضع الداكن",
     "lightMode": "الوضع الفاتح",
     "backToStore": "العودة للمتجر",
     "logout": "تسجيل الخروج",
-    "categories": "الفئات"
+    "settings": "الإعدادات"
   },
   "common": {
     "currencyEGP": "ج.م",
@@ -19,10 +22,29 @@
     "loading": "جاري التحميل...",
     "cancel": "إلغاء",
     "confirm": "تأكيد",
+    "save": "حفظ",
+    "notSpecified": "غير محدد",
+    "file": "ملف",
+    "select": "اختر",
+    "actions": "إجراءات",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "openMenu": "فتح القائمة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "update": "تحديث",
     "pagination": {
       "previous": "السابق",
       "next": "التالي"
+    },
+    "export": {
+      "success": "تم التصدير بنجاح"
     }
+  },
+  "gender": {
+    "male": "ذكر",
+    "female": "أنثى",
+    "other": "آخر"
   },
   "orders": {
     "stats": {
@@ -297,12 +319,33 @@
       "no": "لا",
       "sample": "ملف العينة",
       "noSample": "لا يوجد ملف عينة. يمكن إرفاق العينات عند إنشاء المنتج.",
+      "noSampleAvailable": "لا يوجد ملف عينة متاح لهذا المنتج. قم برفع ملف PDF أو Word لتوفير معاينة.",
       "viewSample": "عرض بملء الشاشة",
+      "previewSample": "معاينة العينة",
       "downloadSample": "تحميل",
+      "uploadSample": "رفع عينة",
+      "replaceSample": "استبدال العينة",
+      "removeSample": "حذف العينة",
       "sampleFileName": "الملف",
       "sampleFileSize": "الحجم",
       "sampleFileType": "النوع",
-      "openSamplePage": "فتح صفحة العينة"
+      "openSamplePage": "فتح صفحة العينة",
+      "shareLinkCopied": "تم نسخ رابط المشاركة!",
+      "copyShareLink": "نسخ رابط المشاركة",
+      "copyLink": "نسخ",
+      "copied": "تم النسخ!",
+      "linkCopied": "تم نسخ الرابط!",
+      "shareLink": "رابط المشاركة",
+      "shareInstructions": "شارك هذا الرابط مع العملاء للسماح لهم بمعاينة العينة قبل الشراء.",
+      "invalidSampleType": "نوع الملف غير صالح. يرجى رفع ملف PDF أو Word.",
+      "sampleUpdated": "تم تحديث العينة بنجاح!",
+      "sampleUpdateError": "فشل في تحديث العينة. يرجى المحاولة مرة أخرى.",
+      "sampleRemoved": "تم حذف العينة بنجاح!",
+      "sampleRemoveError": "فشل في حذف العينة. يرجى المحاولة مرة أخرى.",
+      "confirmRemoveSampleTitle": "حذف العينة",
+      "confirmRemoveSampleDescription": "هل أنت متأكد من حذف ملف العينة هذا؟ لا يمكن التراجع عن هذا الإجراء وسيمحو العينة نهائياً من هذا المنتج.",
+      "uploading": "جاري الرفع...",
+      "processing": "جاري المعالجة..."
     }
   },
   "samples": {
@@ -516,6 +559,232 @@
     "messages": {
       "archiveWarning": "أرشفة هذه الفئة سيؤدي لأرشفة جميع فئاتها الفرعية.",
       "depthLimitReached": "لا يمكن إضافة المزيد من المستويات المودعة. تم الوصول للحد الأقصى وهو 3."
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "description": "إدارة إعدادات الحساب والتفضيلات",
+    "profile": {
+      "title": "معلومات الملف الشخصي",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "secondaryPhone": "رقم الهاتف الثانوي",
+      "gender": "الجنس",
+      "uploadAvatar": "رفع الصورة الرمزية",
+      "avatarHint": "JPG، PNG أو GIF. الحد الأقصى للحجم 2MB.",
+      "editProfile": "تعديل الملف الشخصي",
+      "updateSuccess": "تم تحديث الملف الشخصي بنجاح"
+    },
+    "password": {
+      "title": "إدارة كلمة المرور",
+      "changePassword": "تغيير كلمة المرور",
+      "setPassword": "تعيين كلمة المرور",
+      "changeDescription": "تغيير كلمة المرور الحالية",
+      "setDescription": "تعيين كلمة مرور لتسجيل الدخول المحلي",
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "currentPasswordPlaceholder": "أدخل كلمة المرور الحالية",
+      "newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
+      "confirmPasswordPlaceholder": "أكد كلمة المرور الجديدة",
+      "passwordMismatch": "كلمات المرور غير متطابقة",
+      "confirmChangeTitle": "تغيير كلمة المرور",
+      "confirmChange": "هل أنت متأكد من تغيير كلمة المرور؟ سيتم تسجيل خروجك من جميع الأجهزة.",
+      "confirmSetTitle": "تعيين كلمة المرور",
+      "confirmSet": "هل أنت متأكد من تعيين كلمة مرور؟ هذا سيمكن تسجيل الدخول المحلي لحسابك."
+    },
+    "account": {
+      "title": "أمان الحساب",
+      "linkedProviders": "مزودو الخدمة المرتبطون",
+      "linkNewAccount": "ربط حساب جديد",
+      "linkDescription": "ربط حسابات إضافية لتمكين طرق تسجيل دخول متعددة.",
+      "linkFirebase": "ربط حساب Google",
+      "setPasswordFirst": "تعيين كلمة المرور أولاً",
+      "noLinkedProviders": "لا توجد حسابات مرتبطة",
+      "connected": "متصل",
+      "unlink": "إلغاء الربط",
+      "confirmUnlinkTitle": "إلغاء ربط مزود الخدمة",
+      "confirmUnlink": "هل أنت متأكد من إلغاء ربط هذا المزود؟ ستفقد الوصول إلى طريقة تسجيل الدخول هذه.",
+      "unlinkWarning": "ستفقد الوصول إلى طريقة تسجيل الدخول هذه وستحتاج إلى استخدام أحد حساباتك المتبقية لتسجيل الدخول.",
+      "providers": {
+        "local": "البريد الإلكتروني",
+        "google": "Google",
+        "facebook": "Facebook",
+        "firebase": "Firebase"
+      }
+    },
+    "email": {
+      "title": "التحقق من البريد الإلكتروني",
+      "verificationStatus": "حالة التحقق",
+      "verified": "تم التحقق من البريد الإلكتروني",
+      "notVerified": "لم يتم التحقق من البريد الإلكتروني",
+      "pending": "قيد الانتظار",
+      "verificationDescription": "تحقق من بريدك الإلكتروني لتأمين حسابك وتلقي الإشعارات المهمة.",
+      "sendVerification": "إرسال بريد التحقق",
+      "resendVerification": "إعادة إرسال التحقق",
+      "securityInfo": "معلومات الأمان",
+      "cooldown": "انتظر {{seconds}}ث",
+      "benefits": {
+        "title": "فوائد التحقق",
+        "security": "أمان محسّن للحساب",
+        "recovery": "الوصول إلى استعادة كلمة المرور",
+        "notifications": "الإشعارات المهمة"
+      },
+      "troubleshooting": {
+        "title": "استكشاف الأخطاء",
+        "spam": "تحقق من مجلد الرسائل غير المرغوب فيها",
+        "address": "تحقق من عنوان البريد الإلكتروني",
+        "contact": "اتصل بالدعم إذا لزم الأمر"
+      }
+    },
+    "session": {
+      "title": "إدارة الجلسات",
+      "activeSessions": "الجلسات النشطة",
+      "current": "الحالي",
+      "activeNow": "نشط الآن",
+      "minutesAgo": "منذ {{minutes}} دقيقة",
+      "hoursAgo": "منذ {{hours}} ساعة",
+      "daysAgo": "منذ {{days}} يوم",
+      "sessionActions": "إجراءات الجلسة",
+      "logoutCurrent": "تسجيل الخروج من الجهاز الحالي",
+      "logoutCurrentDescription": "تسجيل الخروج من هذا الجهاز",
+      "logoutAll": "تسجيل الخروج من جميع الأجهزة",
+      "logoutAllDescription": "تسجيل الخروج من جميع الأجهزة",
+      "logout": "تسجيل الخروج",
+      "confirmLogoutAllTitle": "تسجيل الخروج من جميع الأجهزة",
+      "confirmLogoutAll": "هل أنت متأكد من تسجيل الخروج من جميع الأجهزة؟",
+      "logoutWarning": "تسجيل الخروج من جميع الأجهزة يتطلب منك تسجيل الدخول مرة أخرى على كل جهاز.",
+      "logoutAllWarning1": "سيتم تسجيل خروجك من جميع الأجهزة فوراً.",
+      "logoutAllWarning2": "ستحتاج إلى تسجيل الدخول مرة أخرى على كل جهاز لمواصلة استخدام حسابك.",
+      "logoutAllWarning3": "سيتم فقدان أي عمل غير محفوظ."
+    },
+    "upload": {
+      "progress": "تقدم الرفع: {{progress}}%",
+      "cancelled": "تم إلغاء الرفع",
+      "error": "فشل الرفع",
+      "file": "ملف"
+    }
+  },
+  "paymentMethods": {
+    "title": "إدارة طرق الدفع",
+    "subtitle": "إدارة طرق الدفع المتاحة في متجرك",
+    "totalMethods": "{{count}} طرق دفع",
+    "createMethod": "إنشاء طريقة دفع",
+    "noMethodsFound": "لم يتم العثور على طرق دفع",
+    "selectedCount": "{count} محدد",
+    "bulkActivate": "تفعيل",
+    "bulkDeactivate": "إلغاء التفعيل",
+    "filters": {
+      "searchPlaceholder": "البحث بالاسم...",
+      "statusFilter": "الحالة",
+      "allStatus": "كل الحالات"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "table": {
+      "id": "المعرف",
+      "name": "الاسم",
+      "phoneNumber": "رقم الهاتف",
+      "status": "الحالة",
+      "image": "الصورة",
+      "createdAt": "تاريخ الإنشاء"
+    },
+    "fields": {
+      "name": "الاسم",
+      "namePlaceholder": "مثال: فودافون كاش",
+      "phoneNumber": "رقم الهاتف",
+      "phoneNumberPlaceholder": "مثال: 01012345678",
+      "status": "الحالة",
+      "statusDescription": "تفعيل أو إلغاء تفعيل طريقة الدفع",
+      "image": "الصورة",
+      "imageOptional": "اترك فارغاً للاحتفاظ بالصورة الحالية"
+    },
+    "create": {
+      "title": "إنشاء طريقة دفع",
+      "description": "إضافة طريقة دفع جديدة لمتجرك.",
+      "submit": "إنشاء طريقة الدفع"
+    },
+    "edit": {
+      "title": "تعديل طريقة الدفع",
+      "description": "تحديث تفاصيل طريقة الدفع.",
+      "submit": "تحديث طريقة الدفع"
+    },
+    "delete": {
+      "title": "حذف طريقة الدفع",
+      "description": "لا يمكن التراجع عن هذا الإجراء.",
+      "warning": "هل أنت متأكد من حذف طريقة الدفع هذه؟ هذا الإجراء دائم ولا يمكن التراجع عنه.",
+      "methodName": "طريقة الدفع",
+      "consequences": "حذف طريقة الدفع هذه سيؤدي إلى:",
+      "consequence1": "إزالتها من خيارات الدفع المتاحة",
+      "consequence2": "التأثير على أي طلبات معلقة تستخدم هذه الطريقة",
+      "consequence3": "يتطلب من العملاء استخدام طرق دفع بديلة",
+      "confirm": "حذف طريقة الدفع"
+    },
+    "activate": "تفعيل",
+    "deactivate": "إلغاء التفعيل",
+    "creating": "جاري الإنشاء...",
+    "updating": "جاري التحديث...",
+    "deleting": "جاري الحذف...",
+    "uploading": "جاري الرفع...",
+    "image": {
+      "dragDrop": "اسحب وأفلت الصورة هنا",
+      "orClick": "أو انقر للاختيار",
+      "supportedFormats": "JPEG, PNG, WebP (الحد الأقصى 5 ميجابايت)",
+      "invalidType": "نوع الملف غير صالح. يرجى رفع صور JPEG, PNG, أو WebP.",
+      "tooLarge": "الملف كبير جداً. الحد الأقصى هو 5 ميجابايت.",
+      "uploading": "جاري الرفع..."
+    }
+  },
+  "requiredFields": {
+    "title": "إدارة الحقول المطلوبة",
+    "subtitle": "إدارة تعريفات الحقول القابلة لإعادة الاستخدام للمنتجات",
+    "totalFields": "{{count}} حقول",
+    "noFields": "لا توجد حقول مطلوبة",
+    "createField": "إنشاء حقل",
+    "fields": {
+      "label": "الاسم",
+      "fieldType": "نوع الحقل",
+      "active": "نشط",
+      "createdAt": "تاريخ الإنشاء"
+    },
+    "types": {
+      "text": "نص",
+      "number": "رقم",
+      "date": "تاريخ",
+      "image": "صورة"
+    },
+    "filters": {
+      "allStatuses": "كل الحالات",
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "create": {
+      "title": "إنشاء حقل مطلوب",
+      "description": "إضافة تعريف حقل قابل لإعادة الاستخدام.",
+      "labelPlaceholder": "أدخل اسم الحقل",
+      "fieldTypePlaceholder": "اختر نوع الحقل"
+    },
+    "edit": {
+      "title": "تعديل الحقل المطلوب",
+      "description": "تحديث تفاصيل تعريف الحقل.",
+      "labelPlaceholder": "أدخل اسم الحقل",
+      "fieldTypePlaceholder": "اختر نوع الحقل",
+      "activeDescription": "تفعيل أو إلغاء تفعيل تعريف الحقل هذا"
+    },
+    "delete": {
+      "title": "حذف الحقل المطلوب",
+      "description": "هل أنت متأكد من حذف الحقل \"{{label}}\"؟",
+      "warning": "لا يمكن التراجع عن هذا الإجراء.",
+      "warningDescription": "حذف هذا الحقل سيزيله من جميع المنتجات ولا يمكن استعادته.",
+      "confirm": "حذف الحقل"
+    },
+    "messages": {
+      "createSuccess": "تم إنشاء الحقل بنجاح",
+      "updateSuccess": "تم تحديث الحقل بنجاح",
+      "deleteSuccess": "تم حذف الحقل بنجاح"
     }
   }
 }

@@ -553,7 +553,7 @@ export type $teaches_atPayload<ExtArgs extends runtime.Types.Extensions.Internal
 export type teaches_atGetPayload<S extends boolean | null | undefined | teaches_atDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$teaches_atPayload, S>
 
 export type teaches_atCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<teaches_atFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<teaches_atFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Teaches_atCountAggregateInputType | true
   }
 
@@ -999,6 +999,7 @@ export type teaches_atFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter, which teaches_at to fetch.
    */
   where: Prisma.teaches_atWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1021,6 +1022,7 @@ export type teaches_atFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which teaches_at to fetch.
    */
   where: Prisma.teaches_atWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1073,6 +1075,7 @@ export type teaches_atFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter by unique combinations of teaches_ats.
    */
   distinct?: Prisma.Teaches_atScalarFieldEnum | Prisma.Teaches_atScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1125,6 +1128,7 @@ export type teaches_atFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter by unique combinations of teaches_ats.
    */
   distinct?: Prisma.Teaches_atScalarFieldEnum | Prisma.Teaches_atScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1172,6 +1176,7 @@ export type teaches_atFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   skip?: number
   distinct?: Prisma.Teaches_atScalarFieldEnum | Prisma.Teaches_atScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1194,6 +1199,7 @@ export type teaches_atCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * The data needed to create a teaches_at.
    */
   data: Prisma.XOR<Prisma.teaches_atCreateInput, Prisma.teaches_atUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1254,6 +1260,7 @@ export type teaches_atUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which teaches_at to update.
    */
   where: Prisma.teaches_atWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1332,6 +1339,7 @@ export type teaches_atUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * In case the teaches_at was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.teaches_atUpdateInput, Prisma.teaches_atUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1354,6 +1362,7 @@ export type teaches_atDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter which teaches_at to delete.
    */
   where: Prisma.teaches_atWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

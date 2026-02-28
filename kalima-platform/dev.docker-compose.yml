@@ -1,7 +1,7 @@
 name: kalima-dev
 services:
   dev-frontend:
-    build: 
+    build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
@@ -41,13 +41,15 @@ services:
       - INITIAL_ADMIN_EMAIL=${INITIAL_ADMIN_EMAIL}
       - INITIAL_ADMIN_PASSWORD=${INITIAL_ADMIN_PASSWORD}
       - INITIAL_ADMIN_NAME=${INITIAL_ADMIN_NAME}
+      - APP_URL=https://dev.kalima-edu.com
+      - SUPPORT_URL=https://dev.kalima-edu.com/support
     depends_on:
       - dev-postgres
       - dev-redis
     networks:
       - dev-network
     volumes:
-      - uploads:/app/uploads
+      - dev-uploads:/app/uploads
 
   dev-postgres:
     image: postgres:18-alpine
@@ -76,6 +78,6 @@ networks:
     driver: bridge
 
 volumes:
-  uploads:
+  dev-uploads:
   dev-postgres-data:
   dev-redis-data:

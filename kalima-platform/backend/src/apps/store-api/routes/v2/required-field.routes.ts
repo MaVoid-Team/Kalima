@@ -3,6 +3,7 @@ import { requiredFieldController } from "../../controllers/required-field.contro
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/client";
+import { makeExportHandler } from "../../export";
 
 const router = Router();
 
@@ -15,6 +16,12 @@ const adminAuth = [
 // ============================================
 // FIELD DEFINITIONS — DICTIONARY CRUD
 // ============================================
+
+router.get(
+  "/definitions/export",
+  ...adminAuth,
+  makeExportHandler("required-field-definitions"),
+);
 
 router.post(
   "/definitions",

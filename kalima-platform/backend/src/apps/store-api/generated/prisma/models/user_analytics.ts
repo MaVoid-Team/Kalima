@@ -610,7 +610,7 @@ export type $user_analyticsPayload<ExtArgs extends runtime.Types.Extensions.Inte
 export type user_analyticsGetPayload<S extends boolean | null | undefined | user_analyticsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$user_analyticsPayload, S>
 
 export type user_analyticsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<user_analyticsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<user_analyticsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: User_analyticsCountAggregateInputType | true
   }
 
@@ -1058,6 +1058,7 @@ export type user_analyticsFindUniqueArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which user_analytics to fetch.
    */
   where: Prisma.user_analyticsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1080,6 +1081,7 @@ export type user_analyticsFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter, which user_analytics to fetch.
    */
   where: Prisma.user_analyticsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1132,6 +1134,7 @@ export type user_analyticsFindFirstArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of user_analytics.
    */
   distinct?: Prisma.User_analyticsScalarFieldEnum | Prisma.User_analyticsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1184,6 +1187,7 @@ export type user_analyticsFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter by unique combinations of user_analytics.
    */
   distinct?: Prisma.User_analyticsScalarFieldEnum | Prisma.User_analyticsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1231,6 +1235,7 @@ export type user_analyticsFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    */
   skip?: number
   distinct?: Prisma.User_analyticsScalarFieldEnum | Prisma.User_analyticsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1253,6 +1258,7 @@ export type user_analyticsCreateArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data needed to create a user_analytics.
    */
   data: Prisma.XOR<Prisma.user_analyticsCreateInput, Prisma.user_analyticsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1313,6 +1319,7 @@ export type user_analyticsUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
    * Choose, which user_analytics to update.
    */
   where: Prisma.user_analyticsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1391,6 +1398,7 @@ export type user_analyticsUpsertArgs<ExtArgs extends runtime.Types.Extensions.In
    * In case the user_analytics was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.user_analyticsUpdateInput, Prisma.user_analyticsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1413,6 +1421,7 @@ export type user_analyticsDeleteArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter which user_analytics to delete.
    */
   where: Prisma.user_analyticsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

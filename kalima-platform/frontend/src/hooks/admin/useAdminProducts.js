@@ -263,6 +263,27 @@ export const useAdminProducts = () => {
         }
     }, [fetchApi]);
 
+    const updateProductSample = (productId, formData, onUploadProgress, signal) =>
+        handleAction(() => fetchApi({
+            endpoint: `/products/${productId}`,
+            method: 'patch',
+            data: formData,
+            onUploadProgress,
+            signal,
+        }).then(res => {
+            if (res?.success) fetchProductById(productId);
+            return res;
+        }));
+
+    const removeProductSample = (productId) =>
+        handleAction(() => fetchApi({
+            endpoint: `/products/${productId}/sample`,
+            method: 'delete',
+        }).then(res => {
+            if (res?.success) fetchProductById(productId);
+            return res;
+        }));
+
     // ─── Filter Setters ───────────────────────────────────────────────────────
 
     const setSearch = useCallback((query) => {
@@ -328,6 +349,8 @@ export const useAdminProducts = () => {
 
         // Samples
         fetchAllSamples,
+        updateProductSample,
+        removeProductSample,
 
         // Filter Setters
         setSearch,

@@ -14,6 +14,7 @@
    - [Get My Profile](#get-my-profile)
    - [Update My Profile](#update-my-profile)
    - [Upload Avatar](#upload-avatar)
+   - [Delete Avatar](#delete-avatar)
 2. [Teaches At (Teacher)](#teaches-at-teacher)
    - [Get My Locations](#get-my-locations)
    - [Add Location](#add-location)
@@ -72,9 +73,7 @@ Returns the authenticated user's full profile with role-specific data.
     "profile_pic_url": "/uploads/images/avatar.webp",
     "is_email_verified": true,
     "created_at": "2026-01-15T10:00:00.000Z",
-    "user_roles": [
-      { "portal": "store", "role": "Teacher" }
-    ],
+    "user_roles": [{ "portal": "store", "role": "Teacher" }],
     "user_analytics": {
       "views": 0,
       "total_spent": "500.00",
@@ -141,14 +140,14 @@ Updates the authenticated user's profile. Supports basic fields (all roles) and 
 
 **Error Responses:**
 
-| Status | Message               | Condition              |
-| ------ | --------------------- | ---------------------- |
-| 404    | `User not found`      | Invalid user           |
-| 404    | `Subject not found`   | Invalid subject_id     |
-| 404    | `Government not found`| Invalid government_id  |
-| 404    | `Zone not found`      | Invalid zone_id        |
-| 404    | `Level not found`     | Invalid level_id       |
-| 422    | Validation errors     | Invalid body           |
+| Status | Message                | Condition             |
+| ------ | ---------------------- | --------------------- |
+| 404    | `User not found`       | Invalid user          |
+| 404    | `Subject not found`    | Invalid subject_id    |
+| 404    | `Government not found` | Invalid government_id |
+| 404    | `Zone not found`       | Invalid zone_id       |
+| 404    | `Level not found`      | Invalid level_id      |
+| 422    | Validation errors      | Invalid body          |
 
 ---
 
@@ -162,8 +161,8 @@ Uploads or replaces the user's profile picture.
 
 **File Fields:**
 
-| Field    | Type  | Description                    |
-| -------- | ----- | ------------------------------ |
+| Field    | Type  | Description                      |
+| -------- | ----- | -------------------------------- |
 | `avatar` | image | Profile picture image (required) |
 
 **Success Response (200):**
@@ -180,10 +179,34 @@ Uploads or replaces the user's profile picture.
 
 **Error Responses:**
 
-| Status | Message                   | Condition         |
-| ------ | ------------------------- | ----------------- |
-| 400    | `No image file provided`  | No file uploaded  |
-| 404    | `User not found`          | Invalid user      |
+| Status | Message                  | Condition        |
+| ------ | ------------------------ | ---------------- |
+| 400    | `No image file provided` | No file uploaded |
+| 404    | `User not found`         | Invalid user     |
+
+---
+
+### Delete Avatar
+
+Removes the user's profile picture and sets it to null.
+
+**Endpoint:** `DELETE /me/avatar`  
+**Auth Required:** Yes
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Profile picture deleted"
+}
+```
+
+**Error Responses:**
+
+| Status | Message          | Condition    |
+| ------ | ---------------- | ------------ |
+| 404    | `User not found` | Invalid user |
 
 ---
 
@@ -424,11 +447,11 @@ Manage parent-child relationships.
 
 **Error Responses:**
 
-| Status | Message                                | Condition                  |
-| ------ | -------------------------------------- | -------------------------- |
-| 404    | `Parent not found`                     | Parent profile missing     |
-| 404    | `Student not found`                    | Student profile missing    |
-| 409    | `Parent-child relation already exists` | Duplicate link             |
+| Status | Message                                | Condition               |
+| ------ | -------------------------------------- | ----------------------- |
+| 404    | `Parent not found`                     | Parent profile missing  |
+| 404    | `Student not found`                    | Student profile missing |
+| 409    | `Parent-child relation already exists` | Duplicate link          |
 
 ---
 
@@ -450,23 +473,24 @@ Admin and SubAdmin users can manage any user's profile using the same endpoints,
 
 **Base:** `/api/v2/profile/users/:userId`
 
-| Self-Service | Admin Equivalent |
-|---|---|
-| `GET /me` | `GET /users/:userId` |
-| `PATCH /me` | `PATCH /users/:userId` |
-| `POST /me/avatar` | `POST /users/:userId/avatar` |
-| `GET /me/teaches-at` | `GET /users/:userId/teaches-at` |
-| `POST /me/teaches-at` | `POST /users/:userId/teaches-at` |
-| `PATCH /me/teaches-at/:id` | `PATCH /users/:userId/teaches-at/:id` |
-| `DELETE /me/teaches-at/:id` | `DELETE /users/:userId/teaches-at/:id` |
-| `GET /me/social-media` | `GET /users/:userId/social-media` |
-| `POST /me/social-media` | `POST /users/:userId/social-media` |
-| `PATCH /me/social-media/:id` | `PATCH /users/:userId/social-media/:id` |
+| Self-Service                  | Admin Equivalent                         |
+| ----------------------------- | ---------------------------------------- |
+| `GET /me`                     | `GET /users/:userId`                     |
+| `PATCH /me`                   | `PATCH /users/:userId`                   |
+| `POST /me/avatar`             | `POST /users/:userId/avatar`             |
+| `DELETE /me/avatar`           | `DELETE /users/:userId/avatar`           |
+| `GET /me/teaches-at`          | `GET /users/:userId/teaches-at`          |
+| `POST /me/teaches-at`         | `POST /users/:userId/teaches-at`         |
+| `PATCH /me/teaches-at/:id`    | `PATCH /users/:userId/teaches-at/:id`    |
+| `DELETE /me/teaches-at/:id`   | `DELETE /users/:userId/teaches-at/:id`   |
+| `GET /me/social-media`        | `GET /users/:userId/social-media`        |
+| `POST /me/social-media`       | `POST /users/:userId/social-media`       |
+| `PATCH /me/social-media/:id`  | `PATCH /users/:userId/social-media/:id`  |
 | `DELETE /me/social-media/:id` | `DELETE /users/:userId/social-media/:id` |
-| `GET /me/children` | `GET /users/:userId/children` |
-| `POST /me/children` | `POST /users/:userId/children` |
-| `PATCH /me/children/:id` | `PATCH /users/:userId/children/:id` |
-| `DELETE /me/children/:id` | `DELETE /users/:userId/children/:id` |
+| `GET /me/children`            | `GET /users/:userId/children`            |
+| `POST /me/children`           | `POST /users/:userId/children`           |
+| `PATCH /me/children/:id`      | `PATCH /users/:userId/children/:id`      |
+| `DELETE /me/children/:id`     | `DELETE /users/:userId/children/:id`     |
 
 > **Auth:** Only users with **Admin** or **SubAdmin** role can access `/users/:userId` routes. Non-admin users get `403 Forbidden`.
 
@@ -503,14 +527,14 @@ Admin and SubAdmin users can manage any user's profile using the same endpoints,
 
 ## Error Codes
 
-| Status | Error Type          | Description                                           |
-| ------ | ------------------- | ----------------------------------------------------- |
-| 400    | `BadRequestError`   | Invalid input or missing files                        |
-| 401    | `UnauthorizedError` | Missing or invalid authorization token                |
-| 403    | `ForbiddenError`    | Not authorized to access or modify this resource      |
-| 404    | `NotFoundError`     | User, subject, government, zone, or record not found  |
-| 409    | `ConflictError`     | Duplicate record (e.g., parent-child link)            |
-| 422    | `ValidationError`   | DTO validation failed — returns `errors` array        |
+| Status | Error Type          | Description                                          |
+| ------ | ------------------- | ---------------------------------------------------- |
+| 400    | `BadRequestError`   | Invalid input or missing files                       |
+| 401    | `UnauthorizedError` | Missing or invalid authorization token               |
+| 403    | `ForbiddenError`    | Not authorized to access or modify this resource     |
+| 404    | `NotFoundError`     | User, subject, government, zone, or record not found |
+| 409    | `ConflictError`     | Duplicate record (e.g., parent-child link)           |
+| 422    | `ValidationError`   | DTO validation failed — returns `errors` array       |
 
 ### Error Response Format
 

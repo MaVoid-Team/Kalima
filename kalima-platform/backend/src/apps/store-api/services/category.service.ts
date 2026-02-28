@@ -8,7 +8,49 @@ import { BadRequestError, NotFoundError } from "../../../libs/errors";
 // CONSTANTS
 // ============================================
 
-const MAX_NESTING_DEPTH = 3;
+const MAX_NESTING_DEPTH = 1000;
+
+const SUB_CATEGORIES_SELECT = {
+  id: true,
+  title: true,
+  active: true,
+};
+
+const CATEGORY_SELECT = {
+  id: true,
+  title: true,
+  active: true,
+  description: true,
+  parent: { select: { id: true, title: true } },
+  product_categories: {
+    select: { product_id: true },
+  },
+  sub_categories: {
+    select: {
+      ...SUB_CATEGORIES_SELECT,
+      sub_categories: { select: SUB_CATEGORIES_SELECT },
+    },
+  },
+  created_at: true,
+  updated_at: true,
+};
+
+interface CATEGORY_RETURN {
+  id: number;
+  title: string;
+  active: boolean;
+  description: string;
+  parent: { id: number; title: string } | null;
+  product_categories: { product_id: number }[];
+  sub_categories: {
+    id: number;
+    title: string;
+    active: boolean;
+    sub_categories: {}[];
+  }[];
+  created_at: Date;
+  updated_at: Date;
+}
 
 // ============================================
 // CATEGORY SERVICE
@@ -63,7 +105,7 @@ class CategoryService {
     page?: number;
     limit?: number;
   }): Promise<{
-    data: categories[];
+    data: CATEGORY_RETURN[];
     total: number;
     page: number;
     limit: number;
@@ -79,36 +121,12 @@ class CategoryService {
     }
 
     // Get root categories (no parent) with 3 levels of nesting
-    where.parent_id = null;
+    // where.parent_id = null;
 
     const [data, total] = await Promise.all([
       this.db.categories.findMany({
         where,
-        include: {
-          other_categories: {
-            where:
-              filters?.active !== undefined ? { active: filters.active } : {},
-            include: {
-              other_categories: {
-                where:
-                  filters?.active !== undefined
-                    ? { active: filters.active }
-                    : {},
-                include: {
-                  product_categories: {
-                    select: { product_id: true },
-                  },
-                },
-              },
-              product_categories: {
-                select: { product_id: true },
-              },
-            },
-          },
-          product_categories: {
-            select: { product_id: true },
-          },
-        },
+        select: CATEGORY_SELECT,
         orderBy: { created_at: "desc" },
         skip,
         take: limit,
@@ -129,16 +147,33 @@ class CategoryService {
    */
   async getRootCategories(filters?: {
     active?: boolean;
-  }): Promise<categories[]> {
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    data: CATEGORY_RETURN[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const page = filters?.page ?? 1;
+    const limit = filters?.limit ?? 10;
+    const skip = (page - 1) * limit;
+
     const where: any = { parent_id: null };
     if (filters?.active !== undefined) where.active = filters.active;
 
-    const roots = await this.db.categories.findMany({
-      where,
-      orderBy: { created_at: "desc" },
-    });
+    const [data, total] = await Promise.all([
+      this.db.categories.findMany({
+        where,
+        select: CATEGORY_SELECT,
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.categories.count({ where }),
+    ]);
 
-    return roots;
+    return { data, total, page, limit };
   }
 
   /**
@@ -147,50 +182,48 @@ class CategoryService {
    */
   async getChildrenByParent(
     parentId: number,
-    filters?: { active?: boolean },
-  ): Promise<categories[]> {
+    filters?: { active?: boolean; page?: number; limit?: number },
+  ): Promise<{
+    data: CATEGORY_RETURN[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const page = filters?.page ?? 1;
+    const limit = filters?.limit ?? 10;
+    const skip = (page - 1) * limit;
+
     const parent = await this.db.categories.findUnique({
       where: { id: parentId },
+      select: { id: true },
     });
     if (!parent) throw new NotFoundError("Parent category not found");
 
     const where: any = { parent_id: parentId };
     if (filters?.active !== undefined) where.active = filters.active;
 
-    const children = await this.db.categories.findMany({
-      where,
-      orderBy: { created_at: "desc" },
-    });
+    const [data, total] = await Promise.all([
+      this.db.categories.findMany({
+        where,
+        orderBy: { created_at: "desc" },
+        select: CATEGORY_SELECT,
+        skip,
+        take: limit,
+      }),
+      this.db.categories.count({ where }),
+    ]);
 
-    return children;
+    return { data, total, page, limit };
   }
 
   // ============================================
   // READ — SINGLE
   // ============================================
 
-  async getCategoryById(id: number): Promise<categories> {
+  async getCategoryById(id: number): Promise<CATEGORY_RETURN> {
     const category = await this.db.categories.findUnique({
       where: { id },
-      include: {
-        other_categories: {
-          include: {
-            other_categories: {
-              include: {
-                product_categories: {
-                  select: { product_id: true },
-                },
-              },
-            },
-            product_categories: {
-              select: { product_id: true },
-            },
-          },
-        },
-        product_categories: {
-          select: { product_id: true },
-        },
-      },
+      select: CATEGORY_SELECT,
     });
 
     if (!category) {
