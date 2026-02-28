@@ -89,7 +89,7 @@ export default function SamplePage() {
                         <div className="space-y-6">
                             {/* Preview Box */}
                             <div className="relative w-full aspect-4/3 rounded-2xl overflow-hidden bg-muted border flex items-center justify-center">
-                                {isPdf ? (
+                                {isPdf && fileUrl ? (
                                     <div className="w-full h-full max-w-4xl">
                                         <PDFViewer
                                             config={{
@@ -97,7 +97,7 @@ export default function SamplePage() {
                                                 theme: { preference: 'system' },
                                                 i18n: viewerI18n,
                                                 dir: i18n.dir(),
-                                                disabledCategories: ['annotation', 'redaction'],
+                                                disabledCategories: ['annotation', 'redaction', 'file', 'local', 'download'],
                                             }}
                                             style={{ width: '100%', height: '100%' }}
                                         />
@@ -126,7 +126,7 @@ export default function SamplePage() {
                                         <ExternalLink className="me-2 h-4 w-4" />
                                     </Link>
                                 </Button>
-                                
+
                                 <Button variant="outline" className="flex-1" asChild>
                                     <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
                                         <Download className="me-2 h-4 w-4" />
@@ -158,25 +158,25 @@ export default function SamplePage() {
                                         <FileText className="h-5 w-5" />
                                         {t('samplePage.sampleInfo', 'Sample Information')}
                                     </h2>
-                                    
+
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between py-2 border-b border-border/50">
                                             <span className="text-sm text-muted-foreground">{t('samplePage.fileName', 'File Name')}</span>
                                             <span className="text-sm font-medium truncate ml-2 max-w-[60%]">{sample?.original_name}</span>
                                         </div>
-                                        
+
                                         <div className="flex items-center justify-between py-2 border-b border-border/50">
                                             <span className="text-sm text-muted-foreground">{t('samplePage.fileSize', 'File Size')}</span>
                                             <span className="text-sm font-medium">{sample?.size ? formatFileSize(sample.size) : 'N/A'}</span>
                                         </div>
-                                        
+
                                         <div className="flex items-center justify-between py-2 border-b border-border/50">
                                             <span className="text-sm text-muted-foreground">{t('samplePage.fileType', 'File Type')}</span>
                                             <Badge variant="outline">
                                                 {isPdf ? 'PDF' : 'Word'}
                                             </Badge>
                                         </div>
-                                        
+
                                         <div className="flex items-center justify-between py-2 border-b border-border/50">
                                             <span className="text-sm text-muted-foreground">{t('samplePage.uploadDate', 'Upload Date')}</span>
                                             <span className="text-sm font-medium">
@@ -193,18 +193,18 @@ export default function SamplePage() {
                                             <Package className="h-5 w-5" />
                                             {t('samplePage.productInfo', 'Product Information')}
                                         </h2>
-                                        
+
                                         <div className="space-y-3">
                                             <div className="flex items-center justify-between py-2 border-b border-border/50">
                                                 <span className="text-sm text-muted-foreground">{t('samplePage.productName', 'Product Name')}</span>
                                                 <span className="text-sm font-medium truncate ml-2 max-w-[60%]">{product.title}</span>
                                             </div>
-                                            
+
                                             <div className="flex items-center justify-between py-2 border-b border-border/50">
                                                 <span className="text-sm text-muted-foreground">{t('samplePage.productType', 'Product Type')}</span>
                                                 <Badge variant="secondary">{product.type}</Badge>
                                             </div>
-                                            
+
                                             <div className="flex items-center justify-between py-2 border-b border-border/50">
                                                 <span className="text-sm text-muted-foreground">{t('samplePage.price', 'Price')}</span>
                                                 <div className="flex items-center gap-2">
@@ -218,14 +218,14 @@ export default function SamplePage() {
                                                     )}
                                                 </div>
                                             </div>
-                                            
+
                                             {product.serial && (
                                                 <div className="flex items-center justify-between py-2 border-b border-border/50">
                                                     <span className="text-sm text-muted-foreground">{t('samplePage.serial', 'Serial')}</span>
                                                     <span className="text-sm font-medium">{product.serial}</span>
                                                 </div>
                                             )}
-                                            
+
                                             <div className="pt-4">
                                                 <Button variant="default" className="w-full" asChild>
                                                     <Link to={`/product/${product.id}`}>
