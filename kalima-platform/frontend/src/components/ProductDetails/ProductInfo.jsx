@@ -103,7 +103,7 @@ export default function ProductInfo({ product }) {
             {t("product:info.perks", "Product Features:")}
           </h3>
           <ul className="list-disc ps-5 text-sm text-muted-foreground">
-            {product.perks.split(',').map((perk, index) => (
+            {product.perks.split(/[,،]/).map((perk, index) => (
               <li key={index}>{perk.trim()}</li>
             ))}
           </ul>

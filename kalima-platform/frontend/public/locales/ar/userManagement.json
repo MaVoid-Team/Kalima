@@ -41,7 +41,9 @@
         "makeSubAdmin": "إضافة نائب مدير",
         "makeModerator": "إضافة مشرف",
         "makeAssistant": "إضافة مساعد",
-        "revokeRole": "إلغاء دور"
+        "revokeRole": "إلغاء دور",
+        "delete": "حذف",
+        "cancel": "إلغاء"
     },
     "details": {
         "title": "ملف المستخدم",
@@ -70,7 +72,9 @@
         "preparatory": "إعدادي",
         "secondary": "ثانوي",
         "usersCreated": "المستخدمون المنشئون",
-        "currency": "جنيه"
+        "currency": "جنيه",
+        "confirmDeleteTitle": "هل أنت متأكد؟",
+        "confirmDeleteDesc": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف حساب المستخدم بشكل نهائي."
     },
     "roles": {
         "Admin": "مدير",

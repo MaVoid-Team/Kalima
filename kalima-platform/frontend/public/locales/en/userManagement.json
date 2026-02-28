@@ -41,7 +41,9 @@
         "makeSubAdmin": "Create SubAdmin",
         "makeModerator": "Create Moderator",
         "makeAssistant": "Create Assistant",
-        "revokeRole": "Revoke Role"
+        "revokeRole": "Revoke Role",
+        "delete": "Delete",
+        "cancel": "Cancel"
     },
     "details": {
         "title": "User Profile",
@@ -70,7 +72,9 @@
         "preparatory": "Preparatory",
         "secondary": "Secondary",
         "usersCreated": "Users Created",
-        "currency": "EGP"
+        "currency": "EGP",
+        "confirmDeleteTitle": "Are you sure?",
+        "confirmDeleteDesc": "This action cannot be undone. This will permanently delete the user account."
     },
     "roles": {
         "Admin": "Admin",

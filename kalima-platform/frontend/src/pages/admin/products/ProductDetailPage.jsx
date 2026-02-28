@@ -222,7 +222,7 @@ export default function ProductDetailPage() {
                         <div className="sm:col-span-2 lg:col-span-3" data-testid="product-detail-perks">
                             <span className="text-muted-foreground">{t('products.form.perks')}</span>
                             <ul className="list-disc ps-5 mt-0.5">
-                                {product.perks.split(',').map((perk, i) => (
+                                {product.perks.split(/[,،]/).map((perk, i) => (
                                     <li key={i}>{perk.trim()}</li>
                                 ))}
                             </ul>

@@ -6,7 +6,8 @@ import { arSA } from 'date-fns/locale';
 import {
     ArrowLeft, User, Mail, Phone, Calendar,
     ShieldCheck, Eye, ShoppingBag, UserPlus, BookOpen,
-    MapPin, Hash, GraduationCap, BarChart3, Users
+    MapPin, Hash, GraduationCap, BarChart3, Users,
+    Trash2
 } from 'lucide-react';
 
 import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
@@ -18,6 +19,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import UserRolesSection from '@/components/admin/users/UserRolesSection';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 /* ─── helpers ────────────────────────────────────────────────────────────── */
 function StatCard({ icon: Icon, label, value, color = 'text-primary' }) {
@@ -63,7 +75,8 @@ export default function UserDetailPage() {
         actionLoading,
         fetchUserById,
         assignRole,
-        revokeRole
+        revokeRole,
+        deleteUser
     } = useAdminUsers();
 
     useEffect(() => {
@@ -81,6 +94,13 @@ export default function UserDetailPage() {
     const handleRevokeRole = async (portal, role) => {
         await revokeRole(id, portal, role);
         fetchUserById(id);
+    };
+
+    const handleDeleteUser = async () => {
+        const res = await deleteUser(id);
+        if (res?.success) {
+            fetchUserById(id);
+        }
     };
 
     /* ── loading / not-found states ── */
@@ -134,6 +154,9 @@ export default function UserDetailPage() {
 
     const createdEntries = Object.entries(userCreated).filter(([, v]) => v > 0);
 
+    const displayEmail = selectedUser.email?.includes('_deleted_') ? selectedUser.email.split('_deleted_')[0] : selectedUser.email;
+    const displayPhone = selectedUser.phone?.includes('_deleted_') ? selectedUser.phone.split('_deleted_')[0] : selectedUser.phone;
+
     return (
         <div className="space-y-6 max-w-6xl mx-auto" data-testid="user-detail-page">
 
@@ -162,12 +185,59 @@ export default function UserDetailPage() {
                     </div>
                 </div>
 
-                {selectedUser.is_email_verified && (
-                    <Badge variant="default" className="gap-1" data-testid="user-detail-verified-badge">
-                        <ShieldCheck className="w-4 h-4" />
-                        {t('status.verified')}
-                    </Badge>
-                )}
+                <div className="flex items-center gap-2">
+                    {selectedUser.is_deleted ? (
+                        <Badge variant="destructive" className="gap-1" data-testid="user-detail-deleted-badge">
+                            <Trash2 className="w-4 h-4" />
+                            {t('status.deleted', 'Deleted')}
+                        </Badge>
+                    ) : selectedUser.is_email_verified ? (
+                        <Badge variant="default" className="gap-1" data-testid="user-detail-verified-badge">
+                            <ShieldCheck className="w-4 h-4" />
+                            {t('status.verified')}
+                        </Badge>
+                    ) : (
+                        <Badge variant="outline" className="gap-1" data-testid="user-detail-pending-badge">
+                            {t('status.pending', 'Pending')}
+                        </Badge>
+                    )}
+
+                    {!selectedUser.is_deleted && hasAdminAccess && (
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    disabled={actionLoading}
+                                    data-testid="user-detail-delete-button"
+                                    className="ms-2"
+                                >
+                                    <Trash2 className="h-4 w-4 me-1" />
+                                    {t('actions.delete', 'Delete')}
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent dir={i18n.dir()}>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>{t('details.confirmDeleteTitle', 'Are you sure?')}</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        {t('details.confirmDeleteDesc', 'This action cannot be undone. This will permanently delete the user account.')}
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel disabled={actionLoading}>{t('actions.cancel', 'Cancel')}</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={handleDeleteUser}
+                                        disabled={actionLoading}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                        {actionLoading && <LoadingSpinner className="h-4 w-4 mr-2" />}
+                                        {t('actions.delete', 'Delete')}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    )}
+                </div>
             </div>
 
             {/* ── Profile Hero Card ── */}
@@ -196,16 +266,16 @@ export default function UserDetailPage() {
                             </div>
 
                             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-2">
-                                {selectedUser.email && (
-                                    <span className="flex items-center gap-1.5">
+                                {displayEmail && (
+                                    <span className="flex items-center gap-1.5" dir="ltr">
                                         <Mail className="h-3.5 w-3.5 shrink-0" />
-                                        {selectedUser.email}
+                                        {displayEmail}
                                     </span>
                                 )}
-                                {selectedUser.phone && (
+                                {displayPhone && (
                                     <span className="flex items-center gap-1.5" dir="ltr">
                                         <Phone className="h-3.5 w-3.5 shrink-0" />
-                                        {selectedUser.phone}
+                                        {displayPhone}
                                     </span>
                                 )}
                                 {selectedUser.gender && (
