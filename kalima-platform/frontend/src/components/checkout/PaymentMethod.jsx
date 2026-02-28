@@ -10,16 +10,42 @@ import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
 import { ImageOff } from "lucide-react";
 import { getImageUrl } from "@/lib/storeUtils";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { PhoneInput, egyptPhoneSchema } from "@/components/ui/phone-input";
 
 export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
     numberTransferredFrom, setNumberTransferredFrom,
     notes, setNotes,
-    screenshotFile, setScreenshotFile }) {
+    screenshotFile, setScreenshotFile, setValidationErrors }) {
     const { t, i18n } = useTranslation('checkout');
     const [methods, setMethods] = useState([]);
     const fileInputRef = useRef(null);
     const [showPreview, setShowPreview] = useState(false);
     const [previewUrl, setPreviewUrl] = useState('');
+
+    const schema = React.useMemo(() => z.object({
+        numberTransferredFrom: egyptPhoneSchema,
+    }), []);
+
+    const {
+        control,
+        trigger,
+        formState: { errors, isValid }
+    } = useForm({
+        resolver: zodResolver(schema),
+        defaultValues: {
+            numberTransferredFrom: numberTransferredFrom || "",
+        },
+        mode: "onChange",
+    });
+
+    useEffect(() => {
+        if (setValidationErrors) {
+            setValidationErrors(!isValid);
+        }
+    }, [isValid, setValidationErrors]);
 
     useEffect(() => {
         if (screenshotFile) {
@@ -93,13 +119,30 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                             {t('payment.transferNumber')}
                             <span className="text-destructive">*</span>
                         </Label>
-                        <Input
-                            id="transfer-number"
-                            type="text"
-                            value={numberTransferredFrom}
-                            onChange={e => setNumberTransferredFrom(e.target.value)}
-                            className="w-full"
-                            data-testid="checkout-payment-method-transfer-number"
+                        <Controller
+                            control={control}
+                            name="numberTransferredFrom"
+                            render={({ field }) => (
+                                <div>
+                                    <PhoneInput
+                                        id="transfer-number"
+                                        dir="ltr"
+                                        {...field}
+                                        onChange={(e) => {
+                                            field.onChange(e);
+                                            setNumberTransferredFrom(e.target.value);
+                                        }}
+                                        onBlur={() => trigger("numberTransferredFrom")}
+                                        className="w-full"
+                                        data-testid="checkout-payment-method-transfer-number"
+                                    />
+                                    {errors.numberTransferredFrom && (
+                                        <p className="text-destructive text-sm mt-1 font-medium">
+                                            {errors.numberTransferredFrom.message?.toString()}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         />
                     </div>
                     <div className="grid gap-2">

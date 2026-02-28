@@ -25,6 +25,7 @@ export default function PaymentStep({ onBack }) {
     const [purchase, setPurchase] = useState(null);
     const [showReceipt, setShowReceipt] = useState(false);
     const [paymentMethodName, setPaymentMethodName] = useState('');
+    const [hasValidationErrors, setHasValidationErrors] = useState(false);
     const receiptRef = useRef(null);
 
     useEffect(() => {
@@ -38,6 +39,11 @@ export default function PaymentStep({ onBack }) {
         }
         if (!numberTransferredFrom) {
             toast.error(t('payment.transferNumberRequired') || 'Please enter the number you transferred from');
+            return;
+        }
+
+        if (hasValidationErrors) {
+            toast.error(t('payment.invalidPhoneNumber', 'Please enter a valid phone number'));
             return;
         }
         // Assuming screenshot might be optional in some cases but required here
@@ -154,6 +160,7 @@ export default function PaymentStep({ onBack }) {
                         setNotes={setNotes}
                         screenshotFile={screenshotFile}
                         setScreenshotFile={setScreenshotFile}
+                        setValidationErrors={setHasValidationErrors}
                     />
                 </div>
 

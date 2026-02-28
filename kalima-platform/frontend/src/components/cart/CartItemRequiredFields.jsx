@@ -4,6 +4,7 @@ import { Trash, ImageOff, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PhoneInput, egyptPhoneSchema } from '@/components/ui/phone-input';
 import {
     Accordion,
     AccordionItem,
@@ -63,6 +64,15 @@ export default function CartItemRequiredFields({
             ) {
                 hasError = true;
                 errors[rf.field_definition_id] = t('pleaseSelectFile', 'Please select a file');
+            } else if (rf.required_field_definitions.field_type === 'number') {
+                const val = fieldValues[rf.field_definition_id];
+                if (rf.is_required || (val && val.trim() !== '')) {
+                    const parsed = egyptPhoneSchema.safeParse(val || "");
+                    if (!parsed.success) {
+                        hasError = true;
+                        errors[rf.field_definition_id] = t('invalidPhone', 'Invalid Egyptian mobile number');
+                    }
+                }
             }
         });
 
@@ -308,6 +318,39 @@ export default function CartItemRequiredFields({
                                                     );
                                                 })()
                                             }
+                                        </>
+                                    ) : rf?.required_field_definitions?.field_type === 'number' ? (
+                                        <>
+                                            <PhoneInput
+                                                dir="ltr"
+                                                value={fieldValues[rf.field_definition_id] || ''}
+                                                required={rf?.is_required}
+                                                onChange={e => {
+                                                    const val = e.target.value;
+                                                    setFieldValues(prev => ({
+                                                        ...prev,
+                                                        [rf.field_definition_id]: val,
+                                                    }));
+                                                    setFileErrors(prev => {
+                                                        const copy = { ...prev };
+                                                        delete copy[rf.field_definition_id];
+                                                        return copy;
+                                                    });
+                                                }}
+                                                className="input-sm outline-none"
+                                                data-testid={`cart-item-fields-input-${item.id}-${rf.field_definition_id}`}
+                                            />
+                                            {fileErrors[rf.field_definition_id] && (
+                                                <motion.p
+                                                    key={`error-text-${rf.field_definition_id}-${errorShakeTick}`}
+                                                    initial={{ x: 0 }}
+                                                    animate={{ x: [0, -7, 7, -5, 5, -3, 3, 0] }}
+                                                    transition={{ duration: 0.35 }}
+                                                    className="text-destructive text-xs mt-1"
+                                                >
+                                                    {fileErrors[rf.field_definition_id]}
+                                                </motion.p>
+                                            )}
                                         </>
                                     ) : (
                                         <Input
