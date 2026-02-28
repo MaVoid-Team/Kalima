@@ -40,7 +40,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
     const formSchema = React.useMemo(() => {
         const baseShape = {
             name: z.string().min(2, { message: t("validation.required", "Name is required") }).optional().or(z.literal("")),
-            email: z.string().email({ message: t("validation.email_invalid", "Invalid email") }).optional().or(z.literal("")),
+            email: z.string().email({ message: t("validation.emailInvalid", "Invalid email") }).optional().or(z.literal("")),
             phone: z.string().min(1, { message: t("validation.required", "Phone is required") }),
             gender: z.enum(["male", "female"], { required_error: t("validation.required", "Gender is required") }),
             password: z.string().optional().or(z.literal("")),
@@ -54,8 +54,8 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
             if (!firebaseToken) {
                 if (!data.name) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t("validation.required"), path: ["name"] });
                 if (!data.email) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t("validation.required"), path: ["email"] });
-                if (!data.password || data.password.length < 6) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t("validation.password_min"), path: ["password"] });
-                if (data.password !== data.confirmPassword) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t("validation.password_mismatch"), path: ["confirmPassword"] });
+                if (!data.password || data.password.length < 6) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t("validation.passwordMin"), path: ["password"] });
+                if (data.password !== data.confirmPassword) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t("validation.passwordMismatch"), path: ["confirmPassword"] });
             }
         });
     }, [t, extraSchema, firebaseToken]);
