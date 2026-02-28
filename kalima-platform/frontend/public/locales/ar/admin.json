@@ -6,6 +6,7 @@
     "samples": "العينات",
     "coupons": "القسائم",
     "categories": "الفئات",
+    "requiredFields": "الحقول المطلوبة",
     "paymentMethods": "طرق الدفع",
     "themeToggle": "تبديل المظهر",
     "darkMode": "الوضع الداكن",
@@ -29,6 +30,9 @@
     "edit": "تعديل",
     "delete": "حذف",
     "openMenu": "فتح القائمة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "update": "تحديث",
     "pagination": {
       "previous": "السابق",
       "next": "التالي"
@@ -732,6 +736,55 @@
       "invalidType": "نوع الملف غير صالح. يرجى رفع صور JPEG, PNG, أو WebP.",
       "tooLarge": "الملف كبير جداً. الحد الأقصى هو 5 ميجابايت.",
       "uploading": "جاري الرفع..."
+    }
+  },
+  "requiredFields": {
+    "title": "إدارة الحقول المطلوبة",
+    "subtitle": "إدارة تعريفات الحقول القابلة لإعادة الاستخدام للمنتجات",
+    "totalFields": "{{count}} حقول",
+    "noFields": "لا توجد حقول مطلوبة",
+    "createField": "إنشاء حقل",
+    "fields": {
+      "label": "الاسم",
+      "fieldType": "نوع الحقل",
+      "active": "نشط",
+      "createdAt": "تاريخ الإنشاء"
+    },
+    "types": {
+      "text": "نص",
+      "number": "رقم",
+      "date": "تاريخ",
+      "image": "صورة"
+    },
+    "filters": {
+      "allStatuses": "كل الحالات",
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "create": {
+      "title": "إنشاء حقل مطلوب",
+      "description": "إضافة تعريف حقل قابل لإعادة الاستخدام.",
+      "labelPlaceholder": "أدخل اسم الحقل",
+      "fieldTypePlaceholder": "اختر نوع الحقل"
+    },
+    "edit": {
+      "title": "تعديل الحقل المطلوب",
+      "description": "تحديث تفاصيل تعريف الحقل.",
+      "labelPlaceholder": "أدخل اسم الحقل",
+      "fieldTypePlaceholder": "اختر نوع الحقل",
+      "activeDescription": "تفعيل أو إلغاء تفعيل تعريف الحقل هذا"
+    },
+    "delete": {
+      "title": "حذف الحقل المطلوب",
+      "description": "هل أنت متأكد من حذف الحقل \"{{label}}\"؟",
+      "warning": "لا يمكن التراجع عن هذا الإجراء.",
+      "warningDescription": "حذف هذا الحقل سيزيله من جميع المنتجات ولا يمكن استعادته.",
+      "confirm": "حذف الحقل"
+    },
+    "messages": {
+      "createSuccess": "تم إنشاء الحقل بنجاح",
+      "updateSuccess": "تم تحديث الحقل بنجاح",
+      "deleteSuccess": "تم حذف الحقل بنجاح"
     }
   }
 }
