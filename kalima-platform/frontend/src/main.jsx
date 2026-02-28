@@ -10,13 +10,11 @@ import { Toaster } from 'sonner';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <BrowserRouter>
-            <AuthProvider>
-                <CartProvider>
-                    <App />
-                    <Toaster richColors position="bottom-right" />
-                </CartProvider>
-            </AuthProvider>
-        </BrowserRouter>
+        <AuthProvider>
+            <CartProvider>
+                <App />
+                <Toaster richColors position="bottom-right" />
+            </CartProvider>
+        </AuthProvider>
     </React.StrictMode>
 )
