@@ -956,14 +956,30 @@ class UserManagementService {
   async deleteUser(userId: number): Promise<void> {
     const user = await this.db.users.findUnique({
       where: { id: userId },
-      select: { id: true },
+      select: { id: true, email: true, phone: true, mongo_id: true },
     });
 
     if (!user) {
       throw new NotFoundError("User not found");
     }
 
-    await this.db.users.delete({ where: { id: userId } });
+    const ts = Date.now();
+    await this.db.users.update({
+      where: { id: userId },
+      data: {
+        email: user.email ? `${user.email}_deleted_${ts}` : null,
+        phone: user.phone ? `${user.phone}_deleted_${ts}` : null,
+        mongo_id: user.mongo_id ? `${user.mongo_id}_deleted_${ts}` : null,
+        password: null,
+        // we leave 'name' and relations intact for order history
+        updated_at: new Date(),
+      },
+    });
+
+    // Cleanup active sessions
+    await this.db.refresh_tokens.deleteMany({ where: { user_id: userId } });
+    await this.db.user_roles.deleteMany({ where: { user_id: userId } });
+    await this.db.auth_identities.deleteMany({ where: { user_id: userId } });
   }
 
   // ============================================
@@ -1056,6 +1072,7 @@ class UserManagementService {
         lecturers: { select: { bio: true } },
         assistants: { select: { lecturer_user_id: true } },
         parents: { select: { government_id: true } },
+        user_analytics: true,
       },
     });
 
