@@ -62,7 +62,6 @@ export default function UserDetailPage() {
         loading,
         actionLoading,
         fetchUserById,
-        fetchUserRoles,
         assignRole,
         revokeRole
     } = useAdminUsers();
@@ -120,12 +119,6 @@ export default function UserDetailPage() {
 
     const analyticsStats = [
         {
-            icon: Eye,
-            label: t('details.views'),
-            value: analytics.views ?? 0,
-            color: 'text-chart-2',
-        },
-        {
             icon: ShoppingBag,
             label: t('details.totalSpent'),
             value: `${Number(analytics.total_spent ?? 0).toLocaleString()} ${t('details.currency')}`,
@@ -136,13 +129,7 @@ export default function UserDetailPage() {
             label: t('details.purchases'),
             value: analytics.number_of_purchases ?? 0,
             color: 'text-primary',
-        },
-        {
-            icon: UserPlus,
-            label: t('details.invites'),
-            value: analytics.successful_invites ?? 0,
-            color: 'text-chart-4',
-        },
+        }
     ];
 
     const createdEntries = Object.entries(userCreated).filter(([, v]) => v > 0);
@@ -245,7 +232,7 @@ export default function UserDetailPage() {
                     <BarChart3 className="h-4 w-4" />
                     {t('details.analytics')}
                 </h3>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-testid="user-detail-analytics">
+                <div className="grid grid-cols-2 gap-4" data-testid="user-detail-analytics">
                     {analyticsStats.map((s) => (
                         <StatCard key={s.label} {...s} />
                     ))}

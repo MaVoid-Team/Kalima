@@ -161,7 +161,7 @@
       "deleteOrderSuccess": "تم حذف الطلب بنجاح",
       "deleteItemSuccess": "تم حذف العنصر بنجاح",
       "noteSaved": "تم حفظ ملاحظة الإدارة بنجاح",
-            "noOrdersFound": "لم يتم العثور على طلبات."
+      "noOrdersFound": "لم يتم العثور على طلبات."
     },
     "details": {
       "title": "تفاصيل الطلب",
@@ -198,7 +198,7 @@
     "noProductsDescription": "لا توجد منتجات تطابق الفلاتر الحالية.",
     "createProduct": "إنشاء منتج",
     "backToProducts": "العودة للمنتجات",
-        "backToProduct":"العودة للمنتج",
+    "backToProduct": "العودة للمنتج",
     "filters": {
       "allCategories": "جميع الفئات",
       "allStatuses": "جميع الحالات",
@@ -244,9 +244,9 @@
       "couponIdPlaceholder": "معرف الكوبون (اختياري)",
       "thumbnail": "صورة الغلاف",
       "sample": "ملف النموذج (PDF)",
-            "chooseImage": "اختر صورة",
-            "chooseSampleFile": "اختر ملف العينة",
-            "noFileSelected": "لم يتم اختيار ملف",
+      "chooseImage": "اختر صورة",
+      "chooseSampleFile": "اختر ملف العينة",
+      "noFileSelected": "لم يتم اختيار ملف",
       "categories": "الفئات",
       "isArchived": "مؤرشف",
       "perks": "المميزات",
@@ -353,6 +353,9 @@
     "subtitle": "جميع ملفات عينات المنتجات في المتجر",
     "count": "عينات",
     "noSamples": "لا توجد ملفات عينات.",
+    "copyLink": "نسخ الرابط",
+    "linkCopied": "تم نسخ رابط العينة!",
+    "linkCopyError": "فشل نسخ الرابط",
     "table": {
       "file": "الملف",
       "product": "المنتج",
@@ -390,7 +393,7 @@
       "date": {
         "start": "تاريخ البداية",
         "end": "تاريخ النهاية",
-                "range": "تصفية حسب النطاق الزمني"
+        "range": "تصفية حسب النطاق الزمني"
       }
     },
     "discountType": {

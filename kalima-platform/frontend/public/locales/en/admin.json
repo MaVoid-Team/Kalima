@@ -353,6 +353,9 @@
     "subtitle": "All product sample files across the store",
     "count": "samples",
     "noSamples": "No sample files found.",
+    "copyLink": "Copy link",
+    "linkCopied": "Sample link copied!",
+    "linkCopyError": "Failed to copy link",
     "table": {
       "file": "File",
       "product": "Product",
