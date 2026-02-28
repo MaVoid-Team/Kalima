@@ -10,7 +10,8 @@ import ConfirmUnlinkDialog from './ConfirmUnlinkDialog';
 import useLinkAccounts from '@/hooks/auth/useLinkAccounts';
 import useAuth from '@/hooks/auth/useAuth';
 import { useAccountProviders } from '@/hooks/useAccountProviders';
-import { providerIcons, GoogleIcon } from './ProviderIcons';
+import { providerIcons } from './ProviderIcons';
+import { getFirebaseIdToken } from '@/utils/firebaseAuth';
 
 export default function AccountSection() {
     const { t, i18n } = useTranslation('admin');
@@ -32,13 +33,15 @@ export default function AccountSection() {
     const handleLinkFirebase = async () => {
         setIsLinkingFirebase(true);
         try {
-            // This would integrate with Firebase OAuth flow
-            // For now, showing a placeholder implementation
-            const idToken = 'firebase_id_token_placeholder'; // This would come from Firebase auth
+            // Initiate Firebase OAuth flow and get ID token
+            const idToken = await getFirebaseIdToken();
+            
+            // Link the Firebase account to the user's profile
             await linkFirebaseAccount(idToken);
             refreshProviders();
         } catch (error) {
-            // Error handled by hook
+            // Error handled by hook - the hook should show error message
+            console.error('Failed to link Firebase account:', error);
         } finally {
             setIsLinkingFirebase(false);
         }
@@ -146,7 +149,7 @@ export default function AccountSection() {
                                 disabled={isLinkingFirebase || loading}
                                 className="flex items-center gap-2"
                             >
-                                <GoogleIcon className="h-4 w-4" />
+                                {/* <GoogleIcon className="h-4 w-4" /> */}
                                 {isLinkingFirebase 
                                     ? t('common.loading') 
                                     : t('settings.account.linkFirebase', 'Link Google Account')
