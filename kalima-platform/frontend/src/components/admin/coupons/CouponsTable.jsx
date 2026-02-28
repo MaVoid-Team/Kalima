@@ -55,7 +55,7 @@ export default function CouponsTable({ coupons, loading, onEdit, onDelete, onTog
                             <TableHead>{t('coupons.table.discountType')}</TableHead>
                             <TableHead>{t('coupons.table.discountValue')}</TableHead>
                             <TableHead>{t('coupons.table.productId')}</TableHead>
-                            <TableHead>{t('coupons.table.dates')}</TableHead>
+                            <TableHead className="text-center">{t('coupons.table.dates')}</TableHead>
                             <TableHead>{t('coupons.table.status')}</TableHead>
                             <TableHead className="text-center">{t('coupons.table.actions')}</TableHead>
                         </TableRow>
