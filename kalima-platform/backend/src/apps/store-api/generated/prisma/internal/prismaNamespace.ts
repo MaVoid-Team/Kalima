@@ -3345,6 +3345,8 @@ export const UsersScalarFieldEnum = {
   is_email_verified: 'is_email_verified',
   created_at: 'created_at',
   updated_at: 'updated_at',
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted',
   secondary_phone: 'secondary_phone',
   profile_pic_url: 'profile_pic_url',
   password_changed_at: 'password_changed_at',
