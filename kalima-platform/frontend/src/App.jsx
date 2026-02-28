@@ -52,6 +52,7 @@ const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
 const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
 const AdminSamplesPage = lazy(() => import("./pages/admin/samples/AdminSamplesPage"));
 const SettingsPage = lazy(() => import("./pages/admin/settings/SettingsPage"))
+const PaymentMethodsPage = lazy(() => import("./pages/admin/payment-methods/PaymentMethodsPage"));
 // Public viewer (no layout)
 const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
 const SamplesDirectoryPage = lazy(() => import("./pages/sample/SamplesDirectoryPage"));
@@ -113,6 +114,7 @@ function App() {
               <Route path="/admin/products/:id" element={<ProductDetailPage />} />
               <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
               <Route path="/admin/categories" element={<CategoriesPage />} />
+              <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
               <Route path="/admin/users" element={<UsersPage />} />
               <Route path="/admin/users/:id" element={<UserDetailPage />} />
               <Route path="/admin/samples" element={<AdminSamplesPage />} />

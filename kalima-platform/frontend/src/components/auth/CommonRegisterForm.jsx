@@ -163,7 +163,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                     )}
 
                     {firebaseToken && (
-                        <div className="bg-primary/10 p-4 rounded-md mb-4 text-sm text-primary">
+                        <div className="bg-success/30 p-4 rounded-md mb-4 text-sm text-primary">
                             ✓ {t("signup.firebaseAuthenticated", "Social account connected. Please complete the remaining fields.")}
                         </div>
                     )}
