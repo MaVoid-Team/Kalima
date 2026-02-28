@@ -160,12 +160,13 @@ Returns a paginated list of all non-deleted coupons. Supports filtering by activ
 
 **Query Parameters:**
 
-| Param       | Type    | Default | Description                                      |
-| ----------- | ------- | ------- | ------------------------------------------------ |
-| `page`      | number  | 1       | Page number                                      |
-| `limit`     | number  | 20      | Items per page                                   |
-| `active`    | boolean | —       | Filter by active status (`true` or `false`)       |
-| `product_id`| number  | —       | Filter by product (returns coupons for that product) |
+| Param        | Type    | Default | Description                                          |
+| ------------ | ------- | ------- | ---------------------------------------------------- |
+| `page`       | number  | 1       | Page number                                          |
+| `limit`      | number  | 20      | Items per page                                       |
+| `active`     | boolean | —       | Filter by active status (`true` or `false`)          |
+| `product_id` | number  | —       | Filter by product (returns coupons for that product) |
+| `search`     | string  | —       | Search for coupons by code (case-insensitive)        |
 
 **Example:** `GET /coupons?page=1&limit=10&active=true&product_id=1`
 
@@ -385,13 +386,13 @@ Checks whether a coupon code is valid (exists, is active, and has not expired). 
 
 **Error Responses:**
 
-| Status | Message                                | Condition                                      |
-| ------ | -------------------------------------- | ---------------------------------------------- |
-| 400    | `This coupon is no longer active`      | Coupon exists but `active` is `false`          |
-| 400    | `This coupon has expired`              | Coupon exists but `expires_at` is in the past  |
+| Status | Message                                     | Condition                                                          |
+| ------ | ------------------------------------------- | ------------------------------------------------------------------ |
+| 400    | `This coupon is no longer active`           | Coupon exists but `active` is `false`                              |
+| 400    | `This coupon has expired`                   | Coupon exists but `expires_at` is in the past                      |
 | 400    | `This coupon is not valid for this product` | Coupon applies to a different product (when `product_id` provided) |
-| 404    | `Invalid coupon code`                  | Code does not exist or is soft-deleted         |
-| 422    | Validation errors array                | Missing `code` field                           |
+| 404    | `Invalid coupon code`                       | Code does not exist or is soft-deleted                             |
+| 422    | Validation errors array                     | Missing `code` field                                               |
 
 ---
 

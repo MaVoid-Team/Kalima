@@ -132,6 +132,7 @@ class CouponService {
     startDate?: Date;
     endDate?: Date;
     isAmount?: boolean;
+    search?: string;
   }): Promise<{
     coupons: coupons[];
     total: number;
@@ -170,6 +171,13 @@ class CouponService {
       where.type = filters.isAmount
         ? coupon_type.fixed
         : coupon_type.percentage;
+    }
+
+    if (filters?.search) {
+      where.code = {
+        contains: filters.search,
+        mode: "insensitive",
+      };
     }
 
     const [coupons, total] = await Promise.all([

@@ -189,4 +189,8 @@ export class getAllCouponsDto {
   @IsOptional()
   @IsBoolean()
   isAmount?: boolean;
+
+  @IsString()
+  @IsOptional()
+  search?: string;
 }
