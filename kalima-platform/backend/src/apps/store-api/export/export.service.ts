@@ -22,7 +22,7 @@ export interface ExportResult {
 
 export interface ResourceExportConfig<T = any> {
   /** Fetch all records (no pagination). When `ids` supplied, filter to those. */
-  fetcher: (ids?: number[]) => Promise<T[]>;
+  fetcher: (ids?: number[], filters?: Record<string, unknown>) => Promise<T[]>;
   /** Flattens a DB record to a key-value row and defines column order. */
   mapper: ExportMapper<T>;
   /** Sheet / file label (e.g. "products"). */
@@ -52,13 +52,14 @@ export async function exportResource(
   resourceName: string,
   format: ExportFormat,
   ids?: number[],
+  filters?: Record<string, unknown>,
 ): Promise<ExportResult> {
   const config = registry.get(resourceName);
   if (!config) {
     throw new Error(`Unknown export resource: ${resourceName}`);
   }
 
-  const records = await config.fetcher(ids);
+  const records = await config.fetcher(ids, filters);
 
   if (records.length > MAX_EXPORT_ROWS) {
     throw new Error(
