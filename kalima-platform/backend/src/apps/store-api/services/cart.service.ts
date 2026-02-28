@@ -952,6 +952,7 @@ class CartService {
             purchaseSerial: createdPurchase.purchase_serial ?? "N/A",
             totalItems: itemCount,
             productListHTML,
+            ordersUrl: `${process.env.APP_URL || ""}/orders`,
           })
           .catch((err) =>
             console.error("[Cart] Failed to send order received email:", err),

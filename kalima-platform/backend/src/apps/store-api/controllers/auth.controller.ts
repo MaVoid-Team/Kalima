@@ -454,6 +454,28 @@ export const authController = {
   },
 
   // ============================================
+  // ACCOUNT DELETION
+  // ============================================
+
+  async deleteAccount(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;
+      if (!userId) {
+        throw new UnauthorizedError();
+      }
+
+      const result = await authService.deleteAccount(userId);
+      res.status(200).json({ success: true, ...result });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // ============================================
   // ADMIN USER CREATION
   // ============================================
 

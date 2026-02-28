@@ -3,13 +3,16 @@ export interface OrderReceivedEmailData {
   purchaseSerial: string;
   totalItems: number;
   productListHTML: string;
+  ordersUrl?: string;
 }
 
 export function getOrderReceivedEmailSubject(): string {
-  return 'Your Order Has Been Received';
+  return "Your Order Has Been Received";
 }
 
-export function getOrderReceivedEmailHtml(data: OrderReceivedEmailData): string {
+export function getOrderReceivedEmailHtml(
+  data: OrderReceivedEmailData,
+): string {
   return `
 <div dir="auto" style='font-family: Arial, sans-serif;'>
     <h2>Thank you for your purchase!</h2>
@@ -28,6 +31,15 @@ export function getOrderReceivedEmailHtml(data: OrderReceivedEmailData): string 
         </tbody>
     </table>
     <p>Your order will be processed after the payment is reviewed by our team during working hours from <b>9:00 AM to 9:00 PM</b>.</p>
+    ${
+      data.ordersUrl
+        ? `
+    <div style="text-align: center; margin: 20px 0;">
+        <a href="${data.ordersUrl}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold;">View My Orders</a>
+    </div>
+    `
+        : ""
+    }
     <p>If you have any questions, please contact our support team.</p>
     <br>
     <p>Best regards,<br><b>Kalima Team</b></p>
@@ -35,7 +47,9 @@ export function getOrderReceivedEmailHtml(data: OrderReceivedEmailData): string 
   `.trim();
 }
 
-export function getOrderReceivedEmailText(data: OrderReceivedEmailData): string {
+export function getOrderReceivedEmailText(
+  data: OrderReceivedEmailData,
+): string {
   return `
 Thank you for your purchase!
 
@@ -45,7 +59,13 @@ We’re happy to let you know that your order (${data.purchaseSerial}) has been 
 You have ordered ${data.totalItems} product(s).
 
 Your order will be processed after the payment is reviewed by our team during working hours from 9:00 AM to 9:00 PM.
-
+${
+  data.ordersUrl
+    ? `
+View My Orders: ${data.ordersUrl}
+`
+    : ""
+}
 If you have any questions, please contact our support team.
 
 Best regards,

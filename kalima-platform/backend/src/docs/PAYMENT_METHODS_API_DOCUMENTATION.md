@@ -44,33 +44,40 @@ Authorization: Bearer <access_token>
 Returns a list of all payment methods. Admin users can filter by status or search by name.
 
 **Endpoint:** `GET /`  
-**Auth Required:** Yes 
+**Auth Required:** Yes
 
 **Query Parameters:**
 
-| Param    | Type    | Default | Description                                 |
-| -------- | ------- | ------- | ------------------------------------------- |
+| Param    | Type    | Default | Description                                          |
+| -------- | ------- | ------- | ---------------------------------------------------- |
 | `status` | boolean | —       | Filter by active/inactive status (`true` or `false`) |
-| `search` | string  | —       | Search by name                              |
+| `search` | string  | —       | Search by name                                       |
+| `page`   | number  | 1       | Page number (1-based)                                |
+| `limit`  | number  | 10      | Items per page                                       |
 
-**Example:** `GET /payment-methods?status=true&search=Vodafone`
+**Example:** `GET /payment-methods?status=true&search=Vodafone&page=1&limit=10`
 
 **Success Response (200):**
 
 ```json
 {
   "success": true,
-  "data": [
-    {
-      "id": 1,
-      "name": "Vodafone Cash",
-      "phone_number": "010xxxxxx",
-      "status": true,
-      "image_url": "/uploads/images/1234.webp",
-      "created_at": "2024-03-20T10:00:00.000Z",
-      "updated_at": "2024-03-20T10:00:00.000Z"
-    }
-  ]
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "name": "Vodafone Cash",
+        "phone_number": "010xxxxxx",
+        "status": true,
+        "image_url": "/uploads/images/1234.webp",
+        "created_at": "2024-03-20T10:00:00.000Z",
+        "updated_at": "2024-03-20T10:00:00.000Z"
+      }
+    ],
+    "total": 5,
+    "page": 1,
+    "limit": 10
+  }
 }
 ```
 
@@ -85,8 +92,8 @@ Returns a single payment method by its ID.
 
 **URL Parameters:**
 
-| Param | Type   | Description |
-| ----- | ------ | ----------- |
+| Param | Type   | Description       |
+| ----- | ------ | ----------------- |
 | `id`  | number | Payment Method ID |
 
 **Success Response (200):**
@@ -108,9 +115,9 @@ Returns a single payment method by its ID.
 
 **Error Responses:**
 
-| Status | Message             | Condition                                |
-| ------ | ------------------- | ---------------------------------------- |
-| 400    | `Invalid payment method ID` | ID is not a number                       |
+| Status | Message                                  | Condition                     |
+| ------ | ---------------------------------------- | ----------------------------- |
+| 400    | `Invalid payment method ID`              | ID is not a number            |
 | 404    | `Payment method with ID <id> not found.` | Payment method does not exist |
 
 ---
@@ -158,10 +165,10 @@ Creates a new payment method. Supports uploading an image directly via multipart
 
 **Error Responses:**
 
-| Status | Message               | Condition                 |
-| ------ | --------------------- | ------------------------- |
-| 400    | `Unsupported image type` | Invalid image extension   |
-| 422    | Validation errors array | Missing required fields |
+| Status | Message                  | Condition               |
+| ------ | ------------------------ | ----------------------- |
+| 400    | `Unsupported image type` | Invalid image extension |
+| 422    | Validation errors array  | Missing required fields |
 
 ---
 
@@ -175,18 +182,18 @@ Updates an existing payment method. Supports uploading a new image to replace th
 
 **URL Parameters:**
 
-| Param | Type   | Description |
-| ----- | ------ | ----------- |
+| Param | Type   | Description       |
+| ----- | ------ | ----------------- |
 | `id`  | number | Payment Method ID |
 
 **Form Data Fields (all optional):**
 
-| Field          | Type    | Description                                  |
-| -------------- | ------- | -------------------------------------------- |
-| `name`         | string  | Updated name                                 |
-| `phone_number` | string  | Updated phone number                         |
-| `status`       | boolean | `true` or `false`                            |
-| `image`        | file    | New image file to upload (replaces old one)  |
+| Field          | Type    | Description                                 |
+| -------------- | ------- | ------------------------------------------- |
+| `name`         | string  | Updated name                                |
+| `phone_number` | string  | Updated phone number                        |
+| `status`       | boolean | `true` or `false`                           |
+| `image`        | file    | New image file to upload (replaces old one) |
 
 **Success Response (200):**
 
@@ -208,25 +215,25 @@ Updates an existing payment method. Supports uploading a new image to replace th
 
 **Error Responses:**
 
-| Status | Message             | Condition                                |
-| ------ | ------------------- | ---------------------------------------- |
-| 400    | `Invalid payment method ID` | ID is not a number                       |
-| 400    | `Unsupported image type` | Invalid image extension   |
+| Status | Message                                  | Condition                     |
+| ------ | ---------------------------------------- | ----------------------------- |
+| 400    | `Invalid payment method ID`              | ID is not a number            |
+| 400    | `Unsupported image type`                 | Invalid image extension       |
 | 404    | `Payment method with ID <id> not found.` | Payment method does not exist |
 
 ---
 
 ### Delete Payment Method
 
-Deletes a payment method by ID. 
+Deletes a payment method by ID.
 
 **Endpoint:** `DELETE /:id`  
 **Auth Required:** Yes (Admin)
 
 **URL Parameters:**
 
-| Param | Type   | Description |
-| ----- | ------ | ----------- |
+| Param | Type   | Description       |
+| ----- | ------ | ----------------- |
 | `id`  | number | Payment Method ID |
 
 **Success Response (200):**
@@ -240,9 +247,9 @@ Deletes a payment method by ID.
 
 **Error Responses:**
 
-| Status | Message             | Condition                                |
-| ------ | ------------------- | ---------------------------------------- |
-| 400    | `Invalid payment method ID` | ID is not a number                       |
+| Status | Message                                  | Condition                     |
+| ------ | ---------------------------------------- | ----------------------------- |
+| 400    | `Invalid payment method ID`              | ID is not a number            |
 | 404    | `Payment method with ID <id> not found.` | Payment method does not exist |
 
 ---
@@ -283,13 +290,13 @@ All successful responses follow this structure:
 
 ## Error Codes
 
-| Status | Error Type          | Description                                           |
-| ------ | ------------------- | ----------------------------------------------------- |
-| 400    | `BadRequestError`   | Invalid input or unsupported image type               |
-| 401    | `UnauthorizedError` | Missing or invalid authorization token                |
-| 403    | `ForbiddenError`    | User does not have the required role                  |
-| 404    | `NotFoundError`     | Payment method not found                              |
-| 422    | `ValidationError`   | DTO validation failed — returns `errors` array        |
+| Status | Error Type          | Description                                    |
+| ------ | ------------------- | ---------------------------------------------- |
+| 400    | `BadRequestError`   | Invalid input or unsupported image type        |
+| 401    | `UnauthorizedError` | Missing or invalid authorization token         |
+| 403    | `ForbiddenError`    | User does not have the required role           |
+| 404    | `NotFoundError`     | Payment method not found                       |
+| 422    | `ValidationError`   | DTO validation failed — returns `errors` array |
 
 ### Error Response Format
 

@@ -319,7 +319,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Teacher,
           auth_identities: {
@@ -379,7 +379,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Student,
           auth_identities: {
@@ -431,7 +431,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Parent,
           auth_identities: {
@@ -477,7 +477,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Lecturer,
           auth_identities: {
@@ -947,6 +947,23 @@ class UserManagementService {
       where: { id: tokenId },
       data: { used_at: new Date() },
     });
+  }
+
+  // ============================================
+  // DELETE USER
+  // ============================================
+
+  async deleteUser(userId: number): Promise<void> {
+    const user = await this.db.users.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    await this.db.users.delete({ where: { id: userId } });
   }
 
   // ============================================
