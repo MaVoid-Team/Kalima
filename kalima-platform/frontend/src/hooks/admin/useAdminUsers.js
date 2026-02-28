@@ -15,7 +15,8 @@ export const useAdminUsers = () => {
     const [filters, setFilters] = useState({
         search: '',
         role: '',
-        portal: ''
+        portal: '',
+        is_deleted: 'all'
     });
 
     // Detail State
@@ -36,6 +37,7 @@ export const useAdminUsers = () => {
         if (filters.search) query.append('search', filters.search);
         if (filters.role && filters.role !== 'all') query.append('role', filters.role);
         if (filters.portal && filters.portal !== 'all') query.append('portal', filters.portal);
+        if (filters.is_deleted && filters.is_deleted !== 'all') query.append('is_deleted', filters.is_deleted);
 
         return query.toString();
     }, [pagination.page, pagination.limit, filters]);
@@ -179,6 +181,12 @@ export const useAdminUsers = () => {
             data: userData
         }));
 
+    const deleteUser = (userId) =>
+        handleAction(() => fetchApi({
+            endpoint: `/admin/users/${userId}`,
+            method: 'delete'
+        }));
+
     // Setters
     const setSearch = useCallback((query) => {
         setFilters((prev) => ({ ...prev, search: query }));
@@ -192,6 +200,11 @@ export const useAdminUsers = () => {
 
     const setPortal = useCallback((portal) => {
         setFilters((prev) => ({ ...prev, portal }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    }, []);
+
+    const setIsDeleted = useCallback((is_deleted) => {
+        setFilters((prev) => ({ ...prev, is_deleted }));
         setPagination((prev) => ({ ...prev, page: 1 }));
     }, []);
 
@@ -222,11 +235,13 @@ export const useAdminUsers = () => {
         createSubAdminUser,
         createModeratorUser,
         createAssistantUser,
+        deleteUser,
 
         // Setters
         setSearch,
         setRole,
         setPortal,
+        setIsDeleted,
         setPage
     };
 };

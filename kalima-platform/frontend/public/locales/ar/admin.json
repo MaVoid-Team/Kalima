@@ -250,7 +250,8 @@
       "categories": "الفئات",
       "isArchived": "مؤرشف",
       "perks": "المميزات",
-      "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code"
+      "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code",
+      "perksTip": "يمكنك استخدام الفواصل الإنجليزية (,) أو الفواصل العربية (،) للفصل بين المميزات."
     },
     "create": {
       "dialogTitle": "إنشاء منتج جديد",

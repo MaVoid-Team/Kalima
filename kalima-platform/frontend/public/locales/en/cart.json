@@ -21,6 +21,7 @@
   "orderSummary": "Order Summary",
   "fillRequiredFields": "Please fill all required fields for cart items before proceeding to checkout.",
   "fillRequiredFieldsHint": "You can do that by clicking the red 'View more' for each item and filling the required fields.",
+  "invalidPhone": "Invalid Egyptian mobile number",
   "subtotal": "Subtotal",
   "shippingEstimate": "Shipping Estimate",
   "taxEstimate": "Tax Estimate",

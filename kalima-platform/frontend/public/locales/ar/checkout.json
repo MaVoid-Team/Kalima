@@ -40,6 +40,7 @@
     "cvcPlaceholder": "CVC",
     "nameOnCard": "الاسم على البطاقة",
     "phone": "رقم الهاتف",
+    "invalidPhoneNumber": "يرجى إدخال رقم هاتف صالح",
     "transferNumberRequired": "الرجاء إدخال رقم المحفظة المحول منها",
     "screenshotRequired": "الرجاء رفع صورة التحويل",
     "methodRequired": "الرجاء اختيار طريقة الدفع",
@@ -94,7 +95,7 @@
   "fastBuy": {
     "checkoutSuccess": "تم الشراء بنجاح! إعادة التوجيه إلى السوق..."
   },
-  "success":{
+  "success": {
     "copied": "تم النسخ إلى الحافظة"
   },
   "failed": "فشل في إتمام الدفع، يرجى المحاولة مرة أخرى",
