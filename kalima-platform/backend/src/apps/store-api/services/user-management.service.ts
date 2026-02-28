@@ -875,6 +875,10 @@ class UserManagementService {
             profile_pic_url: true,
             created_at: true,
             role: true,
+            user_roles: {
+              select: { role: true },
+              take: 1,
+            },
           },
         },
       },
