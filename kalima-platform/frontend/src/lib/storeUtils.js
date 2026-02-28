@@ -59,7 +59,11 @@ export function getBaseUrl() {
   try {
     return new URL(raw).origin;
   } catch {
-    return raw.split("/api/v2")[0];
+    try {
+      return new URL(raw, globalThis.location.origin).origin;
+    } catch {
+      return globalThis.location.origin;
+    }
   }
 }
 

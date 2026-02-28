@@ -198,7 +198,12 @@ export default function useCart() {
                 endpoint: `/payment-methods`
             });
             if (res.success) {
-                return res.data;
+                const payload = res.data;
+                if (Array.isArray(payload)) return payload;
+                if (Array.isArray(payload?.data)) return payload.data;
+                if (Array.isArray(payload?.payment_methods)) return payload.payment_methods;
+                if (Array.isArray(payload?.methods)) return payload.methods;
+                return [];
             } else {
                 throw new Error(res?.message || "Failed to get payment methods");
             }
