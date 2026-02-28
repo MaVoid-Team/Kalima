@@ -18,7 +18,7 @@ import { useCart } from '@/contexts/CartContext';
 export default function CartHeader({ itemCount }) {
   const { t, i18n } = useTranslation('cart');
   const navigate = useNavigate();
-  const { clearCart } = useCart();
+  const { clearCart, loading } = useCart();
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleClearCart = async () => {
@@ -40,6 +40,7 @@ export default function CartHeader({ itemCount }) {
               onClick={() => setDialogOpen(true)}
               variant="outline"
               size="sm"
+              disapled={loading}
               className="flex items-center gap-1 text-destructive hover:text-destructive border-destructive/20 hover:border-destructive/40"
               data-testid="cart-header-clear-cart-button"
             >
