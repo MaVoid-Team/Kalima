@@ -65,6 +65,10 @@ const PRODUCT_INCLUDE = {
     orderBy: { created_at: "desc" as const },
   },
   samples: true,
+  product_reviews: {
+    include: { users: { select: { id: true, name: true, role: true } } },
+    orderBy: { created_at: "desc" as const },
+  },
 };
 
 // ============================================
