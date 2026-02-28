@@ -13,6 +13,7 @@ import SocialLoginButtons from "./SocialLoginButtons";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PhoneInput, egyptPhoneSchema } from "@/components/ui/phone-input";
 import {
     Form,
     FormControl,
@@ -41,7 +42,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
         const baseShape = {
             name: z.string().min(2, { message: t("validation.required", "Name is required") }).optional().or(z.literal("")),
             email: z.string().email({ message: t("validation.email_invalid", "Invalid email") }).optional().or(z.literal("")),
-            phone: z.string().min(1, { message: t("validation.required", "Phone is required") }),
+            phone: egyptPhoneSchema,
             gender: z.enum(["male", "female"], { required_error: t("validation.required", "Gender is required") }),
             password: z.string().optional().or(z.literal("")),
             confirmPassword: z.string().optional().or(z.literal("")),
@@ -175,7 +176,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                             <FormItem>
                                 <FormLabel htmlFor="phone">{t("signup.fields.phone")}</FormLabel>
                                 <FormControl>
-                                    <Input id="phone" type="tel" dir={i18n.dir()} {...field} data-testid="auth-register-phone-input" />
+                                    <PhoneInput id="phone" dir="ltr" {...field} data-testid="auth-register-phone-input" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

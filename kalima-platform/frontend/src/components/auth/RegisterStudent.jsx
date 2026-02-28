@@ -18,6 +18,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { PhoneInput, egyptPhoneSchema } from "@/components/ui/phone-input";
 import CommonRegisterForm from "./CommonRegisterForm";
 import useRegister from "@/hooks/auth/useRegister";
 import useLookups from "@/hooks/useLookups";
@@ -34,7 +35,7 @@ export default function RegisterStudent({ onBack }) {
         level_id: z.string().min(1, { message: t("validation.required") }),
         government_id: z.string().min(1, { message: t("validation.required") }),
         zone_id: z.string().min(1, { message: t("validation.required") }),
-        parent_phone_number: z.string().min(1, { message: t("validation.required") }),
+        parent_phone_number: egyptPhoneSchema,
         studentCode: z.string().optional(),
         faction: z.string().default("Alpha"),
     });
@@ -191,7 +192,7 @@ function StudentFields() {
                     <FormItem>
                         <FormLabel>{t("signup.fields.parentPhone")}</FormLabel>
                         <FormControl>
-                            <Input placeholder={t("signup.fields.parentPhonePlaceholder")} {...field} data-testid="auth-register-student-parent-phone-input" />
+                            <PhoneInput dir="ltr" placeholder={t("signup.fields.parentPhonePlaceholder")} {...field} data-testid="auth-register-student-parent-phone-input" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
