@@ -6,10 +6,12 @@ export interface AccountCreatedEmailData {
 }
 
 export function getAccountCreatedEmailSubject(): string {
-  return 'Welcome to Kalima Platform - Verify Your Account';
+  return "Welcome to Kalima Platform - Verify Your Account";
 }
 
-export function getAccountCreatedEmailHtml(data: AccountCreatedEmailData): string {
+export function getAccountCreatedEmailHtml(
+  data: AccountCreatedEmailData,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -49,7 +51,7 @@ export function getAccountCreatedEmailHtml(data: AccountCreatedEmailData): strin
                   <td align="center" style="padding: 20px 0;">
                     <a href="${data.verificationUrl}" 
                        style="display: inline-block; padding: 16px 40px; background-color: #10B981; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px;">
-                      Verify My Account
+                      ✅ Activate My Account
                     </a>
                   </td>
                 </tr>
@@ -97,7 +99,9 @@ export function getAccountCreatedEmailHtml(data: AccountCreatedEmailData): strin
   `.trim();
 }
 
-export function getAccountCreatedEmailText(data: AccountCreatedEmailData): string {
+export function getAccountCreatedEmailText(
+  data: AccountCreatedEmailData,
+): string {
   return `
 Welcome to Kalima Platform!
 
