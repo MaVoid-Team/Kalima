@@ -6,6 +6,7 @@
     "samples": "Samples",
     "coupons": "Coupons",
     "categories": "Categories",
+    "requiredFields": "Required Fields",
     "paymentMethods": "Payment Methods",
     "themeToggle": "Toggle Theme",
     "darkMode": "Dark Mode",
@@ -29,6 +30,9 @@
     "edit": "Edit",
     "delete": "Delete",
     "openMenu": "Open menu",
+    "active": "Active",
+    "inactive": "Inactive",
+    "update": "Update",
     "pagination": {
       "previous": "Previous",
       "next": "Next"
@@ -732,6 +736,55 @@
       "invalidType": "Invalid file type. Please upload JPEG, PNG, or WebP images.",
       "tooLarge": "File too large. Maximum size is 5MB.",
       "uploading": "Uploading..."
+    }
+  },
+  "requiredFields": {
+    "title": "Required Fields Management",
+    "subtitle": "Manage reusable field definitions for products",
+    "totalFields": "{{count}} fields",
+    "noFields": "No required fields found",
+    "createField": "Create Field",
+    "fields": {
+      "label": "Label",
+      "fieldType": "Field Type",
+      "active": "Active",
+      "createdAt": "Created At"
+    },
+    "types": {
+      "text": "Text",
+      "number": "Number",
+      "date": "Date",
+      "image": "Image"
+    },
+    "filters": {
+      "allStatuses": "All Statuses",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "create": {
+      "title": "Create Required Field",
+      "description": "Add a new reusable field definition.",
+      "labelPlaceholder": "Enter field label",
+      "fieldTypePlaceholder": "Select field type"
+    },
+    "edit": {
+      "title": "Edit Required Field",
+      "description": "Update field definition details.",
+      "labelPlaceholder": "Enter field label",
+      "fieldTypePlaceholder": "Select field type",
+      "activeDescription": "Enable or disable this field definition"
+    },
+    "delete": {
+      "title": "Delete Required Field",
+      "description": "Are you sure you want to delete the field \"{{label}}\"?",
+      "warning": "This action cannot be undone.",
+      "warningDescription": "Deleting this field will remove it from all products and cannot be recovered.",
+      "confirm": "Delete Field"
+    },
+    "messages": {
+      "createSuccess": "Field created successfully",
+      "updateSuccess": "Field updated successfully",
+      "deleteSuccess": "Field deleted successfully"
     }
   }
 }
