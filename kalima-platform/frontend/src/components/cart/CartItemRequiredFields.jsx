@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trash, ImageOff, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -24,6 +25,7 @@ export default function CartItemRequiredFields({
     const [originalImages, setOriginalImages] = useState({});
     const [fileErrors, setFileErrors] = useState({});
     const [brokenPreviews, setBrokenPreviews] = useState({});
+    const [errorShakeTick, setErrorShakeTick] = useState(0);
 
     useEffect(() => {
         if (!item || !isOpen) return;
@@ -66,6 +68,7 @@ export default function CartItemRequiredFields({
 
         if (hasError) {
             setFileErrors(errors);
+            setErrorShakeTick(prev => prev + 1);
             return;
         }
 
@@ -226,9 +229,15 @@ export default function CartItemRequiredFields({
                                                     </div>
                                                 ) : null}
                                                 {fileErrors[rf.field_definition_id] && (
-                                                    <p className="text-destructive text-xs mt-1">
+                                                    <motion.p
+                                                        key={`error-${rf.field_definition_id}-${errorShakeTick}`}
+                                                        initial={{ x: 0 }}
+                                                        animate={{ x: [0, -7, 7, -5, 5, -3, 3, 0] }}
+                                                        transition={{ duration: 0.35 }}
+                                                        className="text-destructive text-xs mt-1"
+                                                    >
                                                         {fileErrors[rf.field_definition_id]}
-                                                    </p>
+                                                    </motion.p>
                                                 )}
                                             </div>
                                             {

@@ -175,7 +175,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                             <FormItem>
                                 <FormLabel htmlFor="phone">{t("signup.fields.phone")}</FormLabel>
                                 <FormControl>
-                                    <Input id="phone" type="tel" {...field} data-testid="auth-register-phone-input" />
+                                    <Input id="phone" type="tel" dir={i18n.dir()} {...field} data-testid="auth-register-phone-input" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

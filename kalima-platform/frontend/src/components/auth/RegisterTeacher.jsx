@@ -197,6 +197,7 @@ function TeacherFields() {
                             <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                                 <FormControl>
                                     <Checkbox
+                                        className={`${isRTL ? "scale-x-[-1]" : ""}`}
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
                                         data-testid="auth-register-teacher-primary-checkbox"
@@ -217,6 +218,7 @@ function TeacherFields() {
                             <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                                 <FormControl>
                                     <Checkbox
+                                        className={`${isRTL ? "scale-x-[-1]" : ""}`}
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
                                         data-testid="auth-register-teacher-preparatory-checkbox"
@@ -237,6 +239,7 @@ function TeacherFields() {
                             <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                                 <FormControl>
                                     <Checkbox
+                                        className={`${isRTL ? "scale-x-[-1]" : ""}`}
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
                                         data-testid="auth-register-teacher-secondary-checkbox"

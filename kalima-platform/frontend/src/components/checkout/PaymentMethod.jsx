@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogFooter, AlertDialogCancel }
 import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
 import { ImageOff } from "lucide-react";
+import { getImageUrl } from "@/lib/storeUtils";
 
 export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
     numberTransferredFrom, setNumberTransferredFrom,
@@ -34,6 +35,8 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
         getPaymentMethods().then(setMethods).catch(console.error);
     }, [getPaymentMethods]);
 
+    const safeMethods = Array.isArray(methods) ? methods : [];
+
     return (
         <Card>
             <CardHeader>
@@ -52,10 +55,10 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                         className="grid gap-4"
                         dir={i18n.dir()}
                     >
-                        {methods.map(m => (
+                        {safeMethods.map(m => (
                             <div key={m.id} className="border rounded-md overflow-hidden">
                                 <div className="flex justify-between items-center p-4">
-                                    <div className="flex items-center space-x-3">
+                                    <div className="flex items-center gap-3">
                                         <RadioGroupItem
                                             value={m.id.toString()}
                                             id={`pm-${m.id}`}
@@ -65,9 +68,9 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                                             {m.name}
                                         </Label>
                                     </div>
-                                    {m.image_url && (
+                                    {m?.image_url && (
                                         <img
-                                            src={new URL(m.image_url, import.meta.env.VITE_API_URL || 'http://localhost:3000').toString()}
+                                            src={getImageUrl(m.image_url) || ''}
                                             alt={m.name}
                                             className="w-8 h-8 object-contain"
                                         />

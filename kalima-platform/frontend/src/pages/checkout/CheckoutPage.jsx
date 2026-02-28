@@ -3,11 +3,16 @@ import CheckoutForm from "@/components/checkout/CheckoutForm";
 import CheckoutSuccess from "@/components/checkout/CheckoutSuccess";
 import { useCheckoutPage } from "@/hooks/useCheckoutPage";
 import LoadingSpinner from "../../components/ui/loading-spinner";
+import { useEffect } from "react";
 
 export default function CheckoutPage() {
   const { t } = useTranslation("checkout");
   const { state, submitting, handleCheckout } = useCheckoutPage();
   const { preview, loading, error, purchaseSerial } = state;
+
+  useEffect(() =>{
+    alert(purchaseSerial);
+  }, [purchaseSerial]);
 
   if (loading) {
     return (

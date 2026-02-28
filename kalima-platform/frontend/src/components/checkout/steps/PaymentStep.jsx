@@ -9,20 +9,14 @@ import { Button } from '@/components/ui/button';
 import PrintableReceipt from '@/components/checkout/PrintableReceipt';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { getBaseUrl, getImageUrl } from '@/lib/storeUtils';
 
 export default function PaymentStep({ onBack }) {
     const { cart, checkout, getPaymentMethods } = useCart();
     const { t, i18n } = useTranslation('checkout');
     const navigate = useNavigate();
 
-    const baseURL = React.useMemo(() => {
-        const raw = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        try {
-            return new URL(raw).origin;
-        } catch {
-            return raw.split('/api/v2')[0];
-        }
-    }, []);
+    const baseURL = React.useMemo(() => getBaseUrl(), []);
 
     const [numberTransferredFrom, setNumberTransferredFrom] = useState('');
     const [notes, setNotes] = useState('');
@@ -77,7 +71,7 @@ export default function PaymentStep({ onBack }) {
 
     const items = (cart?.cart_items || []).map(i => {
         const image = i.products?.thumbnail_image?.url
-            ? new URL(i.products.thumbnail_image.url, baseURL).toString()
+            ? (getImageUrl(i.products.thumbnail_image.url) || '')
             : '';
         return {
             id: i.id,
@@ -191,7 +185,7 @@ export default function PaymentStep({ onBack }) {
                             <div className="mt-4 border-t pt-2 space-y-2">
                                 {purchase.purchase_items.map((it, idx) => (
                                     <div key={it.products?.id ?? idx} className="flex items-center gap-2">
-                                        <img src={new URL(it.products.thumbnail_image?.url || '', baseURL).toString()} alt={it.products?.title || ''} className="w-8 h-8 object-cover rounded" />
+                                        <img src={getImageUrl(it.products.thumbnail_image?.url) || ''} alt={it.products?.title || ''} className="w-8 h-8 object-cover rounded" />
                                         <div className="flex-1">
                                             <p>{it.products.title}</p>
                                             <p className="text-xs text-muted-foreground">{it.products.type}</p>

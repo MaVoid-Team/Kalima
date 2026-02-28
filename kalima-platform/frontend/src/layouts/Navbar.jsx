@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Globe, Search, ShoppingCart, FileText } from "lucide-react";
+import { Menu, X, Globe, ShoppingCart, FileText } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -154,7 +154,7 @@ export default function Navbar() {
                 title={t("navbar.cartToggle")}
               >
                 <ShoppingCart className="h-5 w-5" />
-                <span className={`absolute -top-2 ${i18n.language === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
+                <span className={`absolute -top-1 ${i18n.language === 'ar' ? 'left-0' : 'right-0'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
                   {loading ? "..." : cart.cart_items.length}
                 </span>
               </Button>}
@@ -228,7 +228,7 @@ export default function Navbar() {
               title={t("navbar.cartToggle")}
             >
               <ShoppingCart className="h-5 w-5" />
-              <span className={`absolute -top-2 ${i18n.language === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
+              <span className={`absolute -top-1 ${i18n.language === 'ar' ? 'left-0' : 'right-0'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
                 {cart.cart_items.length}
               </span>
             </Button>}
