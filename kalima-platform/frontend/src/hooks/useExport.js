@@ -20,6 +20,9 @@ export const useExport = () => {
             // Expected by backend
             params.set('format', format);
 
+            console.log('filters:', filters);
+            console.log('params:', params.toString());
+
             if (ids?.length > 0) {
                 params.set('ids', ids.join(','));
             }

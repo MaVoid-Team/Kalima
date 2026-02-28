@@ -33,6 +33,7 @@ export default function OrdersTable({
                         <TableRow>
                             <TableHead className="w-12">
                                 <Checkbox
+                                    className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                     checked={orders.length > 0 && selectedIds.length === orders.length}
                                     onCheckedChange={onSelectAll}
                                     aria-label="Select all"
@@ -51,6 +52,7 @@ export default function OrdersTable({
                             <TableRow key={order.id} data-state={selectedIds.includes(order.id) && "selected"}>
                                 <TableCell>
                                     <Checkbox
+                                        className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                         checked={selectedIds.includes(order.id)}
                                         onCheckedChange={(checked) => onSelect(order.id, checked)}
                                         aria-label={`Select order ${order.purchase_serial || order.id}`}

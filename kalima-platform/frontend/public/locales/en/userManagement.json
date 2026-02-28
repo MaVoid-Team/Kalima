@@ -22,7 +22,8 @@
         "role": "Primary Role",
         "status": "Verified",
         "joined": "Joined",
-        "actions": "Actions"
+        "actions": "Actions",
+        "noUsersFound": "No users found matching your criteria."
     },
     "status": {
         "verified": "Verified",

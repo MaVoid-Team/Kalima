@@ -20,7 +20,7 @@ export default function CategoryForm({
   isEdit,
   parentOptions,
 }) {
-  const { t } = useTranslation("admin");
+  const { t, i18n } = useTranslation("admin");
   const { title, description, parentId, active } = formData;
   const { validParents, allCategoriesDisabled } = parentOptions;
 
@@ -65,6 +65,7 @@ export default function CategoryForm({
           {t("categories.form.parentCategory")}
         </Label>
         <Select
+          dir={i18n.dir()}
           value={parentId}
           onValueChange={(val) => onChange("parentId", val)}
           disabled={allCategoriesDisabled}
