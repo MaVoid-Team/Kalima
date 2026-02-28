@@ -66,7 +66,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   };
 
   return (
-    <div className="group flex flex-col" data-testid={`market-product-card-${id}`}>
+    <div className="group flex flex-col h-full" data-testid={`market-product-card-${id}`}>
       {/* Clickable image/info area */}
       <Link to={`/product/${id}`} className="block" data-testid={`market-product-card-${id}-link`}>
         <Card className="border-none shadow-none">
