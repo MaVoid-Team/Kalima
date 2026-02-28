@@ -973,6 +973,7 @@ class UserManagementService {
         password: null,
         // we leave 'name' and relations intact for order history
         updated_at: new Date(),
+        deleted_at: new Date(),
       },
     });
 
@@ -993,6 +994,7 @@ class UserManagementService {
       search?: string;
       role?: role_enum;
       portal?: portal_enum;
+      isDeleted?: boolean;
     } = {},
   ) {
     const page = Math.max(1, options.page ?? 1);
@@ -1000,6 +1002,10 @@ class UserManagementService {
     const skip = (page - 1) * limit;
 
     const where: any = {};
+
+    if (options.isDeleted !== undefined) {
+      where.is_deleted = options.isDeleted;
+    }
 
     // Text search on name, email, phone
     if (options.search) {
