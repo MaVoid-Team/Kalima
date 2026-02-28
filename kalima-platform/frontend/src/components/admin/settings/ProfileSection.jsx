@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { User, Mail, Phone, Camera, Upload } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,9 +12,30 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
+import { PhoneInput, egyptPhoneSchema } from '@/components/ui/phone-input';
 import FileUploadProgress from './FileUploadProgress';
 import { useProfile } from '@/hooks/useProfile';
 import { getImageUrl } from '@/lib/storeUtils';
+
+const getProfileSchema = (t) => z.object({
+    name: z.string().min(1, t('settings.profile.validation.nameRequired', 'Name is required')).max(255),
+    email: z.string().email(t('settings.profile.validation.emailInvalid', 'Invalid email address')),
+    phone: z.string().optional().refine(val => !val || egyptPhoneSchema.safeParse(val).success, {
+        message: t('settings.profile.validation.invalidPhone', 'Invalid Egyptian phone number')
+    }),
+    secondary_phone: z.string().optional().refine(val => !val || egyptPhoneSchema.safeParse(val).success, {
+        message: t('settings.profile.validation.invalidPhone', 'Invalid Egyptian phone number')
+    }),
+    gender: z.string().optional()
+});
 
 export default function ProfileSection() {
     const { t, i18n } = useTranslation('admin');
@@ -21,20 +45,24 @@ export default function ProfileSection() {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        secondary_phone: '',
-        gender: ''
-    });
 
     const { profile, updateProfile, uploadAvatar, cancelUpload, loading } = useProfile();
+
+    const form = useForm({
+        resolver: zodResolver(getProfileSchema(t)),
+        defaultValues: {
+            name: '',
+            email: '',
+            phone: '',
+            secondary_phone: '',
+            gender: ''
+        }
+    });
 
     // Initialize form data when profile is loaded
     useEffect(() => {
         if (profile) {
-            setFormData({
+            form.reset({
                 name: profile.name || '',
                 email: profile.email || '',
                 phone: profile.phone || '',
@@ -42,24 +70,24 @@ export default function ProfileSection() {
                 gender: profile.gender || ''
             });
         }
-    }, [profile]);
+    }, [profile, form]);
 
     const handleAvatarUpload = async (file) => {
         setSelectedFile(file);
         setIsUploading(true);
         setUploadError(null);
-        
+
         try {
             const result = await uploadAvatar(file, (progress) => {
                 setUploadProgress(progress);
             });
-            
+
             // Check if upload was cancelled
             if (result?.cancelled) {
                 setUploadProgress(null);
                 return;
             }
-            
+
             // Show success message
             setUploadProgress(null);
             // Success message is handled by the useApiMutation hook
@@ -87,10 +115,9 @@ export default function ProfileSection() {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const onSubmit = async (values) => {
         try {
-            await updateProfile(formData);
+            await updateProfile(values);
             setIsEditing(false);
         } catch (error) {
             // Error handled by hook
@@ -150,71 +177,112 @@ export default function ProfileSection() {
 
                 {/* Profile Form */}
                 {isEditing ? (
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">{t('settings.profile.name')}</Label>
-                                <Input
-                                    id="name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                                    disabled={loading}
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t('settings.profile.name')}</FormLabel>
+                                            <FormControl>
+                                                <Input disabled={loading} {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t('settings.profile.email')}</FormLabel>
+                                            <FormControl>
+                                                <Input type="email" disabled={loading} {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="phone"
+                                    render={({ field }) => (
+                                        <FormItem dir="ltr">
+                                            <FormLabel className={isRtl ? "text-right block w-full" : ""}>
+                                                {t('settings.profile.phone')}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <PhoneInput
+                                                    disabled={loading}
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage className={isRtl ? "text-right block w-full" : ""} />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="secondary_phone"
+                                    render={({ field }) => (
+                                        <FormItem dir="ltr">
+                                            <FormLabel className={isRtl ? "text-right block w-full" : ""}>
+                                                {t('settings.profile.secondaryPhone')}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <PhoneInput
+                                                    disabled={loading}
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage className={isRtl ? "text-right block w-full" : ""} />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="gender"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t('settings.profile.gender')}</FormLabel>
+                                            <Select
+                                                dir={i18n.dir()}
+                                                disabled={loading}
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder={t('common.select', 'Select')} />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="male">{t('gender.male', 'Male')}</SelectItem>
+                                                    <SelectItem value="female">{t('gender.female', 'Female')}</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="email">{t('settings.profile.email')}</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                                    disabled={loading}
-                                />
+                            <div className="flex gap-2">
+                                <Button type="submit" disabled={loading}>
+                                    {loading ? t('common.loading') : t('common.save')}
+                                </Button>
+                                <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
+                                    {t('common.cancel')}
+                                </Button>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="phone">{t('settings.profile.phone')}</Label>
-                                <Input
-                                    id="phone"
-                                    value={formData.phone}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                                    disabled={loading}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="secondary_phone">{t('settings.profile.secondaryPhone')}</Label>
-                                <Input
-                                    id="secondary_phone"
-                                    value={formData.secondary_phone}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, secondary_phone: e.target.value }))}
-                                    disabled={loading}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="gender">{t('settings.profile.gender')}</Label>
-                                <Select
-                                    value={formData.gender}
-                                    onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value }))}
-                                    disabled={loading}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder={t('common.select', 'Select')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="male">{t('gender.male', 'Male')}</SelectItem>
-                                        <SelectItem value="female">{t('gender.female', 'Female')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="flex gap-2">
-                            <Button type="submit" disabled={loading}>
-                                {loading ? t('common.loading') : t('common.save')}
-                            </Button>
-                            <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
-                                {t('common.cancel')}
-                            </Button>
-                        </div>
-                    </form>
+                        </form>
+                    </Form>
                 ) : (
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -240,7 +308,7 @@ export default function ProfileSection() {
                                 <Label className="text-sm font-medium text-muted-foreground">
                                     {t('settings.profile.phone')}
                                 </Label>
-                                <p className="flex items-center gap-2">
+                                <p className="flex items-center gap-2" dir="ltr">
                                     <Phone className="h-4 w-4 text-muted-foreground" />
                                     {profile?.phone || t('common.notSpecified')}
                                 </p>

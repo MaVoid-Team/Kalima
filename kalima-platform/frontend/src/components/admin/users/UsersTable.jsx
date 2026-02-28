@@ -124,7 +124,7 @@ export default function UsersTable({ users, loading, selectedIds = [], onSelect,
                                         : '—'}
                                 </TableCell>
                                 <TableCell>
-                                    <div className="flex items-center justify-end gap-2">
+                                    <div className="">
                                         <Button
                                             variant="ghost"
                                             size="icon"

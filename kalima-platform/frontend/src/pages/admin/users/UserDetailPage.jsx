@@ -126,6 +126,7 @@ export default function UserDetailPage() {
     /* ── derived values ── */
     const analytics = selectedUser.user_analytics || {};
     const teacher = selectedUser.teachers;
+    const teachesAt = selectedUser.teaches_at || [];
     const userCreated = selectedUser.userCreated || {};
     const roles = selectedUser.user_roles || [];
 
@@ -340,13 +341,13 @@ export default function UserDetailPage() {
                                 <InfoRow
                                     icon={MapPin}
                                     label={t('details.government')}
-                                    value={teacher.government?.title}
+                                    value={teacher.government?.title || teacher.government_id ? `ID: ${teacher.government_id}` : null}
                                 />
                                 <Separator className="my-1 opacity-50" />
                                 <InfoRow
                                     icon={MapPin}
                                     label={t('details.zone')}
-                                    value={teacher.zones?.title}
+                                    value={teacher.zones?.title || teacher.zone_id ? `ID: ${teacher.zone_id}` : null}
                                 />
 
                                 {activeLevels.length > 0 && (
@@ -363,6 +364,30 @@ export default function UserDetailPage() {
                                                         <Badge key={lvl} variant="secondary" className="text-xs">
                                                             {lvl}
                                                         </Badge>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
+                                {teachesAt.length > 0 && (
+                                    <>
+                                        <Separator className="my-1 opacity-50" />
+                                        <div className="flex items-start gap-3 py-2">
+                                            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-xs text-muted-foreground leading-none mb-1.5">
+                                                    {t('details.teachingLocations', 'Teaching Locations')}
+                                                </p>
+                                                <div className="space-y-1">
+                                                    {teachesAt.map((location) => (
+                                                        <div key={location.id} className="text-sm font-medium">
+                                                            {location.location_name}
+                                                            <Badge variant="outline" className="text-xs ms-2">
+                                                                {location.location_type}
+                                                            </Badge>
+                                                        </div>
                                                     ))}
                                                 </div>
                                             </div>

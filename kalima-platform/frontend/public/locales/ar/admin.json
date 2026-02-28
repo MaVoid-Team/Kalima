@@ -578,7 +578,12 @@
       "uploadAvatar": "رفع الصورة الرمزية",
       "avatarHint": "JPG، PNG أو GIF. الحد الأقصى للحجم 2MB.",
       "editProfile": "تعديل الملف الشخصي",
-      "updateSuccess": "تم تحديث الملف الشخصي بنجاح"
+      "updateSuccess": "تم تحديث الملف الشخصي بنجاح",
+      "validation": {
+        "nameRequired": "الاسم مطلوب",
+        "emailInvalid": "عنوان البريد الإلكتروني غير صالح",
+        "invalidPhone": "رقم هاتف محمول غير صالح"
+      }
     },
     "password": {
       "title": "إدارة كلمة المرور",
