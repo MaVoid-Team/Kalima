@@ -5,7 +5,7 @@ export interface WelcomeEmailData {
 }
 
 export function getWelcomeEmailSubject(): string {
-  return 'Welcome to Kalima Platform!';
+  return "Welcome to Kalima Platform!";
 }
 
 export function getWelcomeEmailHtml(data: WelcomeEmailData): string {
@@ -56,7 +56,7 @@ export function getWelcomeEmailHtml(data: WelcomeEmailData): string {
                   <td align="center" style="padding: 20px 0;">
                     <a href="${data.loginUrl}" 
                        style="display: inline-block; padding: 16px 40px; background-color: #10B981; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px;">
-                      Go to Dashboard
+                      🚀 Go to My Dashboard
                     </a>
                   </td>
                 </tr>

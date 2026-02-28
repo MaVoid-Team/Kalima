@@ -67,6 +67,16 @@ export default function CheckoutSuccess({ purchaseSerial }) {
             {t("success.continue_shopping")}
             <ArrowRight className="w-4 h-4 ms-2" />
           </Button>
+
+          <Button
+            onClick={() => navigate("/orders")}
+            variant="outline"
+            className="w-full"
+            size="lg"
+            data-testid="checkout-success-view-orders-button"
+          >
+            {t("success.view_orders", "View My Orders")}
+          </Button>
         </CardContent>
       </Card>
     </div>

@@ -21,6 +21,7 @@ meRouter.post(
   uploadSingleImage("avatar"),
   userProfileController.uploadAvatar,
 );
+meRouter.delete("/avatar", userProfileController.deleteAvatar);
 
 // Teaches-at (Teacher)
 meRouter.get("/teaches-at", userProfileController.getAllTeachesAt);
@@ -56,6 +57,7 @@ adminRouter.post(
   uploadSingleImage("avatar"),
   userProfileController.uploadAvatar,
 );
+adminRouter.delete("/avatar", userProfileController.deleteAvatar);
 
 adminRouter.get("/teaches-at", userProfileController.getAllTeachesAt);
 adminRouter.post("/teaches-at", userProfileController.createTeachesAt);
@@ -65,7 +67,10 @@ adminRouter.delete("/teaches-at/:id", userProfileController.deleteTeachesAt);
 adminRouter.get("/social-media", userProfileController.getAllSocialMedia);
 adminRouter.post("/social-media", userProfileController.createSocialMedia);
 adminRouter.patch("/social-media/:id", userProfileController.updateSocialMedia);
-adminRouter.delete("/social-media/:id", userProfileController.deleteSocialMedia);
+adminRouter.delete(
+  "/social-media/:id",
+  userProfileController.deleteSocialMedia,
+);
 
 adminRouter.get("/children", userProfileController.getAllChildren);
 adminRouter.post("/children", userProfileController.addChild);

@@ -13,7 +13,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
-import EditProductDialog from '@/components/admin/products/EditProductDialog';
 import EditCouponDialog from '@/components/admin/coupons/EditCouponDialog';
 import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
 import ThumbnailManager from '@/components/admin/products/ThumbnailManager';
@@ -47,7 +46,9 @@ export default function ProductDetailPage() {
         detachCategory,
         attachRequiredFields,
         detachRequiredField,
-        getProductCoupons
+        getProductCoupons,
+        updateProductSample,
+        removeProductSample
     } = useAdminProducts();
 
     const {
@@ -263,7 +264,12 @@ export default function ProductDetailPage() {
             <div className="rounded-xl border border-border p-5 space-y-3" data-testid="product-detail-sample">
                 <h2 className="font-semibold text-foreground">{t('products.detail.sample')}</h2>
                 <Separator />
-                <SampleManager product={product} />
+                <SampleManager
+                    product={product}
+                    onUpdateSample={updateProductSample}
+                    onRemoveSample={removeProductSample}
+                    loading={actionLoading}
+                />
             </div>
 
             {/* Categories */}
@@ -338,19 +344,6 @@ export default function ProductDetailPage() {
                     </div>
                 )}
             </div>
-
-            {/* Edit Dialog */}
-            <EditProductDialog
-                product={product}
-                open={editOpen}
-                onOpenChange={setEditOpen}
-                onSuccess={refresh}
-                fieldDefinitions={fieldDefinitions}
-                onLoadDefinitions={fetchFieldDefinitions}
-                onAttachField={(productId, fields) => attachRequiredFields(productId, fields)}
-                onDetachField={(productId, fieldDefinitionId) => detachRequiredField(productId, fieldDefinitionId)}
-            />
-
             <EditCouponDialog
                 open={editCouponOpen}
                 onOpenChange={(openState) => {

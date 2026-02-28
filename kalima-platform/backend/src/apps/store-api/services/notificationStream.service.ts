@@ -19,7 +19,7 @@ export type PurchaseNotificationPayload = {
  * No-op when Redis is not configured.
  */
 export async function addPurchaseEvent(
-  payload: PurchaseNotificationPayload
+  payload: PurchaseNotificationPayload,
 ): Promise<void> {
   if (!isRedisAvailable() || !redis) return;
   try {
@@ -29,7 +29,7 @@ export async function addPurchaseEvent(
       "payload",
       JSON.stringify(payload),
       "timestamp",
-      Date.now().toString()
+      Date.now().toString(),
     );
   } catch (err) {
     console.error("[NotificationStream] Failed to add purchase event:", err);
@@ -57,55 +57,90 @@ export async function ensureConsumerGroup(): Promise<void> {
  * Designed to run in-process; call from server startup.
  */
 export function startPurchaseNotificationConsumer(
-  onPurchase: (payload: PurchaseNotificationPayload) => void | Promise<void>
+  onPurchase: (payload: PurchaseNotificationPayload) => void | Promise<void>,
 ): void {
   let running = true;
+  const MAX_CONSECUTIVE_ERRORS = 3;
+  let consecutiveErrors = 0;
 
   async function poll(): Promise<void> {
     if (!running) return;
-    if (!isRedisAvailable() || !redis) return;
-    try {
-      const results = await (redis.xreadgroup as any)(
-        "GROUP",
-        CONSUMER_GROUP,
-        CONSUMER_NAME,
-        "BLOCK",
-        "5000",
-        "COUNT",
-        "10",
-        "STREAMS",
-        STREAM_KEY,
-        ">"
-      );
 
-      if (!results || results.length === 0) {
-        setImmediate(poll);
-        return;
+    while (running) {
+      if (!isRedisAvailable() || !redis) {
+        // If Redis becomes unavailable during runtime, treat it as an error
+        consecutiveErrors++;
+        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+          console.warn(
+            `[NotificationStream] Stopped after ${MAX_CONSECUTIVE_ERRORS} consecutive errors due to Redis unavailability.`,
+          );
+          running = false; // Stop polling
+          return;
+        }
+        console.error(
+          "[NotificationStream] Consumer error: Redis is not available.",
+        );
+        await new Promise((r) => setTimeout(r, 2000)); // Wait before retrying
+        continue; // Try again in the next loop iteration
       }
 
-      for (const [, messages] of results) {
-        for (const [id, fields] of messages) {
-          try {
-            const payloadIdx = fields.indexOf("payload");
-            if (payloadIdx >= 0 && fields[payloadIdx + 1]) {
-              const payload = JSON.parse(
-                fields[payloadIdx + 1]
-              ) as PurchaseNotificationPayload;
-              await onPurchase(payload);
+      try {
+        const results = await (redis!.xreadgroup as any)(
+          "GROUP",
+          CONSUMER_GROUP,
+          CONSUMER_NAME,
+          "BLOCK",
+          "2000",
+          "COUNT",
+          "10",
+          "STREAMS",
+          STREAM_KEY,
+          ">",
+        );
+
+        consecutiveErrors = 0; // Reset errors on successful read
+
+        if (!results || results.length === 0) {
+          // No messages, continue polling immediately (BLOCK handles timeout)
+          continue;
+        }
+
+        for (const [, messages] of results) {
+          for (const [id, fields] of messages) {
+            try {
+              const payloadIdx = fields.indexOf("payload");
+              if (payloadIdx >= 0 && fields[payloadIdx + 1]) {
+                const payload = JSON.parse(
+                  fields[payloadIdx + 1],
+                ) as PurchaseNotificationPayload;
+                await onPurchase(payload);
+              }
+              if (redis) await redis.xack(STREAM_KEY, CONSUMER_GROUP, id);
+            } catch (err) {
+              console.error(
+                "[NotificationStream] Error processing message:",
+                err,
+              );
             }
-            if (redis) await redis.xack(STREAM_KEY, CONSUMER_GROUP, id);
-          } catch (err) {
-            console.error(
-              "[NotificationStream] Error processing message:",
-              err
-            );
           }
         }
+      } catch (err) {
+        consecutiveErrors++;
+        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+          console.warn(
+            `[NotificationStream] Stopped after ${MAX_CONSECUTIVE_ERRORS} consecutive errors. Redis may be unavailable.`,
+          );
+          running = false; // Stop polling
+          return;
+        }
+        console.error(
+          "[NotificationStream] Consumer error:",
+          (err as Error).message,
+        );
+        // Wait before retrying to avoid spamming
+        await new Promise((r) => setTimeout(r, 2000));
       }
-    } catch (err) {
-      console.error("[NotificationStream] Consumer error:", err);
     }
-    setImmediate(poll);
   }
 
   ensureConsumerGroup().then(() => poll());

@@ -3,10 +3,7 @@ import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 import { userProfileService } from "../services/user-profile.service";
 import { UpdateProfileDto } from "../dtos/user-profile.dto";
-import {
-  CreateTeachesAtDto,
-  UpdateTeachesAtDto,
-} from "../dtos/teaches-at.dto";
+import { CreateTeachesAtDto, UpdateTeachesAtDto } from "../dtos/teaches-at.dto";
 import {
   CreateSocialMediaDto,
   UpdateSocialMediaDto,
@@ -40,7 +37,10 @@ async function validateDto<T extends object>(
   return dto;
 }
 
-function parseIntParam(raw: string | string[] | undefined, name: string): number {
+function parseIntParam(
+  raw: string | string[] | undefined,
+  name: string,
+): number {
   const val = Array.isArray(raw) ? raw[0] : raw;
   const n = Number(val);
   if (!val || Number.isNaN(n) || n <= 0)
@@ -49,12 +49,23 @@ function parseIntParam(raw: string | string[] | undefined, name: string): number
 }
 
 /** Extract authenticated user */
-function getAuth(req: Request): { id: number; role: role_enum; roles: string[] } {
+function getAuth(req: Request): {
+  id: number;
+  role: role_enum;
+  roles: string[];
+} {
   const user = req.user as any;
+  const rawRoles = Array.isArray(user.roles) ? user.roles : [];
+  const rolesList = rawRoles.map((r: any) => r.role || r);
+  const primaryRole = rolesList.includes(role_enum.Admin)
+    ? role_enum.Admin
+    : rolesList.includes(role_enum.SubAdmin)
+      ? role_enum.SubAdmin
+      : rolesList[0] || null;
   return {
-    id: user.id,
-    role: user.role,
-    roles: Array.isArray(user.roles) ? user.roles : [user.role],
+    id: user.userId || user.id,
+    role: primaryRole,
+    roles: rolesList,
   };
 }
 
@@ -68,10 +79,7 @@ function resolveTargetUserId(req: Request): number {
   if (req.params.userId) {
     // Admin path
     const auth = getAuth(req);
-    if (
-      auth.role !== role_enum.Admin &&
-      auth.role !== role_enum.SubAdmin
-    ) {
+    if (auth.role !== role_enum.Admin && auth.role !== role_enum.SubAdmin) {
       throw new ForbiddenError("Not authorized to manage other users");
     }
     return parseIntParam(req.params.userId, "userId");
@@ -118,7 +126,11 @@ export const userProfileController = {
       const targetProfile = await userProfileService.getProfile(userId);
       const roles = (targetProfile.user_roles || []).map((r) => r.role);
 
-      const updated = await userProfileService.updateProfile(userId, dto, roles);
+      const updated = await userProfileService.updateProfile(
+        userId,
+        dto,
+        roles,
+      );
       res.status(200).json({
         success: true,
         message: "Profile updated successfully",
@@ -140,6 +152,19 @@ export const userProfileController = {
         success: true,
         message: "Profile picture updated",
         data: result,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async deleteAvatar(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = resolveTargetUserId(req);
+      await userProfileService.deleteProfilePic(userId);
+      res.status(200).json({
+        success: true,
+        message: "Profile picture deleted",
       });
     } catch (err) {
       next(err);
@@ -188,7 +213,10 @@ export const userProfileController = {
         dto.user_id = auth.id;
       }
 
-      const updated = await userProfileService.teachesAt.updateTeachesAt(id, dto);
+      const updated = await userProfileService.teachesAt.updateTeachesAt(
+        id,
+        dto,
+      );
       res
         .status(200)
         .json({ success: true, message: "Location updated", data: updated });
@@ -230,7 +258,8 @@ export const userProfileController = {
       const dto = await validateDto(CreateSocialMediaDto, req.body);
       dto.teacher_user_id = userId;
 
-      const created = await userProfileService.socialMedia.createSocialMedia(dto);
+      const created =
+        await userProfileService.socialMedia.createSocialMedia(dto);
       res
         .status(201)
         .json({ success: true, message: "Social media added", data: created });
@@ -257,7 +286,11 @@ export const userProfileController = {
       );
       res
         .status(200)
-        .json({ success: true, message: "Social media updated", data: updated });
+        .json({
+          success: true,
+          message: "Social media updated",
+          data: updated,
+        });
     } catch (err) {
       next(err);
     }

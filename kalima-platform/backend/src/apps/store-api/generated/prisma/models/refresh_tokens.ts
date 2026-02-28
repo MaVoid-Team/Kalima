@@ -587,7 +587,7 @@ export type $refresh_tokensPayload<ExtArgs extends runtime.Types.Extensions.Inte
 export type refresh_tokensGetPayload<S extends boolean | null | undefined | refresh_tokensDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$refresh_tokensPayload, S>
 
 export type refresh_tokensCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<refresh_tokensFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<refresh_tokensFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Refresh_tokensCountAggregateInputType | true
   }
 
@@ -1034,6 +1034,7 @@ export type refresh_tokensFindUniqueArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which refresh_tokens to fetch.
    */
   where: Prisma.refresh_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1056,6 +1057,7 @@ export type refresh_tokensFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter, which refresh_tokens to fetch.
    */
   where: Prisma.refresh_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1108,6 +1110,7 @@ export type refresh_tokensFindFirstArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of refresh_tokens.
    */
   distinct?: Prisma.Refresh_tokensScalarFieldEnum | Prisma.Refresh_tokensScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1160,6 +1163,7 @@ export type refresh_tokensFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter by unique combinations of refresh_tokens.
    */
   distinct?: Prisma.Refresh_tokensScalarFieldEnum | Prisma.Refresh_tokensScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1207,6 +1211,7 @@ export type refresh_tokensFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    */
   skip?: number
   distinct?: Prisma.Refresh_tokensScalarFieldEnum | Prisma.Refresh_tokensScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1229,6 +1234,7 @@ export type refresh_tokensCreateArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data needed to create a refresh_tokens.
    */
   data: Prisma.XOR<Prisma.refresh_tokensCreateInput, Prisma.refresh_tokensUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1289,6 +1295,7 @@ export type refresh_tokensUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
    * Choose, which refresh_tokens to update.
    */
   where: Prisma.refresh_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1367,6 +1374,7 @@ export type refresh_tokensUpsertArgs<ExtArgs extends runtime.Types.Extensions.In
    * In case the refresh_tokens was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.refresh_tokensUpdateInput, Prisma.refresh_tokensUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1389,6 +1397,7 @@ export type refresh_tokensDeleteArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter which refresh_tokens to delete.
    */
   where: Prisma.refresh_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

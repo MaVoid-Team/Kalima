@@ -7,6 +7,7 @@ import {
   UpdateCouponDto,
   ValidateCouponDto,
   UseCouponDto,
+  getAllCouponsDto,
 } from "../dtos/coupon.dto";
 import { ValidationError, BadRequestError } from "../../../libs/errors";
 
@@ -104,18 +105,41 @@ export const couponController = {
     _next: NextFunction,
   ): Promise<void> {
     try {
-      const page = req.query.page
-        ? parseInt(req.query.page as string, 10)
-        : undefined;
-      const limit = req.query.limit
-        ? parseInt(req.query.limit as string, 10)
-        : undefined;
       const active =
-        req.query.active !== undefined
-          ? req.query.active === "true"
+        req.query.active !== undefined ? req.query.active === "1" : undefined;
+
+      const isAmount =
+        req.query.isAmount !== undefined
+          ? req.query.isAmount === "1"
           : undefined;
 
-      const result = await couponService.getAllCoupons({ page, limit, active });
+      const startDate = req.query.startDate
+        ? new Date(req.query.startDate as string)
+        : undefined;
+
+      const endDate = req.query.endDate
+        ? new Date(req.query.endDate as string)
+        : undefined;
+
+      const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+
+      const limit = req.query.limit
+        ? parseInt(req.query.limit as string, 10)
+        : 50;
+
+      const product_id = req.query.product_id
+        ? parseInt(req.query.product_id as string, 10)
+        : undefined;
+
+      const result = await couponService.getAllCoupons({
+        page,
+        limit,
+        product_id,
+        active,
+        isAmount,
+        startDate,
+        endDate,
+      });
 
       res.status(200).json({
         success: true,
@@ -221,7 +245,7 @@ export const couponController = {
 
   /**
    * POST /coupons/validate
-   * Body: { code }
+   * Body: { code, product_id? }
    */
   async validateCoupon(
     req: Request,
@@ -230,7 +254,11 @@ export const couponController = {
   ): Promise<void> {
     try {
       const dto = await validateDto(ValidateCouponDto, req.body);
-      const result = await couponService.validateCoupon(dto.code);
+      const result = await couponService.validateCoupon(
+        dto.code,
+        undefined,
+        dto.product_id,
+      );
 
       res.status(200).json({
         success: true,
@@ -264,6 +292,23 @@ export const couponController = {
         success: true,
         message: "Coupon applied successfully",
         data: coupon,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  async getCouponStats(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const stats = await couponService.getCouponStats();
+
+      res.status(200).json({
+        success: true,
+        data: stats,
       });
     } catch (error) {
       _next(error);

@@ -567,7 +567,7 @@ export type $samplesPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type samplesGetPayload<S extends boolean | null | undefined | samplesDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$samplesPayload, S>
 
 export type samplesCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<samplesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<samplesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: SamplesCountAggregateInputType | true
   }
 
@@ -1015,6 +1015,7 @@ export type samplesFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter, which samples to fetch.
    */
   where: Prisma.samplesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1037,6 +1038,7 @@ export type samplesFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which samples to fetch.
    */
   where: Prisma.samplesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1089,6 +1091,7 @@ export type samplesFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of samples.
    */
   distinct?: Prisma.SamplesScalarFieldEnum | Prisma.SamplesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1141,6 +1144,7 @@ export type samplesFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of samples.
    */
   distinct?: Prisma.SamplesScalarFieldEnum | Prisma.SamplesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1188,6 +1192,7 @@ export type samplesFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   skip?: number
   distinct?: Prisma.SamplesScalarFieldEnum | Prisma.SamplesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1210,6 +1215,7 @@ export type samplesCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * The data needed to create a samples.
    */
   data: Prisma.XOR<Prisma.samplesCreateInput, Prisma.samplesUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1270,6 +1276,7 @@ export type samplesUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which samples to update.
    */
   where: Prisma.samplesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1348,6 +1355,7 @@ export type samplesUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * In case the samples was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.samplesUpdateInput, Prisma.samplesUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1370,6 +1378,7 @@ export type samplesDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter which samples to delete.
    */
   where: Prisma.samplesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

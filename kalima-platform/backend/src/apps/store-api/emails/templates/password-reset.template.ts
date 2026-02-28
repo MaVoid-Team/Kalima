@@ -5,10 +5,12 @@ export interface PasswordResetEmailData {
 }
 
 export function getPasswordResetEmailSubject(): string {
-  return 'Reset Your Password - Kalima Platform';
+  return "Reset Your Password - Kalima Platform";
 }
 
-export function getPasswordResetEmailHtml(data: PasswordResetEmailData): string {
+export function getPasswordResetEmailHtml(
+  data: PasswordResetEmailData,
+): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -48,7 +50,7 @@ export function getPasswordResetEmailHtml(data: PasswordResetEmailData): string 
                   <td align="center" style="padding: 20px 0;">
                     <a href="${data.resetUrl}" 
                        style="display: inline-block; padding: 16px 40px; background-color: #DC2626; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px;">
-                      Reset Password
+                      🔑 Set My New Password
                     </a>
                   </td>
                 </tr>
@@ -95,7 +97,9 @@ export function getPasswordResetEmailHtml(data: PasswordResetEmailData): string 
   `.trim();
 }
 
-export function getPasswordResetEmailText(data: PasswordResetEmailData): string {
+export function getPasswordResetEmailText(
+  data: PasswordResetEmailData,
+): string {
   return `
 Reset Your Password - Kalima Platform
 

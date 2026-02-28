@@ -3,12 +3,15 @@ import {
   IsBoolean,
   IsDate,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsPositive,
   IsString,
   Max,
+  MaxLength,
+  Matches,
   ValidateIf,
 } from "class-validator";
 
@@ -17,8 +20,8 @@ import {
 // ============================================
 
 export enum DiscountType {
-  AMOUNT = "amount",
-  PERCENTAGE = "percentage",
+  AMOUNT = "AMOUNT",
+  PERCENTAGE = "PERCENTAGE",
 }
 
 // ============================================
@@ -28,20 +31,31 @@ export enum DiscountType {
 export class CreateCouponDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(50)
+  @Matches(/^[A-Z0-9-]+$/, {
+    message: "code must contain only uppercase letters, numbers, and hyphens",
+  })
   code: string;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsNotEmpty()
+  product_id: number;
 
   @IsEnum(DiscountType)
   @IsNotEmpty()
   discount_type: DiscountType;
 
-  /** Required when discount_type is "amount" */
+  /** Required when discount_type is "AMOUNT" */
   @ValidateIf((o) => o.discount_type === DiscountType.AMOUNT)
   @IsNumber()
   @IsNotEmpty()
   @IsPositive()
+  @Max(999999)
   discount_amount: number;
 
-  /** Required when discount_type is "percentage" */
+  /** Required when discount_type is "PERCENTAGE" */
   @ValidateIf((o) => o.discount_type === DiscountType.PERCENTAGE)
   @IsNumber()
   @IsNotEmpty()
@@ -67,8 +81,18 @@ export class CreateCouponDto {
 export class UpdateCouponDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(50)
+  @Matches(/^[A-Z0-9-]+$/, {
+    message: "code must contain only uppercase letters, numbers, and hyphens",
+  })
   @IsOptional()
   code?: string;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  product_id?: number;
 
   @IsEnum(DiscountType)
   @IsOptional()
@@ -113,10 +137,56 @@ export class ValidateCouponDto {
   @IsString()
   @IsNotEmpty()
   code: string;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  product_id?: number;
 }
 
 export class UseCouponDto {
   @IsString()
   @IsNotEmpty()
   code: string;
+}
+
+export class getAllCouponsDto {
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  page?: number;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  limit?: number;
+
+  @Type(() => Boolean)
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  product_id?: number;
+
+  @Type(() => Date)
+  @IsOptional()
+  @IsDate()
+  startDate?: Date;
+
+  @Type(() => Date)
+  @IsOptional()
+  @IsDate()
+  endDate?: Date;
+
+  @Type(() => Boolean)
+  @IsOptional()
+  @IsBoolean()
+  isAmount?: boolean;
 }

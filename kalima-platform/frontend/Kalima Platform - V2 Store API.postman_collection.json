@@ -6630,27 +6630,56 @@
                 "value": "Bearer {{token}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
-              "raw": "{{base_url}}/api/v2/purchases/my?status=pending&page=2&limit=3",
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "v2",
-                "purchases",
-                "my"
-              ],
-              "query": [
+                "ec",
+                "cart-purchases"
+              ]
+            },
+            "description": "Get all purchases for current user"
+          },
+          "response": [
+            {
+              "name": "Get User Purchases",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/ec/cart-purchases",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "ec",
+                    "cart-purchases"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
                 {
                   "key": "status",
                   "value": "pending"

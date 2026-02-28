@@ -5,7 +5,7 @@ export interface VerificationEmailData {
 }
 
 export function getVerificationEmailSubject(): string {
-  return 'Verify Your Email - Kalima Platform';
+  return "Verify Your Email - Kalima Platform";
 }
 
 export function getVerificationEmailHtml(data: VerificationEmailData): string {
@@ -48,7 +48,7 @@ export function getVerificationEmailHtml(data: VerificationEmailData): string {
                   <td align="center" style="padding: 20px 0;">
                     <a href="${data.verificationUrl}" 
                        style="display: inline-block; padding: 16px 40px; background-color: #4F46E5; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px;">
-                      Verify Email
+                      ✉️ Confirm My Email Address
                     </a>
                   </td>
                 </tr>

@@ -775,7 +775,7 @@ export type $payment_methodsPayload<ExtArgs extends runtime.Types.Extensions.Int
 export type payment_methodsGetPayload<S extends boolean | null | undefined | payment_methodsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$payment_methodsPayload, S>
 
 export type payment_methodsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<payment_methodsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<payment_methodsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Payment_methodsCountAggregateInputType | true
   }
 
@@ -1225,6 +1225,7 @@ export type payment_methodsFindUniqueArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which payment_methods to fetch.
    */
   where: Prisma.payment_methodsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1247,6 +1248,7 @@ export type payment_methodsFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.E
    * Filter, which payment_methods to fetch.
    */
   where: Prisma.payment_methodsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1299,6 +1301,7 @@ export type payment_methodsFindFirstArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of payment_methods.
    */
   distinct?: Prisma.Payment_methodsScalarFieldEnum | Prisma.Payment_methodsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1351,6 +1354,7 @@ export type payment_methodsFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter by unique combinations of payment_methods.
    */
   distinct?: Prisma.Payment_methodsScalarFieldEnum | Prisma.Payment_methodsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1398,6 +1402,7 @@ export type payment_methodsFindManyArgs<ExtArgs extends runtime.Types.Extensions
    */
   skip?: number
   distinct?: Prisma.Payment_methodsScalarFieldEnum | Prisma.Payment_methodsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1420,6 +1425,7 @@ export type payment_methodsCreateArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data needed to create a payment_methods.
    */
   data: Prisma.XOR<Prisma.payment_methodsCreateInput, Prisma.payment_methodsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1480,6 +1486,7 @@ export type payment_methodsUpdateArgs<ExtArgs extends runtime.Types.Extensions.I
    * Choose, which payment_methods to update.
    */
   where: Prisma.payment_methodsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1558,6 +1565,7 @@ export type payment_methodsUpsertArgs<ExtArgs extends runtime.Types.Extensions.I
    * In case the payment_methods was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.payment_methodsUpdateInput, Prisma.payment_methodsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1580,6 +1588,7 @@ export type payment_methodsDeleteArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter which payment_methods to delete.
    */
   where: Prisma.payment_methodsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -52,12 +52,28 @@ Returns the authenticated user's purchases, sorted by newest first.
 **Endpoint:** `GET /my`  
 **Auth Required:** Yes (Teacher)
 
+**Query Parameters:**
+
+| Param    | Type   | Default | Description                                                      |
+| -------- | ------ | ------- | ---------------------------------------------------------------- |
+| `status` | string | —       | Filter by status (`pending`, `received`, `confirmed`, `returned`) |
+| `page`   | number | 1       | Page number                                                      |
+| `limit`  | number | 10      | Items per page                                                   |
+
+**Example:** `GET /my?status=pending&page=1&limit=10`
+
 **Success Response (200):**
 
 ```json
 {
   "success": true,
   "results": 2,
+  "pagination": {
+    "total": 2,
+    "page": 1,
+    "pages": 1,
+    "limit": 10
+  },
   "data": {
     "purchases": [
       {
@@ -113,6 +129,29 @@ Returns the authenticated user's purchases, sorted by newest first.
   }
 }
 ```
+
+---
+    "purchase": {
+      "id": 16,
+      "user_id": 42,
+      "status": "pending",
+      "subtotal": "125.00",
+      "discount": "0",
+      "total": "125.00",
+      "purchase_serial": "A1B2C3D4-CP-20260223-002"
+    }
+  }
+}
+```
+
+**Error Responses:**
+
+| Status | Message                                                              | Condition                                    |
+| ------ | -------------------------------------------------------------------- | -------------------------------------------- |
+| 400    | `Product not found`                                                  | Invalid `product_id`                         |
+| 400    | `Missing required product fields: <ids>`                             | Forgot to send required fields for product   |
+| 400    | `Payment screenshot is required`                                     | Did not send the `payment_screenshot` file   |
+| 400    | `Invalid validation for checkout payment`                            | Total/Payment mismatches                     |
 
 ---
 

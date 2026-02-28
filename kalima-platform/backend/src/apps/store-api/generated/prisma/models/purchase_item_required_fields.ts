@@ -712,7 +712,7 @@ export type $purchase_item_required_fieldsPayload<ExtArgs extends runtime.Types.
 export type purchase_item_required_fieldsGetPayload<S extends boolean | null | undefined | purchase_item_required_fieldsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$purchase_item_required_fieldsPayload, S>
 
 export type purchase_item_required_fieldsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<purchase_item_required_fieldsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<purchase_item_required_fieldsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Purchase_item_required_fieldsCountAggregateInputType | true
   }
 
@@ -1160,6 +1160,7 @@ export type purchase_item_required_fieldsFindUniqueArgs<ExtArgs extends runtime.
    * Filter, which purchase_item_required_fields to fetch.
    */
   where: Prisma.purchase_item_required_fieldsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1182,6 +1183,7 @@ export type purchase_item_required_fieldsFindUniqueOrThrowArgs<ExtArgs extends r
    * Filter, which purchase_item_required_fields to fetch.
    */
   where: Prisma.purchase_item_required_fieldsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1234,6 +1236,7 @@ export type purchase_item_required_fieldsFindFirstArgs<ExtArgs extends runtime.T
    * Filter by unique combinations of purchase_item_required_fields.
    */
   distinct?: Prisma.Purchase_item_required_fieldsScalarFieldEnum | Prisma.Purchase_item_required_fieldsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1286,6 +1289,7 @@ export type purchase_item_required_fieldsFindFirstOrThrowArgs<ExtArgs extends ru
    * Filter by unique combinations of purchase_item_required_fields.
    */
   distinct?: Prisma.Purchase_item_required_fieldsScalarFieldEnum | Prisma.Purchase_item_required_fieldsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1333,6 +1337,7 @@ export type purchase_item_required_fieldsFindManyArgs<ExtArgs extends runtime.Ty
    */
   skip?: number
   distinct?: Prisma.Purchase_item_required_fieldsScalarFieldEnum | Prisma.Purchase_item_required_fieldsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1355,6 +1360,7 @@ export type purchase_item_required_fieldsCreateArgs<ExtArgs extends runtime.Type
    * The data needed to create a purchase_item_required_fields.
    */
   data: Prisma.XOR<Prisma.purchase_item_required_fieldsCreateInput, Prisma.purchase_item_required_fieldsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1415,6 +1421,7 @@ export type purchase_item_required_fieldsUpdateArgs<ExtArgs extends runtime.Type
    * Choose, which purchase_item_required_fields to update.
    */
   where: Prisma.purchase_item_required_fieldsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1493,6 +1500,7 @@ export type purchase_item_required_fieldsUpsertArgs<ExtArgs extends runtime.Type
    * In case the purchase_item_required_fields was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.purchase_item_required_fieldsUpdateInput, Prisma.purchase_item_required_fieldsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1515,6 +1523,7 @@ export type purchase_item_required_fieldsDeleteArgs<ExtArgs extends runtime.Type
    * Filter which purchase_item_required_fields to delete.
    */
   where: Prisma.purchase_item_required_fieldsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -32,6 +32,18 @@ export class CreatePurchaseItemDto {
   @IsNumber()
   discount: number;
 
+  @IsInt()
+  @IsPositive()
+  quantity: number;
+
+  @IsNumber()
+  final_price: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  coupon_id?: number | null;
+
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
@@ -83,9 +95,15 @@ export class CreatePurchaseDto {
 }
 
 export class AdminNoteDto {
+  @IsOptional()
   @IsString()
   @MaxLength(5000)
-  admin_notes: string;
+  admin_notes?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(5000)
+  adminNote?: string;
 }
 
 export class PurchaseFilterDto {

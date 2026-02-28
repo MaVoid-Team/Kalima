@@ -1,5 +1,5 @@
 import path from "path";
-import fs from "fs";
+import { promises as fsPromises } from "fs";
 import crypto from "crypto";
 import sharp from "sharp";
 import type { PrismaClient } from "../../../libs/db/prisma";
@@ -54,11 +54,15 @@ export interface UploadImageOptions {
 // ============================================
 
 class ImageService {
-  constructor(private db: PrismaClient = prisma) {
-    // Ensure upload directory exists
-    if (!fs.existsSync(UPLOAD_DIR)) {
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  private initPromise: Promise<unknown> | null = null;
+
+  constructor(private db: PrismaClient = prisma) {}
+
+  private async ensureUploadDir(): Promise<void> {
+    if (!this.initPromise) {
+      this.initPromise = fsPromises.mkdir(UPLOAD_DIR, { recursive: true });
     }
+    await this.initPromise;
   }
 
   // ============================================
@@ -109,8 +113,8 @@ class ImageService {
     const filename = `${uniqueId}${ext}`;
     const filePath = path.join(UPLOAD_DIR, filename);
 
-    // Write to disk
-    fs.writeFileSync(filePath, finalBuffer);
+    await this.ensureUploadDir();
+    await fsPromises.writeFile(filePath, finalBuffer);
 
     // Relative URL for serving via express.static
     const url = `/uploads/images/${filename}`;
@@ -139,12 +143,7 @@ class ImageService {
     files: Express.Multer.File[],
     options: UploadImageOptions = {},
   ): Promise<images[]> {
-    const results: images[] = [];
-    for (const file of files) {
-      const image = await this.uploadImage(file, options);
-      results.push(image);
-    }
-    return results;
+    return Promise.all(files.map((file) => this.uploadImage(file, options)));
   }
 
   // ============================================
@@ -188,21 +187,12 @@ class ImageService {
    * Does not throw if the file doesn't exist (already cleaned up).
    */
   removeFileFromDisk(url: string): void {
-    // url is like /uploads/images/filename.webp
-    // Resolve to absolute path from project root
     const absolutePath = path.resolve(
       __dirname,
       "../../../..",
       url.startsWith("/") ? url.slice(1) : url,
     );
-
-    try {
-      if (fs.existsSync(absolutePath)) {
-        fs.unlinkSync(absolutePath);
-      }
-    } catch {
-      // Silently ignore — file may have been cleaned up already
-    }
+    void fsPromises.unlink(absolutePath).catch(() => {});
   }
 
   // ============================================

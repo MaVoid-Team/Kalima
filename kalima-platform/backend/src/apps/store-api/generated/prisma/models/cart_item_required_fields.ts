@@ -249,6 +249,7 @@ export type cart_item_required_fieldsOrderByWithRelationInput = {
 
 export type cart_item_required_fieldsWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  cart_item_id_field_definition_id?: Prisma.cart_item_required_fieldsCart_item_idField_definition_idCompoundUniqueInput
   AND?: Prisma.cart_item_required_fieldsWhereInput | Prisma.cart_item_required_fieldsWhereInput[]
   OR?: Prisma.cart_item_required_fieldsWhereInput[]
   NOT?: Prisma.cart_item_required_fieldsWhereInput | Prisma.cart_item_required_fieldsWhereInput[]
@@ -259,7 +260,7 @@ export type cart_item_required_fieldsWhereUniqueInput = Prisma.AtLeast<{
   updated_at?: Prisma.DateTimeNullableFilter<"cart_item_required_fields"> | Date | string | null
   cart_items?: Prisma.XOR<Prisma.Cart_itemsScalarRelationFilter, Prisma.cart_itemsWhereInput>
   required_field_definitions?: Prisma.XOR<Prisma.Required_field_definitionsScalarRelationFilter, Prisma.required_field_definitionsWhereInput>
-}, "id">
+}, "id" | "cart_item_id_field_definition_id">
 
 export type cart_item_required_fieldsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -353,6 +354,11 @@ export type Cart_item_required_fieldsListRelationFilter = {
 
 export type cart_item_required_fieldsOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type cart_item_required_fieldsCart_item_idField_definition_idCompoundUniqueInput = {
+  cart_item_id: number
+  field_definition_id: number
 }
 
 export type cart_item_required_fieldsCountOrderByAggregateInput = {
@@ -712,7 +718,7 @@ export type $cart_item_required_fieldsPayload<ExtArgs extends runtime.Types.Exte
 export type cart_item_required_fieldsGetPayload<S extends boolean | null | undefined | cart_item_required_fieldsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$cart_item_required_fieldsPayload, S>
 
 export type cart_item_required_fieldsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<cart_item_required_fieldsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<cart_item_required_fieldsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Cart_item_required_fieldsCountAggregateInputType | true
   }
 
@@ -1160,6 +1166,7 @@ export type cart_item_required_fieldsFindUniqueArgs<ExtArgs extends runtime.Type
    * Filter, which cart_item_required_fields to fetch.
    */
   where: Prisma.cart_item_required_fieldsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1182,6 +1189,7 @@ export type cart_item_required_fieldsFindUniqueOrThrowArgs<ExtArgs extends runti
    * Filter, which cart_item_required_fields to fetch.
    */
   where: Prisma.cart_item_required_fieldsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1234,6 +1242,7 @@ export type cart_item_required_fieldsFindFirstArgs<ExtArgs extends runtime.Types
    * Filter by unique combinations of cart_item_required_fields.
    */
   distinct?: Prisma.Cart_item_required_fieldsScalarFieldEnum | Prisma.Cart_item_required_fieldsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1286,6 +1295,7 @@ export type cart_item_required_fieldsFindFirstOrThrowArgs<ExtArgs extends runtim
    * Filter by unique combinations of cart_item_required_fields.
    */
   distinct?: Prisma.Cart_item_required_fieldsScalarFieldEnum | Prisma.Cart_item_required_fieldsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1333,6 +1343,7 @@ export type cart_item_required_fieldsFindManyArgs<ExtArgs extends runtime.Types.
    */
   skip?: number
   distinct?: Prisma.Cart_item_required_fieldsScalarFieldEnum | Prisma.Cart_item_required_fieldsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1355,6 +1366,7 @@ export type cart_item_required_fieldsCreateArgs<ExtArgs extends runtime.Types.Ex
    * The data needed to create a cart_item_required_fields.
    */
   data: Prisma.XOR<Prisma.cart_item_required_fieldsCreateInput, Prisma.cart_item_required_fieldsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1415,6 +1427,7 @@ export type cart_item_required_fieldsUpdateArgs<ExtArgs extends runtime.Types.Ex
    * Choose, which cart_item_required_fields to update.
    */
   where: Prisma.cart_item_required_fieldsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1493,6 +1506,7 @@ export type cart_item_required_fieldsUpsertArgs<ExtArgs extends runtime.Types.Ex
    * In case the cart_item_required_fields was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.cart_item_required_fieldsUpdateInput, Prisma.cart_item_required_fieldsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1515,6 +1529,7 @@ export type cart_item_required_fieldsDeleteArgs<ExtArgs extends runtime.Types.Ex
    * Filter which cart_item_required_fields to delete.
    */
   where: Prisma.cart_item_required_fieldsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

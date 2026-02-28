@@ -7,6 +7,7 @@ import {
   AvatarGroup,
   AvatarGroupCount,
 } from "@/components/ui/avatar";
+import { Link } from "react-router-dom";
 
 
 const HERO_IMAGE_URL =
@@ -46,16 +47,20 @@ export default function WelcomeSection() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-2 justify-start">
-              <Button variant="default" className="w-full sm:w-fit h-12 text-base" data-testid="landing-welcome-browse-courses-button">
-                {t("welcome.browseCourses")}
-              </Button>
-              <Button
-                variant="secondary"
-                className="w-full sm:w-fit h-12 text-base"
-                data-testid="landing-welcome-teachers-button"
-              >
-                {t("welcome.teachers")}
-              </Button>
+              <Link to="/market">
+                <Button variant="default" className="w-full sm:w-fit h-12 text-base" data-testid="landing-welcome-browse-courses-button">
+                  {t("welcome.market")}
+                </Button>
+              </Link>
+              <Link to="/samples">
+                <Button
+                  variant="secondary"
+                  className="w-full sm:w-fit h-12 text-base"
+                  data-testid="landing-welcome-teachers-button"
+                >
+                  {t("welcome.samples")}
+                </Button>
+              </Link>
             </div>
 
             {/* Trusted By */}

@@ -15,23 +15,13 @@ import CartHeader from "@/components/cart/CartHeader";
 import CartItemsTable from "@/components/cart/CartItemsTable";
 import CartOrderSummary from "@/components/cart/CartOrderSummary";
 import EmptyCartState from "@/components/cart/EmptyCartState";
+import { useCart } from "@/contexts/CartContext";
 
 export default function CartPage() {
   const { t, i18n } = useTranslation("cart");
-  const location = useLocation();
   const navigate = useNavigate();
-  const { cart } = location.state || { cart: [] }; // Get cart items from location state or default to empty array
-  const [cartItems, setCartItems] = useState(cart);
+  const { cart, loading, error, updateQuantity, removeFromCart, applyCoupon, removeCoupon, updateCartItemRequiredFields, updateCartItemRequiredFieldsImage } = useCart();
   const [promoCode, setPromoCode] = useState("");
-
-  const updateQuantity = (id, newQuantity) => {
-    if (newQuantity < 1) return;
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item,
-      ),
-    );
-  };
 
   const localize = (item, base) => {
     const langSuffix = i18n.language === "ar" ? "Ar" : "En";
@@ -44,17 +34,15 @@ export default function CartPage() {
     );
   };
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-  const shippingEstimate = t("shippingCalculatedNext");
-  const taxEstimate = 15.2;
-  const total = subtotal + taxEstimate;
+  // Use cart data from context
+  const cartItems = cart?.cart_items || [];
+  const subtotal = cart?.subtotal || 0;
+  const discount = cart?.discount || 0;
+  const total = cart?.total || 0;
 
   // Empty Cart State
-  if (cartItems.length === 0) {
-    return <EmptyCartState onBrowseProducts={(e) => e.preventDefault()} />;
+  if (!loading && cartItems.length === 0) {
+    return <EmptyCartState onBrowseProducts={() => navigate('/market')} />;
   }
 
   return (
@@ -68,7 +56,7 @@ export default function CartPage() {
         {/* Header */}
         <CartHeader
           itemCount={cartItems.length}
-          onContinueShopping={(e) => e.preventDefault()}
+          onContinueShopping={() => navigate('/market')}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -76,8 +64,12 @@ export default function CartPage() {
           <div className="lg:col-span-2">
             <CartItemsTable
               cartItems={cartItems}
-              localize={localize}
               updateQuantity={updateQuantity}
+              removeFromCart={removeFromCart}
+              applyCoupon={applyCoupon}
+              removeCoupon={removeCoupon}
+              updateCartItemRequiredFields={updateCartItemRequiredFields}
+              updateCartItemRequiredFieldsImage={updateCartItemRequiredFieldsImage}
             />
           </div>
 
@@ -85,8 +77,7 @@ export default function CartPage() {
           <div className="lg:col-span-1">
             <CartOrderSummary
               subtotal={subtotal}
-              shippingEstimate={shippingEstimate}
-              taxEstimate={taxEstimate}
+              discount={discount}
               total={total}
               promoCode={promoCode}
               onPromoCodeChange={setPromoCode}
