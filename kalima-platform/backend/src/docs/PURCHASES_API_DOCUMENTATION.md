@@ -54,11 +54,11 @@ Returns the authenticated user's purchases, sorted by newest first.
 
 **Query Parameters:**
 
-| Param    | Type   | Default | Description                                                      |
-| -------- | ------ | ------- | ---------------------------------------------------------------- |
+| Param    | Type   | Default | Description                                                       |
+| -------- | ------ | ------- | ----------------------------------------------------------------- |
 | `status` | string | —       | Filter by status (`pending`, `received`, `confirmed`, `returned`) |
-| `page`   | number | 1       | Page number                                                      |
-| `limit`  | number | 10      | Items per page                                                   |
+| `page`   | number | 1       | Page number                                                       |
+| `limit`  | number | 10      | Items per page                                                    |
 
 **Example:** `GET /my?status=pending&page=1&limit=10`
 
@@ -92,12 +92,24 @@ Returns the authenticated user's purchases, sorted by newest first.
         "confirmed_at": "2026-02-20T14:00:00.000Z",
         "returned_at": null,
         "created_at": "2026-02-20T10:00:00.000Z",
-        "users": { "id": 42, "name": "Ahmed Hassan", "email": "ahmed@example.com", "phone": "01012345678" },
+        "users": {
+          "id": 42,
+          "name": "Ahmed Hassan",
+          "email": "ahmed@example.com",
+          "phone": "01012345678"
+        },
         "received_by_user": { "id": 1, "name": "Admin User" },
         "confirmed_by_user": { "id": 1, "name": "Admin User" },
         "returned_by_user": null,
-        "payment_methods": { "id": 3, "name": "Vodafone Cash", "phone_number": "01098765432" },
-        "payment_screenshot": { "id": 88, "url": "/uploads/images/screenshot.webp" },
+        "payment_methods": {
+          "id": 3,
+          "name": "Vodafone Cash",
+          "phone_number": "01098765432"
+        },
+        "payment_screenshot": {
+          "id": 88,
+          "url": "/uploads/images/screenshot.webp"
+        },
         "watermark": null,
         "purchase_items": [
           {
@@ -111,14 +123,21 @@ Returns the authenticated user's purchases, sorted by newest first.
               "serial": "ALG-101",
               "type": "Book",
               "price": "125.00",
-              "thumbnail_image": { "id": 5, "url": "/uploads/images/thumb.webp" }
+              "thumbnail_image": {
+                "id": 5,
+                "url": "/uploads/images/thumb.webp"
+              }
             },
             "purchase_item_required_fields": [
               {
                 "id": 1,
                 "field_definition_id": 7,
                 "value": "Mohamed Ali",
-                "required_field_definitions": { "id": 7, "label": "Student Name", "field_type": "text" }
+                "required_field_definitions": {
+                  "id": 7,
+                  "label": "Student Name",
+                  "field_type": "text"
+                }
               }
             ]
           }
@@ -131,6 +150,7 @@ Returns the authenticated user's purchases, sorted by newest first.
 ```
 
 ---
+
     "purchase": {
       "id": 16,
       "user_id": 42,
@@ -140,9 +160,11 @@ Returns the authenticated user's purchases, sorted by newest first.
       "total": "125.00",
       "purchase_serial": "A1B2C3D4-CP-20260223-002"
     }
-  }
+
 }
-```
+}
+
+````
 
 **Error Responses:**
 
@@ -165,7 +187,7 @@ Returns the authenticated user's purchases, sorted by newest first.
 
 Returns a paginated list of purchases with search and filters.
 
-**Endpoint:** `GET /`  
+**Endpoint:** `GET /`
 **Auth Required:** Yes (Admin, SubAdmin)
 
 **Query Parameters:**
@@ -199,7 +221,7 @@ Returns a paginated list of purchases with search and filters.
     "purchases": ["/* array of Purchase objects */"]
   }
 }
-```
+````
 
 ---
 
@@ -229,10 +251,10 @@ Returns a single purchase with all relations.
 
 **Error Responses:**
 
-| Status | Message               | Condition                 |
-| ------ | --------------------- | ------------------------- |
-| 400    | `Invalid purchase ID` | ID is not a valid number  |
-| 404    | `Purchase not found`  | Purchase does not exist   |
+| Status | Message               | Condition                |
+| ------ | --------------------- | ------------------------ |
+| 400    | `Invalid purchase ID` | ID is not a valid number |
+| 404    | `Purchase not found`  | Purchase does not exist  |
 
 ---
 
@@ -267,11 +289,11 @@ Transitions a purchase from `pending` → `received`. Records who received it an
 
 **Error Responses:**
 
-| Status | Message                             | Condition                              |
-| ------ | ----------------------------------- | -------------------------------------- |
-| 400    | `Invalid purchase ID`               | ID is not a valid number               |
-| 400    | `Purchase is already received`      | Status is not `pending`                |
-| 404    | `Purchase not found`                | Purchase does not exist                |
+| Status | Message                        | Condition                |
+| ------ | ------------------------------ | ------------------------ |
+| 400    | `Invalid purchase ID`          | ID is not a valid number |
+| 400    | `Purchase is already received` | Status is not `pending`  |
+| 404    | `Purchase not found`           | Purchase does not exist  |
 
 ---
 
@@ -306,11 +328,11 @@ Transitions a purchase from `received` or `returned` → `confirmed`.
 
 **Error Responses:**
 
-| Status | Message                                                                    | Condition                                  |
-| ------ | -------------------------------------------------------------------------- | ------------------------------------------ |
-| 400    | `Purchase is already confirmed`                                            | Already confirmed                          |
-| 400    | `Purchase must be received or in returned status before it can be confirmed` | Status is not `received` or `returned`     |
-| 404    | `Purchase not found`                                                       | Purchase does not exist                    |
+| Status | Message                                                                      | Condition                              |
+| ------ | ---------------------------------------------------------------------------- | -------------------------------------- |
+| 400    | `Purchase is already confirmed`                                              | Already confirmed                      |
+| 400    | `Purchase must be received or in returned status before it can be confirmed` | Status is not `received` or `returned` |
+| 404    | `Purchase not found`                                                         | Purchase does not exist                |
 
 ---
 
@@ -345,11 +367,11 @@ Transitions a purchase from `received` or `confirmed` → `returned`.
 
 **Error Responses:**
 
-| Status | Message                                                      | Condition                                |
-| ------ | ------------------------------------------------------------ | ---------------------------------------- |
-| 400    | `Purchase is already returned`                               | Already returned                         |
-| 400    | `Only confirmed or received purchases can be returned`       | Status is not `confirmed` or `received`  |
-| 404    | `Purchase not found`                                         | Purchase does not exist                  |
+| Status | Message                                                | Condition                               |
+| ------ | ------------------------------------------------------ | --------------------------------------- |
+| 400    | `Purchase is already returned`                         | Already returned                        |
+| 400    | `Only confirmed or received purchases can be returned` | Status is not `confirmed` or `received` |
+| 404    | `Purchase not found`                                   | Purchase does not exist                 |
 
 ---
 
@@ -390,8 +412,8 @@ Sets or updates the admin notes on a purchase.
 
 **Error Responses:**
 
-| Status | Message               | Condition               |
-| ------ | --------------------- | ----------------------- |
+| Status | Message               | Condition                |
+| ------ | --------------------- | ------------------------ |
 | 400    | `Invalid purchase ID` | ID is not a valid number |
 | 404    | `Purchase not found`  | Purchase does not exist  |
 | 422    | Validation errors     | Invalid body             |
@@ -400,7 +422,7 @@ Sets or updates the admin notes on a purchase.
 
 ### Delete Purchase
 
-Hard-deletes a purchase and all its items. If the purchase was confirmed and had coupons, the coupon usages are restored (deleted from `coupon_usages`).
+Soft-deletes a purchase and all its items by setting `deleted_at`. If the purchase was confirmed and had coupons, the coupon usages are restored (hard deleted from `coupon_usages` to reactivate the coupon).
 
 **Endpoint:** `DELETE /:id`  
 **Auth Required:** Yes (Admin, SubAdmin)
@@ -422,8 +444,8 @@ Hard-deletes a purchase and all its items. If the purchase was confirmed and had
 
 **Error Responses:**
 
-| Status | Message               | Condition               |
-| ------ | --------------------- | ----------------------- |
+| Status | Message               | Condition                |
+| ------ | --------------------- | ------------------------ |
 | 400    | `Invalid purchase ID` | ID is not a valid number |
 | 404    | `Purchase not found`  | Purchase does not exist  |
 
@@ -431,7 +453,7 @@ Hard-deletes a purchase and all its items. If the purchase was confirmed and had
 
 ### Delete Item from Purchase
 
-Removes a single item from a purchase and recalculates totals. Cannot remove the last item — delete the entire purchase instead.
+Removes a single item from a purchase (via a **soft delete**) and recalculates totals. Cannot remove the last item — delete the entire purchase instead.
 
 **Endpoint:** `DELETE /:id/items/:itemId`  
 **Auth Required:** Yes (Admin, SubAdmin)
@@ -457,12 +479,12 @@ Removes a single item from a purchase and recalculates totals. Cannot remove the
 
 **Error Responses:**
 
-| Status | Message                                                           | Condition                         |
-| ------ | ----------------------------------------------------------------- | --------------------------------- |
-| 400    | `Invalid purchase ID` / `Invalid item ID`                        | ID is not a valid number          |
-| 400    | `Cannot remove the last item. Delete the entire purchase instead.` | Only one item remains             |
-| 404    | `Purchase not found`                                              | Purchase does not exist           |
-| 404    | `Item not found in this purchase`                                 | Item does not belong to purchase  |
+| Status | Message                                                            | Condition                        |
+| ------ | ------------------------------------------------------------------ | -------------------------------- |
+| 400    | `Invalid purchase ID` / `Invalid item ID`                          | ID is not a valid number         |
+| 400    | `Cannot remove the last item. Delete the entire purchase instead.` | Only one item remains            |
+| 404    | `Purchase not found`                                               | Purchase does not exist          |
+| 404    | `Item not found in this purchase`                                  | Item does not belong to purchase |
 
 ---
 
@@ -474,11 +496,11 @@ pending → received → confirmed
            received → returned → confirmed
 ```
 
-| Transition | From | To | Endpoint |
-|------------|------|----|----------|
-| Receive    | `pending` | `received` | `PATCH /:id/receive` |
-| Confirm    | `received` \| `returned` | `confirmed` | `PATCH /:id/confirm` |
-| Return     | `received` \| `confirmed` | `returned` | `PATCH /:id/return` |
+| Transition | From                      | To          | Endpoint             |
+| ---------- | ------------------------- | ----------- | -------------------- |
+| Receive    | `pending`                 | `received`  | `PATCH /:id/receive` |
+| Confirm    | `received` \| `returned`  | `confirmed` | `PATCH /:id/confirm` |
+| Return     | `received` \| `confirmed` | `returned`  | `PATCH /:id/return`  |
 
 ---
 
@@ -526,6 +548,7 @@ pending → received → confirmed
 ### Related Objects
 
 **PurchaseItem:**
+
 ```json
 {
   "id": "number",
@@ -539,24 +562,35 @@ pending → received → confirmed
 ```
 
 **PurchaseItemRequiredField:**
+
 ```json
 {
   "id": "number",
   "purchase_item_id": "number",
   "field_definition_id": "number",
   "value": "string",
-  "required_field_definitions": { "id": "number", "label": "string", "field_type": "text | number | date | image" }
+  "required_field_definitions": {
+    "id": "number",
+    "label": "string",
+    "field_type": "text | number | date | image"
+  }
 }
 ```
 
 **CouponUsage:**
+
 ```json
 {
   "id": "number",
   "user_id": "number",
   "coupon_id": "number",
   "purchase_id": "number | null",
-  "coupons": { "id": "number", "code": "string", "discount_amount": "decimal", "discount_percentage": "number" }
+  "coupons": {
+    "id": "number",
+    "code": "string",
+    "discount_amount": "decimal",
+    "discount_percentage": "number"
+  }
 }
 ```
 
@@ -608,13 +642,13 @@ pending → received → confirmed
 
 ## Error Codes
 
-| Status | Error Type          | Description                                           |
-| ------ | ------------------- | ----------------------------------------------------- |
+| Status | Error Type          | Description                                             |
+| ------ | ------------------- | ------------------------------------------------------- |
 | 400    | `BadRequestError`   | Invalid input, wrong status transition, or missing data |
-| 401    | `UnauthorizedError` | Missing or invalid authorization token                |
-| 403    | `ForbiddenError`    | User does not have the required role                  |
-| 404    | `NotFoundError`     | Purchase or item not found                            |
-| 422    | `ValidationError`   | DTO validation failed — returns `errors` array        |
+| 401    | `UnauthorizedError` | Missing or invalid authorization token                  |
+| 403    | `ForbiddenError`    | User does not have the required role                    |
+| 404    | `NotFoundError`     | Purchase or item not found                              |
+| 422    | `ValidationError`   | DTO validation failed — returns `errors` array          |
 
 ### Error Response Format
 

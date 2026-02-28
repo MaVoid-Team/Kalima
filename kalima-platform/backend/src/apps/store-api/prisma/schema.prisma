@@ -74,6 +74,7 @@ model users {
   user_analytics            user_analytics?
   user_roles                user_roles[]
   carts                     carts[]
+  product_reviews           product_reviews[]
   purchases                 purchases[]                @relation("PurchaseCreator")
   purchases_received        purchases[]                @relation("PurchaseReceiver")
   purchases_confirmed       purchases[]                @relation("PurchaseConfirmer")
@@ -347,6 +348,23 @@ model products {
   thumbnail_image         images?                   @relation("ProductThumbnail", fields: [thumbnail_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   coupons                 coupons[]
   samples                 samples?
+  product_reviews         product_reviews[]
+}
+
+model product_reviews {
+  id          Int       @id @default(autoincrement())
+  product_id  Int
+  user_id     Int
+  rating      Int
+  review_text String?    @db.Text
+  created_at  DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?  @updatedAt @db.Timestamp(6)
+
+  products products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users    users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([product_id, user_id])
+  @@index([product_id])
 }
 
 model samples {
