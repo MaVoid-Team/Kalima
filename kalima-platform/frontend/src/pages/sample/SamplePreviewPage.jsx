@@ -62,7 +62,7 @@ export default function SamplePreviewPage() {
 
             {/* Full Screen Viewer */}
             <div className="flex-1 overflow-hidden flex items-center justify-center bg-muted/20" data-testid="sample-preview-viewer">
-                {isPdf ? (
+                {isPdf && fileUrl ? (
                     <div className="w-full h-full max-w-6xl">
                         <PDFViewer
                             config={{
@@ -70,7 +70,7 @@ export default function SamplePreviewPage() {
                                 theme: { preference: 'system' },
                                 i18n: viewerI18n,
                                 dir: i18n.dir(),
-                                disabledCategories: ['annotation', 'redaction'],
+                                disabledCategories: ['annotation', 'redaction', 'local', 'download', 'file'],
                             }}
                             style={{ width: '100%', height: '100%' }}
                         />
