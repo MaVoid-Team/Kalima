@@ -10,7 +10,7 @@ import ConfirmUnlinkDialog from './ConfirmUnlinkDialog';
 import useLinkAccounts from '@/hooks/auth/useLinkAccounts';
 import useAuth from '@/hooks/auth/useAuth';
 import { useAccountProviders } from '@/hooks/useAccountProviders';
-import { providerIcons } from './ProviderIcons';
+import { providerIcons, GoogleIcon } from './ProviderIcons';
 import { getFirebaseIdToken } from '@/utils/firebaseAuth';
 
 export default function AccountSection() {
@@ -149,7 +149,7 @@ export default function AccountSection() {
                                 disabled={isLinkingFirebase || loading}
                                 className="flex items-center gap-2"
                             >
-                                {/* <GoogleIcon className="h-4 w-4" /> */}
+                                <GoogleIcon className="h-4 w-4" />
                                 {isLinkingFirebase 
                                     ? t('common.loading') 
                                     : t('settings.account.linkFirebase', 'Link Google Account')
