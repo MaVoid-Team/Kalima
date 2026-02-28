@@ -1,21 +1,46 @@
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useBlocker, useNavigate } from "react-router-dom";
 import FastBuyCheckoutForm from "@/components/fast-buy/FastBuyCheckoutForm";
-import { useFastBuyCheckoutPage } from "@/hooks/useFastBuyCheckoutPage";
-import { useNavigate } from "react-router-dom";
+import FastBuyClearDialog from "@/components/fast-buy/FastBuyClearDialog";
+import { useFastBuy } from "@/hooks/useFastBuy";
 import LoadingSpinner from "../../components/ui/loading-spinner";
-import React from "react";
 
 export default function FastBuyCheckoutPage() {
   const { t } = useTranslation("checkout");
   const navigate = useNavigate();
-  const { state, handleCheckout, handleApplyCoupon } = useFastBuyCheckoutPage();
-  const { preview, isLoading, error, isSubmitting } = state;
+  const { checkout } = useFastBuy({ checkout: true });
+  const { preview, isLoading, error, isSubmitting, computed, applyCoupon, clearFastBuyCart } = checkout;
+  const [showClearDialog, setShowClearDialog] = useState(false);
+  const skipBlockRef = useRef(false);
 
+  const blocker = useBlocker(({ currentLocation, nextLocation }) => {
+    if (skipBlockRef.current) return false;
+    const leavingCheckout = currentLocation.pathname === "/fast-buy/checkout" && nextLocation.pathname !== "/fast-buy/checkout";
+    return computed.hasItems && leavingCheckout;
+  });
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    if (blocker.state === "blocked") {
+      setShowClearDialog(true);
+    }
+  }, [blocker.state]);
+
+  const handleStay = () => {
+    setShowClearDialog(false);
+    blocker.reset?.();
+  };
+
+  const handleLeaveAndClear = async () => {
+    skipBlockRef.current = true;
+    await clearFastBuyCart();
+    setShowClearDialog(false);
+    blocker.proceed?.();
+  };
 
   if (isLoading) {
     return (
@@ -42,15 +67,14 @@ export default function FastBuyCheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background relative selection:bg-primary/10">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
-        <FastBuyCheckoutForm
-          preview={preview}
-          onSubmit={handleCheckout}
-          onApplyCoupon={handleApplyCoupon}
-          loading={isSubmitting}
-        />
+    <>
+      <div className="min-h-screen bg-background relative selection:bg-primary/10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+          <FastBuyCheckoutForm form={checkout} onApplyCoupon={applyCoupon} loading={isSubmitting} />
+        </div>
       </div>
-    </div>
+
+      <FastBuyClearDialog open={showClearDialog} onStay={handleStay} onConfirm={handleLeaveAndClear} />
+    </>
   );
 }
