@@ -92,7 +92,7 @@ export default function VerifyEmailPage() {
                     <Card className="border-0 shadow-none sm:border sm:shadow-sm text-center">
                         <CardHeader>
                             <CardTitle className="text-2xl">
-                                {t("verify_email.title", "Email Verification")}
+                                {t("verifyEmail.title", "Email Verification")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-col items-center py-6">
@@ -102,7 +102,7 @@ export default function VerifyEmailPage() {
                                 <>
                                     <LoadingSpinner className="h-12 w-12 text-primary mb-4" />
                                     <p className="text-muted-foreground">
-                                        {t("verify_email.verifying", "Verifying your email address…")}
+                                        {t("verifyEmail.verifying", "Verifying your email address…")}
                                     </p>
                                 </>
                             )}
@@ -112,11 +112,11 @@ export default function VerifyEmailPage() {
                                 <>
                                     <CheckCircle2 className="h-12 w-12 text-green-500 mb-4" />
                                     <p className="font-semibold text-lg mb-2">
-                                        {t("verify_email.successTitle", "Email Verified!")}
+                                        {t("verifyEmail.successTitle", "Email Verified!")}
                                     </p>
                                     <p className="text-muted-foreground text-sm">
                                         {t(
-                                            "verify_email.success",
+                                            "verifyEmail.success",
                                             "Your email has been successfully verified. You can now log in to your account."
                                         )}
                                     </p>
@@ -126,7 +126,7 @@ export default function VerifyEmailPage() {
                                         data-testid="verify-email-success-login-link"
                                     >
                                         <Link to="/login">
-                                            {t("verify_email.backToLogin", "Go to Login")}
+                                            {t("verifyEmail.backToLogin", "Go to Login")}
                                         </Link>
                                     </Button>
                                 </>
@@ -137,17 +137,17 @@ export default function VerifyEmailPage() {
                                 <>
                                     <AlertCircle className="h-12 w-12 text-amber-500 mb-4" />
                                     <p className="font-semibold text-lg mb-2">
-                                        {t("verify_email.alreadyVerifiedTitle", "Link Already Used")}
+                                        {t("verifyEmail.alreadyVerifiedTitle", "Link Already Used")}
                                     </p>
                                     <p className="text-muted-foreground text-sm mb-1">
                                         {t(
-                                            "verify_email.alreadyVerified",
+                                            "verifyEmail.alreadyVerified",
                                             "This verification link has already been used. Your email is likely already verified."
                                         )}
                                     </p>
                                     <p className="text-muted-foreground text-sm">
                                         {t(
-                                            "verify_email.tryLogin",
+                                            "verifyEmail.tryLogin",
                                             "Please try logging in — if your account is verified, you will be able to sign in normally."
                                         )}
                                     </p>
@@ -157,7 +157,7 @@ export default function VerifyEmailPage() {
                                         data-testid="verify-email-already-verified-login-link"
                                     >
                                         <Link to="/login">
-                                            {t("verify_email.backToLogin", "Go to Login")}
+                                            {t("verifyEmail.backToLogin", "Go to Login")}
                                         </Link>
                                     </Button>
                                 </>
@@ -168,11 +168,11 @@ export default function VerifyEmailPage() {
                                 <>
                                     <XCircle className="h-12 w-12 text-destructive mb-4" />
                                     <p className="font-semibold text-lg mb-2">
-                                        {t("verify_email.errorTitle", "Verification Failed")}
+                                        {t("verifyEmail.errorTitle", "Verification Failed")}
                                     </p>
                                     <p className="text-muted-foreground text-sm">
                                         {t(
-                                            "verify_email.error",
+                                            "verifyEmail.error",
                                             "The verification link is invalid or has expired. Please request a new one."
                                         )}
                                     </p>
@@ -183,7 +183,7 @@ export default function VerifyEmailPage() {
                                             data-testid="verify-email-error-login-link"
                                         >
                                             <Link to="/login">
-                                                {t("verify_email.backToLogin", "Go to Login")}
+                                                {t("verifyEmail.backToLogin", "Go to Login")}
                                             </Link>
                                         </Button>
                                     </div>

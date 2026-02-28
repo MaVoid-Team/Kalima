@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
 
     const formSchema = React.useMemo(() => {
         return z.object({
-            email: z.string().min(1, { message: t("validation.required") }).email({ message: t("validation.email_invalid") }),
+            email: z.string().min(1, { message: t("validation.required") }).email({ message: t("validation.emailInvalid") }),
         });
     }, [t]);
 

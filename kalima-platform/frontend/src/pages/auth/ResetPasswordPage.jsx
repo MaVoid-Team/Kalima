@@ -46,10 +46,10 @@ export default function ResetPasswordPage() {
 
     const formSchema = React.useMemo(() => {
         return z.object({
-            password: z.string().min(6, { message: t("validation.password_min") }),
-            confirmPassword: z.string().min(6, { message: t("validation.password_min") }),
+            password: z.string().min(6, { message: t("validation.passwordMin") }),
+            confirmPassword: z.string().min(6, { message: t("validation.passwordMin") }),
         }).refine((data) => data.password === data.confirmPassword, {
-            message: t("validation.password_mismatch"),
+            message: t("validation.passwordMismatch"),
             path: ["confirmPassword"],
         });
     }, [t]);
@@ -79,7 +79,7 @@ export default function ResetPasswordPage() {
         <div className="container relative flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-1 lg:px-0 min-h-[calc(100vh-4rem)] py-8">
             <div className="lg:p-8 w-full">
                 <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                    <Card className="border-0 shadow-none sm:border sm:shadow-sm">
+                    <Card className="border-0 p-1 shadow-none sm:border sm:shadow-sm">
                         <CardHeader>
                             <CardTitle className="text-2xl">{t("resetPassword.title", "Reset Password")}</CardTitle>
                             <CardDescription>{t("resetPassword.description", "Enter your new password below.")}</CardDescription>
