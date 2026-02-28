@@ -35,8 +35,11 @@
     "update": "تحديث",
     "pagination": {
       "previous": "السابق",
-      "next": "التالي"
+      "next": "التالي",
+      "page": "صفحة",
+      "of": "من"
     },
+    "refresh": "تحديث",
     "export": {
       "success": "تم التصدير بنجاح"
     }
@@ -211,6 +214,7 @@
       "title": "العنوان",
       "type": "النوع",
       "price": "السعر",
+      "rating": "التقييم",
       "categories": "الفئات",
       "status": "الحالة",
       "actions": "الإجراءات"
@@ -343,10 +347,18 @@
       "sampleUpdateError": "فشل في تحديث العينة. يرجى المحاولة مرة أخرى.",
       "sampleRemoved": "تم حذف العينة بنجاح!",
       "sampleRemoveError": "فشل في حذف العينة. يرجى المحاولة مرة أخرى.",
-      "confirmRemoveSampleTitle": "حذف العينة",
-      "confirmRemoveSampleDescription": "هل أنت متأكد من حذف ملف العينة هذا؟ لا يمكن التراجع عن هذا الإجراء وسيمحو العينة نهائياً من هذا المنتج.",
+      "confirmRemoveSampleTitle": "إزالة العينة",
+      "confirmRemoveSampleDescription": "هل أنت متأكد من إزالة ملف العينة هذا؟ لا يمكن التراجع عن هذا الإجراء وسيمحو العينة نهائياً من هذا المنتج.",
       "uploading": "جاري الرفع...",
-      "processing": "جاري المعالجة..."
+      "processing": "جاري المعالجة...",
+      "reviews": {
+        "noReviews": "لا توجد مراجعات بعد",
+        "noReviewsDescription": "هذا المنتج لم يتلق أي مراجعات من العملاء بعد.",
+        "totalReviews": "إجمالي المراجعات",
+        "deleteConfirm": "هل أنت متأكد من حذف هذه المراجعة؟",
+        "deleteSuccess": "تم حذف المراجعة بنجاح",
+        "anonymousUser": "مستخدم مجهول"
+      }
     }
   },
   "samples": {

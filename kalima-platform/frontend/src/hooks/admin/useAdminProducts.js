@@ -64,7 +64,11 @@ export const useAdminProducts = () => {
             });
 
             if (data?.success) {
-                setProducts(data.data ?? []);
+                setProducts(data.data?.map(product => ({
+                    ...product,
+                    rate: product.averageRating || 0,
+                    rate_count: product.reviewCount || 0
+                })) ?? []);
                 setPagination(prev => ({
                     ...prev,
                     total: data.total ?? prev.total,
@@ -305,6 +309,36 @@ export const useAdminProducts = () => {
         setPagination(prev => ({ ...prev, page }));
     }, []);
 
+    // ─── Review Management ────────────────────────────────────────
+
+    const fetchProductReviews = useCallback(async (productId, page = 1, limit = 10) => {
+        try {
+            const query = new URLSearchParams({ page, limit });
+            const data = await fetchApi({
+                endpoint: `/products/${productId}/reviews?${query.toString()}`,
+                method: 'get'
+            });
+            return data;
+        } catch (error) {
+            console.error('Failed to fetch product reviews:', error);
+            throw error;
+        }
+    }, [fetchApi]);
+
+    const deleteReview = useCallback(async (productId, reviewId) => {
+        try {
+            const data = await fetchApi({
+                endpoint: `/products/${productId}/reviews/${reviewId}`,
+                method: 'delete',
+                defaultSuccessMessage: 'Review deleted successfully'
+            });
+            return data;
+        } catch (error) {
+            console.error('Failed to delete review:', error);
+            throw error;
+        }
+    }, [fetchApi]);
+
     // ─────────────────────────────────────────────────────────────────────────
 
     return {
@@ -351,6 +385,10 @@ export const useAdminProducts = () => {
         fetchAllSamples,
         updateProductSample,
         removeProductSample,
+
+        // Reviews
+        fetchProductReviews,
+        deleteReview,
 
         // Filter Setters
         setSearch,

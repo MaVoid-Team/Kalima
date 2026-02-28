@@ -89,6 +89,8 @@ export default function ProductGrid({
                         image: getImageUrl(product.thumbnail_image?.url) || product.image,
                         price: product.price,
                         isPurchased: product.isPurchased,
+                        rate: product.rate,
+                        rate_count: product.rate_count,
                     };
                     return (
                         <motion.div
