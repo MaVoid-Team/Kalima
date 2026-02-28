@@ -250,7 +250,8 @@
       "categories": "Categories",
       "isArchived": "Archived",
       "perks": "Perks (Features)",
-      "perksPlaceholder": "e.g. Carton Cover, 200 pages, QR code"
+      "perksPlaceholder": "e.g. Carton Cover, 200 pages, QR code",
+      "perksTip": "You can use English commas (,) or Arabic commas (،) to separate perks."
     },
     "create": {
       "dialogTitle": "Create New Product",
