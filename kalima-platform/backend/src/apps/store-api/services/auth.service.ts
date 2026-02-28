@@ -162,7 +162,7 @@ class AuthService {
     if (user.email) {
       await getEmailService().sendWelcomeOAuthEmail(user.email, {
         name: user.name,
-        role: this.formatRoleName(user.role!),
+        role: this.formatRoleName(role_enum.Teacher),
         provider: firebaseUser.provider,
         loginUrl: `${APP_URL}/login`,
       });
@@ -188,7 +188,7 @@ class AuthService {
     if (user.email) {
       await getEmailService().sendWelcomeOAuthEmail(user.email, {
         name: user.name,
-        role: this.formatRoleName(user.role!),
+        role: this.formatRoleName(role_enum.Student),
         provider: firebaseUser.provider,
         loginUrl: `${APP_URL}/login`,
       });
@@ -214,7 +214,7 @@ class AuthService {
     if (user.email) {
       await getEmailService().sendWelcomeOAuthEmail(user.email, {
         name: user.name,
-        role: this.formatRoleName(user.role!),
+        role: this.formatRoleName(role_enum.Parent),
         provider: firebaseUser.provider,
         loginUrl: `${APP_URL}/login`,
       });
@@ -240,7 +240,7 @@ class AuthService {
     if (user.email) {
       await getEmailService().sendWelcomeOAuthEmail(user.email, {
         name: user.name,
-        role: this.formatRoleName(user.role!),
+        role: this.formatRoleName(role_enum.Lecturer),
         provider: firebaseUser.provider,
         loginUrl: `${APP_URL}/login`,
       });
@@ -588,7 +588,11 @@ class AuthService {
 
     // Send welcome email
     const loginUrl = `${APP_URL}/login`;
-    const roleName = this.formatRoleName(verificationToken.users.role!);
+    // Use scalar role field; fall back to first user_role entry if null
+    const userRole =
+      (verificationToken.users as any).role ??
+      (verificationToken.users as any).user_roles?.[0]?.role;
+    const roleName = userRole ? this.formatRoleName(userRole) : "Member";
 
     if (verificationToken.users.email) {
       await emailService.sendWelcomeEmail(verificationToken.users.email, {

@@ -6,12 +6,13 @@ export interface WelcomeOAuthEmailData {
 }
 
 export function getWelcomeOAuthEmailSubject(): string {
-  return 'Welcome to Kalima Platform!';
+  return "Welcome to Kalima Platform!";
 }
 
 export function getWelcomeOAuthEmailHtml(data: WelcomeOAuthEmailData): string {
   // Capitalize provider name for display
-  const displayProvider = data.provider.charAt(0).toUpperCase() + data.provider.slice(1);
+  const displayProvider =
+    data.provider.charAt(0).toUpperCase() + data.provider.slice(1);
 
   return `
 <!DOCTYPE html>
@@ -60,7 +61,7 @@ export function getWelcomeOAuthEmailHtml(data: WelcomeOAuthEmailData): string {
                   <td align="center" style="padding: 20px 0;">
                     <a href="${data.loginUrl}" 
                        style="display: inline-block; padding: 16px 40px; background-color: #10B981; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px;">
-                      Go to Dashboard
+                      🚀 Go to My Dashboard
                     </a>
                   </td>
                 </tr>
@@ -90,7 +91,8 @@ export function getWelcomeOAuthEmailHtml(data: WelcomeOAuthEmailData): string {
 }
 
 export function getWelcomeOAuthEmailText(data: WelcomeOAuthEmailData): string {
-  const displayProvider = data.provider.charAt(0).toUpperCase() + data.provider.slice(1);
+  const displayProvider =
+    data.provider.charAt(0).toUpperCase() + data.provider.slice(1);
 
   return `
 Welcome to Kalima Platform!
