@@ -33,5 +33,5 @@ export function isRedisAvailable(): boolean {
 }
 
 export async function closeRedis(): Promise<void> {
-  if (redis) await redis.quit();
+  if (redis) redis.disconnect();
 }
