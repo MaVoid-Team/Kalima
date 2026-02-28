@@ -170,7 +170,7 @@ Retrieve a single user with all their roles and profile data.
 
 ### Delete User
 
-Permanently deletes a user account. Admin/SubAdmin cannot delete their own account via this endpoint.
+Permanently deletes a user account (performs a **soft-delete** and anonymization of personal details in the database to retain order history). Admin/SubAdmin cannot delete their own account via this endpoint.
 
 **Endpoint:** `DELETE /users/:userId`  
 **Auth Required:** Yes (Admin / SubAdmin)

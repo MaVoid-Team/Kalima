@@ -106,9 +106,9 @@ Returns the authenticated user's active cart with all items, product details, an
 
 **Error Responses:**
 
-| Status | Message                 | Condition                          |
-| ------ | ----------------------- | ---------------------------------- |
-| 404    | `Active cart not found` | User has no active cart            |
+| Status | Message                 | Condition               |
+| ------ | ----------------------- | ----------------------- |
+| 404    | `Active cart not found` | User has no active cart |
 
 ---
 
@@ -137,8 +137,8 @@ Adds a product to the cart. If the product already exists, increments the quanti
 
 **File Fields:**
 
-| Field   | Type  | Description                                      |
-| ------- | ----- | ------------------------------------------------ |
+| Field   | Type  | Description                                       |
+| ------- | ----- | ------------------------------------------------- |
 | `image` | image | Required field image (for image-type fields only) |
 
 > **Note:** `productId` is also accepted as an alias for `product_id`.
@@ -162,10 +162,10 @@ Adds a product to the cart. If the product already exists, increments the quanti
 
 **Error Responses:**
 
-| Status | Message              | Condition            |
-| ------ | -------------------- | -------------------- |
-| 404    | `Product not found`  | Invalid product_id   |
-| 422    | Validation errors    | Invalid body         |
+| Status | Message             | Condition          |
+| ------ | ------------------- | ------------------ |
+| 404    | `Product not found` | Invalid product_id |
+| 422    | Validation errors   | Invalid body       |
 
 ---
 
@@ -204,16 +204,16 @@ Updates the quantity of a cart item.
 
 **Error Responses:**
 
-| Status | Message                                 | Condition                    |
-| ------ | --------------------------------------- | ---------------------------- |
-| 404    | `Cart item not found in user's cart`    | Item doesn't exist or wrong cart |
-| 422    | Validation errors                       | Invalid body                 |
+| Status | Message                              | Condition                        |
+| ------ | ------------------------------------ | -------------------------------- |
+| 404    | `Cart item not found in user's cart` | Item doesn't exist or wrong cart |
+| 422    | Validation errors                    | Invalid body                     |
 
 ---
 
 ### Remove Item from Cart
 
-Removes a single item from the cart and recalculates totals.
+Removes a single item from the cart and recalculates totals. This performs a **soft delete** internally (sets `deleted_at`).
 
 **Endpoint:** `DELETE /items/:itemId`  
 **Auth Required:** Yes
@@ -235,15 +235,15 @@ Removes a single item from the cart and recalculates totals.
 
 **Error Responses:**
 
-| Status | Message                                 | Condition                    |
-| ------ | --------------------------------------- | ---------------------------- |
-| 404    | `Cart item not found in user's cart`    | Item doesn't exist or wrong cart |
+| Status | Message                              | Condition                        |
+| ------ | ------------------------------------ | -------------------------------- |
+| 404    | `Cart item not found in user's cart` | Item doesn't exist or wrong cart |
 
 ---
 
 ### Clear Cart
 
-Removes all items from the active cart.
+Removes all items from the active cart. This performs a **soft delete** internally (sets `deleted_at`), retaining the items in the database for history but removing them from the user's active view.
 
 **Endpoint:** `DELETE /`  
 **Auth Required:** Yes
@@ -296,14 +296,14 @@ Applies a coupon code to a specific cart item. Each coupon can only be applied t
 
 **Error Responses:**
 
-| Status | Message                                                      | Condition                              |
-| ------ | ------------------------------------------------------------ | -------------------------------------- |
-| 400    | `couponCode and itemId are required`                         | Missing required fields                |
-| 400    | `Invalid coupon code`                                        | Coupon not found, expired, or inactive |
+| Status | Message                                                       | Condition                              |
+| ------ | ------------------------------------------------------------- | -------------------------------------- |
+| 400    | `couponCode and itemId are required`                          | Missing required fields                |
+| 400    | `Invalid coupon code`                                         | Coupon not found, expired, or inactive |
 | 400    | `This coupon is already applied to another item in your cart` | Same coupon on different item          |
-| 400    | `This item already has a coupon applied`                     | Item already has a coupon              |
-| 400    | `You have already used this coupon`                          | Coupon already used by this user       |
-| 404    | `Cart item not found in user's cart`                         | Invalid itemId                         |
+| 400    | `This item already has a coupon applied`                      | Item already has a coupon              |
+| 400    | `You have already used this coupon`                           | Coupon already used by this user       |
+| 404    | `Cart item not found in user's cart`                          | Invalid itemId                         |
 
 ---
 
@@ -330,9 +330,9 @@ Removes the coupon from a cart item and resets the discount to 0.
 
 **Error Responses:**
 
-| Status | Message                                 | Condition                    |
-| ------ | --------------------------------------- | ---------------------------- |
-| 404    | `Cart item not found in user's cart`    | Invalid itemId               |
+| Status | Message                              | Condition      |
+| ------ | ------------------------------------ | -------------- |
+| 404    | `Cart item not found in user's cart` | Invalid itemId |
 
 ---
 
@@ -372,12 +372,12 @@ Updates the required field values for a cart item (excluding images). Replaces a
 
 **Error Responses:**
 
-| Status | Message                                          | Condition                       |
-| ------ | ------------------------------------------------ | ------------------------------- |
-| 400    | `Cart item does not belong to user's cart`       | Wrong user                      |
-| 400    | `Field X requires an image upload via...`        | Trying to upload image via JSON |
-| 404    | `Cart item not found`                            | Invalid cart_item_id            |
-| 422    | Validation errors                                | Invalid body                    |
+| Status | Message                                    | Condition                       |
+| ------ | ------------------------------------------ | ------------------------------- |
+| 400    | `Cart item does not belong to user's cart` | Wrong user                      |
+| 400    | `Field X requires an image upload via...`  | Trying to upload image via JSON |
+| 404    | `Cart item not found`                      | Invalid cart_item_id            |
+| 422    | Validation errors                          | Invalid body                    |
 
 ---
 
@@ -391,11 +391,11 @@ Uploads and sets a single required image field for a cart item.
 
 **Form Data Fields:**
 
-| Field                          | Type   | Description                                     |
-| ------------------------------ | ------ | ----------------------------------------------- |
-| `cart_item_id`                 | number | The ID of the cart item (required)              |
-| `required_field_definition_id` | number | The field definition ID for this image (required)|
-| `image`                        | File   | The actual image file (required)                |
+| Field                          | Type   | Description                                       |
+| ------------------------------ | ------ | ------------------------------------------------- |
+| `cart_item_id`                 | number | The ID of the cart item (required)                |
+| `required_field_definition_id` | number | The field definition ID for this image (required) |
+| `image`                        | File   | The actual image file (required)                  |
 
 **Success Response (200):**
 
@@ -407,13 +407,12 @@ Uploads and sets a single required image field for a cart item.
 
 **Error Responses:**
 
-| Status | Message                                          | Condition                       |
-| ------ | ------------------------------------------------ | ------------------------------- |
-| 400    | `Image file is required`                         | No file uploaded                |
-| 400    | `Field X is not an image type`                   | Target field is text            |
-| 404    | `Required field definition not found`            | Invalid definition ID           |
-| 404    | `Cart item not found`                            | Invalid cart item ID            |
-
+| Status | Message                               | Condition             |
+| ------ | ------------------------------------- | --------------------- |
+| 400    | `Image file is required`              | No file uploaded      |
+| 400    | `Field X is not an image type`        | Target field is text  |
+| 404    | `Required field definition not found` | Invalid definition ID |
+| 404    | `Cart item not found`                 | Invalid cart item ID  |
 
 ---
 
@@ -436,10 +435,7 @@ Returns checkout requirements based on the cart contents. It checks all items ag
   "data": {
     "hasBooks": true,
     "requiredFields": {
-      "common": [
-        "numberTransferredFrom",
-        "paymentScreenShot"
-      ],
+      "common": ["numberTransferredFrom", "paymentScreenShot"],
       "itemsMissingFields": [
         {
           "cart_item_id": 35,
@@ -462,9 +458,9 @@ Returns checkout requirements based on the cart contents. It checks all items ag
 
 **Error Responses:**
 
-| Status | Message                 | Condition              |
-| ------ | ----------------------- | ---------------------- |
-| 404    | `Active cart not found` | No active cart         |
+| Status | Message                 | Condition      |
+| ------ | ----------------------- | -------------- |
+| 404    | `Active cart not found` | No active cart |
 
 ---
 
@@ -543,15 +539,15 @@ Processes the cart checkout: validates items & required fields, uploads payment 
 
 **Error Responses:**
 
-| Status | Message                                                                   | Condition                              |
-| ------ | ------------------------------------------------------------------------- | -------------------------------------- |
-| 400    | `Cart is empty`                                                           | No items in cart                       |
-| 400    | `Cart item for product X is missing required fields: ...`                 | Missing required fields for a product  |
-| 400    | `Payment method is required`                                              | No payment_method_id                   |
-| 400    | `Payment screenshot is required`                                          | No file uploaded                       |
-| 400    | `Invalid or inactive payment method`                                      | Payment method not found or inactive   |
-| 404    | `Active cart not found`                                                   | No active cart                         |
-| 404    | `User not found`                                                          | Invalid user                           |
+| Status | Message                                                   | Condition                             |
+| ------ | --------------------------------------------------------- | ------------------------------------- |
+| 400    | `Cart is empty`                                           | No items in cart                      |
+| 400    | `Cart item for product X is missing required fields: ...` | Missing required fields for a product |
+| 400    | `Payment method is required`                              | No payment_method_id                  |
+| 400    | `Payment screenshot is required`                          | No file uploaded                      |
+| 400    | `Invalid or inactive payment method`                      | Payment method not found or inactive  |
+| 404    | `Active cart not found`                                   | No active cart                        |
+| 404    | `User not found`                                          | Invalid user                          |
 
 ---
 
@@ -620,7 +616,6 @@ Uploads a required image field for the item in the Fast Buy cart. Identical to t
 **Auth Required:** Yes  
 **Content-Type:** `multipart/form-data`
 
-
 ---
 
 ### Apply Coupon to Fast Buy
@@ -628,7 +623,7 @@ Uploads a required image field for the item in the Fast Buy cart. Identical to t
 Applies a coupon to the item in the Fast Buy cart.
 
 **Endpoint:** `POST /fast-buy/items/coupon`  
-**Auth Required:** Yes  
+**Auth Required:** Yes
 
 ---
 
@@ -656,10 +651,10 @@ Processes the final checkout for the Fast Buy cart.
 
 ### Cart Status
 
-| Value          | Description                   |
-| -------------- | ----------------------------- |
-| `active`       | Active cart, in use           |
-| `checked_out`  | Cart has been checked out     |
+| Value         | Description               |
+| ------------- | ------------------------- |
+| `active`      | Active cart, in use       |
+| `checked_out` | Cart has been checked out |
 
 ### Cart Object
 
@@ -739,12 +734,12 @@ Processes the final checkout for the Fast Buy cart.
 
 ## Error Codes
 
-| Status | Error Type          | Description                                             |
-| ------ | ------------------- | ------------------------------------------------------- |
-| 400    | `BadRequestError`   | Invalid input, empty cart, duplicate coupon, etc.        |
-| 401    | `UnauthorizedError` | Missing or invalid authorization token                  |
-| 404    | `NotFoundError`     | Cart, cart item, or product not found                   |
-| 422    | `ValidationError`   | DTO validation failed — returns `errors` array          |
+| Status | Error Type          | Description                                       |
+| ------ | ------------------- | ------------------------------------------------- |
+| 400    | `BadRequestError`   | Invalid input, empty cart, duplicate coupon, etc. |
+| 401    | `UnauthorizedError` | Missing or invalid authorization token            |
+| 404    | `NotFoundError`     | Cart, cart item, or product not found             |
+| 422    | `ValidationError`   | DTO validation failed — returns `errors` array    |
 
 ### Error Response Format
 
