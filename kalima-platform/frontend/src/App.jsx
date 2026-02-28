@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet } from "react-router-dom";
 import { useEffect, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
@@ -67,7 +67,7 @@ const PageLoader = () => (
   </div>
 );
 
-function App() {
+function Root() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
@@ -78,70 +78,80 @@ function App() {
   return (
     <ErrorBoundary>
       <Suspense fallback={<PageLoader />}>
-        <Routes>
-          {/* Public Routes with MainLayout (Navbar & Footer) */}
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/market" element={<MarketPage />} />
-            <Route path="/samples" element={<SamplesDirectoryPage />} />
-            <Route path="/samples/:id" element={<SamplePage />} />
-            <Route path="/samples/:id/preview" element={<SamplePreview />} />
-            <Route path="/product/:id" element={<ProductDetailsPage />} />
-            <Route path="/booklet/:id" element={<BookletDetailsPage />} />
-
-            {/* Protected Routes inside MainLayout */}
-            <Route element={<ProtectedRoute requireAuth={true} />}>
-              <Route path="/cart" element={<WizardCheckoutPage />} />
-              <Route path="/checkout" element={<WizardCheckoutPage />} />
-              <Route path="/orders" element={<MyOrdersPage />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route
-                path="/fast-buy/checkout"
-                element={<FastBuyCheckoutPage />}
-              />
-            </Route>
-
-            {/* 404 Fallback */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
-          {/* Admin Routes */}
-          <Route element={<AdminRoute />}>
-            <Route element={<AdminLayout />}>
-              <Route path="/admin/orders" element={<OrdersPage />} />
-              <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
-              <Route path="/admin/products" element={<ProductsPage />} />
-              <Route path="/admin/products/create" element={<CreateProductPage />} />
-              <Route path="/admin/products/:id" element={<ProductDetailPage />} />
-              <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
-              <Route path="/admin/categories" element={<CategoriesPage />} />
-              <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
-              <Route path="/admin/required-fields" element={<RequiredFieldsPage />} />
-              <Route path="/admin/users" element={<UsersPage />} />
-              <Route path="/admin/users/:id" element={<UserDetailPage />} />
-              <Route path="/admin/samples" element={<AdminSamplesPage />} />
-              <Route path="/admin/coupons" element={<CouponsPage />} />
-              <Route path="/admin/settings" element={<SettingsPage />} />
-            </Route>
-          </Route>
-
-          {/* Guest-only routes with AuthLayout (No Navbar/Footer) */}
-          <Route element={<MainLayout />}>
-            <Route element={<ProtectedRoute requireAuth={false} />}>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route
-                path="/auth/reset-password"
-                element={<ResetPasswordPage />}
-              />
-              <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
-            </Route>
-          </Route>
-        </Routes>
+        <Outlet />
       </Suspense>
     </ErrorBoundary>
   );
+}
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route element={<Root />}>
+      {/* Public Routes with MainLayout (Navbar & Footer) */}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/market" element={<MarketPage />} />
+        <Route path="/samples" element={<SamplesDirectoryPage />} />
+        <Route path="/samples/:id" element={<SamplePage />} />
+        <Route path="/samples/:id/preview" element={<SamplePreview />} />
+        <Route path="/product/:id" element={<ProductDetailsPage />} />
+        <Route path="/booklet/:id" element={<BookletDetailsPage />} />
+
+        {/* Protected Routes inside MainLayout */}
+        <Route element={<ProtectedRoute requireAuth={true} />}>
+          <Route path="/cart" element={<WizardCheckoutPage />} />
+          <Route path="/checkout" element={<WizardCheckoutPage />} />
+          <Route path="/orders" element={<MyOrdersPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route
+            path="/fast-buy/checkout"
+            element={<FastBuyCheckoutPage />}
+          />
+        </Route>
+
+        {/* 404 Fallback */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+      {/* Admin Routes */}
+      <Route element={<AdminRoute />}>
+        <Route element={<AdminLayout />}>
+          <Route path="/admin/orders" element={<OrdersPage />} />
+          <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
+          <Route path="/admin/products" element={<ProductsPage />} />
+          <Route path="/admin/products/create" element={<CreateProductPage />} />
+          <Route path="/admin/products/:id" element={<ProductDetailPage />} />
+          <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
+          <Route path="/admin/categories" element={<CategoriesPage />} />
+          <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
+          <Route path="/admin/required-fields" element={<RequiredFieldsPage />} />
+          <Route path="/admin/users" element={<UsersPage />} />
+          <Route path="/admin/users/:id" element={<UserDetailPage />} />
+          <Route path="/admin/samples" element={<AdminSamplesPage />} />
+          <Route path="/admin/coupons" element={<CouponsPage />} />
+          <Route path="/admin/settings" element={<SettingsPage />} />
+        </Route>
+      </Route>
+
+      {/* Guest-only routes with AuthLayout (No Navbar/Footer) */}
+      <Route element={<MainLayout />}>
+        <Route element={<ProtectedRoute requireAuth={false} />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route
+            path="/auth/reset-password"
+            element={<ResetPasswordPage />}
+          />
+          <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+        </Route>
+      </Route>
+    </Route>
+  )
+);
+
+function App() {
+  return <RouterProvider router={router} />;
 }
 
 export default App;
