@@ -344,19 +344,6 @@ export default function ProductDetailPage() {
                     </div>
                 )}
             </div>
-
-            {/* Edit Dialog */}
-            <EditProductDialog
-                product={product}
-                open={editOpen}
-                onOpenChange={setEditOpen}
-                onSuccess={refresh}
-                fieldDefinitions={fieldDefinitions}
-                onLoadDefinitions={fetchFieldDefinitions}
-                onAttachField={(productId, fields) => attachRequiredFields(productId, fields)}
-                onDetachField={(productId, fieldDefinitionId) => detachRequiredField(productId, fieldDefinitionId)}
-            />
-
             <EditCouponDialog
                 open={editCouponOpen}
                 onOpenChange={(openState) => {

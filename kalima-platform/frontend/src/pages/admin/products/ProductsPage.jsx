@@ -241,14 +241,6 @@ export default function ProductsPage() {
                 </div>
             )}
 
-            {/* Edit Dialog */}
-            <EditProductDialog
-                product={editProduct}
-                open={editOpen}
-                onOpenChange={setEditOpen}
-                onSuccess={load}
-            />
-
             {/* Delete Confirmation Dialog */}
             <DeleteProductDialog
                 open={deleteOpen}
