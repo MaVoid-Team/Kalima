@@ -29,7 +29,7 @@ export const useAccountProviders = () => {
     // Check if user has OAuth providers (not local)
     const hasOAuthProviders = linkedProviders.some(p => p.provider !== 'local');
     const hasLocalProvider = linkedProviders.some(p => p.provider === 'local');
-    const hasFirebaseProvider = linkedProviders.some(p => p.provider === 'firebase');
+    const hasFirebaseProvider = linkedProviders.some(p => ['firebase', 'google'].includes(p.provider));
 
     return {
         linkedProviders,

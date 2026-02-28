@@ -13,12 +13,12 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { providerIcons } from './ProviderIcons';
 
-export default function ConfirmUnlinkDialog({ 
-    open, 
-    onOpenChange, 
-    onConfirm, 
-    loading, 
-    provider 
+export default function ConfirmUnlinkDialog({
+    open,
+    onOpenChange,
+    onConfirm,
+    loading,
+    provider
 }) {
     const { t } = useTranslation('admin');
 
@@ -38,7 +38,7 @@ export default function ConfirmUnlinkDialog({
                         {t('settings.account.confirmUnlink')}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                
+
                 <div className="py-4">
                     <div className="flex items-center gap-3 p-3 border rounded-lg bg-muted/50">
                         {typeof IconComponent === 'function' ? (
@@ -48,9 +48,11 @@ export default function ConfirmUnlinkDialog({
                         )}
                         <div className="flex-1">
                             <p className="font-medium">
-                                {provider.provider === 'local' 
+                                {provider.provider === 'local'
                                     ? t('settings.account.providers.local', 'Email Account')
-                                    : t(`settings.account.providers.${provider.provider}`, provider.provider)
+                                    : ['firebase', 'google'].includes(provider.provider)
+                                        ? t('settings.account.providers.google', 'Google')
+                                        : t(`settings.account.providers.${provider.provider}`, provider.provider)
                                 }
                             </p>
                             <p className="text-sm text-muted-foreground">
@@ -61,7 +63,7 @@ export default function ConfirmUnlinkDialog({
                             {t('settings.account.connected', 'Connected')}
                         </Badge>
                     </div>
-                    
+
                     <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
                         <div className="flex items-start gap-2">
                             <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />

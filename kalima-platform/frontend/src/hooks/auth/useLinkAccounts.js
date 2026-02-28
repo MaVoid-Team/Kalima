@@ -27,7 +27,7 @@ const useLinkAccounts = () => {
                 method: 'get',
                 endpoint: '/auth/linked-providers'
             });
-            return responseData?.linkedProviders || responseData?.data?.linkedProviders || [];
+            return responseData?.linkedProviders || (Array.isArray(responseData?.data) ? responseData.data : responseData?.data?.linkedProviders) || [];
         } catch (err) {
             return [];
         }

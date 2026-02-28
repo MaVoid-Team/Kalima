@@ -17,15 +17,15 @@ export default function AccountSection() {
     const { t, i18n } = useTranslation('admin');
     const { user } = useAuth();
     const { linkFirebaseAccount, unlinkProvider } = useLinkAccounts();
-    const { 
-        linkedProviders, 
-        loading, 
+    const {
+        linkedProviders,
+        loading,
         refreshProviders,
         hasOAuthProviders,
         hasLocalProvider,
-        hasFirebaseProvider 
+        hasFirebaseProvider
     } = useAccountProviders();
-    
+
     const [showUnlinkDialog, setShowUnlinkDialog] = useState(false);
     const [selectedProvider, setSelectedProvider] = useState(null);
     const [isLinkingFirebase, setIsLinkingFirebase] = useState(false);
@@ -35,7 +35,7 @@ export default function AccountSection() {
         try {
             // Initiate Firebase OAuth flow and get ID token
             const idToken = await getFirebaseIdToken();
-            
+
             // Link the Firebase account to the user's profile
             await linkFirebaseAccount(idToken);
             refreshProviders();
@@ -77,7 +77,7 @@ export default function AccountSection() {
                 {/* Linked Providers */}
                 <div className="space-y-4">
                     <h3 className="text-sm font-medium">{t('settings.account.linkedProviders')}</h3>
-                    
+
                     {linkedProviders.length === 0 ? (
                         <div className="text-center py-8 border-2 border-dashed border-muted rounded-lg">
                             <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -102,9 +102,11 @@ export default function AccountSection() {
                                             )}
                                             <div>
                                                 <p className="font-medium">
-                                                    {provider.provider === 'local' 
+                                                    {provider.provider === 'local'
                                                         ? t('settings.account.providers.local', 'Email Account')
-                                                        : t(`settings.account.providers.${provider.provider}`, provider.provider)
+                                                        : ['firebase', 'google'].includes(provider.provider)
+                                                            ? t('settings.account.providers.google', 'Google')
+                                                            : t(`settings.account.providers.${provider.provider}`, provider.provider)
                                                     }
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
@@ -140,7 +142,7 @@ export default function AccountSection() {
                 {/* Link New Accounts */}
                 <div className="space-y-4">
                     <h3 className="text-sm font-medium">{t('settings.account.linkNewAccount')}</h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {!hasFirebaseProvider && (
                             <Button
@@ -150,13 +152,13 @@ export default function AccountSection() {
                                 className="flex items-center gap-2"
                             >
                                 <GoogleIcon className="h-4 w-4" />
-                                {isLinkingFirebase 
-                                    ? t('common.loading') 
+                                {isLinkingFirebase
+                                    ? t('common.loading')
                                     : t('settings.account.linkFirebase', 'Link Google Account')
                                 }
                             </Button>
                         )}
-                        
+
                         {!hasLocalProvider && hasOAuthProviders && (
                             <Button
                                 variant="outline"
@@ -168,7 +170,7 @@ export default function AccountSection() {
                             </Button>
                         )}
                     </div>
-                    
+
                     <p className="text-sm text-muted-foreground">
                         {t('settings.account.linkDescription', 'Link additional accounts to enable multiple login methods.')}
                     </p>
