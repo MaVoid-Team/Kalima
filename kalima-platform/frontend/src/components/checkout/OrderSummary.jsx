@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import OrderItem from "./OrderItem";
 
 import PricingSummary from "./PricingSummary";
-import { Lock, Heart, FileText } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 export default function OrderSummary({ items, pricing, onPay }) {
@@ -28,11 +27,6 @@ export default function OrderSummary({ items, pricing, onPay }) {
 
                 <PricingSummary pricing={pricing} onPay={onPay} />
             </CardContent>
-            <CardFooter className="flex justify-center gap-4 pt-4 border-t">
-                <Lock className="w-5 h-5 text-muted-foreground" />
-                <Heart className="w-5 h-5 text-muted-foreground" />
-                <FileText className="w-5 h-5 text-muted-foreground" />
-            </CardFooter>
         </Card>
     );
 }

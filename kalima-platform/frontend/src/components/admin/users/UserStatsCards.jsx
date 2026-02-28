@@ -59,11 +59,17 @@ export default function UserStatsCards() {
             value: adminCount,
             icon: Shield,
             color: "text-chart-4"
-        }
+        },
+        {
+            title: t('stats.moderators', 'Moderators'),
+            value: userStats.byRole?.Moderator || 0,
+            icon: GraduationCap,
+            color: "text-chart-2"
+        },
     ];
 
     return (
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-4 mb-6">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-5 lg:grid-cols-5 mb-6">
             {stats.map((stat, i) => (
                 <Card key={i} className="shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
