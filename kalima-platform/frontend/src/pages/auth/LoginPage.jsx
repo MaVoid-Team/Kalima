@@ -43,7 +43,7 @@ export default function LoginPage() {
 
     const formSchema = React.useMemo(() => {
         return z.object({
-            email: z.string().min(1, { message: t("validation.required") }).email({ message: t("validation.email_invalid") }),
+            email: z.string().min(1, { message: t("validation.required") }).email({ message: t("validation.emailInvalid") }),
             password: z.string().min(1, { message: t("validation.required") }),
         });
     }, [t]);
