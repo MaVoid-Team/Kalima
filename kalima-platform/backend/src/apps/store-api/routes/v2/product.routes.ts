@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { productController } from "../../controllers/product.controller";
+import { reviewController } from "../../controllers/review.controller";
 import {
   authenticateToken,
   optionalAuthenticateToken,
@@ -11,7 +12,7 @@ import {
   uploadProductWithSample,
   uploadProductUpdate,
 } from "../../middleware/upload.middleware";
-import { role_enum } from "../../generated/prisma/client";
+import { role_enum, portal_enum } from "../../generated/prisma/client";
 import { makeExportHandler } from "../../export";
 
 const router = Router();
@@ -19,6 +20,14 @@ const router = Router();
 const adminAuth = [
   authenticateToken,
   requireRole([role_enum.Admin, role_enum.SubAdmin]),
+];
+
+const storeCustomerAuth = [
+  authenticateToken,
+  requireRole(
+    [role_enum.Teacher, role_enum.Student, role_enum.Parent],
+    portal_enum.store,
+  ),
 ];
 
 // ============================================
@@ -32,6 +41,28 @@ router.get("/:id/coupons", productController.getProductCoupons);
 router.get("/:id/thumbnail", productController.getThumbnail);
 router.get("/:id/gallery", productController.getGallery);
 router.get("/:id/required-fields", productController.getProductRequiredFields);
+
+// ============================================
+// REVIEWS — public list, auth for create/update/delete
+// ============================================
+
+router.get("/:id/reviews", reviewController.getProductReviews);
+router.get(
+  "/:id/reviews/can-review",
+  authenticateToken,
+  reviewController.checkCanReview,
+);
+router.post("/:id/reviews", ...storeCustomerAuth, reviewController.createReview);
+router.patch(
+  "/:id/reviews/:reviewId",
+  authenticateToken,
+  reviewController.updateReview,
+);
+router.delete(
+  "/:id/reviews/:reviewId",
+  authenticateToken,
+  reviewController.deleteReview,
+);
 
 // ============================================
 // ADMIN / SUBADMIN — product CRUD

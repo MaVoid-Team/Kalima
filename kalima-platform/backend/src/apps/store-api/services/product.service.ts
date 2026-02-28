@@ -18,6 +18,7 @@ import {
   NotFoundError,
   ConflictError,
 } from "../../../libs/errors";
+import { reviewService } from "./review.service";
 
 // ============================================
 // SHARED INCLUDES
@@ -219,19 +220,27 @@ class ProductService {
       purchasedProductIds = new Set(purchases.map((p) => p.product_id));
     }
 
-    const productsWithPurchased = data.map((product) => ({
-      ...product,
-      isPurchased: purchasedProductIds.has(product.id),
-    }));
+    const productsWithExtras = await Promise.all(
+      data.map(async (product) => {
+        const { averageRating, reviewCount } =
+          await reviewService.getAggregatedRating(product.id);
+        return {
+          ...product,
+          isPurchased: purchasedProductIds.has(product.id),
+          averageRating,
+          reviewCount,
+        };
+      }),
+    );
 
-    return { data: productsWithPurchased, total, page, limit };
+    return { data: productsWithExtras, total, page, limit };
   }
 
   // ============================================
   // READ — SINGLE
   // ============================================
 
-  async getProductById(id: number): Promise<products> {
+  async getProductById(id: number): Promise<any> {
     const product = await this.db.products.findFirst({
       where: { id, deleted_at: null },
       include: PRODUCT_INCLUDE,
@@ -241,7 +250,14 @@ class ProductService {
       throw new NotFoundError("Product not found");
     }
 
-    return product;
+    const { averageRating, reviewCount } =
+      await reviewService.getAggregatedRating(id);
+
+    return {
+      ...product,
+      averageRating,
+      reviewCount,
+    };
   }
 
   // ============================================
