@@ -63,6 +63,7 @@ export default function ProductsTable({
                     <TableRow>
                         <TableHead className="w-10">
                             <Checkbox
+                                className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                 checked={products.length > 0 && selectedIds.length === products.length}
                                 onCheckedChange={onSelectAll}
                                 aria-label="Select all"
@@ -93,6 +94,7 @@ export default function ProductsTable({
                                 {/* Checkbox */}
                                 <TableCell onClick={(e) => e.stopPropagation()}>
                                     <Checkbox
+                                        className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                         checked={selectedIds.includes(product.id)}
                                         onCheckedChange={(checked) => onSelect?.(product.id, checked)}
                                         aria-label={`Select product ${product.title}`}

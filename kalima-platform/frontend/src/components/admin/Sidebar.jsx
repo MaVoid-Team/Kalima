@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, ChevronRight, Menu, X, Package, FileText, Ticket, Settings } from 'lucide-react';
+import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 
 const ADMIN_THEME_STORAGE_KEY = 'adminTheme';
@@ -42,7 +42,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
     { name: t('nav.products'), href: '/admin/products', icon: Package },
     { name: t('nav.samples'), href: '/admin/samples', icon: FileText },
     { name: t('nav.coupons'), href: '/admin/coupons', icon: Ticket },
-    { name: t('nav.categories'), href: '/admin/categories', icon: Ticket },
+    { name: t('nav.categories'), href: '/admin/categories', icon: LayoutGrid },
     { name: i18n.t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users },
     // { name: t('nav.settings'), href: '/admin/settings', icon: Settings },
   ];

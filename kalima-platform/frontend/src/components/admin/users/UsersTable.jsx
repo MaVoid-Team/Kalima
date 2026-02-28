@@ -33,18 +33,19 @@ export default function UsersTable({ users, loading, selectedIds = [], onSelect,
     if (!users?.length) {
         return (
             <div className="flex h-48 flex-col items-center justify-center border rounded-md text-muted-foreground">
-                <p>No users found matching your criteria.</p>
+                <p>{t('table.noUsersFound')}</p>
             </div>
         );
     }
 
     return (
-        <div className="rounded-md border">
+        <div className="rounded-md border custom-scrollbar">
             <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-10">
                             <Checkbox
+                                className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                 checked={users.length > 0 && selectedIds.length === users.length}
                                 onCheckedChange={onSelectAll}
                                 aria-label="Select all users"
@@ -69,6 +70,7 @@ export default function UsersTable({ users, loading, selectedIds = [], onSelect,
                         >
                             <TableCell onClick={(e) => e.stopPropagation()}>
                                 <Checkbox
+                                    className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                     checked={selectedIds.includes(user.id)}
                                     onCheckedChange={(checked) => onSelect?.(user.id, checked)}
                                     aria-label={`Select user ${user.name}`}

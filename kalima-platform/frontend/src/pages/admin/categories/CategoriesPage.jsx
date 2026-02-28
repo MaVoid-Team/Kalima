@@ -17,7 +17,7 @@ import EditCategoryModal from "@/components/admin/categories/EditCategoryModal";
 import DeleteCategoryDialog from "@/components/admin/categories/DeleteCategoryDialog";
 
 export default function CategoriesPage() {
-  const { t } = useTranslation("admin");
+  const { t, i18n } = useTranslation("admin");
   const {
     categories,
     pagination,
@@ -63,7 +63,7 @@ export default function CategoriesPage() {
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Future implementation: we can add text search if supported backend */}
         <div className="w-full sm:max-w-xs">
-          <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+          <Select dir={i18n.dir()} value={statusFilter} onValueChange={handleStatusFilterChange}>
             <SelectTrigger data-testid="categories-status-filter">
               <SelectValue placeholder={t("products.filters.allStatuses")} />
             </SelectTrigger>

@@ -19,7 +19,6 @@ import {
 
 export default function AdminSamplesPage() {
     const { t, i18n } = useTranslation('admin');
-    const isRtl = i18n.dir() === 'rtl';
     const { mutate: fetchApi, loading } = useApiMutation();
     const { exportData, loading: exportLoading, exportProgress } = useExport();
 
@@ -136,6 +135,7 @@ export default function AdminSamplesPage() {
                             <tr>
                                 <th className="ps-4 py-3 w-10">
                                     <Checkbox
+                                        className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                         checked={samples.length > 0 && selectedIds.length === samples.length}
                                         onCheckedChange={handleSelectAll}
                                         aria-label="Select all samples"
@@ -155,6 +155,7 @@ export default function AdminSamplesPage() {
                                     {/* Checkbox */}
                                     <td className="ps-4 py-3">
                                         <Checkbox
+                                            className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                             checked={selectedIds.includes(sample.id)}
                                             onCheckedChange={(checked) => handleSelect(sample.id, checked)}
                                             aria-label={`Select sample ${sample.original_name}`}
