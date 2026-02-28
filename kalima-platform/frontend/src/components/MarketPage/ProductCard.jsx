@@ -8,6 +8,7 @@ import { calculateDiscountPercentage, formatPrice } from "@/lib/storeUtils";
 import useAuth from "@/hooks/auth/useAuth";
 import { useCart } from "@/contexts/CartContext";
 import useRole from "@/hooks/useRole";
+import { useFastBuy } from "@/hooks/useFastBuy";
 
 /**
  * ProductCard — renders a single product in the market grid.
@@ -19,6 +20,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { isAdmin } = useRole();
+  const { startFastBuy, loading: fastBuyLoading } = useFastBuy();
 
   let cartCtx = null;
   try {
@@ -60,7 +62,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
       navigate("/login");
       return;
     }
-    navigate(`/fast-buy/checkout?productId=${id}`);
+    startFastBuy(id, 1);
   };
 
   return (
@@ -141,6 +143,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
             onClick={handleBuyNow}
             data-testid={`market-product-card-${id}-buy-now`}
             title={t("product.buyNow", "Buy Now")}
+            disabled={fastBuyLoading}
           >
             <Zap className="h-3.5 w-3.5 me-1.5 shrink-0" />
             {t("product.buyNow", "Buy Now")}
