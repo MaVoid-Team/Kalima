@@ -34,6 +34,8 @@ const PRODUCT_LIST_SELECT = {
   is_archived: true,
   price_after_discount: true,
   thumbnail_image: true,
+  rate: true,
+  rate_count: true,
   product_categories: {
     include: { categories: { select: { id: true, title: true } } },
   },
