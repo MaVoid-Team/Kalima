@@ -131,6 +131,10 @@ export const couponController = {
         ? parseInt(req.query.product_id as string, 10)
         : undefined;
 
+      const search = req.query.search
+        ? (req.query.search as string)
+        : undefined;
+
       const result = await couponService.getAllCoupons({
         page,
         limit,
@@ -139,6 +143,7 @@ export const couponController = {
         isAmount,
         startDate,
         endDate,
+        search,
       });
 
       res.status(200).json({
