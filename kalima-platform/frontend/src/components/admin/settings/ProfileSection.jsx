@@ -6,10 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import FileUploadProgress from './FileUploadProgress';
 import { useProfile } from '@/hooks/useProfile';
+import { getImageUrl } from '@/lib/storeUtils';
 
 export default function ProfileSection() {
     const { t, i18n } = useTranslation('admin');
@@ -107,7 +109,7 @@ export default function ProfileSection() {
                 {/* Avatar Section */}
                 <div className="flex items-center gap-4">
                     <Avatar className="h-20 w-20">
-                        <AvatarImage src={profile?.profile_pic_url} />
+                        <AvatarImage src={getImageUrl(profile?.profile_pic_url)} />
                         <AvatarFallback>
                             {profile?.name?.charAt(0)?.toUpperCase()}
                         </AvatarFallback>
@@ -189,17 +191,19 @@ export default function ProfileSection() {
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="gender">{t('settings.profile.gender')}</Label>
-                                <select
-                                    id="gender"
+                                <Select
                                     value={formData.gender}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value }))}
+                                    onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value }))}
                                     disabled={loading}
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                    <option value="">{t('common.select', 'Select')}</option>
-                                    <option value="male">{t('settings.gender.male', 'Male')}</option>
-                                    <option value="female">{t('settings.gender.female', 'Female')}</option>
-                                </select>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder={t('common.select', 'Select')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="male">{t('gender.male', 'Male')}</SelectItem>
+                                        <SelectItem value="female">{t('gender.female', 'Female')}</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
                         <div className="flex gap-2">
