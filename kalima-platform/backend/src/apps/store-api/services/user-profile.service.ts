@@ -277,6 +277,22 @@ class UserProfileService {
   }
 
   // ==========================================
+  // DELETE PROFILE PICTURE
+  // ==========================================
+
+  async deleteProfilePic(userId: number) {
+    const user = await this.db.users.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundError("User not found");
+
+    await this.db.users.update({
+      where: { id: userId },
+      data: { profile_pic_url: null, updated_at: new Date() },
+    });
+
+    return { success: true };
+  }
+
+  // ==========================================
   // TEACHES-AT (delegates to service)
   // ==========================================
 
