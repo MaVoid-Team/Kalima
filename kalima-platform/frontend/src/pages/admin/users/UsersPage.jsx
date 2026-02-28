@@ -26,6 +26,16 @@ import UserFilters from '@/components/admin/users/UserFilters';
 import UsersTable from '@/components/admin/users/UsersTable';
 import CreateUserDialog from '@/components/admin/users/CreateUserDialog';
 import UserStatsCards from '@/components/admin/users/UserStatsCards';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function UsersPage() {
     const { t, i18n } = useTranslation('userManagement');
@@ -35,15 +45,19 @@ export default function UsersPage() {
         pagination,
         filters,
         loading,
+        actionLoading,
         fetchUsers,
         setSearch,
         setRole,
         setPortal,
-        setPage
+        setIsDeleted,
+        setPage,
+        deleteUser
     } = useAdminUsers();
 
     const { exportData, loading: exportLoading, exportProgress } = useExport();
     const [selectedIds, setSelectedIds] = useState([]);
+    const [userToDelete, setUserToDelete] = useState(null);
 
     useEffect(() => {
         fetchUsers();
@@ -70,6 +84,15 @@ export default function UsersPage() {
             ids: selectedIds,
             filters,
         });
+    };
+
+    const handleDeleteUser = async () => {
+        if (!userToDelete) return;
+        const res = await deleteUser(userToDelete.id);
+        if (res?.success) {
+            fetchUsers();
+            setUserToDelete(null);
+        }
     };
 
     return (
@@ -137,6 +160,7 @@ export default function UsersPage() {
                 onSearchChange={setSearch}
                 onRoleChange={setRole}
                 onPortalChange={setPortal}
+                onIsDeletedChange={setIsDeleted}
             />
 
             <UsersTable
@@ -145,7 +169,29 @@ export default function UsersPage() {
                 selectedIds={selectedIds}
                 onSelect={handleSelect}
                 onSelectAll={handleSelectAll}
+                onDeleteReq={setUserToDelete}
             />
+
+            <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+                <AlertDialogContent dir={i18n.dir()}>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('details.confirmDeleteTitle', 'Are you sure?')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t('details.confirmDeleteDesc', 'This action cannot be undone. This will permanently delete the user account.')}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={actionLoading}>{t('actions.cancel', 'Cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeleteUser}
+                            disabled={actionLoading}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            {t('actions.delete', 'Delete')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             {pagination.pages > 1 && (
                 <div className="mt-4 flex justify-end">

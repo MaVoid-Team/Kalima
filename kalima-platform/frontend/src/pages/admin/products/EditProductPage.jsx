@@ -296,7 +296,16 @@ export default function EditProductPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="edit-product-form">
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
+                            e.preventDefault();
+                        }
+                    }}
+                    className="space-y-6"
+                    data-testid="edit-product-form"
+                >
 
                     {/* ── Section: Core Info ── */}
                     <div className="rounded-xl border border-border p-5 space-y-4">
@@ -430,6 +439,9 @@ export default function EditProductPage() {
                                             {...field}
                                         />
                                     </FormControl>
+                                    <p className="text-[0.8rem] text-muted-foreground mt-1">
+                                        {t('products.form.perksTip')}
+                                    </p>
                                     <FormMessage />
                                 </FormItem>
                             )}
