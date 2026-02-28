@@ -152,11 +152,10 @@ const ItemCouponInput = ({ itemId, onApplyCoupon }) => {
       />
       <Button
         type="button"
-        variant="secondary"
+        variant="default"
         size="sm"
         disabled={isApplying || !code.trim()}
         onClick={handleApply}
-        className="h-10 text-sm px-4 sm:px-6 bg-muted/60 font-semibold text-foreground shrink-0"
         data-testid="fastbuy-summary-coupon-apply-button"
       >
         {isApplying ? (

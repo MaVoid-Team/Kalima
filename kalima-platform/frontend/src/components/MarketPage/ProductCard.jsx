@@ -120,7 +120,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
       </Link>
 
       {/* Action buttons — outside the Link to avoid nested interactive elements */}
-      {!isPurchased && !isAdmin && isAuthenticated && (
+      { !isAdmin && isAuthenticated && (
         <div className="flex items-center gap-2 mt-auto">
           <Button
             variant="outline"
