@@ -88,56 +88,63 @@ class UserManagementService {
       this.generateTeacherSerial(input.subject_id),
     ]);
 
-    const user = await this.db.$transaction(async (tx) => {
-      const created = await tx.users.create({
-        data: {
-          name: input.name,
-          email,
-          phone: input.phone,
-          secondary_phone: input.secondary_phone,
-          gender: input.gender,
-          password: passwordHash,
-          role: role_enum.Teacher,
-          created_by: creator?.userId,
-          auth_identities: {
-            create: {
-              provider: "local",
-              provider_user_id: email,
-              provider_email: email,
-            },
-          },
-          teachers: {
-            create: {
-              serial,
-              is_primary: input.is_primary,
-              is_preparatory: input.is_preparatory,
-              is_secondary: input.is_secondary,
-              government_id: input.government_id,
-              zone_id: input.zone_id,
-              subject_id: input.subject_id,
-            },
-          },
-          user_roles: {
-            create: [
-              {
-                portal: portal_enum.store,
-                role: role_enum.Teacher,
+    let currentSerial = serial;
+    let user: any;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        user = await this.db.$transaction(async (tx) => {
+          const created = await tx.users.create({
+            data: {
+              name: input.name,
+              email,
+              phone: input.phone,
+              secondary_phone: input.secondary_phone,
+              gender: input.gender,
+              password: passwordHash,
+              role: role_enum.Teacher,
+              created_by: creator?.userId,
+              auth_identities: {
+                create: {
+                  provider: "local",
+                  provider_user_id: email,
+                  provider_email: email,
+                },
               },
-              {
-                portal: portal_enum.academy,
-                role: role_enum.Teacher,
+              teachers: {
+                create: {
+                  serial: currentSerial,
+                  is_primary: input.is_primary,
+                  is_preparatory: input.is_preparatory,
+                  is_secondary: input.is_secondary,
+                  government_id: input.government_id,
+                  zone_id: input.zone_id,
+                  subject_id: input.subject_id,
+                },
               },
-            ],
-          },
-          user_analytics: {
-            create: {},
-          },
-        },
-        select: this.baseUserSelect(),
-      });
-
-      return created;
-    });
+              user_roles: {
+                create: [
+                  { portal: portal_enum.store, role: role_enum.Teacher },
+                  { portal: portal_enum.academy, role: role_enum.Teacher },
+                ],
+              },
+              user_analytics: { create: {} },
+            },
+            select: this.baseUserSelect(),
+          });
+          return created;
+        });
+        break;
+      } catch (err: any) {
+        if (err?.code === "P2002" && err?.meta?.target?.includes("serial")) {
+          currentSerial = await this.generateTeacherSerial(
+            input.subject_id,
+            attempt + 1,
+          );
+        } else {
+          throw err;
+        }
+      }
+    }
 
     return { user, email };
   }
@@ -311,56 +318,63 @@ class UserManagementService {
       this.generateTeacherSerial(input.subject_id),
     ]);
 
-    const user = await this.db.$transaction(async (tx) => {
-      const created = await tx.users.create({
-        data: {
-          name: firebaseUser.name,
-          email: firebaseUser.email,
-          phone: input.phone,
-          secondary_phone: input.secondary_phone,
-          gender: input.gender,
-          is_email_verified: true, // OAuth accounts are pre-verified
-          profile_pic_url: firebaseUser.photoUrl,
-          role: role_enum.Teacher,
-          auth_identities: {
-            create: {
-              provider: firebaseUser.provider,
-              provider_user_id: firebaseUser.uid,
-              provider_email: firebaseUser.email,
-            },
-          },
-          teachers: {
-            create: {
-              serial,
-              is_primary: input.is_primary,
-              is_preparatory: input.is_preparatory,
-              is_secondary: input.is_secondary,
-              government_id: input.government_id,
-              zone_id: input.zone_id,
-              subject_id: input.subject_id,
-            },
-          },
-          user_roles: {
-            create: [
-              {
-                portal: portal_enum.store,
-                role: role_enum.Teacher,
+    let currentSerial = serial;
+    let user: any;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        user = await this.db.$transaction(async (tx) => {
+          const created = await tx.users.create({
+            data: {
+              name: firebaseUser.name,
+              email: firebaseUser.email,
+              phone: input.phone,
+              secondary_phone: input.secondary_phone,
+              gender: input.gender,
+              is_email_verified: true,
+              profile_pic_url: firebaseUser.photoUrl,
+              role: role_enum.Teacher,
+              auth_identities: {
+                create: {
+                  provider: firebaseUser.provider,
+                  provider_user_id: firebaseUser.uid,
+                  provider_email: firebaseUser.email,
+                },
               },
-              {
-                portal: portal_enum.academy,
-                role: role_enum.Teacher,
+              teachers: {
+                create: {
+                  serial: currentSerial,
+                  is_primary: input.is_primary,
+                  is_preparatory: input.is_preparatory,
+                  is_secondary: input.is_secondary,
+                  government_id: input.government_id,
+                  zone_id: input.zone_id,
+                  subject_id: input.subject_id,
+                },
               },
-            ],
-          },
-          user_analytics: {
-            create: {},
-          },
-        },
-        select: this.baseUserSelect(),
-      });
-
-      return created;
-    });
+              user_roles: {
+                create: [
+                  { portal: portal_enum.store, role: role_enum.Teacher },
+                  { portal: portal_enum.academy, role: role_enum.Teacher },
+                ],
+              },
+              user_analytics: { create: {} },
+            },
+            select: this.baseUserSelect(),
+          });
+          return created;
+        });
+        break;
+      } catch (err: any) {
+        if (err?.code === "P2002" && err?.meta?.target?.includes("serial")) {
+          currentSerial = await this.generateTeacherSerial(
+            input.subject_id,
+            attempt + 1,
+          );
+        } else {
+          throw err;
+        }
+      }
+    }
 
     return { user, email: firebaseUser.email };
   }
@@ -1211,7 +1225,10 @@ class UserManagementService {
     }
   }
 
-  async generateTeacherSerial(subjectId: number): Promise<string> {
+  async generateTeacherSerial(
+    subjectId: number,
+    offset: number = 0,
+  ): Promise<string> {
     const [subject, count] = await Promise.all([
       this.db.subjects.findUnique({
         where: { id: subjectId },
@@ -1222,7 +1239,7 @@ class UserManagementService {
       }),
     ]);
 
-    const serialNo = count + 1;
+    const serialNo = count + 1 + offset;
 
     if (!subject) {
       throw new NotFoundError("Subject not found");
