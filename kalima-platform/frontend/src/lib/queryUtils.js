@@ -30,16 +30,31 @@ export const buildQueryString = ({ pagination = {}, filters = {} }) => {
     if (pagination.limit !== undefined) query.append('limit', pagination.limit);
 
     // Filters
-    if (filters.search) query.append('search', filters.search);
-    if (filters.status && filters.status !== 'all') query.append('status', filters.status);
+    Object.entries(filters || {}).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === '') return;
+        if (key === 'status' && value === 'all') return;
 
-    if (filters.startDate) {
-        query.append('startDate', formatISODateWithoutMs(filters.startDate));
-    }
+        const appendValue = (singleValue) => {
+            if (singleValue === undefined || singleValue === null || singleValue === '') return;
 
-    if (filters.endDate) {
-        query.append('endDate', formatISODateWithoutMs(filters.endDate));
-    }
+            const isDateKey = /date/i.test(key);
+            const isDateValue = singleValue instanceof Date;
+
+            if (isDateValue || isDateKey) {
+                query.append(key, formatISODateWithoutMs(singleValue));
+                return;
+            }
+
+            query.append(key, String(singleValue));
+        };
+
+        if (Array.isArray(value)) {
+            value.forEach(appendValue);
+            return;
+        }
+
+        appendValue(value);
+    });
 
     return query.toString();
 };

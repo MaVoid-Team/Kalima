@@ -24,7 +24,7 @@ import { getCouponId, isCouponActive } from '@/lib/couponUtils';
 const getProductId = (product) => product?.id || product?._id;
 
 export default function CouponsPage() {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
     const {
         getAllCoupons,
         getCouponsStats,
@@ -100,6 +100,9 @@ export default function CouponsPage() {
         );
     }, [coupons, filters.search]);
 
+    const hasSearchFilter = Boolean((filters.search || '').trim());
+    const couponsCount = hasSearchFilter ? filteredCoupons.length : pagination.total;
+
     const loadCouponsStats = useCallback(async () => {
         const stats = await getCouponsStats();
         if (stats) {
@@ -172,13 +175,33 @@ export default function CouponsPage() {
         }
     };
 
-    const handleExport = (format) => {
-        exportData({
+    const handleExport = async (format) => {
+        const normalizedSearch = (filters.search || '').trim();
+        const idsForExport = normalizedSearch
+            ? Array.from(new Set(filteredCoupons.map((coupon) => getCouponId(coupon)).filter(Boolean)))
+            : selectedIds;
+
+        if (normalizedSearch) {
+            setSelectedIds(idsForExport);
+        }
+
+        await exportData({
             resource: 'coupons',
             format,
-            ids: selectedIds,
-            filters,
+            ids: idsForExport,
+            filters:{
+                active: filters.active === 'all' ? undefined : filters.active == "true" ? true : false,
+                product_id: filters.product_id || undefined,
+                isAmount: filters.discount_type === 'AMOUNT'
+                    ? 1
+                    : filters.discount_type === 'PERCENTAGE' ? 0 : undefined,
+                startDate: filters.startDate || undefined,
+                endDate: filters.endDate || undefined,
+            }
         });
+
+        // After export completes, clear selected IDs
+        setSelectedIds([]);
     };
 
     const handleCreate = async (payload) => {
@@ -240,8 +263,11 @@ export default function CouponsPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
+                    <p className="text-sm text-muted-foreground hidden sm:block">
+                        {t('coupons.totalCoupons', { count: couponsCount })}
+                    </p>
                     {/* Export dropdown */}
-                    <DropdownMenu>
+                    <DropdownMenu dir={i18n.dir()}>
                         <DropdownMenuTrigger asChild>
                             <Button disabled={exportLoading} variant="outline" data-testid="coupons-export-button">
                                 <Download className="me-2 h-4 w-4" />
