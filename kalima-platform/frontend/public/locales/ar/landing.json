@@ -51,6 +51,7 @@
   },
   "welcome": {
     "badge": "تحلق في سماء الإبداع",
+    "sparkleBadge": "محتوى جديد",
     "title": "منصة",
     "titleHighlight": "كلمة",
     "titleEnd": "التعليمية",
@@ -119,6 +120,7 @@
   },
   "about": {
     "badge": "قصة التميز",
+    "sparkleBadge": "الأعلى تقييماً",
     "title": "نتجاوز",
     "titleHighlight": "آفاق",
     "titleEnd": "التعلم التقليدي",
@@ -136,6 +138,7 @@
   },
   "appDownload": {
     "badge": "تطبيق كلمة",
+    "sparkleBadge": "جاهز للتحميل",
     "title": "تعلم بلا",
     "titleHighlight": "حدود",
     "titleEnd": "في راحة يدك",

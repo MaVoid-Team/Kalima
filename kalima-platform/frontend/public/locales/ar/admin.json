@@ -694,7 +694,7 @@
     "totalMethods": "{{count}} طرق دفع",
     "createMethod": "إنشاء طريقة دفع",
     "noMethodsFound": "لم يتم العثور على طرق دفع",
-    "selectedCount": "{count} محدد",
+    "selectedCount": "{{count}} محدد",
     "bulkActivate": "تفعيل",
     "bulkDeactivate": "إلغاء التفعيل",
     "filters": {
@@ -717,12 +717,18 @@
     "fields": {
       "name": "الاسم",
       "namePlaceholder": "مثال: فودافون كاش",
+      "nameDescription": "اسم طريقة الدفع الذي سيراه العملاء",
       "phoneNumber": "رقم الهاتف",
       "phoneNumberPlaceholder": "مثال: 01012345678",
+      "phoneDescription": "رقم الهاتف المرتبط بطريقة الدفع.",
       "status": "الحالة",
       "statusDescription": "تفعيل أو إلغاء تفعيل طريقة الدفع",
       "image": "الصورة",
-      "imageOptional": "اترك فارغاً للاحتفاظ بالصورة الحالية"
+      "imageOptional": "اترك فارغاً للاحتفاظ بالصورة الحالية",
+      "imageDescription": "ارفع صورة جديدة لاستبدال الصورة الحالية. المقاس الموصى به: 200×200 بكسل",
+      "currentImage": "الصورة الحالية",
+      "unchanged": "لم يتم تغيير الصورة",
+      "newImage": "صورة جديدة تم اختيارها"
     },
     "create": {
       "title": "إنشاء طريقة دفع",

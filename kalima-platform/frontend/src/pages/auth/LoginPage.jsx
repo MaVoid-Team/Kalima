@@ -7,10 +7,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 import useLogin from "@/hooks/auth/useLogin";
 import { signInWithPopup } from 'firebase/auth';
 import { auth } from "@/lib/firebase";
 import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
+import LoginAnimatedBackground from "@/components/auth/LoginAnimatedBackground";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +38,24 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const { login, loginWithFirebase, loading } = useLogin();
     const [showPassword, setShowPassword] = useState(false);
+
+    const containerVariants = {
+        hidden: { opacity: 0, y: 28 },
+        show: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.9,
+                ease: "easeOut",
+                staggerChildren: 0.12,
+            },
+        },
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 18 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } },
+    };
 
     React.useEffect(() => {
         window.scrollTo(0, 0);
@@ -80,21 +100,34 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="container relative flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-1 lg:px-0 min-h-[calc(100vh-4rem)] py-8">
-            <div className="lg:p-8 w-full">
-                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                    <Card className="border-0 shadow-none sm:border sm:shadow-sm">
-                        <CardHeader>
+        <div className="container relative grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden py-8 lg:max-w-none lg:grid-cols-1 lg:px-0">
+            <LoginAnimatedBackground />
+
+            <div className="relative w-full lg:p-8">
+                <motion.div
+                    className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="show"
+                >
+                    <motion.div
+                        variants={itemVariants}
+                        className="relative rounded-2xl p-px bg-linear-to-br from-primary/35 via-border to-accent/35 shadow-2xl shadow-primary/10"
+                    >
+                        <div className="pointer-events-none absolute inset-0 rounded-2xl bg-linear-to-tr from-transparent via-primary/10 to-transparent" />
+                        <Card className="relative border-0 bg-background/92 shadow-none backdrop-blur-sm sm:border sm:shadow-sm">
+                            <CardHeader>
                             <CardTitle className="text-2xl">{t("login.title")}</CardTitle>
                             <CardDescription>{t("login.description")}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
+                            </CardHeader>
+                            <CardContent>
                             <Form {...form}>
                                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
                                     <FormField
                                         control={form.control}
                                         name="email"
                                         render={({ field }) => (
+                                            <motion.div variants={itemVariants}>
                                             <FormItem>
                                                 <FormLabel>{t("login.emailLabel")}</FormLabel>
                                                 <FormControl>
@@ -102,12 +135,14 @@ export default function LoginPage() {
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
+                                            </motion.div>
                                         )}
                                     />
                                     <FormField
                                         control={form.control}
                                         name="password"
                                         render={({ field }) => (
+                                            <motion.div variants={itemVariants}>
                                             <FormItem>
                                                 <FormLabel>{t("login.passwordLabel")}</FormLabel>
                                                 <FormControl>
@@ -145,35 +180,40 @@ export default function LoginPage() {
                                                     </Link>
                                                 </div>
                                             </FormItem>
+                                            </motion.div>
                                         )}
                                     />
+                                    <motion.div variants={itemVariants}>
                                     <Button type="submit" className="w-full" disabled={loading} data-testid="login-submit-button">
                                         {loading && (
                                             <LoadingSpinner className="mr-2 h-4 w-4" />
                                         )}
                                         {t("login.submit")}
                                     </Button>
+                                    </motion.div>
 
-                                    <div className="relative my-4">
+                                    <motion.div variants={itemVariants} className="relative my-4">
                                         <div className="absolute inset-0 flex items-center">
                                             <span className="w-full border-t" />
                                         </div>
                                         <div className="relative flex justify-center text-xs uppercase">
-                                            <span className="bg-background px-2 text-muted-foreground">
+                                            <span className="bg-background rounded-sm px-2 text-muted-foreground">
                                                 {t("login.continueWith", "Or continue with")}
                                             </span>
                                         </div>
-                                    </div>
+                                    </motion.div>
 
-                                    <SocialLoginButtons
-                                        onProviderSelect={handleFirebaseLogin}
-                                        isLoading={loading}
-                                        textGoogle={t("login.google", "Google")}
-                                    />
+                                    <motion.div variants={itemVariants}>
+                                        <SocialLoginButtons
+                                            onProviderSelect={handleFirebaseLogin}
+                                            isLoading={loading}
+                                            textGoogle={t("login.google", "Google")}
+                                        />
+                                    </motion.div>
                                 </form>
                             </Form>
-                        </CardContent>
-                        <CardFooter className="flex flex-col gap-2">
+                            </CardContent>
+                            <CardFooter className="flex flex-col gap-2">
                             <div className="text-sm text-muted-foreground text-center">
                                 {t("login.noAccount", "Don't have an account?")}{" "}
                                 <Link
@@ -184,9 +224,10 @@ export default function LoginPage() {
                                     {t("login.signupLink", "Sign up")}
                                 </Link>
                             </div>
-                        </CardFooter>
-                    </Card>
-                </div>
+                            </CardFooter>
+                        </Card>
+                    </motion.div>
+                </motion.div>
             </div>
         </div>
     );
