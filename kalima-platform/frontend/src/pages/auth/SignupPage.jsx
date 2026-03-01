@@ -7,7 +7,7 @@ import RegisterStudent from "@/components/auth/RegisterStudent";
 import RegisterTeacher from "@/components/auth/RegisterTeacher";
 import RegisterParent from "@/components/auth/RegisterParent";
 import RegisterLecturer from "@/components/auth/RegisterLecturer";
-import LoginAnimatedBackground from "@/components/auth/LoginAnimatedBackground";
+import AuthAnimatedBackground from "@/components/auth/AuthAnimatedBackground";
 
 export default function SignupPage() {
     const { i18n } = useTranslation("auth");
@@ -39,7 +39,7 @@ export default function SignupPage() {
 
     return (
         <div className="container relative grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <LoginAnimatedBackground />
+            <AuthAnimatedBackground variant="register" />
 
             {/* Right Side - Image Loop / Artwork */}
             <motion.div
