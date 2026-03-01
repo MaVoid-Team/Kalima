@@ -16,7 +16,12 @@
    - [Get Product Coupons](#get-product-coupons)
    - [Get Product Gallery](#get-product-gallery)
    - [Get Product Required Fields](#get-product-required-fields)
-2. [Admin / SubAdmin Endpoints](#admin--subadmin-endpoints)
+2. [Customer Endpoints](#customer-endpoints)
+   - [Check Review Eligibility](#check-review-eligibility)
+   - [Create Product Review](#create-product-review)
+   - [Update Product Review](#update-product-review)
+   - [Delete Product Review](#delete-product-review)
+3. [Admin / SubAdmin Endpoints](#admin--subadmin-endpoints)
    - [Create Product](#create-product)
    - [Update Product](#update-product)
    - [Delete Product (Soft Delete)](#delete-product-soft-delete)
@@ -29,10 +34,10 @@
    - [Detach Category](#detach-category)
    - [Attach Required Fields](#attach-required-fields)
    - [Detach Required Field](#detach-required-field)
-3. [Enums & Types](#enums--types)
-4. [Business Rules](#business-rules)
-5. [Common Response Types](#common-response-types)
-6. [Error Codes](#error-codes)
+4. [Enums & Types](#enums--types)
+5. [Business Rules](#business-rules)
+6. [Common Response Types](#common-response-types)
+7. [Error Codes](#error-codes)
 
 ---
 
@@ -50,6 +55,66 @@ Authorization: Bearer <access_token>
 
 ---
 
+### Get Product Reviews
+
+Returns a paginated list of reviews for a specific product, including the total count and average rating.
+
+**Endpoint:** `GET /:id/reviews`  
+**Auth Required:** No
+
+**URL Parameters:**
+
+| Param | Type   | Description |
+| ----- | ------ | ----------- |
+| `id`  | number | Product ID  |
+
+**Query Parameters:**
+
+| Param   | Type   | Default | Description    |
+| ------- | ------ | ------- | -------------- |
+| `page`  | number | 1       | Page number    |
+| `limit` | number | 10      | Items per page |
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "product_id": 10,
+      "user_id": 42,
+      "rating": 5,
+      "review_text": "Great product, highly recommended!",
+      "created_at": "2026-03-01T10:00:00.000Z",
+      "updated_at": "2026-03-01T10:00:00.000Z",
+      "users": {
+        "id": 42,
+        "name": "John Doe",
+        "profile_pic_url": "/uploads/profiles/john.jpg"
+      }
+    }
+  ],
+  "pagination": {
+    "total": 15,
+    "page": 1,
+    "limit": 10,
+    "pages": 2
+  },
+  "averageRating": 4.8,
+  "reviewCount": 15
+}
+```
+
+**Error Responses:**
+
+| Status | Message              | Condition          |
+| ------ | -------------------- | ------------------ |
+| 400    | `Invalid product ID` | ID is not a number |
+
+---
+
 ### Get All Products
 
 Returns a paginated list of products with optional filters.
@@ -59,13 +124,13 @@ Returns a paginated list of products with optional filters.
 
 **Query Parameters:**
 
-| Param         | Type    | Default | Description                                  |
-| ------------- | ------- | ------- | -------------------------------------------- |
-| `is_archived` | boolean | —       | Filter by archived status                    |
-| `category_id` | number  | —       | Filter by category ID                        |
-| `search`      | string  | —       | Text search on title and description         |
-| `page`        | number  | 1       | Page number                                  |
-| `limit`       | number  | 20      | Items per page                               |
+| Param         | Type    | Default | Description                          |
+| ------------- | ------- | ------- | ------------------------------------ |
+| `is_archived` | boolean | —       | Filter by archived status            |
+| `category_id` | number  | —       | Filter by category ID                |
+| `search`      | string  | —       | Text search on title and description |
+| `page`        | number  | 1       | Page number                          |
+| `limit`       | number  | 20      | Items per page                       |
 
 **Example:** `GET /products?search=algebra&page=1&limit=10`
 
@@ -94,7 +159,11 @@ Returns a paginated list of products with optional filters.
         "created_at": "2026-02-20T10:00:00.000Z"
       },
       "product_categories": [
-        { "id": 12, "category_id": 1, "categories": { "id": 1, "title": "Books" } }
+        {
+          "id": 12,
+          "category_id": 1,
+          "categories": { "id": 1, "title": "Books" }
+        }
       ],
       "product_gallery": [],
       "product_required_fields": [],
@@ -149,13 +218,26 @@ Returns a single product with linked categories, gallery entries, sample, coupon
       "created_at": "2026-02-20T10:00:00.000Z"
     },
     "product_categories": [
-      { "id": 12, "category_id": 1, "categories": { "id": 1, "title": "Books" } }
+      {
+        "id": 12,
+        "category_id": 1,
+        "categories": { "id": 1, "title": "Books" }
+      }
     ],
     "product_gallery": [
-      { "id": 3, "sort_order": 0, "active": true, "images": { "id": 8, "url": "/uploads/images/gallery1.webp" } }
+      {
+        "id": 3,
+        "sort_order": 0,
+        "active": true,
+        "images": { "id": 8, "url": "/uploads/images/gallery1.webp" }
+      }
     ],
     "product_required_fields": [
-      { "id": 2, "field_definition_id": 7, "required_field_definitions": { "id": 7, "label": "Student Name" } }
+      {
+        "id": 2,
+        "field_definition_id": 7,
+        "required_field_definitions": { "id": 7, "label": "Student Name" }
+      }
     ],
     "samples": {
       "id": 1,
@@ -165,7 +247,15 @@ Returns a single product with linked categories, gallery entries, sample, coupon
       "size": 204800,
       "created_at": "2026-02-20T10:00:00.000Z"
     },
-    "coupons": [{ "id": 1, "code": "KLM-ABC123", "discount_amount": "50.00", "discount_percentage": 0, "expires_at": "2026-06-01T00:00:00.000Z" }],
+    "coupons": [
+      {
+        "id": 1,
+        "code": "KLM-ABC123",
+        "discount_amount": "50.00",
+        "discount_percentage": 0,
+        "expires_at": "2026-06-01T00:00:00.000Z"
+      }
+    ],
     "created_at": "2026-02-20T10:00:00.000Z",
     "updated_at": null
   }
@@ -196,8 +286,8 @@ Returns active coupons for a specific product.
 
 **Query Parameters:**
 
-| Param    | Type    | Default | Description                          |
-| -------- | ------- | ------- | ------------------------------------ |
+| Param    | Type    | Default | Description                              |
+| -------- | ------- | ------- | ---------------------------------------- |
 | `active` | boolean | true    | Filter by active status (`true`/`false`) |
 
 **Success Response (200):**
@@ -253,11 +343,11 @@ Returns the thumbnail image details for a product. Returns 404 if the product do
 
 **Error Responses:**
 
-| Status | Message                                  | Condition                                    |
-| ------ | ---------------------------------------- | -------------------------------------------- |
-| 400    | `Invalid product ID`                     | ID is not a number                           |
-| 404    | `Product not found`                      | Product does not exist or is soft-deleted    |
-| 404    | `Thumbnail not found for this product`   | Product has no thumbnail                     |
+| Status | Message                                | Condition                                 |
+| ------ | -------------------------------------- | ----------------------------------------- |
+| 400    | `Invalid product ID`                   | ID is not a number                        |
+| 404    | `Product not found`                    | Product does not exist or is soft-deleted |
+| 404    | `Thumbnail not found for this product` | Product has no thumbnail                  |
 
 ---
 
@@ -276,8 +366,8 @@ Returns gallery entries for a product. Optionally include inactive (hidden) entr
 
 **Query Parameters:**
 
-| Param             | Type    | Default | Description                        |
-| ----------------- | ------- | ------- | ---------------------------------- |
+| Param             | Type    | Default | Description                         |
+| ----------------- | ------- | ------- | ----------------------------------- |
 | `includeInactive` | boolean | false   | Include deactivated gallery entries |
 
 **Success Response (200):**
@@ -363,6 +453,204 @@ Returns required-field definitions attached to the product (used for checkout va
 
 ---
 
+## Customer Endpoints
+
+---
+
+### Check Review Eligibility
+
+Checks if the currently authenticated user is eligible to review a specific product. Returns reasons if not eligible (e.g. not authenticated, no confirmed purchase, or already reviewed).
+
+**Endpoint:** `GET /:id/reviews/can-review`  
+**Auth Required:** Yes (Optional, if no auth token is provided it returns `canReview: false` with reason `not_authenticated`)
+
+**URL Parameters:**
+
+| Param | Type   | Description |
+| ----- | ------ | ----------- |
+| `id`  | number | Product ID  |
+
+**Success Response (200 - Eligible):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "canReview": true
+  }
+}
+```
+
+**Success Response (200 - Not Eligible):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "canReview": false,
+    "reason": "no_confirmed_purchase | already_reviewed | not_authenticated",
+    "existingReview": { "/* populated if reason is already_reviewed */" }
+  }
+}
+```
+
+**Error Responses:**
+
+| Status | Message              | Condition          |
+| ------ | -------------------- | ------------------ |
+| 400    | `Invalid product ID` | ID is not a number |
+
+---
+
+### Create Product Review
+
+Creates a new review for a product. Requires the user to have a confirmed purchase of the product and not have already reviewed it.
+
+**Endpoint:** `POST /:id/reviews`  
+**Auth Required:** Yes (Teacher, Student, or Parent in Store portal)
+
+**URL Parameters:**
+
+| Param | Type   | Description |
+| ----- | ------ | ----------- |
+| `id`  | number | Product ID  |
+
+**Request Body:**
+
+```json
+{
+  "rating": "number (required, 1-5)",
+  "review_text": "string (optional, max 2000 chars)"
+}
+```
+
+**Example:**
+
+```json
+{
+  "rating": 5,
+  "review_text": "Excellent book for learning algebra."
+}
+```
+
+**Success Response (201):**
+
+```json
+{
+  "success": true,
+  "message": "Review created successfully",
+  "data": {
+    "id": 1,
+    "product_id": 10,
+    "user_id": 42,
+    "rating": 5,
+    "review_text": "Excellent book for learning algebra.",
+    "created_at": "2026-03-01T10:00:00.000Z",
+    "updated_at": "2026-03-01T10:00:00.000Z"
+  }
+}
+```
+
+**Error Responses:**
+
+| Status | Message                                                | Condition                                  |
+| ------ | ------------------------------------------------------ | ------------------------------------------ |
+| 400    | `Invalid product ID`                                   | ID is not a number                         |
+| 400    | `User not authenticated`                               | Token missing or invalid                   |
+| 403    | `You must have a confirmed purchase to leave a review` | User hasn't purchased the product          |
+| 403    | `You have already reviewed this product`               | User already has a review for this product |
+| 422    | Validation errors                                      | Rating out of bounds, text too long        |
+
+---
+
+### Update Product Review
+
+Updates an existing review.
+
+**Endpoint:** `PATCH /:id/reviews/:reviewId`  
+**Auth Required:** Yes (Any authenticated user)
+
+**URL Parameters:**
+
+| Param      | Type   | Description |
+| ---------- | ------ | ----------- |
+| `id`       | number | Product ID  |
+| `reviewId` | number | Review ID   |
+
+**Request Body (all fields optional):**
+
+```json
+{
+  "rating": "number (1-5)",
+  "review_text": "string (max 2000 chars)"
+}
+```
+
+**Example:**
+
+```json
+{
+  "rating": 4,
+  "review_text": "Good book, but could use more examples."
+}
+```
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Review updated successfully",
+  "data": { "/* full review object */" }
+}
+```
+
+**Error Responses:**
+
+| Status | Message                                | Condition                           |
+| ------ | -------------------------------------- | ----------------------------------- |
+| 400    | `Invalid product ID or review ID`      | ID is not a number                  |
+| 400    | `User not authenticated`               | Token missing or invalid            |
+| 403    | `You can only update your own reviews` | Review belongs to another user      |
+| 404    | `Review not found`                     | Review ID does not exist            |
+| 422    | Validation errors                      | Rating out of bounds, text too long |
+
+---
+
+### Delete Product Review
+
+Deletes an existing review.
+
+**Endpoint:** `DELETE /:id/reviews/:reviewId`  
+**Auth Required:** Yes (Any authenticated user)
+
+**URL Parameters:**
+
+| Param      | Type   | Description |
+| ---------- | ------ | ----------- |
+| `id`       | number | Product ID  |
+| `reviewId` | number | Review ID   |
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Review deleted successfully"
+}
+```
+
+**Error Responses:**
+
+| Status | Message                                | Condition                      |
+| ------ | -------------------------------------- | ------------------------------ |
+| 400    | `Invalid review ID`                    | ID is not a number             |
+| 400    | `User not authenticated`               | Token missing or invalid       |
+| 403    | `You can only delete your own reviews` | Review belongs to another user |
+| 404    | `Review not found`                     | Review ID does not exist       |
+
+---
+
 ## Admin / SubAdmin Endpoints
 
 > All endpoints in this section require the authenticated user to have the **Admin** or **SubAdmin** role.
@@ -413,14 +701,14 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 
 **Example — form-data (with file upload):**
 
-| Field          | Value                   |
-| -------------- | ----------------------- |
-| `title`        | Algebra Book            |
-| `price`        | 100                     |
-| `type`         | Book                    |
-| `category_ids` | [1,3]                   |
-| `thumbnail`    | *(image file)*          |
-| `sample`       | *(PDF file)*            |
+| Field          | Value          |
+| -------------- | -------------- |
+| `title`        | Algebra Book   |
+| `price`        | 100            |
+| `type`         | Book           |
+| `category_ids` | [1,3]          |
+| `thumbnail`    | _(image file)_ |
+| `sample`       | _(PDF file)_   |
 
 **Success Response (201):**
 
@@ -440,7 +728,11 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
     "is_archived": false,
     "thumbnail_image": null,
     "product_categories": [
-      { "id": 1, "category_id": 5, "categories": { "id": 5, "title": "Mathematics" } }
+      {
+        "id": 1,
+        "category_id": 5,
+        "categories": { "id": 5, "title": "Mathematics" }
+      }
     ],
     "product_gallery": [],
     "product_required_fields": [],
@@ -454,11 +746,11 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 
 **Error Responses:**
 
-| Status | Message                                              | Condition                     |
-| ------ | ---------------------------------------------------- | ----------------------------- |
+| Status | Message                                               | Condition                     |
+| ------ | ----------------------------------------------------- | ----------------------------- |
 | 400    | `category_ids must be a valid JSON array of integers` | Malformed category_ids string |
-| 404    | `Category ID(s) not found: 99`                       | Invalid category ID           |
-| 422    | Validation errors array                              | Invalid or missing fields     |
+| 404    | `Category ID(s) not found: 99`                        | Invalid category ID           |
+| 422    | Validation errors array                               | Invalid or missing fields     |
 
 ---
 
@@ -543,9 +835,9 @@ Soft-deletes a product by setting `deleted_at` to the current timestamp. The pro
 
 **Error Responses:**
 
-| Status | Message              | Condition                                 |
-| ------ | -------------------- | ----------------------------------------- |
-| 400    | `Invalid product ID` | ID is not a number                        |
+| Status | Message              | Condition                                    |
+| ------ | -------------------- | -------------------------------------------- |
+| 400    | `Invalid product ID` | ID is not a number                           |
 | 404    | `Product not found`  | Product does not exist or is already deleted |
 
 ---
@@ -566,8 +858,8 @@ Uploads or replaces the product thumbnail image. If a thumbnail already exists, 
 
 **File Fields:**
 
-| Field       | Type  | Max Size | Description             |
-| ----------- | ----- | -------- | ----------------------- |
+| Field       | Type  | Max Size | Description                |
+| ----------- | ----- | -------- | -------------------------- |
 | `thumbnail` | image | 5 MB     | Thumbnail image (required) |
 
 **Success Response (200):**
@@ -582,11 +874,11 @@ Uploads or replaces the product thumbnail image. If a thumbnail already exists, 
 
 **Error Responses:**
 
-| Status | Message                       | Condition                                 |
-| ------ | ----------------------------- | ----------------------------------------- |
-| 400    | `Invalid product ID`          | ID is not a number                        |
-| 400    | `No thumbnail file provided`  | No file in request                        |
-| 404    | `Product not found`           | Product does not exist or is soft-deleted |
+| Status | Message                      | Condition                                 |
+| ------ | ---------------------------- | ----------------------------------------- |
+| 400    | `Invalid product ID`         | ID is not a number                        |
+| 400    | `No thumbnail file provided` | No file in request                        |
+| 404    | `Product not found`          | Product does not exist or is soft-deleted |
 
 ---
 
@@ -615,11 +907,11 @@ Removes the thumbnail image from a product.
 
 **Error Responses:**
 
-| Status | Message                      | Condition                                 |
-| ------ | ---------------------------- | ----------------------------------------- |
-| 400    | `Invalid product ID`         | ID is not a number                        |
-| 400    | `Product has no thumbnail`   | Product has no thumbnail to remove        |
-| 404    | `Product not found`          | Product does not exist or is soft-deleted |
+| Status | Message                    | Condition                                 |
+| ------ | -------------------------- | ----------------------------------------- |
+| 400    | `Invalid product ID`       | ID is not a number                        |
+| 400    | `Product has no thumbnail` | Product has no thumbnail to remove        |
+| 404    | `Product not found`        | Product does not exist or is soft-deleted |
 
 ---
 
@@ -639,15 +931,15 @@ Uploads 1–10 images to the product gallery. Images are compressed by default.
 
 **Query Parameters:**
 
-| Param      | Type    | Default | Description                  |
-| ---------- | ------- | ------- | ---------------------------- |
+| Param      | Type    | Default | Description                        |
+| ---------- | ------- | ------- | ---------------------------------- |
 | `compress` | boolean | true    | Set to `false` to skip compression |
 
 **File Fields:**
 
-| Field     | Type  | Max Size | Max Count | Description         |
-| --------- | ----- | -------- | --------- | ------------------- |
-| `gallery` | image | 5 MB     | 10        | Gallery images      |
+| Field     | Type  | Max Size | Max Count | Description    |
+| --------- | ----- | -------- | --------- | -------------- |
+| `gallery` | image | 5 MB     | 10        | Gallery images |
 
 **Success Response (201):**
 
@@ -730,10 +1022,10 @@ Updates the sort order or active status of a gallery entry.
 
 **Error Responses:**
 
-| Status | Message                                | Condition                    |
-| ------ | -------------------------------------- | ---------------------------- |
-| 400    | `Invalid product ID or gallery ID`     | ID is not a number           |
-| 404    | `Gallery entry not found`              | Entry does not exist         |
+| Status | Message                            | Condition            |
+| ------ | ---------------------------------- | -------------------- |
+| 400    | `Invalid product ID or gallery ID` | ID is not a number   |
+| 404    | `Gallery entry not found`          | Entry does not exist |
 
 ---
 
@@ -762,10 +1054,10 @@ Deletes a gallery entry and its associated image from disk.
 
 **Error Responses:**
 
-| Status | Message                                | Condition                    |
-| ------ | -------------------------------------- | ---------------------------- |
-| 400    | `Invalid product ID or gallery ID`     | ID is not a number           |
-| 404    | `Gallery entry not found`              | Entry does not exist         |
+| Status | Message                            | Condition            |
+| ------ | ---------------------------------- | -------------------- |
+| 400    | `Invalid product ID or gallery ID` | ID is not a number   |
+| 404    | `Gallery entry not found`          | Entry does not exist |
 
 ---
 
@@ -805,12 +1097,12 @@ Attaches one or more categories to a product. Already-attached categories are sk
 
 **Error Responses:**
 
-| Status | Message                                | Condition                                 |
-| ------ | -------------------------------------- | ----------------------------------------- |
-| 400    | `Invalid product ID`                   | ID is not a number                        |
-| 404    | `Product not found`                    | Product does not exist or is soft-deleted |
-| 404    | `Category ID(s) not found: 99`         | Invalid category IDs                      |
-| 422    | Validation errors                      | Invalid body                              |
+| Status | Message                        | Condition                                 |
+| ------ | ------------------------------ | ----------------------------------------- |
+| 400    | `Invalid product ID`           | ID is not a number                        |
+| 404    | `Product not found`            | Product does not exist or is soft-deleted |
+| 404    | `Category ID(s) not found: 99` | Invalid category IDs                      |
+| 422    | Validation errors              | Invalid body                              |
 
 ---
 
@@ -839,10 +1131,10 @@ Removes a category from a product.
 
 **Error Responses:**
 
-| Status | Message                                       | Condition                     |
-| ------ | --------------------------------------------- | ----------------------------- |
-| 400    | `Invalid product ID or category ID`           | ID is not a number            |
-| 404    | `Category is not attached to this product`    | Link does not exist           |
+| Status | Message                                    | Condition           |
+| ------ | ------------------------------------------ | ------------------- |
+| 400    | `Invalid product ID or category ID`        | ID is not a number  |
+| 404    | `Category is not attached to this product` | Link does not exist |
 
 ---
 
@@ -885,12 +1177,12 @@ Attaches one or more required-field definitions to a product. Already-attached f
 
 **Error Responses:**
 
-| Status | Message                                    | Condition                                 |
-| ------ | ------------------------------------------ | ----------------------------------------- |
-| 400    | `Invalid product ID`                       | ID is not a number                        |
-| 404    | `Product not found`                        | Product does not exist or is soft-deleted |
-| 404    | `Field definition(s) not found: 99`        | Invalid field definition IDs              |
-| 422    | Validation errors                          | Invalid body                              |
+| Status | Message                             | Condition                                 |
+| ------ | ----------------------------------- | ----------------------------------------- |
+| 400    | `Invalid product ID`                | ID is not a number                        |
+| 404    | `Product not found`                 | Product does not exist or is soft-deleted |
+| 404    | `Field definition(s) not found: 99` | Invalid field definition IDs              |
+| 422    | Validation errors                   | Invalid body                              |
 
 ---
 
@@ -919,10 +1211,10 @@ Removes a required-field definition from a product.
 
 **Error Responses:**
 
-| Status | Message                                              | Condition                          |
-| ------ | ---------------------------------------------------- | ---------------------------------- |
-| 400    | `Invalid product ID or field definition ID`          | ID is not a number                 |
-| 404    | `This field is not attached to the specified product` | Link does not exist                |
+| Status | Message                                               | Condition           |
+| ------ | ----------------------------------------------------- | ------------------- |
+| 400    | `Invalid product ID or field definition ID`           | ID is not a number  |
+| 404    | `This field is not attached to the specified product` | Link does not exist |
 
 ---
 
@@ -930,10 +1222,10 @@ Removes a required-field definition from a product.
 
 ### ProductType
 
-| Value     | Description                        |
-| --------- | ---------------------------------- |
-| `Book`    | Digital book product               |
-| `Product` | General product (default)          |
+| Value     | Description               |
+| --------- | ------------------------- |
+| `Book`    | Digital book product      |
+| `Product` | General product (default) |
 
 ### Product Object
 
@@ -963,6 +1255,7 @@ Removes a required-field definition from a product.
 ### Related Objects
 
 **Image:**
+
 ```json
 {
   "id": "number",
@@ -975,6 +1268,7 @@ Removes a required-field definition from a product.
 ```
 
 **GalleryEntry:**
+
 ```json
 {
   "id": "number",
@@ -988,6 +1282,7 @@ Removes a required-field definition from a product.
 ```
 
 **ProductCategory:**
+
 ```json
 {
   "id": "number",
@@ -998,6 +1293,7 @@ Removes a required-field definition from a product.
 ```
 
 **Sample:**
+
 ```json
 {
   "id": "number",
@@ -1065,14 +1361,14 @@ List endpoints return pagination metadata:
 
 ## Error Codes
 
-| Status | Error Type          | Description                                             |
-| ------ | ------------------- | ------------------------------------------------------- |
-| 400    | `BadRequestError`   | Invalid input, malformed IDs, or missing files          |
-| 401    | `UnauthorizedError` | Missing or invalid authorization token                  |
-| 403    | `ForbiddenError`    | User does not have the required role                    |
-| 404    | `NotFoundError`     | Product, category, gallery entry, or field not found    |
-| 409    | `ConflictError`     | Duplicate serial or unique constraint violation         |
-| 422    | `ValidationError`   | DTO validation failed — returns `errors` array          |
+| Status | Error Type          | Description                                          |
+| ------ | ------------------- | ---------------------------------------------------- |
+| 400    | `BadRequestError`   | Invalid input, malformed IDs, or missing files       |
+| 401    | `UnauthorizedError` | Missing or invalid authorization token               |
+| 403    | `ForbiddenError`    | User does not have the required role                 |
+| 404    | `NotFoundError`     | Product, category, gallery entry, or field not found |
+| 409    | `ConflictError`     | Duplicate serial or unique constraint violation      |
+| 422    | `ValidationError`   | DTO validation failed — returns `errors` array       |
 
 ### Error Response Format
 

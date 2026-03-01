@@ -9,13 +9,14 @@ import useAuth from "@/hooks/auth/useAuth";
 import { useCart } from "@/contexts/CartContext";
 import useRole from "@/hooks/useRole";
 import { useFastBuy } from "@/hooks/useFastBuy";
+import RatingDisplay from "@/components/ui/RatingDisplay";
 
 /**
  * ProductCard — renders a single product in the market grid.
  * The image/title area links to /product/:id.
  * "Add to Cart" and "Buy Now" buttons appear below (not inside the Link).
  */
-const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, isPurchased }) => {
+const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, isPurchased, rate, rate_count }) => {
   const { t, i18n } = useTranslation("market");
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -107,6 +108,12 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
               {title}
             </h3>
             <p className="text-sm text-muted-foreground w-full truncate">{category}</p>
+            <RatingDisplay 
+              rating={rate} 
+              reviewCount={rate_count} 
+              size="sm" 
+              className="mt-1"
+            />
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               <span className="text-base font-semibold">
                 {formatPrice(effectiveFinalPrice)} {t("product.currency")}

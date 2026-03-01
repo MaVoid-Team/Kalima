@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { arSA } from 'react-day-picker/locale';
-import { ChevronLeft, ChevronRight, Package, Pencil, Trash2 } from 'lucide-react';
+import { ChevronLeft, Package, Pencil, Trash2 } from 'lucide-react';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useAdminCoupons } from '@/hooks/admin/useAdminCoupons';
 import { formatCurrency } from '@/lib/storeUtils';
@@ -20,6 +20,7 @@ import GalleryManager from '@/components/admin/products/GalleryManager';
 import CategoriesManager from '@/components/admin/products/CategoriesManager';
 import RequiredFieldsManager from '@/components/admin/products/RequiredFieldsManager';
 import SampleManager from '@/components/admin/products/SampleManager';
+import FileUploadProgress from '@/components/admin/settings/FileUploadProgress';
 import { getDiscountType, getCouponId, isCouponActive } from '@/lib/couponUtils';
 
 export default function ProductDetailPage() {
@@ -35,7 +36,6 @@ export default function ProductDetailPage() {
         actionLoading,
         fetchProductById,
         fetchFieldDefinitions,
-        updateProduct,
         deleteProduct,
         uploadThumbnail,
         removeThumbnail,
@@ -48,7 +48,7 @@ export default function ProductDetailPage() {
         detachRequiredField,
         getProductCoupons,
         updateProductSample,
-        removeProductSample
+        removeProductSample,
     } = useAdminProducts();
 
     const {
@@ -57,12 +57,18 @@ export default function ProductDetailPage() {
         apiLoading: couponLoading,
     } = useAdminCoupons();
 
-    const [editOpen, setEditOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [productCoupons, setProductCoupons] = useState([]);
     const [couponsLoading, setCouponsLoading] = useState(false);
     const [selectedCoupon, setSelectedCoupon] = useState(null);
     const [editCouponOpen, setEditCouponOpen] = useState(false);
+
+    // Upload progress state
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadFileName, setUploadFileName] = useState('');
+    const [uploadError, setUploadError] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadAbortController, setUploadAbortController] = useState(null);
 
     const refresh = useCallback(() => {
         fetchProductById(id);
@@ -108,6 +114,128 @@ export default function ProductDetailPage() {
         const result = await updateCoupon(couponId, payload);
         await loadProductCoupons();
         return result ?? true;
+    };
+
+    // ─── Upload Handlers ───────────────────────────────────────────────────────
+
+    const handleThumbnailUpload = async (formData) => {
+        const file = formData.get('thumbnail');
+        if (!file) return;
+
+        // Create new AbortController for this upload
+        const abortController = new AbortController();
+        setUploadAbortController(abortController);
+
+        setIsUploading(true);
+        setUploadFileName(file.name);
+        setUploadError('');
+        setUploadProgress(0);
+
+        try {
+            const res = await uploadThumbnail(id, formData, (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
+            }, abortController.signal);
+            if (res?.success) {
+                fetchProductById(id);
+            } else {
+                setUploadError(res?.message || 'Upload failed');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                setUploadError(error.message || 'Upload failed');
+            }
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadFileName('');
+            setUploadAbortController(null);
+        }
+    };
+
+    const handleGalleryUpload = async (formData) => {
+        // Create new AbortController for this upload
+        const abortController = new AbortController();
+        setUploadAbortController(abortController);
+
+        setIsUploading(true);
+        setUploadFileName('Gallery images');
+        setUploadError('');
+        setUploadProgress(0);
+
+        try {
+            const res = await addGalleryImages(id, formData, (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
+            }, abortController.signal);
+            if (res?.success) {
+                // Product refresh is handled in hook
+            } else {
+                setUploadError(res?.message || 'Upload failed');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                setUploadError(error.message || 'Upload failed');
+            }
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadFileName('');
+            setUploadAbortController(null);
+        }
+    };
+
+    const handleSampleUpload = async (formData) => {
+        const file = formData.get('sample');
+        if (!file) return;
+
+        // Create new AbortController for this upload
+        const abortController = new AbortController();
+        setUploadAbortController(abortController);
+
+        setIsUploading(true);
+        setUploadFileName(file.name);
+        setUploadError('');
+        setUploadProgress(0);
+
+        try {
+            const res = await updateProductSample(id, formData, (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
+            }, abortController.signal);
+            if (res?.success) {
+                // Product refresh is handled in hook
+            } else {
+                setUploadError(res?.message || 'Upload failed');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                setUploadError(error.message || 'Upload failed');
+            }
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadFileName('');
+            setUploadAbortController(null);
+        }
+    };
+
+    const handleUploadCancel = () => {
+        if (uploadAbortController) {
+            uploadAbortController.abort();
+            setUploadAbortController(null);
+        }
+        // Immediately reset all upload states to re-enable buttons
+        setIsUploading(false);
+        setUploadProgress(0);
+        setUploadFileName('');
+        setUploadError('');
     };
 
     if (loading && !selectedProduct) {
@@ -240,9 +368,9 @@ export default function ProductDetailPage() {
                     <h3 className="text-sm font-medium text-muted-foreground mb-3">{t('products.detail.thumbnail')}</h3>
                     <ThumbnailManager
                         product={product}
-                        onUpload={(formData) => uploadThumbnail(id, formData)}
+                        onUpload={handleThumbnailUpload}
                         onRemove={() => removeThumbnail(id)}
-                        loading={actionLoading}
+                        loading={isUploading}
                     />
                 </div>
 
@@ -252,13 +380,22 @@ export default function ProductDetailPage() {
                     <h3 className="text-sm font-medium text-muted-foreground mb-3">{t('products.detail.gallery')}</h3>
                     <GalleryManager
                         product={product}
-                        onAddImages={(formData) => addGalleryImages(id, formData)}
+                        onAddImages={handleGalleryUpload}
                         onUpdateEntry={(galleryId, data) => updateGalleryEntry(id, galleryId, data)}
                         onRemoveEntry={(galleryId) => removeGalleryEntry(id, galleryId)}
-                        loading={actionLoading}
+                        loading={isUploading}
                     />
                 </div>
             </div>
+
+            {/* ── Upload Progress ── */}
+            <FileUploadProgress
+                progress={uploadProgress}
+                isUploading={isUploading}
+                onCancel={handleUploadCancel}
+                fileName={uploadFileName}
+                error={uploadError}
+            />
 
             {/* Sample */}
             <div className="rounded-xl border border-border p-5 space-y-3" data-testid="product-detail-sample">
@@ -266,9 +403,9 @@ export default function ProductDetailPage() {
                 <Separator />
                 <SampleManager
                     product={product}
-                    onUpdateSample={updateProductSample}
+                    onUpdateSample={handleSampleUpload}
                     onRemoveSample={removeProductSample}
-                    loading={actionLoading}
+                    loading={isUploading}
                 />
             </div>
 

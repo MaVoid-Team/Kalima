@@ -6,6 +6,7 @@ import { getImageUrl, formatCurrency } from '@/lib/storeUtils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import RatingDisplay from '@/components/ui/RatingDisplay';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -74,6 +75,7 @@ export default function ProductsTable({
                         <TableHead>{t('products.table.title')}</TableHead>
                         <TableHead className="hidden md:table-cell">{t('products.table.type')}</TableHead>
                         <TableHead>{t('products.table.price')}</TableHead>
+                        <TableHead className="hidden lg:table-cell">{t('products.table.rating')}</TableHead>
                         <TableHead className="hidden lg:table-cell">{t('products.table.categories')}</TableHead>
                         <TableHead className="hidden sm:table-cell">{t('products.table.status')}</TableHead>
                         <TableHead className="text-end">{t('products.table.actions')}</TableHead>
@@ -145,6 +147,16 @@ export default function ProductsTable({
                                         </div>
                                     </TableCell>
                                 )}
+
+                                {/* Rating */}
+                                <TableCell className="hidden lg:table-cell">
+                                    <RatingDisplay 
+                                        rating={product.rate || 0} 
+                                        reviewCount={product.rate_count || 0}
+                                        size="sm"
+                                        data-testid={`products-table-rating-${product.id}`}
+                                    />
+                                </TableCell>
 
                                 {/* Categories */}
                                 <TableCell className="hidden lg:table-cell">

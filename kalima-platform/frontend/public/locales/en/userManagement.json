@@ -72,6 +72,12 @@
         "preparatory": "Preparatory",
         "secondary": "Secondary",
         "usersCreated": "Users Created",
+        "students": "Students",
+        "lecturers": "Lecturers",
+        "assistants": "Assistants",
+        "parents": "Parents",
+        "assists": "Assists",
+        "teachingLocations": "Teaching Locations",
         "currency": "EGP",
         "confirmDeleteTitle": "Are you sure?",
         "confirmDeleteDesc": "This action cannot be undone. This will permanently delete the user account."

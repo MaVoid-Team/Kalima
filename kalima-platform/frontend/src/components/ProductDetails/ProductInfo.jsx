@@ -72,6 +72,8 @@ export default function ProductInfo({ product }) {
         </CardContent>
       </Card>
 
+      {/* Additional sections can be added here */}
+
       {/* Required Fields Info */}
       {product.product_required_fields &&
         product.product_required_fields.length > 0 && (

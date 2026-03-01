@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 import ImageGallery from "@/components/ProductDetails/ImageGallery";
 import ProductInfo from "@/components/ProductDetails/ProductInfo";
 import ProductActions from "@/components/ProductDetails/ProductActions";
+import ReviewList from "@/components/ProductDetails/ReviewList";
 import { useProducts } from "@/hooks/useProducts";
 
 export default function ProductDetailsPage() {
@@ -134,6 +135,16 @@ export default function ProductDetailsPage() {
             </div>
           </motion.div>
         </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="container mx-auto px-4 md:px-8 py-8">
+        <ReviewList 
+          productId={productProps.id}
+          averageRating={productProps.rate}
+          totalReviews={productProps.rate_count}
+          productReviews={productProps.product_reviews || []}
+        />
       </div>
     </div>
   );
