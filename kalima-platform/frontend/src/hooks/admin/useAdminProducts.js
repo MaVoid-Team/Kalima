@@ -150,15 +150,21 @@ export const useAdminProducts = () => {
 
     // ─── Thumbnail ────────────────────────────────────────────────────────────
 
-    const uploadThumbnail = (productId, formData) =>
-        handleAction(() => fetchApi({
+    const uploadThumbnail = (productId, formData, onUploadProgress, signal) => {
+        setActionLoading(true);
+        return fetchApi({
             endpoint: `/products/${productId}/thumbnail`,
             method: 'post',
             data: formData,
+            onUploadProgress,
+            signal,
         }).then(res => {
             if (res?.success) setSelectedProduct(res.data);
             return res;
-        }));
+        }).finally(() => {
+            setActionLoading(false);
+        });
+    };
 
     const removeThumbnail = (productId) =>
         handleAction(() => fetchApi({
@@ -171,16 +177,22 @@ export const useAdminProducts = () => {
 
     // ─── Gallery ──────────────────────────────────────────────────────────────
 
-    const addGalleryImages = (productId, formData) =>
-        handleAction(() => fetchApi({
+    const addGalleryImages = (productId, formData, onUploadProgress, signal) => {
+        setActionLoading(true);
+        return fetchApi({
             endpoint: `/products/${productId}/gallery`,
             method: 'post',
             data: formData,
+            onUploadProgress,
+            signal,
         }).then(res => {
             // Refresh product to get updated gallery
             if (res?.success) fetchProductById(productId);
             return res;
-        }));
+        }).finally(() => {
+            setActionLoading(false);
+        });
+    };
 
     const updateGalleryEntry = (productId, galleryId, data) =>
         handleAction(() => fetchApi({

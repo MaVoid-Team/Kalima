@@ -218,46 +218,70 @@ export default function EditProductPage() {
         const file = formData.get('thumbnail');
         if (!file) return;
 
+        // Create new AbortController for this upload
+        const abortController = new AbortController();
+        setUploadAbortController(abortController);
+
         setIsUploading(true);
         setUploadFileName(file.name);
         setUploadError('');
         setUploadProgress(0);
 
         try {
-            const res = await uploadThumbnail(id, formData);
+            const res = await uploadThumbnail(id, formData, (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
+            }, abortController.signal);
             if (res?.success) {
                 fetchProductById(id);
             } else {
                 setUploadError(res?.message || 'Upload failed');
             }
         } catch (error) {
-            setUploadError(error.message || 'Upload failed');
+            if (error.name !== 'AbortError') {
+                setUploadError(error.message || 'Upload failed');
+            }
         } finally {
             setIsUploading(false);
             setUploadProgress(0);
             setUploadFileName('');
+            setUploadAbortController(null);
         }
     };
 
     const handleGalleryUpload = async (formData) => {
+        // Create new AbortController for this upload
+        const abortController = new AbortController();
+        setUploadAbortController(abortController);
+
         setIsUploading(true);
         setUploadFileName('Gallery images');
         setUploadError('');
         setUploadProgress(0);
 
         try {
-            const res = await addGalleryImages(id, formData);
+            const res = await addGalleryImages(id, formData, (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
+            }, abortController.signal);
             if (res?.success) {
                 // Product refresh is handled in the hook
             } else {
                 setUploadError(res?.message || 'Upload failed');
             }
         } catch (error) {
-            setUploadError(error.message || 'Upload failed');
+            if (error.name !== 'AbortError') {
+                setUploadError(error.message || 'Upload failed');
+            }
         } finally {
             setIsUploading(false);
             setUploadProgress(0);
             setUploadFileName('');
+            setUploadAbortController(null);
         }
     };
 
@@ -266,6 +290,7 @@ export default function EditProductPage() {
             uploadAbortController.abort();
             setUploadAbortController(null);
         }
+        // Immediately reset all upload states to re-enable buttons
         setIsUploading(false);
         setUploadProgress(0);
         setUploadFileName('');
@@ -552,7 +577,7 @@ export default function EditProductPage() {
                             product={selectedProduct}
                             onUpload={handleThumbnailUpload}
                             onRemove={() => removeThumbnail(id)}
-                            loading={actionLoading || isUploading}
+                            loading={isUploading}
                         />
                     </div>
 
@@ -565,7 +590,7 @@ export default function EditProductPage() {
                             onAddImages={handleGalleryUpload}
                             onUpdateEntry={(galleryId, data) => updateGalleryEntry(id, galleryId, data)}
                             onRemoveEntry={(galleryId) => removeGalleryEntry(id, galleryId)}
-                            loading={actionLoading || isUploading}
+                            loading={isUploading}
                         />
                     </div>
 
