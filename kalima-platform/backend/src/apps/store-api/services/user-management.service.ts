@@ -974,6 +974,7 @@ class UserManagementService {
         // we leave 'name' and relations intact for order history
         updated_at: new Date(),
         deleted_at: new Date(),
+        is_deleted: true,
       },
     });
 
@@ -1034,6 +1035,7 @@ class UserManagementService {
         orderBy: { created_at: "desc" },
         select: {
           ...this.baseUserSelect(),
+          is_deleted: true,
           role: true,
           confirmed: true,
           user_roles: {
@@ -1065,6 +1067,7 @@ class UserManagementService {
       select: {
         ...this.baseUserSelect(),
         role: true,
+        is_deleted: true,
         confirmed: true,
         user_roles: {
           select: {
@@ -1073,12 +1076,15 @@ class UserManagementService {
             role: true,
           },
         },
-        teachers: { include: { subjects: true } },
+        teachers: {
+          include: { subjects: true, government: true, zones: true },
+        },
         teaches_at: true,
-        students: { select: { level_id: true } },
+        students: { include: { levels: true, government: true, zones: true } },
         lecturers: { select: { bio: true } },
-        assistants: { select: { lecturer_user_id: true } },
-        parents: { select: { government_id: true } },
+        assistants: { include: { lecturers: true } },
+        parents: { include: { government: true, zones: true } },
+        deleted_at: true,
         user_analytics: true,
       },
     });

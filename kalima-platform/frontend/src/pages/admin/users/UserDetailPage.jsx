@@ -127,6 +127,10 @@ export default function UserDetailPage() {
     const analytics = selectedUser.user_analytics || {};
     const teacher = selectedUser.teachers;
     const teachesAt = selectedUser.teaches_at || [];
+    const students = selectedUser.students ? (Array.isArray(selectedUser.students) ? selectedUser.students : []) : [];
+    const lecturers = selectedUser.lecturers ? (Array.isArray(selectedUser.lecturers) ? selectedUser.lecturers : []) : [];
+    const assistants = selectedUser.assistants ? (Array.isArray(selectedUser.assistants) ? selectedUser.assistants : []) : [];
+    const parents = selectedUser.parents ? (Array.isArray(selectedUser.parents) ? selectedUser.parents : []) : [];
     const userCreated = selectedUser.userCreated || {};
     const roles = selectedUser.user_roles || [];
 
@@ -341,13 +345,13 @@ export default function UserDetailPage() {
                                 <InfoRow
                                     icon={MapPin}
                                     label={t('details.government')}
-                                    value={teacher.government?.title || teacher.government_id ? `ID: ${teacher.government_id}` : null}
+                                    value={teacher.government?.title || `ID: ${teacher.government_id}`}
                                 />
                                 <Separator className="my-1 opacity-50" />
                                 <InfoRow
                                     icon={MapPin}
                                     label={t('details.zone')}
-                                    value={teacher.zones?.title || teacher.zone_id ? `ID: ${teacher.zone_id}` : null}
+                                    value={teacher.zones?.title || `ID: ${teacher.zone_id}`}
                                 />
 
                                 {activeLevels.length > 0 && (
@@ -420,6 +424,158 @@ export default function UserDetailPage() {
                                         </div>
                                     ))}
                                 </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Students Card */}
+                    {students.length > 0 && (
+                        <Card className="shadow-sm" data-testid="user-detail-students-card">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <GraduationCap className="h-5 w-5 text-primary" />
+                                    {t('details.students', 'Students')}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-0 space-y-0">
+                                {students.map((student) => (
+                                    <div key={student.id} className="py-2">
+                                        <div className="flex items-start gap-3">
+                                            <User className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium truncate">{student.name}</p>
+                                                <div className="flex flex-wrap gap-2 mt-1">
+                                                    {student.levels && (
+                                                        <Badge variant="outline" className="text-xs">
+                                                            {student.levels.title}
+                                                        </Badge>
+                                                    )}
+                                                    {student.government && (
+                                                        <Badge variant="secondary" className="text-xs">
+                                                            {student.government.title}
+                                                        </Badge>
+                                                    )}
+                                                    {student.zones && (
+                                                        <Badge variant="secondary" className="text-xs">
+                                                            {student.zones.title}
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {student !== students[students.length - 1] && (
+                                            <Separator className="my-2 opacity-50" />
+                                        )}
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Lecturers Card */}
+                    {lecturers.length > 0 && (
+                        <Card className="shadow-sm" data-testid="user-detail-lecturers-card">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <BookOpen className="h-5 w-5 text-primary" />
+                                    {t('details.lecturers', 'Lecturers')}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-0 space-y-0">
+                                {lecturers.map((lecturer) => (
+                                    <div key={lecturer.id} className="py-2">
+                                        <div className="flex items-start gap-3">
+                                            <BookOpen className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium truncate">{lecturer.name}</p>
+                                                {lecturer.bio && (
+                                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                                        {lecturer.bio}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {lecturer !== lecturers[lecturers.length - 1] && (
+                                            <Separator className="my-2 opacity-50" />
+                                        )}
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Assistants Card */}
+                    {assistants.length > 0 && (
+                        <Card className="shadow-sm" data-testid="user-detail-assistants-card">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <UserPlus className="h-5 w-5 text-primary" />
+                                    {t('details.assistants', 'Assistants')}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-0 space-y-0">
+                                {assistants.map((assistant) => (
+                                    <div key={assistant.id} className="py-2">
+                                        <div className="flex items-start gap-3">
+                                            <UserPlus className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium truncate">{assistant.name}</p>
+                                                {assistant.lecturers && assistant.lecturers.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1 mt-1">
+                                                        <span className="text-xs text-muted-foreground">{t('details.assists', 'Assists')}:</span>
+                                                        {assistant.lecturers.map((lecturer) => (
+                                                            <Badge key={lecturer.id} variant="outline" className="text-xs">
+                                                                {lecturer.name}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {assistant !== assistants[assistants.length - 1] && (
+                                            <Separator className="my-2 opacity-50" />
+                                        )}
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Parents Card */}
+                    {parents.length > 0 && (
+                        <Card className="shadow-sm" data-testid="user-detail-parents-card">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <Users className="h-5 w-5 text-primary" />
+                                    {t('details.parents', 'Parents')}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-0 space-y-0">
+                                {parents.map((parent) => (
+                                    <div key={parent.id} className="py-2">
+                                        <div className="flex items-start gap-3">
+                                            <Users className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium truncate">{parent.name}</p>
+                                                <div className="flex flex-wrap gap-2 mt-1">
+                                                    {parent.government && (
+                                                        <Badge variant="secondary" className="text-xs">
+                                                            {parent.government.title}
+                                                        </Badge>
+                                                    )}
+                                                    {parent.zones && (
+                                                        <Badge variant="secondary" className="text-xs">
+                                                            {parent.zones.title}
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {parent !== parents[parents.length - 1] && (
+                                            <Separator className="my-2 opacity-50" />
+                                        )}
+                                    </div>
+                                ))}
                             </CardContent>
                         </Card>
                     )}

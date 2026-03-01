@@ -72,6 +72,12 @@
         "preparatory": "إعدادي",
         "secondary": "ثانوي",
         "usersCreated": "المستخدمون المنشئون",
+        "students": "الطلاب",
+        "lecturers": "المحاضرون",
+        "assistants": "المساعدون",
+        "parents": "أولياء الأمور",
+        "assists": "يساعد",
+        "teachingLocations": "أماكن التدريس",
         "currency": "جنيه",
         "confirmDeleteTitle": "هل أنت متأكد؟",
         "confirmDeleteDesc": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف حساب المستخدم بشكل نهائي."
