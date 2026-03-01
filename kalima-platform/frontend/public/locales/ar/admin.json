@@ -186,7 +186,8 @@
       "total": "الإجمالي",
       "by": "بواسطة",
       "lastNoteBy": "آخر ملاحظة بواسطة: {{name}}",
-      "contactWhatsApp": "تواصل عبر واتساب"
+      "contactWhatsApp": "تواصل عبر واتساب",
+      "loading": "جاري تحميل التفاصيل..."
     }
   },
   "products": {

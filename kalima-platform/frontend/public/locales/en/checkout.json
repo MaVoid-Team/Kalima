@@ -69,6 +69,7 @@
     "optional": "Optional",
     "securePayment": "Secure Payment",
     "encryptedCheckout": "Encrypted Checkout",
+    "errorLoading": "Error loading payment options, please try again later",
     "transferNumberPlaceholder": "Enter transfer number"
   },
   "orderSummary": {

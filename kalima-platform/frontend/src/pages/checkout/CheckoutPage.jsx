@@ -10,10 +10,6 @@ export default function CheckoutPage() {
   const { state, submitting, handleCheckout } = useCheckoutPage();
   const { preview, loading, error, purchaseSerial } = state;
 
-  useEffect(() =>{
-    alert(purchaseSerial);
-  }, [purchaseSerial]);
-
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -23,7 +19,7 @@ export default function CheckoutPage() {
   }
 
   if (error) {
-    const msg = error?.response?.data?.message || t("payment.error_loading");
+    const msg = error?.response?.data?.message || t("payment.errorLoading");
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <p className="text-destructive text-sm">{msg}</p>
