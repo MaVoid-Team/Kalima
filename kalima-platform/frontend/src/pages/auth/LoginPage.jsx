@@ -12,7 +12,7 @@ import useLogin from "@/hooks/auth/useLogin";
 import { signInWithPopup } from 'firebase/auth';
 import { auth } from "@/lib/firebase";
 import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
-import LoginAnimatedBackground from "@/components/auth/LoginAnimatedBackground";
+import AuthAnimatedBackground from "@/components/auth/AuthAnimatedBackground";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -101,7 +101,7 @@ export default function LoginPage() {
 
     return (
         <div className="container relative grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden py-8 lg:max-w-none lg:grid-cols-1 lg:px-0">
-            <LoginAnimatedBackground />
+            <AuthAnimatedBackground variant="login" />
 
             <div className="relative w-full lg:p-8">
                 <motion.div
