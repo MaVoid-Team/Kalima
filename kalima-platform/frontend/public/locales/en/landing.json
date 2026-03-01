@@ -51,6 +51,7 @@
   },
   "welcome": {
     "badge": "Soar in the Sky of Creativity",
+    "sparkleBadge": "Fresh Content",
     "title": "",
     "titleHighlight": "Kalima",
     "titleEnd": "Learning Platform",
@@ -119,6 +120,7 @@
   },
   "about": {
     "badge": "The Legacy",
+    "sparkleBadge": "Top Rated",
     "title": "Beyond",
     "titleHighlight": "Boundaries",
     "titleEnd": "of Traditional Learning",
@@ -136,6 +138,7 @@
   },
   "appDownload": {
     "badge": "Kalima App",
+    "sparkleBadge": "Download Ready",
     "title": "Learn Without",
     "titleHighlight": "Boundaries",
     "titleEnd": "In Your Hands",

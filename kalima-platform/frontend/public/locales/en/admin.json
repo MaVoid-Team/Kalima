@@ -717,12 +717,18 @@
     "fields": {
       "name": "Name",
       "namePlaceholder": "e.g., Vodafone Cash",
+      "nameDescription": "Enter a descriptive name for the payment method",
       "phoneNumber": "Phone Number",
       "phoneNumberPlaceholder": "e.g., 01012345678",
+      "phoneDescription": "Enter the contact phone number for this payment method.",
       "status": "Status",
       "statusDescription": "Enable or disable this payment method",
       "image": "Image",
-      "imageOptional": "Leave empty to keep current image"
+      "imageOptional": "Leave empty to keep current image",
+      "imageDescription": "Upload a new image to replace the current one. Recommended size: 200x200px",
+      "currentImage": "Current Image",
+      "unchanged": "Unchanged",
+      "newImage": "New Image"
     },
     "create": {
       "title": "Create Payment Method",
