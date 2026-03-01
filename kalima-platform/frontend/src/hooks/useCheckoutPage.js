@@ -35,7 +35,8 @@ export function useCheckoutPage() {
         method: "post",
         data: formData,
       });
-      const serial = data?.purchase_serial;
+      const serial = data?.purchase?.purchase_serial;
+      alert("Here 1: ", serial);
       if (serial) setPurchaseSerial(serial);
     } catch {
       // Error toast handled globally

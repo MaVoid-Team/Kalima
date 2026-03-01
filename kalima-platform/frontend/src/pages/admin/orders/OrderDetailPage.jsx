@@ -25,7 +25,6 @@ export default function OrderDetailPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { t, i18n } = useTranslation('admin');
-    const isRtl = i18n.dir() === 'rtl';
 
     const {
         selectedOrder: order,
@@ -89,7 +88,7 @@ export default function OrderDetailPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
                 <div className="flex items-center space-x-4 rtl:space-x-reverse">
                     <Button variant="ghost" size="icon" onClick={() => navigate('/admin/orders')} className="shrink-0" data-testid="order-detail-back-button">
-                        {isRtl ? <ChevronRight /> : <ChevronLeft />}
+                        <ChevronLeft />
                     </Button>
                     <div>
                         <div className="flex items-center space-x-3 rtl:space-x-reverse">

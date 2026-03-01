@@ -70,6 +70,7 @@
     "optional": "اختياري",
     "securePayment": "دفع آمن",
     "encryptedCheckout": "إتمام شراء مشفر",
+    "errorLoading": "خطأ في تحميل خيارات الدفع، يرجى المحاولة مرة أخرى لاحقًا",
     "transferNumberPlaceholder": "أدخل رقم المحفظة المحول منها"
   },
   "orderSummary": {

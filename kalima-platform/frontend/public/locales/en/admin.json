@@ -186,7 +186,8 @@
       "total": "Total",
       "by": "by",
       "lastNoteBy": "Last note by: {{name}}",
-      "contactWhatsApp": "Contact on WhatsApp"
+      "contactWhatsApp": "Contact on WhatsApp",
+      "loading": "Loading details..."
     }
   },
   "products": {
