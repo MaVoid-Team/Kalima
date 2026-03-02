@@ -23,7 +23,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-background border-t text-muted-foreground py-8 md:py-12">
+    <footer className="border-t text-muted-foreground py-8 md:py-12">
       <div className="container px-6 md:px-6">
         <div className="flex flex-row justify-between items-center">
           {/* Brand */}

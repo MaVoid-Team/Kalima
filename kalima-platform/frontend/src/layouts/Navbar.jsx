@@ -30,7 +30,7 @@ export default function Navbar() {
   const location = useLocation();
   const { t, i18n } = useTranslation("landing");
   const [commandValue, setCommandValue] = useState("");
-  
+
   useEffect(() => {
     const down = (e) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -80,7 +80,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-background ">
+      <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border/40">
         <div className="container md:px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 decoration-0">
