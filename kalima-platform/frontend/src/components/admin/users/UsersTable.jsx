@@ -48,7 +48,7 @@ export default function UsersTable({ users, loading, selectedIds = [], onSelect,
                                 className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                 checked={users.length > 0 && selectedIds.length === users.length}
                                 onCheckedChange={onSelectAll}
-                                aria-label="Select all users"
+                                aria-label={t('table.selectAll', 'Select all users')}
                                 data-testid="users-table-select-all"
                             />
                         </TableHead>

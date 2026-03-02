@@ -1,12 +1,17 @@
 {
   "title": "Your Shopping Cart",
-  "L.E": "L.E",
+  "L": {
+    "E": "L.E"
+  },
   "continueShopping": "Continue Shopping",
   "goShopping": "Go Shopping",
   "hideRequiredFields": "Hide required fields",
   "viewRequiredFields": "View required fields",
   "itemAddedToCart": "Item added to cart",
   "cartCleared": "Cart cleared successfully",
+  "clearCartSuccess": "Cart cleared successfully",
+  "clearCartFailed": "Failed to clear cart. Please try again.",
+  "clearingCart": "Clearing...",
   "requiredFieldsUpdated": "Required fields updated",
   "requiredFieldsImageUpdated": "Required fields image updated",
   "uploadImage": "Upload image",

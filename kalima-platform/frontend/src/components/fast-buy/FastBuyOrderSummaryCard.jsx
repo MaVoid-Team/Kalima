@@ -21,7 +21,7 @@ export default function FastBuyOrderSummaryCard({
   const submitLabel = loading ? (
     <LoadingSpinner className="w-5 h-5" />
   ) : (
-    t("payment.complete_purchase", "Complete Purchase")
+    t("payment.completePurchase", "Complete Purchase")
   );
 
   return (

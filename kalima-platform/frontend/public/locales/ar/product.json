@@ -18,7 +18,7 @@
   "actions": {
     "addToCart": "إضافة إلى السلة",
     "buyNow": "اشتري الآن",
-    "viewSample": "عرض نموذج",
+    "viewSample": "عرض عينة",
     "follow": "متابعة"
   },
   "info": {
@@ -120,5 +120,8 @@
     "fileDetails": "تفاصيل الملف",
     "publisherInfo": "معلومات الناشر",
     "saveToPlan": "حفظ في الخطة"
+  },
+  "common": {
+    "cancel": "إلغاء"
   }
 }

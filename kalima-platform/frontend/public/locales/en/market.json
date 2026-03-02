@@ -61,7 +61,8 @@
     "buyNow": "Buy Now",
     "purchased": "PURCHASED",
     "new": "NEW",
-    "off": "OFF"
+    "off": "OFF",
+    "cart": "Cart"
   },
   "products": {
     "trending": {
@@ -107,9 +108,13 @@
   },
   "pagination": {
     "previous": "Previous",
+    "prev": "Previous",
     "next": "Next",
     "page": "Page",
     "of": "of"
+  },
+  "common": {
+    "back": "Back"
   },
   "errors": {
     "loadingError": "Error loading data",

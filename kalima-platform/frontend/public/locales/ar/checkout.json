@@ -1,7 +1,8 @@
 {
   "header": {
     "secureCheckout": "دفع آمن",
-    "marketName": "سوق كلمة"
+    "marketName": "سوق كلمة",
+    "market_name": "سوق كلمة"
   },
   "steps": {
     "information": "المعلومات",
@@ -51,27 +52,31 @@
     "cancel": "إلغاء",
     "preview": "معاينة",
     "backToCart": "العودة إلى السلة",
-    "screenshot": "صورة الإيصال",
     "upload": "رفع",
+    "uploadHint": "PNG للصور، بحجم أقصى 5 ميجا",
+    "upload_hint": "PNG للصور، بحجم أقصى 5 ميجا",
+    "enterField": "أدخل {{field}}",
     "notes": "ملاحظات (اختياري)",
     "notesPlaceholder": "أي طلبات خاصة؟",
-    "bookDetails": "تفاصيل الكتاب",
-    "nameOnBook": "الاسم على الكتاب",
-    "numberOnBook": "الرقم التسلسلى على الكتاب",
-    "seriesName": "اسم السلسله",
-    "TeacherName": "اسم المعلم",
-    "method": "اختر طريقة الدفع",
-    "BookName": "اسم الكتاب",
-    "Image": "الصورة",
-    "enter": "أدخل",
-    "enterField": "أدخل {{field}}",
-    "notesLabel": "اضافه ملاحظات",
-    "uploadHint": "PNG للصور، بحجم أقصى 5 ميجا",
-    "optional": "اختياري",
+    "notes_label": "تعليمات التسليم أو الطلبات الخاصة",
+    "notesLabel": "تعليمات التسليم أو الطلبات الخاصة",
+    "book_details": "تفاصيل الكتاب",
+    "name_on_book": "الاسم على الكتاب",
+    "number_on_book": "الرقم على الكتاب",
+    "series_name": "اسم السلسلة",
+    "teacher_name": "اسم المدرس",
     "securePayment": "دفع آمن",
-    "encryptedCheckout": "إتمام شراء مشفر",
-    "errorLoading": "خطأ في تحميل خيارات الدفع، يرجى المحاولة مرة أخرى لاحقًا",
-    "transferNumberPlaceholder": "أدخل رقم المحفظة المحول منها"
+    "secure_notice": "معلومات الدفع الخاصة بك آمنة.",
+    "encryptedCheckout": "دفع مشفر",
+    "error_loading": "خطأ في تحميل خيارات الدفع، يرجى المحاولة لاحقاً",
+    "errorLoading": "خطأ في تحميل خيارات الدفع، يرجى المحاولة لاحقاً",
+    "transferNumberPlaceholder": "أدخل رقم المحفظة",
+    "transfer_number_placeholder": "أدخل رقم المحفظة",
+    "transfer_number": "رقم المحفظة المحول منها",
+    "complete_purchase": "إتمام الشراء",
+    "completePurchase": "إتمام الشراء",
+    "screenshot": "صورة الإيصال",
+    "method": "اختر طريقة الدفع"
   },
   "orderSummary": {
     "title": "ملخص الطلب",
@@ -82,7 +87,7 @@
     "taxes": "الضرائب (تقديري)",
     "discount": "الخصم",
     "total": "الإجمالي",
-    "currency": "دولار أمريكي",
+    "currency": "جنيه مصري",
     "pay": "ادفع",
     "qty": "الكمية"
   },
@@ -96,7 +101,19 @@
   "fastBuy": {
     "checkoutSuccess": "تم الشراء بنجاح! إعادة التوجيه إلى السوق..."
   },
+  "fastBuyClearDialog": {
+    "title": "هل تريد مغادرة إتمام الشراء السريع؟",
+    "description": "مغادرة هذه الصفحة ستؤدي إلى مسح سلة الشراء السريع الخاصة بك. يمكنك البقاء لإكمال الدفع، أو المغادرة والبدء من جديد لاحقًا.",
+    "cancel": "البقاء في صفحة الدفع",
+    "confirm": "المغادرة ومسح السلة"
+  },
   "success": {
+    "title": "تم الطلب بنجاح!",
+    "description": "شكراً لشرائك. لقد تلقينا طلبك وسنقوم بمعالجته قريباً.",
+    "serial_label": "الرقم التسلسلي للطلب",
+    "copy": "نسخ الرقم التسلسلي",
+    "continue_shopping": "متابعة التسوق",
+    "view_orders": "عرض طلباتي",
     "copied": "تم النسخ إلى الحافظة"
   },
   "failed": "فشل في إتمام الدفع، يرجى المحاولة مرة أخرى",
@@ -120,12 +137,20 @@
       "pending": "قيد الانتظار",
       "completed": "مكتمل",
       "failed": "فشل",
-      "refunded": "تم الاسترداد"
+      "refunded": "تم الاسترداد",
+      "Pending": "قيد الانتظار",
+      "Completed": "مكتمل",
+      "Failed": "فشل",
+      "Refunded": "تم الاسترداد"
     }
   },
   "wizard": {
     "cart": "السلة",
     "payment": "الدفع"
+  },
+  "cancel": "إلغاء",
+  "general": {
+    "go_back": "الرجوع"
   },
   "L.E": " ج.م"
 }

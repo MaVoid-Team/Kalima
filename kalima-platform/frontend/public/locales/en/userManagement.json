@@ -11,9 +11,17 @@
     "export": "Export",
     "exportCsv": "Export as CSV",
     "exportXlsx": "Export as Excel",
+    "exporting": "Exporting...",
+    "processing": "Preparing data...",
+    "export.exporting": "Exporting...",
+    "export.processing": "Preparing data...",
     "filters": {
         "allRoles": "All Roles",
-        "allPortals": "All Portals"
+        "allPortals": "All Portals",
+        "allStatuses": "All Statuses",
+        "allAccounts": "All Accounts",
+        "activeAccounts": "Active",
+        "deletedAccounts": "Deleted"
     },
     "table": {
         "name": "Name",
@@ -23,11 +31,13 @@
         "status": "Verified",
         "joined": "Joined",
         "actions": "Actions",
-        "noUsersFound": "No users found matching your criteria."
+        "noUsersFound": "No users found matching your criteria.",
+        "selectAll": "Select all users"
     },
     "status": {
         "verified": "Verified",
-        "pending": "Pending"
+        "pending": "Pending",
+        "deleted": "Deleted"
     },
     "actions": {
         "view": "View Profile",
@@ -120,6 +130,7 @@
         "totalUsers": "Total Users",
         "verifiedUsers": "Verified Users",
         "teachers": "Teachers",
-        "admins": "Administrators"
+        "admins": "Administrators",
+        "moderators": "Moderators"
     }
 }

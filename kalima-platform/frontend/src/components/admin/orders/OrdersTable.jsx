@@ -36,7 +36,7 @@ export default function OrdersTable({
                                     className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                     checked={orders.length > 0 && selectedIds.length === orders.length}
                                     onCheckedChange={onSelectAll}
-                                    aria-label="Select all"
+                                    aria-label={t('orders.table.selectAll', 'Select all')}
                                 />
                             </TableHead>
                             <TableHead>{t('orders.table.serial')}</TableHead>

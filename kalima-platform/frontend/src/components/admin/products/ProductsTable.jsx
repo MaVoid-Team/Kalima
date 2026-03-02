@@ -67,7 +67,7 @@ export default function ProductsTable({
                                 className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                 checked={products.length > 0 && selectedIds.length === products.length}
                                 onCheckedChange={onSelectAll}
-                                aria-label="Select all"
+                                aria-label={t('products.table.selectAll', 'Select all')}
                                 data-testid="products-table-select-all"
                             />
                         </TableHead>
@@ -150,8 +150,8 @@ export default function ProductsTable({
 
                                 {/* Rating */}
                                 <TableCell className="hidden lg:table-cell">
-                                    <RatingDisplay 
-                                        rating={product.rate || 0} 
+                                    <RatingDisplay
+                                        rating={product.rate || 0}
                                         reviewCount={product.rate_count || 0}
                                         size="sm"
                                         data-testid={`products-table-rating-${product.id}`}

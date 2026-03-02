@@ -1,6 +1,8 @@
 {
   "title": "عربة التسوق الخاصة بك",
-  "L.E": "ج.م",
+  "L": {
+    "E": "ج.م"
+  },
   "continueShopping": "مواصلة التسوق",
   "goShopping": "اذهب للتسوق",
   "hideRequiredFields": "إخفاء الخانات المطلوبة",
@@ -16,6 +18,9 @@
   "checkoutSuccess": "تم الدفع بنجاح",
   "itemAddedToCart": "تم إضافة العنصر إلى العربة",
   "cartCleared": "تم تفريغ السلة بنجاح",
+  "clearCartSuccess": "تم تفريغ السلة بنجاح",
+  "clearCartFailed": "فشل تفريغ السلة. يرجى المحاولة مرة أخرى.",
+  "clearingCart": "جاري التفريغ...",
   "requiredFieldsUpdated": "تم تحديث الخانات المطلوبة",
   "itemsInCart": "لديك {{count}} عنصر في سلة التسوق جاهز للدفع.",
   "orderSummary": "ملخص الطلب",

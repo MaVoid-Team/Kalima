@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import AdminReviewCard from './AdminReviewCard';
-import useApiMutation  from '@/hooks/useApiMutation';
+import useApiMutation from '@/hooks/useApiMutation';
 import { cn } from '@/lib/utils';
 
 /**
@@ -32,7 +32,7 @@ const ReviewManager = ({ productId, className }) => {
   const fetchReviews = useCallback(async (page = 1) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const query = new URLSearchParams({
         page,
@@ -104,7 +104,7 @@ const ReviewManager = ({ productId, className }) => {
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <MessageSquare className="w-5 h-5" />
-            {t('products.detail.reviews', 'Reviews')}
+            {t('products.reviews.title', 'Reviews')}
           </h2>
           {pagination.total > 0 && (
             <Badge variant="secondary" className="text-sm">
@@ -112,7 +112,7 @@ const ReviewManager = ({ productId, className }) => {
             </Badge>
           )}
         </div>
-        
+
         <Button
           variant="outline"
           size="sm"
@@ -180,11 +180,11 @@ const ReviewManager = ({ productId, className }) => {
           >
             {t('common.pagination.previous', 'Previous')}
           </Button>
-          
+
           <span className="text-sm text-muted-foreground">
             {t('common.pagination.page', 'Page')} {pagination.page} {t('common.pagination.of', 'of')} {pagination.pages}
           </span>
-          
+
           <Button
             variant="outline"
             size="sm"

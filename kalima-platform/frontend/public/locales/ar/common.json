@@ -1,0 +1,21 @@
+{
+    "validation": {
+        "required": "هذا الحقل مطلوب",
+        "email": "يرجى إدخال بريد إلكتروني صالح",
+        "minLength": "يجب أن يكون {{min}} أحرف على الأقل",
+        "invalidPhone": "رقم هاتف مصري غير صالح"
+    },
+    "roles": {
+        "Admin": "مدير",
+        "SubAdmin": "مدير مساعد",
+        "Moderator": "مشرف",
+        "Assistant": "مساعد"
+    },
+    "export": {
+        "success": "تم التصدير بنجاح"
+    },
+    "gender": {
+        "male": "ذكر",
+        "female": "أنثى"
+    }
+}

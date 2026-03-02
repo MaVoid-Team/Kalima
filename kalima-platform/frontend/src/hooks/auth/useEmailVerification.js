@@ -15,7 +15,7 @@ const useEmailVerification = () => {
     const sendVerification = async () => {
         return await mutate({
             endpoint: '/auth/send-verification',
-            defaultSuccessMessage: t('veryifyEmail.verificationEmailSent', 'Verification email sent!')
+            defaultSuccessMessage: t('verifyEmail.verificationEmailSent', 'Verification email sent!')
         });
     };
 
