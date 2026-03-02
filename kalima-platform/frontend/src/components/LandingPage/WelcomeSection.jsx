@@ -111,7 +111,7 @@ export default function WelcomeSection() {
             transition={{ duration: 0.5, delay: 0.12 }}
             className="relative"
           >
-            <img src={HERO_IMAGE} alt={t("landingPage.hero.title")} className="h-[460px] w-full rounded-3xl object-cover shadow-2xl" />
+            <img src={HERO_IMAGE} alt={t("landingPage.hero.title")} fetchPriority="high" width="800" height="460" className="h-[460px] w-full rounded-3xl object-cover shadow-2xl" />
             <motion.div
               className="absolute -bottom-5 start-4 w-[92%] rounded-2xl border border-border/60 bg-background/95 p-4 shadow-lg"
               initial={{ opacity: 0, y: 18 }}

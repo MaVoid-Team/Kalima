@@ -91,6 +91,9 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
               <img
                 src={image}
                 alt={title}
+                loading="lazy"
+                width="400"
+                height="500"
                 className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                 onError={(e) => {
                   e.target.onerror = null;
@@ -99,7 +102,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-muted">
-                <img src={fallbackImage} alt="Placeholder" className="w-full h-full object-cover opacity-50" />
+                <img src={fallbackImage} alt="Placeholder" loading="lazy" width="400" height="500" className="w-full h-full object-cover opacity-50" />
               </div>
             )}
           </CardContent>
@@ -108,10 +111,10 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
               {title}
             </h3>
             <p className="text-sm text-muted-foreground w-full truncate">{category}</p>
-            <RatingDisplay 
-              rating={rate} 
-              reviewCount={rate_count} 
-              size="sm" 
+            <RatingDisplay
+              rating={rate}
+              reviewCount={rate_count}
+              size="sm"
               className="mt-1"
             />
             <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -129,7 +132,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
       </Link>
 
       {/* Action buttons — outside the Link to avoid nested interactive elements */}
-      { !isAdmin && isAuthenticated && (
+      {!isAdmin && isAuthenticated && (
         <div className="flex items-center gap-2 mt-auto">
           <Button
             variant="outline"
