@@ -223,9 +223,8 @@ class CartService {
   // ============================================
   async startFastBuy(user_id: number, product_id: number, quantity: number) {
     // 1. Delete any existing fastbuy carts for this user
-    await this.db.carts.updateMany({
+    await this.db.carts.deleteMany({
       where: { user_id, status: "fastbuy", deleted_at: null },
-      data: { deleted_at: new Date() },
     });
     await invalidateCartCache(`fastbuy:${user_id}` as any);
 
@@ -403,12 +402,6 @@ class CartService {
     });
     if (!product) throw new NotFoundError("Product not found");
 
-    console.log(
-      "product price:",
-      product.price,
-      "product price after discount:",
-      product.price_after_discount,
-    );
     const price_at_add = Math.min(
       Number(product.price),
       Number(product.price_after_discount),
