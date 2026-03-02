@@ -207,7 +207,9 @@
       }
     },
     "about": {
-      "title": "What makes Kalima production-ready",
+      "titleStart": "What makes ",
+      "titleHighlight": "Kalima",
+      "titleEnd": " your best choice",
       "description": "The platform now combines pedagogical quality, trusted educators, and practical tools into one consistent user journey.",
       "pillars": {
         "curriculum": {
@@ -238,7 +240,9 @@
     },
     "stories": {
       "badge": "Success stories",
-      "title": "How Kalima creates real impact",
+      "titleStart": "How ",
+      "titleHighlight": "Kalima",
+      "titleEnd": " creates real impact",
       "storyOne": {
         "quote": "My students engage more because lessons and worksheets are connected in one path.",
         "name": "Mariam Adel",
@@ -253,6 +257,19 @@
         "quote": "We reduced preparation time while improving average class performance.",
         "name": "Salma Nabil",
         "role": "School Coordinator"
+      },
+      "form": {
+        "title": "Share your success story",
+        "description": "Add your own story and send a comment to inspire others.",
+        "namePlaceholder": "Your name",
+        "rolePlaceholder": "Your role (optional)",
+        "storyPlaceholder": "Write your success story...",
+        "commentPlaceholder": "Add your comment...",
+        "commentLabel": "Comment",
+        "submit": "Share Story",
+        "validation": "Please add your name, story, and comment.",
+        "success": "Your success story has been shared.",
+        "defaultRole": "Community Member"
       }
     },
     "download": {
