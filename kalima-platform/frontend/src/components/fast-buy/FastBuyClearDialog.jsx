@@ -8,20 +8,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "react-i18next";
 
 export default function FastBuyClearDialog({ open, onStay, onConfirm }) {
+  const { t } = useTranslation("checkout");
   return (
     <AlertDialog open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Leave fast buy checkout?</AlertDialogTitle>
+          <AlertDialogTitle>{t("fastBuyClearDialog.title", "Leave fast buy checkout?")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Leaving this page will clear your fast buy cart. You can stay to complete checkout, or leave and start again later.
+            {t("fastBuyClearDialog.description", "Leaving this page will clear your fast buy cart. You can stay to complete checkout, or leave and start again later.")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onStay}>Stay on checkout</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>Leave and clear cart</AlertDialogAction>
+          <AlertDialogCancel onClick={onStay}>{t("fastBuyClearDialog.cancel", "Stay on checkout")}</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}>{t("fastBuyClearDialog.confirm", "Leave and clear cart")}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

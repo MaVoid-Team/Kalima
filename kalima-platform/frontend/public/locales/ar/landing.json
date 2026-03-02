@@ -1,4 +1,8 @@
 {
+  "nav": {
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة"
+  },
   "navbar": {
     "brand": "كلمة",
     "courses": "الكورسات",
@@ -207,6 +211,7 @@
       }
     },
     "about": {
+      "title": "عن كلمة",
       "titleStart": "ما الذي يجعل ",
       "titleHighlight": "كلمة",
       "titleEnd": " افضل اختياراتك",

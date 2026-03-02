@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Minus, Plus, ShoppingCart, Eye, ScanBarcode } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Eye, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
@@ -93,7 +93,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
                 <LoadingSpinner className="h-5 w-5" />
               ) : (
                 <>
-                  <ScanBarcode className="h-4 w-4" />
+                  <Zap className="h-4 w-4" />
 
                   <span>{t("actions.buyNow")}</span>
                 </>

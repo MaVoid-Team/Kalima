@@ -1,7 +1,8 @@
 {
   "header": {
     "secureCheckout": "Secure Checkout",
-    "marketName": "Kalima Market"
+    "marketName": "Kalima Market",
+    "market_name": "Kalima Market"
   },
   "steps": {
     "information": "Information",
@@ -45,7 +46,6 @@
     "screenshotRequired": "Please upload payment screenshot",
     "methodRequired": "Please select a payment method",
     "transferNumber": "Transfer Number",
-    "screenshot": "Payment Screenshot",
     "chooseMethod": "Choose Payment Method",
     "uploadScreenshotButton": "Upload image",
     "removeScreenshot": "Remove screenshot",
@@ -53,24 +53,30 @@
     "preview": "Preview",
     "backToCart": "Return to Cart",
     "upload": "Upload",
+    "uploadHint": "PNG, JPG up to 5MB",
+    "upload_hint": "PNG, JPG up to 5MB",
+    "enterField": "Enter {{field}}",
     "notes": "Notes (Optional)",
     "notesPlaceholder": "Any special requests?",
-    "bookDetails": "Book Details",
-    "nameOnBook": "Name on Book",
-    "numberOnBook": "Number on Book",
-    "seriesName": "Series Name",
-    "teacherName": "Teacher Name",
-    "method": "Select Payment Method",
-    "bookName": "Book Name",
-    "image": "Image",
-    "enter": "Enter",
-    "enterField": "Enter {{field}}",
+    "notes_label": "Delivery instructions or special requests",
     "notesLabel": "Delivery instructions or special requests",
-    "optional": "Optional",
+    "book_details": "Book Details",
+    "name_on_book": "Name on Book",
+    "number_on_book": "Number on Book",
+    "series_name": "Series Name",
+    "teacher_name": "Teacher Name",
     "securePayment": "Secure Payment",
+    "secure_notice": "Your payment information is secure.",
     "encryptedCheckout": "Encrypted Checkout",
+    "error_loading": "Error loading payment options, please try again later",
     "errorLoading": "Error loading payment options, please try again later",
-    "transferNumberPlaceholder": "Enter transfer number"
+    "transferNumberPlaceholder": "Enter transfer number",
+    "transfer_number_placeholder": "Enter transfer number",
+    "transfer_number": "Transfer Number",
+    "complete_purchase": "Complete Purchase",
+    "completePurchase": "Complete Purchase",
+    "screenshot": "Payment Screenshot",
+    "method": "Select Payment Method"
   },
   "orderSummary": {
     "title": "Order Summary",
@@ -95,7 +101,19 @@
   "fastBuy": {
     "checkoutSuccess": "Checkout successful! Redirecting to market..."
   },
+  "fastBuyClearDialog": {
+    "title": "Leave fast buy checkout?",
+    "description": "Leaving this page will clear your fast buy cart. You can stay to complete checkout, or leave and start again later.",
+    "cancel": "Stay on checkout",
+    "confirm": "Leave and clear cart"
+  },
   "success": {
+    "title": "Order Successful!",
+    "description": "Thank you for your purchase. We have received your order and will process it shortly.",
+    "serial_label": "Order Serial",
+    "copy": "Copy Serial",
+    "continue_shopping": "Continue Shopping",
+    "view_orders": "View My Orders",
     "copied": "Copied to clipboard"
   },
   "failed": "Checkout failed, please try again",
@@ -119,12 +137,20 @@
       "pending": "Pending",
       "completed": "Completed",
       "failed": "Failed",
-      "refunded": "Refunded"
+      "refunded": "Refunded",
+      "Pending": "Pending",
+      "Completed": "Completed",
+      "Failed": "Failed",
+      "Refunded": "Refunded"
     }
   },
   "wizard": {
     "cart": "Cart",
     "payment": "Payment"
+  },
+  "cancel": "Cancel",
+  "general": {
+    "go_back": "Go Back"
   },
   "L.E": " L.E"
 }

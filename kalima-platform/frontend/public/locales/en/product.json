@@ -120,5 +120,8 @@
     "fileDetails": "File Details",
     "publisherInfo": "Publisher Info",
     "saveToPlan": "Save to Plan"
+  },
+  "common": {
+    "cancel": "Cancel"
   }
 }

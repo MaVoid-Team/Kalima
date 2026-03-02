@@ -61,7 +61,8 @@
     "buyNow": "اشتر الآن",
     "purchased": "تم الشراء",
     "new": "جديد",
-    "off": "خصم"
+    "off": "خصم",
+    "cart": "العربة"
   },
   "products": {
     "trending": {
@@ -107,9 +108,13 @@
   },
   "pagination": {
     "previous": "السابق",
+    "prev": "السابق",
     "next": "التالي",
     "page": "صفحة",
     "of": "من"
+  },
+  "common": {
+    "back": "رجوع"
   },
   "errors": {
     "loadingError": "خطأ في تحميل البيانات",

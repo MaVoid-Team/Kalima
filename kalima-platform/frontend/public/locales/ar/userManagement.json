@@ -11,9 +11,17 @@
     "export": "تصدير",
     "exportCsv": "تصدير كملف CSV",
     "exportXlsx": "تصدير كملف Excel",
+    "exporting": "جاري التصدير...",
+    "processing": "جاري تجهيز البيانات...",
+    "export.exporting": "جاري التصدير...",
+    "export.processing": "جاري تجهيز البيانات...",
     "filters": {
         "allRoles": "جميع الأدوار",
-        "allPortals": "جميع البوابات"
+        "allPortals": "جميع البوابات",
+        "allStatuses": "جميع الحالات",
+        "allAccounts": "جميع الحسابات",
+        "activeAccounts": "نشط",
+        "deletedAccounts": "محذوف"
     },
     "table": {
         "name": "الاسم",
@@ -23,11 +31,13 @@
         "status": "مفعل",
         "joined": "تاريخ الانضمام",
         "actions": "إجراءات",
-        "noUsersFound": "لا توجد مستخدمين مطابقين لمعايير البحث."
+        "noUsersFound": "لا توجد مستخدمين مطابقين لمعايير البحث.",
+        "selectAll": "تحديد جميع المستخدمين"
     },
     "status": {
         "verified": "حساب موثق",
-        "pending": "قيد الانتظار"
+        "pending": "قيد الانتظار",
+        "deleted": "محذوف"
     },
     "actions": {
         "view": "عرض الملف",
@@ -120,6 +130,7 @@
         "totalUsers": "إجمالي المستخدمين",
         "verifiedUsers": "المستخدمون الموثقون",
         "teachers": "المعلمون",
-        "admins": "المديرون"
+        "admins": "المديرون",
+        "moderators": "المشرفون"
     }
 }

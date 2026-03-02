@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { CheckCheck, ShoppingCart, Zap } from "lucide-react";
@@ -10,6 +11,7 @@ import { useCart } from "@/contexts/CartContext";
 import useRole from "@/hooks/useRole";
 import { useFastBuy } from "@/hooks/useFastBuy";
 import RatingDisplay from "@/components/ui/RatingDisplay";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 
 /**
  * ProductCard — renders a single product in the market grid.
@@ -41,6 +43,9 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
 
   const cartLoading = cartCtx?.loading ?? false;
 
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
+
   const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -50,20 +55,28 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
     }
     if (!cartCtx?.addToCart) return;
     try {
+      setIsAddingToCart(true);
       await cartCtx.addToCart(id, 1);
     } catch (_) {
       // error handled by hook
+    } finally {
+      setIsAddingToCart(false);
     }
   };
 
-  const handleBuyNow = (e) => {
+  const handleBuyNow = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
-    startFastBuy(id, 1);
+    try {
+      setIsBuyingNow(true);
+      await startFastBuy(id, 1);
+    } finally {
+      setIsBuyingNow(false);
+    }
   };
 
   return (
@@ -133,30 +146,43 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
 
       {/* Action buttons — outside the Link to avoid nested interactive elements */}
       {!isAdmin && isAuthenticated && (
-        <div className="flex items-center gap-2 mt-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-auto w-full">
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 h-8 text-xs font-medium"
+            className="flex-1 h-8 text-xs font-medium py-2"
             onClick={handleAddToCart}
-            disabled={cartLoading}
+            disabled={cartLoading || fastBuyLoading || isAddingToCart}
             data-testid={`market-product-card-${id}-add-to-cart`}
             title={t("product.addToCart", "Add to Cart")}
           >
-            <ShoppingCart className="h-3.5 w-3.5 me-1.5 shrink-0" />
-            <span className="hidden sm:inline truncate">{t("product.addToCart", "Add to Cart")}</span>
-            <span className="sm:hidden">{t("product.cart", "Cart")}</span>
+            {isAddingToCart ? (
+              <LoadingSpinner className="h-5 w-5 border-primary" />
+            ) : (
+              <>
+                <ShoppingCart className="h-3.5 w-3.5 me-1.5 shrink-0" />
+                <span className="hidden sm:inline truncate">{t("product.addToCart", "Add to Cart")}</span>
+                <span className="sm:hidden">{t("product.cart", "Cart")}</span>
+              </>
+            )}
           </Button>
           <Button
             size="sm"
-            className="flex-1 h-8 text-xs font-medium"
+            className="flex-1 h-8 text-xs font-medium py-2"
             onClick={handleBuyNow}
             data-testid={`market-product-card-${id}-buy-now`}
             title={t("product.buyNow", "Buy Now")}
-            disabled={fastBuyLoading}
+            disabled={cartLoading || fastBuyLoading || isBuyingNow}
           >
-            <Zap className="h-3.5 w-3.5 me-1.5 shrink-0" />
-            {t("product.buyNow", "Buy Now")}
+            {isBuyingNow ? (
+              <LoadingSpinner className="h-5 w-5 border-white" />
+            ) : (
+              <>
+                <Zap className="h-3.5 w-3.5 me-1.5 shrink-0" />
+                <span className="hidden sm:inline truncate">{t("product.buyNow", "Buy Now")}</span>
+                <span className="sm:hidden">{t("product.buyNow", "Buy")}</span>
+              </>
+            )}
           </Button>
         </div>
       )}

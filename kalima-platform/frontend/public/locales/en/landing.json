@@ -1,4 +1,8 @@
 {
+  "nav": {
+    "openMenu": "Open Menu",
+    "closeMenu": "Close Menu"
+  },
   "navbar": {
     "brand": "Kalima",
     "courses": "Courses",
@@ -207,6 +211,7 @@
       }
     },
     "about": {
+      "title": "About Kalima",
       "titleStart": "What makes ",
       "titleHighlight": "Kalima",
       "titleEnd": " your best choice",

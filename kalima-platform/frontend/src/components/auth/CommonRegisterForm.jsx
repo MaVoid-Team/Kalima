@@ -133,7 +133,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                     </Button>
                 </div>
                 <h1 className="text-2xl font-semibold tracking-tight">{t("signup.title")}</h1>
-                <p className="text-sm text-muted-foreground">{t("signup.roles." + role)}</p>
+                <p className="text-sm text-muted-foreground">{t(`signup.roles.${role}`)}</p>
             </motion.div>
 
             <Form {...form}>
@@ -164,13 +164,13 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                 name="name"
                                 render={({ field }) => (
                                     <motion.div variants={itemVariants}>
-                                    <FormItem>
-                                        <FormLabel htmlFor="name">{t("signup.fields.name")}</FormLabel>
-                                        <FormControl>
-                                            <Input id="name" {...field} data-testid="auth-register-name-input" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
+                                        <FormItem>
+                                            <FormLabel htmlFor="name">{t("signup.fields.name")}</FormLabel>
+                                            <FormControl>
+                                                <Input id="name" {...field} data-testid="auth-register-name-input" />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
                                     </motion.div>
                                 )}
                             />
@@ -180,13 +180,13 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                 name="email"
                                 render={({ field }) => (
                                     <motion.div variants={itemVariants}>
-                                    <FormItem>
-                                        <FormLabel htmlFor="email">{t("signup.fields.email")}</FormLabel>
-                                        <FormControl>
-                                            <Input id="email" type="email" {...field} data-testid="auth-register-email-input" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
+                                        <FormItem>
+                                            <FormLabel htmlFor="email">{t("signup.fields.email")}</FormLabel>
+                                            <FormControl>
+                                                <Input id="email" type="email" {...field} data-testid="auth-register-email-input" />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
                                     </motion.div>
                                 )}
                             />
@@ -204,13 +204,13 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                         name="phone"
                         render={({ field }) => (
                             <motion.div variants={itemVariants}>
-                            <FormItem>
-                                <FormLabel htmlFor="phone">{t("signup.fields.phone")}</FormLabel>
-                                <FormControl>
-                                    <PhoneInput id="phone" dir="ltr" {...field} data-testid="auth-register-phone-input" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
+                                <FormItem>
+                                    <FormLabel htmlFor="phone">{t("signup.fields.phone")}</FormLabel>
+                                    <FormControl>
+                                        <PhoneInput id="phone" dir="ltr" {...field} data-testid="auth-register-phone-input" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
                             </motion.div>
                         )}
                     />
@@ -220,21 +220,21 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                         name="gender"
                         render={({ field }) => (
                             <motion.div variants={itemVariants}>
-                            <FormItem>
-                                <FormLabel>{t("signup.fields.gender")}</FormLabel>
-                                <Select dir={isRTL ? "rtl" : "ltr"} onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={t("signup.fields.genderPlaceholder")} />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="male">{t("signup.gender.male")}</SelectItem>
-                                        <SelectItem value="female">{t("signup.gender.female")}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
+                                <FormItem>
+                                    <FormLabel>{t("signup.fields.gender")}</FormLabel>
+                                    <Select dir={isRTL ? "rtl" : "ltr"} onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder={t("signup.fields.genderPlaceholder")} />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="male">{t("signup.gender.male")}</SelectItem>
+                                            <SelectItem value="female">{t("signup.gender.female")}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
                             </motion.div>
                         )}
                     />

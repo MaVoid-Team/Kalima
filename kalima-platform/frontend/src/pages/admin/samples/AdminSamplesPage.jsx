@@ -146,7 +146,7 @@ export default function AdminSamplesPage() {
                                         className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                         checked={samples.length > 0 && selectedIds.length === samples.length}
                                         onCheckedChange={handleSelectAll}
-                                        aria-label="Select all samples"
+                                        aria-label={t('samples.table.selectAll', 'Select all samples')}
                                         data-testid="samples-table-select-all"
                                     />
                                 </th>
