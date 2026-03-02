@@ -264,7 +264,7 @@ class CartService {
     if (cached) return cached;
 
     const cart = await this.db.carts.findFirst({
-      where: { user_id, status: cartStatus, deleted_at: null },
+      where: { user_id, status: cartStatus },
       include: cartWithItemsQueryInclude,
       relationLoadStrategy: "join",
     });
