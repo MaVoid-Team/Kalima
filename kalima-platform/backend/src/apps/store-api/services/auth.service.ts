@@ -859,12 +859,12 @@ class AuthService {
     const roleNames: Record<role_enum, string> = {
       [role_enum.Admin]: "Administrator",
       [role_enum.SubAdmin]: "Sub-Administrator",
-      [role_enum.Teacher]: "Teacher",
-      [role_enum.Student]: "Student",
-      [role_enum.Parent]: "Parent",
-      [role_enum.Lecturer]: "Lecturer",
-      [role_enum.Assistant]: "Assistant",
-      [role_enum.Moderator]: "Moderator",
+      [role_enum.Teacher]: "معلم",
+      [role_enum.Student]: "طالب",
+      [role_enum.Parent]: "ولى أمر",
+      [role_enum.Lecturer]: "محاضر",
+      [role_enum.Assistant]: "مساعد",
+      [role_enum.Moderator]: "مشرف",
     };
     return roleNames[role] || role;
   }
