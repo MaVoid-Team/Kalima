@@ -107,21 +107,29 @@ export class EmailService {
    */
   async sendEmail(options: SendEmailOptions): Promise<boolean> {
     try {
-      const logoPath = path.resolve(__dirname, 'figs', 'kalima.jpg');
+      const logoCandidates = [
+        path.resolve(__dirname, 'figs', 'kalima.jpg'),
+        path.resolve(process.cwd(), 'src', 'apps', 'store-api', 'emails', 'figs', 'kalima.jpg'),
+      ];
+      const logoPath = logoCandidates.find((candidate) =>
+        fs.existsSync(candidate),
+      );
       const attachments = [] as Array<{
         filename: string;
         path: string;
         cid: string;
       }>;
 
-      if (fs.existsSync(logoPath)) {
+      if (logoPath && fs.existsSync(logoPath)) {
         attachments.push({
           filename: 'kalima.jpg',
           path: logoPath,
           cid: 'kalima-logo',
         });
       } else {
-        console.warn(`Email logo not found at ${logoPath}. Sending without logo.`);
+        console.warn(
+          `Email logo not found at ${logoCandidates.join(' | ')}. Sending without logo.`,
+        );
       }
 
       await this.transporter.sendMail({
