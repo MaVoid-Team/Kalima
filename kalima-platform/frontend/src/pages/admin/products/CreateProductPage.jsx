@@ -206,8 +206,12 @@ export default function CreateProductPage() {
         if (!selectedFieldDefId) return;
         const def = fieldDefinitions.find(d => d.id === parseInt(selectedFieldDefId));
         if (!def || pickedFieldIds.has(def.id)) return;
-        setPickedFields(prev => [...prev, { id: def.id, label: def.label, field_type: def.field_type }]);
+        setPickedFields(prev => [...prev, { id: def.id, label: def.label, field_type: def.field_type, is_required: true }]);
         setSelectedFieldDefId('');
+    };
+
+    const handleToggleFieldRequired = (id, isRequired) => {
+        setPickedFields(prev => prev.map(f => f.id === id ? { ...f, is_required: isRequired } : f));
     };
 
     const handleRemoveField = (id) => {
@@ -306,7 +310,7 @@ export default function CreateProductPage() {
             if (pickedFields.length > 0 && newProductId) {
                 await attachRequiredFields(
                     newProductId,
-                    pickedFields.map(f => ({ field_definition_id: f.id, is_required: true }))
+                    pickedFields.map(f => ({ field_definition_id: f.id, is_required: f.is_required }))
                 );
             }
 
@@ -631,23 +635,36 @@ export default function CreateProductPage() {
                         {pickedFields.length > 0 ? (
                             <div className="flex flex-wrap gap-2">
                                 {pickedFields.map((field) => (
-                                    <span
+                                    <div
                                         key={field.id}
-                                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
                                         data-testid={`create-product-required-field-tag-${field.id}`}
                                     >
-                                        {field.label}
+                                        <span className="font-medium">{field.label}</span>
                                         <span className="text-xs text-muted-foreground opacity-70">({field.field_type})</span>
+
+                                        <div className="flex items-center gap-1 border-s border-primary/30 ps-2 ms-1">
+                                            <span className="text-xs opacity-80">
+                                                {field.is_required ? t('products.detail.fieldRequired', 'Required') : t('products.detail.fieldOptional', 'Optional')}
+                                            </span>
+                                            <Switch
+                                                checked={field.is_required}
+                                                onCheckedChange={(checked) => handleToggleFieldRequired(field.id, checked)}
+                                                className="scale-75 origin-left rtl:origin-right"
+                                                aria-label="Toggle required status"
+                                            />
+                                        </div>
+
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveField(field.id)}
-                                            className="rounded-full hover:bg-primary/20 p-0.5"
+                                            className="rounded-full hover:bg-primary/20 p-0.5 ms-1"
                                             aria-label={`Remove ${field.label}`}
                                             data-testid={`create-product-remove-field-${field.id}`}
                                         >
-                                            <X className="h-3 w-3" />
+                                            <X className="h-3.5 w-3.5" />
                                         </button>
-                                    </span>
+                                    </div>
                                 ))}
                             </div>
                         ) : (

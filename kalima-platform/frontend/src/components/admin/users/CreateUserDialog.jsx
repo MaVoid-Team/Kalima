@@ -39,7 +39,7 @@ import { useRole } from '@/hooks/useRole';
 
 export default function CreateUserDialog({ onSuccess }) {
     const { t, i18n } = useTranslation('userManagement');
-    const { isAdmin } = useRole();
+    const { hasAdminAccess } = useRole();
     const {
         createAdminUser,
         createSubAdminUser,
@@ -132,8 +132,8 @@ export default function CreateUserDialog({ onSuccess }) {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {isAdmin && <SelectItem value="Admin">{t('roles.Admin')}</SelectItem>}
-                                            {isAdmin && <SelectItem value="SubAdmin">{t('roles.SubAdmin')}</SelectItem>}
+                                            {hasAdminAccess && <SelectItem value="Admin">{t('roles.Admin')}</SelectItem>}
+                                            {hasAdminAccess && <SelectItem value="SubAdmin">{t('roles.SubAdmin')}</SelectItem>}
                                             <SelectItem value="Moderator">{t('roles.Moderator')}</SelectItem>
                                             <SelectItem value="Assistant">{t('roles.Assistant')}</SelectItem>
                                         </SelectContent>

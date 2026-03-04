@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MessageSquare, Star, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,10 +24,10 @@ import useAuth from '@/hooks/auth/useAuth';
 const ReviewList = ({ productId, averageRating, totalReviews, productReviews = [], className }) => {
   const { t } = useTranslation('product');
   const { isAuthenticated } = useAuth();
-  const { 
-    checkReviewEligibility, 
-    createReview, 
-    updateReview, 
+  const {
+    checkReviewEligibility,
+    createReview,
+    updateReview,
     loading
   } = useReviews();
 
@@ -82,7 +83,7 @@ const ReviewList = ({ productId, averageRating, totalReviews, productReviews = [
       const result = await updateReview(productId, reviewId, reviewData);
       if (result?.success) {
         // Update review in the list
-        setReviews(prev => prev.map(review => 
+        setReviews(prev => prev.map(review =>
           review.id === reviewId ? { ...review, ...result.data } : review
         ));
         setEditingReview(null);
@@ -122,26 +123,27 @@ const ReviewList = ({ productId, averageRating, totalReviews, productReviews = [
   return (
     <div className={className} data-testid="review-list">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <MessageSquare className="w-5 h-5" />
             {t('reviews.title', 'Reviews')}
           </h2>
           {totalReviews > 0 && (
-            <RatingDisplay 
-              rating={averageRating} 
+            <RatingDisplay
+              rating={averageRating}
               reviewCount={totalReviews}
               size="md"
             />
           )}
         </div>
-        
+
         {/* Write Review Button */}
         {isAuthenticated && (
           <Button
             onClick={() => setShowForm(true)}
             disabled={loading}
+            className="w-full sm:w-auto"
             data-testid="write-review-button"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -159,8 +161,8 @@ const ReviewList = ({ productId, averageRating, totalReviews, productReviews = [
             loading={loading}
             onSubmit={editingReview ? handleUpdateReview : handleCreateReview}
             onCancel={handleCancelForm}
-            submitText={editingReview ? 
-              t('reviews.updateReview', 'Update Review') : 
+            submitText={editingReview ?
+              t('reviews.updateReview', 'Update Review') :
               t('reviews.submitReview', 'Submit Review')
             }
           />
@@ -178,10 +180,18 @@ const ReviewList = ({ productId, averageRating, totalReviews, productReviews = [
 
       {/* Login Prompt */}
       {!isAuthenticated && (
-        <Alert className="mb-6">
-          <AlertDescription>
-            {t('reviews.loginToReview', 'Please log in to write reviews')}
-          </AlertDescription>
+        <Alert className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-primary/20 bg-primary/5">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-primary" />
+            <AlertDescription className="text-sm font-medium">
+              {t('reviews.loginToReview', 'Please log in to write reviews')}
+            </AlertDescription>
+          </div>
+          <Button asChild size="sm" className="shrink-0 w-full sm:w-auto shadow-sm">
+            <Link to="/login">
+              {t('reviews.loginAction', 'Log in')}
+            </Link>
+          </Button>
         </Alert>
       )}
 

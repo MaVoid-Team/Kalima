@@ -96,7 +96,7 @@ export default function ResetPasswordPage() {
     if (!token) return null;
 
     return (
-        <div className="container relative grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden py-8 lg:max-w-none lg:grid-cols-1 lg:px-0">
+        <div className="container relative grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden py-16 md:py-24 lg:max-w-none lg:grid-cols-1 lg:px-0">
             <AuthAnimatedBackground variant="login" />
 
             <div className="relative w-full lg:p-8">
@@ -112,7 +112,7 @@ export default function ResetPasswordPage() {
                     >
                         {/* Ambient Glow effect around the frame */}
                         <div className="pointer-events-none absolute -inset-1.5 -z-10 rounded-2xl bg-primary/20 blur-xl opacity-50 group-hover:opacity-90 transition-opacity duration-500" />
-                        <Card className="relative border-0 bg-background/80 p-1 shadow-none backdrop-blur-2xl rounded-[calc(1rem-1.5px)] sm:border-0">
+                        <Card className="relative border-0 bg-background/80 shadow-none backdrop-blur-2xl rounded-[calc(1rem-1.5px)] sm:border-0">
                             <CardHeader>
                                 <CardTitle className="text-2xl">{t("resetPassword.title", "Reset Password")}</CardTitle>
                                 <CardDescription>{t("resetPassword.description", "Enter your new password below.")}</CardDescription>

@@ -57,7 +57,7 @@ export default function RegisterTeacher({ onBack }) {
             const portalAccess = res?.data?.portalAccess || res?.portalAccess;
             if (user && tokens) {
                 loginSuccess(user, tokens, portalAccess);
-                navigate("/");
+                navigate(-1);
             }
         } else {
             // Email/password flow: backend sends verification email → stay on page

@@ -83,6 +83,7 @@
     "anonymousUser": "مستخدم مجهول",
     "deleteConfirm": "هل أنت متأكد من حذف هذه المراجعة؟",
     "loginToReview": "يرجى تسجيل الدخول لكتابة المراجعات",
+    "loginAction": "تسجيل الدخول",
     "reasons": {
       "noConfirmedPurchase": "يمكنك فقط مراجعة المنتجات التي اشتريتها وتأكدت",
       "notAuthenticated": "يجب تسجيل الدخول لكتابة مراجعة",
