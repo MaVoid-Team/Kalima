@@ -1,10 +1,13 @@
+// DOMAIN: UNKNOWN
+// STATUS: LEGACY
+// NOTE: Code model with unclear domain ownership.
 const mongoose = require("mongoose");
 
 const codeSchema = new mongoose.Schema({
   code: {
     type: String,
     required: true,
-    unique: true,  // This already creates an index
+    unique: true, // This already creates an index
   },
   type: {
     type: String,
@@ -37,26 +40,26 @@ const codeSchema = new mongoose.Schema({
   redeemedAt: {
     type: Date,
     default: null,
-  }
+  },
 });
 
 codeSchema.methods.generateCode = function () {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   // Get current time in nanoseconds (as string)
   const timestamp = Date.now().toString(36).toUpperCase(); // base36 for compactness
   // Generate random part to fill up to 10 characters
   let randLength = 10 - timestamp.length;
-  let randPart = '';
+  let randPart = "";
   for (let i = 0; i < randLength; i++) {
     randPart += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   // Combine timestamp and random part, then shuffle for extra randomness
-  let codeArr = (timestamp + randPart).split('');
+  let codeArr = (timestamp + randPart).split("");
   for (let i = codeArr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [codeArr[i], codeArr[j]] = [codeArr[j], codeArr[i]];
   }
-  this.code = codeArr.join('');
+  this.code = codeArr.join("");
 };
 
 const Code = mongoose.model("Code", codeSchema);

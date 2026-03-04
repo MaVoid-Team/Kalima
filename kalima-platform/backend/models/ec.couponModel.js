@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store coupon model.
 const mongoose = require("mongoose");
 const User = require("./userModel");
 
@@ -53,7 +56,7 @@ const couponSchema = new mongoose.Schema(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 // Index for active coupons

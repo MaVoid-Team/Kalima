@@ -1,402 +1,887 @@
 {
-    "admin": {
-      "pageTitle": "Admin Page",
-      "students": "Students",
-      "teachers": "Teachers",
-      "assistants": "Assistants",
-      "parents": "Parents",
-      "sendOffer": "Send Your Offer Now!",
-      "generatePromoCodes": "Generate Promo Codes",
-      "promo": "Promo Code",
-      "discount": "Discount",
-       "editUser": {
-        "title": "Edit User",
-        "name": "Name",
-        "namePlaceholder": "Name",
-        "phone": "Phone Number",
-        "phonePlaceholder": "Phone Number",
-        "email": "Email",
-        "password": "Password",
-        "passwordPlaceholder": "Password",
-        "passwordHint": "Please enter password",
-        "save": "Save",
-        "cancel": "Cancel"
-      },
-      "userDetails": {
-      "name": "Name",
-      "email": "Email",
-      "gender": "Gender",
-      "phoneNumber": "Phone Number",
-      "role": "Role",
-      "joinedDate": "Joined Date",
-      "government": "Government",
-      "administrationZone": "Administration Zone",
-      "emailVerified": "Email Verified",
-      "successfulInvites": "Successful Invites",
-      "studentInfo": "Student Information",
-      "level": "Level",
-      "sequenceId": "Sequence ID",
-      "parentPhone": "Parent Phone",
-      "faction": "Faction",
-      "hobbies": "Hobbies",
-      "generalPoints": "General Points",
-      "totalPoints": "Total Points",
-      "parentInfo": "Parent Information",
-      "children": "Children",
-      "noChildren": "No children",
-      "views": "Views",
-      "teacherInfo": "Teacher Information",
-      "subject": "Subject",
-      "teachingLevel": "Teaching Level",
-      "school": "School",
-      "teachesAt": "Teaches At",
-      "centers": "Centers",
-      "secondPhone": "Second Phone",
-      "socialMedia": "Social Media",
-      "lecturerInfo": "Lecturer Information",
-      "bio": "Bio",
-      "expertise": "Expertise",
-      "assistantInfo": "Assistant Information",
-      "assignedLecturer": "Assigned Lecturer",
-      "title": "User Details",
-      "close": "Close"
-    },
-    "invites": {
-      "invite": "Invite",
-      "invites": "Invites",
-      "refreshSuccess": "Invites refreshed successfully!",
-      "refreshError": "Error calculating invites data",
-      "calculating": "Calculating...",
-      "refresh": "Refresh Invites"
-    },
-    "yes": "Yes",
-    "no": "No",
-"actions": {
-  "delete": "Delete",
-  "edit": "Edit",
-  "cancel": "Cancel",
-  "whatsapp": "Send WhatsApp message",
-  "viewDetails": "View Details"
-},
-      "export": {
-        "export": "Export",
-        "exporting": "Exporting...",
-        "csvFormat": "CSV Format",
-        "jsonFormat": "JSON Format",
-        "exportFiltered": "Export Filtered",
-        "exportCSVPage": "Export Page (CSV)",
-        "exportCSVAll": "Export All (CSV)",
-        "exportJSONPage": "Export Page (JSON)",
-        "exportJSONAll": "Export All (JSON)",
-        "exportXLSXPage": "Export Page (XLSX)",
-        "exportXLSXAll": "Export All (XLSX)"
-      },
-      "errors": {
-        "fetchLecturers": "Failed to fetch lecturers",
-        "pointsError": "Points amount must be greater than zero",
-        "codesError": "Number of codes must be greater than zero",
-        "phoneRequired": "Please enter phone number",
-        "lecturerRequired": "Please select a lecturer",
-       "generationFailed": "Failed to generate promo codes",
-       "fetchUsers": "Failed to fetch users"
-      
-      },
-      "success": {
-        "codesGenerated": "Promo codes generated successfully"
-      },
-      "form": {
-        "pointsAmount": "Points Amount",
-        "numCodes": "Number of Codes",
-        "codeType": "Code Type",
-        "general": "General",
-        "specific": "Specific",
-        "promo": "Promo",
-        "lecturer": "Lecturer",
-        "lecturerPlaceholder": "Select Lecturer",
-        "generateQrCodes": "Generate QR Codes",
-        "qrCodeDescription": "Generate QR codes for easy code redemption",
-        "qrCodeSize": "QR Code Size"
-      },
-      "printQrCodes": "Print QR Codes",
-      "downloadAllQrCodes": "Download All QR Codes",
-      "points": "Points",
-      "userManagement": {
-        "title": "User Actions Log",
-        "subtitle": "Manage and export user data",
-        "createUser": "Create New User",
-        "delete": "Delete",
-        "edit": "Edit"
-      },
-      "whatsappModal": {
-      "title": "Send Offer via WhatsApp",
-      "phoneLabel": "Phone Number",
-      "phonePlaceholder": "Enter phone number",
-      "messageLabel": "Message (optional)",
-      "messagePlaceholder": "Type your message here...",
-      "cancel": "Cancel",
-      "send": "Send"
-    }, 
-    "generating": "Generating...",
-    "generateCodes": "Generate Codes",
-    "generatedCodes": "Generated Codes",
-    "promoTable": {
-      "number": "#",
-      "code": "Promo Code",
-      "points": "Points",
-      "type": "Type",
-      "actions": "Actions",
-      "discount": "Discount"
-    },
-    "specific": "Specific",
-    "general": "General",
-    "copy": "Copy",
-
-    "filters": {
-      "name": "Name",
-      "phone": "Phone Number",
-      "allTypes": "All Types",
-      "allStatus": "All Statuses",
-      "invites": "Invites"
-    },
-    "roles": {
-      "student": "Student",
-      "parent": "Parent",
-      "lecturers": "Lecturer",
-      "lecturer": "Lecturer",
-      "teacher": "Teacher",
-      "assistant": "Assistant",
-      "admin": "Admin",
-      "subAdmin": "Sub Admin",
-      "Teacher": "Teacher",
-      "moderator": "Moderator"
-    },
-    "status": {
-      "valid": "Valid",
-      "missingData": "Missing Data"
-    },
-    "table": {
-      "actions": "Actions",
-      "status": "Status",
-      "accountType": "Account Type",
-      "phone": "Phone",
-      "name": "Name",
-      "successfulInvites": "Successful Invites" 
-    },
-    "pagination": {
-      "previous": "Previous",
-      "next": "Next",
-      "showing": "Showing",
-      "of": "of"
-    },
-    "confirmDelete": "Are you sure you want to delete this user?",
-    "deleteSuccess": "User deleted successfully",
-    "deleteError": "Failed to delete user",
-    "createSuccess": "User created successfully",
-    "createError": "Failed to create user",
-    "editSuccess": "User updated successfully",
-    "editError": "Failed to update user",
-    "NA": "N/A",
-
-    "auditlog": {
-      "title": "Audit Log",
-      "subtitle": "View and track all system activities",
-      "search": {
-        "enterEmail": "Please enter an email to search",
-        "found": "Found {{count}} records",
-        "noResults": "No records found for this email",
-        "error": "Error occurred while searching"
-      },
-      "noRecords": "No records available",
-      "noRecordsFiltered": "No audit logs match your current filters. Try adjusting your search criteria.",
-      "noRecordsYet": "No audit logs have been recorded yet. Activity will appear here once users start interacting with the system.",
-      
-      "filters": {
-        "all": "All",
-        "user": "User",
-        "role": "Role",
-        "action": "Action",
-        "resource": "Resource",
-        "status": "Status",
-        "date": "Date",
-        "to": "to",
-        "apply": "Apply Filters",
-        "search": "Search audit logs...",
-        "email" : "Email"
-      },
-      
-      "columns": {
-        "user": "User",
-        "role": "Role",
-        "action": "Action",
-        "resource": "Resource",
-        "datetime": "Date/Time",
-        "status": "Status",
-        "email" :"Email"
-      },
-      
-      "roles": {
-        "admin": "Admin",
-        "subadmin": "Subadmin",
-        "lecturer": "Lecturer",
-        "student": "Student",
-        "teacher": "Teacher",
-        "assistant": "Assistant "
-      },
-      
-      "actions": {
-        "create": "Create",
-        "read": "Read",
-        "update": "Update",
-        "delete": "Delete"
-      },
-      
-      "resources": {
-        "container": "Course",
-        "lecture": "Lesson",
-        "user": "User",
-        "timetable": "Schedule",
-        "center": "Center",
-        "code": "Code",
-        "promoCode": "Promo Code",
-        "admin": "Admin",
-        "assistant": "Assistant",
-        "parent": "Parent",
-        "package": "Packages",
-        "lesson": "Lesson",
-                "ec": {
-          "purchase": "Purchase"
-        }
-      },
-      "idDisplay": "ID: {{id}}",
-      "status": {
-        "success": "Success",
-        "pending": "Pending",
-        "failed": "Failed",
-        "unknown": "Unknown"
-      },
-      
-      "errors": {
-        "fetch": "Failed to load audit logs",
-        "general": "An error occurred"
-      },
-      
-      "pagination": {
-        "previous": "Previous",
-        "next": "Next"
-      },
-
-      "export": {
-        "export": "Export",
-        "exporting": "Exporting...",
-        "csvFormat": "CSV Format",
-        "jsonFormat": "JSON Format",
-        "exportFiltered": "Export Filtered",
-        "exportAll": "Export All",
-        "successAll": "Successfully exported {{count}} users",
-        "successFiltered": "Successfully exported {{count}} filtered users",
-        "error": "Failed to export users. Please try again.",
-        "filterInfo": "Filters applied:",
-        "of": "of",
-        "usersShown": "users shown",
-        "name": "Name",
-        "email": "Email",
-        "phone": "Phone Number",
-        "role": "Role",
-        "status": "Status",
-        "government": "Government",
-        "administrationZone": "Administration Zone",
-        "sequenceId": "Sequence ID",
-        "joinedDate": "Joined Date"
-      }
-    }
+  "dashboardTitle": "Admin Dashboard",
+  "nav": {
+    "orders": "Orders",
+    "products": "Products",
+    "samples": "Samples",
+    "coupons": "Coupons",
+    "categories": "Categories",
+    "requiredFields": "Required Fields",
+    "paymentMethods": "Payment Methods",
+    "themeToggle": "Toggle Theme",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "backToStore": "Back to Store",
+    "logout": "Logout",
+    "settings": "Settings",
+    "expandSidebar": "Expand Sidebar",
+    "collapseSidebar": "Collapse Sidebar",
+    "closeSidebar": "Close Sidebar"
   },
-    "promoCodes": {
-      "title": "Promo Codes Management",
-      "code": "Promo Code",
-      "points": "Points",
-      "status": "Status",
-      "redeemedAt": "Redeemed At",
-      "redeemedBy": "Redeemed By",
-      "noCodes": "No promo codes found",
-      "actions": "Actions"
-    },
-    "filters": {
-      "allStatuses": " All Statuses",
-      "redeemed": " Redeemed",
-      "active": " Active",
-      "redeemedBy": "Redeemed By",
-      "apply":  "Apply Filters",
-      "allStudents": "All Students",
-      "all": "All",
-      "general": "General",
-      "specific": "Specific",
-      "promo": "Promo"
-    },
+  "common": {
+    "currencyEGP": "EGP",
+    "na": "N/A",
+    "admin": "Admin",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "notSpecified": "Not specified",
+    "file": "File",
+    "select": "Select",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "openMenu": "Open menu",
+    "active": "Active",
+    "inactive": "Inactive",
+    "update": "Update",
+    "hide": "Hide",
+    "show": "Show",
+    "done": "Done",
+    "copy": "Copy",
+    "removing": "Removing...",
     "pagination": {
       "previous": "Previous",
       "next": "Next",
       "page": "Page",
       "of": "of"
     },
-    "status": {
-      "redeemed": "Redeemed",
-      "active": "Active"
-    },
-    "errors": {
-      "fetchPromo": "Failed to fetch promo codes"
-    },
-    "revenue" :{
-      "errorLoadingRevenue": "Error loading revenue data",
-      "lecturerRevenue": "Lecturer Revenue",
-      "revenueSummary": "Revenue Summary",
-      "totalRevenue": "Total Revenue",
-      "currency": "EGP",
+    "refresh": "Refresh",
+    "export": {
+      "success": "Export successful"
+    }
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female",
+    "other": "Other"
+  },
+  "orders": {
+    "stats": {
       "totalPurchases": "Total Purchases",
-      "monthsWithRevenue": "Months with Revenue",
-      "purchaseCount": "Purchase Count",
-      "noRevenueData": "No revenue data available for this lecturer"
+      "totalRevenue": "Total Revenue",
+      "averagePrice": "Average Price",
+      "confirmedPurchases": "Confirmed Purchases",
+      "confirmedRevenue": "Confirmed Revenue",
+      "pendingPurchases": "Pending Purchases"
+    },
+    "statsToday": {
+      "totalPurchases": "Total Purchases Today",
+      "totalRevenue": "Total Revenue Today",
+      "averagePrice": "Average price Today",
+      "confirmedPurchases": "Confirmed Purchases Today",
+      "confirmedRevenue": "Confirmed Revenue Today",
+      "pendingPurchases": "Pending Purchases Today"
+    },
+    "status": {
+      "label": "Status",
+      "all": "All Orders",
+      "pending": "Pending",
+      "received": "Received",
+      "confirmed": "Confirmed",
+      "processing": "Processing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded",
+      "returned": "Returned",
+      "created": "Created"
+    },
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "createdAt": "Created at",
+    "itemPrice": "Item price",
+    "requiredFields": "Required fields",
+    "field": "Field",
+    "unknownProduct": "Unknown Product",
+    "sections": {
+      "summary": "Summary",
+      "customer": "Customer",
+      "payment": "Payment",
+      "notes": "Notes"
+    },
+    "customer": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "payment": {
+      "method": "Method",
+      "methodPhone": "Payment phone",
+      "transferredFrom": "Transferred from",
+      "targetNumber": "Target number",
+      "screenshot": "Payment screenshot"
+    },
+    "notes": {
+      "customer": "Customer notes",
+      "admin": "Admin notes"
+    },
+    "title": "Orders Management",
+    "myOrders": "My Orders",
+    "subtitle": "Track, manage, and view your order history",
+    "noOrders": "No orders found",
+    "noOrdersForStatus": "You have no orders with this status.",
+    "noOrdersDescription": "Looks like you haven't placed any orders yet.",
+    "totalOrders": "{{count}} orders",
+    "searchPlaceholder": "Search by serial, name, email...",
+    "export": "Export",
+    "exportCsv": "Export as CSV",
+    "exportXlsx": "Export as Excel",
+    "statusAll": "All Statuses",
+    "statusPending": "Pending",
+    "statusReceived": "Received",
+    "statusConfirmed": "Confirmed",
+    "statusProcessing": "Processing",
+    "statusCompleted": "Completed",
+    "statusCancelled": "Cancelled",
+    "statusRefunded": "Refunded",
+    "statusReturned": "Returned",
+    "statusCreated": "Created",
+    "clearFilters": "Clear",
+    "filterByDate": "Filter by date",
+    "table": {
+      "serial": "Serial",
+      "customer": "Customer",
+      "status": "Status",
+      "total": "Total",
+      "payment": "Payment Method",
+      "actions": "Actions",
+      "selectAll": "Select all",
+      "selectAllOrders": "Select all orders"
+    },
+    "items": {
+      "items": "Items",
+      "empty": "No items",
+      "product": "Product",
+      "type": "Type",
+      "price": "Price",
+      "discount": "Discount",
+      "actions": "Actions",
+      "unknownProduct": "Unknown Product"
+    },
+    "actions": {
+      "view": "View Details",
+      "viewDetails": "View details",
+      "receive": "Mark Received",
+      "confirm": "Confirm Order",
+      "refund": "Refunded Order",
+      "statusPending": "Pending",
+      "statusProcessing": "Processing",
+      "statusCompleted": "Completed",
+      "statusCancelled": "Cancelled",
+      "statusRefunded": "Refunded",
+      "statusAll": "All Statuses",
+      "clearFilters": "Clear Filters",
+      "filterByDate": "Filter by date",
+      "searchPlaceholder": "Search orders...",
+      "return": "Return Order",
+      "delete": "Delete Order",
+      "deleteItem": "Remove Item",
+      "whatsapp": "Contact WhatsApp",
+      "collapseItems": "Collapse",
+      "expandItems": "Expand",
+      "viewNote": "View Note"
+    },
+    "messages": {
+      "receiveSuccess": "Order marked as received",
+      "confirmSuccess": "Order marked as confirmed",
+      "returnSuccess": "Order marked as returned",
+      "saveNoteSuccess": "Admin note saved successfully",
+      "deleteOrderWarning": "Are you sure you want to delete this order? This action cannot be undone.",
+      "deleteItemWarning": "Are you sure you want to remove this item from the order?",
+      "deleteOrderSuccess": "Order deleted successfully",
+      "deleteItemSuccess": "Item removed successfully",
+      "noteSaved": "Admin note saved successfully",
+      "noOrdersFound": "No orders found."
+    },
+    "details": {
+      "title": "Order details",
+      "backToOrders": "Back to Orders",
+      "customerInfo": "Customer Info",
+      "customerNotes": "Customer Notes",
+      "orderSummary": "Order Summary",
+      "paymentInfo": "Payment Info",
+      "statusTimeline": "Status Timeline",
+      "orderItems": "Order Items",
+      "adminNotes": "Admin Notes",
+      "couponInfo": "Applied Coupon",
+      "dateCreated": "Date Created",
+      "itemsCount": "Items Count",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "method": "Payment Method",
+      "transferFrom": "Transferred From",
+      "paymentNumber": "Payment Number",
+      "screenshot": "Payment Screenshot",
+      "saveNote": "Save Note",
+      "total": "Total",
+      "by": "by",
+      "lastNoteBy": "Last note by: {{name}}",
+      "contactWhatsApp": "Contact on WhatsApp",
+      "loading": "Loading details...",
+      "addAdminNote": "Add Admin Note",
+      "noteLimitReached": "Note limit reached",
+      "notFound": "Order not found"
+    }
   },
-  "modals" : {
-        "confirmDelete": "delete this code?",
-        "deleteCodeConfirm": "Are you sure you want to delete this code?"
+  "products": {
+    "title": "Products Management",
+    "subtitle": "Manage your store products, media, and settings",
+    "totalProducts": "{{count}} products",
+    "searchPlaceholder": "Search by title, description, serial...",
+    "noProducts": "No products found",
+    "noProductsDescription": "No products match your current filters.",
+    "createProduct": "Create Product",
+    "backToProducts": "Back to Products",
+    "backToProduct": "Back to Product",
+    "filters": {
+      "allCategories": "All Categories",
+      "allStatuses": "All Statuses",
+      "active": "Active",
+      "archived": "Archived",
+      "archivedToggle": "Show Archived"
+    },
+    "table": {
+      "thumbnail": "Image",
+      "title": "Title",
+      "type": "Type",
+      "price": "Price",
+      "rating": "Rating",
+      "categories": "Categories",
+      "status": "Status",
+      "actions": "Actions",
+      "selectAll": "Select all products"
+    },
+    "status": {
+      "active": "Active",
+      "archived": "Archived"
+    },
+    "type": {
+      "Book": "Book",
+      "Product": "Product",
+      "physical": "Physical",
+      "instant": "Instant"
+    },
+    "actions": {
+      "view": "View Details",
+      "edit": "Edit Product",
+      "archive": "Archive",
+      "unarchive": "Restore",
+      "delete": "Delete Product"
+    },
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Product title",
+      "description": "Description",
+      "descriptionPlaceholder": "Product description (optional)",
+      "type": "Type",
+      "price": "Price (EGP)",
+      "priceAfterDiscount": "Price After Discount (EGP)",
+      "serial": "Serial",
+      "serialPlaceholder": "e.g. ALG-101 (optional)",
+      "couponId": "Coupon ID",
+      "couponIdPlaceholder": "Coupon ID (optional)",
+      "thumbnail": "Thumbnail Image",
+      "sample": "Sample File (PDF)",
+      "chooseImage": "Choose image",
+      "chooseSampleFile": "Choose sample file",
+      "noFileSelected": "No file selected",
+      "categories": "Categories",
+      "isArchived": "Archived",
+      "perks": "Perks (Features)",
+      "perksPlaceholder": "e.g. Carton Cover, 200 pages, QR code",
+      "perksTip": "You can use English commas (,) or Arabic commas (،) to separate perks.",
+      "titleIsRequired": "Title is required",
+      "priceMustBeGreaterThan0": "Price must be greater than 0",
+      "discountedPriceMustBeLessThanOriginalPrice": "Discounted price must be less than the original price"
+    },
+    "create": {
+      "dialogTitle": "Create New Product",
+      "dialogDescription": "Fill in the product details. You can manage media and fields from the detail page.",
+      "submit": "Create Product",
+      "creating": "Creating...",
+      "uploading": "Uploading...",
+      "processing": "Processing..."
+    },
+    "edit": {
+      "dialogTitle": "Edit Product",
+      "dialogDescription": "Update the product details.",
+      "submit": "Save Changes",
+      "saving": "Saving..."
+    },
+    "quickCoupon": {
+      "title": "Quick Coupon",
+      "description": "Create and assign a coupon while saving this product.",
+      "enable": "Create coupon for this product",
+      "code": "Coupon Code",
+      "codePlaceholder": "KLM-XXXXXX",
+      "generate": "Generate",
+      "type": "Discount Type",
+      "percentageValue": "Discount Percentage",
+      "amountValue": "Discount Amount",
+      "validationComplete": "Please complete all quick coupon fields",
+      "validationPositive": "Coupon value must be greater than 0",
+      "validationPercentageMax": "Percentage cannot be greater than 100",
+      "validationAmountExceedsPrice": "Discount amount cannot exceed the product price",
+      "createFailed": "Product saved, but coupon creation failed"
+    },
+    "delete": {
+      "confirm": "Are you sure you want to delete this product? This action cannot be undone.",
+      "confirmTitle": "Delete Product",
+      "success": "Product deleted successfully"
+    },
+    "detail": {
+      "info": "Product Info",
+      "media": "Media",
+      "thumbnail": "Thumbnail",
+      "gallery": "Gallery",
+      "categories": "Categories",
+      "coupons": "Assigned Coupons",
+      "requiredFields": "Required Fields",
+      "noThumbnail": "No thumbnail uploaded",
+      "uploadThumbnail": "Upload Thumbnail",
+      "replaceThumbnail": "Replace Thumbnail",
+      "removeThumbnail": "Remove Thumbnail",
+      "addGalleryImages": "Add Gallery Images",
+      "noGalleryImages": "No gallery images yet",
+      "galleryImageActive": "Active",
+      "galleryImageHidden": "Hidden",
+      "toggleVisibility": "Toggle Visibility",
+      "removeImage": "Remove",
+      "noCategories": "No categories attached",
+      "noCoupons": "No coupons assigned to this product",
+      "attachCategory": "Attach Category",
+      "selectCategory": "Select a category...",
+      "detachCategory": "Remove",
+      "noRequiredFields": "No required fields attached",
+      "attachField": "Attach Field",
+      "selectField": "Select a field...",
+      "detachField": "Remove",
+      "fieldLabel": "Field",
+      "fieldType": "Type",
+      "fieldRequired": "Required",
+      "fieldOptional": "Optional",
+      "fieldToggleSuccess": "Required field updated successfully",
+      "fieldToggleError": "Failed to toggle required field",
+      "yes": "Yes",
+      "no": "No",
+      "sample": "Sample File",
+      "noSample": "No sample file uploaded. Samples can be attached when creating a product.",
+      "noSampleAvailable": "No sample file available for this product. Upload a PDF or Word document to provide a preview.",
+      "viewSample": "View Full Screen",
+      "previewSample": "Preview Sample",
+      "downloadSample": "Download",
+      "uploadSample": "Upload Sample",
+      "replaceSample": "Replace Sample",
+      "removeSample": "Remove Sample",
+      "sampleFileName": "File",
+      "sampleFileSize": "Size",
+      "sampleFileType": "Type",
+      "openSamplePage": "Open Sample Page",
+      "shareLinkCopied": "Share link copied to clipboard!",
+      "copyShareLink": "Copy share link",
+      "copyLink": "Copy",
+      "copied": "Copied!",
+      "linkCopied": "Link copied!",
+      "shareLink": "Share Link",
+      "shareInstructions": "Share this link with customers to let them preview the sample before purchasing.",
+      "invalidSampleType": "Invalid file type. Please upload a PDF or Word document.",
+      "sampleUpdated": "Sample updated successfully!",
+      "sampleUpdateError": "Failed to update sample. Please try again.",
+      "sampleRemoved": "Sample removed successfully!",
+      "sampleRemoveError": "Failed to remove sample. Please try again.",
+      "type": {
+        "Product": "Product",
+        "Book": "Book"
+      },
+      "confirmRemoveSampleTitle": "Remove Sample",
+      "confirmRemoveSampleDescription": "Are you sure you want to remove this sample file? This action cannot be undone and will permanently delete sample from this product.",
+      "uploading": "Uploading...",
+      "processing": "Processing...",
+      "selectChildCategory": "Select secondary category",
+      "selectGrandchildCategory": "Select tertiary category"
+    },
+    "reviews": {
+      "title": "Reviews",
+      "noReviews": "No reviews yet",
+      "noReviewsDescription": "This product has not received any customer reviews yet.",
+      "totalReviews": "total reviews",
+      "deleteConfirm": "Are you sure you want to delete this review?",
+      "deleteSuccess": "Review deleted successfully",
+      "anonymousUser": "Anonymous User"
+    }
   },
-  "noPhoneNumber": "No phone number available",
-  "noUsers": "No users found",
-  "noUsersFiltered": "No users match your current filters. Try adjusting your search criteria.",
-  "noUsersYet": "No users have registered yet. Check back later.",
-  "invites": {
-    "invite": "invite",
-    "invites": "invites"
+  "samples": {
+    "title": "Samples Management",
+    "subtitle": "All product sample files across the store",
+    "count": "samples",
+    "noSamples": "No sample files found.",
+    "copyLink": "Copy link",
+    "linkCopied": "Sample link copied!",
+    "linkCopyError": "Failed to copy link",
+    "table": {
+      "name": "Name",
+      "price": "Price",
+      "file": "File",
+      "product": "Product",
+      "size": "Size",
+      "type": "Type",
+      "actions": "Actions",
+      "selectAll": "Select all samples"
+    }
   },
-  "actions": {
-    "delete": "Delete",
-    "edit": "Edit",
-    "cancel": "Cancel",
-    "whatsapp": "Send WhatsApp message"
+  "coupons": {
+    "title": "Coupons Management",
+    "subtitle": "Create, edit, and manage product coupons",
+    "totalCoupons": "{{count}} coupons",
+    "searchPlaceholder": "Search by code...",
+    "empty": "No coupons found.",
+    "export": "Export",
+    "exportCsv": "Export as CSV",
+    "exportXlsx": "Export as Excel",
+    "statusPending": "Pending",
+    "statusProcessing": "Processing",
+    "statusCompleted": "Completed",
+    "statusCancelled": "Cancelled",
+    "statusRefunded": "Refunded",
+    "statusAll": "All Statuses",
+    "filters": {
+      "active": {
+        "label": "Status",
+        "all": "All statuses",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "product": {
+        "placeholder": "Filter by product",
+        "clear": "Clear"
+      },
+      "type": {
+        "label": "Type",
+        "all": "All types",
+        "percentage": "Percentage",
+        "amount": "Amount"
+      },
+      "date": {
+        "start": "Start date",
+        "end": "End date",
+        "range": "Filter by date range",
+        "clear": "Clear"
+      }
+    },
+    "discountType": {
+      "percentage": "Percentage",
+      "amount": "Amount"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "stats": {
+      "totalCoupons": "Total Coupons",
+      "activeCoupons": "Active Coupons",
+      "inactiveCoupons": "Inactive Coupons",
+      "percentageCoupons": "Percentage Coupons",
+      "amountCoupons": "Amount Coupons"
+    },
+    "table": {
+      "code": "Code",
+      "discountType": "Discount Type",
+      "discountValue": "Discount Value",
+      "productId": "Product ID",
+      "dates": "Dates",
+      "createdAt": "Created At",
+      "startsAt": "Starts At",
+      "expiresAt": "Expires At",
+      "status": "Status",
+      "actions": "Actions",
+      "selectAll": "Select all coupons"
+    },
+    "form": {
+      "code": "Code",
+      "codePlaceholder": "KLM-XXXXXX",
+      "discountType": "Discount Type",
+      "discountPercentage": "Discount Percentage",
+      "discountAmount": "Discount Amount",
+      "units": {
+        "percentage": "%",
+        "amount": "L.E"
+      },
+      "productId": "Product ID",
+      "productIdPlaceholder": "Please click on 'Pick Product' to select a product",
+      "startsAt": "Starts At",
+      "startsAtPlaceholder": "Pick a start date",
+      "expiresAt": "Expires At",
+      "expiresAtPlaceholder": "Pick an expiration date",
+      "optional": "Optional",
+      "isActive": "Coupon Activity Status"
+    },
+    "create": {
+      "title": "Create Coupon",
+      "description": "Fill in coupon details and save."
+    },
+    "edit": {
+      "title": "Edit Coupon",
+      "description": "Update coupon details and status.",
+      "toggleHelp": "Use this toggle to activate or deactivate the coupon."
+    },
+    "productPicker": {
+      "open": "Pick Product",
+      "title": "Select Product",
+      "description": "Search products and select one for this coupon.",
+      "searchPlaceholder": "Search by title or serial...",
+      "empty": "No products found.",
+      "select": "Select",
+      "selected": "Selected",
+      "price": "Price",
+      "priceAfterDiscount": "Price After Discount"
+    },
+    "delete": {
+      "title": "Delete Coupon",
+      "confirm": "Are you sure you want to delete this coupon?",
+      "disclaimer": "Deleted coupons will not appear in the list, but they remain stored in history."
+    },
+    "actions": {
+      "create": "Create Coupon",
+      "save": "Save Changes",
+      "delete": "Delete",
+      "generateCode": "Generate Random Code",
+      "copyCode": "Copy Code",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "viewDetails": "View Details",
+      "edit": "Edit Coupon"
+    },
+    "details": {
+      "title": "Coupon details",
+      "description": "Review coupon information and validity."
+    },
+    "messages": {
+      "codeCopied": "Coupon code copied",
+      "codeCopyFailed": "Failed to copy coupon code"
+    },
+    "validation": {
+      "codeRequired": "Coupon code is required",
+      "codeMinLength": "Coupon code must be at least 6 characters",
+      "codeFormat": "Code must contain only uppercase letters, numbers, and hyphens",
+      "discountTypeRequired": "Discount type is required",
+      "productRequired": "Product ID is required",
+      "startsAtRequired": "Start date is required",
+      "startsAtBeforeExpiresAt": "Start date must be before expiration date",
+      "expiresAtRequired": "Expiration date is required",
+      "expiresAtNotPast": "Expiration date cannot be before today",
+      "discountPercentageRequired": "Percentage value is required",
+      "discountPercentageInvalid": "Percentage must be a valid number",
+      "discountPercentageMax": "Percentage cannot be greater than 100",
+      "discountAmountRequired": "Amount value is required",
+      "discountAmountInvalid": "Amount must be a valid number",
+      "discountAmountExceedsProductPrice": "Discount amount cannot exceed the selected product price",
+      "discountValuePositive": "Value must be greater than 0"
+    },
+    "api": {
+      "createSuccess": "Coupon created successfully!",
+      "updateSuccess": "Coupon updated successfully!",
+      "deleteSuccess": "Coupon deleted successfully!"
+    }
+  },
+  "categories": {
+    "title": "Categories Management",
+    "subtitle": "Manage your store's category structure",
+    "totalCategories": "{{count}} categories",
+    "searchPlaceholder": "Search by title...",
+    "noCategories": "No categories found",
+    "noCategoriesDescription": "You haven't added any categories yet.",
+    "noSubCategories": "No subcategories found",
+    "createCategory": "Create Category",
+    "backToCategories": "Back to Categories",
+    "table": {
+      "title": "Title",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Category title",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "parentCategory": "Parent Category (Optional)",
+      "selectParentCategory": "Select Parent...",
+      "rootLevel": "Root Level",
+      "isArchived": "Archived",
+      "depthWarning": "Maximum category depth is 3 levels."
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "create": {
+      "dialogTitle": "Create New Category",
+      "dialogDescription": "Add a new category.",
+      "submit": "Create",
+      "creating": "Creating..."
+    },
+    "edit": {
+      "dialogTitle": "Edit Category",
+      "dialogDescription": "Update category details.",
+      "submit": "Save Changes",
+      "saving": "Saving..."
+    },
+    "delete": {
+      "confirmTitle": "Delete Category",
+      "confirm": "Are you sure you want to delete this category? This will also delete all its subcategories.",
+      "deleteProductsLabel": "Delete attached products",
+      "deleteProductsDescription": "If unchecked, products will only be unlinked.",
+      "success": "Category deleted successfully"
+    },
+    "messages": {
+      "archiveWarning": "Archiving this category will cascade to all subcategories.",
+      "depthLimitReached": "Cannot nest further. Maximum depth of 3 reached."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account settings and preferences",
+    "profile": {
+      "title": "Profile Information",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "secondaryPhone": "Secondary Phone",
+      "gender": "Gender",
+      "uploadAvatar": "Upload Avatar",
+      "avatarHint": "JPG, PNG or GIF. Max size 2MB.",
+      "editProfile": "Edit Profile",
+      "updateSuccess": "Profile updated successfully",
+      "validation": {
+        "nameRequired": "Name is required",
+        "emailInvalid": "Invalid email address",
+        "invalidPhone": "Invalid Egyptian phone number"
+      }
+    },
+    "password": {
+      "title": "Password Management",
+      "changePassword": "Change Password",
+      "setPassword": "Set Password",
+      "changeDescription": "Change your existing password",
+      "setDescription": "Set a password for local login",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "currentPasswordPlaceholder": "Enter current password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "passwordMismatch": "Passwords do not match",
+      "confirmChangeTitle": "Change Password",
+      "confirmChange": "Are you sure you want to change your password? You will be logged out from all devices.",
+      "confirmSetTitle": "Set Password",
+      "confirmSet": "Are you sure you want to set a password? This will enable local login for your account."
+    },
+    "account": {
+      "title": "Account Security",
+      "linkedProviders": "Linked Providers",
+      "linkNewAccount": "Link New Account",
+      "linkDescription": "Link additional accounts to enable multiple login methods.",
+      "linkFirebase": "Link Google Account",
+      "setPasswordFirst": "Set password first",
+      "noLinkedProviders": "No linked accounts",
+      "connected": "Connected",
+      "unlink": "Unlink",
+      "confirmUnlinkTitle": "Unlink Account Provider",
+      "confirmUnlink": "Are you sure you want to unlink this provider? You will lose access to this login method.",
+      "unlinkWarning": "You will lose access to this login method and will need to use one of your remaining accounts to sign in.",
+      "providers": {
+        "local": "Email Account",
+        "google": "Google",
+        "facebook": "Facebook",
+        "github": "GitHub",
+        "firebase": "Firebase",
+        "email": "Email"
+      }
+    },
+    "email": {
+      "title": "Email Verification",
+      "verificationStatus": "Verification Status",
+      "verified": "Email Verified",
+      "notVerified": "Email Not Verified",
+      "pending": "Pending",
+      "verificationDescription": "Verify your email to secure your account and receive important notifications.",
+      "sendVerification": "Send Verification Email",
+      "resendVerification": "Resend Verification",
+      "securityInfo": "Security Information",
+      "cooldown": "Wait {{seconds}}s",
+      "benefits": {
+        "title": "Benefits of Verification",
+        "security": "Enhanced account security",
+        "recovery": "Password recovery access",
+        "notifications": "Important notifications"
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting",
+        "spam": "Check spam folder",
+        "address": "Verify email address",
+        "contact": "Contact support if needed"
+      }
+    },
+    "session": {
+      "title": "Session Management",
+      "activeSessions": "Active Sessions",
+      "current": "Current",
+      "activeNow": "Active now",
+      "minutesAgo": "{{minutes}}m ago",
+      "hoursAgo": "{{hours}}h ago",
+      "daysAgo": "{{days}}d ago",
+      "sessionActions": "Session Actions",
+      "logoutCurrent": "Logout Current Device",
+      "logoutCurrentDescription": "Logout from this device",
+      "logoutAll": "Logout All Devices",
+      "logoutAllDescription": "Logout from all devices",
+      "logout": "Logout",
+      "confirmLogoutAllTitle": "Logout All Devices",
+      "confirmLogoutAll": "Are you sure you want to logout from all devices?",
+      "logoutWarning": "Logging out from all devices will require you to sign in again on each device.",
+      "logoutAllWarning1": "You will be logged out from all devices immediately.",
+      "logoutAllWarning2": "You will need to sign in again on each device to continue using your account.",
+      "logoutAllWarning3": "Any unsaved work will be lost."
+    },
+    "upload": {
+      "progress": "Upload Progress: {{progress}}%",
+      "cancelled": "Upload cancelled",
+      "error": "Upload failed",
+      "file": "File"
+    },
+    "expandSidebar": "Expand Sidebar"
+  },
+  "paymentMethods": {
+    "title": "Payment Methods Management",
+    "subtitle": "Manage payment methods available in your store",
+    "totalMethods": "{{count}} payment methods",
+    "createMethod": "Create Payment Method",
+    "noMethodsFound": "No payment methods found",
+    "selectedCount": "{{count}} selected",
+    "bulkActivate": "Activate",
+    "bulkDeactivate": "Deactivate",
+    "filters": {
+      "searchPlaceholder": "Search by name...",
+      "statusFilter": "Status",
+      "allStatus": "All Status"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "phoneNumber": "Phone Number",
+      "status": "Status",
+      "image": "Image",
+      "createdAt": "Created"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "e.g., Vodafone Cash",
+      "nameDescription": "Enter a descriptive name for the payment method",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "e.g., 01012345678",
+      "phoneDescription": "Enter the contact phone number for this payment method.",
+      "status": "Status",
+      "statusDescription": "Enable or disable this payment method",
+      "image": "Image",
+      "imageOptional": "Leave empty to keep current image",
+      "imageDescription": "Upload a new image to replace the current one. Recommended size: 200x200px",
+      "currentImage": "Current Image",
+      "unchanged": "Unchanged",
+      "newImage": "New Image"
+    },
+    "create": {
+      "title": "Create Payment Method",
+      "description": "Add a new payment method to your store.",
+      "submit": "Create Payment Method"
+    },
+    "edit": {
+      "title": "Edit Payment Method",
+      "description": "Update payment method details.",
+      "submit": "Update Payment Method"
+    },
+    "delete": {
+      "title": "Delete Payment Method",
+      "description": "This action cannot be undone.",
+      "warning": "Are you sure you want to delete this payment method? This action is permanent and cannot be reversed.",
+      "methodName": "Payment Method",
+      "consequences": "Deleting this payment method will:",
+      "consequence1": "Remove it from available payment options",
+      "consequence2": "Affect any pending orders using this method",
+      "consequence3": "Require customers to use alternative payment methods",
+      "confirm": "Delete Payment Method"
+    },
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "creating": "Creating...",
+    "updating": "Updating...",
+    "deleting": "Deleting...",
+    "uploading": "Uploading...",
+    "image": {
+      "dragDrop": "Drag & drop image here",
+      "orClick": "or click to browse",
+      "supportedFormats": "JPEG, PNG, WebP (max 5MB)",
+      "invalidType": "Invalid file type. Please upload JPEG, PNG, or WebP images.",
+      "tooLarge": "File too large. Maximum size is 5MB.",
+      "uploading": "Uploading..."
+    }
+  },
+  "requiredFields": {
+    "title": "Required Fields Management",
+    "subtitle": "Manage reusable field definitions for products",
+    "totalFields": "{{count}} fields",
+    "noFields": "No required fields found",
+    "createField": "Create Field",
+    "fields": {
+      "label": "Label",
+      "fieldType": "Field Type",
+      "active": "Active",
+      "createdAt": "Created At"
+    },
+    "types": {
+      "text": "Text",
+      "number": "Number",
+      "date": "Date",
+      "image": "Image"
+    },
+    "filters": {
+      "allStatuses": "All Statuses",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "create": {
+      "title": "Create Required Field",
+      "description": "Add a new reusable field definition.",
+      "labelPlaceholder": "Enter field label",
+      "fieldTypePlaceholder": "Select field type"
+    },
+    "edit": {
+      "title": "Edit Required Field",
+      "description": "Update field definition details.",
+      "labelPlaceholder": "Enter field label",
+      "fieldTypePlaceholder": "Select field type",
+      "activeDescription": "Enable or disable this field definition"
+    },
+    "delete": {
+      "title": "Delete Required Field",
+      "description": "Are you sure you want to delete the field \"{{label}}\"?",
+      "warning": "This action cannot be undone.",
+      "warningDescription": "Deleting this field will remove it from all products and cannot be recovered.",
+      "confirm": "Delete Field"
+    },
+    "messages": {
+      "createSuccess": "Field created successfully",
+      "updateSuccess": "Field updated successfully",
+      "deleteSuccess": "Field deleted successfully"
+    }
   },
   "export": {
-    "export": "Export",
     "exporting": "Exporting...",
-    "csvFormat": "CSV Format",
-    "jsonFormat": "JSON Format",
-    "exportFiltered": "Export Filtered",
-    "exportAll": "Export All",
-    "successAll": "Successfully exported {{count}} users",
-    "successFiltered": "Successfully exported {{count}} filtered users",
-    "error": "Failed to export users. Please try again.",
-    "filterInfo": "Filters applied:",
-    "of": "of",
-    "usersShown": "users shown",
-    "name": "Name",
-    "email": "Email",
-    "phone": "Phone Number",
-    "role": "Role",
-    "status": "Status",
-    "government": "Government",
-    "administrationZone": "Administration Zone",
-    "sequenceId": "Sequence ID",
-    "joinedDate": "Joined Date"
+    "processing": "Processing your file...",
+    "success": "File exported successfully"
   }
 }
-
-

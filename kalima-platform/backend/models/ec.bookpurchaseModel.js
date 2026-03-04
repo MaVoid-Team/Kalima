@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store book purchase model.
 const mongoose = require("mongoose");
 const ECPurchase = require("./ec.purchaseModel");
 
@@ -24,10 +27,13 @@ const bookPurchaseSchema = new mongoose.Schema(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 // Inherit from ECPurchase using discriminator
-const ECBookPurchase = ECPurchase.discriminator("ECBookPurchase", bookPurchaseSchema);
+const ECBookPurchase = ECPurchase.discriminator(
+  "ECBookPurchase",
+  bookPurchaseSchema,
+);
 
 module.exports = ECBookPurchase;

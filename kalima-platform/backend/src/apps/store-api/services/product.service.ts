@@ -1,0 +1,735 @@
+import type { PrismaClient } from "../../../libs/db/prisma";
+import { prisma } from "../../../libs/db/prisma";
+import {
+  products,
+  product_gallery,
+  product_categories,
+  product_required_fields,
+} from "../generated/prisma/client";
+import { imageService, UploadImageOptions } from "./image.service";
+import { sampleService } from "./sample.service";
+import {
+  CreateProductDto,
+  UpdateProductDto,
+  AttachRequiredFieldEntry,
+} from "../dtos/product.dto";
+import {
+  BadRequestError,
+  NotFoundError,
+  ConflictError,
+} from "../../../libs/errors";
+import { reviewService } from "./review.service";
+
+// ============================================
+// SHARED INCLUDES
+// ============================================
+
+/** Minimal include for product list (getAllProducts) */
+const PRODUCT_LIST_SELECT = {
+  id: true,
+  title: true,
+  description: true,
+  type: true,
+  price: true,
+  is_archived: true,
+  price_after_discount: true,
+  thumbnail_image: true,
+  product_categories: {
+    include: { categories: { select: { id: true, title: true } } },
+  },
+};
+
+/** Full include for single product (getProductById, create, update) */
+const PRODUCT_INCLUDE = {
+  thumbnail_image: true,
+  product_gallery: {
+    include: { images: true },
+    orderBy: { sort_order: "asc" as const },
+  },
+  product_categories: {
+    include: { categories: true },
+  },
+  product_required_fields: {
+    include: { required_field_definitions: true },
+  },
+  coupons: {
+    where: { deleted_at: null, active: true },
+    select: {
+      id: true,
+      code: true,
+      discount_amount: true,
+      discount_percentage: true,
+      active: true,
+      expires_at: true,
+    },
+    orderBy: { created_at: "desc" as const },
+  },
+  samples: true,
+  product_reviews: {
+    include: { users: { select: { id: true, name: true, role: true } } },
+    orderBy: { created_at: "desc" as const },
+  },
+};
+
+// ============================================
+// PRODUCT SERVICE
+// ============================================
+
+class ProductService {
+  constructor(private db: PrismaClient = prisma) {}
+
+  // ============================================
+  // CREATE
+  // ============================================
+
+  async createProduct(
+    dto: CreateProductDto,
+    thumbnailFile?: Express.Multer.File,
+    sampleFile?: Express.Multer.File,
+  ): Promise<products> {
+    // If category_id provided, verify it exists
+    if (dto.category_id) {
+      const category = await this.db.categories.findUnique({
+        where: { id: dto.category_id },
+        select: { id: true },
+      });
+      if (!category) {
+        throw new NotFoundError(`Category ID not found: ${dto.category_id}`);
+      }
+    }
+
+    // Upload thumbnail if provided
+    let thumbnailId: number | null = null;
+    if (thumbnailFile) {
+      const image = await imageService.uploadImage(thumbnailFile, {
+        compress: true,
+        quality: 75,
+      });
+      thumbnailId = image.id;
+    }
+
+    if (dto.price < 0) {
+      throw new BadRequestError("Price cannot be negative");
+    }
+
+    let priceAfterDiscount = dto.price;
+    if (dto.price_after_discount || dto.price_after_discount === 0) {
+      if (dto.price_after_discount > dto.price) {
+        throw new BadRequestError(
+          "Price after discount cannot be greater than price",
+        );
+      }
+      priceAfterDiscount = dto.price_after_discount;
+    }
+
+    // Create product
+    const product = await this.db.products.create({
+      data: {
+        title: dto.title,
+        description: dto.description,
+        type: dto.type,
+        price: dto.price,
+        price_after_discount: priceAfterDiscount,
+        serial: dto.serial,
+        sample_url: dto.sample_url,
+        thumbnail_id: thumbnailId,
+        perks: dto.perks,
+      },
+      include: PRODUCT_INCLUDE,
+    });
+
+    // Attach category if provided
+    if (dto.category_id) {
+      await this.db.product_categories.create({
+        data: {
+          product_id: product.id,
+          category_id: dto.category_id,
+        },
+      });
+    }
+
+    // Upload sample if provided
+    if (sampleFile) {
+      await sampleService.uploadSample(sampleFile, product.id);
+    }
+
+    // Re-fetch to include categories and sample
+    return this.getProductById(product.id);
+  }
+
+  // ============================================
+  // READ — ALL
+  // ============================================
+
+  async getAllProducts(
+    userId?: number,
+    filters?: {
+      is_archived?: boolean;
+      category_id?: number;
+      search?: string;
+      page?: number;
+      limit?: number;
+    },
+  ): Promise<{
+    data: any[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const page = filters?.page ?? 1;
+    const limit = filters?.limit ?? 20;
+    const skip = (page - 1) * limit;
+
+    const where: any = { deleted_at: null };
+
+    if (filters?.is_archived !== undefined) {
+      where.is_archived = filters.is_archived;
+    }
+
+    if (filters?.search) {
+      where.OR = [
+        { title: { contains: filters.search, mode: "insensitive" } },
+        { description: { contains: filters.search, mode: "insensitive" } },
+      ];
+    }
+
+    if (filters?.category_id) {
+      where.product_categories = {
+        some: { category_id: filters.category_id },
+      };
+    }
+
+    const [data, total] = await Promise.all([
+      this.db.products.findMany({
+        where,
+        select: PRODUCT_LIST_SELECT,
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.products.count({ where }),
+    ]);
+
+    // Handle is_purchased if userId is provided
+    let purchasedProductIds = new Set<number>();
+    if (userId) {
+      const purchases = await this.db.purchase_items.findMany({
+        where: {
+          purchases: {
+            user_id: userId,
+          },
+        },
+        select: { product_id: true },
+      });
+      purchasedProductIds = new Set(purchases.map((p) => p.product_id));
+    }
+
+    const productsWithExtras = await Promise.all(
+      data.map(async (product) => {
+        const { averageRating, reviewCount } =
+          await reviewService.getAggregatedRating(product.id);
+        return {
+          ...product,
+          isPurchased: purchasedProductIds.has(product.id),
+          averageRating,
+          reviewCount,
+        };
+      }),
+    );
+
+    return { data: productsWithExtras, total, page, limit };
+  }
+
+  // ============================================
+  // READ — SINGLE
+  // ============================================
+
+  async getProductById(id: number): Promise<any> {
+    const product = await this.db.products.findFirst({
+      where: { id, deleted_at: null },
+      include: PRODUCT_INCLUDE,
+    });
+
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    const { averageRating, reviewCount } =
+      await reviewService.getAggregatedRating(id);
+
+    return {
+      ...product,
+      averageRating,
+      reviewCount,
+    };
+  }
+
+  // ============================================
+  // UPDATE
+  // ============================================
+
+  async updateProduct(
+    id: number,
+    dto: UpdateProductDto,
+    sampleFile?: Express.Multer.File,
+  ): Promise<products> {
+    const product = await this.db.products.findFirst({
+      where: { id, deleted_at: null },
+      include: { samples: true },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    // When a new sample file is provided: delete old sample, upload new one
+    if (sampleFile) {
+      if (product.samples) {
+        await sampleService.deleteSample(product.samples.id);
+      }
+      const newSample = await sampleService.uploadSample(sampleFile, id);
+      dto = { ...dto, sample_url: newSample.url };
+    }
+
+    const data: any = { updated_at: new Date() };
+    if (dto.title !== undefined) data.title = dto.title;
+    if (dto.description !== undefined) data.description = dto.description;
+    if (dto.type !== undefined) data.type = dto.type;
+    if (dto.price !== undefined) data.price = dto.price;
+    if (dto.price_after_discount !== undefined)
+      data.price_after_discount = dto.price_after_discount;
+    if (dto.serial !== undefined) data.serial = dto.serial;
+    if (dto.sample_url !== undefined) data.sample_url = dto.sample_url;
+    if (dto.is_archived !== undefined) data.is_archived = dto.is_archived;
+    if (dto.perks !== undefined) data.perks = dto.perks;
+
+    const updated = await this.db.products.update({
+      where: { id },
+      data,
+      include: PRODUCT_INCLUDE,
+    });
+
+    // When sample_url is updated to a non-null value (from DTO, not file), sync to sample record if one exists
+    if (
+      dto.sample_url !== undefined &&
+      dto.sample_url !== null &&
+      !sampleFile &&
+      updated.samples
+    ) {
+      await this.db.samples.update({
+        where: { id: updated.samples.id },
+        data: { url: dto.sample_url },
+      });
+      return this.getProductById(id);
+    }
+
+    return sampleFile ? this.getProductById(id) : updated;
+  }
+
+  // ============================================
+  // SOFT DELETE
+  // ============================================
+
+  async deleteProduct(id: number): Promise<void> {
+    const product = await this.db.products.findFirst({
+      where: { id, deleted_at: null },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    await this.db.products.update({
+      where: { id },
+      data: { deleted_at: new Date(), updated_at: new Date() },
+    });
+  }
+
+  // ============================================
+  // THUMBNAIL — UPLOAD / REPLACE
+  // ============================================
+
+  async uploadThumbnail(
+    productId: number,
+    file: Express.Multer.File,
+  ): Promise<products> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    const newImage = await imageService.replaceImage(
+      product.thumbnail_id,
+      file,
+      { compress: true, quality: 75 },
+    );
+
+    const updated = await this.db.products.update({
+      where: { id: productId },
+      data: { thumbnail_id: newImage.id, updated_at: new Date() },
+      include: PRODUCT_INCLUDE,
+    });
+
+    return updated;
+  }
+
+  // ============================================
+  // SAMPLE — REMOVE
+  // ============================================
+
+  async removeSample(productId: number): Promise<products> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+      include: { samples: true },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    if (!product.samples) {
+      throw new BadRequestError("Product has no sample");
+    }
+
+    await sampleService.deleteSample(product.samples.id);
+    await this.db.products.update({
+      where: { id: productId },
+      data: { sample_url: null, updated_at: new Date() },
+    });
+
+    return this.getProductById(productId);
+  }
+
+  // ============================================
+  // THUMBNAIL — REMOVE
+  // ============================================
+
+  async removeThumbnail(productId: number): Promise<products> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    if (!product.thumbnail_id) {
+      throw new BadRequestError("Product has no thumbnail");
+    }
+
+    // Nullify FK first, then delete image
+    await this.db.products.update({
+      where: { id: productId },
+      data: { thumbnail_id: null, updated_at: new Date() },
+    });
+
+    await imageService.deleteImage(product.thumbnail_id);
+
+    return this.getProductById(productId);
+  }
+
+  // ============================================
+  // GALLERY — ADD IMAGES
+  // ============================================
+
+  async addToGallery(
+    productId: number,
+    files: Express.Multer.File[],
+    compress: boolean = true,
+  ): Promise<product_gallery[]> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    const maxEntry = await this.db.product_gallery.findFirst({
+      where: { product_id: productId },
+      orderBy: { sort_order: "desc" },
+      select: { sort_order: true },
+    });
+    let nextSort = (maxEntry?.sort_order ?? -1) + 1;
+
+    const images = await Promise.all(
+      files.map((file) =>
+        imageService.uploadImage(file, { compress, quality: 75 }),
+      ),
+    );
+
+    const createData = images.map((image) => ({
+      product_id: productId,
+      image_id: image.id,
+      sort_order: nextSort++,
+    }));
+
+    const created = await this.db.product_gallery.createManyAndReturn({
+      data: createData,
+      include: { images: true },
+    });
+
+    return created;
+  }
+
+  // ============================================
+  // GALLERY — GET
+  // ============================================
+
+  async getGallery(
+    productId: number,
+    includeInactive: boolean = false,
+  ): Promise<product_gallery[]> {
+    const where: any = { product_id: productId };
+    if (!includeInactive) {
+      where.active = true;
+    }
+
+    return this.db.product_gallery.findMany({
+      where,
+      include: { images: true },
+      orderBy: { sort_order: "asc" },
+    });
+  }
+
+  // ============================================
+  // GALLERY — UPDATE ENTRY
+  // ============================================
+
+  async updateGalleryEntry(
+    productId: number,
+    galleryId: number,
+    data: { sort_order?: number; active?: boolean },
+  ): Promise<product_gallery> {
+    const entry = await this.db.product_gallery.findFirst({
+      where: { id: galleryId, product_id: productId },
+    });
+    if (!entry) {
+      throw new NotFoundError("Gallery entry not found");
+    }
+
+    return this.db.product_gallery.update({
+      where: { id: galleryId },
+      data,
+      include: { images: true },
+    });
+  }
+
+  // ============================================
+  // GALLERY — REMOVE
+  // ============================================
+
+  async removeFromGallery(productId: number, galleryId: number): Promise<void> {
+    const entry = await this.db.product_gallery.findFirst({
+      where: { id: galleryId, product_id: productId },
+    });
+    if (!entry) {
+      throw new NotFoundError("Gallery entry not found");
+    }
+
+    // Delete gallery row first, then clean up the image file
+    await this.db.product_gallery.delete({ where: { id: galleryId } });
+    await imageService.deleteImage(entry.image_id);
+  }
+
+  // ============================================
+  // CATEGORIES — ATTACH
+  // ============================================
+
+  async attachCategories(
+    productId: number,
+    categoryIds: number[],
+  ): Promise<{ attached: number; skipped: number }> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    // Verify all categories exist
+    const categories = await this.db.categories.findMany({
+      where: { id: { in: categoryIds } },
+      select: { id: true },
+    });
+    if (categories.length !== categoryIds.length) {
+      const foundIds = new Set(categories.map((c) => c.id));
+      const missing = categoryIds.filter((id) => !foundIds.has(id));
+      throw new NotFoundError(
+        `Category ID(s) not found: ${missing.join(", ")}`,
+      );
+    }
+
+    // Check existing attachments
+    const existing = await this.db.product_categories.findMany({
+      where: {
+        product_id: productId,
+        category_id: { in: categoryIds },
+      },
+    });
+    const existingSet = new Set(existing.map((e) => e.category_id));
+    const toInsert = categoryIds.filter((id) => !existingSet.has(id));
+
+    if (toInsert.length > 0) {
+      await this.db.product_categories.createMany({
+        data: toInsert.map((categoryId) => ({
+          product_id: productId,
+          category_id: categoryId,
+        })),
+      });
+    }
+
+    return {
+      attached: toInsert.length,
+      skipped: categoryIds.length - toInsert.length,
+    };
+  }
+
+  // ============================================
+  // CATEGORIES — DETACH
+  // ============================================
+
+  async detachCategory(productId: number, categoryId: number): Promise<void> {
+    const link = await this.db.product_categories.findFirst({
+      where: { product_id: productId, category_id: categoryId },
+    });
+    if (!link) {
+      throw new NotFoundError("Category is not attached to this product");
+    }
+
+    await this.db.product_categories.delete({ where: { id: link.id } });
+  }
+
+  // ============================================
+  // REQUIRED FIELDS — ATTACH
+  // ============================================
+
+  async attachRequiredFields(
+    productId: number,
+    fields: AttachRequiredFieldEntry[],
+  ): Promise<{ attached: number; skipped: number }> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    const definitionIds = fields.map((f) => f.field_definition_id);
+    const definitions = await this.db.required_field_definitions.findMany({
+      where: { id: { in: definitionIds }, deleted_at: null },
+    });
+
+    const validIds = new Set(definitions.map((d) => d.id));
+    const invalidIds = definitionIds.filter((id) => !validIds.has(id));
+    if (invalidIds.length > 0) {
+      throw new NotFoundError(
+        `Field definition(s) not found: ${invalidIds.join(", ")}`,
+      );
+    }
+
+    const existing = await this.db.product_required_fields.findMany({
+      where: {
+        product_id: productId,
+        field_definition_id: { in: definitionIds },
+      },
+    });
+    const existingSet = new Set(existing.map((e) => e.field_definition_id));
+    const toInsert = fields.filter(
+      (f) => !existingSet.has(f.field_definition_id),
+    );
+
+    if (toInsert.length > 0) {
+      await this.db.product_required_fields.createMany({
+        data: toInsert.map((f) => ({
+          product_id: productId,
+          field_definition_id: f.field_definition_id,
+          is_required: f.is_required ?? true,
+        })),
+      });
+    }
+
+    return {
+      attached: toInsert.length,
+      skipped: fields.length - toInsert.length,
+    };
+  }
+
+  // ============================================
+  // REQUIRED FIELDS — GET
+  // ============================================
+
+  async getProductRequiredFields(productId: number): Promise<any[]> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    return this.db.product_required_fields.findMany({
+      where: { product_id: productId, active: true },
+      select: {
+        field_definition_id: true,
+        is_required: true,
+        required_field_definitions: {
+          select: {
+            label: true,
+            field_type: true,
+          },
+        },
+      },
+    });
+  }
+
+  // ============================================
+  // REQUIRED FIELDS — UPDATE
+  // ============================================
+
+  async updateRequiredField(
+    productId: number,
+    attachmentId: number,
+    isRequired: boolean,
+  ): Promise<void> {
+    const attachment = await this.db.product_required_fields.findFirst({
+      where: {
+        product_id: productId,
+        id: attachmentId,
+      },
+    });
+    if (!attachment) {
+      throw new NotFoundError(
+        "This field is not attached to the specified product",
+      );
+    }
+
+    await this.db.product_required_fields.update({
+      where: { id: attachment.id },
+      data: { is_required: isRequired },
+    });
+  }
+
+  // ============================================
+  // REQUIRED FIELDS — DETACH
+  // ============================================
+
+  async detachRequiredField(
+    productId: number,
+    fieldDefinitionId: number,
+  ): Promise<void> {
+    const attachment = await this.db.product_required_fields.findFirst({
+      where: {
+        product_id: productId,
+        field_definition_id: fieldDefinitionId,
+      },
+    });
+    if (!attachment) {
+      throw new NotFoundError(
+        "This field is not attached to the specified product",
+      );
+    }
+
+    await this.db.product_required_fields.delete({
+      where: { id: attachment.id },
+    });
+  }
+}
+
+export const productService = new ProductService();
