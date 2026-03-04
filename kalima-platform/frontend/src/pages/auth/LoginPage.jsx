@@ -80,7 +80,7 @@ export default function LoginPage() {
         try {
             await login(values);
             // Navigate to dashboard or home after successful login
-            navigate("/");
+            navigate(-1);
         } catch (error) {
             console.error("Login failed:", error);
             // Error is handled by interceptor/hook (toast)
@@ -92,7 +92,7 @@ export default function LoginPage() {
             const result = await signInWithPopup(auth, provider);
             const idToken = await result.user.getIdToken();
             await loginWithFirebase(idToken);
-            navigate("/");
+            navigate(-1);
         } catch (error) {
             console.error("Firebase Login failed:", error);
             toast.error(error?.message || "Failed to login with Firebase");

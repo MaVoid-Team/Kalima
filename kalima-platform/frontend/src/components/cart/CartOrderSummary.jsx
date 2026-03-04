@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight, Lock, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -16,16 +16,66 @@ export default function CartOrderSummary({
   const { t } = useTranslation('cart');
   const navigate = useNavigate();
 
+  const [clientStates, setClientStates] = useState({});
+
+  useEffect(() => {
+    const handleStateChange = (e) => {
+      const { itemId, isDirty, missingFields } = e.detail;
+      setClientStates(prev => ({
+        ...prev,
+        [itemId]: { isDirty, missingFields }
+      }));
+    };
+    window.addEventListener('cart-item-client-state', handleStateChange);
+    window.dispatchEvent(new CustomEvent('request-cart-item-client-state'));
+    return () => window.removeEventListener('cart-item-client-state', handleStateChange);
+  }, []);
+
   const handleCheckout = () => {
-    if (isCartItemsRequiredFieldsFilled) {
-      if (onProceed) {
-        onProceed();
-      } else {
-        navigate('/checkout');
+    let hasMissing = false;
+    let hasDirty = false;
+
+    Object.values(clientStates).forEach(state => {
+      if (state.missingFields && state.missingFields.length > 0) {
+        hasMissing = true;
+      } else if (state.isDirty) {
+        hasDirty = true;
+      }
+    });
+
+    if (!isCartItemsRequiredFieldsFilled && !hasMissing && !hasDirty) {
+      hasMissing = true;
+    }
+
+    if (hasMissing) {
+      toast.error(t('fillRequiredFields_Client_Missing', 'Please fill the missing required fields first'), { description: t('fillRequiredFieldsHint_Client_Missing', 'Some items have missing required fields.') });
+      window.dispatchEvent(new CustomEvent('highlight-missing-fields'));
+      if (window.innerWidth < 1024) {
+        setTimeout(() => {
+          const firstError = document.querySelector('.ring-destructive');
+          if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
       }
       return;
     }
-    toast.error(t('fillRequiredFields'), { description: t('fillRequiredFieldsHint') });
+
+    if (hasDirty) {
+      toast.error(t('saveRequiredFieldsFirst', 'Please save your required fields first.'), { description: t('saveRequiredFieldsFirstHint', 'You have unsaved changes in your cart items.') });
+      window.dispatchEvent(new CustomEvent('highlight-unsaved-save-buttons'));
+      if (window.innerWidth < 1024) {
+        setTimeout(() => {
+          const firstUnsaved = document.querySelector('.ring-primary.animate-pulse');
+          if (firstUnsaved) firstUnsaved.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+      }
+      return;
+    }
+
+    if (onProceed) {
+      onProceed();
+    } else {
+      navigate('/checkout');
+    }
   };
   return (
     <div className="space-y-6 sticky top-20">

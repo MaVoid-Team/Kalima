@@ -10,7 +10,7 @@ export default function useApiMutation() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const mutate = useCallback(async (config) => {
+  const mutate = useCallback(async (config, showToast = true) => {
     const { endpoint, method = 'post', data, defaultSuccessMessage, onUploadProgress } = config;
 
     setLoading(true);
@@ -29,7 +29,7 @@ export default function useApiMutation() {
       const response = await axios(axiosConfig);
 
       const message = response.data?.message || defaultSuccessMessage;
-      if (message) {
+      if (message && showToast) {
         toast.success(message);
       }
 

@@ -244,25 +244,25 @@ export const useAdminProducts = () => {
             if (res?.success) return res.data ?? [];
             return res;
         })),
-    [handleAction, fetchApi]);
+        [handleAction, fetchApi]);
 
     // ─── Required Fields ─────────────────────────────────────────────────────
 
-    const attachRequiredFields = (productId, fields) =>
+    const attachRequiredFields = (productId, fields, showToast = true) =>
         handleAction(() => fetchApi({
             endpoint: `/products/${productId}/required-fields`,
             method: 'post',
             data: { fields },
-        }).then(res => {
+        }, showToast).then(res => {
             if (res?.success) fetchProductById(productId);
             return res;
         }));
 
-    const detachRequiredField = (productId, fieldDefinitionId) =>
+    const detachRequiredField = (productId, fieldDefinitionId, showToast = true) =>
         handleAction(() => fetchApi({
             endpoint: `/products/${productId}/required-fields/${fieldDefinitionId}`,
             method: 'delete',
-        }).then(res => {
+        }, showToast).then(res => {
             if (res?.success) fetchProductById(productId);
             return res;
         }));

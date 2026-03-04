@@ -50,8 +50,8 @@ export default function FastBuyPaymentDetailsCard({
                     key={method.id}
                     onClick={() => updateField("paymentMethodId", method.id)}
                     className={`relative flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${isSelected
-                        ? "border-primary bg-primary/5 shadow-sm"
-                        : "border-border hover:border-primary/50 hover:bg-muted/50"
+                      ? "border-primary bg-primary/5 shadow-sm"
+                      : "border-border hover:border-primary/50 hover:bg-muted/50"
                       }`}
                     data-testid={`fastbuy-payment-method-${method.id}`}
                   >

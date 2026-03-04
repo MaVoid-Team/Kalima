@@ -24,7 +24,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
-  const { isAdmin } = useRole();
+  const { hasAdminAccess } = useRole();
   // getCart is now handled by provider; cart data available directly
   const navigate = useNavigate();
   const location = useLocation();
@@ -146,7 +146,7 @@ export default function Navbar() {
               </Button>
 
               {/* Cart Button Desktop */}
-              {isAuthenticated && !isAdmin && <Button
+              {isAuthenticated && !hasAdminAccess && <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleCartModal}
@@ -161,14 +161,14 @@ export default function Navbar() {
 
               {isAuthenticated ? (
                 <>
-                  {!isAdmin && <Button
+                  {!hasAdminAccess && <Button
                     variant="ghost"
                     className="font-bold hover:bg-transparent hover:text-primary"
                     asChild
                   >
                     <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
                   </Button>}
-                  {isAdmin && <Button
+                  {hasAdminAccess && <Button
                     variant="default"
                     size="default"
                     className="font-bold px-6"
@@ -220,7 +220,7 @@ export default function Navbar() {
 
             {/* Cart Button */}
             {/* Note that this button will take the place of login/signup buttons after logging in */}
-            {isAuthenticated && !isAdmin && <Button
+            {isAuthenticated && !hasAdminAccess && <Button
               variant="ghost"
               size="icon"
               onClick={toggleCartModal}
@@ -290,7 +290,7 @@ export default function Navbar() {
             <div className="flex flex-col gap-3 pt-4">
               {isAuthenticated ? (
                 <>
-                  {!isAdmin && <Button
+                  {!hasAdminAccess && <Button
                     variant="default"
                     className="w-full font-bold justify-center h-12 text-base"
                     onClick={() => setIsMenuOpen(false)}
@@ -298,7 +298,7 @@ export default function Navbar() {
                   >
                     <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
                   </Button>}
-                  {isAdmin && <Button
+                  {hasAdminAccess && <Button
                     variant="default"
                     className="w-full font-bold justify-center h-12 text-base"
                     onClick={() => setIsMenuOpen(false)}

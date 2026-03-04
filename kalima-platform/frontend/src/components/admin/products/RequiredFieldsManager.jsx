@@ -91,7 +91,7 @@ export default function RequiredFieldsManager({ product, fieldDefinitions, onAtt
             {/* Attach picker */}
             {availableDefinitions.length > 0 && (
                 <div className="flex items-center gap-2">
-                    <Select  dir={i18n.dir()} value={selectedDefId} onValueChange={setSelectedDefId}>
+                    <Select dir={i18n.dir()} value={selectedDefId} onValueChange={setSelectedDefId}>
                         <SelectTrigger className="flex-1" data-testid="required-fields-manager-select">
                             <SelectValue placeholder={t('products.detail.selectField')} />
                         </SelectTrigger>
