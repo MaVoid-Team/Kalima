@@ -21,6 +21,12 @@ const adminAuth = [
 // Create user (respects privilege matrix)
 router.post("/users", ...adminAuth, adminController.createUser);
 
+// Create specific user types
+router.post("/teachers", ...adminAuth, adminController.createTeacher);
+router.post("/students", ...adminAuth, adminController.createStudent);
+router.post("/parents", ...adminAuth, adminController.createParent);
+router.post("/lecturers", ...adminAuth, adminController.createLecturer);
+
 // Export users
 router.get("/users/export", ...adminAuth, makeExportHandler("users"));
 

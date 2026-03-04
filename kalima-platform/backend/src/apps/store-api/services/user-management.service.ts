@@ -17,6 +17,10 @@ import {
   CreateSubAdminDto,
   CreateModeratorDto,
   CreateAssistantDto,
+  CreateTeacherDto,
+  CreateStudentDto,
+  CreateParentDto,
+  CreateLecturerDto,
 } from "../dtos/admin.dto";
 import {
   BaseUserData,
@@ -98,6 +102,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Teacher,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           auth_identities: {
             create: {
@@ -161,6 +166,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Student,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           auth_identities: {
             create: {
@@ -216,6 +222,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Parent,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           auth_identities: {
             create: {
@@ -265,6 +272,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Lecturer,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           auth_identities: {
             create: {
@@ -717,6 +725,46 @@ class UserManagementService {
       return created;
     });
 
+    return this.mapToBaseUserData(user);
+  }
+
+  async createTeacherAsAdmin(
+    input: CreateTeacherDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createTeacher(input, creator);
+    return this.mapToBaseUserData(user);
+  }
+
+  async createStudentAsAdmin(
+    input: CreateStudentDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createStudent(input, creator);
+    return this.mapToBaseUserData(user);
+  }
+
+  async createParentAsAdmin(
+    input: CreateParentDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createParent(input, creator);
+    return this.mapToBaseUserData(user);
+  }
+
+  async createLecturerAsAdmin(
+    input: CreateLecturerDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createLecturer(input, creator);
     return this.mapToBaseUserData(user);
   }
 
