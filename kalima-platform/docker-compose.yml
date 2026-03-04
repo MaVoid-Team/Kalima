@@ -73,7 +73,7 @@ services:
   redis:
     image: redis:8.6.0-alpine
     ports:
-      - "6769:6379"
+      - "6770:6379"
     volumes:
       - redis-data:/data
     networks:
