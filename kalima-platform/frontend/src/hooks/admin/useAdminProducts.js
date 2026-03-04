@@ -267,6 +267,16 @@ export const useAdminProducts = () => {
             return res;
         }));
 
+    const toggleRequiredFieldIsRequired = (productId, requiredFieldId, isRequired) =>
+        handleAction(() => fetchApi({
+            endpoint: `/products/${productId}/required-fields/${requiredFieldId}`,
+            method: 'patch',
+            data: { is_required: Boolean(isRequired) },
+        }).then(res => {
+            if (res?.success) fetchProductById(productId);
+            return res;
+        }));
+
     // ─── Samples ──────────────────────────────────────────────────────────────
 
     const fetchAllSamples = useCallback(async () => {
@@ -392,6 +402,7 @@ export const useAdminProducts = () => {
         // Required Fields
         attachRequiredFields,
         detachRequiredField,
+        toggleRequiredFieldIsRequired,
 
         // Samples
         fetchAllSamples,
