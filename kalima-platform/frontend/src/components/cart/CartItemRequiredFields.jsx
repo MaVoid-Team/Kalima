@@ -20,7 +20,7 @@ export default function CartItemRequiredFields({
     onOpenChange
 }) {
     const { t } = useTranslation('cart');
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(!item?.required_fields_filled);
     const [fieldValues, setFieldValues] = useState({});
     const [imageFields, setImageFields] = useState({});
     const [originalImages, setOriginalImages] = useState({});
@@ -43,7 +43,10 @@ export default function CartItemRequiredFields({
                         dirty = true;
                     }
                 } else {
-                    const currentVal = fieldValues[rf.field_definition_id];
+                    let currentVal = fieldValues[rf.field_definition_id];
+                    if (typeof currentVal === 'string' && (currentVal === '+' || currentVal === '+2' || currentVal === '+20')) {
+                        currentVal = '';
+                    }
                     const savedVal = rf.value || '';
                     if (currentVal !== undefined && currentVal !== savedVal) {
                         dirty = true;
@@ -152,6 +155,8 @@ export default function CartItemRequiredFields({
                     origImgs[rf.field_definition_id] = serverUrl;
                 }
                 imgFields[rf.field_definition_id] = null;
+            } else if (rf.required_field_definitions.field_type === 'number') {
+                vals[rf.field_definition_id] = rf.value || '+20';
             } else {
                 vals[rf.field_definition_id] = rf.value || '';
             }
@@ -176,8 +181,10 @@ export default function CartItemRequiredFields({
                 errors[rf.field_definition_id] = t('pleaseSelectFile', 'Please select a file');
             } else if (rf.required_field_definitions.field_type === 'number') {
                 const val = fieldValues[rf.field_definition_id];
-                if (rf.is_required || (val && val.trim() !== '')) {
-                    const parsed = egyptPhoneSchema.safeParse(val || "");
+                const rawVal = String(val || "").trim();
+
+                if (rf.is_required || (rawVal !== '' && rawVal !== '+' && rawVal !== '+2' && rawVal !== '+20')) {
+                    const parsed = egyptPhoneSchema.safeParse(rawVal);
                     if (!parsed.success) {
                         hasError = true;
                         errors[rf.field_definition_id] = t('invalidPhone', 'Invalid Egyptian mobile number');
@@ -234,10 +241,16 @@ export default function CartItemRequiredFields({
             .filter(([id]) => {
                 return !(imageFields[id] instanceof File) && !activeImageFieldDefIds.includes(Number(id));
             })
-            .map(([id, value]) => ({
-                required_field_definition_id: Number(id),
-                value,
-            }));
+            .map(([id, value]) => {
+                let finalValue = value;
+                if (typeof finalValue === 'string' && (finalValue === '+' || finalValue === '+2' || finalValue === '+20')) {
+                    finalValue = '';
+                }
+                return {
+                    required_field_definition_id: Number(id),
+                    value: finalValue,
+                };
+            });
 
         try {
             if (data.length > 0) {
@@ -433,7 +446,7 @@ export default function CartItemRequiredFields({
                                         <>
                                             <PhoneInput
                                                 dir="ltr"
-                                                value={fieldValues[rf.field_definition_id] || ''}
+                                                value={fieldValues[rf.field_definition_id] || '+20'}
                                                 required={rf?.is_required}
                                                 onChange={e => {
                                                     const val = e.target.value;

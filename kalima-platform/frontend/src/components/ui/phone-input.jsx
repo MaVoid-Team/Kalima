@@ -3,6 +3,7 @@ import { useState, forwardRef, useEffect } from "react";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import i18n from "@/i18n";
+import { useTranslation } from "react-i18next";
 
 export const egyptPhoneSchema = z.string().superRefine((value, ctx) => {
     const valid = /^\+20\d{10}$/.test(value || "");
@@ -35,12 +36,12 @@ export const PhoneInput = forwardRef(
         const egyptPrefix = "+20";
         const countryLabel = i18n.language === "ar" ? "مصر" : "Egypt";
         const countryShortLabel = i18n.language === "ar" ? "مصر" : "EG";
-
+        const { t } = useTranslation("common");
         const normalizeEgyptPhone = (rawValue) => {
             const cleaned = String(rawValue || "").replaceAll(/[^\d+]/g, "");
 
             if (!cleaned) return "";
-            if (cleaned === "+" || cleaned === "+2" || cleaned === "+20") return egyptPrefix;
+            if (cleaned === "+" || cleaned === "+2" || cleaned === "+20") return cleaned;
 
             let digits = cleaned;
             if (digits.startsWith("+")) digits = digits.slice(1);
@@ -52,19 +53,18 @@ export const PhoneInput = forwardRef(
         };
 
         useEffect(() => {
-            if (
-                !hasInitialized &&
-                !value
-            ) {
-                const syntheticEvent = {
-                    target: {
-                        value: egyptPrefix,
-                    },
-                };
-                onChange?.(syntheticEvent);
+            if (!hasInitialized) {
+                if (!value) {
+                    const syntheticEvent = {
+                        target: {
+                            value: "+20",
+                        },
+                    };
+                    onChange?.(syntheticEvent);
+                }
                 setHasInitialized(true);
             }
-        }, [onChange, value, hasInitialized]);
+        }, [hasInitialized, onChange, value]);
 
         const handlePhoneChange = (e) => {
             const normalized = normalizeEgyptPhone(e.target.value);
@@ -96,7 +96,7 @@ export const PhoneInput = forwardRef(
                     ref={ref}
                     value={value}
                     onChange={handlePhoneChange}
-                    placeholder={placeholder || "Enter number"}
+                    placeholder={placeholder || t("common:enterNumber", "Enter number")}
                     type="tel"
                     autoComplete="tel"
                     name="phone"

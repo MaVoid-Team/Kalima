@@ -17,5 +17,6 @@
     "gender": {
         "male": "Male",
         "female": "Female"
-    }
+    },
+    "enterNumber": "Enter number"
 }
