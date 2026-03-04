@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart purchase controller logic.
 const ECCartPurchase = require("../models/ec.cartPurchaseModel");
 const ECCart = require("../models/ec.cartModel");
 const ECCoupon = require("../models/ec.couponModel");

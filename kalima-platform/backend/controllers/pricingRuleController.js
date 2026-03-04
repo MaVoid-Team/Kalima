@@ -1,10 +1,13 @@
+// DOMAIN: UNKNOWN
+// STATUS: LEGACY
+// NOTE: Pricing rule logic with unclear domain ownership.
 const PricingRule = require("../models/pricingRuleModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
 const mongoose = require("mongoose"); // Import mongoose
 // Import models to check for existence
-const CLecturer = require("../models/center.lecturerModel"); 
+const CLecturer = require("../models/center.lecturerModel");
 const Subject = require("../models/subjectModel");
 const Level = require("../models/levelModel");
 const Center = require("../models/centerModel");
@@ -50,8 +53,8 @@ exports.createPricingRule = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         "Lecturer, Subject, Level, and all pricing fields are required.",
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -98,12 +101,14 @@ exports.createPricingRule = catchAsync(async (req, res, next) => {
       return next(
         new AppError(
           "A pricing rule already exists for this combination of Lecturer, Subject, Level, and Center.",
-          409
-        )
+          409,
+        ),
       );
     }
     // Handle other potential errors during creation
-    return next(new AppError(`Failed to create pricing rule: ${error.message}`, 500));
+    return next(
+      new AppError(`Failed to create pricing rule: ${error.message}`, 500),
+    );
   }
 });
 
@@ -155,12 +160,18 @@ exports.getPricingRuleById = catchAsync(async (req, res, next) => {
 exports.updatePricingRule = catchAsync(async (req, res, next) => {
   // Only allow updating pricing fields and description
   // No need to re-validate lecturer, subject, level, center here as they are not being updated.
-  const { dailyPrice, multiSessionPrice, multiSessionCount, description } = req.body;
-  const updateData = { dailyPrice, multiSessionPrice, multiSessionCount, description };
+  const { dailyPrice, multiSessionPrice, multiSessionCount, description } =
+    req.body;
+  const updateData = {
+    dailyPrice,
+    multiSessionPrice,
+    multiSessionCount,
+    description,
+  };
 
   // Filter out undefined values to avoid overwriting with null
   Object.keys(updateData).forEach(
-    (key) => updateData[key] === undefined && delete updateData[key]
+    (key) => updateData[key] === undefined && delete updateData[key],
   );
 
   if (Object.keys(updateData).length === 0) {

@@ -1,0 +1,920 @@
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
+import { ChevronLeft, ChevronRight, Loader2, X, Package, PlusCircle, Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { arSA } from 'react-day-picker/locale';
+
+import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
+import { useAdminCoupons } from '@/hooks/admin/useAdminCoupons';
+import { useCategories } from '@/hooks/useCategories';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
+import { Switch } from '@/components/ui/switch';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function CreateProductPage() {
+    const { t, i18n } = useTranslation('admin');
+    const navigate = useNavigate();
+    const isRtl = i18n.dir() === 'rtl';
+
+    // ─── Validation Schema ────────────────────────────────────────────────────────
+
+    const createProductSchema = z.object({
+        title: z.string().min(1, t('products.form.titleIsRequired')).max(255),
+        price: z.coerce.number().positive(t('products.form.priceMustBeGreaterThan0')),
+        type: z.enum(['Product', 'Book']),
+        description: z.string().optional(),
+        price_after_discount: z.preprocess(
+            (val) => (val === '' || val == null ? undefined : val),
+            z.coerce.number().positive().optional()
+        ),
+        serial: z.string().max(100).optional().or(z.literal('')),
+        coupon_id: z.preprocess(
+            (val) => (val === '' || val == null ? undefined : val),
+            z.coerce.number().int().positive().optional()
+        ),
+        perks: z.string().optional().or(z.literal('')),
+    }).refine(
+        (data) => !data.price_after_discount || data.price_after_discount < data.price,
+        { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
+    );
+
+    const {
+        createProduct,
+        attachRequiredFields,
+        fetchFieldDefinitions,
+        fieldDefinitions,
+        actionLoading,
+    } = useAdminProducts();
+
+    const {
+        createCoupon,
+        generateCouponCode,
+        apiLoading: couponLoading,
+    } = useAdminCoupons();
+
+    const {
+        categories: roots = [],
+        childCategories = {},
+        fetchChildCategories = async () => [],
+    } = useCategories();
+
+    const [thumbnail, setThumbnail] = useState(null);
+    const [sample, setSample] = useState(null);
+
+    // Category picker state — single category only (up to 3 levels)
+    const [selectedRootId, setSelectedRootId] = useState('');
+    const [selectedChildId, setSelectedChildId] = useState('');
+    const [selectedGrandchildId, setSelectedGrandchildId] = useState('');
+    const [childrenLoading, setChildrenLoading] = useState(false);
+    const [grandchildrenLoading, setGrandchildrenLoading] = useState(false);
+    const [pickedCategory, setPickedCategory] = useState(null); // { id, title } | null
+
+    // Required fields picker state
+    const [selectedFieldDefId, setSelectedFieldDefId] = useState('');
+    const [pickedFields, setPickedFields] = useState([]); // { id, label, field_type }[]
+
+    // Upload progress state
+    const [uploadProgress, setUploadProgress] = useState(0);
+    // Quick coupon state
+    const [quickCouponEnabled, setQuickCouponEnabled] = useState(false);
+    const [quickCouponCode, setQuickCouponCode] = useState('');
+    const [quickCouponType, setQuickCouponType] = useState('PERCENTAGE');
+    const [quickCouponValue, setQuickCouponValue] = useState('');
+    const [quickCouponExpiresAt, setQuickCouponExpiresAt] = useState('');
+    const thumbnailInputRef = useRef(null);
+    const sampleInputRef = useRef(null);
+
+    // Fetch field definitions on mount
+    useEffect(() => {
+        fetchFieldDefinitions();
+    }, [fetchFieldDefinitions]);
+
+    const form = useForm({
+        resolver: zodResolver(createProductSchema),
+        defaultValues: {
+            title: '',
+            price: '',
+            type: 'Product',
+            description: '',
+            price_after_discount: '',
+            serial: '',
+            coupon_id: '',
+            perks: '',
+        },
+    });
+
+    // ─── Category helpers ─────────────────────────────────────────────────────
+
+    const currentChildren = selectedRootId ? (childCategories[selectedRootId] ?? undefined) : undefined;
+    const hasChildren = currentChildren && currentChildren.length > 0;
+
+    // Grandchildren: stored in childCategories keyed by the selected child id
+    const currentGrandchildren = selectedChildId ? (childCategories[selectedChildId] ?? undefined) : undefined;
+    const hasGrandchildren = currentGrandchildren && currentGrandchildren.length > 0;
+
+    const handleRootChange = async (rootId) => {
+        setSelectedRootId(rootId);
+        setSelectedChildId('');
+        setSelectedGrandchildId('');
+        if (rootId && !childCategories[rootId]) {
+            setChildrenLoading(true);
+            await fetchChildCategories(parseInt(rootId));
+            setChildrenLoading(false);
+        }
+        // Update picked category to this root immediately (child may override)
+        const label = roots.find(r => r.id === parseInt(rootId))?.title;
+        if (rootId) {
+            setPickedCategory({ id: parseInt(rootId), title: label });
+        } else {
+            setPickedCategory(null);
+        }
+    };
+
+    const handleChildChange = async (childId) => {
+        setSelectedChildId(childId);
+        setSelectedGrandchildId('');
+        if (childId) {
+            const label = currentChildren?.find(c => c.id === parseInt(childId))?.title;
+            setPickedCategory({ id: parseInt(childId), title: label });
+            // Fetch grandchildren if not already cached
+            if (!childCategories[childId]) {
+                setGrandchildrenLoading(true);
+                await fetchChildCategories(parseInt(childId));
+                setGrandchildrenLoading(false);
+            }
+        } else {
+            // Revert to root selection
+            const label = roots.find(r => r.id === parseInt(selectedRootId))?.title;
+            setPickedCategory(selectedRootId ? { id: parseInt(selectedRootId), title: label } : null);
+        }
+    };
+
+    const handleGrandchildChange = (grandchildId) => {
+        setSelectedGrandchildId(grandchildId);
+        if (grandchildId) {
+            const label = currentGrandchildren?.find(g => g.id === parseInt(grandchildId))?.title;
+            setPickedCategory({ id: parseInt(grandchildId), title: label });
+        } else {
+            // Revert to child selection
+            const label = currentChildren?.find(c => c.id === parseInt(selectedChildId))?.title;
+            setPickedCategory(selectedChildId ? { id: parseInt(selectedChildId), title: label } : null);
+        }
+    };
+
+    const handleClearCategory = () => {
+        setPickedCategory(null);
+        setSelectedRootId('');
+        setSelectedChildId('');
+        setSelectedGrandchildId('');
+    };
+
+    // ─── Required field helpers ───────────────────────────────────────────────
+
+    const pickedFieldIds = new Set(pickedFields.map(f => f.id));
+    const availableFieldDefs = fieldDefinitions.filter(def => !pickedFieldIds.has(def.id));
+
+    const handleAddField = () => {
+        if (!selectedFieldDefId) return;
+        const def = fieldDefinitions.find(d => d.id === parseInt(selectedFieldDefId));
+        if (!def || pickedFieldIds.has(def.id)) return;
+        setPickedFields(prev => [...prev, { id: def.id, label: def.label, field_type: def.field_type, is_required: true }]);
+        setSelectedFieldDefId('');
+    };
+
+    const handleToggleFieldRequired = (id, isRequired) => {
+        setPickedFields(prev => prev.map(f => f.id === id ? { ...f, is_required: isRequired } : f));
+    };
+
+    const handleRemoveField = (id) => {
+        setPickedFields(prev => prev.filter(f => f.id !== id));
+    };
+
+    // ─── Quick coupon helpers ────────────────────────────────────────────────
+
+    const handleGenerateQuickCouponCode = async () => {
+        const code = await generateCouponCode();
+        if (code) {
+            setQuickCouponCode(code);
+        }
+    };
+
+    const buildQuickCouponPayload = (productId, productPrice) => {
+        if (!quickCouponEnabled) return null;
+
+        const code = quickCouponCode.trim().toUpperCase();
+        const numericValue = Number(quickCouponValue);
+
+        if (!code || !quickCouponValue || !quickCouponExpiresAt) {
+            toast.error(t('products.quickCoupon.validationComplete'));
+            return null;
+        }
+
+        if (!Number.isFinite(numericValue) || numericValue <= 0) {
+            toast.error(t('products.quickCoupon.validationPositive'));
+            return null;
+        }
+
+        if (quickCouponType === 'PERCENTAGE' && numericValue > 100) {
+            toast.error(t('products.quickCoupon.validationPercentageMax'));
+            return null;
+        }
+
+        if (
+            quickCouponType === 'AMOUNT'
+            && Number.isFinite(productPrice)
+            && numericValue > productPrice
+        ) {
+            toast.error(t('products.quickCoupon.validationAmountExceedsPrice'));
+            return null;
+        }
+
+        return {
+            code,
+            discount_type: quickCouponType,
+            product_id: String(productId),
+            expires_at: new Date(quickCouponExpiresAt).toISOString(),
+            ...(quickCouponType === 'PERCENTAGE'
+                ? { discount_percentage: numericValue }
+                : { discount_amount: numericValue }),
+        };
+    };
+
+    // ─── Submit ───────────────────────────────────────────────────────────────
+
+    const onSubmit = async (values) => {
+        const quickCouponDraft = quickCouponEnabled
+            ? buildQuickCouponPayload('__PENDING_PRODUCT_ID__', Number(values.price))
+            : null;
+
+        if (quickCouponEnabled && !quickCouponDraft) {
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('title', values.title);
+        formData.append('price', values.price);
+        formData.append('type', values.type);
+        if (values.description) formData.append('description', values.description);
+        if (values.price_after_discount) formData.append('price_after_discount', values.price_after_discount);
+        if (values.serial) formData.append('serial', values.serial);
+        if (values.coupon_id) formData.append('coupon_id', values.coupon_id);
+        if (values.perks) formData.append('perks', values.perks);
+        if (pickedCategory) {
+            // Keep backward compatibility (category_ids) and support new API contract (category_id)
+            formData.append('category_id', String(pickedCategory.id));
+            formData.append('category_ids', JSON.stringify([pickedCategory.id]));
+        }
+        if (thumbnail) formData.append('thumbnail', thumbnail);
+        if (sample) formData.append('sample', sample);
+
+        setUploadProgress(0);
+        const res = await createProduct(formData, (progressEvent) => {
+            if (progressEvent.total) {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                setUploadProgress(percentCompleted);
+            }
+        });
+
+        if (res?.success) {
+            const newProductId = res.data?.id;
+            // Attach required fields after the product is created
+            if (pickedFields.length > 0 && newProductId) {
+                await attachRequiredFields(
+                    newProductId,
+                    pickedFields.map(f => ({ field_definition_id: f.id, is_required: f.is_required }))
+                );
+            }
+
+            if (quickCouponEnabled && newProductId) {
+                try {
+                    const couponPayload = {
+                        ...quickCouponDraft,
+                        product_id: String(newProductId),
+                    };
+                    await createCoupon(couponPayload);
+                } catch {
+                    toast.error(t('products.quickCoupon.createFailed'));
+                }
+            }
+
+            // Navigate to the new product's detail page
+            if (newProductId) {
+                navigate(`/admin/products/${newProductId}`);
+            } else {
+                navigate('/admin/products');
+            }
+        }
+    };
+
+    // ─── Render ───────────────────────────────────────────────────────────────
+
+    return (
+        <div className="space-y-6 min-w-0 overflow-hidden" data-testid="create-product-page">
+
+            {/* Breadcrumb / Back */}
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Link
+                    to="/admin/products"
+                    className="hover:text-foreground transition-colors flex items-center gap-1"
+                    data-testid="create-product-back-link"
+                >
+                    <ChevronLeft className="h-4 w-4" />
+                    {t('products.backToProducts')}
+                </Link>
+            </div>
+
+            {/* Page Header */}
+            <div className="flex items-start gap-3">
+                <Package className="h-8 w-8 text-primary mt-1 shrink-0" />
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">{t('products.create.dialogTitle')}</h1>
+                    <p className="text-muted-foreground mt-1 text-sm">{t('products.create.dialogDescription')}</p>
+                </div>
+            </div>
+
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
+                            e.preventDefault();
+                        }
+                    }}
+                    className="space-y-6"
+                    data-testid="create-product-form"
+                >
+
+                    {/* ── Section: Core Details ── */}
+                    <div className="rounded-xl border border-border p-5 space-y-4">
+                        <h2 className="font-semibold text-foreground">{t('products.detail.info')}</h2>
+                        <Separator />
+
+                        {/* Title */}
+                        <FormField
+                            control={form.control}
+                            name="title"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t('products.form.title')} *</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder={t('products.form.titlePlaceholder')}
+                                            data-testid="create-product-title-input"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Price + Type */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="price"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t('products.form.price')} *</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
+                                                data-testid="create-product-price-input"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="type"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t('products.form.type')}</FormLabel>
+                                        <Select dir={i18n.dir()} onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger data-testid="create-product-type-select">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="Product">{t('products.type.Product')}</SelectItem>
+                                                <SelectItem value="Book">{t('products.type.Book')}</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        {/* Price after discount + Serial */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="price_after_discount"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t('products.form.priceAfterDiscount')}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
+                                                data-testid="create-product-discount-input"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="serial"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t('products.form.serial')}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder={t('products.form.serialPlaceholder')}
+                                                data-testid="create-product-serial-input"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        {/* Description */}
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t('products.form.description')}</FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder={t('products.form.descriptionPlaceholder')}
+                                            rows={4}
+                                            data-testid="create-product-description-input"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Perks */}
+                        <FormField
+                            control={form.control}
+                            name="perks"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t('products.form.perks')}</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder={t('products.form.perksPlaceholder')}
+                                            data-testid="create-product-perks-input"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <p className="text-[0.8rem] text-muted-foreground mt-1">
+                                        {t('products.form.perksTip')}
+                                    </p>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    {/* ── Section: Category ── */}
+                    <div className="rounded-xl border border-border p-5 space-y-4">
+                        <h2 className="font-semibold text-foreground">{t('products.detail.categories')}</h2>
+                        <Separator />
+
+                        {/* Selected category badge */}
+                        {pickedCategory && (
+                            <div className="flex flex-wrap gap-2">
+                                <span
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
+                                    data-testid="create-product-selected-category"
+                                >
+                                    {pickedCategory.title}
+                                    <button
+                                        type="button"
+                                        onClick={handleClearCategory}
+                                        className="rounded-full hover:bg-primary/20 p-0.5"
+                                        aria-label={`Remove ${pickedCategory.title}`}
+                                        data-testid="create-product-remove-category"
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Cascading root → child → grandchild selects */}
+                        <div className="flex flex-col gap-2">
+                            <Select
+                                dir={i18n.dir()}
+                                value={selectedRootId}
+                                onValueChange={handleRootChange}
+                                disabled={roots.length === 0}
+                            >
+                                <SelectTrigger data-testid="create-product-category-root-select">
+                                    <SelectValue placeholder={t('products.detail.selectCategory')} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {roots.map((cat) => (
+                                        <SelectItem key={cat.id} value={cat.id.toString()}>
+                                            {cat.title}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {selectedRootId && (
+                                childrenLoading ? (
+                                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <span>{t('common.loading')}</span>
+                                    </div>
+                                ) : hasChildren ? (
+                                    <Select
+                                        dir={i18n.dir()}
+                                        value={selectedChildId}
+                                        onValueChange={handleChildChange}
+                                        disabled={!currentChildren?.length}
+                                    >
+                                        <SelectTrigger data-testid="create-product-category-child-select">
+                                            <SelectValue placeholder={t('products.detail.selectChildCategory', 'Subcategory (optional)')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {currentChildren.map((child) => (
+                                                <SelectItem key={child.id} value={child.id.toString()}>
+                                                    {child.title}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                ) : null
+                            )}
+
+                            {selectedChildId && (
+                                grandchildrenLoading ? (
+                                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <span>{t('common.loading')}</span>
+                                    </div>
+                                ) : hasGrandchildren ? (
+                                    <Select
+                                        dir={i18n.dir()}
+                                        value={selectedGrandchildId}
+                                        onValueChange={handleGrandchildChange}
+                                        disabled={!currentGrandchildren?.length}
+                                    >
+                                        <SelectTrigger data-testid="create-product-category-grandchild-select">
+                                            <SelectValue placeholder={t('products.detail.selectGrandchildCategory', 'Sub-subcategory (optional)')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {currentGrandchildren.map((gc) => (
+                                                <SelectItem key={gc.id} value={gc.id.toString()}>
+                                                    {gc.title}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                ) : null
+                            )}
+                        </div>
+                    </div>
+
+                    {/* ── Section: Required Fields ── */}
+                    <div className="rounded-xl border border-border p-5 space-y-4">
+                        <h2 className="font-semibold text-foreground">{t('products.detail.requiredFields')}</h2>
+                        <Separator />
+
+                        {/* Picked field tags */}
+                        {pickedFields.length > 0 ? (
+                            <div className="flex flex-wrap gap-2 overflow-x-auto custom-scrollbar">
+                                {pickedFields.map((field) => (
+                                    <div
+                                        key={field.id}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
+                                        data-testid={`create-product-required-field-tag-${field.id}`}
+                                    >
+                                        <span className="font-medium">{field.label}</span>
+                                        <span className="text-xs text-muted-foreground opacity-70">({field.field_type})</span>
+
+                                        <div className="flex items-center gap-1 border-s border-primary/30 ps-2 ms-1">
+                                            <span className="text-xs opacity-80">
+                                                {field.is_required ? t('products.detail.fieldRequired', 'Required') : t('products.detail.fieldOptional', 'Optional')}
+                                            </span>
+                                            <Switch
+                                                checked={field.is_required}
+                                                onCheckedChange={(checked) => handleToggleFieldRequired(field.id, checked)}
+                                                className="scale-75 origin-left rtl:origin-right"
+                                                aria-label="Toggle required status"
+                                            />
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveField(field.id)}
+                                            className="rounded-full hover:bg-primary/20 p-0.5 ms-1"
+                                            aria-label={`Remove ${field.label}`}
+                                            data-testid={`create-product-remove-field-${field.id}`}
+                                        >
+                                            <X className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">{t('products.detail.noRequiredFields')}</p>
+                        )}
+
+                        {/* Field picker */}
+                        {availableFieldDefs.length > 0 && (
+                            <div className="flex items-center gap-2">
+                                <Select dir={i18n.dir()} value={selectedFieldDefId} onValueChange={setSelectedFieldDefId}>
+                                    <SelectTrigger className="flex-1" data-testid="create-product-field-def-select">
+                                        <SelectValue placeholder={t('products.detail.selectField')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {availableFieldDefs.map((def) => (
+                                            <SelectItem key={def.id} value={def.id.toString()}>
+                                                {def.label} ({def.field_type})
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="shrink-0"
+                                    disabled={!selectedFieldDefId}
+                                    onClick={handleAddField}
+                                    data-testid="create-product-add-field-button"
+                                >
+                                    <PlusCircle className="me-2 h-4 w-4" />
+                                    {t('products.detail.attachField')}
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* ── Section: Media ── */}
+                    <div className="rounded-xl border border-border p-5 space-y-4">
+                        <h2 className="font-semibold text-foreground">{t('products.detail.media')}</h2>
+                        <Separator />
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Thumbnail */}
+                            <div className="space-y-1.5">
+                                <span className="text-sm font-medium leading-none">{t('products.form.thumbnail')}</span>
+                                <input
+                                    ref={thumbnailInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setThumbnail(e.target.files?.[0] ?? null)}
+                                    className="sr-only"
+                                    data-testid="create-product-thumbnail-input"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                    onClick={() => thumbnailInputRef.current?.click()}
+                                    data-testid="create-product-thumbnail-button"
+                                >
+                                    {t('products.form.chooseImage')}
+                                </Button>
+                                <p className="text-xs text-muted-foreground truncate">
+                                    {thumbnail?.name || t('products.form.noFileSelected')}
+                                </p>
+                            </div>
+
+                            {/* Sample */}
+                            <div className="space-y-1.5">
+                                <span className="text-sm font-medium leading-none">{t('products.form.sample')}</span>
+                                <input
+                                    ref={sampleInputRef}
+                                    type="file"
+                                    accept=".pdf,.doc,.docx"
+                                    onChange={(e) => setSample(e.target.files?.[0] ?? null)}
+                                    className="sr-only"
+                                    data-testid="create-product-sample-input"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                    onClick={() => sampleInputRef.current?.click()}
+                                    data-testid="create-product-sample-button"
+                                >
+                                    {t('products.form.chooseSampleFile')}
+                                </Button>
+                                <p className="text-xs text-muted-foreground truncate">
+                                    {sample?.name || t('products.form.noFileSelected')}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── Upload Progress ── */}
+                    {actionLoading && uploadProgress > 0 && (
+                        <div className="mb-4">
+                            <div className="flex justify-between text-sm mb-1 text-muted-foreground">
+                                <span>{uploadProgress < 100 ? t('products.create.uploading', 'Uploading...') : t('products.create.processing', 'Processing...')}</span>
+                                <span>{uploadProgress}%</span>
+                            </div>
+                            <Progress value={uploadProgress} />
+                        </div>
+                    )}
+                    {/* ── Section: Quick Coupon ── */}
+                    <div className="rounded-xl border border-border p-5 space-y-4">
+                        <h2 className="font-semibold text-foreground">{t('products.quickCoupon.title')}</h2>
+                        <p className="text-sm text-muted-foreground">{t('products.quickCoupon.description')}</p>
+                        <Separator />
+
+                        <div className="flex items-center justify-between gap-3">
+                            <label htmlFor="create-product-quick-coupon-switch" className="text-sm font-medium">
+                                {t('products.quickCoupon.enable')}
+                            </label>
+                            <Switch
+                                id="create-product-quick-coupon-switch"
+                                checked={quickCouponEnabled}
+                                onCheckedChange={setQuickCouponEnabled}
+                                data-testid="create-product-quick-coupon-switch"
+                            />
+                        </div>
+
+                        {quickCouponEnabled && (
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2">
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium leading-none">{t('products.quickCoupon.code')}</label>
+                                        <Input
+                                            value={quickCouponCode}
+                                            onChange={(e) => setQuickCouponCode(e.target.value.toUpperCase())}
+                                            placeholder={t('products.quickCoupon.codePlaceholder')}
+                                            data-testid="create-product-quick-coupon-code-input"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="sm:self-end"
+                                        disabled={couponLoading}
+                                        onClick={handleGenerateQuickCouponCode}
+                                        data-testid="create-product-quick-coupon-generate-button"
+                                    >
+                                        {t('products.quickCoupon.generate')}
+                                    </Button>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium leading-none">{t('products.quickCoupon.type')}</label>
+                                        <Select dir={i18n.dir()} value={quickCouponType} onValueChange={setQuickCouponType}>
+                                            <SelectTrigger data-testid="create-product-quick-coupon-type-select">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="PERCENTAGE">{t('coupons.discountType.percentage')}</SelectItem>
+                                                <SelectItem value="AMOUNT">{t('coupons.discountType.amount')}</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium leading-none">
+                                            {quickCouponType === 'PERCENTAGE'
+                                                ? t('products.quickCoupon.percentageValue')
+                                                : t('products.quickCoupon.amountValue')}
+                                        </label>
+                                        <div className="relative">
+                                            <Input
+                                                type="text"
+                                                inputMode="numeric"
+                                                pattern="[0-9]*"
+                                                className="pe-14"
+                                                value={quickCouponValue}
+                                                onChange={(e) => setQuickCouponValue(e.target.value)}
+                                                data-testid="create-product-quick-coupon-value-input"
+                                            />
+                                            <span
+                                                className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-sm text-muted-foreground"
+                                                data-testid="coupons-create-discount-amount-suffix"
+                                            >
+                                                {quickCouponType === 'PERCENTAGE' ? t('coupons.form.units.percentage') : t('coupons.form.units.amount')}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium leading-none">{t('coupons.form.expiresAt')}</label>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    className={cn(
+                                                        'w-full justify-start text-start font-normal',
+                                                        !quickCouponExpiresAt && 'text-muted-foreground'
+                                                    )}
+                                                    data-testid="create-product-quick-coupon-expires-at-input"
+                                                >
+                                                    <CalendarIcon className="me-2 h-4 w-4" />
+                                                    {quickCouponExpiresAt
+                                                        ? format(new Date(quickCouponExpiresAt), 'PPP', { locale: isRtl ? arSA : undefined })
+                                                        : t('coupons.form.expiresAtPlaceholder')}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="end">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={quickCouponExpiresAt ? new Date(quickCouponExpiresAt) : undefined}
+                                                    onSelect={(date) => {
+                                                        if (!date) return;
+                                                        setQuickCouponExpiresAt(date.toISOString());
+                                                    }}
+                                                    locale={isRtl ? arSA : undefined}
+                                                    dir={isRtl ? 'rtl' : 'ltr'}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* ── Action Buttons ── */}
+                    <div className="flex justify-end gap-3 pb-4">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => navigate('/admin/products')}
+                            data-testid="create-product-cancel-button"
+                        >
+                            {t('common.cancel')}
+                        </Button>
+                        <Button
+                            type="submit"
+                            disabled={actionLoading || couponLoading}
+                            data-testid="create-product-submit-button"
+                        >
+                            {actionLoading
+                                ? <><Loader2 className="me-2 h-4 w-4 animate-spin" />{t('products.create.creating')}</>
+                                : t('products.create.submit')
+                            }
+                        </Button>
+                    </div>
+
+                </form>
+            </Form>
+        </div>
+    );
+}

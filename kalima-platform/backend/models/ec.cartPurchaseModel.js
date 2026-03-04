@@ -1,32 +1,45 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart purchase model.
 const { required } = require("joi");
 const mongoose = require("mongoose");
 
 const cartPurchaseItemSchema = new mongoose.Schema({
-    product: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "ECProduct",
-        required: true
-    },
-    productType: {
-        type: String,
-        enum: ["ECProduct", "ECBook"],
-        required: true
-    },
-    priceAtPurchase: {
-        type: Number,
-        required: true
-    },
-    // For books
-    nameOnBook: String,
-    numberOnBook: Number,
-    seriesName: String,
-    // Snapshot of product data
-    productSnapshot: {
-        title: String,
-        thumbnail: String,
-        section: mongoose.Schema.Types.Mixed,
-        serial: String
-    }
+  product: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ECProduct",
+    required: true,
+  },
+  productType: {
+    type: String,
+    enum: ["ECProduct", "ECBook"],
+    required: true,
+  },
+  priceAtPurchase: {
+    type: Number,
+    required: true,
+  },
+  couponCode: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ECCoupon",
+    default: null,
+  },
+  discount: {
+    type: Number,
+    default: 0,
+    min: [0, "Discount cannot be negative"],
+  },
+  // For books
+  nameOnBook: String,
+  numberOnBook: String,
+  seriesName: String,
+  // Snapshot of product data
+  productSnapshot: {
+    title: String,
+    thumbnail: String,
+    section: mongoose.Schema.Types.Mixed,
+    serial: String,
+  },
 });
 
 const cartPurchaseSchema = new mongoose.Schema(
@@ -154,12 +167,28 @@ const cartPurchaseSchema = new mongoose.Schema(
             min: [0, "Total cannot be negative"],
         }
     },
-    {
-        timestamps: true,
-        toJSON: { virtuals: true },
-        toObject: { virtuals: true },
-        strictPopulate: false, // Allow populate on non-reference fields without throwing errors
-    }
+    couponCode: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ECCoupon",
+      default: null,
+    },
+    discount: {
+      type: Number,
+      default: 0,
+      min: [0, "Discount cannot be negative"],
+    },
+    total: {
+      type: Number,
+      required: true,
+      min: [0, "Total cannot be negative"],
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    strictPopulate: false, // Allow populate on non-reference fields without throwing errors
+  },
 );
 
 
@@ -183,5 +212,7 @@ cartPurchaseSchema.pre('save', function (next) {
     next();
 });
 
-const ECCartPurchase = mongoose.model("ECCartPurchase", cartPurchaseSchema);
+const ECCartPurchase =
+  mongoose.models.ECCartPurchase ||
+  mongoose.model("ECCartPurchase", cartPurchaseSchema);
 module.exports = ECCartPurchase;

@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared notification logic.
 const Notification = require("../models/notification");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -75,7 +78,7 @@ exports.markAsRead = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
 
   console.log(
-    `Marking notification ${notificationId} as read for user ${userId}`
+    `Marking notification ${notificationId} as read for user ${userId}`,
   );
 
   // Find the notification and ensure it belongs to the user
@@ -86,7 +89,7 @@ exports.markAsRead = catchAsync(async (req, res, next) => {
 
   if (!notification) {
     return next(
-      new AppError("Notification not found or does not belong to you", 404)
+      new AppError("Notification not found or does not belong to you", 404),
     );
   }
 

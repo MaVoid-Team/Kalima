@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy exam submission logic.
 const mongoose = require("mongoose");
 const StudentExamSubmission = require("../models/studentExamSubmissionModel");
 const LecturerExamConfig = require("../models/ExamConfigModel");
@@ -11,7 +14,7 @@ const getExamResultsFromSheet = async (
   sheetId,
   studentIdentifier,
   studentIdentifierColumn,
-  scoreColumn
+  scoreColumn,
 ) => {
   try {
     // Configure Google Sheets API client
@@ -46,11 +49,12 @@ const getExamResultsFromSheet = async (
 
     // Find column indexes for the student identifier and score
     const identifierColIndex = headers.findIndex(
-      (header) => header.toLowerCase() === studentIdentifierColumn.toLowerCase()
+      (header) =>
+        header.toLowerCase() === studentIdentifierColumn.toLowerCase(),
     );
 
     const scoreColIndex = headers.findIndex(
-      (header) => header.toLowerCase() === scoreColumn.toLowerCase()
+      (header) => header.toLowerCase() === scoreColumn.toLowerCase(),
     );
 
     // If we can't find the required columns, return an error
@@ -73,7 +77,7 @@ const getExamResultsFromSheet = async (
       (row) =>
         row[identifierColIndex] &&
         row[identifierColIndex].toLowerCase().trim() ===
-          studentIdentifier.toLowerCase().trim()
+          studentIdentifier.toLowerCase().trim(),
     );
 
     // If there are multiple submissions, get the most recent one
@@ -165,7 +169,7 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
   // Check if lecture requires either exam or homework
   if (!lecture.requiresExam && !lecture.requiresHomework) {
     return next(
-      new AppError("This lecture does not require any submissions", 400)
+      new AppError("This lecture does not require any submissions", 400),
     );
   }
 
@@ -183,7 +187,7 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
   if (lecture.requiresExam) {
     if (!lecture.examConfig) {
       return next(
-        new AppError("Exam configuration not found for this lecture", 404)
+        new AppError("Exam configuration not found for this lecture", 404),
       );
     }
 
@@ -203,7 +207,7 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
     } else {
       // Get exam config details
       const examConfig = await LecturerExamConfig.findById(
-        lecture.examConfig._id
+        lecture.examConfig._id,
       );
 
       if (!examConfig) {
@@ -215,7 +219,7 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
         examConfig.googleSheetId,
         studentIdentifier,
         examConfig.studentIdentifierColumn,
-        examConfig.scoreColumn
+        examConfig.scoreColumn,
       );
 
       if (!examResults.found) {
@@ -247,7 +251,7 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
             verifiedAt: new Date(),
             config: examConfig._id,
           },
-          { new: true, upsert: true }
+          { new: true, upsert: true },
         );
 
         results.exam = {
@@ -268,24 +272,24 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
     if (!lecture.homeworkConfig) {
       console.error("[Homework Error] Configuration missing but required");
       return next(
-        new AppError("Homework configuration not found for this lecture", 404)
+        new AppError("Homework configuration not found for this lecture", 404),
       );
     }
 
     // Get homework config details
     const homeworkConfig = await LecturerExamConfig.findById(
-      lecture.homeworkConfig._id
+      lecture.homeworkConfig._id,
     );
 
     if (!homeworkConfig) {
       console.error(
-        `[Homework Error] Config ${lecture.homeworkConfig._id} not found`
+        `[Homework Error] Config ${lecture.homeworkConfig._id} not found`,
       );
       return next(new AppError("Homework configuration not found", 404));
     }
 
     console.log(
-      `[Homework Config] Using config ${homeworkConfig._id} (${homeworkConfig.name})`
+      `[Homework Config] Using config ${homeworkConfig._id} (${homeworkConfig.name})`,
     );
 
     // Check existing submission
@@ -310,12 +314,12 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
         homeworkConfig.googleSheetId,
         studentIdentifier,
         homeworkConfig.studentIdentifierColumn,
-        homeworkConfig.scoreColumn
+        homeworkConfig.scoreColumn,
       );
 
       if (!homeworkResults.found) {
         console.warn(
-          `[Homework] No submission found: ${homeworkResults.error}`
+          `[Homework] No submission found: ${homeworkResults.error}`,
         );
         results.homework = {
           status: "not_found",
@@ -330,7 +334,7 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
 
         console.log(
           `[Homework Result] Score: ${homeworkResults.score}/${homeworkResults.maxScore}, ` +
-            `Threshold: ${passingThreshold}, Passed: ${passed}`
+            `Threshold: ${passingThreshold}, Passed: ${passed}`,
         );
 
         // Find and update or create homework submission
@@ -349,7 +353,7 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
             verifiedAt: new Date(),
             config: homeworkConfig._id,
           },
-          { new: true, upsert: true }
+          { new: true, upsert: true },
         );
 
         console.log(`[Homework] Saved submission: ${submission._id}`);
@@ -433,7 +437,7 @@ exports.getLectureSubmissions = catchAsync(async (req, res, next) => {
 
   if (!isCreator && !isAdmin && !isAssistant) {
     return next(
-      new AppError("You do not have permission to view these submissions", 403)
+      new AppError("You do not have permission to view these submissions", 403),
     );
   }
 
