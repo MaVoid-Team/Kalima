@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import path from 'path';
 import type { Transporter } from 'nodemailer';
 import {
   getVerificationEmailHtml,
@@ -105,12 +106,20 @@ export class EmailService {
    */
   async sendEmail(options: SendEmailOptions): Promise<boolean> {
     try {
+      const logoPath = path.resolve(__dirname, 'figs', 'kalima.jpg');
       await this.transporter.sendMail({
         from: this.fromAddress,
         to: options.to,
         subject: options.subject,
         html: options.html,
         text: options.text,
+        attachments: [
+          {
+            filename: 'kalima.jpg',
+            path: logoPath,
+            cid: 'kalima-logo',
+          },
+        ],
       });
       return true;
     } catch (error) {
