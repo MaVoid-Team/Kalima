@@ -17,5 +17,6 @@
     "gender": {
         "male": "ذكر",
         "female": "أنثى"
-    }
+    },
+    "enterNumber": "أدخل الرقم"
 }

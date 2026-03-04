@@ -32,6 +32,12 @@ export default function CartOrderSummary({
   }, []);
 
   const handleCheckout = () => {
+    // it has already been filled
+    if (isCartItemsRequiredFieldsFilled && onProceed) {
+      onProceed();
+      return;
+    }
+
     let hasMissing = false;
     let hasDirty = false;
 
