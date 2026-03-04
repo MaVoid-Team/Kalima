@@ -13,8 +13,8 @@ export function useRole() {
     const storeAccess = portalAccess?.store || { hasAccess: false, roles: [] };
     const storeRoles = storeAccess.roles || [];
 
-    const isAdmin = storeRoles.includes('Admin');
-    const isSubAdmin = storeRoles.includes('SubAdmin');
+    const isAdmin = storeRoles.includes("Admin");
+    const isSubAdmin = storeRoles.includes("SubAdmin");
     const hasAdminAccess = isAdmin || isSubAdmin;
 
     return {
