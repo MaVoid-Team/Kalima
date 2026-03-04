@@ -22,7 +22,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   const { t, i18n } = useTranslation("market");
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { isAdmin } = useRole();
+  const { hasAdminAccess } = useRole();
   const { startFastBuy, loading: fastBuyLoading } = useFastBuy();
 
   let cartCtx = null;
@@ -145,7 +145,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
       </Link>
 
       {/* Action buttons — outside the Link to avoid nested interactive elements */}
-      {!isAdmin && isAuthenticated && (
+      {!hasAdminAccess && isAuthenticated && (
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-auto w-full">
           <Button
             variant="outline"
