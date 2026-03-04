@@ -291,7 +291,10 @@
       "isArchived": "مؤرشف",
       "perks": "المميزات",
       "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code",
-      "perksTip": "يمكنك استخدام الفواصل الإنجليزية (,) أو الفواصل العربية (،) للفصل بين المميزات."
+      "perksTip": "يمكنك استخدام الفواصل الإنجليزية (,) أو الفواصل العربية (،) للفصل بين المميزات.",
+      "titleIsRequired": "العنوان مطلوب",
+      "priceMustBeGreaterThan0": "السعر يجب أن يكون أكبر من 0",
+      "discountedPriceMustBeLessThanOriginalPrice": "السعر بعد الخصم يجب أن يكون أقل من السعر الأصلي"
     },
     "create": {
       "dialogTitle": "إنشاء منتج جديد",
