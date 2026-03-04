@@ -77,6 +77,7 @@ export default function EditProductPage() {
         detachRequiredField,
         fetchFieldDefinitions,
         fieldDefinitions,
+        toggleRequiredFieldIsRequired,
         uploadThumbnail,
         removeThumbnail,
         addGalleryImages,
@@ -334,18 +335,13 @@ export default function EditProductPage() {
         fetchProductById(id);
     };
 
-    const handleToggleAttachedFieldRequired = async (fieldDefinitionId, isRequired) => {
+    const handleToggleAttachedFieldRequired = async (requiredFieldId, isRequired) => {
         if (!id) return;
         try {
-            // Detach and re-attach to update existing field's is_required status without showing the automatic toast
-            await detachRequiredField(id, fieldDefinitionId, false);
-            const fields = [{ field_definition_id: fieldDefinitionId, is_required: isRequired }];
-            await attachRequiredFields(id, fields, false);
-            toast.success(t('products.detail.fieldToggleSuccess', 'Required field updated successfully'));
+            await toggleRequiredFieldIsRequired(id, requiredFieldId, isRequired);
         }
         catch (error) {
             console.error('Failed to toggle required field:', error);
-            toast.error(t('products.detail.fieldToggleError', 'Failed to toggle required field'));
         }
     };
 
@@ -766,7 +762,7 @@ export default function EditProductPage() {
                                             </span>
                                             <Switch
                                                 checked={field.is_required}
-                                                onCheckedChange={(checked) => handleToggleAttachedFieldRequired(field.field_definition_id, checked)}
+                                                onCheckedChange={(checked) => handleToggleAttachedFieldRequired(field.id, checked)}
                                                 disabled={actionLoading}
                                                 className="scale-75 origin-left rtl:origin-right"
                                                 aria-label="Toggle required status"
