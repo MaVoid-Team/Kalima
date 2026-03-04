@@ -423,7 +423,15 @@ export default function ProductDetailPage() {
 
             {/* Required Fields */}
             <div className="rounded-xl border border-border p-5 space-y-3" data-testid="product-detail-required-fields">
-                <h2 className="font-semibold text-foreground">{t('products.detail.requiredFields')}</h2>
+                <div className="flex items-center justify-between">
+                    <h2 className="font-semibold text-foreground">{t('products.detail.requiredFields')}</h2>
+                    <Button asChild variant="ghost" size="sm" className="h-8">
+                        <Link to={`/admin/products/${product?.id}/edit#editRequiredFields`}>
+                            <Pencil className="h-4 w-4 sm:me-2" />
+                            <span className="hidden sm:inline">{t('products.actions.edit')}</span>
+                        </Link>
+                    </Button>
+                </div>
                 <Separator />
                 <RequiredFieldsManager
                     product={product}
