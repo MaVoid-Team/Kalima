@@ -45,13 +45,14 @@ export default function CreateUserDialog({ onSuccess }) {
         createSubAdminUser,
         createModeratorUser,
         createAssistantUser,
+        createTeacherUser,
         actionLoading
     } = useAdminUsers();
 
     const [isOpen, setIsOpen] = useState(false);
 
     const formSchema = z.object({
-        type: z.enum(['Admin', 'SubAdmin', 'Moderator', 'Assistant']),
+        type: z.enum(['Admin', 'SubAdmin', 'Moderator', 'Assistant', 'Teacher']),
         name: z.string().min(1, { message: t('common:validation.required', 'Required') }),
         email: z.string().email({ message: t('common:validation.email', 'Invalid email') }),
         password: z.string().min(6, { message: t('common:validation.minLength', { min: 6, defaultValue: 'Min 6 chars' }) }),
@@ -88,6 +89,9 @@ export default function CreateUserDialog({ onSuccess }) {
                 break;
             case 'Assistant':
                 success = await createAssistantUser(values);
+                break;
+            case 'Teacher':
+                success = await createTeacherUser(values);
                 break;
         }
 
@@ -136,6 +140,7 @@ export default function CreateUserDialog({ onSuccess }) {
                                             {hasAdminAccess && <SelectItem value="SubAdmin">{t('roles.SubAdmin')}</SelectItem>}
                                             <SelectItem value="Moderator">{t('roles.Moderator')}</SelectItem>
                                             <SelectItem value="Assistant">{t('roles.Assistant')}</SelectItem>
+                                            <SelectItem value="Teacher">{t('roles.Teacher')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
