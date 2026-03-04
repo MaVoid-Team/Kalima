@@ -338,7 +338,7 @@ export default function CreateProductPage() {
     // ─── Render ───────────────────────────────────────────────────────────────
 
     return (
-        <div className="space-y-6" data-testid="create-product-page">
+        <div className="space-y-6 min-w-0 overflow-hidden" data-testid="create-product-page">
 
             {/* Breadcrumb / Back */}
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -633,7 +633,7 @@ export default function CreateProductPage() {
 
                         {/* Picked field tags */}
                         {pickedFields.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2 overflow-x-auto custom-scrollbar">
                                 {pickedFields.map((field) => (
                                     <div
                                         key={field.id}
@@ -711,7 +711,7 @@ export default function CreateProductPage() {
                             {/* Thumbnail */}
                             <div className="space-y-1.5">
                                 <span className="text-sm font-medium leading-none">{t('products.form.thumbnail')}</span>
-                                <Input
+                                <input
                                     ref={thumbnailInputRef}
                                     type="file"
                                     accept="image/*"
@@ -736,7 +736,7 @@ export default function CreateProductPage() {
                             {/* Sample */}
                             <div className="space-y-1.5">
                                 <span className="text-sm font-medium leading-none">{t('products.form.sample')}</span>
-                                <Input
+                                <input
                                     ref={sampleInputRef}
                                     type="file"
                                     accept=".pdf,.doc,.docx"
@@ -812,7 +812,7 @@ export default function CreateProductPage() {
                                     </Button>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium leading-none">{t('products.quickCoupon.type')}</label>
                                         <Select dir={i18n.dir()} value={quickCouponType} onValueChange={setQuickCouponType}>
