@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -35,6 +35,7 @@ import { useCategories } from '@/hooks/useCategories';
 import GalleryManager from '@/components/admin/products/GalleryManager';
 import ThumbnailManager from '@/components/admin/products/ThumbnailManager';
 import FileUploadProgress from '@/components/admin/settings/FileUploadProgress';
+import { toast } from 'sonner';
 
 const editProductSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255),
@@ -60,6 +61,7 @@ const editProductSchema = z.object({
 export default function EditProductPage() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { hash } = useLocation();
     const { t, i18n } = useTranslation('admin');
     const isRtl = i18n.dir() === 'rtl';
 
@@ -131,6 +133,21 @@ export default function EditProductPage() {
         fetchProductById(id);
         fetchFieldDefinitions();
     }, [fetchProductById, fetchFieldDefinitions, id]);
+
+    // Handle hash navigation when the page has fully loaded
+    useEffect(() => {
+        if (selectedProduct && hash) {
+            // Need a slight timeout to ensure the DOM is fully rendered before jumping
+            const timeoutId = setTimeout(() => {
+                const elementId = hash.replace('#', '');
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [selectedProduct, hash]);
 
     useEffect(() => {
         if (selectedProduct) {
@@ -315,6 +332,21 @@ export default function EditProductPage() {
         if (!id) return;
         await detachRequiredField(id, fieldDefinitionId);
         fetchProductById(id);
+    };
+
+    const handleToggleAttachedFieldRequired = async (fieldDefinitionId, isRequired) => {
+        if (!id) return;
+        try {
+            // Detach and re-attach to update existing field's is_required status without showing the automatic toast
+            await detachRequiredField(id, fieldDefinitionId, false);
+            const fields = [{ field_definition_id: fieldDefinitionId, is_required: isRequired }];
+            await attachRequiredFields(id, fields, false);
+            toast.success(t('products.detail.fieldToggleSuccess', 'Required field updated successfully'));
+        }
+        catch (error) {
+            console.error('Failed to toggle required field:', error);
+            toast.error(t('products.detail.fieldToggleError', 'Failed to toggle required field'));
+        }
     };
 
     // ─── Submit ────────────────────────────────────────────────────────────────
@@ -709,35 +741,49 @@ export default function EditProductPage() {
                     </div>
 
                     {/* ── Section: Required Fields ── */}
-                    <div className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-required-fields">
+                    <div id='editRequiredFields' className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-required-fields">
                         <h2 className="font-semibold text-foreground">{t('products.detail.requiredFields')}</h2>
                         <Separator />
 
                         {attachedFields.length === 0 ? (
                             <p className="text-sm text-muted-foreground">{t('products.detail.noRequiredFields')}</p>
                         ) : (
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2 overflow-x-auto custom-scrollbar">
                                 {attachedFields.map((field) => (
-                                    <span
+                                    <div
                                         key={field.id}
-                                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
                                         data-testid={`edit-product-required-field-tag-${field.id}`}
                                     >
-                                        {field.required_field_definitions?.label}
-                                        <Badge variant="outline" className="text-xs ms-1">
+                                        <span className="font-medium">{field.required_field_definitions?.label}</span>
+                                        <Badge variant="outline" className="text-xs border-primary/30 mt-0 ms-1">
                                             {field.required_field_definitions?.field_type}
                                         </Badge>
+
+                                        <div className="flex items-center gap-1 border-s border-primary/30 ps-2 ms-1">
+                                            <span className="text-xs opacity-80">
+                                                {field.is_required ? t('products.detail.fieldRequired', 'Required') : t('products.detail.fieldOptional', 'Optional')}
+                                            </span>
+                                            <Switch
+                                                checked={field.is_required}
+                                                onCheckedChange={(checked) => handleToggleAttachedFieldRequired(field.field_definition_id, checked)}
+                                                disabled={actionLoading}
+                                                className="scale-75 origin-left rtl:origin-right"
+                                                aria-label="Toggle required status"
+                                            />
+                                        </div>
+
                                         <button
                                             type="button"
                                             onClick={() => handleDetachField(field.field_definition_id)}
                                             disabled={actionLoading}
-                                            className="rounded-full hover:bg-destructive/20 p-0.5 text-destructive"
+                                            className="rounded-full hover:bg-destructive/20 p-0.5 ms-1 text-destructive"
                                             aria-label={`Remove ${field.required_field_definitions?.label}`}
                                             data-testid={`edit-product-detach-field-${field.id}`}
                                         >
-                                            <X className="h-3 w-3" />
+                                            <X className="h-3.5 w-3.5" />
                                         </button>
-                                    </span>
+                                    </div>
                                 ))}
                             </div>
                         )}
