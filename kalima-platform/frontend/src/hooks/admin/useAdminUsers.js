@@ -181,6 +181,13 @@ export const useAdminUsers = () => {
             data: userData
         }));
 
+    const createTeacherUser = (userData) =>
+        handleAction(() => fetchApi({
+            endpoint: '/admin/teachers',
+            method: 'post',
+            data: userData
+        }));
+
     const deleteUser = (userId) =>
         handleAction(() => fetchApi({
             endpoint: `/admin/users/${userId}`,
@@ -235,6 +242,7 @@ export const useAdminUsers = () => {
         createSubAdminUser,
         createModeratorUser,
         createAssistantUser,
+        createTeacherUser,
         deleteUser,
 
         // Setters
