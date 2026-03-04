@@ -192,7 +192,7 @@ export default function Navbar() {
                     className="font-bold hover:bg-transparent hover:text-primary"
                     asChild
                   >
-                    <Link to="/login">{t("navbar.login")}</Link>
+                    <Link to="/login" state={{ from: location }} replace>{t("navbar.login")}</Link>
                   </Button>
                   <Button
                     variant="default"
@@ -200,7 +200,7 @@ export default function Navbar() {
                     className="font-bold px-6"
                     asChild
                   >
-                    <Link to="/signup">{t("navbar.signup")}</Link>
+                    <Link to="/signup" state={{ from: location }}>{t("navbar.signup")}</Link>
                   </Button>
                 </>
               )}
@@ -325,7 +325,7 @@ export default function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                     asChild
                   >
-                    <Link to="/login">{t("navbar.login")}</Link>
+                    <Link to="/login" state={{ from: location }} replace>{t("navbar.login")}</Link>
                   </Button>
                   <Button
                     variant="default"
@@ -333,7 +333,7 @@ export default function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                     asChild
                   >
-                    <Link to="/signup">{t("navbar.signup")}</Link>
+                    <Link to="/signup" state={{ from: location }}>{t("navbar.signup")}</Link>
                   </Button>
                 </>
               )}

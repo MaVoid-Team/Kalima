@@ -24,7 +24,7 @@ import useRegister from "@/hooks/auth/useRegister";
 import useLookups from "@/hooks/useLookups";
 import useAuth from "@/hooks/auth/useAuth";
 
-export default function RegisterStudent({ onBack }) {
+export default function RegisterStudent({ onBack, redirectTo }) {
     const { t } = useTranslation("auth");
     const navigate = useNavigate();
     const { registerStudent, registerFirebaseStudent } = useRegister();
@@ -59,7 +59,7 @@ export default function RegisterStudent({ onBack }) {
             const portalAccess = res?.data?.portalAccess || res?.portalAccess;
             if (user && tokens) {
                 loginSuccess(user, tokens, portalAccess);
-                navigate(-1);
+                navigate(redirectTo || "/", { replace: true });
             }
         } else {
             // Email/password flow: backend sends verification email → stay on page
@@ -82,6 +82,7 @@ export default function RegisterStudent({ onBack }) {
                 faction: "Alpha",
             }}
             onSubmit={handleSubmit}
+            redirectTo={redirectTo}
         >
             <StudentFields />
         </CommonRegisterForm>

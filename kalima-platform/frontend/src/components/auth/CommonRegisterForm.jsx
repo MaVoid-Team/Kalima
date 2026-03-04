@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-export default function CommonRegisterForm({ role, onBack, children, extraSchema, defaultValues, onSubmit }) {
+export default function CommonRegisterForm({ role, onBack, children, extraSchema, defaultValues, onSubmit, redirectTo }) {
     const { t, i18n } = useTranslation("auth");
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -335,6 +335,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                 {t("signup.hasAccount")}{" "}
                 <Link
                     to="/login"
+                    state={redirectTo ? { from: { pathname: redirectTo } } : undefined}
                     className="underline underline-offset-4 hover:text-primary font-medium"
                     data-testid="auth-register-login-link"
                 >

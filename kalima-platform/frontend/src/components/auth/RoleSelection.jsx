@@ -1,11 +1,12 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { GraduationCap, School, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 export default function RoleSelection({ onRoleSelect }) {
     const { t } = useTranslation("auth");
+    const location = useLocation();
 
     const containerVariants = {
         hidden: { opacity: 0, y: 16 },
@@ -97,7 +98,7 @@ export default function RoleSelection({ onRoleSelect }) {
             </motion.div>
             <motion.div className="text-sm text-muted-foreground w-full text-center" variants={itemVariants}>
                 {t("signup.hasAccount")}{" "}
-                <Link to="/login" className="underline underline-offset-4 hover:text-primary font-medium" data-testid="auth-role-login-link">
+                <Link to="/login" state={{ from: location.state?.from }} className="underline underline-offset-4 hover:text-primary font-medium" data-testid="auth-role-login-link">
                     {t("signup.loginLink")}
                 </Link>
             </motion.div>

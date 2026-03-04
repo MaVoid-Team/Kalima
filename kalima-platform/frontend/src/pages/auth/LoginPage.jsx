@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { Eye, EyeOff } from "lucide-react";
@@ -36,6 +36,8 @@ import {
 export default function LoginPage() {
     const { t } = useTranslation("auth");
     const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
     const { login, loginWithFirebase, loading } = useLogin();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -79,8 +81,8 @@ export default function LoginPage() {
     const onSubmit = async (values) => {
         try {
             await login(values);
-            // Navigate to dashboard or home after successful login
-            navigate(-1);
+            // Navigate forward to the page the user was on before auth
+            navigate(from, { replace: true });
         } catch (error) {
             console.error("Login failed:", error);
             // Error is handled by interceptor/hook (toast)
@@ -92,7 +94,7 @@ export default function LoginPage() {
             const result = await signInWithPopup(auth, provider);
             const idToken = await result.user.getIdToken();
             await loginWithFirebase(idToken);
-            navigate(-1);
+            navigate(from, { replace: true });
         } catch (error) {
             console.error("Firebase Login failed:", error);
             toast.error(error?.message || "Failed to login with Firebase");
@@ -219,6 +221,7 @@ export default function LoginPage() {
                                     {t("login.noAccount", "Don't have an account?")}{" "}
                                     <Link
                                         to="/signup"
+                                        state={{ from: location.state?.from }}
                                         className="underline underline-offset-4 hover:text-primary font-medium"
                                         data-testid="login-signup-link"
                                     >

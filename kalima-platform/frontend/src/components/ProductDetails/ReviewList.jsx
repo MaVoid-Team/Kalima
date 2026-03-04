@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MessageSquare, Star, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -37,7 +37,8 @@ const ReviewList = ({ productId, averageRating, totalReviews, productReviews = [
   const [showForm, setShowForm] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
   const [error, setError] = useState(null);
-
+  const location = useLocation();
+  
   // Initialize reviews from product data
   useEffect(() => {
     setReviews(productReviews);
@@ -188,7 +189,7 @@ const ReviewList = ({ productId, averageRating, totalReviews, productReviews = [
             </AlertDescription>
           </div>
           <Button asChild size="sm" className="shrink-0 w-full sm:w-auto shadow-sm">
-            <Link to="/login">
+            <Link to="/login" state={{from: location}} replace>
               {t('reviews.loginAction', 'Log in')}
             </Link>
           </Button>
