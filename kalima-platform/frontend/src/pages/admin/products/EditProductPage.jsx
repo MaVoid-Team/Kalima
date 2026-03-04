@@ -37,26 +37,7 @@ import ThumbnailManager from '@/components/admin/products/ThumbnailManager';
 import FileUploadProgress from '@/components/admin/settings/FileUploadProgress';
 import { toast } from 'sonner';
 
-const editProductSchema = z.object({
-    title: z.string().min(1, 'Title is required').max(255),
-    price: z.coerce.number().positive('Price must be greater than 0'),
-    type: z.enum(['Product', 'Book']),
-    description: z.string().optional(),
-    price_after_discount: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().positive().optional()
-    ),
-    serial: z.string().max(100).optional().or(z.literal('')),
-    coupon_id: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().int().positive().optional()
-    ),
-    perks: z.string().optional().or(z.literal('')),
-    is_archived: z.boolean(),
-}).refine(
-    (data) => !data.price_after_discount || data.price_after_discount < data.price,
-    { message: 'Discounted price must be less than the original price', path: ['price_after_discount'] }
-);
+
 
 export default function EditProductPage() {
     const { id } = useParams();
@@ -64,6 +45,27 @@ export default function EditProductPage() {
     const { hash } = useLocation();
     const { t, i18n } = useTranslation('admin');
     const isRtl = i18n.dir() === 'rtl';
+
+    const editProductSchema = z.object({
+        title: z.string().min(1, t('products.form.titleIsRequired')).max(255),
+        price: z.coerce.number().positive(t('products.form.priceMustBeGreaterThan0')),
+        type: z.enum(['Product', 'Book']),
+        description: z.string().optional(),
+        price_after_discount: z.preprocess(
+            (val) => (val === '' || val == null ? undefined : val),
+            z.coerce.number().positive().optional()
+        ),
+        serial: z.string().max(100).optional().or(z.literal('')),
+        coupon_id: z.preprocess(
+            (val) => (val === '' || val == null ? undefined : val),
+            z.coerce.number().int().positive().optional()
+        ),
+        perks: z.string().optional().or(z.literal('')),
+        is_archived: z.boolean(),
+    }).refine(
+        (data) => !data.price_after_discount || data.price_after_discount < data.price,
+        { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
+    );
 
     const {
         selectedProduct,
