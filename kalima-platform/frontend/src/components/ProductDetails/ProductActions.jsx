@@ -3,11 +3,12 @@ import { Minus, Plus, ShoppingCart, Eye, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { formatPrice, getImageUrl } from "@/lib/storeUtils";
 import { useCart } from "@/contexts/CartContext";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { useFastBuy } from "@/hooks/useFastBuy";
+import useAuth from "@/hooks/auth/useAuth";
 
 /**
  * ProductActions
@@ -20,12 +21,41 @@ import { useFastBuy } from "@/hooks/useFastBuy";
 export default function ProductActions({ price, productId, sampleUrl, sampleId }) {
   const { t } = useTranslation("product");
   const [quantity, setQuantity] = useState(1);
-  const { addToCart, loading } = useCart();
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  let cartCtx = null;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    cartCtx = useCart();
+  } catch (_) {
+    // Not inside CartProvider — safe to ignore
+  }
+
+  const addToCart = cartCtx?.addToCart;
+  const loading = cartCtx?.loading ?? false;
   const { startFastBuy, loading: fastBuyLoading } = useFastBuy();
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => Math.max(1, prev - 1));
 
   const formattedPrice = formatPrice(price);
+
+  const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: location }, replace: true });
+      return;
+    }
+    if (addToCart) addToCart(productId, quantity);
+  };
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: location }, replace: true });
+      return;
+    }
+    startFastBuy(productId, quantity);
+  };
 
   return (
     <div className="flex flex-col gap-4 mt-2">
@@ -69,7 +99,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
             <Button
               className="h-11 gap-2"
               disabled={loading}
-              onClick={() => addToCart(productId, quantity)}
+              onClick={handleAddToCart}
               data-testid="product-actions-mobile-add-cart-button"
             >
               {loading ? (
@@ -85,7 +115,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
             <Button
               variant="secondary"
               className="h-11 gap-2"
-              onClick={() => startFastBuy(productId, quantity)}
+              onClick={handleBuyNow}
               disabled={fastBuyLoading}
               data-testid="product-actions-mobile-buy-now-button"
             >
@@ -147,7 +177,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
           </div>
 
           {/* Add to Cart */}
-          <Button className="gap-2 flex-1" size="lg" onClick={() => addToCart(productId, quantity)} disabled={loading} data-testid="product-actions-desktop-add-cart-button">
+          <Button className="gap-2 flex-1" size="lg" onClick={handleAddToCart} disabled={loading} data-testid="product-actions-desktop-add-cart-button">
             {loading ? (
               <LoadingSpinner className="h-5 w-5 border-white" />
             ) : (
@@ -165,7 +195,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
             variant="secondary"
             className="text-sm flex-1"
             size="lg"
-            onClick={() => startFastBuy(productId, quantity)}
+            onClick={handleBuyNow}
             disabled={fastBuyLoading}
             data-testid="product-actions-desktop-buy-now-button"
           >

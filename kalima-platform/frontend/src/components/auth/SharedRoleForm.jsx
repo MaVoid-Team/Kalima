@@ -9,7 +9,7 @@ import CommonRegisterForm from "./CommonRegisterForm";
 import { useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/auth/useAuth";
 
-export default function SharedRoleForm({ role, onBack, registerFn, registerFirebaseFn }) {
+export default function SharedRoleForm({ role, onBack, registerFn, registerFirebaseFn, redirectTo }) {
     // Memoize the schema to prevent recreation on every render
     const sharedSchema = React.useMemo(() => z.object({
         secondary_phone: z.union([egyptPhoneSchema, z.literal(""), z.undefined()]),
@@ -32,7 +32,7 @@ export default function SharedRoleForm({ role, onBack, registerFn, registerFireb
             const portalAccess = res?.data?.portalAccess || res?.portalAccess;
             if (user && tokens) {
                 loginSuccess(user, tokens, portalAccess);
-                navigate(-1);
+                navigate(redirectTo || "/", { replace: true });
             }
         } else {
             // Email/password flow: backend sends verification email → stay on page
@@ -48,6 +48,7 @@ export default function SharedRoleForm({ role, onBack, registerFn, registerFireb
             extraSchema={sharedSchema}
             defaultValues={{ secondary_phone: "" }}
             onSubmit={handleSubmit}
+            redirectTo={redirectTo}
         >
             <SharedFields />
         </CommonRegisterForm>

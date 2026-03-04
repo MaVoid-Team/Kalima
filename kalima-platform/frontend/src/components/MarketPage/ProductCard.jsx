@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { CheckCheck, ShoppingCart, Zap } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -20,6 +20,7 @@ import LoadingSpinner from "@/components/ui/loading-spinner";
  */
 const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, isPurchased, rate, rate_count }) => {
   const { t, i18n } = useTranslation("market");
+  const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { hasAdminAccess } = useRole();
@@ -50,7 +51,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
     e.preventDefault();
     e.stopPropagation();
     if (!isAuthenticated) {
-      navigate("/login");
+      navigate("/login", { state: { from: location }, replace: true });
       return;
     }
     if (!cartCtx?.addToCart) return;
@@ -68,7 +69,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
     e.preventDefault();
     e.stopPropagation();
     if (!isAuthenticated) {
-      navigate("/login");
+      navigate("/login", { state: { from: location }, replace: true });
       return;
     }
     try {

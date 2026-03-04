@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -13,6 +14,8 @@ export default function SignupPage() {
     const { i18n } = useTranslation("auth");
     const [role, setRole] = useState(null);
     const isRTL = i18n.dir() === "rtl";
+    const location = useLocation();
+    const redirectTo = location.state?.from?.pathname || "/";
 
     React.useEffect(() => {
         window.scrollTo(0, 0);
@@ -25,13 +28,13 @@ export default function SignupPage() {
 
         switch (role) {
             case "student":
-                return <RegisterStudent onBack={() => setRole(null)} />;
+                return <RegisterStudent onBack={() => setRole(null)} redirectTo={redirectTo} />;
             case "teacher":
-                return <RegisterTeacher onBack={() => setRole(null)} />;
+                return <RegisterTeacher onBack={() => setRole(null)} redirectTo={redirectTo} />;
             case "parent":
-                return <RegisterParent onBack={() => setRole(null)} />;
+                return <RegisterParent onBack={() => setRole(null)} redirectTo={redirectTo} />;
             case "lecturer":
-                return <RegisterLecturer onBack={() => setRole(null)} />;
+                return <RegisterLecturer onBack={() => setRole(null)} redirectTo={redirectTo} />;
             default:
                 return null;
         }
@@ -47,8 +50,8 @@ export default function SignupPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1.1, ease: "easeOut" }}
                 className={cn(
-                "relative hidden h-full flex-col bg-muted p-10 lg:flex",
-                isRTL ? "lg:order-first" : "lg:order-last"
+                    "relative hidden h-full flex-col bg-muted p-10 lg:flex",
+                    isRTL ? "lg:order-first" : "lg:order-last"
                 )}
             >
                 <div className="absolute inset-0" />

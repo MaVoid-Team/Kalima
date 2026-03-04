@@ -22,8 +22,10 @@ const ProtectedRoute = ({ requireAuth = true }) => {
     }
 
     if (!requireAuth && isAuthenticated) {
-        // If they are on a guest-only route like login/signup, redirect to home
-        return <Navigate to="/" replace />;
+        // If they are on a guest-only route like login/signup, redirect to the
+        // page they came from (preserved in location.state.from) or fall back to home.
+        const redirectTo = location.state?.from?.pathname || "/";
+        return <Navigate to={redirectTo} replace />;
     }
 
     return <Outlet />;
