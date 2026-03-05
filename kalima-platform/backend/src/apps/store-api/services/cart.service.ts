@@ -502,7 +502,7 @@ class CartService {
 
     await this.db.cart_items.update({
       where: { id: cart_item_id },
-      data: { deleted_at: new Date() },
+      data: { deleted_at: new Date(), is_deleted: true },
     });
 
     // Recalculate cart totals and persist
@@ -644,7 +644,7 @@ class CartService {
     await this.db.$transaction([
       this.db.cart_items.updateMany({
         where: { cart_id: cart.id },
-        data: { deleted_at: new Date() },
+        data: { deleted_at: new Date(), is_deleted: true },
       }),
       this.db.carts.update({
         where: { id: cart.id },

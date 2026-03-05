@@ -361,6 +361,7 @@ class CouponService {
       where: { id },
       data: {
         deleted_at: new Date(),
+        is_deleted: true,
         active: false,
       },
     });

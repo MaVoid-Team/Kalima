@@ -378,6 +378,7 @@ export const CouponsScalarFieldEnum = {
   created_at: 'created_at',
   updated_at: 'updated_at',
   deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted',
   mongo_id: 'mongo_id',
   type: 'type'
 } as const
@@ -422,6 +423,7 @@ export const ProductsScalarFieldEnum = {
   created_at: 'created_at',
   updated_at: 'updated_at',
   deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted',
   perks: 'perks'
 } as const
 
@@ -461,7 +463,8 @@ export const Required_field_definitionsScalarFieldEnum = {
   active: 'active',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type Required_field_definitionsScalarFieldEnum = (typeof Required_field_definitionsScalarFieldEnum)[keyof typeof Required_field_definitionsScalarFieldEnum]
@@ -476,7 +479,8 @@ export const CartsScalarFieldEnum = {
   total: 'total',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type CartsScalarFieldEnum = (typeof CartsScalarFieldEnum)[keyof typeof CartsScalarFieldEnum]
@@ -494,7 +498,8 @@ export const Cart_itemsScalarFieldEnum = {
   required_fields_filled: 'required_fields_filled',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type Cart_itemsScalarFieldEnum = (typeof Cart_itemsScalarFieldEnum)[keyof typeof Cart_itemsScalarFieldEnum]
@@ -536,7 +541,8 @@ export const PurchasesScalarFieldEnum = {
   returned_by: 'returned_by',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type PurchasesScalarFieldEnum = (typeof PurchasesScalarFieldEnum)[keyof typeof PurchasesScalarFieldEnum]
@@ -554,7 +560,8 @@ export const Purchase_itemsScalarFieldEnum = {
   coupon_id: 'coupon_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type Purchase_itemsScalarFieldEnum = (typeof Purchase_itemsScalarFieldEnum)[keyof typeof Purchase_itemsScalarFieldEnum]
@@ -580,7 +587,8 @@ export const Payment_methodsScalarFieldEnum = {
   image_id: 'image_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type Payment_methodsScalarFieldEnum = (typeof Payment_methodsScalarFieldEnum)[keyof typeof Payment_methodsScalarFieldEnum]
