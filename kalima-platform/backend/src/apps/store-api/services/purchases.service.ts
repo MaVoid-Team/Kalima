@@ -168,11 +168,13 @@ class PurchasesService {
       const purchaseItem = createdItems[i];
       if (item.required_fields?.length && purchaseItem) {
         for (const rf of item.required_fields) {
-          requiredFieldsData.push({
-            purchase_item_id: purchaseItem.id,
-            field_definition_id: rf.field_definition_id,
-            value: rf.value,
-          });
+          if (rf.value !== null && rf.value !== undefined && rf.value !== "") {
+            requiredFieldsData.push({
+              purchase_item_id: purchaseItem.id,
+              field_definition_id: rf.field_definition_id,
+              value: String(rf.value),
+            });
+          }
         }
       }
     }
