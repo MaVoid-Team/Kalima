@@ -42,6 +42,7 @@ export type Required_field_definitionsMinAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
 }
 
 export type Required_field_definitionsMaxAggregateOutputType = {
@@ -52,6 +53,7 @@ export type Required_field_definitionsMaxAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
 }
 
 export type Required_field_definitionsCountAggregateOutputType = {
@@ -62,6 +64,7 @@ export type Required_field_definitionsCountAggregateOutputType = {
   created_at: number
   updated_at: number
   deleted_at: number
+  is_deleted: number
   _all: number
 }
 
@@ -82,6 +85,7 @@ export type Required_field_definitionsMinAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
 }
 
 export type Required_field_definitionsMaxAggregateInputType = {
@@ -92,6 +96,7 @@ export type Required_field_definitionsMaxAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
 }
 
 export type Required_field_definitionsCountAggregateInputType = {
@@ -102,6 +107,7 @@ export type Required_field_definitionsCountAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
   _all?: true
 }
 
@@ -199,6 +205,7 @@ export type Required_field_definitionsGroupByOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
   _count: Required_field_definitionsCountAggregateOutputType | null
   _avg: Required_field_definitionsAvgAggregateOutputType | null
   _sum: Required_field_definitionsSumAggregateOutputType | null
@@ -232,6 +239,7 @@ export type required_field_definitionsWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"required_field_definitions"> | boolean | null
   product_required_fields?: Prisma.Product_required_fieldsListRelationFilter
   purchase_item_required_fields?: Prisma.Purchase_item_required_fieldsListRelationFilter
   cart_item_required_fields?: Prisma.Cart_item_required_fieldsListRelationFilter
@@ -245,6 +253,7 @@ export type required_field_definitionsOrderByWithRelationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   product_required_fields?: Prisma.product_required_fieldsOrderByRelationAggregateInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsOrderByRelationAggregateInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsOrderByRelationAggregateInput
@@ -261,6 +270,7 @@ export type required_field_definitionsWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"required_field_definitions"> | boolean | null
   product_required_fields?: Prisma.Product_required_fieldsListRelationFilter
   purchase_item_required_fields?: Prisma.Purchase_item_required_fieldsListRelationFilter
   cart_item_required_fields?: Prisma.Cart_item_required_fieldsListRelationFilter
@@ -274,6 +284,7 @@ export type required_field_definitionsOrderByWithAggregationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.required_field_definitionsCountOrderByAggregateInput
   _avg?: Prisma.required_field_definitionsAvgOrderByAggregateInput
   _max?: Prisma.required_field_definitionsMaxOrderByAggregateInput
@@ -292,6 +303,7 @@ export type required_field_definitionsScalarWhereWithAggregatesInput = {
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"required_field_definitions"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"required_field_definitions"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"required_field_definitions"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableWithAggregatesFilter<"required_field_definitions"> | boolean | null
 }
 
 export type required_field_definitionsCreateInput = {
@@ -301,6 +313,7 @@ export type required_field_definitionsCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
@@ -314,6 +327,7 @@ export type required_field_definitionsUncheckedCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
@@ -326,6 +340,7 @@ export type required_field_definitionsUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
@@ -339,6 +354,7 @@ export type required_field_definitionsUncheckedUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
@@ -352,6 +368,7 @@ export type required_field_definitionsCreateManyInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type required_field_definitionsUpdateManyMutationInput = {
@@ -361,6 +378,7 @@ export type required_field_definitionsUpdateManyMutationInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type required_field_definitionsUncheckedUpdateManyInput = {
@@ -371,6 +389,7 @@ export type required_field_definitionsUncheckedUpdateManyInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type Required_field_definitionsScalarRelationFilter = {
@@ -386,6 +405,7 @@ export type required_field_definitionsCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type required_field_definitionsAvgOrderByAggregateInput = {
@@ -400,6 +420,7 @@ export type required_field_definitionsMaxOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type required_field_definitionsMinOrderByAggregateInput = {
@@ -410,6 +431,7 @@ export type required_field_definitionsMinOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type required_field_definitionsSumOrderByAggregateInput = {
@@ -469,6 +491,7 @@ export type required_field_definitionsCreateWithoutProduct_required_fieldsInput 
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
 }
@@ -481,6 +504,7 @@ export type required_field_definitionsUncheckedCreateWithoutProduct_required_fie
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
 }
@@ -508,6 +532,7 @@ export type required_field_definitionsUpdateWithoutProduct_required_fieldsInput 
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
 }
@@ -520,6 +545,7 @@ export type required_field_definitionsUncheckedUpdateWithoutProduct_required_fie
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
 }
@@ -531,6 +557,7 @@ export type required_field_definitionsCreateWithoutCart_item_required_fieldsInpu
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
 }
@@ -543,6 +570,7 @@ export type required_field_definitionsUncheckedCreateWithoutCart_item_required_f
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
 }
@@ -570,6 +598,7 @@ export type required_field_definitionsUpdateWithoutCart_item_required_fieldsInpu
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
 }
@@ -582,6 +611,7 @@ export type required_field_definitionsUncheckedUpdateWithoutCart_item_required_f
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
 }
@@ -593,6 +623,7 @@ export type required_field_definitionsCreateWithoutPurchase_item_required_fields
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
 }
@@ -605,6 +636,7 @@ export type required_field_definitionsUncheckedCreateWithoutPurchase_item_requir
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
 }
@@ -632,6 +664,7 @@ export type required_field_definitionsUpdateWithoutPurchase_item_required_fields
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
 }
@@ -644,6 +677,7 @@ export type required_field_definitionsUncheckedUpdateWithoutPurchase_item_requir
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
   cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
 }
@@ -705,6 +739,7 @@ export type required_field_definitionsSelect<ExtArgs extends runtime.Types.Exten
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   product_required_fields?: boolean | Prisma.required_field_definitions$product_required_fieldsArgs<ExtArgs>
   purchase_item_required_fields?: boolean | Prisma.required_field_definitions$purchase_item_required_fieldsArgs<ExtArgs>
   cart_item_required_fields?: boolean | Prisma.required_field_definitions$cart_item_required_fieldsArgs<ExtArgs>
@@ -719,6 +754,7 @@ export type required_field_definitionsSelectCreateManyAndReturn<ExtArgs extends 
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
 }, ExtArgs["result"]["required_field_definitions"]>
 
 export type required_field_definitionsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -729,6 +765,7 @@ export type required_field_definitionsSelectUpdateManyAndReturn<ExtArgs extends 
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
 }, ExtArgs["result"]["required_field_definitions"]>
 
 export type required_field_definitionsSelectScalar = {
@@ -739,9 +776,10 @@ export type required_field_definitionsSelectScalar = {
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
 }
 
-export type required_field_definitionsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "field_type" | "active" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["required_field_definitions"]>
+export type required_field_definitionsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "field_type" | "active" | "created_at" | "updated_at" | "deleted_at" | "is_deleted", ExtArgs["result"]["required_field_definitions"]>
 export type required_field_definitionsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product_required_fields?: boolean | Prisma.required_field_definitions$product_required_fieldsArgs<ExtArgs>
   purchase_item_required_fields?: boolean | Prisma.required_field_definitions$purchase_item_required_fieldsArgs<ExtArgs>
@@ -766,6 +804,7 @@ export type $required_field_definitionsPayload<ExtArgs extends runtime.Types.Ext
     created_at: Date | null
     updated_at: Date | null
     deleted_at: Date | null
+    is_deleted: boolean | null
   }, ExtArgs["result"]["required_field_definitions"]>
   composites: {}
 }
@@ -1199,6 +1238,7 @@ export interface required_field_definitionsFieldRefs {
   readonly created_at: Prisma.FieldRef<"required_field_definitions", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"required_field_definitions", 'DateTime'>
   readonly deleted_at: Prisma.FieldRef<"required_field_definitions", 'DateTime'>
+  readonly is_deleted: Prisma.FieldRef<"required_field_definitions", 'Boolean'>
 }
     
 
