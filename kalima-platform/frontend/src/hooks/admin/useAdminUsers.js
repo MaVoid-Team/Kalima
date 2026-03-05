@@ -12,7 +12,7 @@ export const useAdminUsers = () => {
         total: 0,
         page: 1,
         pages: 1,
-        limit: 10
+        limit: 8
     });
     const [filters, setFilters] = useState({
         search: '',

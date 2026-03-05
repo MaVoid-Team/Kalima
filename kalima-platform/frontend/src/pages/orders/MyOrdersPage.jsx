@@ -26,7 +26,7 @@ const MyOrdersPage = () => {
         setPage,
         filters,
         setStatus,
-    } = useOrders({ limit: 6, autoFetch: false });
+    } = useOrders({ autoFetch: false });
 
     React.useEffect(() => {
         window.scrollTo(0, 0);

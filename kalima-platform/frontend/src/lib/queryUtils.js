@@ -18,9 +18,9 @@ export const formatISODateWithoutMs = (date) => {
  * Automatically formats dates to match the expected API strict timezone formatting without ms.
  *
  * @param {Object} options Parameters to build the query from
- * @param {Object} [options.pagination] Pagination parameters (e.g. { page: 1, limit: 20 })
+ * @param {Object} [options.pagination] Pagination parameters (e.g. { page: 1, limit: 8 })
  * @param {Object} [options.filters] Filter parameters (e.g. { search: 'foo', status: 'pending', startDate: Date, endDate: Date })
- * @returns {string} The constructed query string (e.g. "page=1&limit=20&search=foo")
+ * @returns {string} The constructed query string (e.g. "page=1&limit=8&search=foo")
  */
 export const buildQueryString = ({ pagination = {}, filters = {} }) => {
     const query = new URLSearchParams();
