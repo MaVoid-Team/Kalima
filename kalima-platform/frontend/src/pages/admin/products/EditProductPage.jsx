@@ -48,7 +48,7 @@ export default function EditProductPage() {
 
     const editProductSchema = z.object({
         title: z.string().min(1, t('products.form.titleIsRequired')).max(255, t('products.form.titleMaxLength')),
-        price: z.coerce.number().positive(t('products.form.priceMustBeGreaterThan0')),
+        price: z.coerce.number().min(0, t('products.form.priceMustBeGreaterThan0')),
         type: z.enum(['Product', 'Book']),
         description: z.string().optional(),
         price_after_discount: z.preprocess(
