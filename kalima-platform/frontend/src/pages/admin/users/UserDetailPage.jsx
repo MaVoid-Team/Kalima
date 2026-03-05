@@ -6,7 +6,8 @@ import { arSA } from 'date-fns/locale';
 import {
     ArrowLeft, User, Mail, Phone, Calendar,
     ShieldCheck, Eye, ShoppingBag, UserPlus, BookOpen,
-    MapPin, Hash, GraduationCap, BarChart3, Users
+    MapPin, Hash, GraduationCap, BarChart3, Users,
+    Trash2
 } from 'lucide-react';
 
 import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
@@ -18,6 +19,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import UserRolesSection from '@/components/admin/users/UserRolesSection';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 /* ─── helpers ────────────────────────────────────────────────────────────── */
 function StatCard({ icon: Icon, label, value, color = 'text-primary' }) {
@@ -62,9 +74,9 @@ export default function UserDetailPage() {
         loading,
         actionLoading,
         fetchUserById,
-        fetchUserRoles,
         assignRole,
-        revokeRole
+        revokeRole,
+        deleteUser
     } = useAdminUsers();
 
     useEffect(() => {
@@ -82,6 +94,13 @@ export default function UserDetailPage() {
     const handleRevokeRole = async (portal, role) => {
         await revokeRole(id, portal, role);
         fetchUserById(id);
+    };
+
+    const handleDeleteUser = async () => {
+        const res = await deleteUser(id);
+        if (res?.success) {
+            fetchUserById(id);
+        }
     };
 
     /* ── loading / not-found states ── */
@@ -107,6 +126,11 @@ export default function UserDetailPage() {
     /* ── derived values ── */
     const analytics = selectedUser.user_analytics || {};
     const teacher = selectedUser.teachers;
+    const teachesAt = selectedUser.teaches_at || [];
+    const students = selectedUser.students ? (Array.isArray(selectedUser.students) ? selectedUser.students : []) : [];
+    const lecturers = selectedUser.lecturers ? (Array.isArray(selectedUser.lecturers) ? selectedUser.lecturers : []) : [];
+    const assistants = selectedUser.assistants ? (Array.isArray(selectedUser.assistants) ? selectedUser.assistants : []) : [];
+    const parents = selectedUser.parents ? (Array.isArray(selectedUser.parents) ? selectedUser.parents : []) : [];
     const userCreated = selectedUser.userCreated || {};
     const roles = selectedUser.user_roles || [];
 
@@ -120,12 +144,6 @@ export default function UserDetailPage() {
 
     const analyticsStats = [
         {
-            icon: Eye,
-            label: t('details.views'),
-            value: analytics.views ?? 0,
-            color: 'text-chart-2',
-        },
-        {
             icon: ShoppingBag,
             label: t('details.totalSpent'),
             value: `${Number(analytics.total_spent ?? 0).toLocaleString()} ${t('details.currency')}`,
@@ -136,16 +154,13 @@ export default function UserDetailPage() {
             label: t('details.purchases'),
             value: analytics.number_of_purchases ?? 0,
             color: 'text-primary',
-        },
-        {
-            icon: UserPlus,
-            label: t('details.invites'),
-            value: analytics.successful_invites ?? 0,
-            color: 'text-chart-4',
-        },
+        }
     ];
 
     const createdEntries = Object.entries(userCreated).filter(([, v]) => v > 0);
+
+    const displayEmail = selectedUser.email?.includes('_deleted_') ? selectedUser.email.split('_deleted_')[0] : selectedUser.email;
+    const displayPhone = selectedUser.phone?.includes('_deleted_') ? selectedUser.phone.split('_deleted_')[0] : selectedUser.phone;
 
     return (
         <div className="space-y-6 max-w-6xl mx-auto" data-testid="user-detail-page">
@@ -175,12 +190,59 @@ export default function UserDetailPage() {
                     </div>
                 </div>
 
-                {selectedUser.is_email_verified && (
-                    <Badge variant="default" className="gap-1" data-testid="user-detail-verified-badge">
-                        <ShieldCheck className="w-4 h-4" />
-                        {t('status.verified')}
-                    </Badge>
-                )}
+                <div className="flex items-center gap-2">
+                    {selectedUser.is_deleted ? (
+                        <Badge variant="destructive" className="gap-1" data-testid="user-detail-deleted-badge">
+                            <Trash2 className="w-4 h-4" />
+                            {t('status.deleted', 'Deleted')}
+                        </Badge>
+                    ) : selectedUser.is_email_verified ? (
+                        <Badge variant="default" className="gap-1" data-testid="user-detail-verified-badge">
+                            <ShieldCheck className="w-4 h-4" />
+                            {t('status.verified')}
+                        </Badge>
+                    ) : (
+                        <Badge variant="outline" className="gap-1" data-testid="user-detail-pending-badge">
+                            {t('status.pending', 'Pending')}
+                        </Badge>
+                    )}
+
+                    {!selectedUser.is_deleted && hasAdminAccess && (
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    disabled={actionLoading}
+                                    data-testid="user-detail-delete-button"
+                                    className="ms-2"
+                                >
+                                    <Trash2 className="h-4 w-4 me-1" />
+                                    {t('actions.delete', 'Delete')}
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent dir={i18n.dir()}>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>{t('details.confirmDeleteTitle', 'Are you sure?')}</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        {t('details.confirmDeleteDesc', 'This action cannot be undone. This will permanently delete the user account.')}
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel disabled={actionLoading}>{t('actions.cancel', 'Cancel')}</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={handleDeleteUser}
+                                        disabled={actionLoading}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                        {actionLoading && <LoadingSpinner className="h-4 w-4 mr-2" />}
+                                        {t('actions.delete', 'Delete')}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    )}
+                </div>
             </div>
 
             {/* ── Profile Hero Card ── */}
@@ -209,16 +271,16 @@ export default function UserDetailPage() {
                             </div>
 
                             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-2">
-                                {selectedUser.email && (
-                                    <span className="flex items-center gap-1.5">
+                                {displayEmail && (
+                                    <span className="flex items-center gap-1.5" dir="ltr">
                                         <Mail className="h-3.5 w-3.5 shrink-0" />
-                                        {selectedUser.email}
+                                        {displayEmail}
                                     </span>
                                 )}
-                                {selectedUser.phone && (
+                                {displayPhone && (
                                     <span className="flex items-center gap-1.5" dir="ltr">
                                         <Phone className="h-3.5 w-3.5 shrink-0" />
-                                        {selectedUser.phone}
+                                        {displayPhone}
                                     </span>
                                 )}
                                 {selectedUser.gender && (
@@ -245,7 +307,7 @@ export default function UserDetailPage() {
                     <BarChart3 className="h-4 w-4" />
                     {t('details.analytics')}
                 </h3>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-testid="user-detail-analytics">
+                <div className="grid grid-cols-2 gap-4" data-testid="user-detail-analytics">
                     {analyticsStats.map((s) => (
                         <StatCard key={s.label} {...s} />
                     ))}
@@ -283,13 +345,13 @@ export default function UserDetailPage() {
                                 <InfoRow
                                     icon={MapPin}
                                     label={t('details.government')}
-                                    value={teacher.government?.title}
+                                    value={teacher.government?.title || `ID: ${teacher.government_id}`}
                                 />
                                 <Separator className="my-1 opacity-50" />
                                 <InfoRow
                                     icon={MapPin}
                                     label={t('details.zone')}
-                                    value={teacher.zones?.title}
+                                    value={teacher.zones?.title || `ID: ${teacher.zone_id}`}
                                 />
 
                                 {activeLevels.length > 0 && (
@@ -306,6 +368,30 @@ export default function UserDetailPage() {
                                                         <Badge key={lvl} variant="secondary" className="text-xs">
                                                             {lvl}
                                                         </Badge>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
+                                {teachesAt.length > 0 && (
+                                    <>
+                                        <Separator className="my-1 opacity-50" />
+                                        <div className="flex items-start gap-3 py-2">
+                                            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-xs text-muted-foreground leading-none mb-1.5">
+                                                    {t('details.teachingLocations', 'Teaching Locations')}
+                                                </p>
+                                                <div className="space-y-1">
+                                                    {teachesAt.map((location) => (
+                                                        <div key={location.id} className="text-sm font-medium">
+                                                            {location.location_name}
+                                                            <Badge variant="outline" className="text-xs ms-2">
+                                                                {location.location_type}
+                                                            </Badge>
+                                                        </div>
                                                     ))}
                                                 </div>
                                             </div>
@@ -338,6 +424,158 @@ export default function UserDetailPage() {
                                         </div>
                                     ))}
                                 </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Students Card */}
+                    {students.length > 0 && (
+                        <Card className="shadow-sm" data-testid="user-detail-students-card">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <GraduationCap className="h-5 w-5 text-primary" />
+                                    {t('details.students', 'Students')}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-0 space-y-0">
+                                {students.map((student) => (
+                                    <div key={student.id} className="py-2">
+                                        <div className="flex items-start gap-3">
+                                            <User className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium truncate">{student.name}</p>
+                                                <div className="flex flex-wrap gap-2 mt-1">
+                                                    {student.levels && (
+                                                        <Badge variant="outline" className="text-xs">
+                                                            {student.levels.title}
+                                                        </Badge>
+                                                    )}
+                                                    {student.government && (
+                                                        <Badge variant="secondary" className="text-xs">
+                                                            {student.government.title}
+                                                        </Badge>
+                                                    )}
+                                                    {student.zones && (
+                                                        <Badge variant="secondary" className="text-xs">
+                                                            {student.zones.title}
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {student !== students[students.length - 1] && (
+                                            <Separator className="my-2 opacity-50" />
+                                        )}
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Lecturers Card */}
+                    {lecturers.length > 0 && (
+                        <Card className="shadow-sm" data-testid="user-detail-lecturers-card">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <BookOpen className="h-5 w-5 text-primary" />
+                                    {t('details.lecturers', 'Lecturers')}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-0 space-y-0">
+                                {lecturers.map((lecturer) => (
+                                    <div key={lecturer.id} className="py-2">
+                                        <div className="flex items-start gap-3">
+                                            <BookOpen className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium truncate">{lecturer.name}</p>
+                                                {lecturer.bio && (
+                                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                                        {lecturer.bio}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {lecturer !== lecturers[lecturers.length - 1] && (
+                                            <Separator className="my-2 opacity-50" />
+                                        )}
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Assistants Card */}
+                    {assistants.length > 0 && (
+                        <Card className="shadow-sm" data-testid="user-detail-assistants-card">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <UserPlus className="h-5 w-5 text-primary" />
+                                    {t('details.assistants', 'Assistants')}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-0 space-y-0">
+                                {assistants.map((assistant) => (
+                                    <div key={assistant.id} className="py-2">
+                                        <div className="flex items-start gap-3">
+                                            <UserPlus className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium truncate">{assistant.name}</p>
+                                                {assistant.lecturers && assistant.lecturers.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1 mt-1">
+                                                        <span className="text-xs text-muted-foreground">{t('details.assists', 'Assists')}:</span>
+                                                        {assistant.lecturers.map((lecturer) => (
+                                                            <Badge key={lecturer.id} variant="outline" className="text-xs">
+                                                                {lecturer.name}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {assistant !== assistants[assistants.length - 1] && (
+                                            <Separator className="my-2 opacity-50" />
+                                        )}
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Parents Card */}
+                    {parents.length > 0 && (
+                        <Card className="shadow-sm" data-testid="user-detail-parents-card">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <Users className="h-5 w-5 text-primary" />
+                                    {t('details.parents', 'Parents')}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-0 space-y-0">
+                                {parents.map((parent) => (
+                                    <div key={parent.id} className="py-2">
+                                        <div className="flex items-start gap-3">
+                                            <Users className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium truncate">{parent.name}</p>
+                                                <div className="flex flex-wrap gap-2 mt-1">
+                                                    {parent.government && (
+                                                        <Badge variant="secondary" className="text-xs">
+                                                            {parent.government.title}
+                                                        </Badge>
+                                                    )}
+                                                    {parent.zones && (
+                                                        <Badge variant="secondary" className="text-xs">
+                                                            {parent.zones.title}
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {parent !== parents[parents.length - 1] && (
+                                            <Separator className="my-2 opacity-50" />
+                                        )}
+                                    </div>
+                                ))}
                             </CardContent>
                         </Card>
                     )}

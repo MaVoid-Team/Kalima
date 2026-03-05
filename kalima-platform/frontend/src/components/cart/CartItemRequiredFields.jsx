@@ -4,6 +4,7 @@ import { Trash, ImageOff, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PhoneInput, egyptPhoneSchema } from '@/components/ui/phone-input';
 import {
     Accordion,
     AccordionItem,
@@ -19,13 +20,126 @@ export default function CartItemRequiredFields({
     onOpenChange
 }) {
     const { t } = useTranslation('cart');
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(!item?.required_fields_filled);
     const [fieldValues, setFieldValues] = useState({});
     const [imageFields, setImageFields] = useState({});
     const [originalImages, setOriginalImages] = useState({});
     const [fileErrors, setFileErrors] = useState({});
     const [brokenPreviews, setBrokenPreviews] = useState({});
     const [errorShakeTick, setErrorShakeTick] = useState(0);
+
+    const [isDirty, setIsDirty] = useState(false);
+    const [missingFields, setMissingFields] = useState([]);
+    const [highlightSave, setHighlightSave] = useState(false);
+    const [highlightedFields, setHighlightedFields] = useState({});
+
+    // Track if any field differs from what's saved
+    useEffect(() => {
+        let dirty = false;
+        if (item && item.cart_item_required_fields) {
+            item.cart_item_required_fields.forEach(rf => {
+                if (rf.required_field_definitions.field_type === 'image') {
+                    if (imageFields[rf.field_definition_id] instanceof File) {
+                        dirty = true;
+                    }
+                } else {
+                    let currentVal = fieldValues[rf.field_definition_id];
+                    if (typeof currentVal === 'string' && (currentVal === '+' || currentVal === '+2' || currentVal === '+20')) {
+                        currentVal = '';
+                    }
+                    const savedVal = rf.value || '';
+                    if (currentVal !== undefined && currentVal !== savedVal) {
+                        dirty = true;
+                    }
+                }
+            });
+        }
+        setIsDirty(dirty);
+    }, [fieldValues, imageFields, item]);
+
+    // Track missing fields
+    useEffect(() => {
+        let missing = [];
+        if (item && item.cart_item_required_fields) {
+            item.cart_item_required_fields.forEach(rf => {
+                if (!rf.is_required) return;
+
+                if (rf.required_field_definitions.field_type === 'image') {
+                    const hasSaved = !!originalImages[rf.field_definition_id];
+                    const hasNewFile = imageFields[rf.field_definition_id] instanceof File;
+                    if (!hasSaved && !hasNewFile) {
+                        missing.push(rf.field_definition_id);
+                    }
+                } else if (rf.required_field_definitions.field_type === 'number') {
+                    const val = fieldValues[rf.field_definition_id];
+                    if (!val || String(val).trim() === '') {
+                        missing.push(rf.field_definition_id);
+                    } else {
+                        const parsed = egyptPhoneSchema.safeParse(val || "");
+                        if (!parsed.success) {
+                            missing.push(rf.field_definition_id);
+                        }
+                    }
+                } else {
+                    const val = fieldValues[rf.field_definition_id];
+                    if (val === undefined || val === null || String(val).trim() === '') {
+                        missing.push(rf.field_definition_id);
+                    }
+                }
+            });
+        }
+        setMissingFields(missing);
+    }, [fieldValues, imageFields, item, originalImages]);
+
+    // Dispatch global event so summary knows we have unsaved/missing fields
+    useEffect(() => {
+        if (!item?.id) return;
+        const details = { itemId: item.id, isDirty, missingFields };
+        const event = new CustomEvent('cart-item-client-state', {
+            detail: details
+        });
+        window.dispatchEvent(event);
+
+        const handleRequest = () => {
+            window.dispatchEvent(new CustomEvent('cart-item-client-state', {
+                detail: details
+            }));
+        };
+        window.addEventListener('request-cart-item-client-state', handleRequest);
+        return () => {
+            window.removeEventListener('request-cart-item-client-state', handleRequest);
+            window.dispatchEvent(new CustomEvent('cart-item-client-state', {
+                detail: { itemId: item.id, isDirty: false, missingFields: [] }
+            }));
+        };
+    }, [isDirty, missingFields, item?.id]);
+
+    // Listen for highlight signal from checkout button
+    useEffect(() => {
+        const handleMissing = () => {
+            if (missingFields.length > 0) {
+                setIsOpen(true);
+                const h = {};
+                missingFields.forEach(id => h[id] = true);
+                setHighlightedFields(h);
+                setTimeout(() => setHighlightedFields({}), 2000);
+            }
+        };
+        window.addEventListener('highlight-missing-fields', handleMissing);
+        return () => window.removeEventListener('highlight-missing-fields', handleMissing);
+    }, [missingFields]);
+
+    useEffect(() => {
+        const handleUnsaved = () => {
+            if (isDirty && missingFields.length === 0) {
+                setIsOpen(true);
+                setHighlightSave(true);
+                setTimeout(() => setHighlightSave(false), 2000);
+            }
+        };
+        window.addEventListener('highlight-unsaved-save-buttons', handleUnsaved);
+        return () => window.removeEventListener('highlight-unsaved-save-buttons', handleUnsaved);
+    }, [isDirty, missingFields]);
 
     useEffect(() => {
         if (!item || !isOpen) return;
@@ -41,6 +155,8 @@ export default function CartItemRequiredFields({
                     origImgs[rf.field_definition_id] = serverUrl;
                 }
                 imgFields[rf.field_definition_id] = null;
+            } else if (rf.required_field_definitions.field_type === 'number') {
+                vals[rf.field_definition_id] = rf.value || '+20';
             } else {
                 vals[rf.field_definition_id] = rf.value || '';
             }
@@ -63,6 +179,17 @@ export default function CartItemRequiredFields({
             ) {
                 hasError = true;
                 errors[rf.field_definition_id] = t('pleaseSelectFile', 'Please select a file');
+            } else if (rf.required_field_definitions.field_type === 'number') {
+                const val = fieldValues[rf.field_definition_id];
+                const rawVal = String(val || "").trim();
+
+                if (rf.is_required || (rawVal !== '' && rawVal !== '+' && rawVal !== '+2' && rawVal !== '+20')) {
+                    const parsed = egyptPhoneSchema.safeParse(rawVal);
+                    if (!parsed.success) {
+                        hasError = true;
+                        errors[rf.field_definition_id] = t('invalidPhone', 'Invalid Egyptian mobile number');
+                    }
+                }
             }
         });
 
@@ -114,10 +241,16 @@ export default function CartItemRequiredFields({
             .filter(([id]) => {
                 return !(imageFields[id] instanceof File) && !activeImageFieldDefIds.includes(Number(id));
             })
-            .map(([id, value]) => ({
-                required_field_definition_id: Number(id),
-                value,
-            }));
+            .map(([id, value]) => {
+                let finalValue = value;
+                if (typeof finalValue === 'string' && (finalValue === '+' || finalValue === '+2' || finalValue === '+20')) {
+                    finalValue = '';
+                }
+                return {
+                    required_field_definition_id: Number(id),
+                    value: finalValue,
+                };
+            });
 
         try {
             if (data.length > 0) {
@@ -137,7 +270,7 @@ export default function CartItemRequiredFields({
             <Accordion
                 type="single"
                 collapsible
-                defaultValue="fields"
+                value={isOpen ? 'fields' : ''}
                 className="w-full mb-2 overflow-x-hidden"
                 onValueChange={val => {
                     const open = !!val;
@@ -162,7 +295,7 @@ export default function CartItemRequiredFields({
                                             <div className="flex items-center gap-2 min-w-0">
                                                 <label
                                                     htmlFor={`file-${item.id}-${rf.field_definition_id}`}
-                                                    className="cursor-pointer px-3 py-1 bg-accent text-accent-foreground rounded-sm text-sm"
+                                                    className={`cursor-pointer px-3 py-1 bg-accent text-accent-foreground rounded-sm text-sm transition-all duration-300 ${highlightedFields[rf.field_definition_id] ? 'ring-2 ring-destructive ring-offset-2 animate-pulse bg-destructive/20 text-destructive' : ''}`}
                                                     data-testid={`cart-item-fields-upload-${item.id}-${rf.field_definition_id}`}
                                                 >
                                                     {originalImages[rf.field_definition_id]
@@ -309,6 +442,39 @@ export default function CartItemRequiredFields({
                                                 })()
                                             }
                                         </>
+                                    ) : rf?.required_field_definitions?.field_type === 'number' ? (
+                                        <>
+                                            <PhoneInput
+                                                dir="ltr"
+                                                value={fieldValues[rf.field_definition_id] || '+20'}
+                                                required={rf?.is_required}
+                                                onChange={e => {
+                                                    const val = e.target.value;
+                                                    setFieldValues(prev => ({
+                                                        ...prev,
+                                                        [rf.field_definition_id]: val,
+                                                    }));
+                                                    setFileErrors(prev => {
+                                                        const copy = { ...prev };
+                                                        delete copy[rf.field_definition_id];
+                                                        return copy;
+                                                    });
+                                                }}
+                                                className={`input-sm outline-none transition-all duration-300 ${highlightedFields[rf.field_definition_id] ? 'ring-2 ring-destructive ring-offset-1 animate-pulse border-destructive bg-destructive/5' : ''}`}
+                                                data-testid={`cart-item-fields-input-${item.id}-${rf.field_definition_id}`}
+                                            />
+                                            {fileErrors[rf.field_definition_id] && (
+                                                <motion.p
+                                                    key={`error-text-${rf.field_definition_id}-${errorShakeTick}`}
+                                                    initial={{ x: 0 }}
+                                                    animate={{ x: [0, -7, 7, -5, 5, -3, 3, 0] }}
+                                                    transition={{ duration: 0.35 }}
+                                                    className="text-destructive text-xs mt-1"
+                                                >
+                                                    {fileErrors[rf.field_definition_id]}
+                                                </motion.p>
+                                            )}
+                                        </>
                                     ) : (
                                         <Input
                                             type={rf?.required_field_definitions?.field_type}
@@ -321,7 +487,7 @@ export default function CartItemRequiredFields({
                                                     [rf.field_definition_id]: val,
                                                 }));
                                             }}
-                                            className="input-sm"
+                                            className={`input-sm transition-all duration-300 ${highlightedFields[rf.field_definition_id] ? 'ring-2 ring-destructive ring-offset-1 animate-pulse border-destructive bg-destructive/5' : ''}`}
                                             data-testid={`cart-item-fields-input-${item.id}-${rf.field_definition_id}`}
                                         />
                                     )}
@@ -330,7 +496,7 @@ export default function CartItemRequiredFields({
                             <Button
                                 size="sm"
                                 type="submit"
-                                className="w-fit self-end"
+                                className={`w-fit self-end m-1 transition-all duration-300 ${highlightSave ? 'scale-105 ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/90' : ''}`}
                                 data-testid={`cart-item-fields-save-${item.id}`}
                             >
                                 {t('save', 'Save')}

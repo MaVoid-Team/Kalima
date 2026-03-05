@@ -76,7 +76,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5 hidden lg:block"
-            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            title={isCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
             data-testid="admin-sidebar-mobile-toggle-button"
           >
             {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
@@ -86,7 +86,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
           <button
             className="lg:hidden text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5"
             onClick={() => setIsMobileOpen(false)}
-            title="Close Sidebar"
+            title={t('nav.closeSidebar')}
             data-testid="admin-sidebar-mobile-close-button"
           >
             <X size={20} />

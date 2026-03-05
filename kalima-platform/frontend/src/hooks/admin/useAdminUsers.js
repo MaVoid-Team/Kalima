@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import useApiMutation from '../useApiMutation';
+import { toast } from 'sonner';
+import i18n from '@/i18n';
 
 export const useAdminUsers = () => {
     const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
@@ -15,7 +17,8 @@ export const useAdminUsers = () => {
     const [filters, setFilters] = useState({
         search: '',
         role: '',
-        portal: ''
+        portal: '',
+        isDeleted: 'all'
     });
 
     // Detail State
@@ -36,6 +39,7 @@ export const useAdminUsers = () => {
         if (filters.search) query.append('search', filters.search);
         if (filters.role && filters.role !== 'all') query.append('role', filters.role);
         if (filters.portal && filters.portal !== 'all') query.append('portal', filters.portal);
+        if (filters.isDeleted && filters.isDeleted !== 'all') query.append('isDeleted', filters.isDeleted);
 
         return query.toString();
     }, [pagination.page, pagination.limit, filters]);
@@ -156,6 +160,9 @@ export const useAdminUsers = () => {
             endpoint: '/auth/admin/create-admin',
             method: 'post',
             data: userData
+        }, false).then(res => {
+            if (res?.success) toast.success(i18n.t('userManagement:messages.adminCreated'));
+            return res;
         }));
 
     const createSubAdminUser = (userData) =>
@@ -163,6 +170,9 @@ export const useAdminUsers = () => {
             endpoint: '/auth/admin/create-subadmin',
             method: 'post',
             data: userData
+        }, false).then(res => {
+            if (res?.success) toast.success(i18n.t('userManagement:messages.subAdminCreated'));
+            return res;
         }));
 
     const createModeratorUser = (userData) =>
@@ -170,6 +180,9 @@ export const useAdminUsers = () => {
             endpoint: '/auth/admin/create-moderator',
             method: 'post',
             data: userData
+        }, false).then(res => {
+            if (res?.success) toast.success(i18n.t('userManagement:messages.moderatorCreated'));
+            return res;
         }));
 
     const createAssistantUser = (userData) =>
@@ -177,6 +190,25 @@ export const useAdminUsers = () => {
             endpoint: '/auth/admin/create-assistant',
             method: 'post',
             data: userData
+        }, false).then(res => {
+            if (res?.success) toast.success(i18n.t('userManagement:messages.assistantCreated'));
+            return res;
+        }));
+
+    const createTeacherUser = (userData) =>
+        handleAction(() => fetchApi({
+            endpoint: '/admin/teachers',
+            method: 'post',
+            data: userData
+        }, false).then(res => {
+            if (res?.success) toast.success(i18n.t('userManagement:messages.teacherCreated'));
+            return res;
+        }));
+
+    const deleteUser = (userId) =>
+        handleAction(() => fetchApi({
+            endpoint: `/admin/users/${userId}`,
+            method: 'delete'
         }));
 
     // Setters
@@ -192,6 +224,11 @@ export const useAdminUsers = () => {
 
     const setPortal = useCallback((portal) => {
         setFilters((prev) => ({ ...prev, portal }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    }, []);
+
+    const setIsDeleted = useCallback((isDeleted) => {
+        setFilters((prev) => ({ ...prev, isDeleted }));
         setPagination((prev) => ({ ...prev, page: 1 }));
     }, []);
 
@@ -222,11 +259,14 @@ export const useAdminUsers = () => {
         createSubAdminUser,
         createModeratorUser,
         createAssistantUser,
+        createTeacherUser,
+        deleteUser,
 
         // Setters
         setSearch,
         setRole,
         setPortal,
+        setIsDeleted,
         setPage
     };
 };

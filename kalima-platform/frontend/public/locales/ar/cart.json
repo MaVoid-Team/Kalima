@@ -1,6 +1,8 @@
 {
   "title": "عربة التسوق الخاصة بك",
-  "L.E": "ج.م",
+  "L": {
+    "E": "ج.م"
+  },
   "continueShopping": "مواصلة التسوق",
   "goShopping": "اذهب للتسوق",
   "hideRequiredFields": "إخفاء الخانات المطلوبة",
@@ -16,11 +18,19 @@
   "checkoutSuccess": "تم الدفع بنجاح",
   "itemAddedToCart": "تم إضافة العنصر إلى العربة",
   "cartCleared": "تم تفريغ السلة بنجاح",
+  "clearCartSuccess": "تم تفريغ السلة بنجاح",
+  "clearCartFailed": "فشل تفريغ السلة. يرجى المحاولة مرة أخرى.",
+  "clearingCart": "جاري التفريغ...",
   "requiredFieldsUpdated": "تم تحديث الخانات المطلوبة",
   "itemsInCart": "لديك {{count}} عنصر في سلة التسوق جاهز للدفع.",
   "orderSummary": "ملخص الطلب",
   "fillRequiredFields": "يرجى ملء جميع الخانات المطلوبة لعناصر السلة قبل المتابعة إلى الدفع.",
   "fillRequiredFieldsHint": "يمكنك القيام بذلك عن طريق النقر على 'عرض المزيد' الأحمر لكل عنصر وملء الخانات المطلوبة.",
+  "fillRequiredFields_Client_Missing": "يرجى ملء الخانات المطلوبة المظللة أولاً.",
+  "fillRequiredFieldsHint_Client_Missing": "قم بتوسيع تفاصيل العنصر لملء وحفظ الخانات المطلوبة قبل المتابعة.",
+  "saveRequiredFieldsFirst": "يرجى حفظ الخانات المطلوبة أولاً.",
+  "saveRequiredFieldsFirstHint": "لديك تغييرات غير محفوظة في عناصر السلة. أزرار الحفظ المظللة تظهر التغييرات المعلقة.",
+  "invalidPhone": "رقم هاتف محمول مصري غير صالح",
   "subtotal": "المجموع الفرعي",
   "shippingEstimate": "تقدير الشحن",
   "taxEstimate": "تقدير الضريبة",
@@ -117,5 +127,8 @@
       "descriptionEn": "Stainless Steel • 12 Piece Kit",
       "descriptionAr": "مكونات من الفولاذ المقاوم للصدأ • 12 قطعة"
     }
+  },
+  "validation": {
+    "invalidEgyptPhone": "رقم هاتف مصري غير صالح. يجب أن يبدأ بـ +20 متبوعًا بـ 10 أرقام."
   }
 }

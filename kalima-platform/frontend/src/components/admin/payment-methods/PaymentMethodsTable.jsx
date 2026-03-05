@@ -31,7 +31,7 @@ export default function PaymentMethodsTable({
     onSelect,
     onSelectAll,
 }) {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
 
     const isAllSelected = paymentMethods.length > 0 && selectedIds.length === paymentMethods.length;
     const isIndeterminate = selectedIds.length > 0 && selectedIds.length < paymentMethods.length;
@@ -63,6 +63,7 @@ export default function PaymentMethodsTable({
                     <TableRow>
                         <TableHead className="w-12">
                             <Checkbox
+                                className={`${i18n.language=='ar'? 'scale-x-[-1]': ''}`}
                                 checked={isAllSelected}
                                 data-testid="payment-methods-select-all"
                                 onCheckedChange={(checked) => onSelectAll(checked)}
@@ -89,6 +90,7 @@ export default function PaymentMethodsTable({
                         <TableRow key={paymentMethod.id}>
                             <TableCell>
                                 <Checkbox
+                                    className={`${i18n.language=='ar'? 'scale-x-[-1]': ''}`}
                                     checked={selectedIds.includes(paymentMethod.id)}
                                     onCheckedChange={(checked) => onSelect(paymentMethod.id, checked)}
                                     data-testid={`payment-method-select-${paymentMethod.id}`}
@@ -147,7 +149,7 @@ export default function PaymentMethodsTable({
                                 </div>
                             </TableCell>
                             <TableCell>
-                                <DropdownMenu>
+                                <DropdownMenu dir={i18n.dir()}>
                                     <DropdownMenuTrigger asChild>
                                         <Button
                                             variant="ghost"

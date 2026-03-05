@@ -133,7 +133,7 @@ export default function EditPaymentMethodDialog({ open, onOpenChange, paymentMet
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-md" data-testid="edit-payment-method-dialog">
+            <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto custom-scrollbar" data-testid="edit-payment-method-dialog">
                 <DialogHeader>
                     <DialogTitle>{t('paymentMethods.edit.title', 'Edit Payment Method')}</DialogTitle>
                     <DialogDescription>
@@ -244,9 +244,9 @@ export default function EditPaymentMethodDialog({ open, onOpenChange, paymentMet
                                                                     className="h-16 w-16 rounded-md object-cover border"
                                                                 />
                                                                 <div className="space-y-1">
-                                                                    <p className="text-sm font-medium">{t('paymentMethods.currentImage', 'Current Image')}</p>
+                                                                    <p className="text-sm font-medium">{t('paymentMethods.fields.currentImage', 'Current Image')}</p>
                                                                     <Badge variant="secondary" className="text-xs">
-                                                                        {t('paymentMethods.unchanged', 'Unchanged')}
+                                                                        {t('paymentMethods.fields.unchanged', 'Unchanged')}
                                                                     </Badge>
                                                                 </div>
                                                             </div>
@@ -259,7 +259,7 @@ export default function EditPaymentMethodDialog({ open, onOpenChange, paymentMet
                                                         {field.value && (
                                                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                                 <Badge variant="outline" className="text-xs">
-                                                                    {t('paymentMethods.newImage', 'New Image')}
+                                                                    {t('paymentMethods.fields.newImage', 'New Image')}
                                                                 </Badge>
                                                                 <span>{field.value.name}</span>
                                                             </div>

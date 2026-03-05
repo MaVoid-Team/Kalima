@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer';
+import path from 'path';
+import fs from 'fs';
 import type { Transporter } from 'nodemailer';
 import {
   getVerificationEmailHtml,
@@ -105,12 +107,38 @@ export class EmailService {
    */
   async sendEmail(options: SendEmailOptions): Promise<boolean> {
     try {
+      const logoCandidates = [
+        path.resolve(__dirname, 'figs', 'kalima.jpg'),
+        path.resolve(process.cwd(), 'src', 'apps', 'store-api', 'emails', 'figs', 'kalima.jpg'),
+      ];
+      const logoPath = logoCandidates.find((candidate) =>
+        fs.existsSync(candidate),
+      );
+      const attachments = [] as Array<{
+        filename: string;
+        path: string;
+        cid: string;
+      }>;
+
+      if (logoPath && fs.existsSync(logoPath)) {
+        attachments.push({
+          filename: 'kalima.jpg',
+          path: logoPath,
+          cid: 'kalima-logo',
+        });
+      } else {
+        console.warn(
+          `Email logo not found at ${logoCandidates.join(' | ')}. Sending without logo.`,
+        );
+      }
+
       await this.transporter.sendMail({
         from: this.fromAddress,
         to: options.to,
         subject: options.subject,
         html: options.html,
         text: options.text,
+        attachments,
       });
       return true;
     } catch (error) {

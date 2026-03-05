@@ -11,9 +11,17 @@
     "export": "تصدير",
     "exportCsv": "تصدير كملف CSV",
     "exportXlsx": "تصدير كملف Excel",
+    "exporting": "جاري التصدير...",
+    "processing": "جاري تجهيز البيانات...",
+    "export.exporting": "جاري التصدير...",
+    "export.processing": "جاري تجهيز البيانات...",
     "filters": {
         "allRoles": "جميع الأدوار",
-        "allPortals": "جميع البوابات"
+        "allPortals": "جميع البوابات",
+        "allStatuses": "جميع الحالات",
+        "allAccounts": "جميع الحسابات",
+        "activeAccounts": "نشط",
+        "deletedAccounts": "محذوف"
     },
     "table": {
         "name": "الاسم",
@@ -23,11 +31,13 @@
         "status": "مفعل",
         "joined": "تاريخ الانضمام",
         "actions": "إجراءات",
-        "noUsersFound": "لا توجد مستخدمين مطابقين لمعايير البحث."
+        "noUsersFound": "لا توجد مستخدمين مطابقين لمعايير البحث.",
+        "selectAll": "تحديد جميع المستخدمين"
     },
     "status": {
         "verified": "حساب موثق",
-        "pending": "قيد الانتظار"
+        "pending": "قيد الانتظار",
+        "deleted": "محذوف"
     },
     "actions": {
         "view": "عرض الملف",
@@ -41,7 +51,9 @@
         "makeSubAdmin": "إضافة نائب مدير",
         "makeModerator": "إضافة مشرف",
         "makeAssistant": "إضافة مساعد",
-        "revokeRole": "إلغاء دور"
+        "revokeRole": "إلغاء دور",
+        "delete": "حذف",
+        "cancel": "إلغاء"
     },
     "details": {
         "title": "ملف المستخدم",
@@ -70,7 +82,15 @@
         "preparatory": "إعدادي",
         "secondary": "ثانوي",
         "usersCreated": "المستخدمون المنشئون",
-        "currency": "جنيه"
+        "students": "الطلاب",
+        "lecturers": "المحاضرون",
+        "assistants": "المساعدون",
+        "parents": "أولياء الأمور",
+        "assists": "يساعد",
+        "teachingLocations": "أماكن التدريس",
+        "currency": "جنيه",
+        "confirmDeleteTitle": "هل أنت متأكد؟",
+        "confirmDeleteDesc": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف حساب المستخدم بشكل نهائي."
     },
     "roles": {
         "Admin": "مدير",
@@ -90,6 +110,11 @@
         "roleAssigned": "تم تعيين الدور بنجاح",
         "roleRevoked": "تم إلغاء الدور بنجاح",
         "userCreated": "تم إنشاء المستخدم بنجاح",
+        "adminCreated": "تم إنشاء المدير بنجاح",
+        "subAdminCreated": "تم إنشاء نائب المدير بنجاح",
+        "moderatorCreated": "تم إنشاء المشرف بنجاح",
+        "assistantCreated": "تم إنشاء المساعد بنجاح",
+        "teacherCreated": "تم إنشاء المعلم بنجاح",
         "revokeConfirm": "هل أنت متأكد من إلغاء هذا الدور؟",
         "noRoles": "لا توجد أدوار معينة للمستخدم."
     },
@@ -104,12 +129,24 @@
         "secondaryPhone": "رقم هاتف إضافي (اختياري)",
         "gender": "الجنس",
         "male": "ذكر",
-        "female": "أنثى"
+        "female": "أنثى",
+        "teacherFields": "بيانات المعلم",
+        "government": "المحافظة",
+        "selectGovernment": "اختر المحافظة",
+        "zone": "الإدارة",
+        "selectZone": "اختر الإدارة",
+        "subject": "المادة",
+        "selectSubject": "اختر المادة",
+        "teachingLevels": "المراحل الدراسية",
+        "primary": "ابتدائي",
+        "preparatory": "إعدادي",
+        "secondary": "ثانوي"
     },
     "stats": {
         "totalUsers": "إجمالي المستخدمين",
         "verifiedUsers": "المستخدمون الموثقون",
         "teachers": "المعلمون",
-        "admins": "المديرون"
+        "admins": "المديرون",
+        "moderators": "المشرفون"
     }
 }

@@ -119,7 +119,7 @@ export default function EditRequiredFieldDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('requiredFields.fields.fieldType')}</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  <Select dir={i18n.dir()} onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger data-testid="requiredFields-edit-fieldType-select">
                         <SelectValue placeholder={t('requiredFields.edit.fieldTypePlaceholder')} />

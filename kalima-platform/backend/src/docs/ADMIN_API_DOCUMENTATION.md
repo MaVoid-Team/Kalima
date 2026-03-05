@@ -51,6 +51,70 @@ authenticateToken → requireRole([Admin, SubAdmin]) → controller
 
 ## User Management
 
+### Create Specific Users
+
+Admin and SubAdmin can directly create specific types of users (Teachers, Students, Parents, and Lecturers) using dedicated endpoints. This encapsulates the role-specific data required for each user type.
+
+**Endpoints:**
+
+- `POST /teachers`
+- `POST /students`
+- `POST /parents`
+- `POST /lecturers`
+
+**Auth Required:** Yes (Admin / SubAdmin)
+
+**Common Request Body Fields:**
+All 4 endpoints require the following base fields:
+
+- `name` (string, required)
+- `email` (string, required, valid email)
+- `password` (string, required, min 8 chars)
+- `phone` (string, required)
+- `secondary_phone` (string, optional)
+- `gender` (string, required, enum: `male` | `female`)
+
+**Role-Specific Request Body Fields:**
+
+- **Teacher** (`POST /teachers`):
+  - `is_primary` (boolean, required)
+  - `is_preparatory` (boolean, required)
+  - `is_secondary` (boolean, required)
+  - `government_id` (number, required)
+  - `zone_id` (number, required)
+  - `subject_id` (number, required)
+- **Student** (`POST /students`):
+  - `level_id` (number, required)
+  - `government_id` (number, required)
+  - `zone_id` (number, required)
+  - `parent_phone_number` (string, required)
+  - `faction` (string, optional)
+- **Parent** (`POST /parents`):
+  - (No extra fields required)
+- **Lecturer** (`POST /lecturers`):
+  - `bio` (string, optional)
+  - `expertise` (string, optional)
+
+**Success Response:** `201 Created`
+
+```json
+{
+  "success": true,
+  "message": "<Role> created successfully",
+  "data": {
+    "id": 1,
+    "name": "Ahmed Hassan",
+    "email": "ahmed@example.com",
+    "phone": "01012345678",
+    "gender": "male",
+    "is_email_verified": true,
+    "created_at": "2026-03-05T10:30:00.000Z"
+  }
+}
+```
+
+---
+
 ### List Users
 
 Search and paginate through all users. Supports filtering by role, portal, and text search.
@@ -170,7 +234,7 @@ Retrieve a single user with all their roles and profile data.
 
 ### Delete User
 
-Permanently deletes a user account. Admin/SubAdmin cannot delete their own account via this endpoint.
+Permanently deletes a user account (performs a **soft-delete** and anonymization of personal details in the database to retain order history). Admin/SubAdmin cannot delete their own account via this endpoint.
 
 **Endpoint:** `DELETE /users/:userId`  
 **Auth Required:** Yes (Admin / SubAdmin)

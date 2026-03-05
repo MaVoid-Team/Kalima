@@ -17,6 +17,10 @@ import {
   CreateSubAdminDto,
   CreateModeratorDto,
   CreateAssistantDto,
+  CreateTeacherDto,
+  CreateStudentDto,
+  CreateParentDto,
+  CreateLecturerDto,
 } from "../dtos/admin.dto";
 import {
   BaseUserData,
@@ -98,6 +102,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Teacher,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           auth_identities: {
             create: {
@@ -161,6 +166,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Student,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           auth_identities: {
             create: {
@@ -216,6 +222,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Parent,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           auth_identities: {
             create: {
@@ -265,6 +272,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Lecturer,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           auth_identities: {
             create: {
@@ -720,6 +728,46 @@ class UserManagementService {
     return this.mapToBaseUserData(user);
   }
 
+  async createTeacherAsAdmin(
+    input: CreateTeacherDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createTeacher(input, creator);
+    return this.mapToBaseUserData(user);
+  }
+
+  async createStudentAsAdmin(
+    input: CreateStudentDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createStudent(input, creator);
+    return this.mapToBaseUserData(user);
+  }
+
+  async createParentAsAdmin(
+    input: CreateParentDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createParent(input, creator);
+    return this.mapToBaseUserData(user);
+  }
+
+  async createLecturerAsAdmin(
+    input: CreateLecturerDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createLecturer(input, creator);
+    return this.mapToBaseUserData(user);
+  }
+
   // ============================================
   // USER LOOKUP METHODS
   // ============================================
@@ -973,6 +1021,8 @@ class UserManagementService {
         password: null,
         // we leave 'name' and relations intact for order history
         updated_at: new Date(),
+        deleted_at: new Date(),
+        is_deleted: true,
       },
     });
 
@@ -993,6 +1043,7 @@ class UserManagementService {
       search?: string;
       role?: role_enum;
       portal?: portal_enum;
+      isDeleted?: boolean;
     } = {},
   ) {
     const page = Math.max(1, options.page ?? 1);
@@ -1000,6 +1051,10 @@ class UserManagementService {
     const skip = (page - 1) * limit;
 
     const where: any = {};
+
+    if (options.isDeleted !== undefined) {
+      where.is_deleted = options.isDeleted;
+    }
 
     // Text search on name, email, phone
     if (options.search) {
@@ -1028,6 +1083,7 @@ class UserManagementService {
         orderBy: { created_at: "desc" },
         select: {
           ...this.baseUserSelect(),
+          is_deleted: true,
           role: true,
           confirmed: true,
           user_roles: {
@@ -1059,6 +1115,7 @@ class UserManagementService {
       select: {
         ...this.baseUserSelect(),
         role: true,
+        is_deleted: true,
         confirmed: true,
         user_roles: {
           select: {
@@ -1067,11 +1124,15 @@ class UserManagementService {
             role: true,
           },
         },
-        teachers: { select: { serial: true, subject_id: true } },
-        students: { select: { level_id: true } },
+        teachers: {
+          include: { subjects: true, government: true, zones: true },
+        },
+        teaches_at: true,
+        students: { include: { levels: true, government: true, zones: true } },
         lecturers: { select: { bio: true } },
-        assistants: { select: { lecturer_user_id: true } },
-        parents: { select: { government_id: true } },
+        assistants: { include: { lecturers: true } },
+        parents: { include: { government: true, zones: true } },
+        deleted_at: true,
         user_analytics: true,
       },
     });

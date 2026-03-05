@@ -84,7 +84,7 @@ export function useFastBuy({ checkout = false } = {}) {
 
       const previewData = previewRes?.data?.data ?? {};
       const cartData = cartRes?.data?.data ?? {};
-      const paymentMethodsData = paymentMethodsRes?.data?.data ?? [];
+      const paymentMethodsData = paymentMethodsRes?.data?.data?.data ?? [];
 
       setPreview({
         ...previewData,
@@ -240,7 +240,7 @@ export function useFastBuy({ checkout = false } = {}) {
       });
 
       toast.success(t("fastBuy.checkoutSuccess", "Checkout successful! Redirecting to market..."));
-      navigate("/market", { replace: true, state: { skipFastBuyClear: true } });
+      navigate("/orders", { replace: true, state: { skipFastBuyClear: true } });
     } catch {
       // Global error handler will trigger toasts
     }

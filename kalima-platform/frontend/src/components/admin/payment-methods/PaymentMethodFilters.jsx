@@ -18,7 +18,7 @@ export default function PaymentMethodFilters({
     onBulkActivate,
     onBulkDeactivate,
 }) {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
 
     return (
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -36,7 +36,7 @@ export default function PaymentMethodFilters({
                 </div>
 
                 {/* Status Filter */}
-                <Select
+                <Select dir={i18n.dir()}
                     value={filters.status === null ? 'all' : filters.status.toString()}
                     onValueChange={(value) => {
                         if (value === 'all') {
@@ -68,7 +68,7 @@ export default function PaymentMethodFilters({
             {selectedCount > 0 && (
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
-                        {t('paymentMethods.selectedCount', '{count} selected', { count: selectedCount })}
+                        {t('paymentMethods.selectedCount', '{{count}} selected', { count: selectedCount })}
                     </span>
                     <Button
                         variant="outline"

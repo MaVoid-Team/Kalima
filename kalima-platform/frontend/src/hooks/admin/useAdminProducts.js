@@ -64,7 +64,11 @@ export const useAdminProducts = () => {
             });
 
             if (data?.success) {
-                setProducts(data.data ?? []);
+                setProducts(data.data?.map(product => ({
+                    ...product,
+                    rate: product.averageRating || 0,
+                    rate_count: product.reviewCount || 0
+                })) ?? []);
                 setPagination(prev => ({
                     ...prev,
                     total: data.total ?? prev.total,
@@ -146,15 +150,21 @@ export const useAdminProducts = () => {
 
     // ─── Thumbnail ────────────────────────────────────────────────────────────
 
-    const uploadThumbnail = (productId, formData) =>
-        handleAction(() => fetchApi({
+    const uploadThumbnail = (productId, formData, onUploadProgress, signal) => {
+        setActionLoading(true);
+        return fetchApi({
             endpoint: `/products/${productId}/thumbnail`,
             method: 'post',
             data: formData,
+            onUploadProgress,
+            signal,
         }).then(res => {
             if (res?.success) setSelectedProduct(res.data);
             return res;
-        }));
+        }).finally(() => {
+            setActionLoading(false);
+        });
+    };
 
     const removeThumbnail = (productId) =>
         handleAction(() => fetchApi({
@@ -167,16 +177,22 @@ export const useAdminProducts = () => {
 
     // ─── Gallery ──────────────────────────────────────────────────────────────
 
-    const addGalleryImages = (productId, formData) =>
-        handleAction(() => fetchApi({
+    const addGalleryImages = (productId, formData, onUploadProgress, signal) => {
+        setActionLoading(true);
+        return fetchApi({
             endpoint: `/products/${productId}/gallery`,
             method: 'post',
             data: formData,
+            onUploadProgress,
+            signal,
         }).then(res => {
             // Refresh product to get updated gallery
             if (res?.success) fetchProductById(productId);
             return res;
-        }));
+        }).finally(() => {
+            setActionLoading(false);
+        });
+    };
 
     const updateGalleryEntry = (productId, galleryId, data) =>
         handleAction(() => fetchApi({
@@ -228,24 +244,34 @@ export const useAdminProducts = () => {
             if (res?.success) return res.data ?? [];
             return res;
         })),
-    [handleAction, fetchApi]);
+        [handleAction, fetchApi]);
 
     // ─── Required Fields ─────────────────────────────────────────────────────
 
-    const attachRequiredFields = (productId, fields) =>
+    const attachRequiredFields = (productId, fields, showToast = true) =>
         handleAction(() => fetchApi({
             endpoint: `/products/${productId}/required-fields`,
             method: 'post',
             data: { fields },
-        }).then(res => {
+        }, showToast).then(res => {
             if (res?.success) fetchProductById(productId);
             return res;
         }));
 
-    const detachRequiredField = (productId, fieldDefinitionId) =>
+    const detachRequiredField = (productId, fieldDefinitionId, showToast = true) =>
         handleAction(() => fetchApi({
             endpoint: `/products/${productId}/required-fields/${fieldDefinitionId}`,
             method: 'delete',
+        }, showToast).then(res => {
+            if (res?.success) fetchProductById(productId);
+            return res;
+        }));
+
+    const toggleRequiredFieldIsRequired = (productId, requiredFieldId, isRequired) =>
+        handleAction(() => fetchApi({
+            endpoint: `/products/${productId}/required-fields/${requiredFieldId}`,
+            method: 'patch',
+            data: { is_required: Boolean(isRequired) },
         }).then(res => {
             if (res?.success) fetchProductById(productId);
             return res;
@@ -305,6 +331,36 @@ export const useAdminProducts = () => {
         setPagination(prev => ({ ...prev, page }));
     }, []);
 
+    // ─── Review Management ────────────────────────────────────────
+
+    const fetchProductReviews = useCallback(async (productId, page = 1, limit = 10) => {
+        try {
+            const query = new URLSearchParams({ page, limit });
+            const data = await fetchApi({
+                endpoint: `/products/${productId}/reviews?${query.toString()}`,
+                method: 'get'
+            });
+            return data;
+        } catch (error) {
+            console.error('Failed to fetch product reviews:', error);
+            throw error;
+        }
+    }, [fetchApi]);
+
+    const deleteReview = useCallback(async (productId, reviewId) => {
+        try {
+            const data = await fetchApi({
+                endpoint: `/products/${productId}/reviews/${reviewId}`,
+                method: 'delete',
+                defaultSuccessMessage: 'Review deleted successfully'
+            });
+            return data;
+        } catch (error) {
+            console.error('Failed to delete review:', error);
+            throw error;
+        }
+    }, [fetchApi]);
+
     // ─────────────────────────────────────────────────────────────────────────
 
     return {
@@ -346,11 +402,16 @@ export const useAdminProducts = () => {
         // Required Fields
         attachRequiredFields,
         detachRequiredField,
+        toggleRequiredFieldIsRequired,
 
         // Samples
         fetchAllSamples,
         updateProductSample,
         removeProductSample,
+
+        // Reviews
+        fetchProductReviews,
+        deleteReview,
 
         // Filter Setters
         setSearch,

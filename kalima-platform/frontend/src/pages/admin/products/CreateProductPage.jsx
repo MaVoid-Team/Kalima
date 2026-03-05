@@ -38,27 +38,6 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
-// ─── Validation Schema ────────────────────────────────────────────────────────
-
-const createProductSchema = z.object({
-    title: z.string().min(1, 'Title is required').max(255),
-    price: z.coerce.number().positive('Price must be greater than 0'),
-    type: z.enum(['Product', 'Book']),
-    description: z.string().optional(),
-    price_after_discount: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().positive().optional()
-    ),
-    serial: z.string().max(100).optional().or(z.literal('')),
-    coupon_id: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().int().positive().optional()
-    ),
-    perks: z.string().optional().or(z.literal('')),
-}).refine(
-    (data) => !data.price_after_discount || data.price_after_discount < data.price,
-    { message: 'Discounted price must be less than the original price', path: ['price_after_discount'] }
-);
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -66,6 +45,28 @@ export default function CreateProductPage() {
     const { t, i18n } = useTranslation('admin');
     const navigate = useNavigate();
     const isRtl = i18n.dir() === 'rtl';
+
+    // ─── Validation Schema ────────────────────────────────────────────────────────
+
+    const createProductSchema = z.object({
+        title: z.string().min(1, t('products.form.titleIsRequired')).max(255),
+        price: z.coerce.number().positive(t('products.form.priceMustBeGreaterThan0')),
+        type: z.enum(['Product', 'Book']),
+        description: z.string().optional(),
+        price_after_discount: z.preprocess(
+            (val) => (val === '' || val == null ? undefined : val),
+            z.coerce.number().positive().optional()
+        ),
+        serial: z.string().max(100).optional().or(z.literal('')),
+        coupon_id: z.preprocess(
+            (val) => (val === '' || val == null ? undefined : val),
+            z.coerce.number().int().positive().optional()
+        ),
+        perks: z.string().optional().or(z.literal('')),
+    }).refine(
+        (data) => !data.price_after_discount || data.price_after_discount < data.price,
+        { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
+    );
 
     const {
         createProduct,
@@ -206,8 +207,12 @@ export default function CreateProductPage() {
         if (!selectedFieldDefId) return;
         const def = fieldDefinitions.find(d => d.id === parseInt(selectedFieldDefId));
         if (!def || pickedFieldIds.has(def.id)) return;
-        setPickedFields(prev => [...prev, { id: def.id, label: def.label, field_type: def.field_type }]);
+        setPickedFields(prev => [...prev, { id: def.id, label: def.label, field_type: def.field_type, is_required: true }]);
         setSelectedFieldDefId('');
+    };
+
+    const handleToggleFieldRequired = (id, isRequired) => {
+        setPickedFields(prev => prev.map(f => f.id === id ? { ...f, is_required: isRequired } : f));
     };
 
     const handleRemoveField = (id) => {
@@ -306,7 +311,7 @@ export default function CreateProductPage() {
             if (pickedFields.length > 0 && newProductId) {
                 await attachRequiredFields(
                     newProductId,
-                    pickedFields.map(f => ({ field_definition_id: f.id, is_required: true }))
+                    pickedFields.map(f => ({ field_definition_id: f.id, is_required: f.is_required }))
                 );
             }
 
@@ -334,7 +339,7 @@ export default function CreateProductPage() {
     // ─── Render ───────────────────────────────────────────────────────────────
 
     return (
-        <div className="space-y-6" data-testid="create-product-page">
+        <div className="space-y-6 min-w-0 overflow-hidden" data-testid="create-product-page">
 
             {/* Breadcrumb / Back */}
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -358,7 +363,16 @@ export default function CreateProductPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="create-product-form">
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
+                            e.preventDefault();
+                        }
+                    }}
+                    className="space-y-6"
+                    data-testid="create-product-form"
+                >
 
                     {/* ── Section: Core Details ── */}
                     <div className="rounded-xl border border-border p-5 space-y-4">
@@ -502,6 +516,9 @@ export default function CreateProductPage() {
                                             {...field}
                                         />
                                     </FormControl>
+                                    <p className="text-[0.8rem] text-muted-foreground mt-1">
+                                        {t('products.form.perksTip')}
+                                    </p>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -617,25 +634,38 @@ export default function CreateProductPage() {
 
                         {/* Picked field tags */}
                         {pickedFields.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2 overflow-x-auto custom-scrollbar">
                                 {pickedFields.map((field) => (
-                                    <span
+                                    <div
                                         key={field.id}
-                                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
                                         data-testid={`create-product-required-field-tag-${field.id}`}
                                     >
-                                        {field.label}
+                                        <span className="font-medium">{field.label}</span>
                                         <span className="text-xs text-muted-foreground opacity-70">({field.field_type})</span>
+
+                                        <div className="flex items-center gap-1 border-s border-primary/30 ps-2 ms-1">
+                                            <span className="text-xs opacity-80">
+                                                {field.is_required ? t('products.detail.fieldRequired', 'Required') : t('products.detail.fieldOptional', 'Optional')}
+                                            </span>
+                                            <Switch
+                                                checked={field.is_required}
+                                                onCheckedChange={(checked) => handleToggleFieldRequired(field.id, checked)}
+                                                className="scale-75 origin-left rtl:origin-right"
+                                                aria-label="Toggle required status"
+                                            />
+                                        </div>
+
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveField(field.id)}
-                                            className="rounded-full hover:bg-primary/20 p-0.5"
+                                            className="rounded-full hover:bg-primary/20 p-0.5 ms-1"
                                             aria-label={`Remove ${field.label}`}
                                             data-testid={`create-product-remove-field-${field.id}`}
                                         >
-                                            <X className="h-3 w-3" />
+                                            <X className="h-3.5 w-3.5" />
                                         </button>
-                                    </span>
+                                    </div>
                                 ))}
                             </div>
                         ) : (
@@ -682,7 +712,7 @@ export default function CreateProductPage() {
                             {/* Thumbnail */}
                             <div className="space-y-1.5">
                                 <span className="text-sm font-medium leading-none">{t('products.form.thumbnail')}</span>
-                                <Input
+                                <input
                                     ref={thumbnailInputRef}
                                     type="file"
                                     accept="image/*"
@@ -707,7 +737,7 @@ export default function CreateProductPage() {
                             {/* Sample */}
                             <div className="space-y-1.5">
                                 <span className="text-sm font-medium leading-none">{t('products.form.sample')}</span>
-                                <Input
+                                <input
                                     ref={sampleInputRef}
                                     type="file"
                                     accept=".pdf,.doc,.docx"
@@ -783,7 +813,7 @@ export default function CreateProductPage() {
                                     </Button>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium leading-none">{t('products.quickCoupon.type')}</label>
                                         <Select dir={i18n.dir()} value={quickCouponType} onValueChange={setQuickCouponType}>

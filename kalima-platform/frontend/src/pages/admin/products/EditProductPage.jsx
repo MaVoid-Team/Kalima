@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Progress } from '@/components/ui/progress';
 import {
     Form,
     FormControl,
@@ -31,33 +32,40 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useCategories } from '@/hooks/useCategories';
+import GalleryManager from '@/components/admin/products/GalleryManager';
+import ThumbnailManager from '@/components/admin/products/ThumbnailManager';
+import FileUploadProgress from '@/components/admin/settings/FileUploadProgress';
+import { toast } from 'sonner';
 
-const editProductSchema = z.object({
-    title: z.string().min(1, 'Title is required').max(255),
-    price: z.coerce.number().positive('Price must be greater than 0'),
-    type: z.enum(['Product', 'Book']),
-    description: z.string().optional(),
-    price_after_discount: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().positive().optional()
-    ),
-    serial: z.string().max(100).optional().or(z.literal('')),
-    coupon_id: z.preprocess(
-        (val) => (val === '' || val == null ? undefined : val),
-        z.coerce.number().int().positive().optional()
-    ),
-    perks: z.string().optional().or(z.literal('')),
-    is_archived: z.boolean(),
-}).refine(
-    (data) => !data.price_after_discount || data.price_after_discount < data.price,
-    { message: 'Discounted price must be less than the original price', path: ['price_after_discount'] }
-);
+
 
 export default function EditProductPage() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { hash } = useLocation();
     const { t, i18n } = useTranslation('admin');
     const isRtl = i18n.dir() === 'rtl';
+
+    const editProductSchema = z.object({
+        title: z.string().min(1, t('products.form.titleIsRequired')).max(255),
+        price: z.coerce.number().positive(t('products.form.priceMustBeGreaterThan0')),
+        type: z.enum(['Product', 'Book']),
+        description: z.string().optional(),
+        price_after_discount: z.preprocess(
+            (val) => (val === '' || val == null ? undefined : val),
+            z.coerce.number().positive().optional()
+        ),
+        serial: z.string().max(100).optional().or(z.literal('')),
+        coupon_id: z.preprocess(
+            (val) => (val === '' || val == null ? undefined : val),
+            z.coerce.number().int().positive().optional()
+        ),
+        perks: z.string().optional().or(z.literal('')),
+        is_archived: z.boolean(),
+    }).refine(
+        (data) => !data.price_after_discount || data.price_after_discount < data.price,
+        { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
+    );
 
     const {
         selectedProduct,
@@ -71,6 +79,12 @@ export default function EditProductPage() {
         detachRequiredField,
         fetchFieldDefinitions,
         fieldDefinitions,
+        toggleRequiredFieldIsRequired,
+        uploadThumbnail,
+        removeThumbnail,
+        addGalleryImages,
+        updateGalleryEntry,
+        removeGalleryEntry,
     } = useAdminProducts();
 
     const {
@@ -80,6 +94,13 @@ export default function EditProductPage() {
     } = useCategories();
 
     const [selectedFieldDefId, setSelectedFieldDefId] = useState('');
+
+    // Upload progress state
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadFileName, setUploadFileName] = useState('');
+    const [uploadError, setUploadError] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadAbortController, setUploadAbortController] = useState(null);
 
     // Category state
     const [pickedCategory, setPickedCategory] = useState(null);
@@ -115,6 +136,21 @@ export default function EditProductPage() {
         fetchProductById(id);
         fetchFieldDefinitions();
     }, [fetchProductById, fetchFieldDefinitions, id]);
+
+    // Handle hash navigation when the page has fully loaded
+    useEffect(() => {
+        if (selectedProduct && hash) {
+            // Need a slight timeout to ensure the DOM is fully rendered before jumping
+            const timeoutId = setTimeout(() => {
+                const elementId = hash.replace('#', '');
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [selectedProduct, hash]);
 
     useEffect(() => {
         if (selectedProduct) {
@@ -196,6 +232,91 @@ export default function EditProductPage() {
         setSelectedGrandchildId('');
     };
 
+    // ─── Upload Handlers ───────────────────────────────────────────────────────
+
+    const handleThumbnailUpload = async (formData) => {
+        const file = formData.get('thumbnail');
+        if (!file) return;
+
+        // Create new AbortController for this upload
+        const abortController = new AbortController();
+        setUploadAbortController(abortController);
+
+        setIsUploading(true);
+        setUploadFileName(file.name);
+        setUploadError('');
+        setUploadProgress(0);
+
+        try {
+            const res = await uploadThumbnail(id, formData, (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
+            }, abortController.signal);
+            if (res?.success) {
+                fetchProductById(id);
+            } else {
+                setUploadError(res?.message || 'Upload failed');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                setUploadError(error.message || 'Upload failed');
+            }
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadFileName('');
+            setUploadAbortController(null);
+        }
+    };
+
+    const handleGalleryUpload = async (formData) => {
+        // Create new AbortController for this upload
+        const abortController = new AbortController();
+        setUploadAbortController(abortController);
+
+        setIsUploading(true);
+        setUploadFileName('Gallery images');
+        setUploadError('');
+        setUploadProgress(0);
+
+        try {
+            const res = await addGalleryImages(id, formData, (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
+            }, abortController.signal);
+            if (res?.success) {
+                // Product refresh is handled in the hook
+            } else {
+                setUploadError(res?.message || 'Upload failed');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                setUploadError(error.message || 'Upload failed');
+            }
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadFileName('');
+            setUploadAbortController(null);
+        }
+    };
+
+    const handleUploadCancel = () => {
+        if (uploadAbortController) {
+            uploadAbortController.abort();
+            setUploadAbortController(null);
+        }
+        // Immediately reset all upload states to re-enable buttons
+        setIsUploading(false);
+        setUploadProgress(0);
+        setUploadFileName('');
+        setUploadError('');
+    };
+
     // ─── Required field helpers ────────────────────────────────────────────────
 
     const attachedFields = selectedProduct?.product_required_fields ?? [];
@@ -214,6 +335,16 @@ export default function EditProductPage() {
         if (!id) return;
         await detachRequiredField(id, fieldDefinitionId);
         fetchProductById(id);
+    };
+
+    const handleToggleAttachedFieldRequired = async (requiredFieldId, isRequired) => {
+        if (!id) return;
+        try {
+            await toggleRequiredFieldIsRequired(id, requiredFieldId, isRequired);
+        }
+        catch (error) {
+            console.error('Failed to toggle required field:', error);
+        }
     };
 
     // ─── Submit ────────────────────────────────────────────────────────────────
@@ -296,7 +427,16 @@ export default function EditProductPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="edit-product-form">
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
+                            e.preventDefault();
+                        }
+                    }}
+                    className="space-y-6"
+                    data-testid="edit-product-form"
+                >
 
                     {/* ── Section: Core Info ── */}
                     <div className="rounded-xl border border-border p-5 space-y-4">
@@ -430,6 +570,9 @@ export default function EditProductPage() {
                                             {...field}
                                         />
                                     </FormControl>
+                                    <p className="text-[0.8rem] text-muted-foreground mt-1">
+                                        {t('products.form.perksTip')}
+                                    </p>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -455,6 +598,40 @@ export default function EditProductPage() {
                             )}
                         />
                     </div>
+
+                    {/* ── Section: Thumbnail ── */}
+                    <div className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-thumbnail">
+                        <h2 className="font-semibold text-foreground">{t('products.detail.thumbnail')}</h2>
+                        <Separator />
+                        <ThumbnailManager
+                            product={selectedProduct}
+                            onUpload={handleThumbnailUpload}
+                            onRemove={() => removeThumbnail(id)}
+                            loading={isUploading}
+                        />
+                    </div>
+
+                    {/* ── Section: Gallery ── */}
+                    <div className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-gallery">
+                        <h2 className="font-semibold text-foreground">{t('products.detail.gallery')}</h2>
+                        <Separator />
+                        <GalleryManager
+                            product={selectedProduct}
+                            onAddImages={handleGalleryUpload}
+                            onUpdateEntry={(galleryId, data) => updateGalleryEntry(id, galleryId, data)}
+                            onRemoveEntry={(galleryId) => removeGalleryEntry(id, galleryId)}
+                            loading={isUploading}
+                        />
+                    </div>
+
+                    {/* ── Upload Progress ── */}
+                    <FileUploadProgress
+                        progress={uploadProgress}
+                        isUploading={isUploading}
+                        onCancel={handleUploadCancel}
+                        fileName={uploadFileName}
+                        error={uploadError}
+                    />
 
                     {/* ── Section: Category ── */}
                     <div className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-category">
@@ -562,35 +739,49 @@ export default function EditProductPage() {
                     </div>
 
                     {/* ── Section: Required Fields ── */}
-                    <div className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-required-fields">
+                    <div id='editRequiredFields' className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-required-fields">
                         <h2 className="font-semibold text-foreground">{t('products.detail.requiredFields')}</h2>
                         <Separator />
 
                         {attachedFields.length === 0 ? (
                             <p className="text-sm text-muted-foreground">{t('products.detail.noRequiredFields')}</p>
                         ) : (
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2 overflow-x-auto custom-scrollbar">
                                 {attachedFields.map((field) => (
-                                    <span
+                                    <div
                                         key={field.id}
-                                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
                                         data-testid={`edit-product-required-field-tag-${field.id}`}
                                     >
-                                        {field.required_field_definitions?.label}
-                                        <Badge variant="outline" className="text-xs ms-1">
+                                        <span className="font-medium">{field.required_field_definitions?.label}</span>
+                                        <Badge variant="outline" className="text-xs border-primary/30 mt-0 ms-1">
                                             {field.required_field_definitions?.field_type}
                                         </Badge>
+
+                                        <div className="flex items-center gap-1 border-s border-primary/30 ps-2 ms-1">
+                                            <span className="text-xs opacity-80">
+                                                {field.is_required ? t('products.detail.fieldRequired', 'Required') : t('products.detail.fieldOptional', 'Optional')}
+                                            </span>
+                                            <Switch
+                                                checked={field.is_required}
+                                                onCheckedChange={(checked) => handleToggleAttachedFieldRequired(field.id, checked)}
+                                                disabled={actionLoading}
+                                                className="scale-75 origin-left rtl:origin-right"
+                                                aria-label="Toggle required status"
+                                            />
+                                        </div>
+
                                         <button
                                             type="button"
                                             onClick={() => handleDetachField(field.field_definition_id)}
                                             disabled={actionLoading}
-                                            className="rounded-full hover:bg-destructive/20 p-0.5 text-destructive"
+                                            className="rounded-full hover:bg-destructive/20 p-0.5 ms-1 text-destructive"
                                             aria-label={`Remove ${field.required_field_definitions?.label}`}
                                             data-testid={`edit-product-detach-field-${field.id}`}
                                         >
-                                            <X className="h-3 w-3" />
+                                            <X className="h-3.5 w-3.5" />
                                         </button>
-                                    </span>
+                                    </div>
                                 ))}
                             </div>
                         )}

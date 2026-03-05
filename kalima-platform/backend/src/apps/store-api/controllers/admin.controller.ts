@@ -10,6 +10,10 @@ import {
   CreateSubAdminDto,
   CreateModeratorDto,
   CreateAssistantDto,
+  CreateTeacherDto,
+  CreateStudentDto,
+  CreateParentDto,
+  CreateLecturerDto,
 } from "../dtos/admin.dto";
 import { role_enum, portal_enum } from "../generated/prisma/client";
 import {
@@ -217,6 +221,130 @@ export const adminController = {
   },
 
   // ============================================
+  // CREATE SPECIFIC USERS (Dedicated Endpoints)
+  // ============================================
+
+  /**
+   * POST /admin/teachers
+   */
+  async createTeacher(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const dto = await validateDto(CreateTeacherDto, req.body);
+      const creator: CreatorContext = {
+        userId: (req as any).user.userId || (req as any).user.id,
+        roles: (req as any).user.roles || [],
+      };
+
+      const result = await userManagementService.createTeacherAsAdmin(
+        dto,
+        creator,
+      );
+
+      res.status(201).json({
+        success: true,
+        message: "Teacher created successfully",
+        data: result,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * POST /admin/students
+   */
+  async createStudent(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const dto = await validateDto(CreateStudentDto, req.body);
+      const creator: CreatorContext = {
+        userId: (req as any).user.userId || (req as any).user.id,
+        roles: (req as any).user.roles || [],
+      };
+
+      const result = await userManagementService.createStudentAsAdmin(
+        dto,
+        creator,
+      );
+
+      res.status(201).json({
+        success: true,
+        message: "Student created successfully",
+        data: result,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * POST /admin/parents
+   */
+  async createParent(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const dto = await validateDto(CreateParentDto, req.body);
+      const creator: CreatorContext = {
+        userId: (req as any).user.userId || (req as any).user.id,
+        roles: (req as any).user.roles || [],
+      };
+
+      const result = await userManagementService.createParentAsAdmin(
+        dto,
+        creator,
+      );
+
+      res.status(201).json({
+        success: true,
+        message: "Parent created successfully",
+        data: result,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * POST /admin/lecturers
+   */
+  async createLecturer(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const dto = await validateDto(CreateLecturerDto, req.body);
+      const creator: CreatorContext = {
+        userId: (req as any).user.userId || (req as any).user.id,
+        roles: (req as any).user.roles || [],
+      };
+
+      const result = await userManagementService.createLecturerAsAdmin(
+        dto,
+        creator,
+      );
+
+      res.status(201).json({
+        success: true,
+        message: "Lecturer created successfully",
+        data: result,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  // ============================================
   // LIST / SEARCH USERS
   // ============================================
 
@@ -251,12 +379,17 @@ export const adminController = {
         );
       }
 
+      const isDeleted = req.query.isDeleted
+        ? req.query.isDeleted === "true"
+        : undefined;
+
       const result = await userManagementService.listUsers({
         page,
         limit,
         search,
         role: role as role_enum | undefined,
         portal: portal as portal_enum | undefined,
+        isDeleted,
       });
 
       res.status(200).json({ success: true, data: result });
@@ -466,13 +599,11 @@ export const adminController = {
       }
 
       if (callerUserId === targetUserId) {
-        res
-          .status(400)
-          .json({
-            success: false,
-            message:
-              "Cannot delete your own account via this endpoint. Use DELETE /auth/delete-account instead.",
-          });
+        res.status(400).json({
+          success: false,
+          message:
+            "Cannot delete your own account via this endpoint. Use DELETE /auth/delete-account instead.",
+        });
         return;
       }
 

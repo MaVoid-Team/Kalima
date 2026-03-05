@@ -65,6 +65,10 @@ const PRODUCT_INCLUDE = {
     orderBy: { created_at: "desc" as const },
   },
   samples: true,
+  product_reviews: {
+    include: { users: { select: { id: true, name: true, role: true } } },
+    orderBy: { created_at: "desc" as const },
+  },
 };
 
 // ============================================
@@ -672,6 +676,33 @@ class ProductService {
           },
         },
       },
+    });
+  }
+
+  // ============================================
+  // REQUIRED FIELDS — UPDATE
+  // ============================================
+
+  async updateRequiredField(
+    productId: number,
+    attachmentId: number,
+    isRequired: boolean,
+  ): Promise<void> {
+    const attachment = await this.db.product_required_fields.findFirst({
+      where: {
+        product_id: productId,
+        id: attachmentId,
+      },
+    });
+    if (!attachment) {
+      throw new NotFoundError(
+        "This field is not attached to the specified product",
+      );
+    }
+
+    await this.db.product_required_fields.update({
+      where: { id: attachment.id },
+      data: { is_required: isRequired },
     });
   }
 

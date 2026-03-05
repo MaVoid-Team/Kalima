@@ -42,7 +42,7 @@ export default function RequiredFieldsTableRow({
   onDelete,
   onToggleActivation,
 }) {
-  const { t } = useTranslation('admin');
+  const { t, i18n } = useTranslation('admin');
 
   const handleToggleActivation = () => {
     onToggleActivation(field);
@@ -80,7 +80,7 @@ export default function RequiredFieldsTableRow({
         {field.created_at ? format(new Date(field.created_at), 'MMM dd, yyyy') : '-'}
       </TableCell>
       <TableCell className="text-end">
-        <DropdownMenu>
+        <DropdownMenu dir={i18n.dir()}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"

@@ -16,7 +16,7 @@ export default function OrderItem({ item }) {
                 />
                 <Badge
                     variant="secondary"
-                    className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full p-0 text-xs"
+                    className="absolute -top-2 -end-0 w-5 h-5 flex items-center justify-center rounded-full p-0 text-xs"
                 >
                     {item?.quantity}
                 </Badge>

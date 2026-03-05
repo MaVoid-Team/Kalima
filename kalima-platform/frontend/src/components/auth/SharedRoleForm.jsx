@@ -4,14 +4,15 @@ import { useFormContext } from "react-hook-form";
 import * as z from "zod";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PhoneInput, egyptPhoneSchema } from "@/components/ui/phone-input";
 import CommonRegisterForm from "./CommonRegisterForm";
 import { useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/auth/useAuth";
 
-export default function SharedRoleForm({ role, onBack, registerFn, registerFirebaseFn }) {
+export default function SharedRoleForm({ role, onBack, registerFn, registerFirebaseFn, redirectTo }) {
     // Memoize the schema to prevent recreation on every render
     const sharedSchema = React.useMemo(() => z.object({
-        secondary_phone: z.string().optional(),
+        secondary_phone: z.union([egyptPhoneSchema, z.literal(""), z.undefined()]),
     }), []);
     const navigate = useNavigate();
     const { loginSuccess } = useAuth();
@@ -31,7 +32,7 @@ export default function SharedRoleForm({ role, onBack, registerFn, registerFireb
             const portalAccess = res?.data?.portalAccess || res?.portalAccess;
             if (user && tokens) {
                 loginSuccess(user, tokens, portalAccess);
-                navigate("/");
+                navigate(redirectTo || "/", { replace: true });
             }
         } else {
             // Email/password flow: backend sends verification email → stay on page
@@ -47,6 +48,7 @@ export default function SharedRoleForm({ role, onBack, registerFn, registerFireb
             extraSchema={sharedSchema}
             defaultValues={{ secondary_phone: "" }}
             onSubmit={handleSubmit}
+            redirectTo={redirectTo}
         >
             <SharedFields />
         </CommonRegisterForm>
@@ -65,7 +67,7 @@ function SharedFields() {
                 <FormItem>
                     <FormLabel>{t("signup.fields.secondaryPhone")}</FormLabel>
                     <FormControl>
-                        <Input dir={i18n.dir()} placeholder={t("signup.fields.secondaryPhonePlaceholder")} type="tel" {...field} data-testid="auth-register-secondary-phone-input" />
+                        <PhoneInput dir="ltr" placeholder={t("signup.fields.secondaryPhonePlaceholder")} {...field} data-testid="auth-register-secondary-phone-input" />
                     </FormControl>
                     <FormMessage />
                 </FormItem>

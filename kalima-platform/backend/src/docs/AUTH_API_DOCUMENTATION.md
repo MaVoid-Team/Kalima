@@ -733,7 +733,7 @@ Returns all linked authentication providers.
 
 ### Delete Account (Self)
 
-Deletes the authenticated user's account. Revokes all refresh tokens and permanently removes the user.
+Deletes the authenticated user's account by performing a **soft-delete** and anonymization of personal details in the database to retain order history. Revokes all active sessions and refresh tokens.
 
 **Endpoint:** `DELETE /delete-account`  
 **Auth Required:** Yes (any authenticated user)
@@ -757,7 +757,7 @@ Deletes the authenticated user's account. Revokes all refresh tokens and permane
 **Side Effects:**
 
 - All refresh tokens are revoked
-- User record and all related data are permanently deleted
+- User record is soft-deleted, personal details are anonymized, and all related data such as purchase history are retained.
 
 ---
 
