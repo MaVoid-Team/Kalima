@@ -114,7 +114,7 @@ export default function OrderDetailPage() {
                             className="bg-primary/10 text-primary hover:bg-primary/20"
                             data-testid="order-detail-receive-button"
                         >
-                            <Package className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
+                            <Package className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
                             {t('orders.actions.receive')}
                         </Button>
                     )}
@@ -126,7 +126,7 @@ export default function OrderDetailPage() {
                             className="bg-success text-success-foreground hover:bg-success/90"
                             data-testid="order-detail-confirm-button"
                         >
-                            <CheckCircle className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
+                            <CheckCircle className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
                             {t('orders.actions.confirm')}
                         </Button>
                     )}
@@ -139,7 +139,7 @@ export default function OrderDetailPage() {
                             className="text-highlight border-highlight hover:bg-highlight/10"
                             data-testid="order-detail-return-button"
                         >
-                            <RotateCcw className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
+                            <RotateCcw className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
                             {t('orders.actions.return')}
                         </Button>
                     )}
@@ -151,7 +151,7 @@ export default function OrderDetailPage() {
                         className="ml-auto"
                         data-testid="order-detail-delete-button"
                     >
-                        <Trash2 className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
+                        <Trash2 className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
                         {t('orders.actions.delete')}
                     </Button>
                 </div>

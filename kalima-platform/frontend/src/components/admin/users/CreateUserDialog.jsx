@@ -60,6 +60,7 @@ export default function CreateUserDialog({ onSuccess }) {
         name: z.string().min(1, { message: t('common:validation.required', 'Required') }),
         email: z.string().email({ message: t('common:validation.email', 'Invalid email') }),
         password: z.string().min(6, { message: t('common:validation.minLength', { min: 6, defaultValue: 'Min 6 chars' }) }),
+        confirm_password: z.string().min(6, { message: t('common:validation.minLength', { min: 6, defaultValue: 'Min 6 chars' }) }),
         phone: egyptPhoneSchema,
         secondary_phone: z.union([egyptPhoneSchema, z.literal(""), z.literal("+20"), z.undefined(), z.null()]),
         gender: z.enum(['male', 'female'], { message: t('common:validation.required', 'Required') }),
@@ -71,6 +72,14 @@ export default function CreateUserDialog({ onSuccess }) {
         is_preparatory: z.boolean().default(false),
         is_secondary: z.boolean().default(false),
     }).superRefine((data, ctx) => {
+        if (data.password !== data.confirm_password) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t('createDialog.passwordMismatch', 'Passwords do not match'),
+                path: ['confirm_password']
+            });
+        }
+
         if (data.type === 'Teacher') {
             if (!data.government_id || data.government_id.length === 0) {
                 ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['government_id'] });
@@ -91,6 +100,7 @@ export default function CreateUserDialog({ onSuccess }) {
             name: '',
             email: '',
             password: '',
+            confirm_password: '',
             phone: '',
             secondary_phone: '',
             gender: 'male',
@@ -116,6 +126,9 @@ export default function CreateUserDialog({ onSuccess }) {
     const onSubmit = async (values) => {
         let success = false;
         let payload = { ...values };
+
+        // Client-side only field; should not be sent to the API.
+        delete payload.confirm_password;
 
         // Parse teacher-specific fields to integers for the API
         if (values.type === 'Teacher') {
@@ -237,6 +250,20 @@ export default function CreateUserDialog({ onSuccess }) {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{t('createDialog.password')}</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" autoComplete="new-password" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="confirm_password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t('createDialog.confirmPassword', 'Confirm Password')}</FormLabel>
                                     <FormControl>
                                         <Input type="password" autoComplete="new-password" {...field} />
                                     </FormControl>
