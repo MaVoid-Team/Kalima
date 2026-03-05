@@ -121,10 +121,20 @@ export const reviewController = {
       const reviewId = parseInt(req.params.reviewId as string, 10);
       if (isNaN(reviewId)) throw new BadRequestError("Invalid review ID");
 
-      const userId = (req.user as any)?.userId;
+      const user = req.user as { userId?: number; roles?: Array<{ portal: string; role: string }> };
+      const userId = user?.userId;
       if (!userId) throw new BadRequestError("User not authenticated");
 
-      await reviewService.deleteReview(reviewId, userId);
+      const roles = user.roles ?? [];
+      const isAdmin = roles.some(
+        (r) =>
+          r.portal === "store" &&
+          (r.role === "Admin" || r.role === "SubAdmin"),
+      );
+
+      await reviewService.deleteReview(reviewId, userId, {
+        asAdmin: isAdmin,
+      });
 
       res.status(200).json({
         success: true,

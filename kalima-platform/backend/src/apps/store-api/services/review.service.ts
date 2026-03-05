@@ -186,14 +186,20 @@ class ReviewService {
     });
   }
 
-  async deleteReview(reviewId: number, userId: number): Promise<void> {
+  async deleteReview(
+    reviewId: number,
+    userId: number,
+    options?: { asAdmin?: boolean },
+  ): Promise<void> {
     const review = await this.db.product_reviews.findUnique({
       where: { id: reviewId },
     });
     if (!review) {
       throw new NotFoundError("Review not found");
     }
-    if (review.user_id !== userId) {
+    const isOwner = review.user_id === userId;
+    const asAdmin = options?.asAdmin === true;
+    if (!isOwner && !asAdmin) {
       throw new ForbiddenError("You can only delete your own review");
     }
 

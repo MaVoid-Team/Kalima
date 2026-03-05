@@ -264,6 +264,54 @@ Permanently deletes a user account (performs a **soft-delete** and anonymization
 
 ---
 
+### Confirmed Purchase Count
+
+Retrieve the total number of confirmed purchases grouped by Admin and Month.
+
+**Endpoint:** `GET /purchases/confirmed-count`  
+**Auth Required:** Yes (Admin / SubAdmin)
+
+**Query Parameters:**
+
+| Parameter | Type   | Required | Default       | Description                              |
+| --------- | ------ | -------- | ------------- | ---------------------------------------- |
+| page      | number | No       | 1             | Page number                              |
+| limit     | number | No       | 10            | Items per page                           |
+| month     | number | No       | Current Month | Filter by confirmation month (1-12)      |
+| year      | number | No       | Current Year  | Filter by confirmation year (e.g., 2026) |
+
+**Success Response:** `200 OK`
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "month": "2026-03-01T00:00:00.000Z",
+      "admin_id": 5,
+      "admin_name": "John Admin",
+      "admin_email": "admin@example.com",
+      "count": 42
+    },
+    {
+      "month": "2026-02-01T00:00:00.000Z",
+      "admin_id": 5,
+      "admin_name": "John Admin",
+      "admin_email": "admin@example.com",
+      "count": 38
+    }
+  ],
+  "pagination": {
+    "total": 50,
+    "page": 1,
+    "pages": 5,
+    "limit": 10
+  }
+}
+```
+
+---
+
 ## Role Management
 
 Roles are stored in the `user_roles` table. Each row is a `(user_id, portal, role)` tuple. A user can have **multiple roles across multiple portals**.

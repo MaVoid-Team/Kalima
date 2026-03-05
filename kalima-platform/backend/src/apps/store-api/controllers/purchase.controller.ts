@@ -80,6 +80,41 @@ export const purchaseController = {
     }
   },
 
+  /** GET /confirmed-count — count all confirmed purchases per admin/month */
+  async getConfirmedCount(req: Request, res: Response, next: NextFunction) {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const month = req.query.month
+        ? parseInt(req.query.month as string)
+        : undefined;
+      const year = req.query.year
+        ? parseInt(req.query.year as string)
+        : undefined;
+
+      const result = await purchasesService.getConfirmedStats(
+        page,
+        limit,
+        month,
+        year,
+      );
+
+      res.status(200).json({
+        success: true,
+        data: result.stats,
+        pagination: {
+          total: result.total,
+          page: result.page,
+          pages: result.pages,
+          limit: result.limit,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   // ---- Teacher ----
 
   /** GET /my — teacher's own purchases */
