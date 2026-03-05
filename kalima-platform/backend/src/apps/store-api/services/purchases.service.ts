@@ -520,7 +520,7 @@ class PurchasesService {
       }
       await tx.purchases.update({
         where: { id: purchaseId },
-        data: { deleted_at: new Date() },
+        data: { deleted_at: new Date(), is_deleted: true },
       });
       await tx.user_analytics.update({
         where: { user_id: purchase.user_id },
@@ -552,7 +552,7 @@ class PurchasesService {
 
     await this.db.purchase_items.update({
       where: { id: itemId },
-      data: { deleted_at: new Date() },
+      data: { deleted_at: new Date(), is_deleted: true },
     });
 
     const remaining = purchase.purchase_items.filter((i) => i.id !== itemId);
