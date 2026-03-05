@@ -7,14 +7,14 @@ const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const { isAuthenticated } = useAuth();
-  const { isAdmin } = useRole();
+  const { hasAdminAccess } = useRole();
   // this hook is only responsible for performing API calls; the provider
   // wraps its results with state and caching.
   const {
     getCart,
     addToCart,
     changeItemQuantity,
-    clearCart,
+    clearCart: clearCartNetwork,
     getPaymentMethods,
     checkout: checkoutNetwork,
     removeFromCart: removeItemNetwork,
@@ -64,12 +64,12 @@ export function CartProvider({ children }) {
   };
 
   useEffect(() => {
-    if (isAuthenticated && !isAdmin) {
+    if (isAuthenticated && !hasAdminAccess) {
       loadCart();
     } else {
       setCart(EMPTY_CART);
     }
-  }, [isAuthenticated, isAdmin]);
+  }, [isAuthenticated, hasAdminAccess]);
 
   const updateQuantity = async (itemId, quantity) => {
     if (quantity < 1) return;
@@ -111,6 +111,11 @@ export function CartProvider({ children }) {
     await updateCartItemRequiredFieldsNetwork(itemId, data);
     await loadCart();
   };
+
+  const clearCart = async () => {
+    await clearCartNetwork();
+    await loadCart();
+  }
 
   const updateCartItemRequiredFieldsImage = async (itemId, reqFieldDefId, imageData) => {
     await updateCartItemRequiredFieldsImageNetwork(itemId, reqFieldDefId, imageData);

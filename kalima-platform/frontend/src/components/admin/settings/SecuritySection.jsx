@@ -78,9 +78,9 @@ export default function SecuritySection() {
                     <div className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex items-center gap-3">
                             {isEmailVerified ? (
-                                <CheckCircle className="h-5 w-5 text-green-600" />
+                                <CheckCircle className={"h-5 w-5 text-green-600" + (i18n.language=="ar" ? ' scale-x-[-1]' : '')} />
                             ) : (
-                                <AlertCircle className="h-5 w-5 text-amber-600" />
+                                <AlertCircle className={"h-5 w-5 text-amber-600" + (i18n.language=="ar" ? ' scale-x-[-1]' : '')} />
                             )}
                             <div>
                                 <p className="font-medium">

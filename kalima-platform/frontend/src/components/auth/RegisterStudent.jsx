@@ -18,12 +18,13 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { PhoneInput, egyptPhoneSchema } from "@/components/ui/phone-input";
 import CommonRegisterForm from "./CommonRegisterForm";
 import useRegister from "@/hooks/auth/useRegister";
 import useLookups from "@/hooks/useLookups";
 import useAuth from "@/hooks/auth/useAuth";
 
-export default function RegisterStudent({ onBack }) {
+export default function RegisterStudent({ onBack, redirectTo }) {
     const { t } = useTranslation("auth");
     const navigate = useNavigate();
     const { registerStudent, registerFirebaseStudent } = useRegister();
@@ -34,7 +35,7 @@ export default function RegisterStudent({ onBack }) {
         level_id: z.string().min(1, { message: t("validation.required") }),
         government_id: z.string().min(1, { message: t("validation.required") }),
         zone_id: z.string().min(1, { message: t("validation.required") }),
-        parent_phone_number: z.string().min(1, { message: t("validation.required") }),
+        parent_phone_number: egyptPhoneSchema,
         studentCode: z.string().optional(),
         faction: z.string().default("Alpha"),
     });
@@ -58,7 +59,7 @@ export default function RegisterStudent({ onBack }) {
             const portalAccess = res?.data?.portalAccess || res?.portalAccess;
             if (user && tokens) {
                 loginSuccess(user, tokens, portalAccess);
-                navigate("/");
+                navigate(redirectTo || "/", { replace: true });
             }
         } else {
             // Email/password flow: backend sends verification email → stay on page
@@ -81,6 +82,7 @@ export default function RegisterStudent({ onBack }) {
                 faction: "Alpha",
             }}
             onSubmit={handleSubmit}
+            redirectTo={redirectTo}
         >
             <StudentFields />
         </CommonRegisterForm>
@@ -191,7 +193,7 @@ function StudentFields() {
                     <FormItem>
                         <FormLabel>{t("signup.fields.parentPhone")}</FormLabel>
                         <FormControl>
-                            <Input placeholder={t("signup.fields.parentPhonePlaceholder")} {...field} data-testid="auth-register-student-parent-phone-input" />
+                            <PhoneInput dir="ltr" placeholder={t("signup.fields.parentPhonePlaceholder")} {...field} data-testid="auth-register-student-parent-phone-input" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

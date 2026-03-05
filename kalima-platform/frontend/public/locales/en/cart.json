@@ -1,12 +1,17 @@
 {
   "title": "Your Shopping Cart",
-  "L.E": "L.E",
+  "L": {
+    "E": "L.E"
+  },
   "continueShopping": "Continue Shopping",
   "goShopping": "Go Shopping",
   "hideRequiredFields": "Hide required fields",
   "viewRequiredFields": "View required fields",
   "itemAddedToCart": "Item added to cart",
   "cartCleared": "Cart cleared successfully",
+  "clearCartSuccess": "Cart cleared successfully",
+  "clearCartFailed": "Failed to clear cart. Please try again.",
+  "clearingCart": "Clearing...",
   "requiredFieldsUpdated": "Required fields updated",
   "requiredFieldsImageUpdated": "Required fields image updated",
   "uploadImage": "Upload image",
@@ -21,6 +26,11 @@
   "orderSummary": "Order Summary",
   "fillRequiredFields": "Please fill all required fields for cart items before proceeding to checkout.",
   "fillRequiredFieldsHint": "You can do that by clicking the red 'View more' for each item and filling the required fields.",
+  "fillRequiredFields_Client_Missing": "Please fill all highlighted missing required fields first.",
+  "fillRequiredFieldsHint_Client_Missing": "Expand the item details to fill and save the required fields before proceeding.",
+  "saveRequiredFieldsFirst": "Please save your required fields first.",
+  "saveRequiredFieldsFirstHint": "You have unsaved changes in your cart items. Highlighted save buttons show pending changes.",
+  "invalidPhone": "Invalid Egyptian mobile number",
   "subtotal": "Subtotal",
   "shippingEstimate": "Shipping Estimate",
   "taxEstimate": "Tax Estimate",
@@ -117,5 +127,8 @@
       "descriptionEn": "Stainless Steel • 12 Piece Kit",
       "descriptionAr": "مكونات من الفولاذ المقاوم للصدأ • 12 قطعة"
     }
+  },
+  "validation": {
+    "invalidEgyptPhone": "Invalid Egyptian phone number. Must start with +20 followed by 10 digits."
   }
 }

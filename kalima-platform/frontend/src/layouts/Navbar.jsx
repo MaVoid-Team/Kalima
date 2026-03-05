@@ -24,13 +24,13 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
-  const { isAdmin } = useRole();
+  const { hasAdminAccess } = useRole();
   // getCart is now handled by provider; cart data available directly
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation("landing");
   const [commandValue, setCommandValue] = useState("");
-  
+
   useEffect(() => {
     const down = (e) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -80,7 +80,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-background ">
+      <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border/40">
         <div className="container md:px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 decoration-0">
@@ -146,7 +146,7 @@ export default function Navbar() {
               </Button>
 
               {/* Cart Button Desktop */}
-              {isAuthenticated && !isAdmin && <Button
+              {isAuthenticated && !hasAdminAccess && <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleCartModal}
@@ -161,14 +161,14 @@ export default function Navbar() {
 
               {isAuthenticated ? (
                 <>
-                  {!isAdmin && <Button
+                  {!hasAdminAccess && <Button
                     variant="ghost"
                     className="font-bold hover:bg-transparent hover:text-primary"
                     asChild
                   >
                     <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
                   </Button>}
-                  {isAdmin && <Button
+                  {hasAdminAccess && <Button
                     variant="default"
                     size="default"
                     className="font-bold px-6"
@@ -192,7 +192,7 @@ export default function Navbar() {
                     className="font-bold hover:bg-transparent hover:text-primary"
                     asChild
                   >
-                    <Link to="/login">{t("navbar.login")}</Link>
+                    <Link to="/login" state={{ from: location }} replace>{t("navbar.login")}</Link>
                   </Button>
                   <Button
                     variant="default"
@@ -200,7 +200,7 @@ export default function Navbar() {
                     className="font-bold px-6"
                     asChild
                   >
-                    <Link to="/signup">{t("navbar.signup")}</Link>
+                    <Link to="/signup" state={{ from: location }}>{t("navbar.signup")}</Link>
                   </Button>
                 </>
               )}
@@ -220,7 +220,7 @@ export default function Navbar() {
 
             {/* Cart Button */}
             {/* Note that this button will take the place of login/signup buttons after logging in */}
-            {isAuthenticated && !isAdmin && <Button
+            {isAuthenticated && !hasAdminAccess && <Button
               variant="ghost"
               size="icon"
               onClick={toggleCartModal}
@@ -238,6 +238,7 @@ export default function Navbar() {
               size="icon"
               className="text-muted-foreground"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              title={isMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
             >
               {isMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -248,91 +249,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden fixed inset-x-0 top-16 bottom-0 z-50 bg-background border-t border-border p-6 animate-in slide-in-from-top-5">
-            <nav className="flex flex-col gap-4 overflow-y-auto pb-8">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.label}
-                  to={link.href}
-                  className="text-lg font-medium text-foreground hover:text-primary transition-colors px-2 py-2 border-b border-border/50"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-
-              <div className="mt-auto space-y-4">
-                <div className="flex items-center justify-between px-2 py-2 border-b border-border/50">
-                  <span className="text-base font-medium text-muted-foreground">{t("navbar.languageToggle")}</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={toggleLanguage}
-                    className="gap-2"
-                  >
-                    <Globe className="h-5 w-5" />
-                    <span className="uppercase">{i18n.language}</span>
-                  </Button>
-                </div>
-
-                <div className="flex flex-col gap-3 pt-4">
-                  {isAuthenticated ? (
-                    <>
-                      {!isAdmin && <Button
-                        variant="default"
-                        className="w-full font-bold justify-center h-12 text-base"
-                        onClick={() => setIsMenuOpen(false)}
-                        asChild
-                      >
-                        <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
-                      </Button>}
-                      {isAdmin && <Button
-                        variant="default"
-                        className="w-full font-bold justify-center h-12 text-base"
-                        onClick={() => setIsMenuOpen(false)}
-                        asChild
-                      >
-                        <Link to="/admin/orders">{t("navbar.dashboard", "Dashboard")}</Link>
-                      </Button>}
-                      <Button
-                        variant="outline"
-                        className="w-full font-bold justify-center h-12 text-base text-destructive hover:text-destructive/90 hover:bg-destructive/10 border-destructive/20 mt-2"
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          logout();
-                        }}
-                      >
-                        {t("navbar.logout", "Log out")}
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outline"
-                        className="w-full font-bold justify-center h-12 text-base"
-                        onClick={() => setIsMenuOpen(false)}
-                        asChild
-                      >
-                        <Link to="/login">{t("navbar.login")}</Link>
-                      </Button>
-                      <Button
-                        variant="default"
-                        className="w-full font-bold justify-center h-12 text-base"
-                        onClick={() => setIsMenuOpen(false)}
-                        asChild
-                      >
-                        <Link to="/signup">{t("navbar.signup")}</Link>
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </nav>
-          </div>
-        )}
-
         <CartPreview
           open={isCartModalOpen}
           onOpenChange={setIsCartModalOpen}
@@ -340,6 +256,91 @@ export default function Navbar() {
           onViewFullCart={handleViewFullCart}
         />
       </header>
+
+      {/* Mobile Menu */}
+      <div
+        className={`md:hidden fixed inset-x-0 top-16 bottom-0 z-40 bg-background border-t border-border p-6 transition-all duration-300 ease-in-out ${isMenuOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-4 pointer-events-none"}`}
+      >
+        <nav className="flex flex-col gap-4 overflow-y-auto pb-8 h-full">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.label}
+              to={link.href}
+              className="text-lg font-medium text-foreground hover:text-primary transition-colors px-2 py-2 border-b border-border/50"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-2 py-2 border-b border-border/50">
+              <span className="text-base font-medium text-muted-foreground">{t("navbar.languageToggle")}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleLanguage}
+                className="gap-2"
+              >
+                <Globe className="h-5 w-5" />
+                <span className="uppercase">{i18n.language}</span>
+              </Button>
+            </div>
+
+            <div className="flex flex-col gap-3 pt-4">
+              {isAuthenticated ? (
+                <>
+                  {!hasAdminAccess && <Button
+                    variant="default"
+                    className="w-full font-bold justify-center h-12 text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                    asChild
+                  >
+                    <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
+                  </Button>}
+                  {hasAdminAccess && <Button
+                    variant="default"
+                    className="w-full font-bold justify-center h-12 text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                    asChild
+                  >
+                    <Link to="/admin/orders">{t("navbar.dashboard", "Dashboard")}</Link>
+                  </Button>}
+                  <Button
+                    variant="outline"
+                    className="w-full font-bold justify-center h-12 text-base text-destructive hover:text-destructive/90 hover:bg-destructive/10 border-destructive/20 mt-2"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      logout();
+                    }}
+                  >
+                    {t("navbar.logout", "Log out")}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    className="w-full font-bold justify-center h-12 text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                    asChild
+                  >
+                    <Link to="/login" state={{ from: location }} replace>{t("navbar.login")}</Link>
+                  </Button>
+                  <Button
+                    variant="default"
+                    className="w-full font-bold justify-center h-12 text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                    asChild
+                  >
+                    <Link to="/signup" state={{ from: location }}>{t("navbar.signup")}</Link>
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </nav>
+      </div>
 
 
       <CommandDialog

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 export default function FastBuyDynamicFields({
   itemsMissingFields,
@@ -88,6 +89,14 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
             data-testid="fastbuy-dynamic-fields-file-input"
           />
         </>
+      ) : field.field_type === "number" ? (
+        <PhoneInput
+          dir="ltr"
+          value={value || ""}
+          onChange={handleChange}
+          className="bg-background focus-visible:ring-primary/20"
+          data-testid="fastbuy-dynamic-fields-phone-input"
+        />
       ) : (
         <Input
           type="text"

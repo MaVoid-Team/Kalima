@@ -1,52 +1,59 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
 
 export default function ImageGallery({ images, badge }) {
   const { t, i18n } = useTranslation("product");
-  const [mainApi, setMainApi] = useState(null);
   const [thumbApi, setThumbApi] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [scrollSnaps, setScrollSnaps] = useState([]);
 
-  const imagesList = [images?.main, ...(images?.thumbnails ?? [])].filter(
-    Boolean,
+  const imagesList = useMemo(
+    () => [images?.main, ...(images?.thumbnails ?? [])].filter(Boolean),
+    [images],
   );
 
   useEffect(() => {
-    if (!mainApi) return;
+    if (!imagesList.length) {
+      setSelectedIndex(0);
+      return;
+    }
 
-    const handleSelect = () => {
-      setSelectedIndex(mainApi.selectedScrollSnap());
-      if (thumbApi) thumbApi.scrollTo(mainApi.selectedScrollSnap());
-    };
+    setSelectedIndex((previousIndex) =>
+      Math.min(previousIndex, imagesList.length - 1),
+    );
+  }, [imagesList]);
 
-    setScrollSnaps(mainApi.scrollSnapList());
-
-    mainApi.on("select", handleSelect);
-    mainApi.on("reInit", handleSelect);
-
-    return () => {
-      mainApi.off("select", handleSelect);
-      mainApi.off("reInit", handleSelect);
-    };
-  }, [mainApi, thumbApi]);
+  useEffect(() => {
+    if (!thumbApi || imagesList.length < 2) return;
+    thumbApi.scrollTo(selectedIndex);
+  }, [thumbApi, selectedIndex, imagesList.length]);
 
   const onThumbClick = useCallback(
     (index) => {
-      if (!mainApi) return;
-      mainApi.scrollTo(index);
+      setSelectedIndex(index);
     },
-    [mainApi],
+    [],
   );
+
+  const showPrevious = useCallback(() => {
+    if (imagesList.length < 2) return;
+    setSelectedIndex((previous) =>
+      previous === 0 ? imagesList.length - 1 : previous - 1,
+    );
+  }, [imagesList.length]);
+
+  const showNext = useCallback(() => {
+    if (imagesList.length < 2) return;
+    setSelectedIndex((previous) => (previous + 1) % imagesList.length);
+  }, [imagesList.length]);
 
   const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
 
@@ -64,54 +71,60 @@ export default function ImageGallery({ images, badge }) {
     <div className="flex flex-col gap-4">
       {/* Main Slider */}
       <div className="relative w-full aspect-square md:aspect-4/3 rounded-2xl overflow-hidden bg-muted group">
-        <Carousel
-          setApi={setMainApi}
-          opts={{
-            loop: true,
-            direction: i18n.dir(),
+        <img
+          src={imagesList[selectedIndex]}
+          alt={`${t("info.view")} ${selectedIndex + 1}`}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = fallbackImage;
           }}
-          className="w-full h-full"
-        >
-          <CarouselContent>
-            {imagesList.map((img, index) => (
-              <CarouselItem key={index} className="h-full">
-                <img
-                  src={img}
-                  alt={`${t("info.view")} ${index + 1}`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = fallbackImage;
-                  }}
+        />
+
+        {imagesList.length > 1 && (
+          <>
+            <div className="hidden md:block">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={showPrevious}
+                className="absolute start-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/80 hover:bg-background"
+                data-testid="product-gallery-prev-button"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span className="sr-only">Previous slide</span>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={showNext}
+                className="absolute end-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/80 hover:bg-background"
+                data-testid="product-gallery-next-button"
+              >
+                <ArrowRight className="h-4 w-4" />
+                <span className="sr-only">Next slide</span>
+              </Button>
+            </div>
+
+            {/* Mobile Dots */}
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 md:hidden">
+              {imagesList.map((_, index) => (
+                <button
+                  key={index}
+                  className={cn(
+                    "w-2 h-2 rounded-full transition-all",
+                    index === selectedIndex ? "bg-primary w-4" : "bg-primary/30",
+                  )}
+                  onClick={() => setSelectedIndex(index)}
+                  data-testid={`product-gallery-dot-${index}-button`}
                 />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          {imagesList.length > 1 && (
-            <>
-              <div className="hidden md:block">
-                <CarouselPrevious className="start-4 bg-background/80 hover:bg-background" data-testid="product-gallery-prev-button" />
-                <CarouselNext className="end-4 bg-background/80 hover:bg-background" data-testid="product-gallery-next-button" />
-              </div>
-              {/* Mobile Dots */}
-              <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 md:hidden">
-                {scrollSnaps.map((_, index) => (
-                  <button
-                    key={index}
-                    className={cn(
-                      "w-2 h-2 rounded-full transition-all",
-                      index === selectedIndex
-                        ? "bg-primary w-4"
-                        : "bg-primary/30",
-                    )}
-                    onClick={() => mainApi?.scrollTo(index)}
-                    data-testid={`product-gallery-dot-${index}-button`}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </Carousel>
+              ))}
+            </div>
+          </>
+        )}
+
         {badge && (
           <div className="absolute top-4 start-4 z-10 pointer-events-none">
             <Badge className="rounded-full px-3">{badge}</Badge>
@@ -132,7 +145,7 @@ export default function ImageGallery({ images, badge }) {
             }}
             className="w-full"
           >
-            <CarouselContent className="-ms-2">
+          <CarouselContent className="-ms-2">
               {imagesList.map((thumb, index) => (
                 <CarouselItem
                   key={index}

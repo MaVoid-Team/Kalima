@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ROLES, PORTALS } from '@/lib/adminConstants';
 import debounce from 'lodash/debounce';
 
-export default function UserFilters({ filters, onSearchChange, onRoleChange, onPortalChange }) {
+export default function UserFilters({ filters, onSearchChange, onRoleChange, onPortalChange, onIsDeletedChange }) {
     const { t, i18n } = useTranslation('userManagement');
     const [searchValue, setSearchValue] = useState(filters.search || '');
 
@@ -68,6 +68,17 @@ export default function UserFilters({ filters, onSearchChange, onRoleChange, onP
                                 {t(`portals.${portal}`)}
                             </SelectItem>
                         ))}
+                    </SelectContent>
+                </Select>
+
+                <Select dir={i18n.dir()} value={String(filters.isDeleted || 'all')} onValueChange={onIsDeletedChange}>
+                    <SelectTrigger className="w-[160px]">
+                        <SelectValue placeholder={t('filters.allStatuses', 'All Statuses')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">{t('filters.allAccounts', 'All Accounts')}</SelectItem>
+                        <SelectItem value="false">{t('filters.activeAccounts', 'Active')}</SelectItem>
+                        <SelectItem value="true">{t('filters.deletedAccounts', 'Deleted')}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

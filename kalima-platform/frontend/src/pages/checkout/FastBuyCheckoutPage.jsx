@@ -16,6 +16,7 @@ export default function FastBuyCheckoutPage() {
 
   const blocker = useBlocker(({ currentLocation, nextLocation }) => {
     if (skipBlockRef.current) return false;
+    if (nextLocation.state?.skipFastBuyClear) return false;
     const leavingCheckout = currentLocation.pathname === "/fast-buy/checkout" && nextLocation.pathname !== "/fast-buy/checkout";
     return computed.hasItems && leavingCheckout;
   });

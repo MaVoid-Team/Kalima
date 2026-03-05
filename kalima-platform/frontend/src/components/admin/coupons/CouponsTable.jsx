@@ -47,7 +47,7 @@ export default function CouponsTable({ coupons, loading, onEdit, onDelete, onTog
                                     className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                     checked={coupons.length > 0 && selectedIds.length === coupons.length}
                                     onCheckedChange={(checked) => onSelectAll?.(!!checked)}
-                                    aria-label="Select all coupons"
+                                    aria-label={t('orders.table.selectAll', 'Select all')}
                                     data-testid="coupons-table-select-all"
                                 />
                             </TableHead>
@@ -55,7 +55,7 @@ export default function CouponsTable({ coupons, loading, onEdit, onDelete, onTog
                             <TableHead>{t('coupons.table.discountType')}</TableHead>
                             <TableHead>{t('coupons.table.discountValue')}</TableHead>
                             <TableHead>{t('coupons.table.productId')}</TableHead>
-                            <TableHead>{t('coupons.table.dates')}</TableHead>
+                            <TableHead className="text-center">{t('coupons.table.dates')}</TableHead>
                             <TableHead>{t('coupons.table.status')}</TableHead>
                             <TableHead className="text-center">{t('coupons.table.actions')}</TableHead>
                         </TableRow>

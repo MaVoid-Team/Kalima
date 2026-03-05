@@ -126,6 +126,12 @@ export class UpdateProductDto {
   perks?: string;
 }
 
+export class UpdateProductRequiredFieldDto {
+  @Type(() => Boolean)
+  @IsBoolean()
+  is_required: boolean;
+}
+
 // ============================================
 // GALLERY ENTRY UPDATE DTO
 // ============================================

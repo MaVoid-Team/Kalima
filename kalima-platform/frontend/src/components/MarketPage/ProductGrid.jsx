@@ -89,10 +89,13 @@ export default function ProductGrid({
                         image: getImageUrl(product.thumbnail_image?.url) || product.image,
                         price: product.price,
                         isPurchased: product.isPurchased,
+                        rate: product.rate,
+                        rate_count: product.rate_count,
                     };
                     return (
                         <motion.div
                             key={product.id}
+                            className="h-full"
                             variants={{
                                 hidden: { opacity: 0, y: 30 },
                                 show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 200, damping: 20 } },

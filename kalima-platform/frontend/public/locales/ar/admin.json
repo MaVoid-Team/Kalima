@@ -13,7 +13,10 @@
     "lightMode": "الوضع الفاتح",
     "backToStore": "العودة للمتجر",
     "logout": "تسجيل الخروج",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "expandSidebar": "توسيع الشريط الجانبي",
+    "collapseSidebar": "طي الشريط الجانبي",
+    "closeSidebar": "إغلاق الشريط الجانبي"
   },
   "common": {
     "currencyEGP": "ج.م",
@@ -33,10 +36,18 @@
     "active": "نشط",
     "inactive": "غير نشط",
     "update": "تحديث",
+    "hide": "إخفاء",
+    "show": "إظهار",
+    "done": "تم",
+    "copy": "نسخ",
+    "removing": "جاري الحذف...",
     "pagination": {
       "previous": "السابق",
-      "next": "التالي"
+      "next": "التالي",
+      "page": "صفحة",
+      "of": "من"
     },
+    "refresh": "تحديث",
     "export": {
       "success": "تم التصدير بنجاح"
     }
@@ -69,6 +80,10 @@
       "pending": "قيد الانتظار",
       "received": "تم الاستلام",
       "confirmed": "مؤكد",
+      "processing": "جاري التنفيذ",
+      "completed": "مكتمل",
+      "cancelled": "ملغي",
+      "refunded": "مسترد",
       "returned": "مرتجع",
       "created": "تم الإنشاء"
     },
@@ -117,6 +132,10 @@
     "statusPending": "قيد الانتظار",
     "statusReceived": "تم الاستلام",
     "statusConfirmed": "مؤكد",
+    "statusProcessing": "قيد التنفيذ",
+    "statusCompleted": "مكتمل",
+    "statusCancelled": "ملغي",
+    "statusRefunded": "مسترد",
     "statusReturned": "مرتجع",
     "statusCreated": "تم الإنشاء",
     "clearFilters": "مسح",
@@ -126,8 +145,10 @@
       "customer": "العميل",
       "status": "الحالة",
       "total": "الإجمالي",
-      "payment": "وسيله الدفع",
-      "actions": "إجراءات"
+      "payment": "طريقة الدفع",
+      "actions": "إجراءات",
+      "selectAll": "تحديد الكل",
+      "selectAllOrders": "تحديد جميع الطلبات"
     },
     "items": {
       "items": "الطلبات",
@@ -146,10 +167,21 @@
       "confirm": "تأكيد الطلب",
       "return": "إرجاع الطلب",
       "delete": "حذف الطلب",
-      "deleteItem": "حذف العنصر",
+      "deleteItem": "إزالة العنصر",
       "whatsapp": "تواصل عبر واتساب",
-      "collapseItems": "إخفاء العناصر",
-      "expandItems": "عرض العناصر"
+      "collapseItems": "طي",
+      "expandItems": "توسيع",
+      "viewNote": "عرض الملاحظة",
+      "refund": "استرداد",
+      "statusPending": "قيد الانتظار",
+      "statusProcessing": "قيد التنفيذ",
+      "statusCompleted": "مكتمل",
+      "statusCancelled": "ملغي",
+      "statusRefunded": "مسترد",
+      "statusAll": "كل الحالات",
+      "clearFilters": "مسح التصفية",
+      "filterByDate": "تصفية حسب التاريخ",
+      "searchPlaceholder": "ابحث في الطلبات..."
     },
     "messages": {
       "receiveSuccess": "تم تحديث الطلب إلى مستلم",
@@ -161,7 +193,7 @@
       "deleteOrderSuccess": "تم حذف الطلب بنجاح",
       "deleteItemSuccess": "تم حذف العنصر بنجاح",
       "noteSaved": "تم حفظ ملاحظة الإدارة بنجاح",
-            "noOrdersFound": "لم يتم العثور على طلبات."
+      "noOrdersFound": "لم يتم العثور على طلبات."
     },
     "details": {
       "title": "تفاصيل الطلب",
@@ -186,7 +218,11 @@
       "total": "الإجمالي",
       "by": "بواسطة",
       "lastNoteBy": "آخر ملاحظة بواسطة: {{name}}",
-      "contactWhatsApp": "تواصل عبر واتساب"
+      "contactWhatsApp": "تواصل عبر واتساب",
+      "loading": "جاري تحميل التفاصيل...",
+      "addAdminNote": "إضافة ملاحظة إدارية",
+      "noteLimitReached": "تم الوصول للحد الأقصى للملاحظات",
+      "notFound": "الطلب غير موجود"
     }
   },
   "products": {
@@ -198,7 +234,7 @@
     "noProductsDescription": "لا توجد منتجات تطابق الفلاتر الحالية.",
     "createProduct": "إنشاء منتج",
     "backToProducts": "العودة للمنتجات",
-        "backToProduct":"العودة للمنتج",
+    "backToProduct": "العودة للمنتج",
     "filters": {
       "allCategories": "جميع الفئات",
       "allStatuses": "جميع الحالات",
@@ -211,9 +247,11 @@
       "title": "العنوان",
       "type": "النوع",
       "price": "السعر",
+      "rating": "التقييم",
       "categories": "الفئات",
       "status": "الحالة",
-      "actions": "الإجراءات"
+      "actions": "الإجراءات",
+      "selectAll": "تحديد جميع المنتجات"
     },
     "status": {
       "active": "نشط",
@@ -221,7 +259,9 @@
     },
     "type": {
       "Book": "كتاب",
-      "Product": "منتج"
+      "Product": "منتج",
+      "physical": "منتج مادي",
+      "instant": "تنزيل فوري"
     },
     "actions": {
       "view": "عرض التفاصيل",
@@ -244,19 +284,25 @@
       "couponIdPlaceholder": "معرف الكوبون (اختياري)",
       "thumbnail": "صورة الغلاف",
       "sample": "ملف النموذج (PDF)",
-            "chooseImage": "اختر صورة",
-            "chooseSampleFile": "اختر ملف العينة",
-            "noFileSelected": "لم يتم اختيار ملف",
+      "chooseImage": "اختر صورة",
+      "chooseSampleFile": "اختر ملف العينة",
+      "noFileSelected": "لم يتم اختيار ملف",
       "categories": "الفئات",
       "isArchived": "مؤرشف",
       "perks": "المميزات",
-      "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code"
+      "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code",
+      "perksTip": "يمكنك استخدام الفواصل الإنجليزية (,) أو الفواصل العربية (،) للفصل بين المميزات.",
+      "titleIsRequired": "العنوان مطلوب",
+      "priceMustBeGreaterThan0": "السعر يجب أن يكون أكبر من 0",
+      "discountedPriceMustBeLessThanOriginalPrice": "السعر بعد الخصم يجب أن يكون أقل من السعر الأصلي"
     },
     "create": {
       "dialogTitle": "إنشاء منتج جديد",
       "dialogDescription": "أدخل تفاصيل المنتج. يمكنك إدارة الوسائط والحقول من صفحة التفاصيل.",
       "submit": "إنشاء المنتج",
-      "creating": "جاري الإنشاء..."
+      "creating": "جاري الإنشاء...",
+      "uploading": "جاري الرفع...",
+      "processing": "جاري المعالجة..."
     },
     "edit": {
       "dialogTitle": "تعديل المنتج",
@@ -315,6 +361,9 @@
       "fieldLabel": "الحقل",
       "fieldType": "النوع",
       "fieldRequired": "مطلوب",
+      "fieldOptional": "اختياري",
+      "fieldToggleSuccess": "تم تحديث الحقل المطلوب بنجاح",
+      "fieldToggleError": "فشل في تحديث الحقل المطلوب",
       "yes": "نعم",
       "no": "لا",
       "sample": "ملف العينة",
@@ -342,10 +391,25 @@
       "sampleUpdateError": "فشل في تحديث العينة. يرجى المحاولة مرة أخرى.",
       "sampleRemoved": "تم حذف العينة بنجاح!",
       "sampleRemoveError": "فشل في حذف العينة. يرجى المحاولة مرة أخرى.",
+      "type": {
+        "Product": "منتج",
+        "Book": "كتاب"
+      },
       "confirmRemoveSampleTitle": "حذف العينة",
-      "confirmRemoveSampleDescription": "هل أنت متأكد من حذف ملف العينة هذا؟ لا يمكن التراجع عن هذا الإجراء وسيمحو العينة نهائياً من هذا المنتج.",
+      "confirmRemoveSampleDescription": "هل أنت متأكد من رغبتك في حذف ملف العينة هذا؟ لا يمكن التراجع عن هذا الإجراء وسيتم حذف الملف نهائياً من هذا المنتج.",
       "uploading": "جاري الرفع...",
-      "processing": "جاري المعالجة..."
+      "processing": "جاري المعالجة...",
+      "selectChildCategory": "اختر الفئة الثانوية",
+      "selectGrandchildCategory": "اختر الفئة الثالثة"
+    },
+    "reviews": {
+      "title": "المراجعات",
+      "noReviews": "لا توجد مراجعات بعد",
+      "noReviewsDescription": "هذا المنتج لم يتلق أي مراجعات من العملاء بعد.",
+      "totalReviews": "إجمالي المراجعات",
+      "deleteConfirm": "هل أنت متأكد من حذف هذه المراجعة؟",
+      "deleteSuccess": "تم حذف المراجعة بنجاح",
+      "anonymousUser": "مستخدم مجهول"
     }
   },
   "samples": {
@@ -353,12 +417,18 @@
     "subtitle": "جميع ملفات عينات المنتجات في المتجر",
     "count": "عينات",
     "noSamples": "لا توجد ملفات عينات.",
+    "copyLink": "نسخ الرابط",
+    "linkCopied": "تم نسخ رابط العينة!",
+    "linkCopyError": "فشل نسخ الرابط",
     "table": {
       "file": "الملف",
       "product": "المنتج",
       "size": "الحجم",
       "type": "النوع",
-      "actions": "الإجراءات"
+      "name": "الاسم",
+      "price": "السعر",
+      "actions": "الإجراءات",
+      "selectAll": "تحديد جميع العينات"
     }
   },
   "coupons": {
@@ -370,6 +440,12 @@
     "export": "تصدير",
     "exportCsv": "تصدير كـ CSV",
     "exportXlsx": "تصدير كـ Excel",
+    "statusPending": "قيد الانتظار",
+    "statusProcessing": "قيد التنفيذ",
+    "statusCompleted": "مكتمل",
+    "statusCancelled": "ملغي",
+    "statusRefunded": "مسترد",
+    "statusAll": "كل الحالات",
     "filters": {
       "active": {
         "label": "الحالة",
@@ -388,9 +464,10 @@
         "amount": "قيمة ثابتة"
       },
       "date": {
-        "start": "تاريخ البداية",
-        "end": "تاريخ النهاية",
-                "range": "تصفية حسب النطاق الزمني"
+        "start": "تاريخ البدء",
+        "end": "تاريخ الانتهاء",
+        "range": "تصفية بنطاق التاريخ",
+        "clear": "مسح"
       }
     },
     "discountType": {
@@ -418,7 +495,8 @@
       "startsAt": "تاريخ البداية",
       "expiresAt": "تاريخ الانتهاء",
       "status": "الحالة",
-      "actions": "الإجراءات"
+      "actions": "الإجراءات",
+      "selectAll": "تحديد جميع القسائم"
     },
     "form": {
       "code": "الكود",
@@ -563,7 +641,7 @@
   },
   "settings": {
     "title": "الإعدادات",
-    "description": "إدارة إعدادات الحساب والتفضيلات",
+    "description": "إدارة إعدادات حسابك وتفضيلاته",
     "profile": {
       "title": "معلومات الملف الشخصي",
       "name": "الاسم",
@@ -574,7 +652,12 @@
       "uploadAvatar": "رفع الصورة الرمزية",
       "avatarHint": "JPG، PNG أو GIF. الحد الأقصى للحجم 2MB.",
       "editProfile": "تعديل الملف الشخصي",
-      "updateSuccess": "تم تحديث الملف الشخصي بنجاح"
+      "updateSuccess": "تم تحديث الملف الشخصي بنجاح",
+      "validation": {
+        "nameRequired": "الاسم مطلوب",
+        "emailInvalid": "عنوان البريد الإلكتروني غير صالح",
+        "invalidPhone": "رقم هاتف محمول غير صالح"
+      }
     },
     "password": {
       "title": "إدارة كلمة المرور",
@@ -596,11 +679,11 @@
     },
     "account": {
       "title": "أمان الحساب",
-      "linkedProviders": "مزودو الخدمة المرتبطون",
+      "linkedProviders": "الحسابات المرتبطة",
       "linkNewAccount": "ربط حساب جديد",
-      "linkDescription": "ربط حسابات إضافية لتمكين طرق تسجيل دخول متعددة.",
-      "linkFirebase": "ربط حساب Google",
-      "setPasswordFirst": "تعيين كلمة المرور أولاً",
+      "linkDescription": "اربط حسابات إضافية لتفعيل عدة طرق لتسجيل الدخول.",
+      "linkFirebase": "ربط حساب جوجل",
+      "setPasswordFirst": "يجب تعيين كلمة مرور أولاً",
       "noLinkedProviders": "لا توجد حسابات مرتبطة",
       "connected": "متصل",
       "unlink": "إلغاء الربط",
@@ -608,10 +691,12 @@
       "confirmUnlink": "هل أنت متأكد من إلغاء ربط هذا المزود؟ ستفقد الوصول إلى طريقة تسجيل الدخول هذه.",
       "unlinkWarning": "ستفقد الوصول إلى طريقة تسجيل الدخول هذه وستحتاج إلى استخدام أحد حساباتك المتبقية لتسجيل الدخول.",
       "providers": {
-        "local": "البريد الإلكتروني",
-        "google": "Google",
-        "facebook": "Facebook",
-        "firebase": "Firebase"
+        "local": "حساب البريد الإلكتروني",
+        "google": "جوجل",
+        "facebook": "فيسبوك",
+        "github": "جيت هاب",
+        "firebase": "فايربيز",
+        "email": "البريد الإلكتروني"
       }
     },
     "email": {
@@ -664,7 +749,8 @@
       "cancelled": "تم إلغاء الرفع",
       "error": "فشل الرفع",
       "file": "ملف"
-    }
+    },
+    "expandSidebar": "توسيع الشريط الجانبي"
   },
   "paymentMethods": {
     "title": "إدارة طرق الدفع",
@@ -672,7 +758,7 @@
     "totalMethods": "{{count}} طرق دفع",
     "createMethod": "إنشاء طريقة دفع",
     "noMethodsFound": "لم يتم العثور على طرق دفع",
-    "selectedCount": "{count} محدد",
+    "selectedCount": "{{count}} محدد",
     "bulkActivate": "تفعيل",
     "bulkDeactivate": "إلغاء التفعيل",
     "filters": {
@@ -695,12 +781,18 @@
     "fields": {
       "name": "الاسم",
       "namePlaceholder": "مثال: فودافون كاش",
+      "nameDescription": "اسم طريقة الدفع الذي سيراه العملاء",
       "phoneNumber": "رقم الهاتف",
       "phoneNumberPlaceholder": "مثال: 01012345678",
+      "phoneDescription": "رقم الهاتف المرتبط بطريقة الدفع.",
       "status": "الحالة",
       "statusDescription": "تفعيل أو إلغاء تفعيل طريقة الدفع",
       "image": "الصورة",
-      "imageOptional": "اترك فارغاً للاحتفاظ بالصورة الحالية"
+      "imageOptional": "اترك فارغاً للاحتفاظ بالصورة الحالية",
+      "imageDescription": "ارفع صورة جديدة لاستبدال الصورة الحالية. المقاس الموصى به: 200×200 بكسل",
+      "currentImage": "الصورة الحالية",
+      "unchanged": "لم يتم تغيير الصورة",
+      "newImage": "صورة جديدة تم اختيارها"
     },
     "create": {
       "title": "إنشاء طريقة دفع",
@@ -786,5 +878,10 @@
       "updateSuccess": "تم تحديث الحقل بنجاح",
       "deleteSuccess": "تم حذف الحقل بنجاح"
     }
+  },
+  "export": {
+    "exporting": "جاري التصدير...",
+    "processing": "جاري معالجة الملف...",
+    "success": "تم تصدير الملف بنجاح"
   }
 }

@@ -46,7 +46,11 @@ export const useProducts = (id = null) => {
             });
 
             if (data?.success) {
-                setProducts(data.data);
+                setProducts(data.data?.map(product => ({
+                    ...product,
+                    rate: product.averageRating || 0,
+                    rate_count: product.reviewCount || 0
+                })) ?? []);
                 setPagination(prev => ({
                     ...prev,
                     total: data.total ?? prev.total,
@@ -74,7 +78,11 @@ export const useProducts = (id = null) => {
             });
 
             if (data?.success) {
-                const prodData = data.data;
+                const prodData = {
+                    ...data.data,
+                    rate: data.data.averageRating || 0,
+                    rate_count: data.data.reviewCount || 0
+                };
 
                 // Attach the first category title as `category` on the product for breadcrumbs
                 if (prodData.product_categories && prodData.product_categories.length > 0) {

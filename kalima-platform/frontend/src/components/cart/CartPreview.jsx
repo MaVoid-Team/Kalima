@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { ShoppingBag, TicketCheck, Plus, Minus, Trash2 } from 'lucide-react';
+import { ShoppingBag, TicketCheck, Plus, Minus, Trash2, Loader2 } from 'lucide-react';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 import {
   Sheet,
   SheetContent,
@@ -21,14 +22,16 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { getBaseUrl } from '@/lib/storeUtils';
 import { useCart } from '@/contexts/CartContext';
+import { toast } from 'sonner';
 
 export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }) {
   const { t, i18n } = useTranslation('cart');
   const navigate = useNavigate();
   const baseURL = useMemo(() => getBaseUrl(), []);
-  const { updateQuantity, removeFromCart, clearCart } = useCart();
+  const { updateQuantity, removeFromCart, clearCart, loading } = useCart();
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
+  const [isClearingCart, setIsClearingCart] = useState(false);
 
   const onContinueShopping = () => {
     onOpenChange(false);
@@ -54,12 +57,18 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
   };
 
   const handleClearCart = async () => {
+    if (isClearingCart) return;
     try {
+      setIsClearingCart(true);
       await clearCart();
       setClearDialogOpen(false);
       onOpenChange(false);
+      toast.success(t('clearCartSuccess', 'Cart cleared successfully'));
     } catch (error) {
       console.error('Failed to clear cart:', error);
+      toast.error(t('clearCartFailed', 'Failed to clear cart. Please try again.'));
+    } finally {
+      setIsClearingCart(false);
     }
   };
 
@@ -74,12 +83,15 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
             {cart?.cart_items?.length > 0 && (
               <Button
                 onClick={() => setClearDialogOpen(true)}
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="text-destructive hover:text-destructive hover:bg-destructive/10 p-1 h-auto"
+                className={"text-destructive border-destructive/30 hover:text-destructive hover:bg-destructive/10 gap-1.5 px-3 h-8" + (i18n.language === 'ar' ? ' ml-5' : ' mr-5')}
                 data-testid="cart-preview-clear-cart-button"
+                title={t('clearCart', 'Clear Cart')}
+                disabled={isClearingCart}
               >
                 <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline text-xs font-medium">{t('clearCart', 'Clear Cart')}</span>
               </Button>
             )}
           </div>
@@ -219,6 +231,9 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
                 </Button>
               </div>
             </SheetFooter>
+            {loading && (<div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10" data-testid="cart-preview-loading-overlay" style={{ display: loading ? 'flex' : 'none' }}>
+              <LoadingSpinner />
+            </div>)}
           </>
         )}
       </SheetContent>
@@ -264,8 +279,14 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
               onClick={handleClearCart}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="cart-preview-clear-confirm"
+              disabled={isClearingCart}
             >
-              {t('clearCart', 'Clear Cart')}
+              {isClearingCart ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {t('clearingCart', 'Clearing...')}
+                </span>
+              ) : t('clearCart', 'Clear Cart')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

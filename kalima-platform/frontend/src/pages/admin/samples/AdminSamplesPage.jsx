@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FileText, Download, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FileText, Download, ExternalLink, ChevronLeft, ChevronRight, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -16,6 +16,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 export default function AdminSamplesPage() {
     const { t, i18n } = useTranslation('admin');
@@ -62,6 +63,13 @@ export default function AdminSamplesPage() {
             ids: selectedIds,
         });
     };
+
+    const handleCopyLink = useCallback((sampleId) => {
+        const url = `${window.location.origin}/samples/${sampleId}`;
+        navigator.clipboard.writeText(url)
+            .then(() => toast.success(t('samples.linkCopied', 'Sample link copied!')))
+            .catch(() => toast.error(t('samples.linkCopyError', 'Failed to copy link')));
+    }, [t]);
 
     return (
         <div className="space-y-6" data-testid="admin-samples-page">
@@ -138,7 +146,7 @@ export default function AdminSamplesPage() {
                                         className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                         checked={samples.length > 0 && selectedIds.length === samples.length}
                                         onCheckedChange={handleSelectAll}
-                                        aria-label="Select all samples"
+                                        aria-label={t('samples.table.selectAll', 'Select all samples')}
                                         data-testid="samples-table-select-all"
                                     />
                                 </th>
@@ -201,6 +209,15 @@ export default function AdminSamplesPage() {
                                     {/* Actions */}
                                     <td className="pe-4 py-3">
                                         <div className="flex items-center justify-end gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleCopyLink(sample.id)}
+                                                title={t('samples.copyLink', 'Copy link')}
+                                                data-testid={`admin-samples-copy-button-${sample.id}`}
+                                            >
+                                                <Copy className="h-4 w-4" />
+                                            </Button>
                                             <Button
                                                 variant="ghost"
                                                 size="sm"

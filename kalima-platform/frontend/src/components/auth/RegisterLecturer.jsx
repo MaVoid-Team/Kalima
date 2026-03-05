@@ -1,7 +1,7 @@
 import SharedRoleForm from "./SharedRoleForm";
 import useRegister from "@/hooks/auth/useRegister";
 
-export default function RegisterLecturer({ onBack }) {
+export default function RegisterLecturer({ onBack, redirectTo }) {
     const { registerLecturer, registerFirebaseLecturer } = useRegister();
     return (
         <SharedRoleForm
@@ -9,6 +9,7 @@ export default function RegisterLecturer({ onBack }) {
             onBack={onBack}
             registerFn={registerLecturer}
             registerFirebaseFn={registerFirebaseLecturer}
+            redirectTo={redirectTo}
         />
     );
 }

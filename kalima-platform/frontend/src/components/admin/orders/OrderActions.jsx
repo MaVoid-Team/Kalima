@@ -29,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import useOrders from '@/hooks/useOrders';
 
 export default function OrderActions({ order, onActionSuccess }) {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
     const { receiveOrder, confirmOrder, returnOrder, deleteOrder } = useOrders();
 
     const handleAction = async (actionFn) => {
@@ -95,7 +95,7 @@ export default function OrderActions({ order, onActionSuccess }) {
                 </Button>
             )}
 
-            <DropdownMenu>
+            <DropdownMenu dir={i18n.dir()}>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
                         <span className="sr-only">Open menu</span>

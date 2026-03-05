@@ -23,7 +23,7 @@ import useLookups from "@/hooks/useLookups";
 import { useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/auth/useAuth";
 
-export default function RegisterTeacher({ onBack }) {
+export default function RegisterTeacher({ onBack, redirectTo }) {
     const { t } = useTranslation("auth");
     const navigate = useNavigate();
     const { registerTeacher, registerFirebaseTeacher } = useRegister();
@@ -57,7 +57,7 @@ export default function RegisterTeacher({ onBack }) {
             const portalAccess = res?.data?.portalAccess || res?.portalAccess;
             if (user && tokens) {
                 loginSuccess(user, tokens, portalAccess);
-                navigate("/");
+                navigate(redirectTo || "/", { replace: true });
             }
         } else {
             // Email/password flow: backend sends verification email → stay on page
@@ -80,6 +80,7 @@ export default function RegisterTeacher({ onBack }) {
                 is_secondary: false,
             }}
             onSubmit={handleSubmit}
+            redirectTo={redirectTo}
         >
             <TeacherFields />
         </CommonRegisterForm>

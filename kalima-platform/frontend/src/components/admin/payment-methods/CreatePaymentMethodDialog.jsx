@@ -117,7 +117,7 @@ export default function CreatePaymentMethodDialog({ open, onOpenChange, onSucces
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-md" data-testid="create-payment-method-dialog">
+            <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto custom-scrollbar" data-testid="create-payment-method-dialog">
                 <DialogHeader>
                     <DialogTitle>{t('paymentMethods.create.title', 'Create Payment Method')}</DialogTitle>
                     <DialogDescription>

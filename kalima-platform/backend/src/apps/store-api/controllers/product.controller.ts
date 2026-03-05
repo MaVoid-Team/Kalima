@@ -9,6 +9,7 @@ import {
   UpdateGalleryEntryDto,
   AttachCategoriesDto,
   AttachRequiredFieldsDto,
+  UpdateProductRequiredFieldDto,
 } from "../dtos/product.dto";
 import {
   ValidationError,
@@ -215,9 +216,7 @@ export const productController = {
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
       const dto = await validateDto(UpdateProductDto, req.body);
-      const files = req.files as
-        | { sample?: Express.Multer.File[] }
-        | undefined;
+      const files = req.files as { sample?: Express.Multer.File[] } | undefined;
       const sampleFile = files?.sample?.[0];
 
       const product = await productService.updateProduct(id, dto, sampleFile);
@@ -559,6 +558,38 @@ export const productController = {
         success: true,
         results: fields.length,
         data: fields,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * PATCH /products/:id/required-fields/:fieldDefinitionId
+   * Body: { is_required: boolean }
+   */
+  async updateRequiredField(req: Request, res: Response, _next: NextFunction) {
+    try {
+      const id = parseInt(req.params.id as string, 10);
+      const fieldDefinitionId = parseInt(
+        req.params.fieldDefinitionId as string,
+        10,
+      );
+
+      if (isNaN(id) || isNaN(fieldDefinitionId)) {
+        throw new BadRequestError("Invalid product ID or field definition ID");
+      }
+
+      const dto = await validateDto(UpdateProductRequiredFieldDto, req.body);
+      await productService.updateRequiredField(
+        id,
+        fieldDefinitionId,
+        dto.is_required,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Required field updated",
       });
     } catch (error) {
       _next(error);

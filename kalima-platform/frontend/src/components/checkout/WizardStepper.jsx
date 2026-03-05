@@ -22,11 +22,11 @@ export default function WizardStepper({ currentStep }) {
                     return (
                         <React.Fragment key={step.id}>
                             {/* Step Marker */}
-                            <div className={`relative p-1 z-10 flex flex-col items-center gap-2 transition-colors duration-300 ${isActive ? 'text-primary' : isCompleted ? 'text-primary' : 'text-gray-400'}`}>
+                            <div className={`relative w-16 p-1 z-10 flex flex-col items-center gap-2 transition-colors duration-300 ${isActive ? 'text-primary' : isCompleted ? 'text-primary' : 'text-gray-400'}`}>
                                 <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isActive ? 'border-primary bg-primary/10 scale-110 shadow-sm' : isCompleted ? 'border-primary bg-primary text-white' : 'border-gray-200 bg-gray-50'}`}>
                                     <Icon className="w-5 h-5" />
                                 </div>
-                                <span className={`absolute -bottom-7 w-24 text-center text-sm font-semibold tracking-wide ${isActive || isCompleted ? 'opacity-100' : 'opacity-70'}`}>
+                                <span className={`absolute -bottom-8 w-max whitespace-nowrap px-2 text-center text-sm font-semibold tracking-wide ${isActive || isCompleted ? 'opacity-100' : 'opacity-70'}`}>
                                     {step.label}
                                 </span>
                             </div>

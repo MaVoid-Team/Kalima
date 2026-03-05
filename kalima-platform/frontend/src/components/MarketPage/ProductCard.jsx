@@ -1,4 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { CheckCheck, ShoppingCart, Zap } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -9,17 +10,20 @@ import useAuth from "@/hooks/auth/useAuth";
 import { useCart } from "@/contexts/CartContext";
 import useRole from "@/hooks/useRole";
 import { useFastBuy } from "@/hooks/useFastBuy";
+import RatingDisplay from "@/components/ui/RatingDisplay";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 
 /**
  * ProductCard — renders a single product in the market grid.
  * The image/title area links to /product/:id.
  * "Add to Cart" and "Buy Now" buttons appear below (not inside the Link).
  */
-const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, isPurchased }) => {
+const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, isPurchased, rate, rate_count }) => {
   const { t, i18n } = useTranslation("market");
+  const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { isAdmin } = useRole();
+  const { hasAdminAccess } = useRole();
   const { startFastBuy, loading: fastBuyLoading } = useFastBuy();
 
   let cartCtx = null;
@@ -40,33 +44,44 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
 
   const cartLoading = cartCtx?.loading ?? false;
 
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
+
   const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (!isAuthenticated) {
-      navigate("/login");
+      navigate("/login", { state: { from: location }, replace: true });
       return;
     }
     if (!cartCtx?.addToCart) return;
     try {
+      setIsAddingToCart(true);
       await cartCtx.addToCart(id, 1);
     } catch (_) {
       // error handled by hook
+    } finally {
+      setIsAddingToCart(false);
     }
   };
 
-  const handleBuyNow = (e) => {
+  const handleBuyNow = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (!isAuthenticated) {
-      navigate("/login");
+      navigate("/login", { state: { from: location }, replace: true });
       return;
     }
-    startFastBuy(id, 1);
+    try {
+      setIsBuyingNow(true);
+      await startFastBuy(id, 1);
+    } finally {
+      setIsBuyingNow(false);
+    }
   };
 
   return (
-    <div className="group flex flex-col" data-testid={`market-product-card-${id}`}>
+    <div className="group flex flex-col h-full" data-testid={`market-product-card-${id}`}>
       {/* Clickable image/info area */}
       <Link to={`/product/${id}`} className="block" data-testid={`market-product-card-${id}-link`}>
         <Card className="border-none shadow-none">
@@ -90,6 +105,9 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
               <img
                 src={image}
                 alt={title}
+                loading="lazy"
+                width="400"
+                height="500"
                 className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                 onError={(e) => {
                   e.target.onerror = null;
@@ -98,7 +116,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-muted">
-                <img src={fallbackImage} alt="Placeholder" className="w-full h-full object-cover opacity-50" />
+                <img src={fallbackImage} alt="Placeholder" loading="lazy" width="400" height="500" className="w-full h-full object-cover opacity-50" />
               </div>
             )}
           </CardContent>
@@ -107,6 +125,12 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
               {title}
             </h3>
             <p className="text-sm text-muted-foreground w-full truncate">{category}</p>
+            <RatingDisplay
+              rating={rate}
+              reviewCount={rate_count}
+              size="sm"
+              className="mt-1"
+            />
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               <span className="text-base font-semibold">
                 {formatPrice(effectiveFinalPrice)} {t("product.currency")}
@@ -122,31 +146,44 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
       </Link>
 
       {/* Action buttons — outside the Link to avoid nested interactive elements */}
-      { !isAdmin && isAuthenticated && (
-        <div className="flex items-center gap-2 mt-auto">
+      {!hasAdminAccess && isAuthenticated && (
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-auto w-full">
           <Button
             variant="outline"
             size="sm"
-            className="flex-1 h-8 text-xs font-medium"
+            className="flex-1 h-8 text-xs font-medium py-2"
             onClick={handleAddToCart}
-            disabled={cartLoading}
+            disabled={cartLoading || fastBuyLoading || isAddingToCart}
             data-testid={`market-product-card-${id}-add-to-cart`}
             title={t("product.addToCart", "Add to Cart")}
           >
-            <ShoppingCart className="h-3.5 w-3.5 me-1.5 shrink-0" />
-            <span className="hidden sm:inline truncate">{t("product.addToCart", "Add to Cart")}</span>
-            <span className="sm:hidden">{t("product.cart", "Cart")}</span>
+            {isAddingToCart ? (
+              <LoadingSpinner className="h-5 w-5 border-primary" />
+            ) : (
+              <>
+                <ShoppingCart className="h-3.5 w-3.5 me-1.5 shrink-0" />
+                <span className="hidden sm:inline truncate">{t("product.addToCart", "Add to Cart")}</span>
+                <span className="sm:hidden">{t("product.cart", "Cart")}</span>
+              </>
+            )}
           </Button>
           <Button
             size="sm"
-            className="flex-1 h-8 text-xs font-medium"
+            className="flex-1 h-8 text-xs font-medium py-2"
             onClick={handleBuyNow}
             data-testid={`market-product-card-${id}-buy-now`}
             title={t("product.buyNow", "Buy Now")}
-            disabled={fastBuyLoading}
+            disabled={cartLoading || fastBuyLoading || isBuyingNow}
           >
-            <Zap className="h-3.5 w-3.5 me-1.5 shrink-0" />
-            {t("product.buyNow", "Buy Now")}
+            {isBuyingNow ? (
+              <LoadingSpinner className="h-5 w-5 border-white" />
+            ) : (
+              <>
+                <Zap className="h-3.5 w-3.5 me-1.5 shrink-0" />
+                <span className="hidden sm:inline truncate">{t("product.buyNow", "Buy Now")}</span>
+                <span className="sm:hidden">{t("product.buyNow", "Buy")}</span>
+              </>
+            )}
           </Button>
         </div>
       )}

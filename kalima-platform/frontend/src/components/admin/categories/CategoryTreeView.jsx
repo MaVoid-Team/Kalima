@@ -43,7 +43,7 @@ export default function CategoryTreeView({
 
   return (
     <div className="space-y-4" data-testid="categories-tree-view">
-      <div className="rounded-md border">
+      <div className="rounded-md border custom-scrollbar">
         <Table>
           <TableHeader>
             <TableRow>

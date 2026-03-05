@@ -52,7 +52,11 @@ router.get(
   authenticateToken,
   reviewController.checkCanReview,
 );
-router.post("/:id/reviews", ...storeCustomerAuth, reviewController.createReview);
+router.post(
+  "/:id/reviews",
+  ...storeCustomerAuth,
+  reviewController.createReview,
+);
 router.patch(
   "/:id/reviews/:reviewId",
   authenticateToken,
@@ -81,6 +85,13 @@ router.patch(
   uploadProductUpdate,
   productController.updateProduct,
 );
+
+router.patch(
+  "/:id/required-fields/:fieldDefinitionId",
+  ...adminAuth,
+  productController.updateRequiredField,
+);
+
 router.delete("/:id", ...adminAuth, productController.deleteProduct);
 
 // ============================================
