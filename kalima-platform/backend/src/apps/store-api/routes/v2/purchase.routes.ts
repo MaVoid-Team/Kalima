@@ -24,6 +24,11 @@ router.get("/my", authenticateToken, purchaseController.getMyPurchases);
 // ============================================
 
 router.get("/export", ...adminAuth, makeExportHandler("purchases"));
+router.get(
+  "/confirmed-count",
+  ...adminAuth,
+  purchaseController.getConfirmedCount,
+);
 router.get("/", ...adminAuth, purchaseController.getAll);
 router.get("/:id", ...adminAuth, purchaseController.getById);
 
@@ -33,6 +38,10 @@ router.patch("/:id/return", ...adminAuth, purchaseController.returnPurchase);
 router.patch("/:id/admin-note", ...adminAuth, purchaseController.addAdminNote);
 
 router.delete("/:id", ...adminAuth, purchaseController.deletePurchase);
-router.delete("/:id/items/:itemId", ...adminAuth, purchaseController.deleteItem);
+router.delete(
+  "/:id/items/:itemId",
+  ...adminAuth,
+  purchaseController.deleteItem,
+);
 
 export default router;
