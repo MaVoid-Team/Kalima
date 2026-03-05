@@ -125,6 +125,8 @@
         "name": "Full Name",
         "email": "Email Address",
         "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "passwordMismatch": "Passwords do not match",
         "phone": "Phone Number",
         "secondaryPhone": "Secondary Phone (Optional)",
         "gender": "Gender",
