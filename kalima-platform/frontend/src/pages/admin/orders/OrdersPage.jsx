@@ -37,7 +37,7 @@ export default function OrdersPage() {
         setDateRange,
         setPage,
         fetchOrders
-    } = useOrders({ limit: 6 });
+    } = useOrders();
 
     const { exportData, loading: exportLoading, exportProgress } = useExport();
     const [selectedIds, setSelectedIds] = useState([]);

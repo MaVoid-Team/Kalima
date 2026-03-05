@@ -64,6 +64,9 @@ export default function OrderDetailPage() {
     };
 
     const paymentScreenshot = getImageUrl(order.payment_screenshot?.url);
+    const hasPurchaseItemRequiredFields = (order.purchase_items ?? []).some(
+        (item) => (item.purchase_item_required_fields ?? []).length > 0
+    );
 
     return (
         <div className="max-w-6xl mx-auto space-y-6">
@@ -165,6 +168,42 @@ export default function OrderDetailPage() {
                         orderId={order.id}
                         onDeleteItem={deleteOrderItem}
                     />
+
+                    {/* Required fields collected per purchase item */}
+                    {hasPurchaseItemRequiredFields && (
+                        <div className="border rounded-md p-4 space-y-4" data-testid="order-detail-required-fields-section">
+                            <h3 className="font-medium">{t('orders.details.requiredFields', 'Required Fields')}</h3>
+
+                            <div className="space-y-4">
+                                {(order.purchase_items ?? []).map((item, itemIndex) => {
+                                    const requiredFields = item.purchase_item_required_fields ?? [];
+                                    if (requiredFields.length === 0) return null;
+
+                                    return (
+                                        <div key={item.id || itemIndex} className="rounded-md border p-3 space-y-2">
+                                            <div className="text-sm font-medium">
+                                                {t('orders.details.item', 'Item')} {itemIndex + 1}: {item.products?.title || item.product?.title || item.title || `#${item.id}`}
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                {requiredFields.map((field, index) => (
+                                                    <div
+                                                        key={field.id || `${item.id || itemIndex}-${field.field_definition_id || index}`}
+                                                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3 text-sm"
+                                                    >
+                                                        <span className="text-muted-foreground">
+                                                            {field.required_field_definitions?.label || t('orders.details.field', 'Field')}
+                                                        </span>
+                                                        <span className="font-mono break-all">{field.value || '-'}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Admin Notes */}
                     <AdminNotesSection

@@ -18,7 +18,7 @@ import {
     generatePaginationLinks,
 } from "@/components/ui/pagination";
 
-const LIMIT = 6;
+const LIMIT = 8;
 
 export default function SamplesDirectoryPage() {
     const { t, i18n } = useTranslation("market");
