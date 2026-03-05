@@ -47,7 +47,7 @@ export default function CartItem({
             </div>
 
             <div className="mt-4 flex items-center justify-between gap-4">
-                <div className="flex items-center border rounded-lg h-9">
+                {/* <div className="flex items-center border rounded-lg h-9">
                     <Button
                         aria-label={t('decreaseQuantity')}
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
@@ -69,7 +69,7 @@ export default function CartItem({
                     >
                         <Plus className="w-4 h-4" />
                     </Button>
-                </div>
+                </div> */}
                 <div className="text-xs text-muted-foreground font-medium">
                     {t('each', { price: `${item?.price_at_add} ${t('L.E')}` })}
                 </div>
