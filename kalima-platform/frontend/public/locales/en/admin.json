@@ -294,7 +294,7 @@
       "perksTip": "You can use English commas (,) or Arabic commas (،) to separate perks.",
       "titleIsRequired": "Title is required",
       "titleMaxLength": "Title must be at most 255 characters",
-      "priceMustBeGreaterThan0": "Price must be greater than 0",
+      "priceMustBeGreaterThan0": "Price must be greater than or equal to 0",
       "discountedPriceMustBeGreaterThan0": "Discounted price must be greater than 0",
       "serialMaxLength": "Serial must be at most 100 characters",
       "couponIdMustBeInteger": "Coupon ID must be an integer",
