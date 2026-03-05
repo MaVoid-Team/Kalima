@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import axios from "@/api/axios";
 import useApiMutation from "@/hooks/useApiMutation";
 import { getImageUrl } from "@/lib/storeUtils";
+import { egyptPhoneSchema } from "@/components/ui/phone-input";
 
 const separateRequiredFields = (itemFields) => {
   const imageUploads = [];
@@ -119,7 +120,10 @@ export function useFastBuy({ checkout = false } = {}) {
 
     const needsScreenshot = commonFields.some((f) => f.toLowerCase() === "paymentscreenshot");
     const needsTransferNumber = commonFields.includes("numberTransferredFrom");
-    const missingTransNum = needsTransferNumber && !formData.numberTransferredFrom;
+    const transferNumberValue = formData.numberTransferredFrom || "";
+    const missingTransNum = needsTransferNumber && !transferNumberValue;
+    const invalidTransferNumber =
+      needsTransferNumber && !egyptPhoneSchema.safeParse(transferNumberValue).success;
     const missingScreenshot = needsScreenshot && !formData.paymentScreenshot;
 
     return {
@@ -132,7 +136,10 @@ export function useFastBuy({ checkout = false } = {}) {
       itemsMissingFields,
       screenshotName: formData.paymentScreenshot?.name || "",
       isSubmitDisabled:
-        !isAllFieldsFilled(itemsMissingFields, itemFields) || missingTransNum || missingScreenshot,
+        !isAllFieldsFilled(itemsMissingFields, itemFields) ||
+        missingTransNum ||
+        missingScreenshot ||
+        invalidTransferNumber,
       hasItems: (preview?.cart_items || []).length > 0,
     };
   }, [preview, formData, itemFields]);

@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   CreditCard,
@@ -10,7 +11,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { PhoneInput, egyptPhoneSchema } from "@/components/ui/phone-input";
 import { Label } from "@/components/ui/label";
 import { getImageUrl } from "@/lib/storeUtils";
 
@@ -23,6 +24,14 @@ export default function FastBuyPaymentDetailsCard({
   paymentMethods,
 }) {
   const { t } = useTranslation("checkout");
+  const [transferTouched, setTransferTouched] = useState(false);
+
+  const transferNumberError = useMemo(() => {
+    if (!needsTransferNumber) return "";
+    const parsed = egyptPhoneSchema.safeParse(state.numberTransferredFrom || "");
+    if (parsed.success) return "";
+    return parsed.error.issues?.[0]?.message?.toString() || "";
+  }, [needsTransferNumber, state.numberTransferredFrom]);
 
   return (
     <Card className="border-muted shadow-sm overflow-hidden">
@@ -92,12 +101,15 @@ export default function FastBuyPaymentDetailsCard({
               {t("payment.transferNumber", "Transfer Number")}
               <span className="text-destructive">*</span>
             </Label>
-            <Input
+            <PhoneInput
               id="transferNumber"
+              dir="ltr"
               value={state.numberTransferredFrom}
-              onChange={(e) =>
+              onChange={(e) => {
+                setTransferTouched(true);
                 updateField("numberTransferredFrom", e.target.value)
-              }
+              }}
+              onBlur={() => setTransferTouched(true)}
               placeholder={t(
                 "payment.transferNumberPlaceholder",
                 "Enter transfer number",
@@ -105,6 +117,11 @@ export default function FastBuyPaymentDetailsCard({
               className="h-12 bg-background focus-visible:ring-primary/20"
               data-testid="fastbuy-payment-transfer-number"
             />
+            {transferTouched && transferNumberError && (
+              <p className="text-destructive text-sm mt-1 font-medium">
+                {transferNumberError}
+              </p>
+            )}
           </div>
         )}
 
