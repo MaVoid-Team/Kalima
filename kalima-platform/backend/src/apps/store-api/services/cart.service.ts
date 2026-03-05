@@ -833,12 +833,15 @@ class CartService {
     for (const item of cart.cart_items) {
       const unitPrice = Number(item.price_at_add);
       const itemDiscount = Number(item.discount || 0);
-      const required_fields = (item.cart_item_required_fields || []).map(
-        (rf) => ({
+      const required_fields = (item.cart_item_required_fields || [])
+        .filter(
+          (rf) =>
+            rf.value !== null && rf.value !== undefined && rf.value !== "",
+        )
+        .map((rf) => ({
           field_definition_id: rf.field_definition_id,
-          value: rf.value,
-        }),
-      );
+          value: String(rf.value),
+        }));
 
       flattenedItems.push({
         product_id: item.product_id,
