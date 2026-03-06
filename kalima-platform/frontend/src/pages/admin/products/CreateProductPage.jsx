@@ -49,18 +49,18 @@ export default function CreateProductPage() {
     // ─── Validation Schema ────────────────────────────────────────────────────────
 
     const createProductSchema = z.object({
-        title: z.string().min(1, t('products.form.titleIsRequired')).max(255),
-        price: z.coerce.number().positive(t('products.form.priceMustBeGreaterThan0')),
+        title: z.string().min(1, t('products.form.titleIsRequired')).max(255, t('products.form.titleMaxLength')),
+        price: z.coerce.number().min(0, t('products.form.priceMustBeGreaterThan0')),
         type: z.enum(['Product', 'Book']),
         description: z.string().optional(),
         price_after_discount: z.preprocess(
             (val) => (val === '' || val == null ? undefined : val),
-            z.coerce.number().positive().optional()
+            z.coerce.number().positive(t('products.form.discountedPriceMustBeGreaterThan0')).optional()
         ),
-        serial: z.string().max(100).optional().or(z.literal('')),
+        serial: z.string().max(100, t('products.form.serialMaxLength')).optional().or(z.literal('')),
         coupon_id: z.preprocess(
             (val) => (val === '' || val == null ? undefined : val),
-            z.coerce.number().int().positive().optional()
+            z.coerce.number().int(t('products.form.couponIdMustBeInteger')).positive(t('products.form.couponIdMustBeGreaterThan0')).optional()
         ),
         perks: z.string().optional().or(z.literal('')),
     }).refine(

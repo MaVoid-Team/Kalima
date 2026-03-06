@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency, buildProductImages } from '@/lib/storeUtils';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import {
     AlertDialog,
@@ -92,7 +93,7 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                     const product = item.products;
                                     const { main: mainImage } = buildProductImages(product);
                                     return (
-                                        <TableRow key={item.id}>
+                                        <TableRow key={item.id} className={item.is_deleted ? 'opacity-60' : ''}>
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     {mainImage && (
@@ -101,7 +102,15 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                                         </div>
                                                     )}
                                                     <div>
-                                                        <div className="font-medium text-sm">{product?.title || t('orders.items.unknownProduct', 'Unknown Product')}</div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-medium text-sm">{product?.title || t('orders.items.unknownProduct', 'Unknown Product')}</span>
+                                                            {item.is_deleted && (
+                                                                <Badge variant="destructive" className="gap-1 text-[10px] px-1.5 py-0">
+                                                                    <Trash2 className="h-3 w-3" />
+                                                                    {t('orders.deleted', 'Deleted')}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                         <div className="text-xs text-muted-foreground">{product?.product_serial}</div>
                                                     </div>
                                                 </div>
@@ -116,8 +125,8 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => setDeleteItemId(item.id)}
-                                                    disabled={items.length <= 1}
-                                                    title={items.length <= 1 ? "Cannot delete the only item" : t('orders.actions.deleteItem')}
+                                                    disabled={items.length <= 1 || item.is_deleted}
+                                                    title={item.is_deleted ? t('orders.deleted', 'Deleted') : items.length <= 1 ? "Cannot delete the only item" : t('orders.actions.deleteItem')}
                                                     data-testid={`admin-orders-item-delete-${item.id}`}
                                                 >
                                                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -137,7 +146,7 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                             const { main: mainImage } = buildProductImages(product);
 
                             return (
-                                <div key={item.id} className="border rounded-md p-4 space-y-3 shadow-sm">
+                                <div key={item.id} className={`border rounded-md p-4 space-y-3 shadow-sm ${item.is_deleted ? 'opacity-60 border-destructive/30' : ''}`}>
                                     <div className="flex gap-4">
                                         {mainImage && (
                                             <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md border">
@@ -145,8 +154,16 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                             </div>
                                         )}
                                         <div className="flex-1 min-w-0">
-                                            <div className="font-medium text-base truncate" title={product?.title || t('orders.items.unknownProduct', 'Unknown Product')}>
-                                                {product?.title || t('orders.items.unknownProduct', 'Unknown Product')}
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className="font-medium text-base truncate" title={product?.title || t('orders.items.unknownProduct', 'Unknown Product')}>
+                                                    {product?.title || t('orders.items.unknownProduct', 'Unknown Product')}
+                                                </span>
+                                                {item.is_deleted && (
+                                                    <Badge variant="destructive" className="gap-1 text-[10px] px-1.5 py-0 shrink-0">
+                                                        <Trash2 className="h-3 w-3" />
+                                                        {t('orders.deleted', 'Deleted')}
+                                                    </Badge>
+                                                )}
                                             </div>
                                             <div className="text-sm text-muted-foreground truncate">
                                                 {product?.product_serial} • {product?.type || item.item_type || t('common.na', 'N/A')}
@@ -156,7 +173,7 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => setDeleteItemId(item.id)}
-                                            disabled={items.length <= 1}
+                                            disabled={items.length <= 1 || item.is_deleted}
                                             className="shrink-0 h-8 w-8"
                                             data-testid={`admin-orders-item-delete-mobile-${item.id}`}
                                         >

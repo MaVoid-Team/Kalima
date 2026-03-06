@@ -26,14 +26,25 @@ const getProductId = (product) => product?.id || product?._id;
 export default function CouponsPage() {
     const { t, i18n } = useTranslation('admin');
     const {
-        getAllCoupons,
+        coupons,
+        pagination,
+        filters,
+        loadCoupons,
+        setSearch,
+        setActive,
+        setDiscountType,
+        setProductFilter,
+        setStartDate,
+        setEndDate,
+        clearProductFilter,
+        setPage,
         getCouponsStats,
         createCoupon,
         updateCoupon,
         deleteCoupon,
         generateCouponCode,
         apiLoading,
-    } = useAdminCoupons();
+    } = useAdminCoupons({ enableList: true });
 
     const {
         products,
@@ -46,50 +57,11 @@ export default function CouponsPage() {
 
     const { exportData, loading: exportLoading, exportProgress } = useExport();
     const [selectedIds, setSelectedIds] = useState([]);
-
-    const [coupons, setCoupons] = useState([]);
     const [couponsStats, setCouponsStats] = useState(null);
-    const [pagination, setPagination] = useState({
-        total: 0,
-        page: 1,
-        pages: 1,
-        limit: 10,
-    });
-    const [filters, setFilters] = useState({
-        search: '',
-        active: 'all',
-        product_id: '',
-        discount_type: 'all',
-        startDate: '',
-        endDate: '',
-    });
 
     const [editOpen, setEditOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [selectedCoupon, setSelectedCoupon] = useState(null);
-
-    const loadCoupons = useCallback(async () => {
-        const response = await getAllCoupons({
-            page: pagination.page,
-            limit: pagination.limit,
-            active: filters.active === 'all' ? undefined : filters.active == "true" ? 1 : 0,
-            product_id: filters.product_id || undefined,
-            isAmount:
-                filters.discount_type === 'AMOUNT'
-                    ? 1
-                    : filters.discount_type === 'PERCENTAGE'
-                        ? 0
-                        : undefined,
-            startDate: filters.startDate || undefined,
-            endDate: filters.endDate || undefined,
-        });
-
-        setCoupons(response?.coupons || []);
-        setPagination((prev) => ({
-            ...prev,
-            ...(response?.pagination || {}),
-        }));
-    }, [getAllCoupons, pagination.page, pagination.limit, filters.active, filters.product_id, filters.discount_type, filters.startDate, filters.endDate]);
 
     const filteredCoupons = useMemo(() => {
         const normalizedSearch = (filters.search || '').trim().toLowerCase();
@@ -111,55 +83,8 @@ export default function CouponsPage() {
     }, [getCouponsStats]);
 
     useEffect(() => {
-        loadCoupons();
-    }, [loadCoupons]);
-
-    useEffect(() => {
         loadCouponsStats();
     }, [loadCouponsStats]);
-
-    const setSearch = (search) => {
-        setFilters((prev) => ({ ...prev, search }));
-        setPagination((prev) => ({ ...prev, page: 1 }));
-    };
-
-    const setActive = (active) => {
-        setFilters((prev) => ({ ...prev, active }));
-        setPagination((prev) => ({ ...prev, page: 1 }));
-    };
-
-    const setDiscountType = (discountType) => {
-        setFilters((prev) => ({ ...prev, discount_type: discountType }));
-        setPagination((prev) => ({ ...prev, page: 1 }));
-    };
-
-    const setProductFilter = (product) => {
-        const productId = getProductId(product);
-        setFilters((prev) => ({
-            ...prev,
-            product_id: productId !== null && productId !== undefined ? String(productId) : '',
-        }));
-        setPagination((prev) => ({ ...prev, page: 1 }));
-    };
-
-    const setStartDate = (startDate) => {
-        setFilters((prev) => ({ ...prev, startDate }));
-        setPagination((prev) => ({ ...prev, page: 1 }));
-    };
-
-    const setEndDate = (endDate) => {
-        setFilters((prev) => ({ ...prev, endDate }));
-        setPagination((prev) => ({ ...prev, page: 1 }));
-    };
-
-    const clearProductFilter = () => {
-        setFilters((prev) => ({ ...prev, product_id: '' }));
-        setPagination((prev) => ({ ...prev, page: 1 }));
-    };
-
-    const setPage = (page) => {
-        setPagination((prev) => ({ ...prev, page }));
-    };
 
     const handleSelect = (id, checked) => {
         setSelectedIds((prev) =>
@@ -327,7 +252,7 @@ export default function CouponsPage() {
                 productSearch={productFilters.search}
                 onProductSearchChange={setProductSearch}
                 onProductPageChange={setProductPage}
-                onProductFilterChange={setProductFilter}
+                onProductFilterChange={(product) => setProductFilter(getProductId(product))}
                 onProductFilterClear={clearProductFilter}
             />
 

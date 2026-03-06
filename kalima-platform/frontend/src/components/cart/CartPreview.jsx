@@ -159,10 +159,20 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
                             </span>
                           </div>
                         }
+                        {/* Remove Item Button */}
+                        <Button
+                          onClick={() => setItemToRemove(item.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 p-1 h-auto"
+                          data-testid={`cart-preview-remove-${item.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                       
                       {/* Quantity Controls */}
-                      <div className="flex items-center justify-between">
+                      {/* <div className="flex items-center justify-between">
                         <div className="flex items-center border rounded-lg h-8">
                           <Button
                             aria-label={t('decreaseQuantity')}
@@ -187,7 +197,6 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
                           </Button>
                         </div>
                         
-                        {/* Remove Item Button */}
                         <Button
                           onClick={() => setItemToRemove(item.id)}
                           variant="ghost"
@@ -197,7 +206,7 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 ))}

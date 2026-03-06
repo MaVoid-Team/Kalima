@@ -6,13 +6,13 @@ export const useOrders = (optionsOrId = null) => {
     const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
 
     let id = null;
-    let initialLimit = 20;
+    let initialLimit = 8;
     let autoFetch = true;
 
     if (optionsOrId !== null) {
         if (typeof optionsOrId === 'object') {
             id = optionsOrId.id || null;
-            initialLimit = optionsOrId.limit || 20;
+            initialLimit = optionsOrId.limit || 8;
             if (optionsOrId.autoFetch !== undefined) autoFetch = optionsOrId.autoFetch;
         } else {
             id = optionsOrId;

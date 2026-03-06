@@ -103,11 +103,11 @@ export default function useAdminCategories() {
   const [state, setState] = useState({
     categories: [],
     childrenMap: {},
-    pagination: { total: 0, page: 1, limit: 50 },
+    pagination: { total: 0, page: 1, limit: 8 },
   });
 
   const fetchCategories = useCallback(
-    async ({ page = 1, limit = 50, active } = {}) => {
+    async ({ page = 1, limit = 8, active } = {}) => {
       setFetching(true);
       try {
         const query = new URLSearchParams({ page, limit });

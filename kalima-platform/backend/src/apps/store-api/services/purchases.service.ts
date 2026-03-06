@@ -5,6 +5,7 @@ import { CreatePurchaseDto, CreatePurchaseItemDto } from "../dtos/purchase.dto";
 import { userManagementService } from "./user-management.service";
 import { imageService } from "./image.service";
 import type { Prisma } from "../generated/prisma/client";
+import { role_enum } from "../generated/prisma/client";
 import type { CheckoutDto } from "../dtos/cart.dto";
 import { couponService } from "./coupon.service";
 import { validatePaymentForCheckout } from "./checkout-validation.service";
@@ -167,11 +168,13 @@ class PurchasesService {
       const purchaseItem = createdItems[i];
       if (item.required_fields?.length && purchaseItem) {
         for (const rf of item.required_fields) {
-          requiredFieldsData.push({
-            purchase_item_id: purchaseItem.id,
-            field_definition_id: rf.field_definition_id,
-            value: rf.value,
-          });
+          if (rf.value !== null && rf.value !== undefined && rf.value !== "") {
+            requiredFieldsData.push({
+              purchase_item_id: purchaseItem.id,
+              field_definition_id: rf.field_definition_id,
+              value: String(rf.value),
+            });
+          }
         }
       }
     }
@@ -308,6 +311,98 @@ class PurchasesService {
     return purchase;
   }
 
+  /** Aggregated count of confirmed purchases per admin and per month with pagination */
+  async getConfirmedStats(
+    page: number,
+    limit: number,
+    month?: number,
+    year?: number,
+  ) {
+    const skip = (page - 1) * limit;
+
+    const now = new Date();
+    const targetMonth = month || now.getMonth() + 1;
+    const targetYear = year || now.getFullYear();
+
+    const startDate = new Date(targetYear, targetMonth - 1, 1);
+    const endDate = new Date(targetYear, targetMonth, 1);
+
+    // 1. Get all eligible users (Admin, SubAdmin, Moderator)
+    const eligibleRoles: role_enum[] = ["Admin", "SubAdmin", "Moderator"];
+
+    // We filter users who have any of these roles
+    const totalAdmins = await this.db.users.count({
+      where: {
+        user_roles: {
+          some: {
+            role: { in: eligibleRoles },
+          },
+        },
+        deleted_at: null,
+      },
+    });
+
+    const admins = await this.db.users.findMany({
+      where: {
+        user_roles: {
+          some: {
+            role: { in: eligibleRoles },
+          },
+        },
+        deleted_at: null,
+      },
+      select: {
+        id: true,
+        name: true,
+        user_roles: {
+          select: { role: true },
+          where: { role: { in: eligibleRoles } },
+          take: 1, // Generally one primary role for this grouping
+        },
+      },
+      orderBy: { name: "asc" },
+      skip,
+      take: limit,
+    });
+
+    const adminIds = admins.map((a) => a.id);
+
+    // 2. Get confirmed counts for these specific admins in the target month
+    const grouped = await this.db.purchases.groupBy({
+      by: ["confirmed_by"],
+      _count: { _all: true },
+      where: {
+        confirmed_by: { in: adminIds },
+        status: "confirmed",
+        deleted_at: null,
+        confirmed_at: {
+          gte: startDate,
+          lt: endDate,
+        },
+      },
+    });
+
+    const countsMap = new Map(
+      grouped.map((g) => [g.confirmed_by, g._count._all]),
+    );
+
+    // 3. Merge data
+    const stats = admins.map((admin) => ({
+      id: admin.id,
+      name: admin.name,
+      role: admin.user_roles[0]?.role || null,
+      count: countsMap.get(admin.id) || 0,
+    }));
+
+    return {
+      stats,
+      total: totalAdmins,
+      page,
+      pages: Math.ceil(totalAdmins / limit),
+      limit,
+    };
+  }
+
   // =============================================================
   // Status transitions
   // =============================================================
@@ -425,7 +520,7 @@ class PurchasesService {
       }
       await tx.purchases.update({
         where: { id: purchaseId },
-        data: { deleted_at: new Date() },
+        data: { deleted_at: new Date(), is_deleted: true },
       });
       await tx.user_analytics.update({
         where: { user_id: purchase.user_id },
@@ -457,7 +552,7 @@ class PurchasesService {
 
     await this.db.purchase_items.update({
       where: { id: itemId },
-      data: { deleted_at: new Date() },
+      data: { deleted_at: new Date(), is_deleted: true },
     });
 
     const remaining = purchase.purchase_items.filter((i) => i.id !== itemId);

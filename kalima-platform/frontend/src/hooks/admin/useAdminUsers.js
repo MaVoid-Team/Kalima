@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import useApiMutation from '../useApiMutation';
+import { toast } from 'sonner';
+import i18n from '@/i18n';
 
 export const useAdminUsers = () => {
     const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
@@ -10,7 +12,7 @@ export const useAdminUsers = () => {
         total: 0,
         page: 1,
         pages: 1,
-        limit: 10
+        limit: 8
     });
     const [filters, setFilters] = useState({
         search: '',
@@ -158,6 +160,9 @@ export const useAdminUsers = () => {
             endpoint: '/auth/admin/create-admin',
             method: 'post',
             data: userData
+        }, false).then(res => {
+            if (res?.success) toast.success(i18n.t('userManagement:messages.adminCreated'));
+            return res;
         }));
 
     const createSubAdminUser = (userData) =>
@@ -165,6 +170,9 @@ export const useAdminUsers = () => {
             endpoint: '/auth/admin/create-subadmin',
             method: 'post',
             data: userData
+        }, false).then(res => {
+            if (res?.success) toast.success(i18n.t('userManagement:messages.subAdminCreated'));
+            return res;
         }));
 
     const createModeratorUser = (userData) =>
@@ -172,6 +180,9 @@ export const useAdminUsers = () => {
             endpoint: '/auth/admin/create-moderator',
             method: 'post',
             data: userData
+        }, false).then(res => {
+            if (res?.success) toast.success(i18n.t('userManagement:messages.moderatorCreated'));
+            return res;
         }));
 
     const createAssistantUser = (userData) =>
@@ -179,6 +190,19 @@ export const useAdminUsers = () => {
             endpoint: '/auth/admin/create-assistant',
             method: 'post',
             data: userData
+        }, false).then(res => {
+            if (res?.success) toast.success(i18n.t('userManagement:messages.assistantCreated'));
+            return res;
+        }));
+
+    const createTeacherUser = (userData) =>
+        handleAction(() => fetchApi({
+            endpoint: '/admin/teachers',
+            method: 'post',
+            data: userData
+        }, false).then(res => {
+            if (res?.success) toast.success(i18n.t('userManagement:messages.teacherCreated'));
+            return res;
         }));
 
     const deleteUser = (userId) =>
@@ -235,6 +259,7 @@ export const useAdminUsers = () => {
         createSubAdminUser,
         createModeratorUser,
         createAssistantUser,
+        createTeacherUser,
         deleteUser,
 
         // Setters

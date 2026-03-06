@@ -339,7 +339,11 @@ class ProductService {
 
     await this.db.products.update({
       where: { id },
-      data: { deleted_at: new Date(), updated_at: new Date() },
+      data: {
+        deleted_at: new Date(),
+        is_deleted: true,
+        updated_at: new Date(),
+      },
     });
   }
 

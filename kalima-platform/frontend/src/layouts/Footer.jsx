@@ -1,12 +1,14 @@
-import { Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
+import { FacebookIcon, YoutubeIcon } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logo from "../assets/Logo.png";
 
 const SOCIAL_LINKS = [
-  { Icon: Facebook, href: "https://www.facebook.com/kalima010", label: "Facebook" },
-  { Icon: Youtube, href: "https://www.youtube.com/@kalima1", label: "Youtube" },
+  { Icon: FacebookIcon, href: "https://www.facebook.com/kalima010", label: "Facebook" },
+  { Icon: YoutubeIcon, href: "https://www.youtube.com/@kalima1", label: "Youtube" },
+  { Icon: FaWhatsapp, href: "https://wa.me/201000000000", label: "WhatsApp" },
 ];
 
 export default function Footer() {
