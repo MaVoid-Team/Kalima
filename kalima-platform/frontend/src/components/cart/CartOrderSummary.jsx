@@ -15,6 +15,7 @@ export default function CartOrderSummary({
 }) {
   const { t } = useTranslation('cart');
   const navigate = useNavigate();
+  const whatsappUrl = 'https://wa.me/201000000000';
 
   const [clientStates, setClientStates] = useState({});
 
@@ -134,11 +135,14 @@ export default function CartOrderSummary({
               <h3 className="text-sm font-bold mb-1">{t("needHelp")}</h3>
               <p className="text-xs mb-3">{t("needHelpText")}</p>
               <Button
+                asChild
                 variant="link"
                 className="text-xs font-semibold text-primary hover:text-primary/80 p-0 h-auto"
                 data-testid="cart-summary-chat-button"
               >
-                {t("chatWithUs")}
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  {t("chatWithUs")}
+                </a>
               </Button>
             </div>
           </div>
