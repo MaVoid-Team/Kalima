@@ -138,6 +138,7 @@
     "statusRefunded": "Refunded",
     "statusReturned": "Returned",
     "statusCreated": "Created",
+    "deleted": "Deleted",
     "clearFilters": "Clear",
     "filterByDate": "Filter by date",
     "table": {

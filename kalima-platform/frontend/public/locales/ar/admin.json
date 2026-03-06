@@ -138,6 +138,7 @@
     "statusRefunded": "مسترد",
     "statusReturned": "مرتجع",
     "statusCreated": "تم الإنشاء",
+    "deleted": "محذوف",
     "clearFilters": "مسح",
     "filterByDate": "تصفية حسب التاريخ",
     "table": {

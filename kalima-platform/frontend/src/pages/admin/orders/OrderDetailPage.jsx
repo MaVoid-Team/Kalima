@@ -101,6 +101,12 @@ export default function OrderDetailPage() {
                             <Badge variant="outline" className={getStatusColor(order.status)}>
                                 {t(`orders.status${order.status.charAt(0).toUpperCase() + order.status.slice(1).toLowerCase()}`, { defaultValue: order.status })}
                             </Badge>
+                            {order.is_deleted && (
+                                <Badge variant="destructive" className="gap-1" data-testid="order-detail-deleted-badge">
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    {t('orders.deleted', 'Deleted')}
+                                </Badge>
+                            )}
                         </div>
                         <div className="text-muted-foreground">
                             {formatOrderDate(order.created_at, i18n.language)}
