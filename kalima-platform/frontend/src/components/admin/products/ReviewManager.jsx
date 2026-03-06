@@ -24,7 +24,7 @@ const ReviewManager = ({ productId, className }) => {
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 8,
     total: 0,
     pages: 1
   });

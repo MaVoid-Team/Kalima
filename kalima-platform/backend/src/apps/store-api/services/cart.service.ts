@@ -502,7 +502,7 @@ class CartService {
 
     await this.db.cart_items.update({
       where: { id: cart_item_id },
-      data: { deleted_at: new Date() },
+      data: { deleted_at: new Date(), is_deleted: true },
     });
 
     // Recalculate cart totals and persist
@@ -644,7 +644,7 @@ class CartService {
     await this.db.$transaction([
       this.db.cart_items.updateMany({
         where: { cart_id: cart.id },
-        data: { deleted_at: new Date() },
+        data: { deleted_at: new Date(), is_deleted: true },
       }),
       this.db.carts.update({
         where: { id: cart.id },
@@ -833,12 +833,15 @@ class CartService {
     for (const item of cart.cart_items) {
       const unitPrice = Number(item.price_at_add);
       const itemDiscount = Number(item.discount || 0);
-      const required_fields = (item.cart_item_required_fields || []).map(
-        (rf) => ({
+      const required_fields = (item.cart_item_required_fields || [])
+        .filter(
+          (rf) =>
+            rf.value !== null && rf.value !== undefined && rf.value !== "",
+        )
+        .map((rf) => ({
           field_definition_id: rf.field_definition_id,
-          value: rf.value,
-        }),
-      );
+          value: String(rf.value),
+        }));
 
       flattenedItems.push({
         product_id: item.product_id,
@@ -1089,9 +1092,20 @@ class CartService {
       this.db.cart_items.findUnique({ where: { id: dto.cart_item_id } }),
       this.getActiveCartByUser(user_id, cartStatus),
     ]);
+
     if (!cartItem) throw new NotFoundError("Cart item not found");
     if (cartItem.cart_id !== cart.id)
       throw new BadRequestError("Cart item does not belong to user's cart");
+
+    const product = await this.db.products.findUnique({
+      where: { id: cartItem.product_id },
+      select: {
+        product_required_fields: {
+          select: { id: true, field_definition_id: true, is_required: true },
+        },
+      },
+    });
+    if (!product) throw new NotFoundError("Product not found");
 
     // preload definitions to determine if any required field expects an image
     const defIds = dto.required_fields.map(
@@ -1107,13 +1121,17 @@ class CartService {
     // Build field values
     const operations: Promise<unknown>[] = [];
     for (const f of dto.required_fields) {
+      const is_required = product.product_required_fields.find(
+        (x) => x.field_definition_id === f.required_field_definition_id,
+      )?.is_required;
+
       let value: string | null = f.value;
       if (typeof value === "string" && value.trim() === "") {
         value = null; // empty string becomes null representing not-filled
       }
 
       const fieldType = defMap.get(f.required_field_definition_id);
-      if (fieldType === "image") {
+      if (fieldType === "image" && is_required) {
         throw new BadRequestError(
           `Field ${f.required_field_definition_id} requires an image upload via the dedicated form-data endpoint.`,
         );
@@ -1127,7 +1145,7 @@ class CartService {
       });
 
       if (existing) {
-        if (value === null) {
+        if (value === null && !is_required) {
           operations.push(
             this.db.cart_item_required_fields.delete({
               where: { id: existing.id },

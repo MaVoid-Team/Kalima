@@ -55,6 +55,7 @@ export type ProductsMinAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
   perks: string | null
 }
 
@@ -73,6 +74,7 @@ export type ProductsMaxAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
   perks: string | null
 }
 
@@ -91,6 +93,7 @@ export type ProductsCountAggregateOutputType = {
   created_at: number
   updated_at: number
   deleted_at: number
+  is_deleted: number
   perks: number
   _all: number
 }
@@ -125,6 +128,7 @@ export type ProductsMinAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
   perks?: true
 }
 
@@ -143,6 +147,7 @@ export type ProductsMaxAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
   perks?: true
 }
 
@@ -161,6 +166,7 @@ export type ProductsCountAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
   perks?: true
   _all?: true
 }
@@ -266,6 +272,7 @@ export type ProductsGroupByOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
   perks: string | null
   _count: ProductsCountAggregateOutputType | null
   _avg: ProductsAvgAggregateOutputType | null
@@ -307,6 +314,7 @@ export type productsWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"products"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"products"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"products"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"products"> | boolean | null
   perks?: Prisma.StringNullableFilter<"products"> | string | null
   product_required_fields?: Prisma.Product_required_fieldsListRelationFilter
   product_categories?: Prisma.Product_categoriesListRelationFilter
@@ -334,6 +342,7 @@ export type productsOrderByWithRelationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   perks?: Prisma.SortOrderInput | Prisma.SortOrder
   product_required_fields?: Prisma.product_required_fieldsOrderByRelationAggregateInput
   product_categories?: Prisma.product_categoriesOrderByRelationAggregateInput
@@ -364,6 +373,7 @@ export type productsWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeNullableFilter<"products"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"products"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"products"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"products"> | boolean | null
   perks?: Prisma.StringNullableFilter<"products"> | string | null
   product_required_fields?: Prisma.Product_required_fieldsListRelationFilter
   product_categories?: Prisma.Product_categoriesListRelationFilter
@@ -391,6 +401,7 @@ export type productsOrderByWithAggregationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   perks?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.productsCountOrderByAggregateInput
   _avg?: Prisma.productsAvgOrderByAggregateInput
@@ -417,6 +428,7 @@ export type productsScalarWhereWithAggregatesInput = {
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"products"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"products"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"products"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableWithAggregatesFilter<"products"> | boolean | null
   perks?: Prisma.StringNullableWithAggregatesFilter<"products"> | string | null
 }
 
@@ -433,6 +445,7 @@ export type productsCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
@@ -460,6 +473,7 @@ export type productsUncheckedCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
@@ -484,6 +498,7 @@ export type productsUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
@@ -511,6 +526,7 @@ export type productsUncheckedUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
@@ -537,6 +553,7 @@ export type productsCreateManyInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
 }
 
@@ -553,6 +570,7 @@ export type productsUpdateManyMutationInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -571,6 +589,7 @@ export type productsUncheckedUpdateManyInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -594,6 +613,7 @@ export type productsCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
   perks?: Prisma.SortOrder
 }
 
@@ -619,6 +639,7 @@ export type productsMaxOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
   perks?: Prisma.SortOrder
 }
 
@@ -637,6 +658,7 @@ export type productsMinOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
   perks?: Prisma.SortOrder
 }
 
@@ -836,6 +858,7 @@ export type productsCreateWithoutProduct_categoriesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutProductsInput
@@ -862,6 +885,7 @@ export type productsUncheckedCreateWithoutProduct_categoriesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
@@ -901,6 +925,7 @@ export type productsUpdateWithoutProduct_categoriesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutProductsNestedInput
@@ -927,6 +952,7 @@ export type productsUncheckedUpdateWithoutProduct_categoriesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
@@ -950,6 +976,7 @@ export type productsCreateWithoutCouponsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
@@ -976,6 +1003,7 @@ export type productsUncheckedCreateWithoutCouponsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
@@ -1015,6 +1043,7 @@ export type productsUpdateWithoutCouponsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
@@ -1041,6 +1070,7 @@ export type productsUncheckedUpdateWithoutCouponsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
@@ -1064,6 +1094,7 @@ export type productsCreateWithoutProduct_required_fieldsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutProductsInput
@@ -1090,6 +1121,7 @@ export type productsUncheckedCreateWithoutProduct_required_fieldsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
@@ -1129,6 +1161,7 @@ export type productsUpdateWithoutProduct_required_fieldsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutProductsNestedInput
@@ -1155,6 +1188,7 @@ export type productsUncheckedUpdateWithoutProduct_required_fieldsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
@@ -1178,6 +1212,7 @@ export type productsCreateWithoutProduct_reviewsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
@@ -1204,6 +1239,7 @@ export type productsUncheckedCreateWithoutProduct_reviewsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
@@ -1243,6 +1279,7 @@ export type productsUpdateWithoutProduct_reviewsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
@@ -1269,6 +1306,7 @@ export type productsUncheckedUpdateWithoutProduct_reviewsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
@@ -1292,6 +1330,7 @@ export type productsCreateWithoutSamplesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
@@ -1318,6 +1357,7 @@ export type productsUncheckedCreateWithoutSamplesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
@@ -1357,6 +1397,7 @@ export type productsUpdateWithoutSamplesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
@@ -1383,6 +1424,7 @@ export type productsUncheckedUpdateWithoutSamplesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
@@ -1406,6 +1448,7 @@ export type productsCreateWithoutCart_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
@@ -1432,6 +1475,7 @@ export type productsUncheckedCreateWithoutCart_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
@@ -1471,6 +1515,7 @@ export type productsUpdateWithoutCart_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
@@ -1497,6 +1542,7 @@ export type productsUncheckedUpdateWithoutCart_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
@@ -1520,6 +1566,7 @@ export type productsCreateWithoutPurchase_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
@@ -1546,6 +1593,7 @@ export type productsUncheckedCreateWithoutPurchase_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
@@ -1585,6 +1633,7 @@ export type productsUpdateWithoutPurchase_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
@@ -1611,6 +1660,7 @@ export type productsUncheckedUpdateWithoutPurchase_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
@@ -1634,6 +1684,7 @@ export type productsCreateWithoutThumbnail_imageInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
@@ -1659,6 +1710,7 @@ export type productsUncheckedCreateWithoutThumbnail_imageInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
@@ -1714,6 +1766,7 @@ export type productsScalarWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"products"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"products"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"products"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"products"> | boolean | null
   perks?: Prisma.StringNullableFilter<"products"> | string | null
 }
 
@@ -1730,6 +1783,7 @@ export type productsCreateWithoutProduct_galleryInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
@@ -1756,6 +1810,7 @@ export type productsUncheckedCreateWithoutProduct_galleryInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
@@ -1795,6 +1850,7 @@ export type productsUpdateWithoutProduct_galleryInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
@@ -1821,6 +1877,7 @@ export type productsUncheckedUpdateWithoutProduct_galleryInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
@@ -1845,6 +1902,7 @@ export type productsCreateManyThumbnail_imageInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   perks?: string | null
 }
 
@@ -1861,6 +1919,7 @@ export type productsUpdateWithoutThumbnail_imageInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
@@ -1886,6 +1945,7 @@ export type productsUncheckedUpdateWithoutThumbnail_imageInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
@@ -1911,6 +1971,7 @@ export type productsUncheckedUpdateManyWithoutThumbnail_imageInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   perks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -2014,6 +2075,7 @@ export type productsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   perks?: boolean
   product_required_fields?: boolean | Prisma.products$product_required_fieldsArgs<ExtArgs>
   product_categories?: boolean | Prisma.products$product_categoriesArgs<ExtArgs>
@@ -2042,6 +2104,7 @@ export type productsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   perks?: boolean
   thumbnail_image?: boolean | Prisma.products$thumbnail_imageArgs<ExtArgs>
 }, ExtArgs["result"]["products"]>
@@ -2061,6 +2124,7 @@ export type productsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   perks?: boolean
   thumbnail_image?: boolean | Prisma.products$thumbnail_imageArgs<ExtArgs>
 }, ExtArgs["result"]["products"]>
@@ -2080,10 +2144,11 @@ export type productsSelectScalar = {
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   perks?: boolean
 }
 
-export type productsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "type" | "price" | "price_after_discount" | "serial" | "thumbnail_id" | "sample_url" | "is_archived" | "mongo_id" | "created_at" | "updated_at" | "deleted_at" | "perks", ExtArgs["result"]["products"]>
+export type productsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "type" | "price" | "price_after_discount" | "serial" | "thumbnail_id" | "sample_url" | "is_archived" | "mongo_id" | "created_at" | "updated_at" | "deleted_at" | "is_deleted" | "perks", ExtArgs["result"]["products"]>
 export type productsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product_required_fields?: boolean | Prisma.products$product_required_fieldsArgs<ExtArgs>
   product_categories?: boolean | Prisma.products$product_categoriesArgs<ExtArgs>
@@ -2131,6 +2196,7 @@ export type $productsPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     created_at: Date | null
     updated_at: Date | null
     deleted_at: Date | null
+    is_deleted: boolean | null
     perks: string | null
   }, ExtArgs["result"]["products"]>
   composites: {}
@@ -2578,6 +2644,7 @@ export interface productsFieldRefs {
   readonly created_at: Prisma.FieldRef<"products", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"products", 'DateTime'>
   readonly deleted_at: Prisma.FieldRef<"products", 'DateTime'>
+  readonly is_deleted: Prisma.FieldRef<"products", 'Boolean'>
   readonly perks: Prisma.FieldRef<"products", 'String'>
 }
     

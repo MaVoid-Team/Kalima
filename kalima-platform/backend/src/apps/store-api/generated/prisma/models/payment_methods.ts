@@ -45,6 +45,7 @@ export type Payment_methodsMinAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
 }
 
 export type Payment_methodsMaxAggregateOutputType = {
@@ -56,6 +57,7 @@ export type Payment_methodsMaxAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
 }
 
 export type Payment_methodsCountAggregateOutputType = {
@@ -67,6 +69,7 @@ export type Payment_methodsCountAggregateOutputType = {
   created_at: number
   updated_at: number
   deleted_at: number
+  is_deleted: number
   _all: number
 }
 
@@ -90,6 +93,7 @@ export type Payment_methodsMinAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
 }
 
 export type Payment_methodsMaxAggregateInputType = {
@@ -101,6 +105,7 @@ export type Payment_methodsMaxAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
 }
 
 export type Payment_methodsCountAggregateInputType = {
@@ -112,6 +117,7 @@ export type Payment_methodsCountAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
   _all?: true
 }
 
@@ -210,6 +216,7 @@ export type Payment_methodsGroupByOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
   _count: Payment_methodsCountAggregateOutputType | null
   _avg: Payment_methodsAvgAggregateOutputType | null
   _sum: Payment_methodsSumAggregateOutputType | null
@@ -244,6 +251,7 @@ export type payment_methodsWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"payment_methods"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"payment_methods"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"payment_methods"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"payment_methods"> | boolean | null
   images?: Prisma.XOR<Prisma.ImagesNullableScalarRelationFilter, Prisma.imagesWhereInput> | null
   purchases?: Prisma.PurchasesListRelationFilter
 }
@@ -257,6 +265,7 @@ export type payment_methodsOrderByWithRelationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   images?: Prisma.imagesOrderByWithRelationInput
   purchases?: Prisma.purchasesOrderByRelationAggregateInput
 }
@@ -273,6 +282,7 @@ export type payment_methodsWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeNullableFilter<"payment_methods"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"payment_methods"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"payment_methods"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"payment_methods"> | boolean | null
   images?: Prisma.XOR<Prisma.ImagesNullableScalarRelationFilter, Prisma.imagesWhereInput> | null
   purchases?: Prisma.PurchasesListRelationFilter
 }, "id">
@@ -286,6 +296,7 @@ export type payment_methodsOrderByWithAggregationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.payment_methodsCountOrderByAggregateInput
   _avg?: Prisma.payment_methodsAvgOrderByAggregateInput
   _max?: Prisma.payment_methodsMaxOrderByAggregateInput
@@ -305,6 +316,7 @@ export type payment_methodsScalarWhereWithAggregatesInput = {
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"payment_methods"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"payment_methods"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"payment_methods"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableWithAggregatesFilter<"payment_methods"> | boolean | null
 }
 
 export type payment_methodsCreateInput = {
@@ -314,6 +326,7 @@ export type payment_methodsCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   images?: Prisma.imagesCreateNestedOneWithoutPayment_methodsInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutPayment_methodsInput
 }
@@ -327,6 +340,7 @@ export type payment_methodsUncheckedCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_methodsInput
 }
 
@@ -337,6 +351,7 @@ export type payment_methodsUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   images?: Prisma.imagesUpdateOneWithoutPayment_methodsNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutPayment_methodsNestedInput
 }
@@ -350,6 +365,7 @@ export type payment_methodsUncheckedUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_methodsNestedInput
 }
 
@@ -362,6 +378,7 @@ export type payment_methodsCreateManyInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type payment_methodsUpdateManyMutationInput = {
@@ -371,6 +388,7 @@ export type payment_methodsUpdateManyMutationInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type payment_methodsUncheckedUpdateManyInput = {
@@ -382,6 +400,7 @@ export type payment_methodsUncheckedUpdateManyInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type Payment_methodsNullableScalarRelationFilter = {
@@ -398,6 +417,7 @@ export type payment_methodsCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type payment_methodsAvgOrderByAggregateInput = {
@@ -414,6 +434,7 @@ export type payment_methodsMaxOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type payment_methodsMinOrderByAggregateInput = {
@@ -425,6 +446,7 @@ export type payment_methodsMinOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type payment_methodsSumOrderByAggregateInput = {
@@ -507,6 +529,7 @@ export type payment_methodsCreateWithoutPurchasesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   images?: Prisma.imagesCreateNestedOneWithoutPayment_methodsInput
 }
 
@@ -519,6 +542,7 @@ export type payment_methodsUncheckedCreateWithoutPurchasesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type payment_methodsCreateOrConnectWithoutPurchasesInput = {
@@ -544,6 +568,7 @@ export type payment_methodsUpdateWithoutPurchasesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   images?: Prisma.imagesUpdateOneWithoutPayment_methodsNestedInput
 }
 
@@ -556,6 +581,7 @@ export type payment_methodsUncheckedUpdateWithoutPurchasesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type payment_methodsCreateWithoutImagesInput = {
@@ -565,6 +591,7 @@ export type payment_methodsCreateWithoutImagesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchases?: Prisma.purchasesCreateNestedManyWithoutPayment_methodsInput
 }
 
@@ -576,6 +603,7 @@ export type payment_methodsUncheckedCreateWithoutImagesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_methodsInput
 }
 
@@ -617,6 +645,7 @@ export type payment_methodsScalarWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"payment_methods"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"payment_methods"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"payment_methods"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"payment_methods"> | boolean | null
 }
 
 export type payment_methodsCreateManyImagesInput = {
@@ -627,6 +656,7 @@ export type payment_methodsCreateManyImagesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type payment_methodsUpdateWithoutImagesInput = {
@@ -636,6 +666,7 @@ export type payment_methodsUpdateWithoutImagesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchases?: Prisma.purchasesUpdateManyWithoutPayment_methodsNestedInput
 }
 
@@ -647,6 +678,7 @@ export type payment_methodsUncheckedUpdateWithoutImagesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_methodsNestedInput
 }
 
@@ -658,6 +690,7 @@ export type payment_methodsUncheckedUpdateManyWithoutImagesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 
@@ -700,6 +733,7 @@ export type payment_methodsSelect<ExtArgs extends runtime.Types.Extensions.Inter
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   images?: boolean | Prisma.payment_methods$imagesArgs<ExtArgs>
   purchases?: boolean | Prisma.payment_methods$purchasesArgs<ExtArgs>
   _count?: boolean | Prisma.Payment_methodsCountOutputTypeDefaultArgs<ExtArgs>
@@ -714,6 +748,7 @@ export type payment_methodsSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   images?: boolean | Prisma.payment_methods$imagesArgs<ExtArgs>
 }, ExtArgs["result"]["payment_methods"]>
 
@@ -726,6 +761,7 @@ export type payment_methodsSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   images?: boolean | Prisma.payment_methods$imagesArgs<ExtArgs>
 }, ExtArgs["result"]["payment_methods"]>
 
@@ -738,9 +774,10 @@ export type payment_methodsSelectScalar = {
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
 }
 
-export type payment_methodsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "phone_number" | "status" | "image_id" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["payment_methods"]>
+export type payment_methodsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "phone_number" | "status" | "image_id" | "created_at" | "updated_at" | "deleted_at" | "is_deleted", ExtArgs["result"]["payment_methods"]>
 export type payment_methodsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | Prisma.payment_methods$imagesArgs<ExtArgs>
   purchases?: boolean | Prisma.payment_methods$purchasesArgs<ExtArgs>
@@ -768,6 +805,7 @@ export type $payment_methodsPayload<ExtArgs extends runtime.Types.Extensions.Int
     created_at: Date | null
     updated_at: Date | null
     deleted_at: Date | null
+    is_deleted: boolean | null
   }, ExtArgs["result"]["payment_methods"]>
   composites: {}
 }
@@ -1201,6 +1239,7 @@ export interface payment_methodsFieldRefs {
   readonly created_at: Prisma.FieldRef<"payment_methods", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"payment_methods", 'DateTime'>
   readonly deleted_at: Prisma.FieldRef<"payment_methods", 'DateTime'>
+  readonly is_deleted: Prisma.FieldRef<"payment_methods", 'Boolean'>
 }
     
 

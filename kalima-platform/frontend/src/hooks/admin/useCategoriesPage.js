@@ -24,7 +24,7 @@ export default function useCategoriesPage() {
   const [deleteCategoryItem, setDeleteCategoryItem] = useState(null);
 
   useEffect(() => {
-    fetchCategories({ page, limit: 50, active: statusFilter });
+    fetchCategories({ page, limit: 8, active: statusFilter });
   }, [fetchCategories, page, statusFilter]);
 
   const handlePageChange = useCallback((newPage) => {
@@ -34,7 +34,7 @@ export default function useCategoriesPage() {
   const handleSuccess = useCallback(
     (shouldRefetch = false) => {
       if (shouldRefetch || statusFilter !== "all") {
-        fetchCategories({ page, limit: 50, active: statusFilter });
+        fetchCategories({ page, limit: 8, active: statusFilter });
       }
       setIsCreateModalOpen(false);
       setEditCategory(null);

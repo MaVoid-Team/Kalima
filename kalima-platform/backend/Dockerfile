@@ -1,10 +1,10 @@
 
-FROM node:23-alpine
+# FROM node:23-alpine
 
-WORKDIR /app
-COPY package*.json ./
-RUN npm install --legacy-peer-deps
-COPY . .
+# WORKDIR /app
+# COPY package*.json ./
+# RUN npm install --force
+# COPY . .
 
-EXPOSE 5000
-CMD ["npm", "start"]
+# EXPOSE 5000
+# CMD ["npm", "start"]

@@ -138,6 +138,7 @@
     "statusRefunded": "مسترد",
     "statusReturned": "مرتجع",
     "statusCreated": "تم الإنشاء",
+    "deleted": "محذوف",
     "clearFilters": "مسح",
     "filterByDate": "تصفية حسب التاريخ",
     "table": {
@@ -206,6 +207,9 @@
       "orderItems": "عناصر الطلب",
       "adminNotes": "ملاحظات الإدارة",
       "couponInfo": "الكوبون المستخدم",
+      "requiredFields": "الحقول المطلوبة",
+      "item": "العنصر",
+      "field": "الحقل",
       "dateCreated": "تاريخ الإنشاء",
       "itemsCount": "عدد العناصر",
       "subtotal": "المجموع الفرعي",
@@ -293,7 +297,12 @@
       "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code",
       "perksTip": "يمكنك استخدام الفواصل الإنجليزية (,) أو الفواصل العربية (،) للفصل بين المميزات.",
       "titleIsRequired": "العنوان مطلوب",
-      "priceMustBeGreaterThan0": "السعر يجب أن يكون أكبر من 0",
+      "titleMaxLength": "يجب ألا يزيد العنوان عن 255 حرفًا",
+      "priceMustBeGreaterThan0": "السعر يجب أن يكون أكبر من او يساوي 0",
+      "discountedPriceMustBeGreaterThan0": "السعر بعد الخصم يجب أن يكون أكبر من 0",
+      "serialMaxLength": "يجب ألا يزيد الرقم التسلسلي عن 100 حرف",
+      "couponIdMustBeInteger": "معرف الكوبون يجب أن يكون رقمًا صحيحًا",
+      "couponIdMustBeGreaterThan0": "معرف الكوبون يجب أن يكون أكبر من 0",
       "discountedPriceMustBeLessThanOriginalPrice": "السعر بعد الخصم يجب أن يكون أقل من السعر الأصلي"
     },
     "create": {

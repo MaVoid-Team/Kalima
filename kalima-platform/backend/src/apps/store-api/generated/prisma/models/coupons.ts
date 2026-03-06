@@ -52,6 +52,7 @@ export type CouponsMinAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
   mongo_id: string | null
   type: $Enums.coupon_type | null
 }
@@ -68,6 +69,7 @@ export type CouponsMaxAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
   mongo_id: string | null
   type: $Enums.coupon_type | null
 }
@@ -84,6 +86,7 @@ export type CouponsCountAggregateOutputType = {
   created_at: number
   updated_at: number
   deleted_at: number
+  is_deleted: number
   mongo_id: number
   type: number
   _all: number
@@ -116,6 +119,7 @@ export type CouponsMinAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
   mongo_id?: true
   type?: true
 }
@@ -132,6 +136,7 @@ export type CouponsMaxAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
   mongo_id?: true
   type?: true
 }
@@ -148,6 +153,7 @@ export type CouponsCountAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
   mongo_id?: true
   type?: true
   _all?: true
@@ -251,6 +257,7 @@ export type CouponsGroupByOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
   mongo_id: string | null
   type: $Enums.coupon_type
   _count: CouponsCountAggregateOutputType | null
@@ -290,6 +297,7 @@ export type couponsWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"coupons"> | boolean | null
   mongo_id?: Prisma.StringNullableFilter<"coupons"> | string | null
   type?: Prisma.Enumcoupon_typeFilter<"coupons"> | $Enums.coupon_type
   product?: Prisma.XOR<Prisma.ProductsScalarRelationFilter, Prisma.productsWhereInput>
@@ -310,6 +318,7 @@ export type couponsOrderByWithRelationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   mongo_id?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   product?: Prisma.productsOrderByWithRelationInput
@@ -334,6 +343,7 @@ export type couponsWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"coupons"> | boolean | null
   type?: Prisma.Enumcoupon_typeFilter<"coupons"> | $Enums.coupon_type
   product?: Prisma.XOR<Prisma.ProductsScalarRelationFilter, Prisma.productsWhereInput>
   cart_items?: Prisma.Cart_itemsListRelationFilter
@@ -353,6 +363,7 @@ export type couponsOrderByWithAggregationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   mongo_id?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   _count?: Prisma.couponsCountOrderByAggregateInput
@@ -377,6 +388,7 @@ export type couponsScalarWhereWithAggregatesInput = {
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"coupons"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"coupons"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"coupons"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableWithAggregatesFilter<"coupons"> | boolean | null
   mongo_id?: Prisma.StringNullableWithAggregatesFilter<"coupons"> | string | null
   type?: Prisma.Enumcoupon_typeWithAggregatesFilter<"coupons"> | $Enums.coupon_type
 }
@@ -391,6 +403,7 @@ export type couponsCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
   product: Prisma.productsCreateNestedOneWithoutCouponsInput
@@ -411,6 +424,7 @@ export type couponsUncheckedCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutCouponsInput
@@ -428,6 +442,7 @@ export type couponsUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
   product?: Prisma.productsUpdateOneRequiredWithoutCouponsNestedInput
@@ -448,6 +463,7 @@ export type couponsUncheckedUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutCouponsNestedInput
@@ -467,6 +483,7 @@ export type couponsCreateManyInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
 }
@@ -481,6 +498,7 @@ export type couponsUpdateManyMutationInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
 }
@@ -497,6 +515,7 @@ export type couponsUncheckedUpdateManyInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
 }
@@ -513,6 +532,7 @@ export type couponsCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
   mongo_id?: Prisma.SortOrder
   type?: Prisma.SortOrder
 }
@@ -536,6 +556,7 @@ export type couponsMaxOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
   mongo_id?: Prisma.SortOrder
   type?: Prisma.SortOrder
 }
@@ -552,6 +573,7 @@ export type couponsMinOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
   mongo_id?: Prisma.SortOrder
   type?: Prisma.SortOrder
 }
@@ -685,6 +707,7 @@ export type couponsCreateWithoutCoupon_usagesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
   product: Prisma.productsCreateNestedOneWithoutCouponsInput
@@ -704,6 +727,7 @@ export type couponsUncheckedCreateWithoutCoupon_usagesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutCouponsInput
@@ -736,6 +760,7 @@ export type couponsUpdateWithoutCoupon_usagesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
   product?: Prisma.productsUpdateOneRequiredWithoutCouponsNestedInput
@@ -755,6 +780,7 @@ export type couponsUncheckedUpdateWithoutCoupon_usagesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutCouponsNestedInput
@@ -771,6 +797,7 @@ export type couponsCreateWithoutProductInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutCouponsInput
@@ -789,6 +816,7 @@ export type couponsUncheckedCreateWithoutProductInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutCouponsInput
@@ -837,6 +865,7 @@ export type couponsScalarWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"coupons"> | boolean | null
   mongo_id?: Prisma.StringNullableFilter<"coupons"> | string | null
   type?: Prisma.Enumcoupon_typeFilter<"coupons"> | $Enums.coupon_type
 }
@@ -851,6 +880,7 @@ export type couponsCreateWithoutCart_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
   product: Prisma.productsCreateNestedOneWithoutCouponsInput
@@ -870,6 +900,7 @@ export type couponsUncheckedCreateWithoutCart_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutCouponsInput
@@ -902,6 +933,7 @@ export type couponsUpdateWithoutCart_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
   product?: Prisma.productsUpdateOneRequiredWithoutCouponsNestedInput
@@ -921,6 +953,7 @@ export type couponsUncheckedUpdateWithoutCart_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutCouponsNestedInput
@@ -937,6 +970,7 @@ export type couponsCreateWithoutPurchase_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
   product: Prisma.productsCreateNestedOneWithoutCouponsInput
@@ -956,6 +990,7 @@ export type couponsUncheckedCreateWithoutPurchase_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutCouponsInput
@@ -988,6 +1023,7 @@ export type couponsUpdateWithoutPurchase_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
   product?: Prisma.productsUpdateOneRequiredWithoutCouponsNestedInput
@@ -1007,6 +1043,7 @@ export type couponsUncheckedUpdateWithoutPurchase_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutCouponsNestedInput
@@ -1024,6 +1061,7 @@ export type couponsCreateManyProductInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
 }
@@ -1038,6 +1076,7 @@ export type couponsUpdateWithoutProductInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
   cart_items?: Prisma.cart_itemsUpdateManyWithoutCouponsNestedInput
@@ -1056,6 +1095,7 @@ export type couponsUncheckedUpdateWithoutProductInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutCouponsNestedInput
@@ -1074,6 +1114,7 @@ export type couponsUncheckedUpdateManyWithoutProductInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
 }
@@ -1139,6 +1180,7 @@ export type couponsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   mongo_id?: boolean
   type?: boolean
   product?: boolean | Prisma.productsDefaultArgs<ExtArgs>
@@ -1160,6 +1202,7 @@ export type couponsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   mongo_id?: boolean
   type?: boolean
   product?: boolean | Prisma.productsDefaultArgs<ExtArgs>
@@ -1177,6 +1220,7 @@ export type couponsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   mongo_id?: boolean
   type?: boolean
   product?: boolean | Prisma.productsDefaultArgs<ExtArgs>
@@ -1194,11 +1238,12 @@ export type couponsSelectScalar = {
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   mongo_id?: boolean
   type?: boolean
 }
 
-export type couponsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "product_id" | "discount_amount" | "discount_percentage" | "active" | "starts_at" | "expires_at" | "created_at" | "updated_at" | "deleted_at" | "mongo_id" | "type", ExtArgs["result"]["coupons"]>
+export type couponsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "product_id" | "discount_amount" | "discount_percentage" | "active" | "starts_at" | "expires_at" | "created_at" | "updated_at" | "deleted_at" | "is_deleted" | "mongo_id" | "type", ExtArgs["result"]["coupons"]>
 export type couponsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.productsDefaultArgs<ExtArgs>
   cart_items?: boolean | Prisma.coupons$cart_itemsArgs<ExtArgs>
@@ -1233,6 +1278,7 @@ export type $couponsPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     created_at: Date | null
     updated_at: Date | null
     deleted_at: Date | null
+    is_deleted: boolean | null
     mongo_id: string | null
     type: $Enums.coupon_type
   }, ExtArgs["result"]["coupons"]>
@@ -1673,6 +1719,7 @@ export interface couponsFieldRefs {
   readonly created_at: Prisma.FieldRef<"coupons", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"coupons", 'DateTime'>
   readonly deleted_at: Prisma.FieldRef<"coupons", 'DateTime'>
+  readonly is_deleted: Prisma.FieldRef<"coupons", 'Boolean'>
   readonly mongo_id: Prisma.FieldRef<"coupons", 'String'>
   readonly type: Prisma.FieldRef<"coupons", 'coupon_type'>
 }

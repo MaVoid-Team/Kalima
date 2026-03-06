@@ -81,6 +81,7 @@ export type PurchasesMinAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
 }
 
 export type PurchasesMaxAggregateOutputType = {
@@ -108,6 +109,7 @@ export type PurchasesMaxAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
 }
 
 export type PurchasesCountAggregateOutputType = {
@@ -135,6 +137,7 @@ export type PurchasesCountAggregateOutputType = {
   created_at: number
   updated_at: number
   deleted_at: number
+  is_deleted: number
   _all: number
 }
 
@@ -194,6 +197,7 @@ export type PurchasesMinAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
 }
 
 export type PurchasesMaxAggregateInputType = {
@@ -221,6 +225,7 @@ export type PurchasesMaxAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
 }
 
 export type PurchasesCountAggregateInputType = {
@@ -248,6 +253,7 @@ export type PurchasesCountAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
   _all?: true
 }
 
@@ -362,6 +368,7 @@ export type PurchasesGroupByOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
   _count: PurchasesCountAggregateOutputType | null
   _avg: PurchasesAvgAggregateOutputType | null
   _sum: PurchasesSumAggregateOutputType | null
@@ -412,6 +419,7 @@ export type purchasesWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"purchases"> | boolean | null
   purchase_items?: Prisma.Purchase_itemsListRelationFilter
   coupon_usages?: Prisma.Coupon_usagesListRelationFilter
   users?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
@@ -448,6 +456,7 @@ export type purchasesOrderByWithRelationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   purchase_items?: Prisma.purchase_itemsOrderByRelationAggregateInput
   coupon_usages?: Prisma.coupon_usagesOrderByRelationAggregateInput
   users?: Prisma.usersOrderByWithRelationInput
@@ -487,6 +496,7 @@ export type purchasesWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"purchases"> | boolean | null
   purchase_items?: Prisma.Purchase_itemsListRelationFilter
   coupon_usages?: Prisma.Coupon_usagesListRelationFilter
   users?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
@@ -523,6 +533,7 @@ export type purchasesOrderByWithAggregationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.purchasesCountOrderByAggregateInput
   _avg?: Prisma.purchasesAvgOrderByAggregateInput
   _max?: Prisma.purchasesMaxOrderByAggregateInput
@@ -558,6 +569,7 @@ export type purchasesScalarWhereWithAggregatesInput = {
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"purchases"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"purchases"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"purchases"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableWithAggregatesFilter<"purchases"> | boolean | null
 }
 
 export type purchasesCreateInput = {
@@ -577,6 +589,7 @@ export type purchasesCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
@@ -613,6 +626,7 @@ export type purchasesUncheckedCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
 }
@@ -634,6 +648,7 @@ export type purchasesUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
@@ -670,6 +685,7 @@ export type purchasesUncheckedUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
 }
@@ -699,6 +715,7 @@ export type purchasesCreateManyInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchasesUpdateManyMutationInput = {
@@ -718,6 +735,7 @@ export type purchasesUpdateManyMutationInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type purchasesUncheckedUpdateManyInput = {
@@ -745,6 +763,7 @@ export type purchasesUncheckedUpdateManyInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type PurchasesListRelationFilter = {
@@ -787,6 +806,7 @@ export type purchasesCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type purchasesAvgOrderByAggregateInput = {
@@ -829,6 +849,7 @@ export type purchasesMaxOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type purchasesMinOrderByAggregateInput = {
@@ -856,6 +877,7 @@ export type purchasesMinOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type purchasesSumOrderByAggregateInput = {
@@ -1219,6 +1241,7 @@ export type purchasesCreateWithoutUsersInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
@@ -1253,6 +1276,7 @@ export type purchasesUncheckedCreateWithoutUsersInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
 }
@@ -1284,6 +1308,7 @@ export type purchasesCreateWithoutReceived_by_userInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
@@ -1318,6 +1343,7 @@ export type purchasesUncheckedCreateWithoutReceived_by_userInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
 }
@@ -1349,6 +1375,7 @@ export type purchasesCreateWithoutConfirmed_by_userInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
@@ -1383,6 +1410,7 @@ export type purchasesUncheckedCreateWithoutConfirmed_by_userInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
 }
@@ -1414,6 +1442,7 @@ export type purchasesCreateWithoutReturned_by_userInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
@@ -1448,6 +1477,7 @@ export type purchasesUncheckedCreateWithoutReturned_by_userInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
 }
@@ -1506,6 +1536,7 @@ export type purchasesScalarWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"purchases"> | boolean | null
 }
 
 export type purchasesUpsertWithWhereUniqueWithoutReceived_by_userInput = {
@@ -1573,6 +1604,7 @@ export type purchasesCreateWithoutCoupon_usagesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
@@ -1608,6 +1640,7 @@ export type purchasesUncheckedCreateWithoutCoupon_usagesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
 }
 
@@ -1644,6 +1677,7 @@ export type purchasesUpdateWithoutCoupon_usagesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
@@ -1679,6 +1713,7 @@ export type purchasesUncheckedUpdateWithoutCoupon_usagesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
 }
 
@@ -1699,6 +1734,7 @@ export type purchasesCreateWithoutPurchase_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
@@ -1734,6 +1770,7 @@ export type purchasesUncheckedCreateWithoutPurchase_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
 }
 
@@ -1770,6 +1807,7 @@ export type purchasesUpdateWithoutPurchase_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
@@ -1805,6 +1843,7 @@ export type purchasesUncheckedUpdateWithoutPurchase_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
 }
 
@@ -1825,6 +1864,7 @@ export type purchasesCreateWithoutPayment_methodsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
@@ -1859,6 +1899,7 @@ export type purchasesUncheckedCreateWithoutPayment_methodsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
 }
@@ -1906,6 +1947,7 @@ export type purchasesCreateWithoutWatermarkInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
@@ -1940,6 +1982,7 @@ export type purchasesUncheckedCreateWithoutWatermarkInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
 }
@@ -1971,6 +2014,7 @@ export type purchasesCreateWithoutPayment_screenshotInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
@@ -2005,6 +2049,7 @@ export type purchasesUncheckedCreateWithoutPayment_screenshotInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
 }
@@ -2075,6 +2120,7 @@ export type purchasesCreateManyUsersInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchasesCreateManyReceived_by_userInput = {
@@ -2101,6 +2147,7 @@ export type purchasesCreateManyReceived_by_userInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchasesCreateManyConfirmed_by_userInput = {
@@ -2127,6 +2174,7 @@ export type purchasesCreateManyConfirmed_by_userInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchasesCreateManyReturned_by_userInput = {
@@ -2153,6 +2201,7 @@ export type purchasesCreateManyReturned_by_userInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchasesUpdateWithoutUsersInput = {
@@ -2172,6 +2221,7 @@ export type purchasesUpdateWithoutUsersInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
@@ -2206,6 +2256,7 @@ export type purchasesUncheckedUpdateWithoutUsersInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
 }
@@ -2234,6 +2285,7 @@ export type purchasesUncheckedUpdateManyWithoutUsersInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type purchasesUpdateWithoutReceived_by_userInput = {
@@ -2253,6 +2305,7 @@ export type purchasesUpdateWithoutReceived_by_userInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
@@ -2287,6 +2340,7 @@ export type purchasesUncheckedUpdateWithoutReceived_by_userInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
 }
@@ -2315,6 +2369,7 @@ export type purchasesUncheckedUpdateManyWithoutReceived_by_userInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type purchasesUpdateWithoutConfirmed_by_userInput = {
@@ -2334,6 +2389,7 @@ export type purchasesUpdateWithoutConfirmed_by_userInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
@@ -2368,6 +2424,7 @@ export type purchasesUncheckedUpdateWithoutConfirmed_by_userInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
 }
@@ -2396,6 +2453,7 @@ export type purchasesUncheckedUpdateManyWithoutConfirmed_by_userInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type purchasesUpdateWithoutReturned_by_userInput = {
@@ -2415,6 +2473,7 @@ export type purchasesUpdateWithoutReturned_by_userInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
@@ -2449,6 +2508,7 @@ export type purchasesUncheckedUpdateWithoutReturned_by_userInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
 }
@@ -2477,6 +2537,7 @@ export type purchasesUncheckedUpdateManyWithoutReturned_by_userInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type purchasesCreateManyPayment_methodsInput = {
@@ -2503,6 +2564,7 @@ export type purchasesCreateManyPayment_methodsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchasesUpdateWithoutPayment_methodsInput = {
@@ -2522,6 +2584,7 @@ export type purchasesUpdateWithoutPayment_methodsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
@@ -2556,6 +2619,7 @@ export type purchasesUncheckedUpdateWithoutPayment_methodsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
 }
@@ -2584,6 +2648,7 @@ export type purchasesUncheckedUpdateManyWithoutPayment_methodsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type purchasesCreateManyWatermarkInput = {
@@ -2610,6 +2675,7 @@ export type purchasesCreateManyWatermarkInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchasesCreateManyPayment_screenshotInput = {
@@ -2636,6 +2702,7 @@ export type purchasesCreateManyPayment_screenshotInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchasesUpdateWithoutWatermarkInput = {
@@ -2655,6 +2722,7 @@ export type purchasesUpdateWithoutWatermarkInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
@@ -2689,6 +2757,7 @@ export type purchasesUncheckedUpdateWithoutWatermarkInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
 }
@@ -2717,6 +2786,7 @@ export type purchasesUncheckedUpdateManyWithoutWatermarkInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type purchasesUpdateWithoutPayment_screenshotInput = {
@@ -2736,6 +2806,7 @@ export type purchasesUpdateWithoutPayment_screenshotInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
@@ -2770,6 +2841,7 @@ export type purchasesUncheckedUpdateWithoutPayment_screenshotInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
 }
@@ -2798,6 +2870,7 @@ export type purchasesUncheckedUpdateManyWithoutPayment_screenshotInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 
@@ -2865,6 +2938,7 @@ export type purchasesSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   purchase_items?: boolean | Prisma.purchases$purchase_itemsArgs<ExtArgs>
   coupon_usages?: boolean | Prisma.purchases$coupon_usagesArgs<ExtArgs>
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
@@ -2902,6 +2976,7 @@ export type purchasesSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   received_by_user?: boolean | Prisma.purchases$received_by_userArgs<ExtArgs>
   confirmed_by_user?: boolean | Prisma.purchases$confirmed_by_userArgs<ExtArgs>
@@ -2936,6 +3011,7 @@ export type purchasesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   received_by_user?: boolean | Prisma.purchases$received_by_userArgs<ExtArgs>
   confirmed_by_user?: boolean | Prisma.purchases$confirmed_by_userArgs<ExtArgs>
@@ -2970,9 +3046,10 @@ export type purchasesSelectScalar = {
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
 }
 
-export type purchasesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "status" | "subtotal" | "discount" | "total" | "payment_method_id" | "payment_screenshot_id" | "watermark_id" | "purchase_serial" | "number_transferred_from" | "payment_number" | "notes" | "admin_notes" | "admin_note_by" | "received_at" | "received_by" | "confirmed_at" | "confirmed_by" | "returned_at" | "returned_by" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["purchases"]>
+export type purchasesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "status" | "subtotal" | "discount" | "total" | "payment_method_id" | "payment_screenshot_id" | "watermark_id" | "purchase_serial" | "number_transferred_from" | "payment_number" | "notes" | "admin_notes" | "admin_note_by" | "received_at" | "received_by" | "confirmed_at" | "confirmed_by" | "returned_at" | "returned_by" | "created_at" | "updated_at" | "deleted_at" | "is_deleted", ExtArgs["result"]["purchases"]>
 export type purchasesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchase_items?: boolean | Prisma.purchases$purchase_itemsArgs<ExtArgs>
   coupon_usages?: boolean | Prisma.purchases$coupon_usagesArgs<ExtArgs>
@@ -3042,6 +3119,7 @@ export type $purchasesPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     created_at: Date | null
     updated_at: Date | null
     deleted_at: Date | null
+    is_deleted: boolean | null
   }, ExtArgs["result"]["purchases"]>
   composites: {}
 }
@@ -3498,6 +3576,7 @@ export interface purchasesFieldRefs {
   readonly created_at: Prisma.FieldRef<"purchases", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"purchases", 'DateTime'>
   readonly deleted_at: Prisma.FieldRef<"purchases", 'DateTime'>
+  readonly is_deleted: Prisma.FieldRef<"purchases", 'Boolean'>
 }
     
 

@@ -72,7 +72,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
               </span>
             </div>
 
-            <div className="flex items-center gap-1 shrink-0">
+            {/* <div className="flex items-center gap-1 shrink-0">
               <Button
                 variant="outline"
                 size="icon"
@@ -92,7 +92,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
               <Button variant="outline" size="icon" onClick={handleIncrement} className="h-9 w-9" data-testid="product-actions-mobile-increment-button">
                 <Plus className="h-4 w-4" />
               </Button>
-            </div>
+            </div> */}
           </div>
 
           <div className="grid grid-cols-2 gap-2">
@@ -153,7 +153,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
       <div className="hidden md:flex flex-col gap-4">
         <div className="flex gap-4">
           {/* Quantity Stepper */}
-          <div className="flex items-center gap-1">
+          {/* <div className="flex items-center gap-1">
             <Button
               variant="outline"
               size="icon"
@@ -174,7 +174,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
             <Button variant="outline" size="icon" onClick={handleIncrement} data-testid="product-actions-desktop-increment-button">
               <Plus className="h-4 w-4" />
             </Button>
-          </div>
+          </div> */}
 
           {/* Add to Cart */}
           <Button className="gap-2 flex-1" size="lg" onClick={handleAddToCart} disabled={loading} data-testid="product-actions-desktop-add-cart-button">

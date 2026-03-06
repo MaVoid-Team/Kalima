@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatCurrency, formatOrderDate, getStatusColor } from '@/lib/storeUtils';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Trash2 } from 'lucide-react';
 import OrderActions from './OrderActions';
 import { Link } from 'react-router-dom';
 
@@ -49,7 +50,7 @@ export default function OrdersTable({
                     </TableHeader>
                     <TableBody>
                         {orders.map((order) => (
-                            <TableRow key={order.id} data-state={selectedIds.includes(order.id) && "selected"}>
+                            <TableRow key={order.id} data-state={selectedIds.includes(order.id) && "selected"} className={order.is_deleted ? 'opacity-60' : ''}>
                                 <TableCell>
                                     <Checkbox
                                         className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
@@ -59,9 +60,17 @@ export default function OrdersTable({
                                     />
                                 </TableCell>
                                 <TableCell className="font-medium">
-                                    <Link to={`/admin/orders/${order.id}`} className="text-primary hover:underline" data-testid={`admin-orders-table-link-${order.id}`}>
-                                        {order.purchase_serial || `#${order.id}`}
-                                    </Link>
+                                    <div className="flex items-center gap-2">
+                                        <Link to={`/admin/orders/${order.id}`} className="text-primary hover:underline" data-testid={`admin-orders-table-link-${order.id}`}>
+                                            {order.purchase_serial || `#${order.id}`}
+                                        </Link>
+                                        {order.is_deleted && (
+                                            <Badge variant="destructive" className="gap-1 text-[10px] px-1.5 py-0">
+                                                <Trash2 className="h-3 w-3" />
+                                                {t('orders.deleted', 'Deleted')}
+                                            </Badge>
+                                        )}
+                                    </div>
                                     <div className="text-xs text-muted-foreground mt-1">
                                         {formatOrderDate(order.created_at, i18n.language)}
                                     </div>
@@ -96,7 +105,7 @@ export default function OrdersTable({
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
                 {orders.map((order) => (
-                    <div key={order.id} className="border rounded-md p-4 space-y-4 text-card-foreground shadow-sm">
+                    <div key={order.id} className={`border rounded-md p-4 space-y-4 text-card-foreground shadow-sm ${order.is_deleted ? 'opacity-60 border-destructive/30' : ''}`}>
                         <div className="flex justify-between items-start gap-4">
                             <div className="flex items-start gap-3">
                                 <Checkbox
@@ -106,9 +115,17 @@ export default function OrdersTable({
                                     aria-label={`Select order ${order.purchase_serial || order.id}`}
                                 />
                                 <div>
-                                    <Link to={`/admin/orders/${order.id}`} className="font-semibold text-primary hover:underline text-lg" data-testid={`admin-orders-table-link-mobile-${order.id}`}>
-                                        {order.purchase_serial || `#${order.id}`}
-                                    </Link>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <Link to={`/admin/orders/${order.id}`} className="font-semibold text-primary hover:underline text-lg" data-testid={`admin-orders-table-link-mobile-${order.id}`}>
+                                            {order.purchase_serial || `#${order.id}`}
+                                        </Link>
+                                        {order.is_deleted && (
+                                            <Badge variant="destructive" className="gap-1 text-[10px] px-1.5 py-0">
+                                                <Trash2 className="h-3 w-3" />
+                                                {t('orders.deleted', 'Deleted')}
+                                            </Badge>
+                                        )}
+                                    </div>
                                     <div className="text-sm text-muted-foreground mt-1">
                                         {formatOrderDate(order.created_at, i18n.language)}
                                     </div>
