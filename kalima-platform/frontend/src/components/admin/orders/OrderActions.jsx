@@ -32,6 +32,41 @@ export default function OrderActions({ order, onActionSuccess }) {
     const { t, i18n } = useTranslation('admin');
     const { receiveOrder, confirmOrder, returnOrder, deleteOrder } = useOrders();
 
+    const whatsappPhone = order?.users?.phone?.replaceAll(/\D/g, '');
+    const orderSerial = order?.purchase_serial || `#${order?.id ?? '-'}`;
+    const whatsappItems = (order?.purchase_items ?? []).map((item, index) => {
+        const product = item?.products || {};
+        const title = product?.title || '-';
+        const type = product?.type || '-';
+        const price = item?.price_at_purchase ?? product?.price ?? 0;
+        return [
+            `- منتج ${index + 1}`,
+            `  الاسم: ${title}`,
+            `  النوع: ${type}`,
+            `  السعر: ${price} جم`,
+        ].join('\n');
+    });
+    const whatsappMessage = [
+        `هلاً بك أ/ ${order?.users?.name || '-'}`,
+        'تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.',
+        '',
+        `رقم الطلب: ${orderSerial}`,
+        '',
+        'المنتجات:',
+        whatsappItems.length ? whatsappItems.join('\n') : '-',
+        '',
+        `الإجمالي: ${order?.total ?? 0} جنية`,
+        '',
+        'لو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.',
+        'نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا!',
+        '',
+        'مع تحيات فريق عمل',
+        'منصة كلمة',
+    ].join('\n');
+    const whatsappHref = whatsappPhone
+        ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(whatsappMessage)}`
+        : '#';
+
     const handleAction = async (actionFn) => {
         const res = await actionFn();
         if (res?.success && onActionSuccess) {
@@ -112,10 +147,10 @@ export default function OrderActions({ order, onActionSuccess }) {
 
                     <DropdownMenuSeparator />
 
-                    {order.users?.phone && (
+                    {whatsappPhone && (
                         <DropdownMenuItem asChild>
                             <a
-                                href={`https://wa.me/${order.users.phone.replace(/\D/g, '')}`}
+                                href={whatsappHref}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="cursor-pointer flex items-center text-success focus:text-success focus:bg-success/10"
