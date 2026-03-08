@@ -125,7 +125,7 @@ For validation errors (422):
 | POST | `/change-password` | Yes | Change password (authenticated) |
 | POST | `/link/firebase` | Yes | Link Firebase account |
 
-See `AUTH_API_DOCUMENTATION.md` for full request/response bodies.
+See `api/AUTH_API_DOCUMENTATION.md` for full request/response bodies.
 
 ---
 
@@ -431,18 +431,18 @@ GET /api/v2/<resource>/export?format=xlsx&ids=1,2,3
 | `format` | string | Yes      | `"csv"` or `"xlsx"`                    |
 | `ids`    | string | No       | Comma-separated IDs for selected rows  |
 
-See `EXPORT_API_DOCUMENTATION.md` for full details.
+See `api/EXPORT_API_DOCUMENTATION.md` for full details.
 
 ---
 
 ## Related Documentation
 
-- `AUTH_API_DOCUMENTATION.md` — Auth endpoints in detail
-- `PRODUCT_SAMPLE_API_DOCUMENTATION.md` — Product sample read API and creation flow
-- `EXPORT_API_DOCUMENTATION.md` — CSV/XLSX export endpoints for all resources
-- `PRODUCTS_API_DOCUMENTATION.md` — Product CRUD and media
-- `COUPON_API_DOCUMENTATION.md` — Coupon admin and usage
-- `REQUIRED_FIELDS_API_DOCUMENTATION.md` — Checkout required fields
+- `api/AUTH_API_DOCUMENTATION.md` — Auth endpoints in detail
+- `api/PRODUCT_SAMPLE_API_DOCUMENTATION.md` — Product sample read API and creation flow
+- `api/EXPORT_API_DOCUMENTATION.md` — CSV/XLSX export endpoints for all resources
+- `api/PRODUCTS_API_DOCUMENTATION.md` — Product CRUD and media
+- `api/COUPON_API_DOCUMENTATION.md` — Coupon admin and usage
+- `api/REQUIRED_FIELDS_API_DOCUMENTATION.md` — Checkout required fields
 - `API_DOCS_INDEX.md` — Full list of docs
 
 ---
