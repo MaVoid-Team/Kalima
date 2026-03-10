@@ -1,13 +1,17 @@
+import path from "path";
+import crypto from "crypto";
+import { promises as fsPromises } from "fs";
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
 import {
   products,
   product_gallery,
+  product_gallery_videos,
   product_categories,
   product_required_fields,
 } from "../generated/prisma/client";
+import { video_source_type_enum } from "../generated/prisma/client";
 import { imageService, UploadImageOptions } from "./image.service";
-import { sampleService } from "./sample.service";
 import {
   CreateProductDto,
   UpdateProductDto,
@@ -19,10 +23,27 @@ import {
   ConflictError,
 } from "../../../libs/errors";
 import { reviewService } from "./review.service";
+import { sampleService as defaultSampleService } from "./sample.service";
 
 // ============================================
 // SHARED INCLUDES
 // ============================================
+
+/** Enrich product with computed release fields (not stored in DB) */
+function enrichProductWithReleaseInfo<T extends { release_at?: Date | null }>(
+  product: T,
+): T & { is_released: boolean; time_until_release_ms: number | null } {
+  const releaseAt = product.release_at ? new Date(product.release_at) : null;
+  const now = new Date();
+  const isReleased = !releaseAt || releaseAt <= now;
+  const timeUntilReleaseMs =
+    releaseAt && releaseAt > now ? releaseAt.getTime() - now.getTime() : null;
+  return {
+    ...product,
+    is_released: isReleased,
+    time_until_release_ms: timeUntilReleaseMs,
+  } as T & { is_released: boolean; time_until_release_ms: number | null };
+}
 
 /** Minimal include for product list (getAllProducts) */
 const PRODUCT_LIST_SELECT = {
@@ -33,6 +54,7 @@ const PRODUCT_LIST_SELECT = {
   price: true,
   is_archived: true,
   price_after_discount: true,
+  release_at: true,
   thumbnail_image: true,
   product_categories: {
     include: { categories: { select: { id: true, title: true } } },
@@ -44,6 +66,9 @@ const PRODUCT_INCLUDE = {
   thumbnail_image: true,
   product_gallery: {
     include: { images: true },
+    orderBy: { sort_order: "asc" as const },
+  },
+  product_gallery_videos: {
     orderBy: { sort_order: "asc" as const },
   },
   product_categories: {
@@ -76,7 +101,10 @@ const PRODUCT_INCLUDE = {
 // ============================================
 
 class ProductService {
-  constructor(private db: PrismaClient = prisma) {}
+  constructor(
+    private db: PrismaClient = prisma,
+    private sampleService = defaultSampleService,
+  ) {}
 
   // ============================================
   // CREATE
@@ -108,6 +136,8 @@ class ProductService {
       thumbnailId = image.id;
     }
 
+    const releaseAt = dto.release_at ? new Date(dto.release_at) : null;
+
     if (dto.price < 0) {
       throw new BadRequestError("Price cannot be negative");
     }
@@ -133,6 +163,7 @@ class ProductService {
         serial: dto.serial,
         sample_url: dto.sample_url,
         thumbnail_id: thumbnailId,
+        release_at: releaseAt,
         perks: dto.perks,
       },
       include: PRODUCT_INCLUDE,
@@ -148,12 +179,16 @@ class ProductService {
       });
     }
 
-    // Upload sample if provided
-    if (sampleFile) {
-      await sampleService.uploadSample(sampleFile, product.id);
+    // Attach sample if provided
+    if (sampleFile && dto.sample_section_id) {
+      await this.sampleService.createSample(
+        dto.sample_section_id,
+        product.id,
+        sampleFile,
+      );
     }
 
-    // Re-fetch to include categories and sample
+    // Re-fetch to include categories and samples
     return this.getProductById(product.id);
   }
 
@@ -199,7 +234,7 @@ class ProductService {
       };
     }
 
-    const [data, total] = await Promise.all([
+    const [rawData, total] = await Promise.all([
       this.db.products.findMany({
         where,
         select: PRODUCT_LIST_SELECT,
@@ -209,6 +244,8 @@ class ProductService {
       }),
       this.db.products.count({ where }),
     ]);
+
+    const data = rawData.map((p) => enrichProductWithReleaseInfo(p));
 
     // Handle is_purchased if userId is provided
     let purchasedProductIds = new Set<number>();
@@ -254,11 +291,12 @@ class ProductService {
       throw new NotFoundError("Product not found");
     }
 
+    const enriched = enrichProductWithReleaseInfo(product);
     const { averageRating, reviewCount } =
       await reviewService.getAggregatedRating(id);
 
     return {
-      ...product,
+      ...enriched,
       averageRating,
       reviewCount,
     };
@@ -282,12 +320,14 @@ class ProductService {
     }
 
     // When a new sample file is provided: delete old sample, upload new one
-    if (sampleFile) {
-      if (product.samples) {
-        await sampleService.deleteSample(product.samples.id);
+    if (sampleFile && dto.sample_section_id) {
+      if (product.samples && product.samples.length > 0) {
+        for (const sample of product.samples) {
+          await this.sampleService.deleteSample(sample.id);
+        }
       }
-      const newSample = await sampleService.uploadSample(sampleFile, id);
-      dto = { ...dto, sample_url: newSample.url };
+      await this.sampleService.createSample(dto.sample_section_id, id, sampleFile);
+      // We don't need to manually update dto.sample_url because the new schema handles it via relations
     }
 
     const data: any = { updated_at: new Date() };
@@ -300,6 +340,8 @@ class ProductService {
     if (dto.serial !== undefined) data.serial = dto.serial;
     if (dto.sample_url !== undefined) data.sample_url = dto.sample_url;
     if (dto.is_archived !== undefined) data.is_archived = dto.is_archived;
+    if (dto.release_at !== undefined)
+      data.release_at = dto.release_at ? new Date(dto.release_at) : null;
     if (dto.perks !== undefined) data.perks = dto.perks;
 
     const updated = await this.db.products.update({
@@ -313,16 +355,19 @@ class ProductService {
       dto.sample_url !== undefined &&
       dto.sample_url !== null &&
       !sampleFile &&
-      updated.samples
+      product.samples &&
+      product.samples.length > 0
     ) {
       await this.db.samples.update({
-        where: { id: updated.samples.id },
-        data: { url: dto.sample_url },
+        where: { id: product.samples[0].id },
+        data: { high_quality_url: dto.sample_url },
       });
       return this.getProductById(id);
     }
 
-    return sampleFile ? this.getProductById(id) : updated;
+    return sampleFile
+      ? this.getProductById(id)
+      : (enrichProductWithReleaseInfo(updated) as products);
   }
 
   // ============================================
@@ -374,7 +419,7 @@ class ProductService {
       include: PRODUCT_INCLUDE,
     });
 
-    return updated;
+    return enrichProductWithReleaseInfo(updated) as products;
   }
 
   // ============================================
@@ -390,11 +435,14 @@ class ProductService {
       throw new NotFoundError("Product not found");
     }
 
-    if (!product.samples) {
+    if (!product.samples || product.samples.length === 0) {
       throw new BadRequestError("Product has no sample");
     }
 
-    await sampleService.deleteSample(product.samples.id);
+    for (const sample of product.samples) {
+      await this.sampleService.deleteSample(sample.id);
+    }
+    
     await this.db.products.update({
       where: { id: productId },
       data: { sample_url: null, updated_at: new Date() },
@@ -531,6 +579,205 @@ class ProductService {
     // Delete gallery row first, then clean up the image file
     await this.db.product_gallery.delete({ where: { id: galleryId } });
     await imageService.deleteImage(entry.image_id);
+  }
+
+  // ============================================
+  // GALLERY VIDEOS — UPLOAD
+  // ============================================
+
+  private static readonly GALLERY_VIDEO_DIR = path.resolve(
+    __dirname,
+    "../../../../uploads/gallery_videos",
+  );
+  private static readonly GALLERY_VIDEO_MIME_TYPES = new Set([
+    "video/mp4",
+    "video/webm",
+    "video/quicktime",
+  ]);
+  private videoDirInitPromise: Promise<unknown> | null = null;
+
+  private async ensureVideoDirExists(): Promise<void> {
+    if (!this.videoDirInitPromise) {
+      this.videoDirInitPromise = fsPromises.mkdir(
+        ProductService.GALLERY_VIDEO_DIR,
+        { recursive: true },
+      );
+    }
+    await this.videoDirInitPromise;
+  }
+
+  async addVideoToGallery(
+    productId: number,
+    file: Express.Multer.File,
+  ): Promise<product_gallery_videos> {
+    if (!file.buffer) {
+      throw new BadRequestError("Video file buffer is required");
+    }
+    if (!ProductService.GALLERY_VIDEO_MIME_TYPES.has(file.mimetype)) {
+      throw new BadRequestError(
+        `Invalid video type: ${file.mimetype}. Allowed: mp4, webm, quicktime`,
+      );
+    }
+
+    // Verify product exists and get max sort order in parallel
+    const [product, maxSort] = await Promise.all([
+      this.db.products.findFirst({
+        where: { id: productId, deleted_at: null },
+        select: { id: true },
+      }),
+      this.db.product_gallery_videos.findFirst({
+        where: { product_id: productId },
+        orderBy: { sort_order: "desc" },
+        select: { sort_order: true },
+      }),
+    ]);
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    await this.ensureVideoDirExists();
+
+    const ext = path.extname(file.originalname) || ".mp4";
+    const uniqueId = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
+    const filename = `${uniqueId}${ext}`;
+    const filePath = path.join(ProductService.GALLERY_VIDEO_DIR, filename);
+    await fsPromises.writeFile(filePath, file.buffer);
+
+    const url = `/uploads/gallery_videos/${filename}`;
+    const sortOrder = (maxSort?.sort_order ?? -1) + 1;
+
+    return this.db.product_gallery_videos.create({
+      data: {
+        product_id: productId,
+        url,
+        source_type: video_source_type_enum.upload,
+        original_name: file.originalname,
+        mime_type: file.mimetype,
+        size: file.buffer.length,
+        sort_order: sortOrder,
+      },
+    });
+  }
+
+  // ============================================
+  // GALLERY VIDEOS — EXTERNAL URL
+  // ============================================
+
+  async addExternalVideoToGallery(
+    productId: number,
+    url: string,
+  ): Promise<product_gallery_videos> {
+    if (!url || !url.startsWith("http")) {
+      throw new BadRequestError("Valid URL (http/https) is required");
+    }
+
+    const [product, maxSort] = await Promise.all([
+      this.db.products.findFirst({
+        where: { id: productId, deleted_at: null },
+        select: { id: true },
+      }),
+      this.db.product_gallery_videos.findFirst({
+        where: { product_id: productId },
+        orderBy: { sort_order: "desc" },
+        select: { sort_order: true },
+      }),
+    ]);
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+    const sortOrder = (maxSort?.sort_order ?? -1) + 1;
+
+    return this.db.product_gallery_videos.create({
+      data: {
+        product_id: productId,
+        url,
+        source_type: video_source_type_enum.external,
+        sort_order: sortOrder,
+      },
+    });
+  }
+
+  // ============================================
+  // GALLERY VIDEOS — REMOVE
+  // ============================================
+
+  async removeVideoFromGallery(
+    productId: number,
+    videoId: number,
+  ): Promise<void> {
+    const video = await this.db.product_gallery_videos.findFirst({
+      where: { id: videoId, product_id: productId },
+    });
+    if (!video) {
+      throw new NotFoundError("Gallery video not found");
+    }
+
+    if (video.source_type === video_source_type_enum.upload && video.url) {
+      const absolutePath = path.resolve(
+        __dirname,
+        "../../../..",
+        video.url.startsWith("/") ? video.url.slice(1) : video.url,
+      );
+      void fsPromises.unlink(absolutePath).catch(() => {});
+    }
+
+    await this.db.product_gallery_videos.delete({ where: { id: videoId } });
+  }
+
+  // ============================================
+  // GALLERY — FULL (images + videos combined)
+  // ============================================
+
+  async getFullGallery(productId: number): Promise<{
+    images: Array<{
+      id: number;
+      type: "image";
+      url: string;
+      sort_order: number;
+    }>;
+    videos: Array<{
+      id: number;
+      type: "video";
+      url: string;
+      source_type: string;
+      sort_order: number;
+    }>;
+  }> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    const [galleryImages, galleryVideos] = await Promise.all([
+      this.db.product_gallery.findMany({
+        where: { product_id: productId, active: true },
+        include: { images: true },
+        orderBy: { sort_order: "asc" },
+      }),
+      this.db.product_gallery_videos.findMany({
+        where: { product_id: productId, active: true },
+        orderBy: { sort_order: "asc" },
+      }),
+    ]);
+
+    const images = galleryImages.map((g) => ({
+      id: g.id,
+      type: "image" as const,
+      url: (g as any).images?.url ?? "",
+      sort_order: g.sort_order ?? 0,
+    }));
+
+    const videos = galleryVideos.map((v) => ({
+      id: v.id,
+      type: "video" as const,
+      url: v.url,
+      source_type: v.source_type,
+      sort_order: v.sort_order ?? 0,
+    }));
+
+    return { images, videos };
   }
 
   // ============================================

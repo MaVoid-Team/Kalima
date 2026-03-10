@@ -55,6 +55,7 @@ export const ModelName = {
   user_analytics: 'user_analytics',
   user_roles: 'user_roles',
   users: 'users',
+  account_review_settings: 'account_review_settings',
   refresh_tokens: 'refresh_tokens',
   assistants: 'assistants',
   government: 'government',
@@ -87,8 +88,10 @@ export const ModelName = {
   purchase_items: 'purchase_items',
   purchase_item_required_fields: 'purchase_item_required_fields',
   payment_methods: 'payment_methods',
+  sample_sections: 'sample_sections',
   images: 'images',
-  product_gallery: 'product_gallery'
+  product_gallery: 'product_gallery',
+  product_gallery_videos: 'product_gallery_videos'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -174,6 +177,17 @@ export const UsersScalarFieldEnum = {
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
+
+
+export const Account_review_settingsScalarFieldEnum = {
+  id: 'id',
+  role: 'role',
+  requires_review: 'requires_review',
+  updated_at: 'updated_at',
+  updated_by: 'updated_by'
+} as const
+
+export type Account_review_settingsScalarFieldEnum = (typeof Account_review_settingsScalarFieldEnum)[keyof typeof Account_review_settingsScalarFieldEnum]
 
 
 export const Refresh_tokensScalarFieldEnum = {
@@ -419,6 +433,7 @@ export const ProductsScalarFieldEnum = {
   thumbnail_id: 'thumbnail_id',
   sample_url: 'sample_url',
   is_archived: 'is_archived',
+  release_at: 'release_at',
   mongo_id: 'mongo_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
@@ -445,12 +460,16 @@ export type Product_reviewsScalarFieldEnum = (typeof Product_reviewsScalarFieldE
 
 export const SamplesScalarFieldEnum = {
   id: 'id',
+  section_id: 'section_id',
   product_id: 'product_id',
-  url: 'url',
+  media_type: 'media_type',
+  high_quality_url: 'high_quality_url',
+  low_quality_url: 'low_quality_url',
   original_name: 'original_name',
   mime_type: 'mime_type',
   size: 'size',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type SamplesScalarFieldEnum = (typeof SamplesScalarFieldEnum)[keyof typeof SamplesScalarFieldEnum]
@@ -594,6 +613,20 @@ export const Payment_methodsScalarFieldEnum = {
 export type Payment_methodsScalarFieldEnum = (typeof Payment_methodsScalarFieldEnum)[keyof typeof Payment_methodsScalarFieldEnum]
 
 
+export const Sample_sectionsScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  thumbnail_url: 'thumbnail_url',
+  sort_order: 'sort_order',
+  active: 'active',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Sample_sectionsScalarFieldEnum = (typeof Sample_sectionsScalarFieldEnum)[keyof typeof Sample_sectionsScalarFieldEnum]
+
+
 export const ImagesScalarFieldEnum = {
   id: 'id',
   url: 'url',
@@ -616,6 +649,22 @@ export const Product_galleryScalarFieldEnum = {
 } as const
 
 export type Product_galleryScalarFieldEnum = (typeof Product_galleryScalarFieldEnum)[keyof typeof Product_galleryScalarFieldEnum]
+
+
+export const Product_gallery_videosScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  url: 'url',
+  source_type: 'source_type',
+  original_name: 'original_name',
+  mime_type: 'mime_type',
+  size: 'size',
+  sort_order: 'sort_order',
+  active: 'active',
+  created_at: 'created_at'
+} as const
+
+export type Product_gallery_videosScalarFieldEnum = (typeof Product_gallery_videosScalarFieldEnum)[keyof typeof Product_gallery_videosScalarFieldEnum]
 
 
 export const SortOrder = {

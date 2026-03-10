@@ -2,6 +2,7 @@ import { Type } from "class-transformer";
 import {
   IsArray,
   IsBoolean,
+  IsDateString,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -61,6 +62,12 @@ export class CreateProductDto {
   @IsOptional()
   sample_url?: string;
 
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  @Type(() => Number)
+  sample_section_id?: number;
+
   /**
    * Category ID to attach on creation.
    * Sent as string in multipart form data.
@@ -70,6 +77,11 @@ export class CreateProductDto {
   @IsOptional()
   @Type(() => Number)
   category_id?: number;
+
+  /** ISO date string – exact minute of scheduled release. Null = immediately available. */
+  @IsDateString()
+  @IsOptional()
+  release_at?: string;
 
   @IsString()
   @IsOptional()
@@ -116,10 +128,21 @@ export class UpdateProductDto {
   @IsOptional()
   sample_url?: string;
 
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  @Type(() => Number)
+  sample_section_id?: number;
+
   @Type(() => Boolean)
   @IsBoolean()
   @IsOptional()
   is_archived?: boolean;
+
+  /** ISO date string – exact minute of scheduled release. Null = immediately available. */
+  @IsDateString()
+  @IsOptional()
+  release_at?: string;
 
   @IsString()
   @IsOptional()
@@ -182,4 +205,14 @@ export class AttachRequiredFieldsDto {
   @ValidateNested({ each: true })
   @Type(() => AttachRequiredFieldEntry)
   fields: AttachRequiredFieldEntry[];
+}
+
+// ============================================
+// ADD EXTERNAL VIDEO DTO
+// ============================================
+
+export class AddExternalVideoDto {
+  @IsString()
+  @IsNotEmpty()
+  url: string;
 }

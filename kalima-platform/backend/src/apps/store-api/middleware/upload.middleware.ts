@@ -17,6 +17,22 @@ const IMAGE_MIME_TYPES = new Set([
 
 const SAMPLE_MIME_TYPES = new Set(["application/pdf"]);
 
+/** Expanded sample mime types: PDF, images, video, Word, PowerPoint */
+const SAMPLE_SECTION_MIME_TYPES = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+]);
+
 // ============================================
 // FILE FILTER — images only
 // ============================================
@@ -88,10 +104,15 @@ function productWithSampleFilter(
     return imageFilter(_req, file, cb);
   }
   if (file.fieldname === "sample") {
-    if (SAMPLE_MIME_TYPES.has(file.mimetype)) {
+    if (SAMPLE_SECTION_MIME_TYPES.has(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new BadRequestError("Sample must be a PDF file") as any, false);
+      cb(
+        new BadRequestError(
+          "Sample must be a PDF, image, video, Word, or PowerPoint file",
+        ) as any,
+        false,
+      );
     }
     return;
   }
@@ -114,10 +135,18 @@ function sampleOnlyFilter(
   file: Express.Multer.File,
   cb: FileFilterCallback,
 ): void {
-  if (file.fieldname === "sample" && SAMPLE_MIME_TYPES.has(file.mimetype)) {
+  if (
+    file.fieldname === "sample" &&
+    SAMPLE_SECTION_MIME_TYPES.has(file.mimetype)
+  ) {
     cb(null, true);
   } else if (file.fieldname === "sample") {
-    cb(new BadRequestError("Sample must be a PDF file") as any, false);
+    cb(
+      new BadRequestError(
+        "Sample must be a PDF, image, video, Word, or PowerPoint file",
+      ) as any,
+      false,
+    );
   } else {
     cb(null, true);
   }
@@ -137,3 +166,71 @@ export const uploadFastBuy = createImageUpload(5).fields([
   { name: "payment_screenshot", maxCount: 1 },
   { name: "product_image", maxCount: 1 },
 ]);
+
+// ============================================
+// SAMPLE FILES — high_quality + low_quality (PDF, images, video, Word, PowerPoint)
+// ============================================
+
+function sampleFilesFilter(
+  _req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback,
+): void {
+  if (
+    (file.fieldname === "high_quality" || file.fieldname === "low_quality") &&
+    SAMPLE_SECTION_MIME_TYPES.has(file.mimetype)
+  ) {
+    cb(null, true);
+  } else {
+    cb(
+      new BadRequestError(
+        `Invalid file type for ${file.fieldname}: ${file.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
+      ) as any,
+      false,
+    );
+  }
+}
+
+/** Sample create/update: high_quality and/or low_quality files. Max 150 MB per file. */
+export const uploadSampleFiles = multer({
+  storage: memoryStorage,
+  fileFilter: sampleFilesFilter,
+  limits: { fileSize: 150 * 1024 * 1024 },
+}).fields([
+  { name: "high_quality", maxCount: 1 },
+  { name: "low_quality", maxCount: 1 },
+]);
+
+// ============================================
+// GALLERY VIDEO — single video upload (mp4, webm, quicktime)
+// ============================================
+
+const GALLERY_VIDEO_MIME_TYPES = new Set([
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+]);
+
+function galleryVideoFilter(
+  _req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback,
+): void {
+  if (GALLERY_VIDEO_MIME_TYPES.has(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(
+      new BadRequestError(
+        `Invalid video type: ${file.mimetype}. Allowed: mp4, webm, quicktime`,
+      ) as any,
+      false,
+    );
+  }
+}
+
+/** Single gallery video upload. Max 100 MB. */
+export const uploadGalleryVideo = multer({
+  storage: memoryStorage,
+  fileFilter: galleryVideoFilter,
+  limits: { fileSize: 100 * 1024 * 1024 },
+}).single("video");

@@ -13,7 +13,7 @@ import {
   ArrayMinSize,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { gender_enum } from "../generated/prisma/client";
+import { gender_enum, role_enum } from "../generated/prisma/client";
 
 // ============================================
 // ADMIN USER CREATION DTOs
@@ -222,4 +222,24 @@ export class ListUsersQueryDto {
   @IsOptional()
   @IsString()
   portal?: string;
+}
+
+// ============================================
+// ACCOUNT REVIEW DTOs
+// ============================================
+
+export class AccountReviewSettingEntryDto {
+  @IsEnum(role_enum)
+  role: role_enum;
+
+  @IsBoolean()
+  requires_review: boolean;
+}
+
+export class UpsertAccountReviewSettingsDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => AccountReviewSettingEntryDto)
+  settings: AccountReviewSettingEntryDto[];
 }

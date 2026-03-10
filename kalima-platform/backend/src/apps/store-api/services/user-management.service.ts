@@ -38,6 +38,7 @@ import {
   ForbiddenError,
   BadRequestError,
 } from "../../../libs/errors";
+import { accountReviewService } from "./account-review.service";
 
 // ============================================
 // CONSTANTS
@@ -87,9 +88,10 @@ class UserManagementService {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
 
-    const [passwordHash, serial] = await Promise.all([
+    const [passwordHash, serial, requiresReview] = await Promise.all([
       this.hashPassword(input.password),
       this.generateTeacherSerial(input.subject_id),
+      accountReviewService.roleRequiresReview(role_enum.Teacher),
     ]);
 
     const user = await this.db.$transaction(async (tx) => {
@@ -104,6 +106,7 @@ class UserManagementService {
           role: role_enum.Teacher,
           is_email_verified: !!creator,
           created_by: creator?.userId,
+          confirmed: !requiresReview,
           auth_identities: {
             create: {
               provider: "local",
@@ -154,7 +157,10 @@ class UserManagementService {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
 
-    const passwordHash = await this.hashPassword(input.password);
+    const [passwordHash, requiresReview] = await Promise.all([
+      this.hashPassword(input.password),
+      accountReviewService.roleRequiresReview(role_enum.Student),
+    ]);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -168,6 +174,7 @@ class UserManagementService {
           role: role_enum.Student,
           is_email_verified: !!creator,
           created_by: creator?.userId,
+          confirmed: !requiresReview,
           auth_identities: {
             create: {
               provider: "local",
@@ -210,7 +217,10 @@ class UserManagementService {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
 
-    const passwordHash = await this.hashPassword(input.password);
+    const [passwordHash, requiresReview] = await Promise.all([
+      this.hashPassword(input.password),
+      accountReviewService.roleRequiresReview(role_enum.Parent),
+    ]);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -224,6 +234,7 @@ class UserManagementService {
           role: role_enum.Parent,
           is_email_verified: !!creator,
           created_by: creator?.userId,
+          confirmed: !requiresReview,
           auth_identities: {
             create: {
               provider: "local",
@@ -260,7 +271,10 @@ class UserManagementService {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
 
-    const passwordHash = await this.hashPassword(input.password);
+    const [passwordHash, requiresReview] = await Promise.all([
+      this.hashPassword(input.password),
+      accountReviewService.roleRequiresReview(role_enum.Lecturer),
+    ]);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -274,6 +288,7 @@ class UserManagementService {
           role: role_enum.Lecturer,
           is_email_verified: !!creator,
           created_by: creator?.userId,
+          confirmed: !requiresReview,
           auth_identities: {
             create: {
               provider: "local",
@@ -314,9 +329,10 @@ class UserManagementService {
     input: TeacherFirebaseRegistrationDto,
     firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
-    const [, serial] = await Promise.all([
+    const [, serial, requiresReview] = await Promise.all([
       this.ensureEmailNotExists(firebaseUser.email),
       this.generateTeacherSerial(input.subject_id),
+      accountReviewService.roleRequiresReview(role_enum.Teacher),
     ]);
 
     const user = await this.db.$transaction(async (tx) => {
@@ -330,6 +346,7 @@ class UserManagementService {
           is_email_verified: true,
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Teacher,
+          confirmed: !requiresReview,
           auth_identities: {
             create: {
               provider: firebaseUser.provider,
@@ -377,7 +394,10 @@ class UserManagementService {
     input: StudentFirebaseRegistrationDto,
     firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
-    await this.ensureEmailNotExists(firebaseUser.email);
+    const [, requiresReview] = await Promise.all([
+      this.ensureEmailNotExists(firebaseUser.email),
+      accountReviewService.roleRequiresReview(role_enum.Student),
+    ]);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -390,6 +410,7 @@ class UserManagementService {
           is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Student,
+          confirmed: !requiresReview,
           auth_identities: {
             create: {
               provider: firebaseUser.provider,
@@ -429,7 +450,10 @@ class UserManagementService {
     input: ParentFirebaseRegistrationDto,
     firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
-    await this.ensureEmailNotExists(firebaseUser.email);
+    const [, requiresReview] = await Promise.all([
+      this.ensureEmailNotExists(firebaseUser.email),
+      accountReviewService.roleRequiresReview(role_enum.Parent),
+    ]);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -442,6 +466,7 @@ class UserManagementService {
           is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Parent,
+          confirmed: !requiresReview,
           auth_identities: {
             create: {
               provider: firebaseUser.provider,
@@ -475,7 +500,10 @@ class UserManagementService {
     input: LecturerFirebaseRegistrationDto,
     firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
-    await this.ensureEmailNotExists(firebaseUser.email);
+    const [, requiresReview] = await Promise.all([
+      this.ensureEmailNotExists(firebaseUser.email),
+      accountReviewService.roleRequiresReview(role_enum.Lecturer),
+    ]);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -488,6 +516,7 @@ class UserManagementService {
           is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Lecturer,
+          confirmed: !requiresReview,
           auth_identities: {
             create: {
               provider: firebaseUser.provider,
@@ -1338,6 +1367,7 @@ class UserManagementService {
       secondary_phone: true,
       gender: true,
       is_email_verified: true,
+      confirmed: true,
       profile_pic_url: true,
       created_at: true,
     };
@@ -1353,6 +1383,7 @@ class UserManagementService {
       secondary_phone: user.secondary_phone,
       gender: user.gender,
       is_email_verified: user.is_email_verified ?? false,
+      confirmed: user.confirmed ?? false,
       profile_pic_url: user.profile_pic_url,
       created_at: user.created_at,
     };

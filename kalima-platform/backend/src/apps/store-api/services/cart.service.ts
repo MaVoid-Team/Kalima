@@ -398,15 +398,30 @@ class CartService {
 
     const product = await this.db.products.findUnique({
       where: { id: dto.product_id },
-      select: { id: true, price: true, price_after_discount: true },
+      select: {
+        id: true,
+        price: true,
+        price_after_discount: true,
+        release_at: true,
+      },
     });
     if (!product) throw new NotFoundError("Product not found");
+
+    if (product.release_at) {
+      const releaseAt = new Date(product.release_at);
+      if (releaseAt > new Date()) {
+        throw new BadRequestError(
+          `This product has not been released yet. It releases at ${releaseAt.toISOString()}`,
+        );
+      }
+    }
 
     const price_at_add = Math.min(
       Number(product.price),
       Number(product.price_after_discount),
     );
 
+    // Use findFirst + conditional upsert to reduce roundtrips
     const existing = await this.db.cart_items.findFirst({
       where: {
         cart_id: cart.id,
