@@ -3,11 +3,16 @@ import { cartController } from "../../controllers/cart.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { uploadSingleImage } from "../../middleware/upload.middleware";
 import { requireConfirmed } from "../../middleware/requireConfirmed.middleware";
+import { requireRole } from "../../middleware/requireRole.middleware";
+import { role_enum } from "../../generated/prisma/enums";
 
 const router = Router();
 
 // All cart endpoints require authentication
-router.use(authenticateToken);
+
+const adminAuth = [authenticateToken, requireRole([role_enum.Teacher])];
+
+router.use(adminAuth);
 
 // ============================================
 // CART CRUD
@@ -74,7 +79,10 @@ router.patch(
   cartController.updateFastBuyItemRequiredFieldImage,
 );
 
-router.get("/fast-buy/checkout/preview", cartController.getFastBuyCheckoutPreview);
+router.get(
+  "/fast-buy/checkout/preview",
+  cartController.getFastBuyCheckoutPreview,
+);
 router.post(
   "/fast-buy/checkout",
   requireConfirmed,

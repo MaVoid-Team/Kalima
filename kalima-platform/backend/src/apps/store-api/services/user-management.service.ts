@@ -17,6 +17,10 @@ import {
   CreateSubAdminDto,
   CreateModeratorDto,
   CreateAssistantDto,
+  CreateTeacherDto,
+  CreateStudentDto,
+  CreateParentDto,
+  CreateLecturerDto,
 } from "../dtos/admin.dto";
 import {
   BaseUserData,
@@ -100,6 +104,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Teacher,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           confirmed: !requiresReview,
           auth_identities: {
@@ -167,6 +172,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Student,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           confirmed: !requiresReview,
           auth_identities: {
@@ -226,6 +232,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Parent,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           confirmed: !requiresReview,
           auth_identities: {
@@ -279,6 +286,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Lecturer,
+          is_email_verified: !!creator,
           created_by: creator?.userId,
           confirmed: !requiresReview,
           auth_identities: {
@@ -335,7 +343,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true,
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Teacher,
           confirmed: !requiresReview,
@@ -399,7 +407,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Student,
           confirmed: !requiresReview,
@@ -455,7 +463,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Parent,
           confirmed: !requiresReview,
@@ -505,7 +513,7 @@ class UserManagementService {
           phone: input.phone,
           secondary_phone: input.secondary_phone,
           gender: input.gender,
-          is_email_verified: firebaseUser.emailVerified,
+          is_email_verified: true, // OAuth accounts are pre-verified
           profile_pic_url: firebaseUser.photoUrl,
           role: role_enum.Lecturer,
           confirmed: !requiresReview,
@@ -749,6 +757,46 @@ class UserManagementService {
     return this.mapToBaseUserData(user);
   }
 
+  async createTeacherAsAdmin(
+    input: CreateTeacherDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createTeacher(input, creator);
+    return this.mapToBaseUserData(user);
+  }
+
+  async createStudentAsAdmin(
+    input: CreateStudentDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createStudent(input, creator);
+    return this.mapToBaseUserData(user);
+  }
+
+  async createParentAsAdmin(
+    input: CreateParentDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createParent(input, creator);
+    return this.mapToBaseUserData(user);
+  }
+
+  async createLecturerAsAdmin(
+    input: CreateLecturerDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
+    this.ensureCreatorIsAdminOrSubAdmin(creator);
+
+    const { user } = await this.createLecturer(input, creator);
+    return this.mapToBaseUserData(user);
+  }
+
   // ============================================
   // USER LOOKUP METHODS
   // ============================================
@@ -904,6 +952,10 @@ class UserManagementService {
             profile_pic_url: true,
             created_at: true,
             role: true,
+            user_roles: {
+              select: { role: true },
+              take: 1,
+            },
           },
         },
       },
@@ -975,6 +1027,41 @@ class UserManagementService {
   }
 
   // ============================================
+  // DELETE USER
+  // ============================================
+
+  async deleteUser(userId: number): Promise<void> {
+    const user = await this.db.users.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, phone: true, mongo_id: true },
+    });
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    const ts = Date.now();
+    await this.db.users.update({
+      where: { id: userId },
+      data: {
+        email: user.email ? `${user.email}_deleted_${ts}` : null,
+        phone: user.phone ? `${user.phone}_deleted_${ts}` : null,
+        mongo_id: user.mongo_id ? `${user.mongo_id}_deleted_${ts}` : null,
+        password: null,
+        // we leave 'name' and relations intact for order history
+        updated_at: new Date(),
+        deleted_at: new Date(),
+        is_deleted: true,
+      },
+    });
+
+    // Cleanup active sessions
+    await this.db.refresh_tokens.deleteMany({ where: { user_id: userId } });
+    await this.db.user_roles.deleteMany({ where: { user_id: userId } });
+    await this.db.auth_identities.deleteMany({ where: { user_id: userId } });
+  }
+
+  // ============================================
   // ADMIN: USER LISTING & SEARCH
   // ============================================
 
@@ -985,6 +1072,7 @@ class UserManagementService {
       search?: string;
       role?: role_enum;
       portal?: portal_enum;
+      isDeleted?: boolean;
     } = {},
   ) {
     const page = Math.max(1, options.page ?? 1);
@@ -992,6 +1080,10 @@ class UserManagementService {
     const skip = (page - 1) * limit;
 
     const where: any = {};
+
+    if (options.isDeleted !== undefined) {
+      where.is_deleted = options.isDeleted;
+    }
 
     // Text search on name, email, phone
     if (options.search) {
@@ -1020,6 +1112,7 @@ class UserManagementService {
         orderBy: { created_at: "desc" },
         select: {
           ...this.baseUserSelect(),
+          is_deleted: true,
           role: true,
           confirmed: true,
           user_roles: {
@@ -1051,6 +1144,7 @@ class UserManagementService {
       select: {
         ...this.baseUserSelect(),
         role: true,
+        is_deleted: true,
         confirmed: true,
         user_roles: {
           select: {
@@ -1059,11 +1153,16 @@ class UserManagementService {
             role: true,
           },
         },
-        teachers: { select: { serial: true, subject_id: true } },
-        students: { select: { level_id: true } },
+        teachers: {
+          include: { subjects: true, government: true, zones: true },
+        },
+        teaches_at: true,
+        students: { include: { levels: true, government: true, zones: true } },
         lecturers: { select: { bio: true } },
-        assistants: { select: { lecturer_user_id: true } },
-        parents: { select: { government_id: true } },
+        assistants: { include: { lecturers: true } },
+        parents: { include: { government: true, zones: true } },
+        deleted_at: true,
+        user_analytics: true,
       },
     });
 
@@ -1220,23 +1319,33 @@ class UserManagementService {
   }
 
   async generateTeacherSerial(subjectId: number): Promise<string> {
-    const [subject, count] = await Promise.all([
-      this.db.subjects.findUnique({
-        where: { id: subjectId },
-        select: { title: true },
-      }),
-      this.db.teachers.count({
-        where: { subject_id: subjectId },
-      }),
-    ]);
-
-    const serialNo = count + 1;
+    const subject = await this.db.subjects.findUnique({
+      where: { id: subjectId },
+      select: { title: true },
+    });
 
     if (!subject) {
       throw new NotFoundError("Subject not found");
     }
 
     let subjectPrefix = subject.title.substring(0, 2).toUpperCase();
+
+    // Find the highest existing serial number for this prefix
+    // Using max serial instead of count to avoid collisions when teachers are deleted
+    const lastTeacher = await this.db.teachers.findFirst({
+      where: { serial: { startsWith: subjectPrefix } },
+      orderBy: { serial: "desc" },
+      select: { serial: true },
+    });
+
+    let serialNo = 1;
+    if (lastTeacher?.serial) {
+      const numPart = parseInt(
+        lastTeacher.serial.slice(subjectPrefix.length),
+        10,
+      );
+      if (!isNaN(numPart)) serialNo = numPart + 1;
+    }
 
     return `${subjectPrefix}${String(serialNo).padStart(3, "0")}`;
   }

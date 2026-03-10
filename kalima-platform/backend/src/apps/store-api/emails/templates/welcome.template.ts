@@ -5,74 +5,75 @@ export interface WelcomeEmailData {
 }
 
 export function getWelcomeEmailSubject(): string {
-  return 'Welcome to Kalima Platform!';
+  return "مرحبًا بك في منصة كلمة!";
 }
 
 export function getWelcomeEmailHtml(data: WelcomeEmailData): string {
   return `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Kalima Platform</title>
+  <title>مرحبًا بك في منصة كلمة</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+<body style="margin: 0; padding: 0; font-family: 'IBM Plex Sans Arabic', 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f8f8;" dir="rtl">
   <table role="presentation" style="width: 100%; border-collapse: collapse;">
     <tr>
       <td align="center" style="padding: 40px 0;">
-        <table role="presentation" style="width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <table role="presentation" style="width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; box-shadow: 0 12px 30px rgba(175,13,14,0.08);">
           <!-- Header -->
           <tr>
-            <td style="padding: 40px 40px 20px; text-align: center; background-color: #4F46E5; border-radius: 8px 8px 0 0;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">🎉 Welcome to Kalima!</h1>
+            <td style="padding: 40px 40px 20px; text-align: center; background-color: #af0d0e; border-radius: 12px 12px 0 0;">
+              <img src="cid:kalima-logo" alt="Kalima" width="72" style="display: block; margin: 0 auto 16px; height: auto;" />
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">🎉 مرحبًا بك في كلمة!</h1>
             </td>
           </tr>
           
           <!-- Content -->
           <tr>
             <td style="padding: 40px;">
-              <h2 style="margin: 0 0 20px; color: #333333; font-size: 24px; font-weight: 600;">Hello ${data.name}!</h2>
+              <h2 style="margin: 0 0 20px; color: #1a1a1a; font-size: 24px; font-weight: 700;">مرحبًا ${data.name}!</h2>
               
-              <p style="margin: 0 0 20px; color: #666666; font-size: 16px; line-height: 1.6;">
-                Your email has been verified successfully. Welcome to Kalima Platform as a <strong>${data.role}</strong>!
+              <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.8;">
+                تم تأكيد بريدك الإلكتروني بنجاح. مرحبًا بك في منصة كلمة بصفتك <strong>${data.role}</strong>!
               </p>
               
-              <p style="margin: 0 0 20px; color: #666666; font-size: 16px; line-height: 1.6;">
-                You now have full access to all the features available for your account. Here's what you can do next:
+              <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.8;">
+                الآن لديك وصول كامل إلى جميع الميزات المتاحة لحسابك. إليك ما يمكنك فعله بعد ذلك:
               </p>
               
               <!-- Features List -->
-              <ul style="margin: 0 0 20px; padding: 0 0 0 20px; color: #666666; font-size: 16px; line-height: 1.8;">
-                <li>Complete your profile information</li>
-                <li>Explore available courses and content</li>
-                <li>Connect with other users on the platform</li>
-                <li>Access your personalized dashboard</li>
+              <ul style="margin: 0 0 20px; padding: 0 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.9;">
+                <li>استكمال معلومات ملفك الشخصي</li>
+                <li>استكشاف الدورات والمحتوى المتاح</li>
+                <li>التواصل مع مستخدمين آخرين على المنصة</li>
+                <li>الوصول إلى لوحة التحكم الشخصية</li>
               </ul>
               
               <!-- CTA Button -->
               <table role="presentation" style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td align="center" style="padding: 20px 0;">
-                    <a href="${data.loginUrl}" 
-                       style="display: inline-block; padding: 16px 40px; background-color: #10B981; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px;">
-                      Go to Dashboard
+                      <a href="${data.loginUrl}" 
+                        style="display: inline-block; padding: 16px 40px; background-color: #af0d0e; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; border-radius: 10px;">
+                      🚀 الذهاب إلى لوحة التحكم الخاصة بي
                     </a>
                   </td>
                 </tr>
               </table>
               
-              <p style="margin: 20px 0 0; color: #999999; font-size: 14px; line-height: 1.6;">
-                If you have any questions or need assistance, feel free to contact our support team.
+              <p style="margin: 20px 0 0; color: #6b7280; font-size: 14px; line-height: 1.8;">
+                إذا كان لديك أي أسئلة أو تحتاج مساعدة، لا تتردد في التواصل مع فريق الدعم.
               </p>
             </td>
           </tr>
           
           <!-- Footer -->
           <tr>
-            <td style="padding: 30px 40px; background-color: #f8f8f8; border-radius: 0 0 8px 8px; text-align: center;">
-              <p style="margin: 0; color: #999999; font-size: 12px;">
-                © ${new Date().getFullYear()} Kalima Platform. All rights reserved.
+            <td style="padding: 30px 40px; background-color: #fcfcfc; border-radius: 0 0 12px 12px; text-align: center;">
+              <p style="margin: 0; color: #6b7280; font-size: 12px;">
+                © ${new Date().getFullYear()} منصة كلمة. جميع الحقوق محفوظة.
               </p>
             </td>
           </tr>
@@ -87,23 +88,22 @@ export function getWelcomeEmailHtml(data: WelcomeEmailData): string {
 
 export function getWelcomeEmailText(data: WelcomeEmailData): string {
   return `
-Welcome to Kalima Platform!
+مرحبًا بك في منصة كلمة!
 
-Hello ${data.name}!
+مرحبًا ${data.name}!
 
-Your email has been verified successfully. Welcome to Kalima Platform as a ${data.role}!
+تم تأكيد بريدك الإلكتروني بنجاح. مرحبًا بك في منصة كلمة بصفتك ${data.role}!
+الآن لديك وصول كامل إلى جميع الميزات المتاحة لحسابك. إليك ما يمكنك فعله بعد ذلك:
 
-You now have full access to all the features available for your account. Here's what you can do next:
+- استكمال معلومات ملفك الشخصي
+- استكشاف الدورات والمحتوى المتاح
+- التواصل مع مستخدمين آخرين على المنصة
+- الوصول إلى لوحة التحكم الشخصية
 
-- Complete your profile information
-- Explore available courses and content
-- Connect with other users on the platform
-- Access your personalized dashboard
+قم بزيارة لوحة التحكم الخاصة بك: ${data.loginUrl}
 
-Visit your dashboard: ${data.loginUrl}
+إذا كان لديك أي أسئلة أو تحتاج مساعدة، لا تتردد في التواصل مع فريق الدعم.
 
-If you have any questions or need assistance, feel free to contact our support team.
-
-© ${new Date().getFullYear()} Kalima Platform. All rights reserved.
+© ${new Date().getFullYear()} منصة كلمة. جميع الحقوق محفوظة.
   `.trim();
 }

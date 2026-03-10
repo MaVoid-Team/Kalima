@@ -32,6 +32,9 @@ export type Purchase_itemsAvgAggregateOutputType = {
   product_id: number | null
   price_at_purchase: runtime.Decimal | null
   discount: runtime.Decimal | null
+  final_price: runtime.Decimal | null
+  quantity: number | null
+  coupon_id: number | null
 }
 
 export type Purchase_itemsSumAggregateOutputType = {
@@ -40,6 +43,9 @@ export type Purchase_itemsSumAggregateOutputType = {
   product_id: number | null
   price_at_purchase: runtime.Decimal | null
   discount: runtime.Decimal | null
+  final_price: runtime.Decimal | null
+  quantity: number | null
+  coupon_id: number | null
 }
 
 export type Purchase_itemsMinAggregateOutputType = {
@@ -49,9 +55,13 @@ export type Purchase_itemsMinAggregateOutputType = {
   price_at_purchase: runtime.Decimal | null
   discount: runtime.Decimal | null
   required_fields_filled: boolean | null
+  final_price: runtime.Decimal | null
+  quantity: number | null
+  coupon_id: number | null
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
 }
 
 export type Purchase_itemsMaxAggregateOutputType = {
@@ -61,9 +71,13 @@ export type Purchase_itemsMaxAggregateOutputType = {
   price_at_purchase: runtime.Decimal | null
   discount: runtime.Decimal | null
   required_fields_filled: boolean | null
+  final_price: runtime.Decimal | null
+  quantity: number | null
+  coupon_id: number | null
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
 }
 
 export type Purchase_itemsCountAggregateOutputType = {
@@ -73,9 +87,13 @@ export type Purchase_itemsCountAggregateOutputType = {
   price_at_purchase: number
   discount: number
   required_fields_filled: number
+  final_price: number
+  quantity: number
+  coupon_id: number
   created_at: number
   updated_at: number
   deleted_at: number
+  is_deleted: number
   _all: number
 }
 
@@ -86,6 +104,9 @@ export type Purchase_itemsAvgAggregateInputType = {
   product_id?: true
   price_at_purchase?: true
   discount?: true
+  final_price?: true
+  quantity?: true
+  coupon_id?: true
 }
 
 export type Purchase_itemsSumAggregateInputType = {
@@ -94,6 +115,9 @@ export type Purchase_itemsSumAggregateInputType = {
   product_id?: true
   price_at_purchase?: true
   discount?: true
+  final_price?: true
+  quantity?: true
+  coupon_id?: true
 }
 
 export type Purchase_itemsMinAggregateInputType = {
@@ -103,9 +127,13 @@ export type Purchase_itemsMinAggregateInputType = {
   price_at_purchase?: true
   discount?: true
   required_fields_filled?: true
+  final_price?: true
+  quantity?: true
+  coupon_id?: true
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
 }
 
 export type Purchase_itemsMaxAggregateInputType = {
@@ -115,9 +143,13 @@ export type Purchase_itemsMaxAggregateInputType = {
   price_at_purchase?: true
   discount?: true
   required_fields_filled?: true
+  final_price?: true
+  quantity?: true
+  coupon_id?: true
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
 }
 
 export type Purchase_itemsCountAggregateInputType = {
@@ -127,9 +159,13 @@ export type Purchase_itemsCountAggregateInputType = {
   price_at_purchase?: true
   discount?: true
   required_fields_filled?: true
+  final_price?: true
+  quantity?: true
+  coupon_id?: true
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
   _all?: true
 }
 
@@ -226,9 +262,13 @@ export type Purchase_itemsGroupByOutputType = {
   price_at_purchase: runtime.Decimal
   discount: runtime.Decimal
   required_fields_filled: boolean
+  final_price: runtime.Decimal
+  quantity: number
+  coupon_id: number | null
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
   _count: Purchase_itemsCountAggregateOutputType | null
   _avg: Purchase_itemsAvgAggregateOutputType | null
   _sum: Purchase_itemsSumAggregateOutputType | null
@@ -261,12 +301,17 @@ export type purchase_itemsWhereInput = {
   price_at_purchase?: Prisma.DecimalFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFilter<"purchase_items"> | boolean
+  final_price?: Prisma.DecimalFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFilter<"purchase_items"> | number
+  coupon_id?: Prisma.IntNullableFilter<"purchase_items"> | number | null
   created_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"purchase_items"> | boolean | null
   purchases?: Prisma.XOR<Prisma.PurchasesScalarRelationFilter, Prisma.purchasesWhereInput>
   products?: Prisma.XOR<Prisma.ProductsScalarRelationFilter, Prisma.productsWhereInput>
   purchase_item_required_fields?: Prisma.Purchase_item_required_fieldsListRelationFilter
+  coupons?: Prisma.XOR<Prisma.CouponsNullableScalarRelationFilter, Prisma.couponsWhereInput> | null
 }
 
 export type purchase_itemsOrderByWithRelationInput = {
@@ -276,12 +321,17 @@ export type purchase_itemsOrderByWithRelationInput = {
   price_at_purchase?: Prisma.SortOrder
   discount?: Prisma.SortOrder
   required_fields_filled?: Prisma.SortOrder
+  final_price?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  coupon_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   purchases?: Prisma.purchasesOrderByWithRelationInput
   products?: Prisma.productsOrderByWithRelationInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsOrderByRelationAggregateInput
+  coupons?: Prisma.couponsOrderByWithRelationInput
 }
 
 export type purchase_itemsWhereUniqueInput = Prisma.AtLeast<{
@@ -294,12 +344,17 @@ export type purchase_itemsWhereUniqueInput = Prisma.AtLeast<{
   price_at_purchase?: Prisma.DecimalFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFilter<"purchase_items"> | boolean
+  final_price?: Prisma.DecimalFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFilter<"purchase_items"> | number
+  coupon_id?: Prisma.IntNullableFilter<"purchase_items"> | number | null
   created_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"purchase_items"> | boolean | null
   purchases?: Prisma.XOR<Prisma.PurchasesScalarRelationFilter, Prisma.purchasesWhereInput>
   products?: Prisma.XOR<Prisma.ProductsScalarRelationFilter, Prisma.productsWhereInput>
   purchase_item_required_fields?: Prisma.Purchase_item_required_fieldsListRelationFilter
+  coupons?: Prisma.XOR<Prisma.CouponsNullableScalarRelationFilter, Prisma.couponsWhereInput> | null
 }, "id">
 
 export type purchase_itemsOrderByWithAggregationInput = {
@@ -309,9 +364,13 @@ export type purchase_itemsOrderByWithAggregationInput = {
   price_at_purchase?: Prisma.SortOrder
   discount?: Prisma.SortOrder
   required_fields_filled?: Prisma.SortOrder
+  final_price?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  coupon_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.purchase_itemsCountOrderByAggregateInput
   _avg?: Prisma.purchase_itemsAvgOrderByAggregateInput
   _max?: Prisma.purchase_itemsMaxOrderByAggregateInput
@@ -329,21 +388,29 @@ export type purchase_itemsScalarWhereWithAggregatesInput = {
   price_at_purchase?: Prisma.DecimalWithAggregatesFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalWithAggregatesFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolWithAggregatesFilter<"purchase_items"> | boolean
+  final_price?: Prisma.DecimalWithAggregatesFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntWithAggregatesFilter<"purchase_items"> | number
+  coupon_id?: Prisma.IntNullableWithAggregatesFilter<"purchase_items"> | number | null
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"purchase_items"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"purchase_items"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"purchase_items"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableWithAggregatesFilter<"purchase_items"> | boolean | null
 }
 
 export type purchase_itemsCreateInput = {
   price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchases: Prisma.purchasesCreateNestedOneWithoutPurchase_itemsInput
   products: Prisma.productsCreateNestedOneWithoutPurchase_itemsInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsCreateNestedManyWithoutPurchase_itemsInput
+  coupons?: Prisma.couponsCreateNestedOneWithoutPurchase_itemsInput
 }
 
 export type purchase_itemsUncheckedCreateInput = {
@@ -353,9 +420,13 @@ export type purchase_itemsUncheckedCreateInput = {
   price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  coupon_id?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedCreateNestedManyWithoutPurchase_itemsInput
 }
 
@@ -363,12 +434,16 @@ export type purchase_itemsUpdateInput = {
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchases?: Prisma.purchasesUpdateOneRequiredWithoutPurchase_itemsNestedInput
   products?: Prisma.productsUpdateOneRequiredWithoutPurchase_itemsNestedInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUpdateManyWithoutPurchase_itemsNestedInput
+  coupons?: Prisma.couponsUpdateOneWithoutPurchase_itemsNestedInput
 }
 
 export type purchase_itemsUncheckedUpdateInput = {
@@ -378,9 +453,13 @@ export type purchase_itemsUncheckedUpdateInput = {
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  coupon_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedUpdateManyWithoutPurchase_itemsNestedInput
 }
 
@@ -391,18 +470,25 @@ export type purchase_itemsCreateManyInput = {
   price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  coupon_id?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchase_itemsUpdateManyMutationInput = {
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type purchase_itemsUncheckedUpdateManyInput = {
@@ -412,9 +498,13 @@ export type purchase_itemsUncheckedUpdateManyInput = {
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  coupon_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type Purchase_itemsListRelationFilter = {
@@ -434,9 +524,13 @@ export type purchase_itemsCountOrderByAggregateInput = {
   price_at_purchase?: Prisma.SortOrder
   discount?: Prisma.SortOrder
   required_fields_filled?: Prisma.SortOrder
+  final_price?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  coupon_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type purchase_itemsAvgOrderByAggregateInput = {
@@ -445,6 +539,9 @@ export type purchase_itemsAvgOrderByAggregateInput = {
   product_id?: Prisma.SortOrder
   price_at_purchase?: Prisma.SortOrder
   discount?: Prisma.SortOrder
+  final_price?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  coupon_id?: Prisma.SortOrder
 }
 
 export type purchase_itemsMaxOrderByAggregateInput = {
@@ -454,9 +551,13 @@ export type purchase_itemsMaxOrderByAggregateInput = {
   price_at_purchase?: Prisma.SortOrder
   discount?: Prisma.SortOrder
   required_fields_filled?: Prisma.SortOrder
+  final_price?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  coupon_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type purchase_itemsMinOrderByAggregateInput = {
@@ -466,9 +567,13 @@ export type purchase_itemsMinOrderByAggregateInput = {
   price_at_purchase?: Prisma.SortOrder
   discount?: Prisma.SortOrder
   required_fields_filled?: Prisma.SortOrder
+  final_price?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  coupon_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type purchase_itemsSumOrderByAggregateInput = {
@@ -477,11 +582,56 @@ export type purchase_itemsSumOrderByAggregateInput = {
   product_id?: Prisma.SortOrder
   price_at_purchase?: Prisma.SortOrder
   discount?: Prisma.SortOrder
+  final_price?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
+  coupon_id?: Prisma.SortOrder
 }
 
 export type Purchase_itemsScalarRelationFilter = {
   is?: Prisma.purchase_itemsWhereInput
   isNot?: Prisma.purchase_itemsWhereInput
+}
+
+export type purchase_itemsCreateNestedManyWithoutCouponsInput = {
+  create?: Prisma.XOR<Prisma.purchase_itemsCreateWithoutCouponsInput, Prisma.purchase_itemsUncheckedCreateWithoutCouponsInput> | Prisma.purchase_itemsCreateWithoutCouponsInput[] | Prisma.purchase_itemsUncheckedCreateWithoutCouponsInput[]
+  connectOrCreate?: Prisma.purchase_itemsCreateOrConnectWithoutCouponsInput | Prisma.purchase_itemsCreateOrConnectWithoutCouponsInput[]
+  createMany?: Prisma.purchase_itemsCreateManyCouponsInputEnvelope
+  connect?: Prisma.purchase_itemsWhereUniqueInput | Prisma.purchase_itemsWhereUniqueInput[]
+}
+
+export type purchase_itemsUncheckedCreateNestedManyWithoutCouponsInput = {
+  create?: Prisma.XOR<Prisma.purchase_itemsCreateWithoutCouponsInput, Prisma.purchase_itemsUncheckedCreateWithoutCouponsInput> | Prisma.purchase_itemsCreateWithoutCouponsInput[] | Prisma.purchase_itemsUncheckedCreateWithoutCouponsInput[]
+  connectOrCreate?: Prisma.purchase_itemsCreateOrConnectWithoutCouponsInput | Prisma.purchase_itemsCreateOrConnectWithoutCouponsInput[]
+  createMany?: Prisma.purchase_itemsCreateManyCouponsInputEnvelope
+  connect?: Prisma.purchase_itemsWhereUniqueInput | Prisma.purchase_itemsWhereUniqueInput[]
+}
+
+export type purchase_itemsUpdateManyWithoutCouponsNestedInput = {
+  create?: Prisma.XOR<Prisma.purchase_itemsCreateWithoutCouponsInput, Prisma.purchase_itemsUncheckedCreateWithoutCouponsInput> | Prisma.purchase_itemsCreateWithoutCouponsInput[] | Prisma.purchase_itemsUncheckedCreateWithoutCouponsInput[]
+  connectOrCreate?: Prisma.purchase_itemsCreateOrConnectWithoutCouponsInput | Prisma.purchase_itemsCreateOrConnectWithoutCouponsInput[]
+  upsert?: Prisma.purchase_itemsUpsertWithWhereUniqueWithoutCouponsInput | Prisma.purchase_itemsUpsertWithWhereUniqueWithoutCouponsInput[]
+  createMany?: Prisma.purchase_itemsCreateManyCouponsInputEnvelope
+  set?: Prisma.purchase_itemsWhereUniqueInput | Prisma.purchase_itemsWhereUniqueInput[]
+  disconnect?: Prisma.purchase_itemsWhereUniqueInput | Prisma.purchase_itemsWhereUniqueInput[]
+  delete?: Prisma.purchase_itemsWhereUniqueInput | Prisma.purchase_itemsWhereUniqueInput[]
+  connect?: Prisma.purchase_itemsWhereUniqueInput | Prisma.purchase_itemsWhereUniqueInput[]
+  update?: Prisma.purchase_itemsUpdateWithWhereUniqueWithoutCouponsInput | Prisma.purchase_itemsUpdateWithWhereUniqueWithoutCouponsInput[]
+  updateMany?: Prisma.purchase_itemsUpdateManyWithWhereWithoutCouponsInput | Prisma.purchase_itemsUpdateManyWithWhereWithoutCouponsInput[]
+  deleteMany?: Prisma.purchase_itemsScalarWhereInput | Prisma.purchase_itemsScalarWhereInput[]
+}
+
+export type purchase_itemsUncheckedUpdateManyWithoutCouponsNestedInput = {
+  create?: Prisma.XOR<Prisma.purchase_itemsCreateWithoutCouponsInput, Prisma.purchase_itemsUncheckedCreateWithoutCouponsInput> | Prisma.purchase_itemsCreateWithoutCouponsInput[] | Prisma.purchase_itemsUncheckedCreateWithoutCouponsInput[]
+  connectOrCreate?: Prisma.purchase_itemsCreateOrConnectWithoutCouponsInput | Prisma.purchase_itemsCreateOrConnectWithoutCouponsInput[]
+  upsert?: Prisma.purchase_itemsUpsertWithWhereUniqueWithoutCouponsInput | Prisma.purchase_itemsUpsertWithWhereUniqueWithoutCouponsInput[]
+  createMany?: Prisma.purchase_itemsCreateManyCouponsInputEnvelope
+  set?: Prisma.purchase_itemsWhereUniqueInput | Prisma.purchase_itemsWhereUniqueInput[]
+  disconnect?: Prisma.purchase_itemsWhereUniqueInput | Prisma.purchase_itemsWhereUniqueInput[]
+  delete?: Prisma.purchase_itemsWhereUniqueInput | Prisma.purchase_itemsWhereUniqueInput[]
+  connect?: Prisma.purchase_itemsWhereUniqueInput | Prisma.purchase_itemsWhereUniqueInput[]
+  update?: Prisma.purchase_itemsUpdateWithWhereUniqueWithoutCouponsInput | Prisma.purchase_itemsUpdateWithWhereUniqueWithoutCouponsInput[]
+  updateMany?: Prisma.purchase_itemsUpdateManyWithWhereWithoutCouponsInput | Prisma.purchase_itemsUpdateManyWithWhereWithoutCouponsInput[]
+  deleteMany?: Prisma.purchase_itemsScalarWhereInput | Prisma.purchase_itemsScalarWhereInput[]
 }
 
 export type purchase_itemsCreateNestedManyWithoutProductsInput = {
@@ -582,15 +732,95 @@ export type purchase_itemsUpdateOneRequiredWithoutPurchase_item_required_fieldsN
   update?: Prisma.XOR<Prisma.XOR<Prisma.purchase_itemsUpdateToOneWithWhereWithoutPurchase_item_required_fieldsInput, Prisma.purchase_itemsUpdateWithoutPurchase_item_required_fieldsInput>, Prisma.purchase_itemsUncheckedUpdateWithoutPurchase_item_required_fieldsInput>
 }
 
+export type purchase_itemsCreateWithoutCouponsInput = {
+  price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  purchases: Prisma.purchasesCreateNestedOneWithoutPurchase_itemsInput
+  products: Prisma.productsCreateNestedOneWithoutPurchase_itemsInput
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsCreateNestedManyWithoutPurchase_itemsInput
+}
+
+export type purchase_itemsUncheckedCreateWithoutCouponsInput = {
+  id?: number
+  purchase_id: number
+  product_id: number
+  price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedCreateNestedManyWithoutPurchase_itemsInput
+}
+
+export type purchase_itemsCreateOrConnectWithoutCouponsInput = {
+  where: Prisma.purchase_itemsWhereUniqueInput
+  create: Prisma.XOR<Prisma.purchase_itemsCreateWithoutCouponsInput, Prisma.purchase_itemsUncheckedCreateWithoutCouponsInput>
+}
+
+export type purchase_itemsCreateManyCouponsInputEnvelope = {
+  data: Prisma.purchase_itemsCreateManyCouponsInput | Prisma.purchase_itemsCreateManyCouponsInput[]
+  skipDuplicates?: boolean
+}
+
+export type purchase_itemsUpsertWithWhereUniqueWithoutCouponsInput = {
+  where: Prisma.purchase_itemsWhereUniqueInput
+  update: Prisma.XOR<Prisma.purchase_itemsUpdateWithoutCouponsInput, Prisma.purchase_itemsUncheckedUpdateWithoutCouponsInput>
+  create: Prisma.XOR<Prisma.purchase_itemsCreateWithoutCouponsInput, Prisma.purchase_itemsUncheckedCreateWithoutCouponsInput>
+}
+
+export type purchase_itemsUpdateWithWhereUniqueWithoutCouponsInput = {
+  where: Prisma.purchase_itemsWhereUniqueInput
+  data: Prisma.XOR<Prisma.purchase_itemsUpdateWithoutCouponsInput, Prisma.purchase_itemsUncheckedUpdateWithoutCouponsInput>
+}
+
+export type purchase_itemsUpdateManyWithWhereWithoutCouponsInput = {
+  where: Prisma.purchase_itemsScalarWhereInput
+  data: Prisma.XOR<Prisma.purchase_itemsUpdateManyMutationInput, Prisma.purchase_itemsUncheckedUpdateManyWithoutCouponsInput>
+}
+
+export type purchase_itemsScalarWhereInput = {
+  AND?: Prisma.purchase_itemsScalarWhereInput | Prisma.purchase_itemsScalarWhereInput[]
+  OR?: Prisma.purchase_itemsScalarWhereInput[]
+  NOT?: Prisma.purchase_itemsScalarWhereInput | Prisma.purchase_itemsScalarWhereInput[]
+  id?: Prisma.IntFilter<"purchase_items"> | number
+  purchase_id?: Prisma.IntFilter<"purchase_items"> | number
+  product_id?: Prisma.IntFilter<"purchase_items"> | number
+  price_at_purchase?: Prisma.DecimalFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  required_fields_filled?: Prisma.BoolFilter<"purchase_items"> | boolean
+  final_price?: Prisma.DecimalFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFilter<"purchase_items"> | number
+  coupon_id?: Prisma.IntNullableFilter<"purchase_items"> | number | null
+  created_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
+  updated_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"purchase_items"> | boolean | null
+}
+
 export type purchase_itemsCreateWithoutProductsInput = {
   price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchases: Prisma.purchasesCreateNestedOneWithoutPurchase_itemsInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsCreateNestedManyWithoutPurchase_itemsInput
+  coupons?: Prisma.couponsCreateNestedOneWithoutPurchase_itemsInput
 }
 
 export type purchase_itemsUncheckedCreateWithoutProductsInput = {
@@ -599,9 +829,13 @@ export type purchase_itemsUncheckedCreateWithoutProductsInput = {
   price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  coupon_id?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedCreateNestedManyWithoutPurchase_itemsInput
 }
 
@@ -631,30 +865,19 @@ export type purchase_itemsUpdateManyWithWhereWithoutProductsInput = {
   data: Prisma.XOR<Prisma.purchase_itemsUpdateManyMutationInput, Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsInput>
 }
 
-export type purchase_itemsScalarWhereInput = {
-  AND?: Prisma.purchase_itemsScalarWhereInput | Prisma.purchase_itemsScalarWhereInput[]
-  OR?: Prisma.purchase_itemsScalarWhereInput[]
-  NOT?: Prisma.purchase_itemsScalarWhereInput | Prisma.purchase_itemsScalarWhereInput[]
-  id?: Prisma.IntFilter<"purchase_items"> | number
-  purchase_id?: Prisma.IntFilter<"purchase_items"> | number
-  product_id?: Prisma.IntFilter<"purchase_items"> | number
-  price_at_purchase?: Prisma.DecimalFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount?: Prisma.DecimalFilter<"purchase_items"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  required_fields_filled?: Prisma.BoolFilter<"purchase_items"> | boolean
-  created_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
-  updated_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
-  deleted_at?: Prisma.DateTimeNullableFilter<"purchase_items"> | Date | string | null
-}
-
 export type purchase_itemsCreateWithoutPurchasesInput = {
   price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   products: Prisma.productsCreateNestedOneWithoutPurchase_itemsInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsCreateNestedManyWithoutPurchase_itemsInput
+  coupons?: Prisma.couponsCreateNestedOneWithoutPurchase_itemsInput
 }
 
 export type purchase_itemsUncheckedCreateWithoutPurchasesInput = {
@@ -663,9 +886,13 @@ export type purchase_itemsUncheckedCreateWithoutPurchasesInput = {
   price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  coupon_id?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedCreateNestedManyWithoutPurchase_itemsInput
 }
 
@@ -699,11 +926,15 @@ export type purchase_itemsCreateWithoutPurchase_item_required_fieldsInput = {
   price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   purchases: Prisma.purchasesCreateNestedOneWithoutPurchase_itemsInput
   products: Prisma.productsCreateNestedOneWithoutPurchase_itemsInput
+  coupons?: Prisma.couponsCreateNestedOneWithoutPurchase_itemsInput
 }
 
 export type purchase_itemsUncheckedCreateWithoutPurchase_item_required_fieldsInput = {
@@ -713,9 +944,13 @@ export type purchase_itemsUncheckedCreateWithoutPurchase_item_required_fieldsInp
   price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  coupon_id?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchase_itemsCreateOrConnectWithoutPurchase_item_required_fieldsInput = {
@@ -738,11 +973,15 @@ export type purchase_itemsUpdateWithoutPurchase_item_required_fieldsInput = {
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchases?: Prisma.purchasesUpdateOneRequiredWithoutPurchase_itemsNestedInput
   products?: Prisma.productsUpdateOneRequiredWithoutPurchase_itemsNestedInput
+  coupons?: Prisma.couponsUpdateOneWithoutPurchase_itemsNestedInput
 }
 
 export type purchase_itemsUncheckedUpdateWithoutPurchase_item_required_fieldsInput = {
@@ -752,9 +991,74 @@ export type purchase_itemsUncheckedUpdateWithoutPurchase_item_required_fieldsInp
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  coupon_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+}
+
+export type purchase_itemsCreateManyCouponsInput = {
+  id?: number
+  purchase_id: number
+  product_id: number
+  price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+}
+
+export type purchase_itemsUpdateWithoutCouponsInput = {
+  price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  purchases?: Prisma.purchasesUpdateOneRequiredWithoutPurchase_itemsNestedInput
+  products?: Prisma.productsUpdateOneRequiredWithoutPurchase_itemsNestedInput
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUpdateManyWithoutPurchase_itemsNestedInput
+}
+
+export type purchase_itemsUncheckedUpdateWithoutCouponsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  purchase_id?: Prisma.IntFieldUpdateOperationsInput | number
+  product_id?: Prisma.IntFieldUpdateOperationsInput | number
+  price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedUpdateManyWithoutPurchase_itemsNestedInput
+}
+
+export type purchase_itemsUncheckedUpdateManyWithoutCouponsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  purchase_id?: Prisma.IntFieldUpdateOperationsInput | number
+  product_id?: Prisma.IntFieldUpdateOperationsInput | number
+  price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type purchase_itemsCreateManyProductsInput = {
@@ -763,20 +1067,28 @@ export type purchase_itemsCreateManyProductsInput = {
   price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  coupon_id?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchase_itemsUpdateWithoutProductsInput = {
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchases?: Prisma.purchasesUpdateOneRequiredWithoutPurchase_itemsNestedInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUpdateManyWithoutPurchase_itemsNestedInput
+  coupons?: Prisma.couponsUpdateOneWithoutPurchase_itemsNestedInput
 }
 
 export type purchase_itemsUncheckedUpdateWithoutProductsInput = {
@@ -785,9 +1097,13 @@ export type purchase_itemsUncheckedUpdateWithoutProductsInput = {
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  coupon_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedUpdateManyWithoutPurchase_itemsNestedInput
 }
 
@@ -797,9 +1113,13 @@ export type purchase_itemsUncheckedUpdateManyWithoutProductsInput = {
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  coupon_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type purchase_itemsCreateManyPurchasesInput = {
@@ -808,20 +1128,28 @@ export type purchase_itemsCreateManyPurchasesInput = {
   price_at_purchase?: runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: boolean
+  final_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  coupon_id?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type purchase_itemsUpdateWithoutPurchasesInput = {
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   products?: Prisma.productsUpdateOneRequiredWithoutPurchase_itemsNestedInput
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUpdateManyWithoutPurchase_itemsNestedInput
+  coupons?: Prisma.couponsUpdateOneWithoutPurchase_itemsNestedInput
 }
 
 export type purchase_itemsUncheckedUpdateWithoutPurchasesInput = {
@@ -830,9 +1158,13 @@ export type purchase_itemsUncheckedUpdateWithoutPurchasesInput = {
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  coupon_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedUpdateManyWithoutPurchase_itemsNestedInput
 }
 
@@ -842,9 +1174,13 @@ export type purchase_itemsUncheckedUpdateManyWithoutPurchasesInput = {
   price_at_purchase?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   required_fields_filled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  final_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  coupon_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 
@@ -885,12 +1221,17 @@ export type purchase_itemsSelect<ExtArgs extends runtime.Types.Extensions.Intern
   price_at_purchase?: boolean
   discount?: boolean
   required_fields_filled?: boolean
+  final_price?: boolean
+  quantity?: boolean
+  coupon_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   purchases?: boolean | Prisma.purchasesDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
   purchase_item_required_fields?: boolean | Prisma.purchase_items$purchase_item_required_fieldsArgs<ExtArgs>
+  coupons?: boolean | Prisma.purchase_items$couponsArgs<ExtArgs>
   _count?: boolean | Prisma.Purchase_itemsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["purchase_items"]>
 
@@ -901,11 +1242,16 @@ export type purchase_itemsSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   price_at_purchase?: boolean
   discount?: boolean
   required_fields_filled?: boolean
+  final_price?: boolean
+  quantity?: boolean
+  coupon_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   purchases?: boolean | Prisma.purchasesDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
+  coupons?: boolean | Prisma.purchase_items$couponsArgs<ExtArgs>
 }, ExtArgs["result"]["purchase_items"]>
 
 export type purchase_itemsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -915,11 +1261,16 @@ export type purchase_itemsSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   price_at_purchase?: boolean
   discount?: boolean
   required_fields_filled?: boolean
+  final_price?: boolean
+  quantity?: boolean
+  coupon_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   purchases?: boolean | Prisma.purchasesDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
+  coupons?: boolean | Prisma.purchase_items$couponsArgs<ExtArgs>
 }, ExtArgs["result"]["purchase_items"]>
 
 export type purchase_itemsSelectScalar = {
@@ -929,25 +1280,32 @@ export type purchase_itemsSelectScalar = {
   price_at_purchase?: boolean
   discount?: boolean
   required_fields_filled?: boolean
+  final_price?: boolean
+  quantity?: boolean
+  coupon_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
 }
 
-export type purchase_itemsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "purchase_id" | "product_id" | "price_at_purchase" | "discount" | "required_fields_filled" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["purchase_items"]>
+export type purchase_itemsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "purchase_id" | "product_id" | "price_at_purchase" | "discount" | "required_fields_filled" | "final_price" | "quantity" | "coupon_id" | "created_at" | "updated_at" | "deleted_at" | "is_deleted", ExtArgs["result"]["purchase_items"]>
 export type purchase_itemsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchases?: boolean | Prisma.purchasesDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
   purchase_item_required_fields?: boolean | Prisma.purchase_items$purchase_item_required_fieldsArgs<ExtArgs>
+  coupons?: boolean | Prisma.purchase_items$couponsArgs<ExtArgs>
   _count?: boolean | Prisma.Purchase_itemsCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type purchase_itemsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchases?: boolean | Prisma.purchasesDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
+  coupons?: boolean | Prisma.purchase_items$couponsArgs<ExtArgs>
 }
 export type purchase_itemsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchases?: boolean | Prisma.purchasesDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
+  coupons?: boolean | Prisma.purchase_items$couponsArgs<ExtArgs>
 }
 
 export type $purchase_itemsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -956,6 +1314,7 @@ export type $purchase_itemsPayload<ExtArgs extends runtime.Types.Extensions.Inte
     purchases: Prisma.$purchasesPayload<ExtArgs>
     products: Prisma.$productsPayload<ExtArgs>
     purchase_item_required_fields: Prisma.$purchase_item_required_fieldsPayload<ExtArgs>[]
+    coupons: Prisma.$couponsPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -964,9 +1323,13 @@ export type $purchase_itemsPayload<ExtArgs extends runtime.Types.Extensions.Inte
     price_at_purchase: runtime.Decimal
     discount: runtime.Decimal
     required_fields_filled: boolean
+    final_price: runtime.Decimal
+    quantity: number
+    coupon_id: number | null
     created_at: Date | null
     updated_at: Date | null
     deleted_at: Date | null
+    is_deleted: boolean | null
   }, ExtArgs["result"]["purchase_items"]>
   composites: {}
 }
@@ -1364,6 +1727,7 @@ export interface Prisma__purchase_itemsClient<T, Null = never, ExtArgs extends r
   purchases<T extends Prisma.purchasesDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.purchasesDefaultArgs<ExtArgs>>): Prisma.Prisma__purchasesClient<runtime.Types.Result.GetResult<Prisma.$purchasesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   products<T extends Prisma.productsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.productsDefaultArgs<ExtArgs>>): Prisma.Prisma__productsClient<runtime.Types.Result.GetResult<Prisma.$productsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   purchase_item_required_fields<T extends Prisma.purchase_items$purchase_item_required_fieldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.purchase_items$purchase_item_required_fieldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchase_item_required_fieldsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  coupons<T extends Prisma.purchase_items$couponsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.purchase_items$couponsArgs<ExtArgs>>): Prisma.Prisma__couponsClient<runtime.Types.Result.GetResult<Prisma.$couponsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1399,9 +1763,13 @@ export interface purchase_itemsFieldRefs {
   readonly price_at_purchase: Prisma.FieldRef<"purchase_items", 'Decimal'>
   readonly discount: Prisma.FieldRef<"purchase_items", 'Decimal'>
   readonly required_fields_filled: Prisma.FieldRef<"purchase_items", 'Boolean'>
+  readonly final_price: Prisma.FieldRef<"purchase_items", 'Decimal'>
+  readonly quantity: Prisma.FieldRef<"purchase_items", 'Int'>
+  readonly coupon_id: Prisma.FieldRef<"purchase_items", 'Int'>
   readonly created_at: Prisma.FieldRef<"purchase_items", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"purchase_items", 'DateTime'>
   readonly deleted_at: Prisma.FieldRef<"purchase_items", 'DateTime'>
+  readonly is_deleted: Prisma.FieldRef<"purchase_items", 'Boolean'>
 }
     
 
@@ -1828,6 +2196,25 @@ export type purchase_items$purchase_item_required_fieldsArgs<ExtArgs extends run
   take?: number
   skip?: number
   distinct?: Prisma.Purchase_item_required_fieldsScalarFieldEnum | Prisma.Purchase_item_required_fieldsScalarFieldEnum[]
+}
+
+/**
+ * purchase_items.coupons
+ */
+export type purchase_items$couponsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the coupons
+   */
+  select?: Prisma.couponsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the coupons
+   */
+  omit?: Prisma.couponsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.couponsInclude<ExtArgs> | null
+  where?: Prisma.couponsWhereInput
 }
 
 /**

@@ -7,6 +7,7 @@ import {
   IsEnum,
   IsInt,
   IsPositive,
+  IsBoolean,
   IsArray,
   IsBoolean,
   ValidateNested,
@@ -84,6 +85,74 @@ export class CreateAssistantDto {
   @IsPositive()
   @IsNotEmpty()
   lecturer_user_id: number;
+}
+
+export class CreateTeacherDto extends CreateAdminDto {
+  @IsBoolean()
+  @IsNotEmpty()
+  is_primary: boolean;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  is_preparatory: boolean;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  is_secondary: boolean;
+
+  @IsInt()
+  @IsPositive()
+  @IsNotEmpty()
+  government_id: number;
+
+  @IsInt()
+  @IsPositive()
+  @IsNotEmpty()
+  zone_id: number;
+
+  @IsInt()
+  @IsPositive()
+  @IsNotEmpty()
+  subject_id: number;
+}
+
+export class CreateStudentDto extends CreateAdminDto {
+  @IsInt()
+  @IsPositive()
+  @IsNotEmpty()
+  level_id: number;
+
+  @IsInt()
+  @IsPositive()
+  @IsNotEmpty()
+  government_id: number;
+
+  @IsInt()
+  @IsPositive()
+  @IsNotEmpty()
+  zone_id: number;
+
+  @IsString()
+  @IsNotEmpty()
+  parent_phone_number: string;
+
+  @IsString()
+  @IsOptional()
+  faction?: string;
+}
+
+export class CreateParentDto extends CreateAdminDto {
+  // Parent only needs base user fields
+}
+
+export class CreateLecturerDto extends CreateAdminDto {
+  @IsString()
+  @IsOptional()
+  bio?: string;
+
+  @IsString()
+  @IsOptional()
+  expertise?: string;
 }
 
 // ============================================

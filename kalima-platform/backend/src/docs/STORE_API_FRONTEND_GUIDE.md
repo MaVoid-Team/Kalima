@@ -125,7 +125,7 @@ For validation errors (422):
 | POST | `/change-password` | Yes | Change password (authenticated) |
 | POST | `/link/firebase` | Yes | Link Firebase account |
 
-See `AUTH_API_DOCUMENTATION.md` for full request/response bodies.
+See `api/AUTH_API_DOCUMENTATION.md` for full request/response bodies.
 
 ---
 
@@ -417,12 +417,32 @@ Use `multipart/form-data` for endpoints that accept files (e.g. product create, 
 
 ---
 
+## Export Endpoints
+
+Every list resource supports a `GET /export` endpoint for CSV and XLSX download. **All export endpoints require Admin or SubAdmin authentication.**
+
+```
+GET /api/v2/<resource>/export?format=csv
+GET /api/v2/<resource>/export?format=xlsx&ids=1,2,3
+```
+
+| Param    | Type   | Required | Description                            |
+|----------|--------|----------|----------------------------------------|
+| `format` | string | Yes      | `"csv"` or `"xlsx"`                    |
+| `ids`    | string | No       | Comma-separated IDs for selected rows  |
+
+See `api/EXPORT_API_DOCUMENTATION.md` for full details.
+
+---
+
 ## Related Documentation
 
-- `AUTH_API_DOCUMENTATION.md` — Auth endpoints in detail
-- `PRODUCTS_API_DOCUMENTATION.md` — Product CRUD and media
-- `COUPON_API_DOCUMENTATION.md` — Coupon admin and usage
-- `REQUIRED_FIELDS_API_DOCUMENTATION.md` — Checkout required fields
+- `api/AUTH_API_DOCUMENTATION.md` — Auth endpoints in detail
+- `api/PRODUCT_SAMPLE_API_DOCUMENTATION.md` — Product sample read API and creation flow
+- `api/EXPORT_API_DOCUMENTATION.md` — CSV/XLSX export endpoints for all resources
+- `api/PRODUCTS_API_DOCUMENTATION.md` — Product CRUD and media
+- `api/COUPON_API_DOCUMENTATION.md` — Coupon admin and usage
+- `api/REQUIRED_FIELDS_API_DOCUMENTATION.md` — Checkout required fields
 - `API_DOCS_INDEX.md` — Full list of docs
 
 ---

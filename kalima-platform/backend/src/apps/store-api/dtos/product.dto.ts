@@ -63,12 +63,11 @@ export class CreateProductDto {
   sample_url?: string;
 
   /**
-   * Array of category IDs to attach on creation.
-   * Sent as JSON string in multipart form data.
+   * Category ID to attach on creation.
+   * Sent as string in multipart form data.
    */
-  @IsArray()
-  @IsInt({ each: true })
-  @IsPositive({ each: true })
+  @IsInt()
+  @IsPositive()
   @IsOptional()
   @Type(() => Number)
   category_ids?: number[];
@@ -77,6 +76,10 @@ export class CreateProductDto {
   @IsDateString()
   @IsOptional()
   release_at?: string;
+
+  @IsString()
+  @IsOptional()
+  perks?: string;
 }
 
 // ============================================
@@ -128,6 +131,15 @@ export class UpdateProductDto {
   @IsDateString()
   @IsOptional()
   release_at?: string;
+  @IsString()
+  @IsOptional()
+  perks?: string;
+}
+
+export class UpdateProductRequiredFieldDto {
+  @Type(() => Boolean)
+  @IsBoolean()
+  is_required: boolean;
 }
 
 // ============================================
