@@ -6,72 +6,75 @@ export interface AccountCreatedEmailData {
 }
 
 export function getAccountCreatedEmailSubject(): string {
-  return 'Welcome to Kalima Platform - Verify Your Account';
+  return "مرحبًا بك في منصة كلمة - قم بتفعيل حسابك";
 }
 
-export function getAccountCreatedEmailHtml(data: AccountCreatedEmailData): string {
+export function getAccountCreatedEmailHtml(
+  data: AccountCreatedEmailData,
+): string {
   return `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Kalima Platform</title>
+  <title>مرحبًا بك في منصة كلمة</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+<body style="margin: 0; padding: 0; font-family: 'IBM Plex Sans Arabic', 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f8f8;" dir="rtl">
   <table role="presentation" style="width: 100%; border-collapse: collapse;">
     <tr>
       <td align="center" style="padding: 40px 0;">
-        <table role="presentation" style="width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <table role="presentation" style="width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; box-shadow: 0 12px 30px rgba(175,13,14,0.08);">
           <!-- Header -->
           <tr>
-            <td style="padding: 40px 40px 20px; text-align: center; background-color: #4F46E5; border-radius: 8px 8px 0 0;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">🎉 Welcome to Kalima!</h1>
+            <td style="padding: 40px 40px 20px; text-align: center; background-color: #af0d0e; border-radius: 12px 12px 0 0;">
+              <img src="cid:kalima-logo" alt="Kalima" width="72" style="display: block; margin: 0 auto 16px; height: auto;" />
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">🎉 مرحبًا بك في كلمة!</h1>
             </td>
           </tr>
           
           <!-- Content -->
           <tr>
             <td style="padding: 40px;">
-              <h2 style="margin: 0 0 20px; color: #333333; font-size: 24px; font-weight: 600;">Hello ${data.name}!</h2>
+              <h2 style="margin: 0 0 20px; color: #1a1a1a; font-size: 24px; font-weight: 700;">مرحبًا ${data.name}!</h2>
               
-              <p style="margin: 0 0 20px; color: #666666; font-size: 16px; line-height: 1.6;">
-                Thank you for joining Kalima Platform as a <strong>${data.role}</strong>! We're excited to have you on board.
+              <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.8;">
+                شكرًا لانضمامك إلى منصة كلمة بصفتك <strong>${data.role}</strong>! نحن متحمسون لوجودك معنا.
               </p>
               
-              <p style="margin: 0 0 20px; color: #666666; font-size: 16px; line-height: 1.6;">
-                To complete your registration and access all features, please verify your email address by clicking the button below:
+              <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.8;">
+                لإكمال التسجيل والوصول إلى جميع الميزات، الرجاء تأكيد بريدك الإلكتروني عبر الضغط على الزر أدناه:
               </p>
               
               <!-- CTA Button -->
               <table role="presentation" style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td align="center" style="padding: 20px 0;">
-                    <a href="${data.verificationUrl}" 
-                       style="display: inline-block; padding: 16px 40px; background-color: #10B981; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px;">
-                      Verify My Account
+                      <a href="${data.verificationUrl}" 
+                        style="display: inline-block; padding: 16px 40px; background-color: #af0d0e; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 700; border-radius: 10px;">
+                      ✅ تفعيل حسابي
                     </a>
                   </td>
                 </tr>
               </table>
               
-              <p style="margin: 20px 0; color: #666666; font-size: 14px; line-height: 1.6;">
-                Or copy and paste this link into your browser:
+              <p style="margin: 20px 0; color: #4b5563; font-size: 14px; line-height: 1.8;">
+                أو انسخ هذا الرابط والصقه في المتصفح:
               </p>
               
-              <p style="margin: 0 0 20px; padding: 12px; background-color: #f8f8f8; border-radius: 4px; word-break: break-all; color: #4F46E5; font-size: 14px;">
+              <p style="margin: 0 0 20px; padding: 12px; background-color: #fcfcfc; border-radius: 6px; word-break: break-all; color: #af0d0e; font-size: 14px; border: 1px solid #f1f1f1;">
                 ${data.verificationUrl}
               </p>
               
-              <p style="margin: 20px 0 0; color: #999999; font-size: 14px; line-height: 1.6;">
-                This link will expire in <strong>${data.expiresInHours} hours</strong>.
+              <p style="margin: 20px 0 0; color: #6b7280; font-size: 14px; line-height: 1.8;">
+                سينتهي صلاحية هذا الرابط خلال <strong>${data.expiresInHours} ساعات</strong>.
               </p>
               
               <!-- Info Box -->
-              <div style="margin: 30px 0 0; padding: 20px; background-color: #EEF2FF; border-radius: 8px; border-left: 4px solid #4F46E5;">
-                <p style="margin: 0; color: #3730A3; font-size: 14px; line-height: 1.6;">
-                  <strong>What happens next?</strong><br>
-                  Once you verify your email, you'll have full access to all the features available for your ${data.role} account.
+              <div style="margin: 30px 0 0; padding: 20px; background-color: #fcf5e9; border-radius: 10px; border-left: 4px solid #c5a059;">
+                <p style="margin: 0; color: #7a5e2a; font-size: 14px; line-height: 1.8;">
+                  <strong>ماذا سيحدث بعد ذلك؟</strong><br>
+                  بمجرد تأكيد بريدك، ستحصل على وصول كامل لجميع الميزات المتاحة لحسابك كـ ${data.role}.
                 </p>
               </div>
             </td>
@@ -79,12 +82,12 @@ export function getAccountCreatedEmailHtml(data: AccountCreatedEmailData): strin
           
           <!-- Footer -->
           <tr>
-            <td style="padding: 30px 40px; background-color: #f8f8f8; border-radius: 0 0 8px 8px; text-align: center;">
-              <p style="margin: 0; color: #999999; font-size: 12px;">
-                © ${new Date().getFullYear()} Kalima Platform. All rights reserved.
+            <td style="padding: 30px 40px; background-color: #fcfcfc; border-radius: 0 0 12px 12px; text-align: center;">
+              <p style="margin: 0; color: #6b7280; font-size: 12px;">
+                © ${new Date().getFullYear()} منصة كلمة. جميع الحقوق محفوظة.
               </p>
-              <p style="margin: 10px 0 0; color: #999999; font-size: 12px;">
-                If you didn't create this account, please ignore this email.
+              <p style="margin: 10px 0 0; color: #6b7280; font-size: 12px;">
+                إذا لم تقم بإنشاء هذا الحساب، يرجى تجاهل هذا البريد.
               </p>
             </td>
           </tr>
@@ -97,24 +100,26 @@ export function getAccountCreatedEmailHtml(data: AccountCreatedEmailData): strin
   `.trim();
 }
 
-export function getAccountCreatedEmailText(data: AccountCreatedEmailData): string {
+export function getAccountCreatedEmailText(
+  data: AccountCreatedEmailData,
+): string {
   return `
-Welcome to Kalima Platform!
+مرحبًا بك في منصة كلمة!
 
-Hello ${data.name}!
+مرحبًا ${data.name}!
 
-Thank you for joining Kalima Platform as a ${data.role}! We're excited to have you on board.
+شكرًا لانضمامك إلى منصة كلمة بصفتك ${data.role}! نحن متحمسون لوجودك معنا.
 
-To complete your registration and access all features, please verify your email address by visiting the link below:
+لإكمال التسجيل والوصول إلى جميع الميزات، الرجاء تأكيد بريدك الإلكتروني من خلال الرابط التالي:
 
 ${data.verificationUrl}
 
-This link will expire in ${data.expiresInHours} hours.
+سينتهي صلاحية هذا الرابط خلال ${data.expiresInHours} ساعات.
 
-What happens next?
-Once you verify your email, you'll have full access to all the features available for your ${data.role} account.
+ماذا سيحدث بعد ذلك؟
+بمجرد تأكيد بريدك، ستحصل على وصول كامل لجميع الميزات المتاحة لحسابك كـ ${data.role}.
 
-© ${new Date().getFullYear()} Kalima Platform. All rights reserved.
-If you didn't create this account, please ignore this email.
+© ${new Date().getFullYear()} منصة كلمة. جميع الحقوق محفوظة.
+إذا لم تقم بإنشاء هذا الحساب، يرجى تجاهل هذا البريد.
   `.trim();
 }

@@ -124,6 +124,27 @@ export const uploadProductWithSample = multer({
   { name: "sample", maxCount: 1 },
 ]);
 
+/** Product update: optional sample (PDF). Max 150 MB. For multipart PATCH. */
+function sampleOnlyFilter(
+  _req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback,
+): void {
+  if (file.fieldname === "sample" && SAMPLE_MIME_TYPES.has(file.mimetype)) {
+    cb(null, true);
+  } else if (file.fieldname === "sample") {
+    cb(new BadRequestError("Sample must be a PDF file") as any, false);
+  } else {
+    cb(null, true);
+  }
+}
+
+export const uploadProductUpdate = multer({
+  storage: memoryStorage,
+  fileFilter: sampleOnlyFilter,
+  limits: { fileSize: 150 * 1024 * 1024 },
+}).fields([{ name: "sample", maxCount: 1 }]);
+
 // ============================================
 // FAST BUY — payment screenshot + optional product image
 // ============================================

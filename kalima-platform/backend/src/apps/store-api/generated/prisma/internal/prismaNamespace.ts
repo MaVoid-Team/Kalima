@@ -411,6 +411,7 @@ export const ModelName = {
   coupon_usages: 'coupon_usages',
   product_required_fields: 'product_required_fields',
   products: 'products',
+  product_reviews: 'product_reviews',
   samples: 'samples',
   required_field_definitions: 'required_field_definitions',
   carts: 'carts',
@@ -439,7 +440,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2441,6 +2442,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    product_reviews: {
+      payload: Prisma.$product_reviewsPayload<ExtArgs>
+      fields: Prisma.product_reviewsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.product_reviewsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.product_reviewsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        findFirst: {
+          args: Prisma.product_reviewsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.product_reviewsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        findMany: {
+          args: Prisma.product_reviewsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>[]
+        }
+        create: {
+          args: Prisma.product_reviewsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        createMany: {
+          args: Prisma.product_reviewsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.product_reviewsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>[]
+        }
+        delete: {
+          args: Prisma.product_reviewsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        update: {
+          args: Prisma.product_reviewsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        deleteMany: {
+          args: Prisma.product_reviewsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.product_reviewsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.product_reviewsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>[]
+        }
+        upsert: {
+          args: Prisma.product_reviewsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_reviewsPayload>
+        }
+        aggregate: {
+          args: Prisma.Product_reviewsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProduct_reviews>
+        }
+        groupBy: {
+          args: Prisma.product_reviewsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Product_reviewsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.product_reviewsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Product_reviewsCountAggregateOutputType> | number
+        }
+      }
+    }
     samples: {
       payload: Prisma.$samplesPayload<ExtArgs>
       fields: Prisma.samplesFieldRefs
@@ -3495,6 +3570,8 @@ export const UsersScalarFieldEnum = {
   is_email_verified: 'is_email_verified',
   created_at: 'created_at',
   updated_at: 'updated_at',
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted',
   secondary_phone: 'secondary_phone',
   profile_pic_url: 'profile_pic_url',
   password_changed_at: 'password_changed_at',
@@ -3722,7 +3799,9 @@ export const CouponsScalarFieldEnum = {
   created_at: 'created_at',
   updated_at: 'updated_at',
   deleted_at: 'deleted_at',
-  mongo_id: 'mongo_id'
+  is_deleted: 'is_deleted',
+  mongo_id: 'mongo_id',
+  type: 'type'
 } as const
 
 export type CouponsScalarFieldEnum = (typeof CouponsScalarFieldEnum)[keyof typeof CouponsScalarFieldEnum]
@@ -3765,10 +3844,25 @@ export const ProductsScalarFieldEnum = {
   mongo_id: 'mongo_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted',
+  perks: 'perks'
 } as const
 
 export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum]
+
+
+export const Product_reviewsScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  user_id: 'user_id',
+  rating: 'rating',
+  review_text: 'review_text',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Product_reviewsScalarFieldEnum = (typeof Product_reviewsScalarFieldEnum)[keyof typeof Product_reviewsScalarFieldEnum]
 
 
 export const SamplesScalarFieldEnum = {
@@ -3795,7 +3889,8 @@ export const Required_field_definitionsScalarFieldEnum = {
   active: 'active',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type Required_field_definitionsScalarFieldEnum = (typeof Required_field_definitionsScalarFieldEnum)[keyof typeof Required_field_definitionsScalarFieldEnum]
@@ -3810,7 +3905,8 @@ export const CartsScalarFieldEnum = {
   total: 'total',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type CartsScalarFieldEnum = (typeof CartsScalarFieldEnum)[keyof typeof CartsScalarFieldEnum]
@@ -3828,7 +3924,8 @@ export const Cart_itemsScalarFieldEnum = {
   required_fields_filled: 'required_fields_filled',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type Cart_itemsScalarFieldEnum = (typeof Cart_itemsScalarFieldEnum)[keyof typeof Cart_itemsScalarFieldEnum]
@@ -3870,7 +3967,8 @@ export const PurchasesScalarFieldEnum = {
   returned_by: 'returned_by',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type PurchasesScalarFieldEnum = (typeof PurchasesScalarFieldEnum)[keyof typeof PurchasesScalarFieldEnum]
@@ -3883,9 +3981,13 @@ export const Purchase_itemsScalarFieldEnum = {
   price_at_purchase: 'price_at_purchase',
   discount: 'discount',
   required_fields_filled: 'required_fields_filled',
+  final_price: 'final_price',
+  quantity: 'quantity',
+  coupon_id: 'coupon_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type Purchase_itemsScalarFieldEnum = (typeof Purchase_itemsScalarFieldEnum)[keyof typeof Purchase_itemsScalarFieldEnum]
@@ -3911,7 +4013,8 @@ export const Payment_methodsScalarFieldEnum = {
   image_id: 'image_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  is_deleted: 'is_deleted'
 } as const
 
 export type Payment_methodsScalarFieldEnum = (typeof Payment_methodsScalarFieldEnum)[keyof typeof Payment_methodsScalarFieldEnum]
@@ -4135,6 +4238,20 @@ export type ListEnumlocation_type_enumFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'coupon_type'
+ */
+export type Enumcoupon_typeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'coupon_type'>
+    
+
+
+/**
+ * Reference to a field of type 'coupon_type[]'
+ */
+export type ListEnumcoupon_typeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'coupon_type[]'>
+    
+
+
+/**
  * Reference to a field of type 'product_type_enum'
  */
 export type Enumproduct_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'product_type_enum'>
@@ -4339,6 +4456,7 @@ export type GlobalOmitConfig = {
   coupon_usages?: Prisma.coupon_usagesOmit
   product_required_fields?: Prisma.product_required_fieldsOmit
   products?: Prisma.productsOmit
+  product_reviews?: Prisma.product_reviewsOmit
   samples?: Prisma.samplesOmit
   required_field_definitions?: Prisma.required_field_definitionsOmit
   carts?: Prisma.cartsOmit

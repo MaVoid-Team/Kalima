@@ -7,6 +7,7 @@ import {
   UpdateCouponDto,
   ValidateCouponDto,
   UseCouponDto,
+  getAllCouponsDto,
 } from "../dtos/coupon.dto";
 import { ValidationError, BadRequestError } from "../../../libs/errors";
 
@@ -104,25 +105,45 @@ export const couponController = {
     _next: NextFunction,
   ): Promise<void> {
     try {
-      const page = req.query.page
-        ? parseInt(req.query.page as string, 10)
+      const active =
+        req.query.active !== undefined ? req.query.active === "1" : undefined;
+
+      const isAmount =
+        req.query.isAmount !== undefined
+          ? req.query.isAmount === "1"
+          : undefined;
+
+      const startDate = req.query.startDate
+        ? new Date(req.query.startDate as string)
         : undefined;
+
+      const endDate = req.query.endDate
+        ? new Date(req.query.endDate as string)
+        : undefined;
+
+      const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+
       const limit = req.query.limit
         ? parseInt(req.query.limit as string, 10)
-        : undefined;
-      const active =
-        req.query.active !== undefined
-          ? req.query.active === "true"
-          : undefined;
+        : 50;
+
       const product_id = req.query.product_id
         ? parseInt(req.query.product_id as string, 10)
+        : undefined;
+
+      const search = req.query.search
+        ? (req.query.search as string)
         : undefined;
 
       const result = await couponService.getAllCoupons({
         page,
         limit,
-        active,
         product_id,
+        active,
+        isAmount,
+        startDate,
+        endDate,
+        search,
       });
 
       res.status(200).json({
@@ -276,6 +297,23 @@ export const couponController = {
         success: true,
         message: "Coupon applied successfully",
         data: coupon,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  async getCouponStats(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const stats = await couponService.getCouponStats();
+
+      res.status(200).json({
+        success: true,
+        data: stats,
       });
     } catch (error) {
       _next(error);

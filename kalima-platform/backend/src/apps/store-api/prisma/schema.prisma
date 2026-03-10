@@ -51,6 +51,8 @@ model users {
   is_email_verified         Boolean?                   @default(false)
   created_at                DateTime?                  @default(now()) @db.Timestamptz(6)
   updated_at                DateTime?                  @default(now()) @db.Timestamptz(6)
+  deleted_at                DateTime?                  @db.Timestamptz(6)
+  is_deleted                Boolean?                   @default(false)
   secondary_phone           String?                    @db.VarChar
   profile_pic_url           String?
   password_changed_at       DateTime?                  @db.Timestamp(6)
@@ -74,6 +76,7 @@ model users {
   user_analytics            user_analytics?
   user_roles                user_roles[]
   carts                     carts[]
+  product_reviews           product_reviews[]
   purchases                 purchases[]                @relation("PurchaseCreator")
   purchases_received        purchases[]                @relation("PurchaseReceiver")
   purchases_confirmed       purchases[]                @relation("PurchaseConfirmer")
@@ -269,9 +272,9 @@ model categories {
   mongo_id           String?              @unique
   created_at         DateTime?            @default(now()) @db.Timestamp(6)
   updated_at         DateTime?            @db.Timestamp(6)
-  categories         categories?          @relation("categoriesTocategories", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  other_categories   categories[]         @relation("categoriesTocategories")
+  parent             categories?          @relation("categoriesTocategories", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   product_categories product_categories[]
+  sub_categories     categories[]         @relation("categoriesTocategories")
 }
 
 model product_categories {
@@ -296,10 +299,13 @@ model coupons {
   created_at          DateTime?       @default(now()) @db.Timestamp(6)
   updated_at          DateTime?       @db.Timestamp(6)
   deleted_at          DateTime?       @db.Timestamp(6)
+  is_deleted          Boolean?        @default(false)
   mongo_id            String?         @unique
+  type                coupon_type     @default(percentage)
   product             products        @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   cart_items          cart_items[]
   coupon_usages       coupon_usages[]
+  purchase_items      purchase_items[]
 
   @@index([product_id])
 }
@@ -346,17 +352,35 @@ model products {
   created_at              DateTime?                 @default(now()) @db.Timestamp(6)
   updated_at              DateTime?                 @db.Timestamp(6)
   deleted_at              DateTime?                 @db.Timestamp(6)
-  product_required_fields   product_required_fields[]
-  product_categories        product_categories[]
-  product_gallery           product_gallery[]
+  is_deleted              Boolean?                  @default(false)
+  perks                   String?
+
+  product_required_fields product_required_fields[]
+  product_categories      product_categories[]
+  product_gallery         product_gallery[]
   product_gallery_videos    product_gallery_videos[]
-  cart_items                cart_items[]
+  cart_items              cart_items[] // <-- Add this line for the relation
   purchase_items          purchase_items[] // <-- Add this line for the opposite relation
   thumbnail_image         images?                   @relation("ProductThumbnail", fields: [thumbnail_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   coupons                 coupons[]
   samples                 samples[]
+  product_reviews         product_reviews[]
+}
 
-  @@index([release_at], map: "ix_products_release_at")
+model product_reviews {
+  id          Int       @id @default(autoincrement())
+  product_id  Int
+  user_id     Int
+  rating      Int
+  review_text String?    @db.Text
+  created_at  DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?  @updatedAt @db.Timestamp(6)
+
+  products products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users    users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([product_id, user_id])
+  @@index([product_id])
 }
 
 model samples {
@@ -387,6 +411,7 @@ model required_field_definitions {
   created_at                    DateTime?                       @default(now()) @db.Timestamp(6)
   updated_at                    DateTime?                       @db.Timestamp(6)
   deleted_at                    DateTime?                       @db.Timestamp(6)
+  is_deleted                    Boolean?                        @default(false)
   product_required_fields       product_required_fields[]
   purchase_item_required_fields purchase_item_required_fields[]
   cart_item_required_fields     cart_item_required_fields[] // <-- Added missing opposite relation
@@ -402,6 +427,7 @@ model carts {
   created_at DateTime?    @default(now()) @db.Timestamp(6)
   updated_at DateTime?    @db.Timestamp(6)
   deleted_at DateTime?    @db.Timestamp(6)
+  is_deleted Boolean?     @default(false)
   cart_items cart_items[]
   users      users        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
@@ -419,6 +445,7 @@ model cart_items {
   created_at                DateTime?                   @default(now()) @db.Timestamp(6)
   updated_at                DateTime?                   @db.Timestamp(6)
   deleted_at                DateTime?                   @db.Timestamp(6)
+  is_deleted                Boolean?                    @default(false)
   carts                     carts                       @relation(fields: [cart_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   products                  products                    @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   coupons                   coupons?                    @relation(fields: [coupon_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
@@ -465,6 +492,7 @@ model purchases {
   created_at              DateTime?        @default(now()) @db.Timestamp(6)
   updated_at              DateTime?        @db.Timestamp(6)
   deleted_at              DateTime?        @db.Timestamp(6)
+  is_deleted              Boolean?         @default(false)
   purchase_items          purchase_items[]
   coupon_usages           coupon_usages[]
   users                   users            @relation("PurchaseCreator", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -488,12 +516,17 @@ model purchase_items {
   price_at_purchase             Decimal                         @default(0) @db.Decimal(10, 2)
   discount                      Decimal                         @default(0) @db.Decimal(10, 2)
   required_fields_filled        Boolean                         @default(false)
+  final_price                   Decimal                         @default(0) @db.Decimal(10, 2)
+  quantity                      Int                             @default(1)
+  coupon_id                     Int?
   created_at                    DateTime?                       @default(now()) @db.Timestamp(6)
   updated_at                    DateTime?                       @db.Timestamp(6)
   deleted_at                    DateTime?                       @db.Timestamp(6)
+  is_deleted                    Boolean?                        @default(false)
   purchases                     purchases                       @relation(fields: [purchase_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   products                      products                        @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   purchase_item_required_fields purchase_item_required_fields[]
+  coupons                       coupons?                        @relation(fields: [coupon_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
 }
 
 model purchase_item_required_fields {
@@ -516,6 +549,7 @@ model payment_methods {
   created_at   DateTime?   @default(now()) @db.Timestamp(6)
   updated_at   DateTime?   @db.Timestamp(6)
   deleted_at   DateTime?   @db.Timestamp(6)
+  is_deleted   Boolean?    @default(false)
   images       images?     @relation(fields: [image_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   purchases    purchases[]
 }
@@ -599,6 +633,10 @@ model sample_sections {
   samples      samples[]
 
   @@index([sort_order], map: "ix_sample_sections_sort_order")
+}
+enum coupon_type {
+  percentage
+  fixed
 }
 
 model images {

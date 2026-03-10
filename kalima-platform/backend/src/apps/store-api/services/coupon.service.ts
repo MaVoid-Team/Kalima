@@ -5,7 +5,7 @@ import {
   UpdateCouponDto,
   DiscountType,
 } from "../dtos/coupon.dto";
-import { coupons } from "../generated/prisma/client";
+import { coupons, coupon_type } from "../generated/prisma/client";
 import {
   BadRequestError,
   NotFoundError,
@@ -71,14 +71,32 @@ class CouponService {
       throw new BadRequestError("starts_at must be before expires_at");
     }
 
+    if (dto.expires_at < new Date()) {
+      throw new BadRequestError("expires_at must be after now");
+    }
+
+    if (dto.discount_type === DiscountType.PERCENTAGE) {
+      if (dto.discount_percentage <= 0) {
+        throw new BadRequestError("Discount percentage must be greater than 0");
+      }
+      if (dto.discount_percentage > 100) {
+        throw new BadRequestError("Discount percentage cannot exceed 100%");
+      }
+    }
+
+    let couponType: coupon_type = coupon_type.percentage;
     // Fixed discount cannot exceed product price
     if (dto.discount_type === DiscountType.AMOUNT) {
+      if (dto.discount_amount <= 0) {
+        throw new BadRequestError("Discount amount must be greater than 0");
+      }
       const productPrice = Number(product.price);
       if (dto.discount_amount > productPrice) {
         throw new BadRequestError(
           `Discount amount (${dto.discount_amount}) cannot exceed product price (${productPrice})`,
         );
       }
+      couponType = coupon_type.fixed;
     }
 
     // Build data based on discount type
@@ -87,6 +105,7 @@ class CouponService {
       product_id: dto.product_id,
       starts_at: dto.starts_at ?? null,
       expires_at: dto.expires_at,
+      type: couponType,
     };
 
     if (dto.discount_type === DiscountType.AMOUNT) {
@@ -110,6 +129,10 @@ class CouponService {
     limit?: number;
     active?: boolean;
     product_id?: number;
+    startDate?: Date;
+    endDate?: Date;
+    isAmount?: boolean;
+    search?: string;
   }): Promise<{
     coupons: coupons[];
     total: number;
@@ -130,6 +153,31 @@ class CouponService {
 
     if (filters?.product_id !== undefined) {
       where.product_id = filters.product_id;
+    }
+
+    if (filters?.startDate || filters?.endDate) {
+      where.created_at = {};
+      if (filters.startDate) {
+        where.created_at.gte = filters.startDate;
+      }
+      if (filters.endDate) {
+        const endOfDay = new Date(filters.endDate);
+        endOfDay.setUTCHours(23, 59, 59, 999);
+        where.created_at.lte = endOfDay;
+      }
+    }
+
+    if (filters?.isAmount !== undefined && filters?.isAmount !== null) {
+      where.type = filters.isAmount
+        ? coupon_type.fixed
+        : coupon_type.percentage;
+    }
+
+    if (filters?.search) {
+      where.code = {
+        contains: filters.search,
+        mode: "insensitive",
+      };
     }
 
     const [coupons, total] = await Promise.all([
@@ -190,7 +238,9 @@ class CouponService {
   async updateCoupon(id: number, dto: UpdateCouponDto): Promise<coupons> {
     const coupon = await this.db.coupons.findFirst({
       where: { id, deleted_at: null },
-      include: { product: { select: { id: true, price: true, is_archived: true } } },
+      include: {
+        product: { select: { id: true, price: true, is_archived: true } },
+      },
     });
     if (!coupon) {
       throw new NotFoundError("Coupon not found");
@@ -234,13 +284,18 @@ class CouponService {
     }
 
     // Discount vs price check when amount discount is being set
-    const product = productForPrice ?? (await this.db.products.findFirst({
-      where: { id: productId, deleted_at: null },
-      select: { price: true },
-    }));
+    const product =
+      productForPrice ??
+      (await this.db.products.findFirst({
+        where: { id: productId, deleted_at: null },
+        select: { price: true },
+      }));
     if (product) {
       let amountToCheck: number | undefined;
-      if (dto.discount_type === DiscountType.AMOUNT && dto.discount_amount !== undefined) {
+      if (
+        dto.discount_type === DiscountType.AMOUNT &&
+        dto.discount_amount !== undefined
+      ) {
         amountToCheck = dto.discount_amount;
       } else if (dto.discount_amount !== undefined) {
         amountToCheck = dto.discount_amount;
@@ -306,6 +361,7 @@ class CouponService {
       where: { id },
       data: {
         deleted_at: new Date(),
+        is_deleted: true,
         active: false,
       },
     });
@@ -376,6 +432,24 @@ class CouponService {
     }
 
     return { isValid: true, coupon: coupon as coupons };
+  }
+
+  async getCouponStats() {
+    const [total, active, inactive, expired, percentage, fixed] =
+      await Promise.all([
+        this.db.coupons.count(),
+        this.db.coupons.count({ where: { active: true } }),
+        this.db.coupons.count({ where: { active: false } }),
+        this.db.coupons.count({ where: { expires_at: { lt: new Date() } } }),
+        this.db.coupons.count({
+          where: { type: coupon_type.percentage },
+        }),
+        this.db.coupons.count({
+          where: { type: coupon_type.fixed },
+        }),
+      ]);
+
+    return { total, active, inactive, expired, percentage, fixed };
   }
 
   /**

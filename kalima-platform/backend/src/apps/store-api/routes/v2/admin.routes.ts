@@ -4,6 +4,7 @@ import { adminUserStatsController } from "../../controllers/admin-user-stats.con
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/client";
+import { makeExportHandler } from "../../export";
 
 const router = Router();
 
@@ -27,11 +28,24 @@ router.put("/account-review-settings", ...adminAuth, adminController.upsertAccou
 // Create user (respects privilege matrix)
 router.post("/users", ...adminAuth, adminController.createUser);
 
+// Create specific user types
+router.post("/teachers", ...adminAuth, adminController.createTeacher);
+router.post("/students", ...adminAuth, adminController.createStudent);
+router.post("/parents", ...adminAuth, adminController.createParent);
+router.post("/lecturers", ...adminAuth, adminController.createLecturer);
+
+// Export users
+router.get("/users/export", ...adminAuth, makeExportHandler("users"));
+
 // List / search users
 router.get("/users", ...adminAuth, adminController.listUsers);
 
 // Created Accounts Statistics
-router.get("/users/stats/created-accounts", ...adminAuth, adminUserStatsController.getCreatedAccountsStats);
+router.get(
+  "/users/stats/created-accounts",
+  ...adminAuth,
+  adminUserStatsController.getCreatedAccountsStats,
+);
 
 // Get single user with all roles
 router.get("/users/:userId", ...adminAuth, adminController.getUser);
@@ -55,5 +69,8 @@ router.put("/users/:userId/roles", ...adminAuth, adminController.setRoles);
 
 // Revoke a role from a user
 router.delete("/users/:userId/roles", ...adminAuth, adminController.revokeRole);
+
+// Delete a user
+router.delete("/users/:userId", ...adminAuth, adminController.deleteUser);
 
 export default router;

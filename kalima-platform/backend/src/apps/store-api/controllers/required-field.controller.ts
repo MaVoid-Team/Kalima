@@ -75,12 +75,21 @@ export const requiredFieldController = {
           ? req.query.active === "true"
           : undefined;
 
-      const list = await requiredFieldService.getAllDefinitions({ active });
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
+      const search = req.query.search as string;
+
+      const list = await requiredFieldService.getAllDefinitions({
+        active,
+        page,
+        limit,
+        search,
+      });
 
       res.status(200).json({
         success: true,
-        results: list.length,
-        data: list,
+        results: list.count,
+        data: list.data,
       });
     } catch (error) {
       _next(error);

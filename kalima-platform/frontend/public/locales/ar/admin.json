@@ -1,431 +1,896 @@
 {
-  "admin": {
-    "pageTitle": "صفحة الأدمن",
-    "students": "الطلاب",
-    "teachers": "المعلمين",
-    "assistants": "المساعدين",
-    "parents": "أولياء الأمور",
-    "generatePromoCodes": "إنشاء أكواد ترويجية",
-    "sendOffer": "ارسل عرضك الان!",
-    "promo": "كود خاص",
-    "discount": "خصم",
-    "editUser": {
-      "title": "تعديل المستخدم",
-      "name": "الاسم",
-      "namePlaceholder": "الاسم",
-      "phone": "رقم الهاتف",
-      "phonePlaceholder": "رقم الهاتف",
-      "email": "البريد الالكتروني",
-      "password": "كلمة المرور",
-      "passwordPlaceholder": "يرجى ادخال كلمة المرور",
-      "save": "حفظ",
-      "cancel": "الغاء",
-      "preferredContactTime": "الوقت المفضل للتواصل",
-      "from": "من",
-      "to": "إلى",
-      "note": "ملاحظة",
-      "contactNotePlaceholder": "ملاحظات حول وقت التواصل"
-    },
-    "userDetails": {
-      "name": "الاسم",
-      "email": "البريد الإلكتروني",
-      "gender": "النوع",
-      "phoneNumber": "رقم الهاتف",
-      "role": "الدور",
-      "joinedDate": "تاريخ الانضمام",
-      "government": "المحافظة",
-      "administrationZone": "المنطقة الإدارية",
-      "emailVerified": "تم التحقق من البريد الإلكتروني",
-      "successfulInvites": "الدعوات الناجحة",
-      "studentInfo": "معلومات الطالب",
-      "level": "المستوى",
-      "sequenceId": "الرقم التسلسلي",
-      "parentPhone": "هاتف ولي الأمر",
-      "faction": "الفئة",
-      "hobbies": "الهوايات",
-      "generalPoints": "النقاط العامة",
-      "totalPoints": "إجمالي النقاط",
-      "parentInfo": "معلومات ولي الأمر",
-      "children": "الأبناء",
-      "noChildren": "لا يوجد أبناء",
-      "views": "عدد المشاهدات",
-      "teacherInfo": "معلومات المعلم",
-      "subject": "المادة",
-      "teachingLevel": "المستوى التعليمي",
-      "school": "المدرسة",
-      "teachesAt": "يُدرّس في",
-      "centers": "المراكز",
-      "secondPhone": "رقم هاتف إضافي",
-      "socialMedia": "وسائل التواصل الاجتماعي",
-      "lecturerInfo": "معلومات المحاضر",
-      "bio": "نبذة",
-      "expertise": "الخبرة",
-      "assistantInfo": "معلومات المساعد",
-      "assignedLecturer": "المحاضر المعين",
-      "title": "تفاصيل المستخدم",
-      "close": "إغلاق",
-      "purchases": "المشتريات",
-      "frequentBuyer": "مشتري متكرر",
-      "newClient": "عميل جديد",
-      "userSerial": "الرقم التسلسلي للمستخدم"
-    },
-    "invites": {
-      "invite": "دعوة",
-      "invites": "دعوات",
-      "refreshSuccess": "تم تحديث الدعوات بنجاح!",
-      "refreshError": "حدث خطأ أثناء حساب بيانات الدعوات",
-      "calculating": "جاري الحساب...",
-      "refresh": "تحديث الدعوات"
-    },
-    "yes": "نعم",
-    "no": "لا",
-    "actions": {
-      "delete": "حذف",
-      "edit": "تعديل",
-      "cancel": "إلغاء",
-      "whatsapp": "إرسال رسالة واتساب",
-      "viewDetails": "عرض التفاصيل"
-    },
-    "export": {
-      "export": "تصدير",
-      "exporting": "جاري التصدير...",
-      "csvFormat": "تنسيق CSV",
-      "jsonFormat": "تنسيق JSON",
-      "xlsxFormat": "تنسيق XLSX",
-      "exportFiltered": "تصدير المفلتر",
-      "exportCSVPage": "تصدير الصفحة (CSV)",
-      "exportCSVAll": "تصدير الكل (CSV)",
-      "exportJSONPage": "تصدير الصفحة (JSON)",
-      "exportJSONAll": "تصدير الكل (JSON)",
-      "exportXLSXPage": "تصدير الصفحة (XLSX)",
-      "exportXLSXAll": "تصدير الكل (XLSX)",
-      "csvPage": "تصدير الصفحة (CSV)",
-      "csvAll": "تصدير الكل (CSV)",
-      "jsonPage": "تصدير الصفحة (JSON)",
-      "jsonAll": "تصدير الكل (JSON)",
-      "xlsxPage": "تصدير الصفحة (XLSX)",
-      "xlsxAll": "تصدير الكل (XLSX)",
-      "successXLSX": "تم تصدير {{count}} مستخدم بنجاح (XLSX)"
-    },
-    "errors": {
-      "fetchLecturers": "فشل في جلب المحاضرين",
-      "pointsError": "يجب أن تكون قيمة النقاط أكبر من صفر",
-      "codesError": "يجب أن يكون عدد الأكواد أكبر من صفر",
-      "phoneRequired": "يرجى إدخال رقم الهاتف",
-      "lecturerRequired": "يرجى اختيار محاضر",
-      "generationFailed": "فشل في إنشاء أكواد الخصم",
-      "fetchUsers": "فشل في جلب المستخدمين"
-    },
-    "success": {
-      "codesGenerated": "تم إنشاء أكواد الخصم بنجاح"
-    },
-    "form": {
-      "pointsAmount": "مقدار النقاط",
-      "numCodes": "عدد الأكواد",
-      "codeType": "نوع الكود",
-      "general": "عام",
-      "specific": "مخصص",
-      "promo": "ترويجي",
-      "lecturer": "المحاضر",
-      "lecturerPlaceholder": "اختر محاضر",
-      "generateQrCodes": "إنشاء رموز QR",
-      "qrCodeDescription": "إنشاء رموز QR لاستخدام الأكواد بسهولة",
-      "qrCodeSize": "حجم رمز QR"
-    },
-
-    "printQrCodes": "طباعة رموز QR",
-    "downloadAllQrCodes": "تحميل جميع رموز QR",
-
-    "points": "نقاط",
-    "userManagement": {
-      "title": "سجل الاجراءات",
-      "subtitle": "إدارة وتصدير بيانات المستخدمين",
-      "createUser": "إنشاء مستخدم جديد",
-      "delete": "حذف",
-      "edit": "تعديل"
-    },
-    "whatsappModal": {
-      "title": "إرسال عرض عبر واتساب",
-      "phoneLabel": "رقم الهاتف",
-      "phonePlaceholder": "ادخل رقم الهاتف",
-      "messageLabel": "الرسالة (اختياري)",
-      "placeholder": "اكتب رسالتك هنا...",
-      "cancel": "إلغاء",
-      "send": "إرسال"
-    },
-    "generating": "جاري الإنشاء...",
-    "generateCodes": "إنشاء الأكواد",
-    "generatedCodes": "الأكواد المنشأة",
-    "promoTable": {
-      "number": "الرقم",
-      "code": "كود الخصم",
-      "points": "النقاط",
-      "type": "النوع",
-      "actions": "الإجراءات",
-      "discount": "الخصم"
-    },
-    "specific": "محدد",
-    "general": "عام",
+  "dashboardTitle": "لوحة الإدارة",
+  "nav": {
+    "orders": "الطلبات",
+    "products": "المنتجات",
+    "samples": "العينات",
+    "coupons": "القسائم",
+    "categories": "الفئات",
+    "requiredFields": "الحقول المطلوبة",
+    "paymentMethods": "طرق الدفع",
+    "themeToggle": "تبديل المظهر",
+    "darkMode": "الوضع الداكن",
+    "lightMode": "الوضع الفاتح",
+    "backToStore": "العودة للمتجر",
+    "logout": "تسجيل الخروج",
+    "settings": "الإعدادات",
+    "expandSidebar": "توسيع الشريط الجانبي",
+    "collapseSidebar": "طي الشريط الجانبي",
+    "closeSidebar": "إغلاق الشريط الجانبي"
+  },
+  "common": {
+    "currencyEGP": "ج.م",
+    "na": "غير متوفر",
+    "admin": "الإدارة",
+    "loading": "جاري التحميل...",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "save": "حفظ",
+    "notSpecified": "غير محدد",
+    "file": "ملف",
+    "select": "اختر",
+    "actions": "إجراءات",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "openMenu": "فتح القائمة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "update": "تحديث",
+    "hide": "إخفاء",
+    "show": "إظهار",
+    "done": "تم",
     "copy": "نسخ",
-
-    "filters": {
-      "name": "الاسم",
-      "phone": "رقم الهاتف",
-      "allTypes": "كل الأنواع",
-      "allStatus": "كل الحالات",
-      "invites": "دعوات",
-      "dateFrom": "من تاريخ",
-      "dateTo": "إلى تاريخ",
-      "role": "الصلاحية",
-      "status": "الحالة"
-    },
-    "roles": {
-      "student": "طالب",
-      "parent": "ولي أمر",
-      "lecturers": "المحاضرين",
-      "lecturer": "المحاضر",
-      "teacher": "مدرس",
-      "assistant": "مساعد",
-      "admin": "أدمن",
-      "subAdmin": "مسؤول فرعي",
-      "Teacher": "مدرس",
-      "moderator": "مشرف"
-    },
-    "status": {
-      "valid": "صالح",
-      "missingData": "بيانات ناقصة"
-    },
-    "table": {
-      "actions": "الإجراءات",
-      "status": "الحالة",
-      "accountType": "نوع الحساب",
-      "phone": "رقم الهاتف",
-      "name": "الاسم",
-      "successfulInvites": "الدعوات الناجحة",
-      "purchases": "المشتريات"
-    },
-
+    "removing": "جاري الحذف...",
     "pagination": {
       "previous": "السابق",
       "next": "التالي",
-      "showing": "عرض",
+      "page": "صفحة",
       "of": "من"
     },
-    "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا المستخدم؟",
-    "deleteSuccess": "تم حذف المستخدم بنجاح",
-    "deleteError": "فشل في حذف المستخدم",
-    "createSuccess": "تم إنشاء المستخدم بنجاح",
-    "createError": "فشل في إنشاء المستخدم",
-    "editSuccess": "تم تعديل المستخدم بنجاح",
-    "editError": "فشل في تعديل المستخدم",
-    "NA": "غير متوفر",
-
-    "auditlog": {
-      "title": "سجل العمليات",
-      "subtitle": "عرض وتتبع جميع الأنشطة على النظام",
-      "search": {
-        "enterEmail": "يرجى إدخال البريد الإلكتروني للبحث",
-        "found": "تم العثور على {{count}} سجل",
-        "noResults": "لا توجد سجلات لهذا البريد الإلكتروني",
-        "error": "حدث خطأ أثناء البحث"
-      },
-      "noRecords": "لا توجد سجلات متاحة",
-      "noRecordsFiltered": "لا توجد سجلات عمليات تطابق المرشحات الحالية. جرب تعديل معايير البحث.",
-      "noRecordsYet": "لم يتم تسجيل أي سجلات عمليات بعد. ستظهر الأنشطة هنا بمجرد بدء المستخدمين التفاعل مع النظام.",
-
-      "filters": {
-        "all": "الكل",
-        "user": "المستخدم",
-        "role": "الصلاحية",
-        "action": "الإجراء",
-        "resource": "العنصر",
-        "status": "الحالة",
-        "date": "التاريخ",
-        "to": "إلى",
-        "apply": "تطبيق الفلتر",
-        "search": "البحث في سجل العمليات...",
-        "email": "البريد الإلكتروني"
-      },
-
-      "columns": {
-        "user": "المستخدم",
-        "role": "الصلاحية",
-        "action": "الإجراء",
-        "resource": "العنصر",
-        "datetime": "التاريخ والوقت",
-        "status": "الحالة",
-        "email": "البريد الإلكتروني"
-      },
-
-      "roles": {
-        "admin": "مسؤول",
-        "subadmin": "مسؤول فرعي",
-        "lecturer": "المحاضر",
-        "student": "طالب",
-        "teacher": "معلم",
-        "assistant": "مساعد"
-      },
-
-      "actions": {
-        "create": "إنشاء",
-        "read": "قراءة",
-        "update": "تعديل",
-        "delete": "حذف",
-        "cancel": "إلغاء"
-      },
-
-      "resources": {
-        "container": "كورس",
-        "lecture": "درس",
-        "user": "مستخدم",
-        "timetable": "جدول زمني",
-        "center": "مركز",
-        "code": "كود",
-        "promoCode": "كود ترويجي",
-        "admin": "أدمن",
-        "assistant": "مساعد",
-        "parent": "ولي أمر",
-        "package": "باقات",
-        "lesson": "درس",
-        "ec": {
-          "purchase": "شراء"
-        }
-      },
-      "idDisplay": "ID: {{id}}",
-
-      "status": {
-        "success": "ناجح",
-        "pending": "قيد الانتظار",
-        "failed": "فشل",
-        "unknown": "غير معروف"
-      },
-
-      "errors": {
-        "fetch": "فشل تحميل سجلات التدقيق",
-        "general": "حدث خطأ"
-      },
-
-      "pagination": {
-        "previous": "السابق",
-        "next": "التالي"
-      },
-
-      "export": {
-        "export": "تصدير السجلات",
-        "exporting": "جاري التصدير...",
-        "csvFormat": "تنسيق CSV",
-        "jsonFormat": "تنسيق JSON",
-        "exportFiltered": "تصدير العرض الحالي",
-        "exportAll": "تصدير جميع السجلات",
-        "noData": "لا توجد بيانات للتصدير",
-        "successAll": "تم تصدير {{count}} سجل عمليات بنجاح",
-        "successFiltered": "تم تصدير {{count}} سجل عمليات مفلتر بنجاح",
-        "error": "فشل في تصدير سجلات العمليات. يرجى المحاولة مرة أخرى.",
-        "filterInfo": "المرشحات المطبقة:",
-        "showing": "عرض",
-        "logs": "سجلات عمليات",
-        "of": "من",
-        "totalLogs": "إجمالي السجلات المعروضة",
-        "user": "المستخدم",
-        "role": "الصلاحية",
-        "action": "الإجراء",
-        "resource": "العنصر",
-        "resourceDetails": "تفاصيل العنصر",
-        "status": "الحالة",
-        "timestamp": "الطابع الزمني",
-        "ipAddress": "عنوان IP",
-        "userAgent": "وكيل المستخدم",
-        "description": "الوصف"
-      }
+    "refresh": "تحديث",
+    "export": {
+      "success": "تم التصدير بنجاح"
     }
   },
-  "promoCodes": {
-    "title": "إدارة الأكواد الترويجية",
-    "code": " كود الخصم",
-    "points": " النقاط",
-    "status": " الحالة",
-    "redeemedAt": "تم استرداده في",
-    "redeemedBy": "تم الاسترداد بواسطة",
-    "noCodes": "لم يتم العثور على أكواد ترويجية",
-    "actions": "الإجراءات"
+  "gender": {
+    "male": "ذكر",
+    "female": "أنثى",
+    "other": "آخر"
   },
-  "filters": {
-    "allStatuses": "كل الحالات",
-    "redeemed": "مسترد",
-    "active": "نشط",
-    "redeemedBy": "تم استرداده بواسطة",
-    "apply": "تطبيق",
-    "allStudents": "كل الطلاب",
-    "all": "كل الانواع",
-    "general": "عام",
-    "specific": "مخصص",
-    "promo": "ترويجي"
+  "orders": {
+    "stats": {
+      "totalPurchases": "إجمالي المشتريات",
+      "totalRevenue": "إجمالي الإيرادات",
+      "averagePrice": "متوسط السعر",
+      "confirmedPurchases": "المشتريات المؤكدة",
+      "confirmedRevenue": "الإيرادات المؤكدة",
+      "pendingPurchases": "مشتريات قيد الانتظار"
+    },
+    "statsToday": {
+      "totalPurchases": "إجمالي المشتريات اليوم",
+      "totalRevenue": "إجمالي الإيرادات اليوم",
+      "averagePrice": "متوسط السعر اليوم",
+      "confirmedPurchases": "المشتريات المؤكدة اليوم",
+      "confirmedRevenue": "الإيرادات المؤكدة اليوم",
+      "pendingPurchases": "مشتريات قيد الانتظار اليوم"
+    },
+    "status": {
+      "label": "الحالة",
+      "all": "جميع الطلبات",
+      "pending": "قيد الانتظار",
+      "received": "تم الاستلام",
+      "confirmed": "مؤكد",
+      "processing": "جاري التنفيذ",
+      "completed": "مكتمل",
+      "cancelled": "ملغي",
+      "refunded": "مسترد",
+      "returned": "مرتجع",
+      "created": "تم الإنشاء"
+    },
+    "total": "الإجمالي",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
+    "createdAt": "تاريخ الإنشاء",
+    "itemPrice": "سعر العنصر",
+    "requiredFields": "الحقول المطلوبة",
+    "field": "الحقل",
+    "unknownProduct": "منتج غير معروف",
+    "sections": {
+      "summary": "الملخص",
+      "customer": "العميل",
+      "payment": "الدفع",
+      "notes": "الملاحظات"
+    },
+    "customer": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف"
+    },
+    "payment": {
+      "method": "الطريقة",
+      "methodPhone": "رقم الدفع",
+      "transferredFrom": "محول من",
+      "targetNumber": "الرقم المستهدف",
+      "screenshot": "صورة الدفع"
+    },
+    "notes": {
+      "customer": "ملاحظات العميل",
+      "admin": "ملاحظات الإدارة"
+    },
+    "title": "إدارة الطلبات",
+    "myOrders": "طلباتي",
+    "subtitle": "تتبع وإدارة وعرض سجل طلباتك",
+    "noOrders": "لا توجد طلبات",
+    "noOrdersForStatus": "ليس لديك أي طلبات بهذه الحالة.",
+    "noOrdersDescription": "يبدو أنك لم تقم بأي طلبات بعد.",
+    "totalOrders": "{{count}} طلبات",
+    "searchPlaceholder": "البحث بالرقم التسلسلي، الاسم، البريد...",
+    "export": "تصدير",
+    "exportCsv": "تصدير كـ CSV",
+    "exportXlsx": "تصدير كـ Excel",
+    "statusAll": "كل الحالات",
+    "statusPending": "قيد الانتظار",
+    "statusReceived": "تم الاستلام",
+    "statusConfirmed": "مؤكد",
+    "statusProcessing": "قيد التنفيذ",
+    "statusCompleted": "مكتمل",
+    "statusCancelled": "ملغي",
+    "statusRefunded": "مسترد",
+    "statusReturned": "مرتجع",
+    "statusCreated": "تم الإنشاء",
+    "deleted": "محذوف",
+    "clearFilters": "مسح",
+    "filterByDate": "تصفية حسب التاريخ",
+    "table": {
+      "serial": "الرقم التسلسلي",
+      "customer": "العميل",
+      "status": "الحالة",
+      "total": "الإجمالي",
+      "payment": "طريقة الدفع",
+      "actions": "إجراءات",
+      "selectAll": "تحديد الكل",
+      "selectAllOrders": "تحديد جميع الطلبات"
+    },
+    "items": {
+      "items": "الطلبات",
+      "empty": "لا توجد عناصر",
+      "product": "المنتج",
+      "type": "النوع",
+      "price": "السعر",
+      "discount": "الخصم",
+      "actions": "الإجراءات",
+      "unknownProduct": "منتج غير معروف"
+    },
+    "actions": {
+      "view": "عرض التفاصيل",
+      "viewDetails": "عرض التفاصيل",
+      "receive": "تحديد كمستلم",
+      "confirm": "تأكيد الطلب",
+      "return": "إرجاع الطلب",
+      "delete": "حذف الطلب",
+      "deleteItem": "إزالة العنصر",
+      "whatsapp": "تواصل عبر واتساب",
+      "collapseItems": "طي",
+      "expandItems": "توسيع",
+      "viewNote": "عرض الملاحظة",
+      "refund": "استرداد",
+      "statusPending": "قيد الانتظار",
+      "statusProcessing": "قيد التنفيذ",
+      "statusCompleted": "مكتمل",
+      "statusCancelled": "ملغي",
+      "statusRefunded": "مسترد",
+      "statusAll": "كل الحالات",
+      "clearFilters": "مسح التصفية",
+      "filterByDate": "تصفية حسب التاريخ",
+      "searchPlaceholder": "ابحث في الطلبات..."
+    },
+    "messages": {
+      "receiveSuccess": "تم تحديث الطلب إلى مستلم",
+      "confirmSuccess": "تم تأكيد الطلب",
+      "returnSuccess": "تم إرجاع الطلب",
+      "saveNoteSuccess": "تم حفظ ملاحظات الإدارة بنجاح",
+      "deleteOrderWarning": "هل أنت متأكد من حذف هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
+      "deleteItemWarning": "هل أنت متأكد من حذف هذا العنصر من الطلب؟",
+      "deleteOrderSuccess": "تم حذف الطلب بنجاح",
+      "deleteItemSuccess": "تم حذف العنصر بنجاح",
+      "noteSaved": "تم حفظ ملاحظة الإدارة بنجاح",
+      "noOrdersFound": "لم يتم العثور على طلبات."
+    },
+    "details": {
+      "title": "تفاصيل الطلب",
+      "backToOrders": "العودة للطلبات",
+      "customerInfo": "معلومات العميل",
+      "customerNotes": "ملاحظات العميل",
+      "orderSummary": "ملخص الطلب",
+      "paymentInfo": "معلومات الدفع",
+      "statusTimeline": "الجدول الزمني للحالة",
+      "orderItems": "عناصر الطلب",
+      "adminNotes": "ملاحظات الإدارة",
+      "couponInfo": "الكوبون المستخدم",
+      "requiredFields": "الحقول المطلوبة",
+      "item": "العنصر",
+      "field": "الحقل",
+      "dateCreated": "تاريخ الإنشاء",
+      "itemsCount": "عدد العناصر",
+      "subtotal": "المجموع الفرعي",
+      "discount": "الخصم",
+      "method": "طريقة الدفع",
+      "transferFrom": "محول من",
+      "paymentNumber": "رقم الدفع",
+      "screenshot": "صورة الحوالة",
+      "saveNote": "حفظ الملاحظة",
+      "total": "الإجمالي",
+      "by": "بواسطة",
+      "lastNoteBy": "آخر ملاحظة بواسطة: {{name}}",
+      "contactWhatsApp": "تواصل عبر واتساب",
+      "loading": "جاري تحميل التفاصيل...",
+      "addAdminNote": "إضافة ملاحظة إدارية",
+      "noteLimitReached": "تم الوصول للحد الأقصى للملاحظات",
+      "notFound": "الطلب غير موجود"
+    }
   },
-  "pagination": {
-    "previous": "السابق",
-    "next": "التالي",
-    "page": "صفحة",
-    "of": "من"
+  "products": {
+    "title": "إدارة المنتجات",
+    "subtitle": "إدارة منتجات المتجر والوسائط والإعدادات",
+    "totalProducts": "{{count}} منتجات",
+    "searchPlaceholder": "البحث بالعنوان، الوصف، الرقم التسلسلي...",
+    "noProducts": "لا توجد منتجات",
+    "noProductsDescription": "لا توجد منتجات تطابق الفلاتر الحالية.",
+    "createProduct": "إنشاء منتج",
+    "backToProducts": "العودة للمنتجات",
+    "backToProduct": "العودة للمنتج",
+    "filters": {
+      "allCategories": "جميع الفئات",
+      "allStatuses": "جميع الحالات",
+      "active": "نشط",
+      "archived": "مؤرشف",
+      "archivedToggle": "عرض المؤرشف"
+    },
+    "table": {
+      "thumbnail": "الصورة",
+      "title": "العنوان",
+      "type": "النوع",
+      "price": "السعر",
+      "rating": "التقييم",
+      "categories": "الفئات",
+      "status": "الحالة",
+      "actions": "الإجراءات",
+      "selectAll": "تحديد جميع المنتجات"
+    },
+    "status": {
+      "active": "نشط",
+      "archived": "مؤرشف"
+    },
+    "type": {
+      "Book": "كتاب",
+      "Product": "منتج",
+      "physical": "منتج مادي",
+      "instant": "تنزيل فوري"
+    },
+    "actions": {
+      "view": "عرض التفاصيل",
+      "edit": "تعديل المنتج",
+      "archive": "أرشفة",
+      "unarchive": "استعادة",
+      "delete": "حذف المنتج"
+    },
+    "form": {
+      "title": "العنوان",
+      "titlePlaceholder": "عنوان المنتج",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف المنتج (اختياري)",
+      "type": "النوع",
+      "price": "السعر (ج.م)",
+      "priceAfterDiscount": "السعر بعد الخصم (ج.م)",
+      "serial": "الرقم التسلسلي",
+      "serialPlaceholder": "مثل: ALG-101 (اختياري)",
+      "couponId": "معرف الكوبون",
+      "couponIdPlaceholder": "معرف الكوبون (اختياري)",
+      "thumbnail": "صورة الغلاف",
+      "sample": "ملف النموذج (PDF)",
+      "chooseImage": "اختر صورة",
+      "chooseSampleFile": "اختر ملف العينة",
+      "noFileSelected": "لم يتم اختيار ملف",
+      "categories": "الفئات",
+      "isArchived": "مؤرشف",
+      "perks": "المميزات",
+      "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code",
+      "perksTip": "يمكنك استخدام الفواصل الإنجليزية (,) أو الفواصل العربية (،) للفصل بين المميزات.",
+      "titleIsRequired": "العنوان مطلوب",
+      "titleMaxLength": "يجب ألا يزيد العنوان عن 255 حرفًا",
+      "priceMustBeGreaterThan0": "السعر يجب أن يكون أكبر من او يساوي 0",
+      "discountedPriceMustBeGreaterThan0": "السعر بعد الخصم يجب أن يكون أكبر من 0",
+      "serialMaxLength": "يجب ألا يزيد الرقم التسلسلي عن 100 حرف",
+      "couponIdMustBeInteger": "معرف الكوبون يجب أن يكون رقمًا صحيحًا",
+      "couponIdMustBeGreaterThan0": "معرف الكوبون يجب أن يكون أكبر من 0",
+      "discountedPriceMustBeLessThanOriginalPrice": "السعر بعد الخصم يجب أن يكون أقل من السعر الأصلي"
+    },
+    "create": {
+      "dialogTitle": "إنشاء منتج جديد",
+      "dialogDescription": "أدخل تفاصيل المنتج. يمكنك إدارة الوسائط والحقول من صفحة التفاصيل.",
+      "submit": "إنشاء المنتج",
+      "creating": "جاري الإنشاء...",
+      "uploading": "جاري الرفع...",
+      "processing": "جاري المعالجة..."
+    },
+    "edit": {
+      "dialogTitle": "تعديل المنتج",
+      "dialogDescription": "تحديث تفاصيل المنتج.",
+      "submit": "حفظ التغييرات",
+      "saving": "جاري الحفظ..."
+    },
+    "quickCoupon": {
+      "title": "قسيمة سريعة",
+      "description": "أنشئ قسيمة واربطها بهذا المنتج أثناء الحفظ.",
+      "enable": "إنشاء قسيمة لهذا المنتج",
+      "code": "كود القسيمة",
+      "codePlaceholder": "KLM-XXXXXX",
+      "generate": "توليد",
+      "type": "نوع الخصم",
+      "percentageValue": "نسبة الخصم",
+      "amountValue": "قيمة الخصم",
+      "validationComplete": "يرجى إكمال جميع حقول القسيمة السريعة",
+      "validationPositive": "يجب أن تكون قيمة القسيمة أكبر من 0",
+      "validationPercentageMax": "لا يمكن أن تزيد النسبة عن 100",
+      "validationAmountExceedsPrice": "لا يمكن أن تتجاوز قيمة الخصم سعر المنتج",
+      "createFailed": "تم حفظ المنتج ولكن فشل إنشاء القسيمة"
+    },
+    "delete": {
+      "confirm": "هل تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
+      "confirmTitle": "حذف المنتج",
+      "success": "تم حذف المنتج بنجاح"
+    },
+    "detail": {
+      "info": "معلومات المنتج",
+      "media": "الوسائط",
+      "thumbnail": "صورة الغلاف",
+      "gallery": "معرض الصور",
+      "categories": "الفئات",
+      "coupons": "القسائم المرتبطة",
+      "requiredFields": "الحقول المطلوبة",
+      "noThumbnail": "لا توجد صورة غلاف",
+      "uploadThumbnail": "رفع صورة الغلاف",
+      "replaceThumbnail": "استبدال صورة الغلاف",
+      "removeThumbnail": "حذف صورة الغلاف",
+      "addGalleryImages": "إضافة صور للمعرض",
+      "noGalleryImages": "لا توجد صور في المعرض",
+      "galleryImageActive": "مرئي",
+      "galleryImageHidden": "مخفي",
+      "toggleVisibility": "تبديل الرؤية",
+      "removeImage": "حذف",
+      "noCategories": "لا توجد فئات مرتبطة",
+      "noCoupons": "لا توجد قسائم مرتبطة بهذا المنتج",
+      "attachCategory": "إضافة فئة",
+      "selectCategory": "اختر فئة...",
+      "detachCategory": "حذف",
+      "noRequiredFields": "لا توجد حقول مطلوبة مرتبطة",
+      "attachField": "إضافة حقل",
+      "selectField": "اختر حقلاً...",
+      "detachField": "حذف",
+      "fieldLabel": "الحقل",
+      "fieldType": "النوع",
+      "fieldRequired": "مطلوب",
+      "fieldOptional": "اختياري",
+      "fieldToggleSuccess": "تم تحديث الحقل المطلوب بنجاح",
+      "fieldToggleError": "فشل في تحديث الحقل المطلوب",
+      "yes": "نعم",
+      "no": "لا",
+      "sample": "ملف العينة",
+      "noSample": "لا يوجد ملف عينة. يمكن إرفاق العينات عند إنشاء المنتج.",
+      "noSampleAvailable": "لا يوجد ملف عينة متاح لهذا المنتج. قم برفع ملف PDF أو Word لتوفير معاينة.",
+      "viewSample": "عرض بملء الشاشة",
+      "previewSample": "معاينة العينة",
+      "downloadSample": "تحميل",
+      "uploadSample": "رفع عينة",
+      "replaceSample": "استبدال العينة",
+      "removeSample": "حذف العينة",
+      "sampleFileName": "الملف",
+      "sampleFileSize": "الحجم",
+      "sampleFileType": "النوع",
+      "openSamplePage": "فتح صفحة العينة",
+      "shareLinkCopied": "تم نسخ رابط المشاركة!",
+      "copyShareLink": "نسخ رابط المشاركة",
+      "copyLink": "نسخ",
+      "copied": "تم النسخ!",
+      "linkCopied": "تم نسخ الرابط!",
+      "shareLink": "رابط المشاركة",
+      "shareInstructions": "شارك هذا الرابط مع العملاء للسماح لهم بمعاينة العينة قبل الشراء.",
+      "invalidSampleType": "نوع الملف غير صالح. يرجى رفع ملف PDF أو Word.",
+      "sampleUpdated": "تم تحديث العينة بنجاح!",
+      "sampleUpdateError": "فشل في تحديث العينة. يرجى المحاولة مرة أخرى.",
+      "sampleRemoved": "تم حذف العينة بنجاح!",
+      "sampleRemoveError": "فشل في حذف العينة. يرجى المحاولة مرة أخرى.",
+      "type": {
+        "Product": "منتج",
+        "Book": "كتاب"
+      },
+      "confirmRemoveSampleTitle": "حذف العينة",
+      "confirmRemoveSampleDescription": "هل أنت متأكد من رغبتك في حذف ملف العينة هذا؟ لا يمكن التراجع عن هذا الإجراء وسيتم حذف الملف نهائياً من هذا المنتج.",
+      "uploading": "جاري الرفع...",
+      "processing": "جاري المعالجة...",
+      "selectChildCategory": "اختر الفئة الثانوية",
+      "selectGrandchildCategory": "اختر الفئة الثالثة"
+    },
+    "reviews": {
+      "title": "المراجعات",
+      "noReviews": "لا توجد مراجعات بعد",
+      "noReviewsDescription": "هذا المنتج لم يتلق أي مراجعات من العملاء بعد.",
+      "totalReviews": "إجمالي المراجعات",
+      "deleteConfirm": "هل أنت متأكد من حذف هذه المراجعة؟",
+      "deleteSuccess": "تم حذف المراجعة بنجاح",
+      "anonymousUser": "مستخدم مجهول"
+    }
   },
-  "status": {
-    "redeemed": "مسترد",
-    "active": "نشط"
+  "samples": {
+    "title": "إدارة العينات",
+    "subtitle": "جميع ملفات عينات المنتجات في المتجر",
+    "count": "عينات",
+    "noSamples": "لا توجد ملفات عينات.",
+    "copyLink": "نسخ الرابط",
+    "linkCopied": "تم نسخ رابط العينة!",
+    "linkCopyError": "فشل نسخ الرابط",
+    "table": {
+      "file": "الملف",
+      "product": "المنتج",
+      "size": "الحجم",
+      "type": "النوع",
+      "name": "الاسم",
+      "price": "السعر",
+      "actions": "الإجراءات",
+      "selectAll": "تحديد جميع العينات"
+    }
   },
-  "errors": {
-    "fetchPromo": "فشل في جلب الأكواد الترويجية"
+  "coupons": {
+    "title": "إدارة القسائم",
+    "subtitle": "إنشاء وتعديل وإدارة قسائم المنتجات",
+    "totalCoupons": "{{count}} قسائم",
+    "searchPlaceholder": "ابحث بالكود...",
+    "empty": "لا توجد قسائم.",
+    "export": "تصدير",
+    "exportCsv": "تصدير كـ CSV",
+    "exportXlsx": "تصدير كـ Excel",
+    "statusPending": "قيد الانتظار",
+    "statusProcessing": "قيد التنفيذ",
+    "statusCompleted": "مكتمل",
+    "statusCancelled": "ملغي",
+    "statusRefunded": "مسترد",
+    "statusAll": "كل الحالات",
+    "filters": {
+      "active": {
+        "label": "الحالة",
+        "all": "جميع الحالات",
+        "active": "نشط",
+        "inactive": "غير نشط"
+      },
+      "product": {
+        "placeholder": "تصفية حسب المنتج",
+        "clear": "مسح"
+      },
+      "type": {
+        "label": "النوع",
+        "all": "كل الأنواع",
+        "percentage": "نسبة مئوية",
+        "amount": "قيمة ثابتة"
+      },
+      "date": {
+        "start": "تاريخ البدء",
+        "end": "تاريخ الانتهاء",
+        "range": "تصفية بنطاق التاريخ",
+        "clear": "مسح"
+      }
+    },
+    "discountType": {
+      "percentage": "نسبة مئوية",
+      "amount": "قيمة ثابتة"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "stats": {
+      "totalCoupons": "إجمالي القسائم",
+      "activeCoupons": "القسائم النشطة",
+      "inactiveCoupons": "القسائم غير النشطة",
+      "percentageCoupons": "قسائم النسبة",
+      "amountCoupons": "قسائم القيمة الثابتة"
+    },
+    "table": {
+      "code": "الكود",
+      "discountType": "نوع الخصم",
+      "discountValue": "قيمة الخصم",
+      "productId": "معرف المنتج",
+      "dates": "التواريخ",
+      "createdAt": "تاريخ الإنشاء",
+      "startsAt": "تاريخ البداية",
+      "expiresAt": "تاريخ الانتهاء",
+      "status": "الحالة",
+      "actions": "الإجراءات",
+      "selectAll": "تحديد جميع القسائم"
+    },
+    "form": {
+      "code": "الكود",
+      "codePlaceholder": "KLM-XXXXXX",
+      "discountType": "نوع الخصم",
+      "discountPercentage": "نسبة الخصم",
+      "discountAmount": "قيمة الخصم",
+      "units": {
+        "percentage": "%",
+        "amount": "ج.م"
+      },
+      "productId": "معرف المنتج",
+      "productIdPlaceholder": "الرجاء النقر على 'اختيار منتج' لتحديد المنتج",
+      "startsAt": "تاريخ البداية",
+      "startsAtPlaceholder": "اختر تاريخ البداية",
+      "expiresAt": "تاريخ الانتهاء",
+      "expiresAtPlaceholder": "اختر تاريخ الانتهاء",
+      "optional": "اختياري",
+      "isActive": "حالة نشاط القسيمة"
+    },
+    "create": {
+      "title": "إنشاء قسيمة",
+      "description": "أدخل بيانات القسيمة ثم احفظ."
+    },
+    "edit": {
+      "title": "تعديل القسيمة",
+      "description": "حدّث بيانات القسيمة وحالتها.",
+      "toggleHelp": "استخدم هذا المفتاح لتفعيل أو تعطيل القسيمة."
+    },
+    "productPicker": {
+      "open": "اختيار منتج",
+      "title": "اختيار المنتج",
+      "description": "ابحث في المنتجات واختر منتجًا لهذه القسيمة.",
+      "searchPlaceholder": "ابحث بالعنوان أو الرقم التسلسلي...",
+      "empty": "لا توجد منتجات.",
+      "select": "اختيار",
+      "selected": "تم الاختيار",
+      "price": "السعر",
+      "priceAfterDiscount": "السعر بعد الخصم"
+    },
+    "delete": {
+      "title": "حذف القسيمة",
+      "confirm": "هل أنت متأكد من حذف هذه القسيمة؟",
+      "disclaimer": "القسائم المحذوفة لن تظهر في قائمة القسائم، لكنها تظل مخزنة في السجل."
+    },
+    "actions": {
+      "create": "إنشاء قسيمة",
+      "save": "حفظ التغييرات",
+      "delete": "حذف",
+      "generateCode": "توليد كود عشوائي",
+      "copyCode": "نسخ الكود",
+      "activate": "تفعيل",
+      "deactivate": "تعطيل",
+      "viewDetails": "عرض التفاصيل",
+      "edit": "تعديل القسيمة"
+    },
+    "details": {
+      "title": "تفاصيل القسيمة",
+      "description": "راجع معلومات القسيمة وصلاحيتها."
+    },
+    "messages": {
+      "codeCopied": "تم نسخ كود القسيمة",
+      "codeCopyFailed": "تعذر نسخ كود القسيمة"
+    },
+    "validation": {
+      "codeRequired": "كود القسيمة مطلوب",
+      "codeMinLength": "يجب ألا يقل كود القسيمة عن 6 أحرف",
+      "codeFormat": "يجب أن يحتوي الكود على أحرف إنجليزية كبيرة وأرقام وشرطات فقط",
+      "discountTypeRequired": "نوع الخصم مطلوب",
+      "productRequired": "معرف المنتج مطلوب",
+      "startsAtRequired": "تاريخ البداية مطلوب",
+      "startsAtBeforeExpiresAt": "يجب أن يكون تاريخ البداية قبل تاريخ الانتهاء",
+      "expiresAtRequired": "تاريخ الانتهاء مطلوب",
+      "expiresAtNotPast": "لا يمكن أن يكون تاريخ الانتهاء قبل اليوم",
+      "discountPercentageRequired": "قيمة النسبة مطلوبة",
+      "discountPercentageInvalid": "يجب أن تكون النسبة رقمًا صالحًا",
+      "discountPercentageMax": "لا يمكن أن تزيد النسبة عن 100",
+      "discountAmountRequired": "قيمة الخصم مطلوبة",
+      "discountAmountInvalid": "يجب أن تكون قيمة الخصم رقمًا صالحًا",
+      "discountAmountExceedsProductPrice": "لا يمكن أن تتجاوز قيمة الخصم سعر المنتج المحدد",
+      "discountValuePositive": "يجب أن تكون القيمة أكبر من 0"
+    },
+    "api": {
+      "createSuccess": "تم إنشاء القسيمة بنجاح",
+      "updateSuccess": "تم تحديث القسيمة بنجاح",
+      "deleteSuccess": "تم حذف القسيمة بنجاح"
+    }
   },
-  "revenue": {
-    "errorLoadingRevenue": "خطأ في تحميل بيانات الإيرادات",
-    "lecturerRevenue": "إيرادات المحاضر",
-    "revenueSummary": "ملخص الإيرادات",
-    "totalRevenue": "إجمالي الإيرادات",
-    "currency": "جنيه",
-    "totalPurchases": "إجمالي المشتريات",
-    "monthsWithRevenue": "أشهر بها إيرادات",
-    "purchaseCount": "عدد المشتريات",
-    "noRevenueData": "لا توجد بيانات إيرادات لهذا المحاضر"
+  "categories": {
+    "title": "إدارة الفئات",
+    "subtitle": "إدارة هيكل فئات المتجر",
+    "totalCategories": "{{count}} فئات",
+    "searchPlaceholder": "البحث بالعنوان...",
+    "noCategories": "لا توجد فئات",
+    "noCategoriesDescription": "لم تقم بإضافة أي فئات بعد.",
+    "noSubCategories": "لا توجد فئات فرعية",
+    "createCategory": "إنشاء فئة",
+    "backToCategories": "العودة للفئات",
+    "table": {
+      "title": "العنوان",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "form": {
+      "title": "العنوان",
+      "titlePlaceholder": "عنوان الفئة",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف اختياري",
+      "parentCategory": "الفئة الأب",
+      "selectParentCategory": "اختر الفئة الأب...",
+      "rootLevel": "تصنيف رئيسي",
+      "isArchived": "مؤرشف",
+      "depthWarning": "الحد الأقصى لعمق الفئات هو 3 مستويات."
+    },
+    "actions": {
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "create": {
+      "dialogTitle": "إنشاء فئة جديدة",
+      "dialogDescription": "إضافة فئة جديدة.",
+      "submit": "إنشاء",
+      "creating": "جاري الإنشاء..."
+    },
+    "edit": {
+      "dialogTitle": "تعديل الفئة",
+      "dialogDescription": "تحديث تفاصيل الفئة.",
+      "submit": "حفظ التغييرات",
+      "saving": "جاري الحفظ..."
+    },
+    "delete": {
+      "confirmTitle": "حذف الفئة",
+      "confirm": "هل أنت متأكد من حذف هذه الفئة؟ سيتم أيضاً حذف جميع الفئات الفرعية التابعة لها.",
+      "deleteProductsLabel": "حذف المنتجات المرتبطة",
+      "deleteProductsDescription": "إذا لم يتم تحديده، سيتم فقط إلغاء ربط المنتجات.",
+      "success": "تم حذف الفئة بنجاح"
+    },
+    "messages": {
+      "archiveWarning": "أرشفة هذه الفئة سيؤدي لأرشفة جميع فئاتها الفرعية.",
+      "depthLimitReached": "لا يمكن إضافة المزيد من المستويات المودعة. تم الوصول للحد الأقصى وهو 3."
+    }
   },
-  "modals": {
-    "confirmDelete": " حذف هذا الكود؟",
-    "deleteCodeConfirm": "هل انت متاكد من رغبتك في حذف هذا الكود؟"
+  "settings": {
+    "title": "الإعدادات",
+    "description": "إدارة إعدادات حسابك وتفضيلاته",
+    "profile": {
+      "title": "معلومات الملف الشخصي",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "secondaryPhone": "رقم الهاتف الثانوي",
+      "gender": "الجنس",
+      "uploadAvatar": "رفع الصورة الرمزية",
+      "avatarHint": "JPG، PNG أو GIF. الحد الأقصى للحجم 2MB.",
+      "editProfile": "تعديل الملف الشخصي",
+      "updateSuccess": "تم تحديث الملف الشخصي بنجاح",
+      "validation": {
+        "nameRequired": "الاسم مطلوب",
+        "emailInvalid": "عنوان البريد الإلكتروني غير صالح",
+        "invalidPhone": "رقم هاتف محمول غير صالح"
+      }
+    },
+    "password": {
+      "title": "إدارة كلمة المرور",
+      "changePassword": "تغيير كلمة المرور",
+      "setPassword": "تعيين كلمة المرور",
+      "changeDescription": "تغيير كلمة المرور الحالية",
+      "setDescription": "تعيين كلمة مرور لتسجيل الدخول المحلي",
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "currentPasswordPlaceholder": "أدخل كلمة المرور الحالية",
+      "newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
+      "confirmPasswordPlaceholder": "أكد كلمة المرور الجديدة",
+      "passwordMismatch": "كلمات المرور غير متطابقة",
+      "confirmChangeTitle": "تغيير كلمة المرور",
+      "confirmChange": "هل أنت متأكد من تغيير كلمة المرور؟ سيتم تسجيل خروجك من جميع الأجهزة.",
+      "confirmSetTitle": "تعيين كلمة المرور",
+      "confirmSet": "هل أنت متأكد من تعيين كلمة مرور؟ هذا سيمكن تسجيل الدخول المحلي لحسابك."
+    },
+    "account": {
+      "title": "أمان الحساب",
+      "linkedProviders": "الحسابات المرتبطة",
+      "linkNewAccount": "ربط حساب جديد",
+      "linkDescription": "اربط حسابات إضافية لتفعيل عدة طرق لتسجيل الدخول.",
+      "linkFirebase": "ربط حساب جوجل",
+      "setPasswordFirst": "يجب تعيين كلمة مرور أولاً",
+      "noLinkedProviders": "لا توجد حسابات مرتبطة",
+      "connected": "متصل",
+      "unlink": "إلغاء الربط",
+      "confirmUnlinkTitle": "إلغاء ربط مزود الخدمة",
+      "confirmUnlink": "هل أنت متأكد من إلغاء ربط هذا المزود؟ ستفقد الوصول إلى طريقة تسجيل الدخول هذه.",
+      "unlinkWarning": "ستفقد الوصول إلى طريقة تسجيل الدخول هذه وستحتاج إلى استخدام أحد حساباتك المتبقية لتسجيل الدخول.",
+      "providers": {
+        "local": "حساب البريد الإلكتروني",
+        "google": "جوجل",
+        "facebook": "فيسبوك",
+        "github": "جيت هاب",
+        "firebase": "فايربيز",
+        "email": "البريد الإلكتروني"
+      }
+    },
+    "email": {
+      "title": "التحقق من البريد الإلكتروني",
+      "verificationStatus": "حالة التحقق",
+      "verified": "تم التحقق من البريد الإلكتروني",
+      "notVerified": "لم يتم التحقق من البريد الإلكتروني",
+      "pending": "قيد الانتظار",
+      "verificationDescription": "تحقق من بريدك الإلكتروني لتأمين حسابك وتلقي الإشعارات المهمة.",
+      "sendVerification": "إرسال بريد التحقق",
+      "resendVerification": "إعادة إرسال التحقق",
+      "securityInfo": "معلومات الأمان",
+      "cooldown": "انتظر {{seconds}}ث",
+      "benefits": {
+        "title": "فوائد التحقق",
+        "security": "أمان محسّن للحساب",
+        "recovery": "الوصول إلى استعادة كلمة المرور",
+        "notifications": "الإشعارات المهمة"
+      },
+      "troubleshooting": {
+        "title": "استكشاف الأخطاء",
+        "spam": "تحقق من مجلد الرسائل غير المرغوب فيها",
+        "address": "تحقق من عنوان البريد الإلكتروني",
+        "contact": "اتصل بالدعم إذا لزم الأمر"
+      }
+    },
+    "session": {
+      "title": "إدارة الجلسات",
+      "activeSessions": "الجلسات النشطة",
+      "current": "الحالي",
+      "activeNow": "نشط الآن",
+      "minutesAgo": "منذ {{minutes}} دقيقة",
+      "hoursAgo": "منذ {{hours}} ساعة",
+      "daysAgo": "منذ {{days}} يوم",
+      "sessionActions": "إجراءات الجلسة",
+      "logoutCurrent": "تسجيل الخروج من الجهاز الحالي",
+      "logoutCurrentDescription": "تسجيل الخروج من هذا الجهاز",
+      "logoutAll": "تسجيل الخروج من جميع الأجهزة",
+      "logoutAllDescription": "تسجيل الخروج من جميع الأجهزة",
+      "logout": "تسجيل الخروج",
+      "confirmLogoutAllTitle": "تسجيل الخروج من جميع الأجهزة",
+      "confirmLogoutAll": "هل أنت متأكد من تسجيل الخروج من جميع الأجهزة؟",
+      "logoutWarning": "تسجيل الخروج من جميع الأجهزة يتطلب منك تسجيل الدخول مرة أخرى على كل جهاز.",
+      "logoutAllWarning1": "سيتم تسجيل خروجك من جميع الأجهزة فوراً.",
+      "logoutAllWarning2": "ستحتاج إلى تسجيل الدخول مرة أخرى على كل جهاز لمواصلة استخدام حسابك.",
+      "logoutAllWarning3": "سيتم فقدان أي عمل غير محفوظ."
+    },
+    "upload": {
+      "progress": "تقدم الرفع: {{progress}}%",
+      "cancelled": "تم إلغاء الرفع",
+      "error": "فشل الرفع",
+      "file": "ملف"
+    },
+    "expandSidebar": "توسيع الشريط الجانبي"
+  },
+  "paymentMethods": {
+    "title": "إدارة طرق الدفع",
+    "subtitle": "إدارة طرق الدفع المتاحة في متجرك",
+    "totalMethods": "{{count}} طرق دفع",
+    "createMethod": "إنشاء طريقة دفع",
+    "noMethodsFound": "لم يتم العثور على طرق دفع",
+    "selectedCount": "{{count}} محدد",
+    "bulkActivate": "تفعيل",
+    "bulkDeactivate": "إلغاء التفعيل",
+    "filters": {
+      "searchPlaceholder": "البحث بالاسم...",
+      "statusFilter": "الحالة",
+      "allStatus": "كل الحالات"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "table": {
+      "id": "المعرف",
+      "name": "الاسم",
+      "phoneNumber": "رقم الهاتف",
+      "status": "الحالة",
+      "image": "الصورة",
+      "createdAt": "تاريخ الإنشاء"
+    },
+    "fields": {
+      "name": "الاسم",
+      "namePlaceholder": "مثال: فودافون كاش",
+      "nameDescription": "اسم طريقة الدفع الذي سيراه العملاء",
+      "phoneNumber": "رقم الهاتف",
+      "phoneNumberPlaceholder": "مثال: 01012345678",
+      "phoneDescription": "رقم الهاتف المرتبط بطريقة الدفع.",
+      "status": "الحالة",
+      "statusDescription": "تفعيل أو إلغاء تفعيل طريقة الدفع",
+      "image": "الصورة",
+      "imageOptional": "اترك فارغاً للاحتفاظ بالصورة الحالية",
+      "imageDescription": "ارفع صورة جديدة لاستبدال الصورة الحالية. المقاس الموصى به: 200×200 بكسل",
+      "currentImage": "الصورة الحالية",
+      "unchanged": "لم يتم تغيير الصورة",
+      "newImage": "صورة جديدة تم اختيارها"
+    },
+    "create": {
+      "title": "إنشاء طريقة دفع",
+      "description": "إضافة طريقة دفع جديدة لمتجرك.",
+      "submit": "إنشاء طريقة الدفع"
+    },
+    "edit": {
+      "title": "تعديل طريقة الدفع",
+      "description": "تحديث تفاصيل طريقة الدفع.",
+      "submit": "تحديث طريقة الدفع"
+    },
+    "delete": {
+      "title": "حذف طريقة الدفع",
+      "description": "لا يمكن التراجع عن هذا الإجراء.",
+      "warning": "هل أنت متأكد من حذف طريقة الدفع هذه؟ هذا الإجراء دائم ولا يمكن التراجع عنه.",
+      "methodName": "طريقة الدفع",
+      "consequences": "حذف طريقة الدفع هذه سيؤدي إلى:",
+      "consequence1": "إزالتها من خيارات الدفع المتاحة",
+      "consequence2": "التأثير على أي طلبات معلقة تستخدم هذه الطريقة",
+      "consequence3": "يتطلب من العملاء استخدام طرق دفع بديلة",
+      "confirm": "حذف طريقة الدفع"
+    },
+    "activate": "تفعيل",
+    "deactivate": "إلغاء التفعيل",
+    "creating": "جاري الإنشاء...",
+    "updating": "جاري التحديث...",
+    "deleting": "جاري الحذف...",
+    "uploading": "جاري الرفع...",
+    "image": {
+      "dragDrop": "اسحب وأفلت الصورة هنا",
+      "orClick": "أو انقر للاختيار",
+      "supportedFormats": "JPEG, PNG, WebP (الحد الأقصى 5 ميجابايت)",
+      "invalidType": "نوع الملف غير صالح. يرجى رفع صور JPEG, PNG, أو WebP.",
+      "tooLarge": "الملف كبير جداً. الحد الأقصى هو 5 ميجابايت.",
+      "uploading": "جاري الرفع..."
+    }
+  },
+  "requiredFields": {
+    "title": "إدارة الحقول المطلوبة",
+    "subtitle": "إدارة تعريفات الحقول القابلة لإعادة الاستخدام للمنتجات",
+    "totalFields": "{{count}} حقول",
+    "noFields": "لا توجد حقول مطلوبة",
+    "createField": "إنشاء حقل",
+    "fields": {
+      "label": "الاسم",
+      "fieldType": "نوع الحقل",
+      "active": "نشط",
+      "createdAt": "تاريخ الإنشاء"
+    },
+    "types": {
+      "text": "نص",
+      "number": "رقم",
+      "date": "تاريخ",
+      "image": "صورة"
+    },
+    "filters": {
+      "allStatuses": "كل الحالات",
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "create": {
+      "title": "إنشاء حقل مطلوب",
+      "description": "إضافة تعريف حقل قابل لإعادة الاستخدام.",
+      "labelPlaceholder": "أدخل اسم الحقل",
+      "fieldTypePlaceholder": "اختر نوع الحقل"
+    },
+    "edit": {
+      "title": "تعديل الحقل المطلوب",
+      "description": "تحديث تفاصيل تعريف الحقل.",
+      "labelPlaceholder": "أدخل اسم الحقل",
+      "fieldTypePlaceholder": "اختر نوع الحقل",
+      "activeDescription": "تفعيل أو إلغاء تفعيل تعريف الحقل هذا"
+    },
+    "delete": {
+      "title": "حذف الحقل المطلوب",
+      "description": "هل أنت متأكد من حذف الحقل \"{{label}}\"؟",
+      "warning": "لا يمكن التراجع عن هذا الإجراء.",
+      "warningDescription": "حذف هذا الحقل سيزيله من جميع المنتجات ولا يمكن استعادته.",
+      "confirm": "حذف الحقل"
+    },
+    "messages": {
+      "createSuccess": "تم إنشاء الحقل بنجاح",
+      "updateSuccess": "تم تحديث الحقل بنجاح",
+      "deleteSuccess": "تم حذف الحقل بنجاح"
+    }
   },
   "export": {
-    "export": "تصدير",
     "exporting": "جاري التصدير...",
-    "csvFormat": "تنسيق CSV",
-    "jsonFormat": "تنسيق JSON",
-    "exportFiltered": "تصدير المفلتر",
-    "exportAll": "تصدير الكل",
-    "successAll": "تم تصدير {{count}} مستخدم بنجاح",
-    "successFiltered": "تم تصدير {{count}} مستخدم مفلتر بنجاح",
-    "error": "فشل في تصدير المستخدمين. يرجى المحاولة مرة أخرى.",
-    "filterInfo": "المرشحات المطبقة:",
-    "of": "من",
-    "usersShown": "مستخدم معروض",
-    "name": "الاسم",
-    "email": "البريد الإلكتروني",
-    "phone": "رقم الهاتف",
-    "role": "الدور",
-    "status": "الحالة",
-    "government": "المحافظة",
-    "administrationZone": "المنطقة الإدارية",
-    "sequenceId": "الرقم التسلسلي",
-    "purchases": "المشتريات",
-    "joinedDate": "تاريخ الانضمام"
-  },
-
-  "noPhoneNumber": "لا يوجد رقم هاتف متاح",
-  "noUsers": "لم يتم العثور على مستخدمين",
-  "noUsersFiltered": "لا يوجد مستخدمين يطابقون المرشحات الحالية. جرب تعديل معايير البحث.",
-  "noUsersYet": "لم يسجل أي مستخدمين بعد. تحقق لاحقاً.",
-  "invites": {
-    "invite": "دعوة",
-    "invites": "دعوات"
-  },
-  "actions": {
-    "delete": "حذف",
-    "edit": "تعديل",
-    "cancel": "إلغاء",
-    "whatsapp": "إرسال رسالة واتساب"
+    "processing": "جاري معالجة الملف...",
+    "success": "تم تصدير الملف بنجاح"
   }
 }

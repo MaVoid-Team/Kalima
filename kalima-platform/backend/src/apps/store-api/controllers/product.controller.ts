@@ -10,8 +10,13 @@ import {
   AttachCategoriesDto,
   AttachRequiredFieldsDto,
   AddExternalVideoDto,
+  UpdateProductRequiredFieldDto,
 } from "../dtos/product.dto";
-import { ValidationError, BadRequestError, NotFoundError } from "../../../libs/errors";
+import {
+  ValidationError,
+  BadRequestError,
+  NotFoundError,
+} from "../../../libs/errors";
 
 // ============================================
 // HELPER
@@ -53,15 +58,13 @@ export const productController = {
     _next: NextFunction,
   ): Promise<void> {
     try {
-      // Parse category_ids from JSON string if sent via form-data
-      if (typeof req.body.category_ids === "string") {
-        try {
-          req.body.category_ids = JSON.parse(req.body.category_ids);
-        } catch {
-          throw new BadRequestError(
-            "category_ids must be a valid JSON array of integers",
-          );
+      // Parse category_id from string if sent via form-data
+      if (typeof req.body.category_id === "string") {
+        const parsed = parseInt(req.body.category_id, 10);
+        if (isNaN(parsed)) {
+          throw new BadRequestError("category_id must be a valid integer");
         }
+        req.body.category_id = parsed;
       }
 
       const dto = await validateDto(CreateProductDto, req.body);
@@ -105,7 +108,8 @@ export const productController = {
         limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 20,
       };
 
-      const result = await productService.getAllProducts(filters);
+      const userId = (req.user as any)?.userId;
+      const result = await productService.getAllProducts(userId, filters);
 
       res.status(200).json({
         success: true,
@@ -128,6 +132,7 @@ export const productController = {
       const id = parseInt(req.params.id as string, 10);
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
+      const userId = (req.user as any)?.userId;
       const product = await productService.getProductById(id);
 
       res.status(200).json({
@@ -153,9 +158,7 @@ export const productController = {
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
       const active =
-        req.query.active !== undefined
-          ? req.query.active === "true"
-          : true;
+        req.query.active !== undefined ? req.query.active === "true" : true;
 
       const coupons = await couponService.getCouponsByProduct(id, active);
 
@@ -180,7 +183,7 @@ export const productController = {
       const id = parseInt(req.params.id as string, 10);
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
-      const product = await productService.getProductById(id) as any;
+      const product = (await productService.getProductById(id)) as any;
 
       if (!product.thumbnail_image) {
         throw new NotFoundError("Thumbnail not found for this product");
@@ -197,6 +200,7 @@ export const productController = {
 
   /**
    * PATCH /products/:id
+   * Accepts JSON or multipart/form-data. If "sample" file is included, replaces existing sample.
    */
   async updateProduct(
     req: Request,
@@ -208,7 +212,10 @@ export const productController = {
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
       const dto = await validateDto(UpdateProductDto, req.body);
-      const product = await productService.updateProduct(id, dto);
+      const files = req.files as { sample?: Express.Multer.File[] } | undefined;
+      const sampleFile = files?.sample?.[0];
+
+      const product = await productService.updateProduct(id, dto, sampleFile);
 
       res.status(200).json({
         success: true,
@@ -268,6 +275,30 @@ export const productController = {
       res.status(200).json({
         success: true,
         message: "Thumbnail uploaded successfully",
+        data: product,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * DELETE /products/:id/sample
+   */
+  async removeSample(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const id = parseInt(req.params.id as string, 10);
+      if (isNaN(id)) throw new BadRequestError("Invalid product ID");
+
+      const product = await productService.removeSample(id);
+
+      res.status(200).json({
+        success: true,
+        message: "Sample removed successfully",
         data: product,
       });
     } catch (error) {
@@ -631,6 +662,38 @@ export const productController = {
         success: true,
         results: fields.length,
         data: fields,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * PATCH /products/:id/required-fields/:fieldDefinitionId
+   * Body: { is_required: boolean }
+   */
+  async updateRequiredField(req: Request, res: Response, _next: NextFunction) {
+    try {
+      const id = parseInt(req.params.id as string, 10);
+      const fieldDefinitionId = parseInt(
+        req.params.fieldDefinitionId as string,
+        10,
+      );
+
+      if (isNaN(id) || isNaN(fieldDefinitionId)) {
+        throw new BadRequestError("Invalid product ID or field definition ID");
+      }
+
+      const dto = await validateDto(UpdateProductRequiredFieldDto, req.body);
+      await productService.updateRequiredField(
+        id,
+        fieldDefinitionId,
+        dto.is_required,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Required field updated",
       });
     } catch (error) {
       _next(error);

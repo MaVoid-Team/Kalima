@@ -14,6 +14,8 @@ This file lists the current API documentation pages for the Store API (v2).
 - `SUBJECTS_API_DOCUMENTATION.md` — Subjects CRUD
 - `COUPON_API_DOCUMENTATION.md` — Coupon usage & admin endpoints
 - `REQUIRED_FIELDS_API_DOCUMENTATION.md` — Product-required checkout fields
+- `PRODUCT_SAMPLE_API_DOCUMENTATION.md` — Product sample files (read endpoints, creation via products)
+- `EXPORT_API_DOCUMENTATION.md` — CSV/XLSX export for all list resources
 
 Notes
 

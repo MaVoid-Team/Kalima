@@ -101,6 +101,52 @@ export interface CreateSampleInput {
   low_quality_url?: string;
 }
 
+const SAMPLE_LIST_SELECT = {
+  id: true,
+  media_type: true,
+  high_quality_url: true,
+  low_quality_url: true,
+  original_name: true,
+  mime_type: true,
+  size: true,
+  created_at: true,
+  products: {
+    select: {
+      id: true,
+      title: true,
+    },
+  },
+};
+
+interface SampleListFilters {
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+interface SampleResponse {
+  id: number;
+  media_type: sample_media_type_enum;
+  high_quality_url: string | null;
+  low_quality_url: string | null;
+  original_name: string;
+  mime_type: string;
+  size: number;
+  created_at: Date | null;
+  products: {
+    id: number;
+    title: string;
+  };
+  is_displayable?: boolean;
+}
+
+interface SampleListResponse {
+  data: SampleResponse[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 // ============================================
 // SAMPLE SERVICE
 // ============================================
@@ -239,6 +285,43 @@ class SampleService {
     }
 
     await this.db.sample_sections.delete({ where: { id } });
+  }
+
+  async getAllSamples(
+    filters?: SampleListFilters,
+  ): Promise<SampleListResponse> {
+    const page = filters?.page ?? 1;
+    const limit = filters?.limit ?? 20;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (filters?.search) {
+      where.OR = [
+        { original_name: { contains: filters.search, mode: "insensitive" } },
+        { products: { title: { contains: filters.search, mode: "insensitive" } } },
+      ];
+    }
+
+    const [data, total] = await Promise.all([
+      this.db.samples.findMany({
+        where,
+        select: SAMPLE_LIST_SELECT,
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.samples.count({ where }),
+    ]);
+
+    const enrichedData = data.map((sample: any) => this.enrichSample(sample));
+
+    return {
+      data: enrichedData,
+      total: total,
+      page,
+      limit,
+    };
   }
 
   // ============================================

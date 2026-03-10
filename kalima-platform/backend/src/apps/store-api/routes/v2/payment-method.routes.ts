@@ -3,13 +3,18 @@ import { paymentMethodController } from "../../controllers/payment-method.contro
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { uploadSingleImage } from "../../middleware/upload.middleware";
-
 import { role_enum } from "../../generated/prisma/client";
+import { makeExportHandler } from "../../export";
 
 const router = Router();
 
-// Public routes (or authenticated user routes, depending on requirements, but usually anyone checking out needs to see payment methods)
-// Using authenticateToken so only logged in users see it (adjust if it needs to be completely public)
+const adminAuth = [
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+];
+
+router.get("/export", ...adminAuth, makeExportHandler("payment-methods"));
+
 router.get(
   "/",
   authenticateToken,

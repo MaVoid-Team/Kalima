@@ -153,6 +153,11 @@ export type product_required_fields = Prisma.product_required_fieldsModel
  */
 export type products = Prisma.productsModel
 /**
+ * Model product_reviews
+ * 
+ */
+export type product_reviews = Prisma.product_reviewsModel
+/**
  * Model samples
  * 
  */

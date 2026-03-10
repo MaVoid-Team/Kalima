@@ -52,6 +52,7 @@ export type CartsMinAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
 }
 
 export type CartsMaxAggregateOutputType = {
@@ -64,6 +65,7 @@ export type CartsMaxAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
 }
 
 export type CartsCountAggregateOutputType = {
@@ -76,6 +78,7 @@ export type CartsCountAggregateOutputType = {
   created_at: number
   updated_at: number
   deleted_at: number
+  is_deleted: number
   _all: number
 }
 
@@ -106,6 +109,7 @@ export type CartsMinAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
 }
 
 export type CartsMaxAggregateInputType = {
@@ -118,6 +122,7 @@ export type CartsMaxAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
 }
 
 export type CartsCountAggregateInputType = {
@@ -130,6 +135,7 @@ export type CartsCountAggregateInputType = {
   created_at?: true
   updated_at?: true
   deleted_at?: true
+  is_deleted?: true
   _all?: true
 }
 
@@ -229,6 +235,7 @@ export type CartsGroupByOutputType = {
   created_at: Date | null
   updated_at: Date | null
   deleted_at: Date | null
+  is_deleted: boolean | null
   _count: CartsCountAggregateOutputType | null
   _avg: CartsAvgAggregateOutputType | null
   _sum: CartsSumAggregateOutputType | null
@@ -264,6 +271,7 @@ export type cartsWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"carts"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"carts"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"carts"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"carts"> | boolean | null
   cart_items?: Prisma.Cart_itemsListRelationFilter
   users?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
 }
@@ -278,6 +286,7 @@ export type cartsOrderByWithRelationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   cart_items?: Prisma.cart_itemsOrderByRelationAggregateInput
   users?: Prisma.usersOrderByWithRelationInput
 }
@@ -295,6 +304,7 @@ export type cartsWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeNullableFilter<"carts"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"carts"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"carts"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"carts"> | boolean | null
   cart_items?: Prisma.Cart_itemsListRelationFilter
   users?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
 }, "id">
@@ -309,6 +319,7 @@ export type cartsOrderByWithAggregationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.cartsCountOrderByAggregateInput
   _avg?: Prisma.cartsAvgOrderByAggregateInput
   _max?: Prisma.cartsMaxOrderByAggregateInput
@@ -329,6 +340,7 @@ export type cartsScalarWhereWithAggregatesInput = {
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"carts"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"carts"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"carts"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableWithAggregatesFilter<"carts"> | boolean | null
 }
 
 export type cartsCreateInput = {
@@ -339,6 +351,7 @@ export type cartsCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutCartsInput
   users: Prisma.usersCreateNestedOneWithoutCartsInput
 }
@@ -353,6 +366,7 @@ export type cartsUncheckedCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutCartsInput
 }
 
@@ -364,6 +378,7 @@ export type cartsUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   cart_items?: Prisma.cart_itemsUpdateManyWithoutCartsNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutCartsNestedInput
 }
@@ -378,6 +393,7 @@ export type cartsUncheckedUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutCartsNestedInput
 }
 
@@ -391,6 +407,7 @@ export type cartsCreateManyInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type cartsUpdateManyMutationInput = {
@@ -401,6 +418,7 @@ export type cartsUpdateManyMutationInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type cartsUncheckedUpdateManyInput = {
@@ -413,6 +431,7 @@ export type cartsUncheckedUpdateManyInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type CartsListRelationFilter = {
@@ -435,6 +454,7 @@ export type cartsCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type cartsAvgOrderByAggregateInput = {
@@ -455,6 +475,7 @@ export type cartsMaxOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type cartsMinOrderByAggregateInput = {
@@ -467,6 +488,7 @@ export type cartsMinOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrder
+  is_deleted?: Prisma.SortOrder
 }
 
 export type cartsSumOrderByAggregateInput = {
@@ -546,6 +568,7 @@ export type cartsCreateWithoutUsersInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutCartsInput
 }
 
@@ -558,6 +581,7 @@ export type cartsUncheckedCreateWithoutUsersInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutCartsInput
 }
 
@@ -600,6 +624,7 @@ export type cartsScalarWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"carts"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"carts"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"carts"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"carts"> | boolean | null
 }
 
 export type cartsCreateWithoutCart_itemsInput = {
@@ -610,6 +635,7 @@ export type cartsCreateWithoutCart_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
   users: Prisma.usersCreateNestedOneWithoutCartsInput
 }
 
@@ -623,6 +649,7 @@ export type cartsUncheckedCreateWithoutCart_itemsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type cartsCreateOrConnectWithoutCart_itemsInput = {
@@ -649,6 +676,7 @@ export type cartsUpdateWithoutCart_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   users?: Prisma.usersUpdateOneRequiredWithoutCartsNestedInput
 }
 
@@ -662,6 +690,7 @@ export type cartsUncheckedUpdateWithoutCart_itemsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type cartsCreateManyUsersInput = {
@@ -673,6 +702,7 @@ export type cartsCreateManyUsersInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  is_deleted?: boolean | null
 }
 
 export type cartsUpdateWithoutUsersInput = {
@@ -683,6 +713,7 @@ export type cartsUpdateWithoutUsersInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   cart_items?: Prisma.cart_itemsUpdateManyWithoutCartsNestedInput
 }
 
@@ -695,6 +726,7 @@ export type cartsUncheckedUpdateWithoutUsersInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutCartsNestedInput
 }
 
@@ -707,6 +739,7 @@ export type cartsUncheckedUpdateManyWithoutUsersInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 
@@ -750,6 +783,7 @@ export type cartsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   cart_items?: boolean | Prisma.carts$cart_itemsArgs<ExtArgs>
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.CartsCountOutputTypeDefaultArgs<ExtArgs>
@@ -765,6 +799,7 @@ export type cartsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["carts"]>
 
@@ -778,6 +813,7 @@ export type cartsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["carts"]>
 
@@ -791,9 +827,10 @@ export type cartsSelectScalar = {
   created_at?: boolean
   updated_at?: boolean
   deleted_at?: boolean
+  is_deleted?: boolean
 }
 
-export type cartsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "status" | "subtotal" | "discount" | "total" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["carts"]>
+export type cartsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "status" | "subtotal" | "discount" | "total" | "created_at" | "updated_at" | "deleted_at" | "is_deleted", ExtArgs["result"]["carts"]>
 export type cartsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cart_items?: boolean | Prisma.carts$cart_itemsArgs<ExtArgs>
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
@@ -822,6 +859,7 @@ export type $cartsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     created_at: Date | null
     updated_at: Date | null
     deleted_at: Date | null
+    is_deleted: boolean | null
   }, ExtArgs["result"]["carts"]>
   composites: {}
 }
@@ -1256,6 +1294,7 @@ export interface cartsFieldRefs {
   readonly created_at: Prisma.FieldRef<"carts", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"carts", 'DateTime'>
   readonly deleted_at: Prisma.FieldRef<"carts", 'DateTime'>
+  readonly is_deleted: Prisma.FieldRef<"carts", 'Boolean'>
 }
     
 
