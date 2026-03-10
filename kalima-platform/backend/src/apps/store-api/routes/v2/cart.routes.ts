@@ -2,6 +2,7 @@ import { Router } from "express";
 import { cartController } from "../../controllers/cart.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { uploadSingleImage } from "../../middleware/upload.middleware";
+import { requireConfirmed } from "../../middleware/requireConfirmed.middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/enums";
 
@@ -52,6 +53,7 @@ router.patch(
 router.get("/checkout/preview", cartController.getCheckoutPreview);
 router.post(
   "/checkout",
+  requireConfirmed,
   uploadSingleImage("paymentScreenshot"),
   cartController.checkout,
 );
@@ -83,6 +85,7 @@ router.get(
 );
 router.post(
   "/fast-buy/checkout",
+  requireConfirmed,
   uploadSingleImage("paymentScreenshot"),
   cartController.fastBuyCheckout,
 );

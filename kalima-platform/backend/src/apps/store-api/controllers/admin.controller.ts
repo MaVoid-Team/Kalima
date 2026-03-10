@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 import { userManagementService } from "../services/user-management.service";
+import { accountReviewService } from "../services/account-review.service";
 import {
   AssignRoleDto,
   RevokeRoleDto,
@@ -10,6 +11,7 @@ import {
   CreateSubAdminDto,
   CreateModeratorDto,
   CreateAssistantDto,
+  UpsertAccountReviewSettingsDto,
   CreateTeacherDto,
   CreateStudentDto,
   CreateParentDto,
@@ -570,6 +572,104 @@ export const adminController = {
           name: user.name,
           roles: user.user_roles,
         },
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  // ============================================
+  // ACCOUNT REVIEW
+  // ============================================
+
+  /**
+   * GET /admin/account-review-settings
+   */
+  async getAccountReviewSettings(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const settings = await accountReviewService.getAllSettings();
+      res.status(200).json({ success: true, data: settings });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * PUT /admin/account-review-settings
+   * Body: { settings: [{ role, requires_review }, ...] }
+   */
+  async upsertAccountReviewSettings(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const dto = await validateDto(UpsertAccountReviewSettingsDto, req.body);
+      const adminId = (req as any).user?.userId ?? (req as any).user?.id;
+
+      for (const entry of dto.settings) {
+        await accountReviewService.upsertSetting(
+          entry.role,
+          entry.requires_review,
+          adminId,
+        );
+      }
+
+      const settings = await accountReviewService.getAllSettings();
+      res.status(200).json({ success: true, data: settings });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * POST /admin/users/:userId/approve
+   */
+  async approveUser(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = parseInt(req.params.userId as string, 10);
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user ID");
+      }
+
+      const user = await accountReviewService.approveUser(userId);
+      res.status(200).json({
+        success: true,
+        message: "User approved",
+        data: user,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * POST /admin/users/:userId/reject
+   */
+  async rejectUser(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = parseInt(req.params.userId as string, 10);
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user ID");
+      }
+
+      const user = await accountReviewService.rejectUser(userId);
+      res.status(200).json({
+        success: true,
+        message: "User rejected",
+        data: user,
       });
     } catch (error) {
       _next(error);

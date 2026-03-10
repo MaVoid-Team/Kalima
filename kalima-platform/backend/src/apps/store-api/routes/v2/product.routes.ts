@@ -9,6 +9,7 @@ import { requireRole } from "../../middleware/requireRole.middleware";
 import {
   uploadSingleImage,
   uploadMultipleImages,
+  uploadGalleryVideo,
   uploadProductWithSample,
   uploadProductUpdate,
 } from "../../middleware/upload.middleware";
@@ -40,6 +41,7 @@ router.get("/:id", optionalAuthenticateToken, productController.getProductById);
 router.get("/:id/coupons", productController.getProductCoupons);
 router.get("/:id/thumbnail", productController.getThumbnail);
 router.get("/:id/gallery", productController.getGallery);
+router.get("/:id/gallery/full", productController.getFullGallery);
 router.get("/:id/required-fields", productController.getProductRequiredFields);
 
 // ============================================
@@ -75,7 +77,7 @@ router.delete(
 router.post(
   "/",
   ...adminAuth,
-  uploadProductWithSample,
+  uploadSingleImage("thumbnail"),
   productController.createProduct,
 );
 
@@ -134,6 +136,25 @@ router.delete(
   "/:id/gallery/:galleryId",
   ...adminAuth,
   productController.removeFromGallery,
+);
+
+router.post(
+  "/:id/gallery/videos",
+  ...adminAuth,
+  uploadGalleryVideo,
+  productController.addVideoToGallery,
+);
+
+router.post(
+  "/:id/gallery/videos/external",
+  ...adminAuth,
+  productController.addExternalVideoToGallery,
+);
+
+router.delete(
+  "/:id/gallery/videos/:videoId",
+  ...adminAuth,
+  productController.removeVideoFromGallery,
 );
 
 // ============================================

@@ -28,88 +28,116 @@ export type AggregateSamples = {
 
 export type SamplesAvgAggregateOutputType = {
   id: number | null
+  section_id: number | null
   product_id: number | null
   size: number | null
 }
 
 export type SamplesSumAggregateOutputType = {
   id: number | null
+  section_id: number | null
   product_id: number | null
   size: number | null
 }
 
 export type SamplesMinAggregateOutputType = {
   id: number | null
+  section_id: number | null
   product_id: number | null
-  url: string | null
+  media_type: $Enums.sample_media_type_enum | null
+  high_quality_url: string | null
+  low_quality_url: string | null
   original_name: string | null
   mime_type: string | null
   size: number | null
   created_at: Date | null
+  updated_at: Date | null
 }
 
 export type SamplesMaxAggregateOutputType = {
   id: number | null
+  section_id: number | null
   product_id: number | null
-  url: string | null
+  media_type: $Enums.sample_media_type_enum | null
+  high_quality_url: string | null
+  low_quality_url: string | null
   original_name: string | null
   mime_type: string | null
   size: number | null
   created_at: Date | null
+  updated_at: Date | null
 }
 
 export type SamplesCountAggregateOutputType = {
   id: number
+  section_id: number
   product_id: number
-  url: number
+  media_type: number
+  high_quality_url: number
+  low_quality_url: number
   original_name: number
   mime_type: number
   size: number
   created_at: number
+  updated_at: number
   _all: number
 }
 
 
 export type SamplesAvgAggregateInputType = {
   id?: true
+  section_id?: true
   product_id?: true
   size?: true
 }
 
 export type SamplesSumAggregateInputType = {
   id?: true
+  section_id?: true
   product_id?: true
   size?: true
 }
 
 export type SamplesMinAggregateInputType = {
   id?: true
+  section_id?: true
   product_id?: true
-  url?: true
+  media_type?: true
+  high_quality_url?: true
+  low_quality_url?: true
   original_name?: true
   mime_type?: true
   size?: true
   created_at?: true
+  updated_at?: true
 }
 
 export type SamplesMaxAggregateInputType = {
   id?: true
+  section_id?: true
   product_id?: true
-  url?: true
+  media_type?: true
+  high_quality_url?: true
+  low_quality_url?: true
   original_name?: true
   mime_type?: true
   size?: true
   created_at?: true
+  updated_at?: true
 }
 
 export type SamplesCountAggregateInputType = {
   id?: true
+  section_id?: true
   product_id?: true
-  url?: true
+  media_type?: true
+  high_quality_url?: true
+  low_quality_url?: true
   original_name?: true
   mime_type?: true
   size?: true
   created_at?: true
+  updated_at?: true
   _all?: true
 }
 
@@ -201,12 +229,16 @@ export type samplesGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 
 export type SamplesGroupByOutputType = {
   id: number
+  section_id: number
   product_id: number
-  url: string
+  media_type: $Enums.sample_media_type_enum
+  high_quality_url: string | null
+  low_quality_url: string | null
   original_name: string
   mime_type: string
   size: number
   created_at: Date | null
+  updated_at: Date | null
   _count: SamplesCountAggregateOutputType | null
   _avg: SamplesAvgAggregateOutputType | null
   _sum: SamplesSumAggregateOutputType | null
@@ -234,48 +266,67 @@ export type samplesWhereInput = {
   OR?: Prisma.samplesWhereInput[]
   NOT?: Prisma.samplesWhereInput | Prisma.samplesWhereInput[]
   id?: Prisma.IntFilter<"samples"> | number
+  section_id?: Prisma.IntFilter<"samples"> | number
   product_id?: Prisma.IntFilter<"samples"> | number
-  url?: Prisma.StringFilter<"samples"> | string
+  media_type?: Prisma.Enumsample_media_type_enumFilter<"samples"> | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
+  low_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
   original_name?: Prisma.StringFilter<"samples"> | string
   mime_type?: Prisma.StringFilter<"samples"> | string
   size?: Prisma.IntFilter<"samples"> | number
   created_at?: Prisma.DateTimeNullableFilter<"samples"> | Date | string | null
+  updated_at?: Prisma.DateTimeNullableFilter<"samples"> | Date | string | null
+  sample_sections?: Prisma.XOR<Prisma.Sample_sectionsScalarRelationFilter, Prisma.sample_sectionsWhereInput>
   products?: Prisma.XOR<Prisma.ProductsScalarRelationFilter, Prisma.productsWhereInput>
 }
 
 export type samplesOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
-  url?: Prisma.SortOrder
+  media_type?: Prisma.SortOrder
+  high_quality_url?: Prisma.SortOrderInput | Prisma.SortOrder
+  low_quality_url?: Prisma.SortOrderInput | Prisma.SortOrder
   original_name?: Prisma.SortOrder
   mime_type?: Prisma.SortOrder
   size?: Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  sample_sections?: Prisma.sample_sectionsOrderByWithRelationInput
   products?: Prisma.productsOrderByWithRelationInput
 }
 
 export type samplesWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  product_id?: number
   AND?: Prisma.samplesWhereInput | Prisma.samplesWhereInput[]
   OR?: Prisma.samplesWhereInput[]
   NOT?: Prisma.samplesWhereInput | Prisma.samplesWhereInput[]
-  url?: Prisma.StringFilter<"samples"> | string
+  section_id?: Prisma.IntFilter<"samples"> | number
+  product_id?: Prisma.IntFilter<"samples"> | number
+  media_type?: Prisma.Enumsample_media_type_enumFilter<"samples"> | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
+  low_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
   original_name?: Prisma.StringFilter<"samples"> | string
   mime_type?: Prisma.StringFilter<"samples"> | string
   size?: Prisma.IntFilter<"samples"> | number
   created_at?: Prisma.DateTimeNullableFilter<"samples"> | Date | string | null
+  updated_at?: Prisma.DateTimeNullableFilter<"samples"> | Date | string | null
+  sample_sections?: Prisma.XOR<Prisma.Sample_sectionsScalarRelationFilter, Prisma.sample_sectionsWhereInput>
   products?: Prisma.XOR<Prisma.ProductsScalarRelationFilter, Prisma.productsWhereInput>
-}, "id" | "product_id">
+}, "id">
 
 export type samplesOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
-  url?: Prisma.SortOrder
+  media_type?: Prisma.SortOrder
+  high_quality_url?: Prisma.SortOrderInput | Prisma.SortOrder
+  low_quality_url?: Prisma.SortOrderInput | Prisma.SortOrder
   original_name?: Prisma.SortOrder
   mime_type?: Prisma.SortOrder
   size?: Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.samplesCountOrderByAggregateInput
   _avg?: Prisma.samplesAvgOrderByAggregateInput
   _max?: Prisma.samplesMaxOrderByAggregateInput
@@ -288,174 +339,288 @@ export type samplesScalarWhereWithAggregatesInput = {
   OR?: Prisma.samplesScalarWhereWithAggregatesInput[]
   NOT?: Prisma.samplesScalarWhereWithAggregatesInput | Prisma.samplesScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"samples"> | number
+  section_id?: Prisma.IntWithAggregatesFilter<"samples"> | number
   product_id?: Prisma.IntWithAggregatesFilter<"samples"> | number
-  url?: Prisma.StringWithAggregatesFilter<"samples"> | string
+  media_type?: Prisma.Enumsample_media_type_enumWithAggregatesFilter<"samples"> | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.StringNullableWithAggregatesFilter<"samples"> | string | null
+  low_quality_url?: Prisma.StringNullableWithAggregatesFilter<"samples"> | string | null
   original_name?: Prisma.StringWithAggregatesFilter<"samples"> | string
   mime_type?: Prisma.StringWithAggregatesFilter<"samples"> | string
   size?: Prisma.IntWithAggregatesFilter<"samples"> | number
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"samples"> | Date | string | null
+  updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"samples"> | Date | string | null
 }
 
 export type samplesCreateInput = {
-  url: string
+  media_type: $Enums.sample_media_type_enum
+  high_quality_url?: string | null
+  low_quality_url?: string | null
   original_name: string
   mime_type: string
   size: number
   created_at?: Date | string | null
+  updated_at?: Date | string | null
+  sample_sections: Prisma.sample_sectionsCreateNestedOneWithoutSamplesInput
   products: Prisma.productsCreateNestedOneWithoutSamplesInput
 }
 
 export type samplesUncheckedCreateInput = {
   id?: number
+  section_id: number
   product_id: number
-  url: string
+  media_type: $Enums.sample_media_type_enum
+  high_quality_url?: string | null
+  low_quality_url?: string | null
   original_name: string
   mime_type: string
   size: number
   created_at?: Date | string | null
+  updated_at?: Date | string | null
 }
 
 export type samplesUpdateInput = {
-  url?: Prisma.StringFieldUpdateOperationsInput | string
+  media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   original_name?: Prisma.StringFieldUpdateOperationsInput | string
   mime_type?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sample_sections?: Prisma.sample_sectionsUpdateOneRequiredWithoutSamplesNestedInput
   products?: Prisma.productsUpdateOneRequiredWithoutSamplesNestedInput
 }
 
 export type samplesUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  section_id?: Prisma.IntFieldUpdateOperationsInput | number
   product_id?: Prisma.IntFieldUpdateOperationsInput | number
-  url?: Prisma.StringFieldUpdateOperationsInput | string
+  media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   original_name?: Prisma.StringFieldUpdateOperationsInput | string
   mime_type?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type samplesCreateManyInput = {
   id?: number
+  section_id: number
   product_id: number
-  url: string
+  media_type: $Enums.sample_media_type_enum
+  high_quality_url?: string | null
+  low_quality_url?: string | null
   original_name: string
   mime_type: string
   size: number
   created_at?: Date | string | null
+  updated_at?: Date | string | null
 }
 
 export type samplesUpdateManyMutationInput = {
-  url?: Prisma.StringFieldUpdateOperationsInput | string
+  media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   original_name?: Prisma.StringFieldUpdateOperationsInput | string
   mime_type?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type samplesUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  section_id?: Prisma.IntFieldUpdateOperationsInput | number
   product_id?: Prisma.IntFieldUpdateOperationsInput | number
-  url?: Prisma.StringFieldUpdateOperationsInput | string
+  media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   original_name?: Prisma.StringFieldUpdateOperationsInput | string
   mime_type?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
-export type SamplesNullableScalarRelationFilter = {
-  is?: Prisma.samplesWhereInput | null
-  isNot?: Prisma.samplesWhereInput | null
+export type SamplesListRelationFilter = {
+  every?: Prisma.samplesWhereInput
+  some?: Prisma.samplesWhereInput
+  none?: Prisma.samplesWhereInput
+}
+
+export type samplesOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type samplesCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
-  url?: Prisma.SortOrder
+  media_type?: Prisma.SortOrder
+  high_quality_url?: Prisma.SortOrder
+  low_quality_url?: Prisma.SortOrder
   original_name?: Prisma.SortOrder
   mime_type?: Prisma.SortOrder
   size?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type samplesAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
   size?: Prisma.SortOrder
 }
 
 export type samplesMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
-  url?: Prisma.SortOrder
+  media_type?: Prisma.SortOrder
+  high_quality_url?: Prisma.SortOrder
+  low_quality_url?: Prisma.SortOrder
   original_name?: Prisma.SortOrder
   mime_type?: Prisma.SortOrder
   size?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type samplesMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
-  url?: Prisma.SortOrder
+  media_type?: Prisma.SortOrder
+  high_quality_url?: Prisma.SortOrder
+  low_quality_url?: Prisma.SortOrder
   original_name?: Prisma.SortOrder
   mime_type?: Prisma.SortOrder
   size?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type samplesSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
   size?: Prisma.SortOrder
 }
 
-export type samplesCreateNestedOneWithoutProductsInput = {
-  create?: Prisma.XOR<Prisma.samplesCreateWithoutProductsInput, Prisma.samplesUncheckedCreateWithoutProductsInput>
-  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutProductsInput
-  connect?: Prisma.samplesWhereUniqueInput
+export type samplesCreateNestedManyWithoutProductsInput = {
+  create?: Prisma.XOR<Prisma.samplesCreateWithoutProductsInput, Prisma.samplesUncheckedCreateWithoutProductsInput> | Prisma.samplesCreateWithoutProductsInput[] | Prisma.samplesUncheckedCreateWithoutProductsInput[]
+  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutProductsInput | Prisma.samplesCreateOrConnectWithoutProductsInput[]
+  createMany?: Prisma.samplesCreateManyProductsInputEnvelope
+  connect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
 }
 
-export type samplesUncheckedCreateNestedOneWithoutProductsInput = {
-  create?: Prisma.XOR<Prisma.samplesCreateWithoutProductsInput, Prisma.samplesUncheckedCreateWithoutProductsInput>
-  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutProductsInput
-  connect?: Prisma.samplesWhereUniqueInput
+export type samplesUncheckedCreateNestedManyWithoutProductsInput = {
+  create?: Prisma.XOR<Prisma.samplesCreateWithoutProductsInput, Prisma.samplesUncheckedCreateWithoutProductsInput> | Prisma.samplesCreateWithoutProductsInput[] | Prisma.samplesUncheckedCreateWithoutProductsInput[]
+  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutProductsInput | Prisma.samplesCreateOrConnectWithoutProductsInput[]
+  createMany?: Prisma.samplesCreateManyProductsInputEnvelope
+  connect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
 }
 
-export type samplesUpdateOneWithoutProductsNestedInput = {
-  create?: Prisma.XOR<Prisma.samplesCreateWithoutProductsInput, Prisma.samplesUncheckedCreateWithoutProductsInput>
-  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutProductsInput
-  upsert?: Prisma.samplesUpsertWithoutProductsInput
-  disconnect?: Prisma.samplesWhereInput | boolean
-  delete?: Prisma.samplesWhereInput | boolean
-  connect?: Prisma.samplesWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.samplesUpdateToOneWithWhereWithoutProductsInput, Prisma.samplesUpdateWithoutProductsInput>, Prisma.samplesUncheckedUpdateWithoutProductsInput>
+export type samplesUpdateManyWithoutProductsNestedInput = {
+  create?: Prisma.XOR<Prisma.samplesCreateWithoutProductsInput, Prisma.samplesUncheckedCreateWithoutProductsInput> | Prisma.samplesCreateWithoutProductsInput[] | Prisma.samplesUncheckedCreateWithoutProductsInput[]
+  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutProductsInput | Prisma.samplesCreateOrConnectWithoutProductsInput[]
+  upsert?: Prisma.samplesUpsertWithWhereUniqueWithoutProductsInput | Prisma.samplesUpsertWithWhereUniqueWithoutProductsInput[]
+  createMany?: Prisma.samplesCreateManyProductsInputEnvelope
+  set?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  disconnect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  delete?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  connect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  update?: Prisma.samplesUpdateWithWhereUniqueWithoutProductsInput | Prisma.samplesUpdateWithWhereUniqueWithoutProductsInput[]
+  updateMany?: Prisma.samplesUpdateManyWithWhereWithoutProductsInput | Prisma.samplesUpdateManyWithWhereWithoutProductsInput[]
+  deleteMany?: Prisma.samplesScalarWhereInput | Prisma.samplesScalarWhereInput[]
 }
 
-export type samplesUncheckedUpdateOneWithoutProductsNestedInput = {
-  create?: Prisma.XOR<Prisma.samplesCreateWithoutProductsInput, Prisma.samplesUncheckedCreateWithoutProductsInput>
-  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutProductsInput
-  upsert?: Prisma.samplesUpsertWithoutProductsInput
-  disconnect?: Prisma.samplesWhereInput | boolean
-  delete?: Prisma.samplesWhereInput | boolean
-  connect?: Prisma.samplesWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.samplesUpdateToOneWithWhereWithoutProductsInput, Prisma.samplesUpdateWithoutProductsInput>, Prisma.samplesUncheckedUpdateWithoutProductsInput>
+export type samplesUncheckedUpdateManyWithoutProductsNestedInput = {
+  create?: Prisma.XOR<Prisma.samplesCreateWithoutProductsInput, Prisma.samplesUncheckedCreateWithoutProductsInput> | Prisma.samplesCreateWithoutProductsInput[] | Prisma.samplesUncheckedCreateWithoutProductsInput[]
+  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutProductsInput | Prisma.samplesCreateOrConnectWithoutProductsInput[]
+  upsert?: Prisma.samplesUpsertWithWhereUniqueWithoutProductsInput | Prisma.samplesUpsertWithWhereUniqueWithoutProductsInput[]
+  createMany?: Prisma.samplesCreateManyProductsInputEnvelope
+  set?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  disconnect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  delete?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  connect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  update?: Prisma.samplesUpdateWithWhereUniqueWithoutProductsInput | Prisma.samplesUpdateWithWhereUniqueWithoutProductsInput[]
+  updateMany?: Prisma.samplesUpdateManyWithWhereWithoutProductsInput | Prisma.samplesUpdateManyWithWhereWithoutProductsInput[]
+  deleteMany?: Prisma.samplesScalarWhereInput | Prisma.samplesScalarWhereInput[]
+}
+
+export type Enumsample_media_type_enumFieldUpdateOperationsInput = {
+  set?: $Enums.sample_media_type_enum
+}
+
+export type samplesCreateNestedManyWithoutSample_sectionsInput = {
+  create?: Prisma.XOR<Prisma.samplesCreateWithoutSample_sectionsInput, Prisma.samplesUncheckedCreateWithoutSample_sectionsInput> | Prisma.samplesCreateWithoutSample_sectionsInput[] | Prisma.samplesUncheckedCreateWithoutSample_sectionsInput[]
+  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutSample_sectionsInput | Prisma.samplesCreateOrConnectWithoutSample_sectionsInput[]
+  createMany?: Prisma.samplesCreateManySample_sectionsInputEnvelope
+  connect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+}
+
+export type samplesUncheckedCreateNestedManyWithoutSample_sectionsInput = {
+  create?: Prisma.XOR<Prisma.samplesCreateWithoutSample_sectionsInput, Prisma.samplesUncheckedCreateWithoutSample_sectionsInput> | Prisma.samplesCreateWithoutSample_sectionsInput[] | Prisma.samplesUncheckedCreateWithoutSample_sectionsInput[]
+  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutSample_sectionsInput | Prisma.samplesCreateOrConnectWithoutSample_sectionsInput[]
+  createMany?: Prisma.samplesCreateManySample_sectionsInputEnvelope
+  connect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+}
+
+export type samplesUpdateManyWithoutSample_sectionsNestedInput = {
+  create?: Prisma.XOR<Prisma.samplesCreateWithoutSample_sectionsInput, Prisma.samplesUncheckedCreateWithoutSample_sectionsInput> | Prisma.samplesCreateWithoutSample_sectionsInput[] | Prisma.samplesUncheckedCreateWithoutSample_sectionsInput[]
+  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutSample_sectionsInput | Prisma.samplesCreateOrConnectWithoutSample_sectionsInput[]
+  upsert?: Prisma.samplesUpsertWithWhereUniqueWithoutSample_sectionsInput | Prisma.samplesUpsertWithWhereUniqueWithoutSample_sectionsInput[]
+  createMany?: Prisma.samplesCreateManySample_sectionsInputEnvelope
+  set?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  disconnect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  delete?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  connect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  update?: Prisma.samplesUpdateWithWhereUniqueWithoutSample_sectionsInput | Prisma.samplesUpdateWithWhereUniqueWithoutSample_sectionsInput[]
+  updateMany?: Prisma.samplesUpdateManyWithWhereWithoutSample_sectionsInput | Prisma.samplesUpdateManyWithWhereWithoutSample_sectionsInput[]
+  deleteMany?: Prisma.samplesScalarWhereInput | Prisma.samplesScalarWhereInput[]
+}
+
+export type samplesUncheckedUpdateManyWithoutSample_sectionsNestedInput = {
+  create?: Prisma.XOR<Prisma.samplesCreateWithoutSample_sectionsInput, Prisma.samplesUncheckedCreateWithoutSample_sectionsInput> | Prisma.samplesCreateWithoutSample_sectionsInput[] | Prisma.samplesUncheckedCreateWithoutSample_sectionsInput[]
+  connectOrCreate?: Prisma.samplesCreateOrConnectWithoutSample_sectionsInput | Prisma.samplesCreateOrConnectWithoutSample_sectionsInput[]
+  upsert?: Prisma.samplesUpsertWithWhereUniqueWithoutSample_sectionsInput | Prisma.samplesUpsertWithWhereUniqueWithoutSample_sectionsInput[]
+  createMany?: Prisma.samplesCreateManySample_sectionsInputEnvelope
+  set?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  disconnect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  delete?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  connect?: Prisma.samplesWhereUniqueInput | Prisma.samplesWhereUniqueInput[]
+  update?: Prisma.samplesUpdateWithWhereUniqueWithoutSample_sectionsInput | Prisma.samplesUpdateWithWhereUniqueWithoutSample_sectionsInput[]
+  updateMany?: Prisma.samplesUpdateManyWithWhereWithoutSample_sectionsInput | Prisma.samplesUpdateManyWithWhereWithoutSample_sectionsInput[]
+  deleteMany?: Prisma.samplesScalarWhereInput | Prisma.samplesScalarWhereInput[]
 }
 
 export type samplesCreateWithoutProductsInput = {
-  url: string
+  media_type: $Enums.sample_media_type_enum
+  high_quality_url?: string | null
+  low_quality_url?: string | null
   original_name: string
   mime_type: string
   size: number
   created_at?: Date | string | null
+  updated_at?: Date | string | null
+  sample_sections: Prisma.sample_sectionsCreateNestedOneWithoutSamplesInput
 }
 
 export type samplesUncheckedCreateWithoutProductsInput = {
   id?: number
-  url: string
+  section_id: number
+  media_type: $Enums.sample_media_type_enum
+  high_quality_url?: string | null
+  low_quality_url?: string | null
   original_name: string
   mime_type: string
   size: number
   created_at?: Date | string | null
+  updated_at?: Date | string | null
 }
 
 export type samplesCreateOrConnectWithoutProductsInput = {
@@ -463,103 +628,293 @@ export type samplesCreateOrConnectWithoutProductsInput = {
   create: Prisma.XOR<Prisma.samplesCreateWithoutProductsInput, Prisma.samplesUncheckedCreateWithoutProductsInput>
 }
 
-export type samplesUpsertWithoutProductsInput = {
-  update: Prisma.XOR<Prisma.samplesUpdateWithoutProductsInput, Prisma.samplesUncheckedUpdateWithoutProductsInput>
-  create: Prisma.XOR<Prisma.samplesCreateWithoutProductsInput, Prisma.samplesUncheckedCreateWithoutProductsInput>
-  where?: Prisma.samplesWhereInput
+export type samplesCreateManyProductsInputEnvelope = {
+  data: Prisma.samplesCreateManyProductsInput | Prisma.samplesCreateManyProductsInput[]
+  skipDuplicates?: boolean
 }
 
-export type samplesUpdateToOneWithWhereWithoutProductsInput = {
-  where?: Prisma.samplesWhereInput
+export type samplesUpsertWithWhereUniqueWithoutProductsInput = {
+  where: Prisma.samplesWhereUniqueInput
+  update: Prisma.XOR<Prisma.samplesUpdateWithoutProductsInput, Prisma.samplesUncheckedUpdateWithoutProductsInput>
+  create: Prisma.XOR<Prisma.samplesCreateWithoutProductsInput, Prisma.samplesUncheckedCreateWithoutProductsInput>
+}
+
+export type samplesUpdateWithWhereUniqueWithoutProductsInput = {
+  where: Prisma.samplesWhereUniqueInput
   data: Prisma.XOR<Prisma.samplesUpdateWithoutProductsInput, Prisma.samplesUncheckedUpdateWithoutProductsInput>
 }
 
+export type samplesUpdateManyWithWhereWithoutProductsInput = {
+  where: Prisma.samplesScalarWhereInput
+  data: Prisma.XOR<Prisma.samplesUpdateManyMutationInput, Prisma.samplesUncheckedUpdateManyWithoutProductsInput>
+}
+
+export type samplesScalarWhereInput = {
+  AND?: Prisma.samplesScalarWhereInput | Prisma.samplesScalarWhereInput[]
+  OR?: Prisma.samplesScalarWhereInput[]
+  NOT?: Prisma.samplesScalarWhereInput | Prisma.samplesScalarWhereInput[]
+  id?: Prisma.IntFilter<"samples"> | number
+  section_id?: Prisma.IntFilter<"samples"> | number
+  product_id?: Prisma.IntFilter<"samples"> | number
+  media_type?: Prisma.Enumsample_media_type_enumFilter<"samples"> | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
+  low_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
+  original_name?: Prisma.StringFilter<"samples"> | string
+  mime_type?: Prisma.StringFilter<"samples"> | string
+  size?: Prisma.IntFilter<"samples"> | number
+  created_at?: Prisma.DateTimeNullableFilter<"samples"> | Date | string | null
+  updated_at?: Prisma.DateTimeNullableFilter<"samples"> | Date | string | null
+}
+
+export type samplesCreateWithoutSample_sectionsInput = {
+  media_type: $Enums.sample_media_type_enum
+  high_quality_url?: string | null
+  low_quality_url?: string | null
+  original_name: string
+  mime_type: string
+  size: number
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  products: Prisma.productsCreateNestedOneWithoutSamplesInput
+}
+
+export type samplesUncheckedCreateWithoutSample_sectionsInput = {
+  id?: number
+  product_id: number
+  media_type: $Enums.sample_media_type_enum
+  high_quality_url?: string | null
+  low_quality_url?: string | null
+  original_name: string
+  mime_type: string
+  size: number
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+}
+
+export type samplesCreateOrConnectWithoutSample_sectionsInput = {
+  where: Prisma.samplesWhereUniqueInput
+  create: Prisma.XOR<Prisma.samplesCreateWithoutSample_sectionsInput, Prisma.samplesUncheckedCreateWithoutSample_sectionsInput>
+}
+
+export type samplesCreateManySample_sectionsInputEnvelope = {
+  data: Prisma.samplesCreateManySample_sectionsInput | Prisma.samplesCreateManySample_sectionsInput[]
+  skipDuplicates?: boolean
+}
+
+export type samplesUpsertWithWhereUniqueWithoutSample_sectionsInput = {
+  where: Prisma.samplesWhereUniqueInput
+  update: Prisma.XOR<Prisma.samplesUpdateWithoutSample_sectionsInput, Prisma.samplesUncheckedUpdateWithoutSample_sectionsInput>
+  create: Prisma.XOR<Prisma.samplesCreateWithoutSample_sectionsInput, Prisma.samplesUncheckedCreateWithoutSample_sectionsInput>
+}
+
+export type samplesUpdateWithWhereUniqueWithoutSample_sectionsInput = {
+  where: Prisma.samplesWhereUniqueInput
+  data: Prisma.XOR<Prisma.samplesUpdateWithoutSample_sectionsInput, Prisma.samplesUncheckedUpdateWithoutSample_sectionsInput>
+}
+
+export type samplesUpdateManyWithWhereWithoutSample_sectionsInput = {
+  where: Prisma.samplesScalarWhereInput
+  data: Prisma.XOR<Prisma.samplesUpdateManyMutationInput, Prisma.samplesUncheckedUpdateManyWithoutSample_sectionsInput>
+}
+
+export type samplesCreateManyProductsInput = {
+  id?: number
+  section_id: number
+  media_type: $Enums.sample_media_type_enum
+  high_quality_url?: string | null
+  low_quality_url?: string | null
+  original_name: string
+  mime_type: string
+  size: number
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+}
+
 export type samplesUpdateWithoutProductsInput = {
-  url?: Prisma.StringFieldUpdateOperationsInput | string
+  media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   original_name?: Prisma.StringFieldUpdateOperationsInput | string
   mime_type?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sample_sections?: Prisma.sample_sectionsUpdateOneRequiredWithoutSamplesNestedInput
 }
 
 export type samplesUncheckedUpdateWithoutProductsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  url?: Prisma.StringFieldUpdateOperationsInput | string
+  section_id?: Prisma.IntFieldUpdateOperationsInput | number
+  media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   original_name?: Prisma.StringFieldUpdateOperationsInput | string
   mime_type?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type samplesUncheckedUpdateManyWithoutProductsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  section_id?: Prisma.IntFieldUpdateOperationsInput | number
+  media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  original_name?: Prisma.StringFieldUpdateOperationsInput | string
+  mime_type?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type samplesCreateManySample_sectionsInput = {
+  id?: number
+  product_id: number
+  media_type: $Enums.sample_media_type_enum
+  high_quality_url?: string | null
+  low_quality_url?: string | null
+  original_name: string
+  mime_type: string
+  size: number
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+}
+
+export type samplesUpdateWithoutSample_sectionsInput = {
+  media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  original_name?: Prisma.StringFieldUpdateOperationsInput | string
+  mime_type?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  products?: Prisma.productsUpdateOneRequiredWithoutSamplesNestedInput
+}
+
+export type samplesUncheckedUpdateWithoutSample_sectionsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  product_id?: Prisma.IntFieldUpdateOperationsInput | number
+  media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  original_name?: Prisma.StringFieldUpdateOperationsInput | string
+  mime_type?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type samplesUncheckedUpdateManyWithoutSample_sectionsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  product_id?: Prisma.IntFieldUpdateOperationsInput | number
+  media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
+  high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  original_name?: Prisma.StringFieldUpdateOperationsInput | string
+  mime_type?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
 
 export type samplesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  section_id?: boolean
   product_id?: boolean
-  url?: boolean
+  media_type?: boolean
+  high_quality_url?: boolean
+  low_quality_url?: boolean
   original_name?: boolean
   mime_type?: boolean
   size?: boolean
   created_at?: boolean
+  updated_at?: boolean
+  sample_sections?: boolean | Prisma.sample_sectionsDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["samples"]>
 
 export type samplesSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  section_id?: boolean
   product_id?: boolean
-  url?: boolean
+  media_type?: boolean
+  high_quality_url?: boolean
+  low_quality_url?: boolean
   original_name?: boolean
   mime_type?: boolean
   size?: boolean
   created_at?: boolean
+  updated_at?: boolean
+  sample_sections?: boolean | Prisma.sample_sectionsDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["samples"]>
 
 export type samplesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  section_id?: boolean
   product_id?: boolean
-  url?: boolean
+  media_type?: boolean
+  high_quality_url?: boolean
+  low_quality_url?: boolean
   original_name?: boolean
   mime_type?: boolean
   size?: boolean
   created_at?: boolean
+  updated_at?: boolean
+  sample_sections?: boolean | Prisma.sample_sectionsDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["samples"]>
 
 export type samplesSelectScalar = {
   id?: boolean
+  section_id?: boolean
   product_id?: boolean
-  url?: boolean
+  media_type?: boolean
+  high_quality_url?: boolean
+  low_quality_url?: boolean
   original_name?: boolean
   mime_type?: boolean
   size?: boolean
   created_at?: boolean
+  updated_at?: boolean
 }
 
-export type samplesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "product_id" | "url" | "original_name" | "mime_type" | "size" | "created_at", ExtArgs["result"]["samples"]>
+export type samplesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "section_id" | "product_id" | "media_type" | "high_quality_url" | "low_quality_url" | "original_name" | "mime_type" | "size" | "created_at" | "updated_at", ExtArgs["result"]["samples"]>
 export type samplesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  sample_sections?: boolean | Prisma.sample_sectionsDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
 }
 export type samplesIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  sample_sections?: boolean | Prisma.sample_sectionsDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
 }
 export type samplesIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  sample_sections?: boolean | Prisma.sample_sectionsDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
 }
 
 export type $samplesPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "samples"
   objects: {
+    sample_sections: Prisma.$sample_sectionsPayload<ExtArgs>
     products: Prisma.$productsPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
+    section_id: number
     product_id: number
-    url: string
+    media_type: $Enums.sample_media_type_enum
+    high_quality_url: string | null
+    low_quality_url: string | null
     original_name: string
     mime_type: string
     size: number
     created_at: Date | null
+    updated_at: Date | null
   }, ExtArgs["result"]["samples"]>
   composites: {}
 }
@@ -954,6 +1309,7 @@ readonly fields: samplesFieldRefs;
  */
 export interface Prisma__samplesClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  sample_sections<T extends Prisma.sample_sectionsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.sample_sectionsDefaultArgs<ExtArgs>>): Prisma.Prisma__sample_sectionsClient<runtime.Types.Result.GetResult<Prisma.$sample_sectionsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   products<T extends Prisma.productsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.productsDefaultArgs<ExtArgs>>): Prisma.Prisma__productsClient<runtime.Types.Result.GetResult<Prisma.$productsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -985,12 +1341,16 @@ export interface Prisma__samplesClient<T, Null = never, ExtArgs extends runtime.
  */
 export interface samplesFieldRefs {
   readonly id: Prisma.FieldRef<"samples", 'Int'>
+  readonly section_id: Prisma.FieldRef<"samples", 'Int'>
   readonly product_id: Prisma.FieldRef<"samples", 'Int'>
-  readonly url: Prisma.FieldRef<"samples", 'String'>
+  readonly media_type: Prisma.FieldRef<"samples", 'sample_media_type_enum'>
+  readonly high_quality_url: Prisma.FieldRef<"samples", 'String'>
+  readonly low_quality_url: Prisma.FieldRef<"samples", 'String'>
   readonly original_name: Prisma.FieldRef<"samples", 'String'>
   readonly mime_type: Prisma.FieldRef<"samples", 'String'>
   readonly size: Prisma.FieldRef<"samples", 'Int'>
   readonly created_at: Prisma.FieldRef<"samples", 'DateTime'>
+  readonly updated_at: Prisma.FieldRef<"samples", 'DateTime'>
 }
     
 
