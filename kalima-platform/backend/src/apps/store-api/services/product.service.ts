@@ -23,7 +23,7 @@ import {
   ConflictError,
 } from "../../../libs/errors";
 import { reviewService } from "./review.service";
-import { sampleService } from "./sample.service";
+import { sampleService as defaultSampleService } from "./sample.service";
 
 // ============================================
 // SHARED INCLUDES
@@ -103,7 +103,7 @@ const PRODUCT_INCLUDE = {
 class ProductService {
   constructor(
     private db: PrismaClient = prisma,
-    private sampleService = sampleService,
+    private sampleService = defaultSampleService,
   ) {}
 
   // ============================================
@@ -181,7 +181,7 @@ class ProductService {
 
     // Attach sample if provided
     if (sampleFile && dto.sample_section_id) {
-      await sampleService.createSample(
+      await this.sampleService.createSample(
         dto.sample_section_id,
         product.id,
         sampleFile,
@@ -323,10 +323,10 @@ class ProductService {
     if (sampleFile && dto.sample_section_id) {
       if (product.samples && product.samples.length > 0) {
         for (const sample of product.samples) {
-          await sampleService.deleteSample(sample.id);
+          await this.sampleService.deleteSample(sample.id);
         }
       }
-      await sampleService.createSample(dto.sample_section_id, id, sampleFile);
+      await this.sampleService.createSample(dto.sample_section_id, id, sampleFile);
       // We don't need to manually update dto.sample_url because the new schema handles it via relations
     }
 
@@ -440,7 +440,7 @@ class ProductService {
     }
 
     for (const sample of product.samples) {
-      await sampleService.deleteSample(sample.id);
+      await this.sampleService.deleteSample(sample.id);
     }
     
     await this.db.products.update({
