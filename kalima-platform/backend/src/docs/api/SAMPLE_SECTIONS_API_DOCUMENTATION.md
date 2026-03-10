@@ -11,17 +11,17 @@
 ## Table of Contents
 
 1. [Public Endpoints](#public-endpoints)
-   - [Get All Sample Sections](#get-all-sample-sections)
-   - [Get Sample Section by ID](#get-sample-section-by-id)
-   - [Preview Sample](#preview-sample)
-   - [Download Sample](#download-sample)
+   - [[NEW] Get All Sample Sections](#new-get-all-sample-sections)
+   - [[NEW] Get Sample Section by ID](#new-get-sample-section-by-id)
+   - [[NEW] Preview Sample](#new-preview-sample)
+   - [[NEW] Download Sample](#new-download-sample)
 2. [Admin Endpoints](#admin-endpoints)
-   - [Create Sample Section](#create-sample-section)
-   - [Update Sample Section](#update-sample-section)
-   - [Delete Sample Section](#delete-sample-section)
-   - [Create Sample (Multipart)](#create-sample-multipart)
-   - [Update Sample](#update-sample)
-   - [Delete Sample](#delete-sample)
+   - [[NEW] Create Sample Section](#new-create-sample-section)
+   - [[NEW] Update Sample Section](#new-update-sample-section)
+   - [[NEW] Delete Sample Section](#new-delete-sample-section)
+   - [[NEW] Create Sample (Multipart)](#new-create-sample-multipart)
+   - [[NEW] Update Sample](#new-update-sample)
+   - [[NEW] Delete Sample](#new-delete-sample)
 
 ---
 

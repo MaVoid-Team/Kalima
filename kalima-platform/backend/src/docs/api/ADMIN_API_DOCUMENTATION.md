@@ -15,6 +15,8 @@
    - [List Users](#list-users)
    - [Get User](#get-user)
    - [Delete User](#delete-user)
+   - [[NEW] Approve User](#new-approve-user)
+   - [[NEW] Reject User](#new-reject-user)
 3. [Role Management](#role-management)
    - [Get User Roles](#get-user-roles)
    - [Assign Role](#assign-role)
@@ -24,6 +26,9 @@
 5. [Common Response Types](#common-response-types)
 6. [Error Codes](#error-codes)
 7. [Admin Dashboard](#admin-dashboard)
+8. [[NEW] Account Review Settings](#new-account-review-settings)
+   - [Get Account Review Settings](#get-account-review-settings)
+   - [Upsert Account Review Settings](#upsert-account-review-settings)
 
 ---
 
