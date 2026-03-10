@@ -9,7 +9,6 @@ import {
   IsPositive,
   IsBoolean,
   IsArray,
-  IsBoolean,
   ValidateNested,
   ArrayMinSize,
 } from "class-validator";

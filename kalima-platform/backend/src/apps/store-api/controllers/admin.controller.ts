@@ -675,6 +675,46 @@ export const adminController = {
       _next(error);
     }
   },
+
+  // ============================================
+  // DELETE USER
+  // ============================================
+
+  /**
+   * DELETE /admin/users/:userId
+   * Admin/SubAdmin can delete any user except themselves.
+   */
+  async deleteUser(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const callerUserId = (req as any).user?.userId;
+      const targetUserId = Number(req.params.userId);
+
+      if (isNaN(targetUserId)) {
+        res.status(400).json({ success: false, message: "Invalid user ID" });
+        return;
+      }
+
+      if (callerUserId === targetUserId) {
+        res.status(400).json({
+          success: false,
+          message:
+            "Cannot delete your own account via this endpoint. Use DELETE /auth/delete-account instead.",
+        });
+        return;
+      }
+
+      await userManagementService.deleteUser(targetUserId);
+      res
+        .status(200)
+        .json({ success: true, message: "User deleted successfully" });
+    } catch (error) {
+      _next(error);
+    }
+  },
 };
 
 export default adminController;
