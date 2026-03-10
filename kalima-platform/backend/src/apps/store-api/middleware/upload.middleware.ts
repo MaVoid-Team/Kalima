@@ -104,10 +104,15 @@ function productWithSampleFilter(
     return imageFilter(_req, file, cb);
   }
   if (file.fieldname === "sample") {
-    if (SAMPLE_MIME_TYPES.has(file.mimetype)) {
+    if (SAMPLE_SECTION_MIME_TYPES.has(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new BadRequestError("Sample must be a PDF file") as any, false);
+      cb(
+        new BadRequestError(
+          "Sample must be a PDF, image, video, Word, or PowerPoint file",
+        ) as any,
+        false,
+      );
     }
     return;
   }
@@ -130,10 +135,18 @@ function sampleOnlyFilter(
   file: Express.Multer.File,
   cb: FileFilterCallback,
 ): void {
-  if (file.fieldname === "sample" && SAMPLE_MIME_TYPES.has(file.mimetype)) {
+  if (
+    file.fieldname === "sample" &&
+    SAMPLE_SECTION_MIME_TYPES.has(file.mimetype)
+  ) {
     cb(null, true);
   } else if (file.fieldname === "sample") {
-    cb(new BadRequestError("Sample must be a PDF file") as any, false);
+    cb(
+      new BadRequestError(
+        "Sample must be a PDF, image, video, Word, or PowerPoint file",
+      ) as any,
+      false,
+    );
   } else {
     cb(null, true);
   }
@@ -172,7 +185,7 @@ function sampleFilesFilter(
     cb(
       new BadRequestError(
         `Invalid file type for ${file.fieldname}: ${file.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
-      ) as unknown as Error,
+      ) as any,
       false,
     );
   }
@@ -209,7 +222,7 @@ function galleryVideoFilter(
     cb(
       new BadRequestError(
         `Invalid video type: ${file.mimetype}. Allowed: mp4, webm, quicktime`,
-      ) as unknown as Error,
+      ) as any,
       false,
     );
   }

@@ -31,7 +31,10 @@ async function validateDto<T extends object>(
   return dto;
 }
 
-function parseId(param: string, name: string): number {
+function parseId(param: unknown, name: string): number {
+  if (typeof param !== "string") {
+    throw new BadRequestError(`Invalid ${name} parameter`);
+  }
   const id = parseInt(param, 10);
   if (isNaN(id)) {
     throw new BadRequestError(`Invalid ${name}`);

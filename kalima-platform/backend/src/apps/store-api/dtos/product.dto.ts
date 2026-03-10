@@ -62,6 +62,12 @@ export class CreateProductDto {
   @IsOptional()
   sample_url?: string;
 
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  @Type(() => Number)
+  sample_section_id?: number;
+
   /**
    * Category ID to attach on creation.
    * Sent as string in multipart form data.
@@ -70,7 +76,7 @@ export class CreateProductDto {
   @IsPositive()
   @IsOptional()
   @Type(() => Number)
-  category_ids?: number[];
+  category_id?: number;
 
   /** ISO date string – exact minute of scheduled release. Null = immediately available. */
   @IsDateString()
@@ -122,6 +128,12 @@ export class UpdateProductDto {
   @IsOptional()
   sample_url?: string;
 
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  @Type(() => Number)
+  sample_section_id?: number;
+
   @Type(() => Boolean)
   @IsBoolean()
   @IsOptional()
@@ -131,6 +143,7 @@ export class UpdateProductDto {
   @IsDateString()
   @IsOptional()
   release_at?: string;
+
   @IsString()
   @IsOptional()
   perks?: string;
