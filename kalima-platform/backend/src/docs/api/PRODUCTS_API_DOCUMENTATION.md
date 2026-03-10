@@ -405,6 +405,21 @@ Returns gallery entries for a product. Optionally include inactive (hidden) entr
 
 ---
 
+### [NEW] Get Product Gallery Full
+
+Returns combined images and videos from the gallery, sorted by `sort_order`.
+
+**Endpoint:** `GET /:id/gallery/full`  
+**Auth Required:** No
+
+**URL Parameters:**
+
+| Param | Type   | Description |
+| ----- | ------ | ----------- |
+| `id`  | number | Product ID  |
+
+---
+
 ### Get Product Required Fields
 
 Returns required-field definitions attached to the product (used for checkout validations).
@@ -975,6 +990,59 @@ Uploads 1–10 images to the product gallery. Images are compressed by default.
 | 400    | `Invalid product ID` | ID is not a number                        |
 | 400    | `No images provided` | No files in request                       |
 | 404    | `Product not found`  | Product does not exist or is soft-deleted |
+
+---
+
+### [NEW] Add Gallery Videos
+
+Uploads a video to the product gallery (multipart, mp4/webm/quicktime, max 100MB).
+
+**Endpoint:** `POST /:id/gallery/videos`  
+**Auth Required:** Yes (Admin, SubAdmin)  
+**Content-Type:** `multipart/form-data`
+
+**URL Parameters:**
+
+| Param | Type   | Description |
+| ----- | ------ | ----------- |
+| `id`  | number | Product ID  |
+
+**File Fields:**
+
+| Field   | Type  | Max Size | Description    |
+| ------- | ----- | -------- | -------------- |
+| `video` | video | 100 MB   | Video file     |
+
+---
+
+### [NEW] Add External Gallery Video
+
+Adds an external video URL to the product gallery.
+
+**Endpoint:** `POST /:id/gallery/videos/external`  
+**Auth Required:** Yes (Admin, SubAdmin)
+
+**URL Parameters:**
+
+| Param | Type   | Description |
+| ----- | ------ | ----------- |
+| `id`  | number | Product ID  |
+
+---
+
+### [NEW] Remove Gallery Video
+
+Removes a video from the product gallery.
+
+**Endpoint:** `DELETE /:id/gallery/videos/:videoId`  
+**Auth Required:** Yes (Admin, SubAdmin)
+
+**URL Parameters:**
+
+| Param     | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | number | Product ID  |
+| `videoId` | number | Video ID    |
 
 ---
 

@@ -264,6 +264,36 @@ Permanently deletes a user account (performs a **soft-delete** and anonymization
 
 ---
 
+### [NEW] Approve User
+
+Set a user's `confirmed` status to `true`.
+
+**Endpoint:** `POST /users/:userId/approve`  
+**Auth Required:** Yes (Admin)
+
+**Path Parameters:**
+
+| Parameter | Type   | Description   |
+| --------- | ------ | ------------- |
+| userId    | number | The user's ID |
+
+---
+
+### [NEW] Reject User
+
+Set a user's `confirmed` status to `false`.
+
+**Endpoint:** `POST /users/:userId/reject`  
+**Auth Required:** Yes (Admin)
+
+**Path Parameters:**
+
+| Parameter | Type   | Description   |
+| --------- | ------ | ------------- |
+| userId    | number | The user's ID |
+
+---
+
 ### Confirmed Purchase Count
 
 Retrieve the total number of confirmed purchases grouped by Admin and Month.
@@ -654,3 +684,80 @@ Returns total users, total verified users, and count of unique users per role.
 > - `POST /admin/users/:userId/ban` — Ban/suspend a user
 > - `POST /admin/users/:userId/unban` — Unban a user
 > - `GET /admin/audit-log` — Admin action audit trail
+
+---
+
+## [NEW] Account Review Settings
+
+Manage the account review settings. This determines whether newly registered users (by role) require manual admin approval before their `confirmed` flag is set to `true`.
+
+### Get Account Review Settings
+
+Get all current account review settings.
+
+**Endpoint:** `GET /account-review-settings`  
+**Auth Required:** Yes (Admin)
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "role": "Teacher",
+      "requires_review": true,
+      "updated_at": "2026-03-01T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+### Upsert Account Review Settings
+
+Update or insert multiple review settings at once.
+
+**Endpoint:** `PUT /account-review-settings`  
+**Auth Required:** Yes (Admin)
+
+**Request Body:**
+
+```json
+{
+  "settings": [
+    {
+      "role": "Teacher",
+      "requires_review": true
+    },
+    {
+      "role": "Student",
+      "requires_review": false
+    }
+  ]
+}
+```
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "role": "Teacher",
+      "requires_review": true,
+      "updated_at": "2026-03-10T12:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "role": "Student",
+      "requires_review": false,
+      "updated_at": "2026-03-10T12:00:00.000Z"
+    }
+  ]
+}
+```
