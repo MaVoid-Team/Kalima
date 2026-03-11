@@ -116,6 +116,12 @@ class ProductService {
     highQualityFile?: Express.Multer.File,
     lowQualityFile?: Express.Multer.File,
   ): Promise<products> {
+    if ((highQualityFile || lowQualityFile) && !dto.sample_section_id && !dto.sample_id) {
+      throw new BadRequestError(
+        "sample_section_id or sample_id is required when uploading sample files",
+      );
+    }
+
     // If category_id provided, verify it exists
     if (dto.category_id) {
       const category = await this.db.categories.findUnique({
@@ -181,7 +187,28 @@ class ProductService {
     }
 
     // Attach sample if provided
-    if ((highQualityFile || lowQualityFile) && dto.sample_section_id) {
+    if (dto.sample_id) {
+      const existingSample = await this.db.samples.findUnique({
+        where: { id: dto.sample_id },
+      });
+      if (!existingSample) {
+        throw new NotFoundError("Sample not found");
+      }
+
+      await this.db.samples.update({
+        where: { id: dto.sample_id },
+        data: { product_id: product.id },
+      });
+
+      if (highQualityFile || lowQualityFile) {
+        await this.sampleService.updateSample(
+          dto.sample_id,
+          existingSample.section_id,
+          highQualityFile,
+          lowQualityFile,
+        );
+      }
+    } else if ((highQualityFile || lowQualityFile) && dto.sample_section_id) {
       await this.sampleService.createSample(
         dto.sample_section_id,
         product.id,
@@ -314,6 +341,12 @@ class ProductService {
     highQualityFile?: Express.Multer.File,
     lowQualityFile?: Express.Multer.File,
   ): Promise<products> {
+    if ((highQualityFile || lowQualityFile) && !dto.sample_section_id && !dto.sample_id) {
+      throw new BadRequestError(
+        "sample_section_id or sample_id is required when uploading sample files",
+      );
+    }
+
     const product = await this.db.products.findFirst({
       where: { id, deleted_at: null },
       include: { samples: true },
@@ -322,15 +355,35 @@ class ProductService {
       throw new NotFoundError("Product not found");
     }
 
-    // When a new sample file is provided: delete old sample, upload new one
-    if ((highQualityFile || lowQualityFile) && dto.sample_section_id) {
+    // Handle sample linking/updating
+    if (dto.sample_id) {
+      const existingSample = await this.db.samples.findUnique({
+        where: { id: dto.sample_id },
+      });
+      if (!existingSample) {
+        throw new NotFoundError("Sample not found");
+      }
+
+      await this.db.samples.update({
+        where: { id: dto.sample_id },
+        data: { product_id: product.id },
+      });
+
+      if (highQualityFile || lowQualityFile) {
+        await this.sampleService.updateSample(
+          dto.sample_id,
+          existingSample.section_id,
+          highQualityFile,
+          lowQualityFile,
+        );
+      }
+    } else if ((highQualityFile || lowQualityFile) && dto.sample_section_id) {
       if (product.samples && product.samples.length > 0) {
         for (const sample of product.samples) {
           await this.sampleService.deleteSample(sample.id);
         }
       }
       await this.sampleService.createSample(dto.sample_section_id, id, highQualityFile, lowQualityFile);
-      // We don't need to manually update dto.sample_url because the new schema handles it via relations
     }
 
     const data: any = { updated_at: new Date() };

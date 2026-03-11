@@ -68,6 +68,12 @@ export class CreateProductDto {
   @Type(() => Number)
   sample_section_id?: number;
 
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  @Type(() => Number)
+  sample_id?: number;
+
   /**
    * Category ID to attach on creation.
    * Sent as string in multipart form data.
@@ -133,6 +139,12 @@ export class UpdateProductDto {
   @IsOptional()
   @Type(() => Number)
   sample_section_id?: number;
+
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  @Type(() => Number)
+  sample_id?: number;
 
   @Type(() => Boolean)
   @IsBoolean()
