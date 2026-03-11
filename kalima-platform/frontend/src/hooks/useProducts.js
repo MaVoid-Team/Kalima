@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import useApiMutation from './useApiMutation';
-import { buildProductImages } from '../lib/storeUtils';
+import { buildProductImages, buildProductMedia } from '../lib/storeUtils';
 
 export const useProducts = (id = null) => {
     const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
@@ -20,6 +20,7 @@ export const useProducts = (id = null) => {
     // Single product state
     const [product, setProduct] = useState(null);
     const [images, setImages] = useState({ main: null, thumbnails: [] });
+    const [media, setMedia] = useState({ main: null, thumbnails: [] });
     const [notFound, setNotFound] = useState(false);
 
     const [initLoading, setInitLoading] = useState(true);
@@ -94,6 +95,9 @@ export const useProducts = (id = null) => {
                 // Use helper from storeUtils to display thumbnails correctly
                 const productImages = buildProductImages(prodData, prodData.product_gallery);
                 setImages(productImages);
+
+                const productMedia = buildProductMedia(prodData);
+                setMedia(productMedia);
             } else {
                 setNotFound(true);
             }
@@ -140,6 +144,7 @@ export const useProducts = (id = null) => {
         // Single product returns
         product,
         images,
+        media,
         notFound,
         // Shared returns
         loading,

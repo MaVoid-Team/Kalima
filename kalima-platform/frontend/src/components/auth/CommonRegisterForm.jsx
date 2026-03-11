@@ -113,6 +113,20 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
             }
         } catch (error) {
             console.error("Form submission error:", error);
+            const errData = error?.response?.data;
+            const errors = errData?.errors || errData?.details;
+            if (errors) {
+                if (Array.isArray(errors)) {
+                    errors.forEach(err => {
+                        const path = err.path || err.field || err.param;
+                        if (path) form.setError(path, { type: "server", message: err.message || err.msg });
+                    });
+                } else if (typeof errors === 'object') {
+                    Object.entries(errors).forEach(([field, msg]) => {
+                        form.setError(field, { type: "server", message: Array.isArray(msg) ? msg[0] : msg });
+                    });
+                }
+            }
         } finally {
             setIsLoading(false);
         }

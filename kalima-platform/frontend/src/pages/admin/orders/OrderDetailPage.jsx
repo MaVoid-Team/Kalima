@@ -68,6 +68,22 @@ export default function OrderDetailPage() {
         (item) => (item.purchase_item_required_fields ?? []).length > 0
     );
 
+    const whatsappPhone = order.users?.phone?.replace(/\D/g, '');
+    const whatsappItems = (order?.purchase_items ?? []).map((item, index) => {
+        const title = item.products?.title || item.product?.title || item.title || `#${item.id}`;
+        return `${index + 1}. ${title} (${item.quantity}x ${item.price} EGP)`;
+    });
+    const whatsappMessage = [
+        t('orders.actions.whatsappGreeting', 'Greetings from Kalima Platform!'),
+        t('orders.actions.whatsappOrderDetails', 'Regarding your order: {{serial}}', { serial: order.purchase_serial || `#${order.id}` }),
+        t('orders.actions.whatsappTotal', 'Total amount: {{total}} {{currency}}', { total: order.total, currency: 'EGP' }),
+        t('orders.actions.whatsappItems', 'Items:'),
+        whatsappItems.length ? whatsappItems.join('\n') : '-',
+    ].join('\n\n');
+    const whatsappHref = whatsappPhone
+        ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(whatsappMessage)}`
+        : '#';
+
     return (
         <div className="max-w-6xl mx-auto space-y-6">
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -191,18 +207,39 @@ export default function OrderDetailPage() {
                                                 {t('orders.details.item', 'Item')} {itemIndex + 1}: {item.products?.title || item.product?.title || item.title || `#${item.id}`}
                                             </div>
 
-                                            <div className="space-y-2">
-                                                {requiredFields.map((field, index) => (
-                                                    <div
-                                                        key={field.id || `${item.id || itemIndex}-${field.field_definition_id || index}`}
-                                                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3 text-sm"
-                                                    >
-                                                        <span className="text-muted-foreground">
-                                                            {field.required_field_definitions?.label || t('orders.details.field', 'Field')}
-                                                        </span>
-                                                        <span className="font-mono break-all">{field.value || '-'}</span>
-                                                    </div>
-                                                ))}
+                                            <div className="space-y-4 sm:space-y-2">
+                                                {requiredFields.map((field, index) => {
+                                                    const isFile = field.required_field_definitions?.type === 'file';
+                                                    return (
+                                                        <div
+                                                            key={field.id || `${item.id || itemIndex}-${field.field_definition_id || index}`}
+                                                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 text-sm"
+                                                        >
+                                                            <span className="text-muted-foreground font-medium shrink-0">
+                                                                {field.required_field_definitions?.label || t('orders.details.field', 'Field')}
+                                                            </span>
+                                                            <div className="sm:max-w-[70%] text-right overflow-hidden break-all">
+                                                                {isFile && field.value ? (
+                                                                    <a
+                                                                        href={getImageUrl(field.value)}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="inline-block border rounded-md overflow-hidden hover:opacity-90 transition-opacity"
+                                                                    >
+                                                                        <img
+                                                                            src={getImageUrl(field.value)}
+                                                                            alt="User Upload"
+                                                                            className="h-16 w-auto object-cover max-w-full"
+                                                                            data-testid={`order-detail-required-file-${field.id}`}
+                                                                        />
+                                                                    </a>
+                                                                ) : (
+                                                                    <span className="font-mono">{field.value || '-'}</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     );
@@ -253,7 +290,7 @@ export default function OrderDetailPage() {
                                 <div className="flex items-center gap-3 mt-2">
                                     <div className="text-muted-foreground truncate" title={order.users.phone}>{order.users.phone}</div>
                                     <a
-                                        href={`https://wa.me/${order.users.phone.replace(/\D/g, '')}`}
+                                        href={whatsappHref}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground h-7 px-2 py-1 text-success border-success/30 hover:border-success/50"

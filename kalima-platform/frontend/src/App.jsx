@@ -52,6 +52,7 @@ const CategoriesPage = lazy(
 const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
 const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
 const AdminSamplesPage = lazy(() => import("./pages/admin/samples/AdminSamplesPage"));
+const AdminSampleSectionDetailPage = lazy(() => import("./pages/admin/samples/AdminSampleSectionDetailPage"));
 const SettingsPage = lazy(() => import("./pages/admin/settings/SettingsPage"))
 const PaymentMethodsPage = lazy(() => import("./pages/admin/payment-methods/PaymentMethodsPage"));
 const RequiredFieldsPage = lazy(() => import("./pages/admin/required-fields/RequiredFieldsPage"));
@@ -136,6 +137,7 @@ const router = createBrowserRouter(
           <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/admin/users/:id" element={<UserDetailPage />} />
           <Route path="/admin/samples" element={<AdminSamplesPage />} />
+          <Route path="/admin/samples/:id" element={<AdminSampleSectionDetailPage />} />
           <Route path="/admin/coupons" element={<CouponsPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
         </Route>

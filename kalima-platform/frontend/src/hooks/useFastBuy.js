@@ -239,12 +239,20 @@ export function useFastBuy({ checkout = false } = {}) {
         data.append("notes", formData.notes);
       }
 
-      await mutate({
+      const res = await mutate({
         endpoint: "/cart/fast-buy/checkout",
         method: "post",
         data,
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      if (typeof window !== 'undefined' && window.fbq) {
+        const reducedPrice = parseFloat(computed.total || 0) * 0.75;
+        window.fbq('track', 'Purchase', {
+            value: Number(reducedPrice.toFixed(2)),
+            currency: 'EGP'
+        });
+      }
 
       toast.success(t("fastBuy.checkoutSuccess", "Checkout successful! Redirecting to market..."));
       navigate("/orders", { replace: true, state: { skipFastBuyClear: true } });
