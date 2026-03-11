@@ -23,6 +23,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 import ProductFilters from '@/components/admin/products/ProductFilters';
 import ProductsTable from '@/components/admin/products/ProductsTable';
@@ -87,6 +88,10 @@ export default function ProductsPage() {
     };
 
     const handleDelete = async (product) => {
+        if (product.samples || product.sample_url) {
+            toast.error(t('products.delete.hasSampleError', 'Cannot delete product with linked sample. Please remove the sample first.'));
+            return;
+        }
         setDeleteTarget(product);
         setDeleteOpen(true);
     };

@@ -1,61 +1,59 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FileText, Upload, Download, ExternalLink, Link2, Check, Trash2, Eye, AlertTriangle, X } from 'lucide-react';
+import { FileText, FileVideo, Image, Upload, Trash2, X, Download, File } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Link } from 'react-router-dom';
-import { getImageUrl, formatFileSize } from '@/lib/storeUtils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
+import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
+import { formatFileSize } from '@/lib/storeUtils';
+import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 
-const PDF_MIME_TYPE = 'application/pdf';
+// Helper: resolve accept string per media type
+const getAccept = (mediaType) => {
+    switch (mediaType) {
+        case 'Video': return 'video/*';
+        case 'Image': return 'image/*';
+        case 'Audio': return 'audio/*';
+        case 'Document':
+        default:
+            return '.pdf,.doc,.docx,.ppt,.pptx';
+    }
+};
 
-export default function SampleManager({ product, onUpdateSample, onRemoveSample, loading }) {
+// Helper: is this media type displayable inline?
+const isPreviewable = (mediaType) => mediaType === 'Image' || mediaType === 'Video';
+
+// Helper: icon for media type
+const MediaIcon = ({ mediaType, className }) => {
+    if (mediaType === 'Video') return <FileVideo className={className} />;
+    if (mediaType === 'Image') return <Image className={className} />;
+    return <FileText className={className} />;
+};
+
+export default function SampleManager({ product, loading, onRefresh }) {
     const { t } = useTranslation('admin');
-    const [copied, setCopied] = useState(false);
+    const { sections, fetchSections, createSample, deleteSample } = useAdminSampleSections();
+
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const fileInputRef = useRef(null);
+    const [sectionId, setSectionId] = useState('');
+    const [mediaType, setMediaType] = useState('Document');
+    
+    // We can only have one sample per product currently, but it might be tied to a section.
+    // Let's assume the backend now populates `product.sample` as an object { id, section_id, media_type, high_quality_url, low_quality_url, sizes, ... }
+    const sample = product?.sample || product?.samples; 
+
+    const hqFileRef = useRef(null);
+    const lqFileRef = useRef(null);
     const abortControllerRef = useRef(null);
 
-    const sample = product?.samples;
-    const sampleUrl = sample ? getImageUrl(sample.url) : null;
-    const isPdf = sample?.mime_type === PDF_MIME_TYPE;
-
-    const shareLink = sample ? `${window.location.origin}/samples/${sample.id}` : null;
-
-    const handleCopyShareLink = async () => {
-        if (!shareLink) return;
-        try {
-            await navigator.clipboard.writeText(shareLink);
-            setCopied(true);
-            toast.success(t('products.detail.shareLinkCopied', 'Share link copied to clipboard!'));
-            setTimeout(() => setCopied(false), 2000);
-        } catch {
-            // Fallback for browsers without clipboard API
-            const el = document.createElement('textarea');
-            el.value = shareLink;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            setCopied(true);
-            toast.success(t('products.detail.shareLinkCopied', 'Share link copied to clipboard!'));
-            setTimeout(() => setCopied(false), 2000);
-        }
-    };
+    useEffect(() => {
+        fetchSections();
+    }, [fetchSections]);
 
     const handleCancelUpload = () => {
         if (abortControllerRef.current) {
@@ -64,351 +62,217 @@ export default function SampleManager({ product, onUpdateSample, onRemoveSample,
         }
         setUploading(false);
         setUploadProgress(0);
-        // Reset file input
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
+        if (hqFileRef.current) hqFileRef.current.value = '';
+        if (lqFileRef.current) lqFileRef.current.value = '';
     };
 
-    const handleFileSelect = async (event) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
+    const handleUpload = async (e) => {
+        e.preventDefault();
+        const hqFile = hqFileRef.current?.files?.[0];
+        const lqFile = lqFileRef.current?.files?.[0];
 
-        // Validate file type
-        const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-        if (!allowedTypes.includes(file.type)) {
-            toast.error(t('products.detail.invalidSampleType', 'Invalid file type. Please upload a PDF or Word document.'));
+        if (!sectionId) {
+            toast.error(t('samples.errors.noSection', 'Please select a sample section.'));
+            return;
+        }
+        if (!hqFile && !lqFile) {
+            toast.error(t('samples.errors.noFile', 'Please select at least one file to upload.'));
             return;
         }
 
-        // Create FormData
         const formData = new FormData();
-        formData.append('sample', file);
+        formData.append('product_id', product.id);
+        formData.append('media_type', mediaType);
+        if (hqFile) formData.append('high_quality', hqFile);
+        if (lqFile) formData.append('low_quality', lqFile);
 
-        // Create abort controller
         const abortController = new AbortController();
         abortControllerRef.current = abortController;
 
         setUploading(true);
         setUploadProgress(0);
         try {
-            await onUpdateSample(product.id, formData, (progressEvent) => {
+            const res = await createSample(sectionId, formData, (progressEvent) => {
                 if (progressEvent.total) {
                     const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                     setUploadProgress(percentCompleted);
                 }
             }, abortController.signal);
-            toast.success(t('products.detail.sampleUpdated', 'Sample updated successfully!'));
+            
+            if (res && res.success) {
+                if (onRefresh) onRefresh();
+            }
         } catch (error) {
-            if (error.name !== 'AbortError') {
-                toast.error(t('products.detail.sampleUpdateError', 'Failed to update sample. Please try again.'));
+            if (error?.name !== 'AbortError') {
+                toast.error(t('samples.errors.uploadFailed', 'Failed to upload sample.'));
             }
         } finally {
             setUploading(false);
             setUploadProgress(0);
             abortControllerRef.current = null;
-            // Reset file input
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
+            if (hqFileRef.current) hqFileRef.current.value = '';
+            if (lqFileRef.current) lqFileRef.current.value = '';
         }
     };
 
     const handleRemoveSample = async () => {
+        if (!sample?.section_id || !sample?.id) return;
         try {
-            await onRemoveSample(product.id);
-            toast.success(t('products.detail.sampleRemoved', 'Sample removed successfully!'));
-            setDeleteDialogOpen(false);
+            const res = await deleteSample(sample.section_id, sample.id);
+            if (res && res.success) {
+                if (onRefresh) onRefresh();
+            }
         } catch (error) {
-            toast.error(t('products.detail.sampleRemoveError', 'Failed to remove sample. Please try again.'));
+            toast.error(t('samples.errors.deleteFailed', 'Failed to delete sample.'));
         }
-    };
-
-    const handleUploadClick = () => {
-        fileInputRef.current?.click();
     };
 
     if (!sample) {
         return (
             <div className="space-y-4">
-                {/* Empty state */}
-                <div
-                    className="flex flex-col items-center justify-center gap-2 py-8 text-center text-muted-foreground"
-                    data-testid="sample-manager-empty"
-                >
-                    <FileText className="h-10 w-10 opacity-40" />
-                    <p className="text-sm max-w-sm">{t('products.detail.noSampleAvailable', 'No sample file available for this product. Upload a PDF or Word document to provide a preview.')}</p>
-                </div>
-
-                {/* Upload button */}
-                <div className="flex justify-center">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleUploadClick}
-                        disabled={loading || uploading}
-                        data-testid="sample-manager-upload-button"
-                    >
-                        <Upload className="me-2 h-4 w-4" />
-                        {uploading ? t('products.detail.uploading', 'Uploading...') : t('products.detail.uploadSample', 'Upload Sample')}
-                    </Button>
-                </div>
-
-                {/* Upload progress */}
-                {uploading && uploadProgress > 0 && (
-                    <div className="max-w-xs mx-auto space-y-2">
-                        <div className="flex justify-between text-sm mb-1 text-muted-foreground">
-                            <span>{uploadProgress < 100 ? t('products.detail.uploading', 'Uploading...') : t('products.detail.processing', 'Processing...')}</span>
-                            <span>{uploadProgress}%</span>
-                        </div>
-                        <Progress value={uploadProgress} />
-                        <div className="flex justify-center">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={handleCancelUpload}
-                                className="text-xs"
-                            >
-                                <X className="me-1 h-3 w-3" />
-                                {t('common.cancel', 'Cancel')}
-                            </Button>
-                        </div>
+                <form onSubmit={handleUpload} className="space-y-4 max-w-lg bg-card border border-border rounded-xl p-4">
+                    <h3 className="font-semibold text-lg">{t('samples.addTitle', 'Add Sample')}</h3>
+                    
+                    <div className="space-y-2">
+                        <Label>{t('samples.sectionLabel', 'Sample Section')}</Label>
+                        <Select value={sectionId} onValueChange={setSectionId}>
+                            <SelectTrigger>
+                                <SelectValue placeholder={t('samples.selectSection', 'Select a section...')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {sections.map(sec => (
+                                    <SelectItem key={sec.id} value={String(sec.id)}>{sec.title}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
-                )}
 
-                {/* Hidden file input */}
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    data-testid="sample-manager-file-input"
-                />
+                    <div className="space-y-2">
+                        <Label>{t('samples.mediaTypeLabel', 'Media Type')}</Label>
+                        <Select value={mediaType} onValueChange={setMediaType}>
+                            <SelectTrigger>
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Document">{t('samples.mediaDocument', 'Document (PDF, Word, PowerPoint)')}</SelectItem>
+                                <SelectItem value="Video">{t('samples.mediaVideo', 'Video')}</SelectItem>
+                                <SelectItem value="Audio">{t('samples.mediaAudio', 'Audio')}</SelectItem>
+                                <SelectItem value="Image">{t('samples.mediaImage', 'Image')}</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        {mediaType === 'Document' && (
+                            <p className="text-xs text-muted-foreground">
+                                {t('samples.docFormats', 'Accepted: PDF, Word (.doc/.docx), PowerPoint (.ppt/.pptx) — download only')}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>{t('samples.hqFileLabel', 'High Quality File (Protected Preview)')}</Label>
+                        <Input type="file" ref={hqFileRef} accept={getAccept(mediaType)} />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>{t('samples.lqFileLabel', 'Low Quality File (Downloadable)')}</Label>
+                        <Input type="file" ref={lqFileRef} accept={getAccept(mediaType)} />
+                    </div>
+
+                    {uploading && uploadProgress > 0 && (
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-sm text-muted-foreground">
+                                <span>{uploadProgress < 100 ? t('common.uploading', 'Uploading...') : t('common.processing', 'Processing...')}</span>
+                                <span>{uploadProgress}%</span>
+                            </div>
+                            <Progress value={uploadProgress} />
+                        </div>
+                    )}
+
+                    <div className="flex justify-end gap-2 pt-2">
+                        {uploading && (
+                            <Button type="button" variant="outline" onClick={handleCancelUpload}>
+                                <X className="me-2 h-4 w-4" /> {t('common.cancel', 'Cancel')}
+                            </Button>
+                        )}
+                        <Button type="submit" disabled={loading || uploading}>
+                            <Upload className="me-2 h-4 w-4" />
+                            {uploading ? t('common.uploading', 'Uploading...') : t('common.upload', 'Upload')}
+                        </Button>
+                    </div>
+                </form>
             </div>
         );
     }
 
-    return (
-        <div className="space-y-4" data-testid="sample-manager">
-            {/* File metadata row */}
-            <div className="flex flex-wrap items-center gap-4 text-sm" data-testid="sample-manager-info">
-                <div className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-primary shrink-0" />
-                    <span className="font-medium break-all">{sample.original_name}</span>
-                </div>
-                <Badge variant="outline" data-testid="sample-manager-type-badge">
-                    {sample.mime_type === PDF_MIME_TYPE ? 'PDF' : 'Word'}
-                </Badge>
-                <span className="text-muted-foreground" data-testid="sample-manager-size">
-                    {formatFileSize(sample.size)}
-                </span>
-            </div>
+    const mt = sample.media_type;
 
-            {/* Quick share link display */}
-            {shareLink && (
-                <div className="space-y-2" data-testid="sample-manager-share-section">
-                    {/* Share link header */}
-                    <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                        <Link2 className="h-4 w-4" />
-                        <span>{t('products.detail.shareLink', 'Share Link')}</span>
+    return (
+        <div className="space-y-4">
+            <div className="border border-border rounded-xl bg-card overflow-hidden">
+                {/* Inline preview for images */}
+                {mt === 'Image' && sample.high_quality_url && (
+                    <div className="w-full max-h-64 overflow-hidden bg-muted flex items-center justify-center">
+                        <img
+                            src={sample.high_quality_url}
+                            alt="Sample preview"
+                            className="max-h-64 object-contain w-full"
+                        />
                     </div>
-                    
-                    {/* Share link input and copy button */}
-                    <div className="relative group">
-                        <div className="flex items-center gap-2 rounded-lg border border-border bg-background p-3 transition-all duration-200 group-hover:border-primary/50 group-hover:shadow-sm">
-                            {/* Link icon */}
-                            <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 text-primary shrink-0">
-                                <Link2 className="h-4 w-4" />
-                            </div>
-                            
-                            {/* URL display */}
-                            <div className="flex-1 min-w-0">
-                                <div className="font-mono text-sm text-foreground break-all bg-muted/50 rounded px-2 py-1 border border-border/50">
-                                    {shareLink}
-                                </div>
-                            </div>
-                            
-                            {/* Copy button */}
-                            <Button
-                                type="button"
-                                variant={copied ? "default" : "outline"}
-                                size="sm"
-                                onClick={handleCopyShareLink}
-                                disabled={copied}
-                                className={cn(
-                                    "shrink-0 transition-all duration-200",
-                                    copied 
-                                        ? "bg-green-500 text-white border-green-500 hover:bg-green-600" 
-                                        : "hover:bg-primary hover:text-primary-foreground hover:border-primary"
-                                )}
-                                data-testid="sample-manager-copy-link-button"
-                            >
-                                {copied ? (
-                                    <>
-                                        <Check className="me-1 h-4 w-4" />
-                                        <span className="hidden sm:inline">{t('products.detail.copied', 'Copied!')}</span>
-                                        <span className="sm:hidden">{t('common.done', 'Done')}</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Link2 className="me-1 h-4 w-4" />
-                                        <span className="hidden sm:inline">{t('products.detail.copyLink', 'Copy')}</span>
-                                        <span className="sm:hidden">{t('common.copy', 'Copy')}</span>
-                                    </>
-                                )}
-                            </Button>
+                )}
+                {/* Inline preview for videos */}
+                {mt === 'Video' && sample.high_quality_url && (
+                    <div className="w-full bg-black">
+                        <video
+                            src={sample.high_quality_url}
+                            controls
+                            className="w-full max-h-64"
+                        />
+                    </div>
+                )}
+
+                <div className="flex items-center justify-between p-4">
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-2">
+                            <MediaIcon mediaType={mt} className="h-5 w-5 text-primary" />
+                            <span className="font-medium text-foreground">{product.title} Sample</span>
+                            <Badge variant="outline">{mt || 'Unknown'}</Badge>
                         </div>
-                        
-                        {/* Success feedback overlay */}
-                        {copied && (
-                            <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-green-500/10 border border-green-500/30 pointer-events-none">
-                                <div className="flex items-center gap-2 text-green-700 bg-white rounded-full px-3 py-1 shadow-sm">
-                                    <Check className="h-4 w-4" />
-                                    <span className="text-sm font-medium">{t('products.detail.linkCopied', 'Link copied!')}</span>
-                                </div>
-                            </div>
+                        {sample.section && (
+                            <p className="text-sm text-muted-foreground">
+                                {t('samples.inSection', 'In Section:')} {sample.section?.title}
+                            </p>
+                        )}
+                        {/* Word/PowerPoint note */}
+                        {mt === 'Document' && (
+                            <p className="text-xs text-muted-foreground">
+                                {t('samples.docDownloadOnly', 'Word and PowerPoint files are available as download only.')}
+                            </p>
                         )}
                     </div>
-                    
-                    {/* Share instructions */}
-                    <p className="text-xs text-muted-foreground">
-                        {t('products.detail.shareInstructions', 'Share this link with customers to let them preview the sample before purchasing.')}
-                    </p>
-                </div>
-            )}
-
-            {/* Action buttons */}
-            <div className="flex flex-wrap gap-2">
-                {/* Preview button */}
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    asChild
-                    data-testid="sample-manager-preview-button"
-                >
-                    <Link to={`/samples/${sample.id}/preview`} target="_blank" rel="noopener noreferrer">
-                        <Eye className="me-2 h-4 w-4" />
-                        {t('products.detail.previewSample')}
-                    </Link>
-                </Button>
-
-                {/* Sample page link */}
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    asChild
-                    data-testid="sample-manager-page-link-button"
-                >
-                    <Link to={`/samples/${sample.id}`} state={{ cameFromAdmin: false }}>
-                        <ExternalLink className="me-2 h-4 w-4" />
-                        {t('products.detail.openSamplePage')}
-                    </Link>
-                </Button>
-
-                {/* Download button */}
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    asChild
-                    data-testid="sample-manager-download-button"
-                >
-                    <a href={sampleUrl} target="_blank" rel="noopener noreferrer" download>
-                        <Download className="me-2 h-4 w-4" />
-                        {t('products.detail.downloadSample')}
-                    </a>
-                </Button>
-
-                {/* Replace button */}
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleUploadClick}
-                    disabled={loading || uploading}
-                    data-testid="sample-manager-replace-button"
-                >
-                    <Upload className="me-2 h-4 w-4" />
-                    {uploading ? t('products.detail.uploading', 'Uploading...') : t('products.detail.replaceSample', 'Replace Sample')}
-                </Button>
-
-                {/* Remove button */}
-                <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => setDeleteDialogOpen(true)}
-                    disabled={loading}
-                    data-testid="sample-manager-remove-button"
-                >
-                    <Trash2 className="me-2 h-4 w-4" />
-                    {t('products.detail.removeSample')}
-                </Button>
-            </div>
-
-            {/* Hidden file input */}
-            <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={handleFileSelect}
-                className="hidden"
-                data-testid="sample-manager-file-input"
-            />
-
-            {/* Upload progress for existing sample replacement */}
-            {uploading && uploadProgress > 0 && (
-                <div className="max-w-xs mx-auto space-y-2">
-                    <div className="flex justify-between text-sm mb-1 text-muted-foreground">
-                        <span>{uploadProgress < 100 ? t('products.detail.uploading', 'Uploading...') : t('products.detail.processing', 'Processing...')}</span>
-                        <span>{uploadProgress}%</span>
-                    </div>
-                    <Progress value={uploadProgress} />
-                    <div className="flex justify-center">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={handleCancelUpload}
-                            className="text-xs"
-                        >
-                            <X className="me-1 h-3 w-3" />
-                            {t('common.cancel', 'Cancel')}
+                    <div className="flex items-center gap-2">
+                        {/* For non-previewable types (Document, Audio), show a HQ open link */}
+                        {!isPreviewable(mt) && sample.high_quality_url && (
+                            <Button variant="outline" size="sm" asChild>
+                                <a href={sample.high_quality_url} target="_blank" rel="noreferrer">
+                                    <Download className="me-2 h-4 w-4" /> {t('samples.open', 'Open')}
+                                </a>
+                            </Button>
+                        )}
+                        {sample.low_quality_url && (
+                            <DownloadWithProgress
+                                url={sample.low_quality_url}
+                                filename={`LQ_Sample_${sample.id}`}
+                                variant="outline"
+                                size="sm"
+                            >
+                                <Download className="me-2 h-4 w-4" /> {t('samples.lqDownload', 'LQ Download')}
+                            </DownloadWithProgress>
+                        )}
+                        <Button variant="outline" size="icon" onClick={handleRemoveSample} className="text-destructive hover:bg-destructive/10">
+                            <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>
                 </div>
-            )}
-
-            {/* Delete confirmation dialog */}
-            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle className="flex items-center gap-2">
-                            <AlertTriangle className="h-5 w-5 text-destructive" />
-                            {t('products.detail.confirmRemoveSampleTitle', 'Remove Sample')}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                            {t('products.detail.confirmRemoveSampleDescription', 'Are you sure you want to remove this sample file? This action cannot be undone and will permanently delete the sample from this product.')}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel disabled={loading}>
-                            {t('common.cancel', 'Cancel')}
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleRemoveSample}
-                            disabled={loading}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                            {loading ? t('common.removing', 'Removing...') : t('products.detail.removeSample', 'Remove Sample')}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            </div>
         </div>
     );
 }

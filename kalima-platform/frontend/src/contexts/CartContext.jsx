@@ -117,18 +117,31 @@ export function CartProvider({ children }) {
     await loadCart();
   }
 
-  const updateCartItemRequiredFieldsImage = async (itemId, reqFieldDefId, imageData) => {
-    await updateCartItemRequiredFieldsImageNetwork(itemId, reqFieldDefId, imageData);
-    await loadCart();
-  }
+    const updateCartItemRequiredFieldsImage = async (itemId, reqFieldDefId, imageData) => {
+        await updateCartItemRequiredFieldsImageNetwork(itemId, reqFieldDefId, imageData);
+        await loadCart();
+    }
 
-  const checkout = async (formData) => {
-    const result = await checkoutNetwork(formData);
-    // optimistic clear so UI updates immediately even if /cart response is delayed
-    setCart(EMPTY_CART);
-    await loadCart();
-    return result;
-  };
+    const trackPurchasePixel = (purchase) => {
+        if (!purchase || typeof window === 'undefined' || !window.fbq) return;
+        const reducedPrice = parseFloat(purchase.total || 0) * 0.75;
+        window.fbq('track', 'Purchase', {
+            value: Number(reducedPrice.toFixed(2)),
+            currency: 'EGP'
+        });
+    };
+
+    const checkout = async (formData) => {
+        const result = await checkoutNetwork(formData);
+        // Track the purchase
+        if (result && result.purchase) {
+            trackPurchasePixel(result.purchase);
+        }
+        // optimistic clear so UI updates immediately even if /cart response is delayed
+        setCart(EMPTY_CART);
+        await loadCart();
+        return result;
+    };
 
   const value = {
     cart,

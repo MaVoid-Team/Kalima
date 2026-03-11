@@ -85,6 +85,48 @@ export function buildProductImages(product, gallery = []) {
 }
 
 /**
+ * Builds a unified media array (images + videos) for advanced galleries.
+ * @param {object} product
+ * @returns {{ main: object|null, thumbnails: object[] }}
+ */
+export function buildProductMedia(product) {
+  const mainImage = getImageUrl(product?.thumbnail_image?.url);
+  const main = mainImage ? { type: 'image', url: mainImage, isMain: true } : null;
+
+  const galleryImages = (product?.product_gallery || []).map(g => ({
+    type: 'image',
+    url: getImageUrl(g?.images?.url),
+    sort_order: g.sort_order || 0
+  })).filter(g => g.url);
+
+  const galleryVideos = (product?.product_gallery_videos || []).map(v => {
+    const isYoutube = v.url?.includes('youtube.com') || v.url?.includes('youtu.be');
+    let thumbnail = null;
+    if (isYoutube) {
+      try {
+        let videoId = '';
+        if (v.url.includes('youtube.com/watch')) {
+          videoId = new URL(v.url).searchParams.get('v');
+        } else if (v.url.includes('youtu.be/')) {
+          videoId = v.url.split('youtu.be/')[1].split(/[?#]/)[0];
+        }
+        if (videoId) thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      } catch (e) {}
+    }
+    return {
+      type: 'video',
+      url: getImageUrl(v.url),
+      thumbnail,
+      source_type: v.source_type,
+      sort_order: v.sort_order || 0
+    };
+  }).filter(v => v.url);
+
+  const thumbnails = [...galleryImages, ...galleryVideos].sort((a,b) => a.sort_order - b.sort_order);
+  return { main, thumbnails };
+}
+
+/**
  * Calculates the checkout subtotal. Prioritizes backend preview subtotal,
  * otherwise falls back to calculating it manually from the mapped items array.
  * @param {object|null} preview

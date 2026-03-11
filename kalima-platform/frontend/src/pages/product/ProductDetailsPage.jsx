@@ -28,7 +28,7 @@ export default function ProductDetailsPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  const { product: productProps, images, loading, notFound } = useProducts(id);
+  const { product: productProps, media, loading, notFound } = useProducts(id);
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) {
@@ -104,7 +104,7 @@ export default function ProductDetailsPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="lg:col-span-7"
           >
-            <ImageGallery images={images} />
+            <ImageGallery images={media} />
           </motion.div>
 
           {/* Right Column: Product Info (5 cols) */}

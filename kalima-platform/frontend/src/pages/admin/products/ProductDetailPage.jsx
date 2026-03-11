@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 import EditCouponDialog from '@/components/admin/coupons/EditCouponDialog';
 import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
@@ -42,6 +43,9 @@ export default function ProductDetailPage() {
         addGalleryImages,
         updateGalleryEntry,
         removeGalleryEntry,
+        addGalleryVideo,
+        addExternalGalleryVideo,
+        removeGalleryVideo,
         attachCategories,
         detachCategory,
         attachRequiredFields,
@@ -97,6 +101,10 @@ export default function ProductDetailPage() {
     }, [loadProductCoupons]);
 
     const handleDelete = () => {
+        if (product?.samples || product?.sample_url) {
+            toast.error(t('products.delete.hasSampleError', 'Cannot delete product with linked sample. Please remove the sample first.'));
+            return;
+        }
         setDeleteOpen(true);
     };
 
@@ -186,6 +194,51 @@ export default function ProductDetailPage() {
             setUploadProgress(0);
             setUploadFileName('');
             setUploadAbortController(null);
+        }
+    };
+
+    const handleGalleryVideoUpload = async (formData) => {
+        const abortController = new AbortController();
+        setUploadAbortController(abortController);
+
+        setIsUploading(true);
+        setUploadFileName('Gallery video');
+        setUploadError('');
+        setUploadProgress(0);
+
+        try {
+            const res = await addGalleryVideo(id, formData, (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
+            }, abortController.signal);
+            if (!res?.success) {
+                setUploadError(res?.message || 'Upload failed');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                setUploadError(error.message || 'Upload failed');
+            }
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadFileName('');
+            setUploadAbortController(null);
+        }
+    };
+
+    const handleGalleryExternalVideo = async (url) => {
+        setIsUploading(true);
+        try {
+            const res = await addExternalGalleryVideo(id, url);
+            if (!res?.success) {
+                toast.error(res?.message || 'Failed to add external video');
+            }
+        } catch (error) {
+            toast.error(error.message || 'Failed to add external video');
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -381,8 +434,11 @@ export default function ProductDetailPage() {
                     <GalleryManager
                         product={product}
                         onAddImages={handleGalleryUpload}
+                        onAddVideo={handleGalleryVideoUpload}
+                        onAddExternalVideo={handleGalleryExternalVideo}
                         onUpdateEntry={(galleryId, data) => updateGalleryEntry(id, galleryId, data)}
-                        onRemoveEntry={(galleryId) => removeGalleryEntry(id, galleryId)}
+                        onRemoveImage={(galleryId) => removeGalleryEntry(id, galleryId)}
+                        onRemoveVideo={(videoId) => removeGalleryVideo(id, videoId)}
                         loading={isUploading}
                     />
                 </div>

@@ -73,13 +73,13 @@ export default function SamplePage() {
                     {product && (
                         <>
                             <span>/</span>
-                            <Link to={`/product/${product.id}`} className="hover:text-foreground truncate max-w-[200px]">
+                            <Link to={`/product/${product.id}`} dir="auto" className="hover:text-foreground truncate max-w-[200px]">
                                 {product.title}
                             </Link>
                         </>
                     )}
                     <span>/</span>
-                    <span className="text-foreground truncate max-w-[200px]">{sample?.original_name}</span>
+                    <span dir="auto" className="text-foreground truncate max-w-[200px]">{sample?.original_name}</span>
                 </div>
 
                 {/* Main Content Grid */}
@@ -142,8 +142,9 @@ export default function SamplePage() {
                         <div className="lg:sticky lg:top-24 flex flex-col gap-6">
                             {/* Sample Info */}
                             <div className="space-y-6">
-                                <div>
-                                    <h1 className="text-2xl font-bold mb-2">{sample?.original_name}</h1>
+                                {/* Sample Details */}
+                                <div className="space-y-4">
+                                    <h1 dir="auto" className="text-2xl font-bold mb-2">{sample?.original_name}</h1>
                                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                         <Badge variant="outline">
                                             {isPdf ? 'PDF' : 'Word'}
@@ -162,7 +163,7 @@ export default function SamplePage() {
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between py-2 border-b border-border/50">
                                             <span className="text-sm text-muted-foreground">{t('samplePage.fileName', 'File Name')}</span>
-                                            <span className="text-sm font-medium truncate ml-2 max-w-[60%]">{sample?.original_name}</span>
+                                            <span dir="auto" className={`text-sm font-medium truncate ${isRtl ? 'mr-2' : 'ml-2'} max-w-[60%]`}>{sample?.original_name}</span>
                                         </div>
 
                                         <div className="flex items-center justify-between py-2 border-b border-border/50">
@@ -197,7 +198,7 @@ export default function SamplePage() {
                                         <div className="space-y-3">
                                             <div className="flex items-center justify-between py-2 border-b border-border/50">
                                                 <span className="text-sm text-muted-foreground">{t('samplePage.productName', 'Product Name')}</span>
-                                                <span className="text-sm font-medium truncate ml-2 max-w-[60%]">{product.title}</span>
+                                                <span dir="auto" className={`text-sm font-medium truncate ${isRtl ? 'mr-2' : 'ml-2'} max-w-[60%]`}>{product.title}</span>
                                             </div>
 
                                             <div className="flex items-center justify-between py-2 border-b border-border/50">

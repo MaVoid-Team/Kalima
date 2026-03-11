@@ -734,13 +734,13 @@ export default function CreateProductPage() {
                                 </p>
                             </div>
 
-                            {/* Sample */}
+                            {/* Sample — supports images, videos, PDFs, Word & PowerPoint */}
                             <div className="space-y-1.5">
                                 <span className="text-sm font-medium leading-none">{t('products.form.sample')}</span>
                                 <input
                                     ref={sampleInputRef}
                                     type="file"
-                                    accept=".pdf,.doc,.docx"
+                                    accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx"
                                     onChange={(e) => setSample(e.target.files?.[0] ?? null)}
                                     className="sr-only"
                                     data-testid="create-product-sample-input"
@@ -756,6 +756,9 @@ export default function CreateProductPage() {
                                 </Button>
                                 <p className="text-xs text-muted-foreground truncate">
                                     {sample?.name || t('products.form.noFileSelected')}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    {t('products.form.sampleFormats', 'Supported: images, videos, PDF, Word, PowerPoint')}
                                 </p>
                             </div>
                         </div>
