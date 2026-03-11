@@ -77,7 +77,7 @@ router.delete(
 router.post(
   "/",
   ...adminAuth,
-  uploadSingleImage("thumbnail"),
+  uploadProductWithSample,
   productController.createProduct,
 );
 
