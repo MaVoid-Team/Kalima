@@ -280,7 +280,15 @@ Set a user's `confirmed` status to `true`.
 
 | Parameter | Type   | Description   |
 | --------- | ------ | ------------- |
-| userId    | number | The user's ID |
+| `userId`  | number | The user's ID |
+
+**Request Body:** None
+
+**Example Request:**
+```bash
+curl -X POST http://localhost:5000/api/v2/admin/users/123/approve \
+  -H "Authorization: Bearer <access_token>"
+```
 
 ---
 
@@ -295,7 +303,15 @@ Set a user's `confirmed` status to `false`.
 
 | Parameter | Type   | Description   |
 | --------- | ------ | ------------- |
-| userId    | number | The user's ID |
+| `userId`  | number | The user's ID |
+
+**Request Body:** None
+
+**Example Request:**
+```bash
+curl -X POST http://localhost:5000/api/v2/admin/users/123/reject \
+  -H "Authorization: Bearer <access_token>"
+```
 
 ---
 

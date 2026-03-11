@@ -1017,6 +1017,14 @@ Uploads a video to the product gallery (multipart, mp4/webm/quicktime, max 100MB
 | ------- | ----- | -------- | -------------- |
 | `video` | video | 100 MB   | Video file     |
 
+**Example Request:**
+```bash
+curl -X POST http://localhost:5000/api/v2/products/1/gallery/videos \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: multipart/form-data" \
+  -F "video=@/path/to/myvideo.mp4"
+```
+
 ---
 
 ### [NEW] Add External Gallery Video
@@ -1031,6 +1039,26 @@ Adds an external video URL to the product gallery.
 | Param | Type   | Description |
 | ----- | ------ | ----------- |
 | `id`  | number | Product ID  |
+
+**Request Body:**
+
+```json
+{
+  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+}
+```
+
+| Field | Type   | Required | Description              |
+| ----- | ------ | -------- | ------------------------ |
+| `url` | string | Yes      | The external video URL   |
+
+**Example Request:**
+```bash
+curl -X POST http://localhost:5000/api/v2/products/1/gallery/videos/external \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}'
+```
 
 ---
 
