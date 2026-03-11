@@ -681,9 +681,10 @@ Deletes an existing review.
 Creates a new product. Supports `multipart/form-data` with an optional `thumbnail` image and optional `high_quality` and `low_quality` sample files. The `category_ids` array must be sent as a JSON string when using form-data.
 
 **Sample Attachment Options:**
+
 1. **Upload new sample**: Send `high_quality` and/or `low_quality` files + `sample_section_id`.
 2. **Link existing sample**: Send `sample_id` (ID of an already-uploaded sample) to re-assign it to this product.
-*(If both are provided, `sample_id` takes precedence and files are replaced on the existing sample).*
+   _(If both are provided, `sample_id` takes precedence and files are replaced on the existing sample)._
 
 > **Validation**: If `high_quality` or `low_quality` files are provided **without** `sample_section_id` **and without** `sample_id`, the request will fail with a `400 Bad Request`.
 
@@ -735,7 +736,7 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 | `title`             | Algebra Book   |
 | `price`             | 100            |
 | `type`              | Book           |
-| `category_ids`      | [1,3]          |
+| `category_id`       | 1              |
 | `thumbnail`         | _(image file)_ |
 | `sample_section_id` | 2              |
 | `high_quality`      | _(PDF file)_   |
@@ -743,11 +744,11 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 
 **Example — form-data (link existing sample):**
 
-| Field          | Value          |
-| -------------- | -------------- |
-| `title`        | Algebra Book   |
-| `price`        | 100            |
-| `sample_id`    | 42             |
+| Field       | Value        |
+| ----------- | ------------ |
+| `title`     | Algebra Book |
+| `price`     | 100          |
+| `sample_id` | 42           |
 
 **Success Response (201):**
 
@@ -798,6 +799,7 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 Updates one or more fields on an existing product. All fields are optional. Supports `multipart/form-data` for replacing `high_quality` and `low_quality` sample files. **Note**: Thumbnail updates must be performed using the dedicated `POST /:id/thumbnail` endpoint.
 
 **Sample Update Options:**
+
 1. **Upload brand new sample**: Send `high_quality` and/or `low_quality` files + `sample_section_id`. This deletes the old sample and creates a new one.
 2. **Link existing sample**: Send `sample_id` without files. Re-assigns the sample to this product.
 3. **Replace files on existing sample**: Send `sample_id` + `high_quality` and/or `low_quality` files.
