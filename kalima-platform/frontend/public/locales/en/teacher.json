@@ -1,0 +1,72 @@
+{
+  "layout": {
+    "openSidebar": "Open sidebar"
+  },
+  "portalTitle": "Teacher Portal",
+  "nav": {
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "closeSidebar": "Close sidebar",
+    "profile": "My Profile",
+    "orders": "My Orders",
+    "settings": "Settings",
+    "themeToggle": "Toggle theme",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode",
+    "backToStore": "Back to Store",
+    "logout": "Logout"
+  },
+  "settings": {
+    "title": "Account Settings",
+    "description": "Manage your password, linked accounts, and session security"
+  },
+  "profile": {
+    "title": "My Profile",
+    "description": "Manage your personal info and teaching details",
+    "personalInfo": "Personal Information",
+    "name": "Full Name",
+    "phone": "Phone",
+    "secondaryPhone": "Secondary Phone",
+    "gender": "Gender",
+    "selectGender": "Select gender",
+    "male": "Male",
+    "female": "Female",
+    "teacherInfo": "Teaching Information",
+    "subject": "Subject",
+    "selectSubject": "Select subject",
+    "government": "Governorate",
+    "selectGovernment": "Select governorate",
+    "zone": "Zone",
+    "selectZone": "Select zone",
+    "save": "Save Changes",
+    "socialMedia": "Social Media",
+    "noSocialMedia": "No social media links added yet.",
+    "editLink": "Edit Link",
+    "addSocialMedia": "Add Social Media",
+    "url": "URL",
+    "removeLinkTitle": "Remove Link?",
+    "removeLinkDesc": "This will remove this social media link from your profile.",
+    "teachingLocations": "Teaching Locations",
+    "noLocations": "No teaching locations added yet.",
+    "locationType": {
+      "school": "School",
+      "center": "Center"
+    },
+    "editLocation": "Edit Location",
+    "addLocation": "Add Location",
+    "locationName": "Location Name",
+    "locationPlaceholder": "e.g. Al-Azhar School",
+    "locationTypeLabel": "Type",
+    "selectType": "Select type",
+    "deleteLocationTitle": "Delete Location?",
+    "deleteLocationDesc": "This will permanently remove this teaching location."
+  },
+  "common": {
+    "loading": "Loading...",
+    "add": "Add",
+    "cancel": "Cancel",
+    "update": "Update",
+    "remove": "Remove",
+    "delete": "Delete"
+  }
+}

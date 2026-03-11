@@ -17,7 +17,7 @@ i18n
         backend: {
             loadPath: '/locales/{{lng}}/{{ns}}.json',
         },
-        ns: ['landing', 'auth', 'checkout', 'market', 'cart', 'PDFViewer', 'userManagement', 'admin', 'product'],
+        ns: ['landing', 'auth', 'checkout', 'market', 'cart', 'PDFViewer', 'userManagement', 'admin', 'product', 'teacher'],
         defaultNS: 'landing',
         detection: {
             order: ['queryString', 'cookie', 'localStorage', 'navigator'],

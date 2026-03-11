@@ -1,0 +1,72 @@
+{
+  "layout": {
+    "openSidebar": "فتح القائمة الجانبية"
+  },
+  "portalTitle": "بوابة المعلم",
+  "nav": {
+    "expandSidebar": "توسيع القائمة الجانبية",
+    "collapseSidebar": "طي القائمة الجانبية",
+    "closeSidebar": "إغلاق القائمة الجانبية",
+    "profile": "ملفي الشخصي",
+    "orders": "طلباتي",
+    "settings": "الإعدادات",
+    "themeToggle": "تبديل المظهر",
+    "lightMode": "الوضع المتزن (النهاري)",
+    "darkMode": "الوضع الداكن (الليلي)",
+    "backToStore": "العودة للمتجر",
+    "logout": "تسجيل الخروج"
+  },
+  "settings": {
+    "title": "إعدادات الحساب",
+    "description": "إدارة كلمة المرور والحسابات المرتبطة وأمان الجلسة"
+  },
+  "profile": {
+    "title": "ملفي الشخصي",
+    "description": "إدارة معلوماتك الشخصية وتفاصيل التدريس الخاص بك",
+    "personalInfo": "المعلومات الشخصية",
+    "name": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "secondaryPhone": "رقم هاتف إضافي",
+    "gender": "الجنس",
+    "selectGender": "اختر الجنس",
+    "male": "ذكر",
+    "female": "أنثى",
+    "teacherInfo": "معلومات التدريس",
+    "subject": "المادة",
+    "selectSubject": "اختر المادة",
+    "government": "المحافظة",
+    "selectGovernment": "اختر المحافظة",
+    "zone": "المنطقة",
+    "selectZone": "اختر المنطقة",
+    "save": "حفظ التغييرات",
+    "socialMedia": "وسائل التواصل الاجتماعي",
+    "noSocialMedia": "لم تتم إضافة بيانات تواصل اجتماعي بعد.",
+    "editLink": "تعديل الرابط",
+    "addSocialMedia": "إضافة تواصل اجتماعي",
+    "url": "الرابط",
+    "removeLinkTitle": "إزالة الرابط؟",
+    "removeLinkDesc": "سيتم إزالة هذا الرابط من ملفك الشخصي.",
+    "teachingLocations": "أماكن التدريس",
+    "noLocations": "لم تتم إضافة أماكن تدريس بعد.",
+    "locationType": {
+      "school": "مدرسة",
+      "center": "سنتر/مركز"
+    },
+    "editLocation": "تعديل المكان",
+    "addLocation": "إضافة مكان",
+    "locationName": "اسم المكان",
+    "locationPlaceholder": "مثل: مدرسة الأزهر",
+    "locationTypeLabel": "النوع",
+    "selectType": "اختر النوع",
+    "deleteLocationTitle": "حذف المكان؟",
+    "deleteLocationDesc": "سيتم إزالة مكان التدريس هذا نهائياً."
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "add": "إضافة",
+    "cancel": "إلغاء",
+    "update": "تحديث",
+    "remove": "إزالة",
+    "delete": "حذف"
+  }
+}

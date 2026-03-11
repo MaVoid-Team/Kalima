@@ -5,7 +5,7 @@ import LoadingSpinner from "@/components/ui/loading-spinner";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AdminRoute from "./components/AdminRoute";
+import RoleRoute from "./components/RoleRoute"; // REPLACED AdminRoute
 import MainLayout from "./layouts/MainLayout";
 import CouponsPage from "./pages/admin/coupons/CouponsPage";
 
@@ -37,6 +37,7 @@ const CartPage = lazy(() => import("./pages/cart/CartPage"));
 
 // Admin lazy-loaded pages
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
+const DashboardPage = lazy(() => import("./pages/admin/dashboard/DashboardPage"));
 const OrdersPage = lazy(() => import("./pages/admin/orders/OrdersPage"));
 const OrderDetailPage = lazy(
   () => import("./pages/admin/orders/OrderDetailPage"),
@@ -60,6 +61,11 @@ const SamplesDirectoryPage = lazy(() => import("./pages/sample/SamplesDirectoryP
 const SamplePreview = lazy(() => import("./pages/sample/SamplePreviewPage"))
 // User lazy-loaded pages
 const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
+
+// Teacher lazy-loaded pages
+const TeacherLayout = lazy(() => import("./layouts/TeacherLayout"));
+const TeacherProfilePage = lazy(() => import("./pages/teacher/profile/TeacherProfilePage"));
+const TeacherSettingsPage = lazy(() => import("./pages/teacher/settings/TeacherSettingsPage"));
 
 const PageLoader = () => (
   <div className="flex min-h-screen items-center justify-center">
@@ -114,8 +120,10 @@ const router = createBrowserRouter(
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Admin Routes */}
-      <Route element={<AdminRoute />}>
+      <Route element={<RoleRoute requiredRole={["Admin", "SubAdmin"]} />}>
         <Route element={<AdminLayout />}>
+          <Route path="/admin" element={<DashboardPage />} />
+          <Route path="/admin/dashboard" element={<DashboardPage />} />
           <Route path="/admin/orders" element={<OrdersPage />} />
           <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
           <Route path="/admin/products" element={<ProductsPage />} />
@@ -130,6 +138,14 @@ const router = createBrowserRouter(
           <Route path="/admin/samples" element={<AdminSamplesPage />} />
           <Route path="/admin/coupons" element={<CouponsPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
+        </Route>
+      </Route>
+
+      {/* Teacher Routes */}
+      <Route element={<RoleRoute requiredRole={["Teacher"]} />}>
+        <Route element={<TeacherLayout />}>
+          <Route path="/teacher/profile" element={<TeacherProfilePage />} />
+          <Route path="/teacher/settings" element={<TeacherSettingsPage />} />
         </Route>
       </Route>
 

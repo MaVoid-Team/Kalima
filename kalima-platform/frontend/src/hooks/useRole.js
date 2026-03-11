@@ -15,12 +15,16 @@ export function useRole() {
 
     const isAdmin = storeRoles.includes("Admin");
     const isSubAdmin = storeRoles.includes("SubAdmin");
+    const isTeacher = storeRoles.includes("Teacher");
     const hasAdminAccess = isAdmin || isSubAdmin;
+    const hasStoreAccess = storeRoles.includes("User");
 
     return {
         isAdmin,
         isSubAdmin,
+        isTeacher,
         hasAdminAccess,
+        hasStoreAccess,
         portalAccess,
         storeRoles,
     };

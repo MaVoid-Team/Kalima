@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput } from 'lucide-react';
+import { ShoppingBag, User, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Settings } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 
-const ADMIN_THEME_STORAGE_KEY = 'adminTheme';
 
-export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
-  const { t, i18n } = useTranslation(['admin', 'userManagement']);
+const TEACHER_THEME_STORAGE_KEY = 'teacherTheme';
+
+export default function TeacherSidebar({ isMobileOpen, setIsMobileOpen }) {
+  const { t, i18n } = useTranslation('teacher');
   const { logout } = useAuth();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -16,7 +17,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
   const isRtl = i18n.dir() === 'rtl';
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem(ADMIN_THEME_STORAGE_KEY);
+    const savedTheme = localStorage.getItem(TEACHER_THEME_STORAGE_KEY);
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
 
@@ -32,22 +33,14 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
-    localStorage.setItem(ADMIN_THEME_STORAGE_KEY, nextTheme);
+    localStorage.setItem(TEACHER_THEME_STORAGE_KEY, nextTheme);
     document.documentElement.classList.toggle('dark', nextTheme === 'dark');
   };
 
-  // Using userManagement namespace explicitly for the users translation
   const navigation = [
-    { name: t('nav.dashboard', 'Dashboard'), href: '/admin/dashboard', icon: Home },
-    { name: t('nav.orders'), href: '/admin/orders', icon: ShoppingCart },
-    { name: t('nav.products'), href: '/admin/products', icon: Package },
-    { name: t('nav.samples'), href: '/admin/samples', icon: FileText },
-    { name: t('nav.coupons'), href: '/admin/coupons', icon: Ticket },
-    { name: t('nav.categories'), href: '/admin/categories', icon: LayoutGrid },
-    { name: t('nav.requiredFields'), href: '/admin/required-fields', icon: FormInput },
-    { name: t('nav.paymentMethods', 'Payment Methods'), href: '/admin/payment-methods', icon: CreditCard },
-    { name: i18n.t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users },
-    { name: t('nav.settings'), href: '/admin/settings', icon: Settings },
+    { name: t('nav.profile', 'My Profile'), href: '/teacher/profile', icon: User },
+    { name: t('nav.orders', 'My Orders'), href: '/orders', icon: ShoppingBag },
+    { name: t('nav.settings', 'Settings'), href: '/teacher/settings', icon: Settings },
   ];
 
   const toggleLanguage = () => {
@@ -69,7 +62,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
         <span
           className={`text-lg font-bold truncate ${isCollapsed ? "lg:hidden" : ""}`}
         >
-          {t("dashboardTitle")}
+          {t("portalTitle", "Teacher Portal")}
         </span>
 
         <div className="flex items-center gap-2">
@@ -77,8 +70,8 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5 hidden lg:block"
-            title={isCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
-            data-testid="admin-sidebar-mobile-toggle-button"
+            title={isCollapsed ? t('nav.expandSidebar', 'Expand sidebar') : t('nav.collapseSidebar', 'Collapse sidebar')}
+            data-testid="teacher-sidebar-mobile-toggle-button"
           >
             {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
           </button>
@@ -87,8 +80,8 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
           <button
             className="lg:hidden text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5"
             onClick={() => setIsMobileOpen(false)}
-            title={t('nav.closeSidebar')}
-            data-testid="admin-sidebar-mobile-close-button"
+            title={t('nav.closeSidebar', 'Close sidebar')}
+            data-testid="teacher-sidebar-mobile-close-button"
           >
             <X size={20} />
           </button>
@@ -104,7 +97,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
               key={item.name}
               to={item.href}
               title={isCollapsed ? item.name : undefined}
-              data-testid={`admin-sidebar-nav-${item.name.toLowerCase()}`}
+              data-testid={`teacher-sidebar-nav-${item.name.toLowerCase().replace(/\\s+/g, '-')}`}
               className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive
                 ? "bg-sidebar-primary text-sidebar-primary-foreground"
                 : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
@@ -128,7 +121,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
           onClick={toggleLanguage}
           title={isCollapsed ? (i18n.language === 'ar' ? 'English' : 'العربية') : undefined}
           className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
-          data-testid="admin-sidebar-language-toggle"
+          data-testid="teacher-sidebar-language-toggle"
         >
           <Globe className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
           <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{i18n.language === 'ar' ? 'English' : 'العربية'}</span>
@@ -136,9 +129,9 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
 
         <button
           onClick={toggleTheme}
-          title={isCollapsed ? t('nav.themeToggle') : undefined}
+          title={isCollapsed ? t('nav.themeToggle', 'Toggle theme') : undefined}
           className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
-          data-testid="admin-sidebar-theme-toggle"
+          data-testid="teacher-sidebar-theme-toggle"
         >
           {theme === 'dark' ? (
             <Sun className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
@@ -146,35 +139,35 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
             <Moon className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
           )}
           <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>
-            {theme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
+            {theme === 'dark' ? t('nav.lightMode', 'Light mode') : t('nav.darkMode', 'Dark mode')}
           </span>
         </button>
 
         <Link
           to="/market"
-          title={isCollapsed ? t("nav.backToStore") : undefined}
+          title={isCollapsed ? t("nav.backToStore", "Store") : undefined}
           className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? "lg:justify-center" : ""}`}
-          data-testid="admin-sidebar-back-store-link"
+          data-testid="teacher-sidebar-back-store-link"
         >
           <Home
             className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}
           />
           <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
-            {t("nav.backToStore")}
+            {t("nav.backToStore", "Back to Store")}
           </span>
         </Link>
 
         <button
           onClick={logout}
-          title={isCollapsed ? t("nav.logout") : undefined}
+          title={isCollapsed ? t("nav.logout", "Logout") : undefined}
           className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 ${isCollapsed ? "lg:justify-center" : ""}`}
-          data-testid="admin-sidebar-logout-button"
+          data-testid="teacher-sidebar-logout-button"
         >
           <LogOut
             className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}
           />
           <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
-            {t("nav.logout")}
+            {t("nav.logout", "Logout")}
           </span>
         </button>
       </div>
