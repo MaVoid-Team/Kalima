@@ -15,6 +15,8 @@
    - [List Users](#list-users)
    - [Get User](#get-user)
    - [Delete User](#delete-user)
+   - [[NEW] Approve User](#new-approve-user)
+   - [[NEW] Reject User](#new-reject-user)
 3. [Role Management](#role-management)
    - [Get User Roles](#get-user-roles)
    - [Assign Role](#assign-role)
@@ -24,6 +26,9 @@
 5. [Common Response Types](#common-response-types)
 6. [Error Codes](#error-codes)
 7. [Admin Dashboard](#admin-dashboard)
+8. [[NEW] Account Review Settings](#new-account-review-settings)
+   - [Get Account Review Settings](#get-account-review-settings)
+   - [Upsert Account Review Settings](#upsert-account-review-settings)
 
 ---
 
@@ -261,6 +266,52 @@ Permanently deletes a user account (performs a **soft-delete** and anonymization
 | 400    | `Invalid user ID`                                                                            |
 | 400    | `Cannot delete your own account via this endpoint. Use DELETE /auth/delete-account instead.` |
 | 404    | `User not found`                                                                             |
+
+---
+
+### [NEW] Approve User
+
+Set a user's `confirmed` status to `true`.
+
+**Endpoint:** `POST /users/:userId/approve`  
+**Auth Required:** Yes (Admin)
+
+**Path Parameters:**
+
+| Parameter | Type   | Description   |
+| --------- | ------ | ------------- |
+| `userId`  | number | The user's ID |
+
+**Request Body:** None
+
+**Example Request:**
+```bash
+curl -X POST http://localhost:5000/api/v2/admin/users/123/approve \
+  -H "Authorization: Bearer <access_token>"
+```
+
+---
+
+### [NEW] Reject User
+
+Set a user's `confirmed` status to `false`.
+
+**Endpoint:** `POST /users/:userId/reject`  
+**Auth Required:** Yes (Admin)
+
+**Path Parameters:**
+
+| Parameter | Type   | Description   |
+| --------- | ------ | ------------- |
+| `userId`  | number | The user's ID |
+
+**Request Body:** None
+
+**Example Request:**
+```bash
+curl -X POST http://localhost:5000/api/v2/admin/users/123/reject \
+  -H "Authorization: Bearer <access_token>"
+```
 
 ---
 
@@ -654,3 +705,80 @@ Returns total users, total verified users, and count of unique users per role.
 > - `POST /admin/users/:userId/ban` — Ban/suspend a user
 > - `POST /admin/users/:userId/unban` — Unban a user
 > - `GET /admin/audit-log` — Admin action audit trail
+
+---
+
+## [NEW] Account Review Settings
+
+Manage the account review settings. This determines whether newly registered users (by role) require manual admin approval before their `confirmed` flag is set to `true`.
+
+### Get Account Review Settings
+
+Get all current account review settings.
+
+**Endpoint:** `GET /account-review-settings`  
+**Auth Required:** Yes (Admin)
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "role": "Teacher",
+      "requires_review": true,
+      "updated_at": "2026-03-01T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+### Upsert Account Review Settings
+
+Update or insert multiple review settings at once.
+
+**Endpoint:** `PUT /account-review-settings`  
+**Auth Required:** Yes (Admin)
+
+**Request Body:**
+
+```json
+{
+  "settings": [
+    {
+      "role": "Teacher",
+      "requires_review": true
+    },
+    {
+      "role": "Student",
+      "requires_review": false
+    }
+  ]
+}
+```
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "role": "Teacher",
+      "requires_review": true,
+      "updated_at": "2026-03-10T12:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "role": "Student",
+      "requires_review": false,
+      "updated_at": "2026-03-10T12:00:00.000Z"
+    }
+  ]
+}
+```

@@ -15,6 +15,7 @@
    - [Get Product by ID](#get-product-by-id)
    - [Get Product Coupons](#get-product-coupons)
    - [Get Product Gallery](#get-product-gallery)
+   - [[NEW] Get Product Gallery Full](#new-get-product-gallery-full)
    - [Get Product Required Fields](#get-product-required-fields)
 2. [Customer Endpoints](#customer-endpoints)
    - [Check Review Eligibility](#check-review-eligibility)
@@ -28,6 +29,9 @@
    - [Upload Thumbnail](#upload-thumbnail)
    - [Remove Thumbnail](#remove-thumbnail)
    - [Add Gallery Images](#add-gallery-images)
+   - [[NEW] Add Gallery Videos](#new-add-gallery-videos)
+   - [[NEW] Add External Gallery Video](#new-add-external-gallery-video)
+   - [[NEW] Remove Gallery Video](#new-remove-gallery-video)
    - [Update Gallery Entry](#update-gallery-entry)
    - [Remove Gallery Entry](#remove-gallery-entry)
    - [Attach Categories](#attach-categories)
@@ -405,6 +409,21 @@ Returns gallery entries for a product. Optionally include inactive (hidden) entr
 
 ---
 
+### [NEW] Get Product Gallery Full
+
+Returns combined images and videos from the gallery, sorted by `sort_order`.
+
+**Endpoint:** `GET /:id/gallery/full`  
+**Auth Required:** No
+
+**URL Parameters:**
+
+| Param | Type   | Description |
+| ----- | ------ | ----------- |
+| `id`  | number | Product ID  |
+
+---
+
 ### Get Product Required Fields
 
 Returns required-field definitions attached to the product (used for checkout validations).
@@ -659,7 +678,15 @@ Deletes an existing review.
 
 ### Create Product
 
-Creates a new product. Supports `multipart/form-data` with an optional `thumbnail` image and an optional `sample` PDF. The `category_ids` array must be sent as a JSON string when using form-data.
+Creates a new product. Supports `multipart/form-data` with an optional `thumbnail` image and optional `high_quality` and `low_quality` sample files. The `category_ids` array must be sent as a JSON string when using form-data.
+
+**Sample Attachment Options:**
+
+1. **Upload new sample**: Send `high_quality` and/or `low_quality` files + `sample_section_id`.
+2. **Link existing sample**: Send `sample_id` (ID of an already-uploaded sample) to re-assign it to this product.
+   _(If both are provided, `sample_id` takes precedence and files are replaced on the existing sample)._
+
+> **Validation**: If `high_quality` or `low_quality` files are provided **without** `sample_section_id` **and without** `sample_id`, the request will fail with a `400 Bad Request`.
 
 **Endpoint:** `POST /`  
 **Auth Required:** Yes (Admin, SubAdmin)  
@@ -676,16 +703,19 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
   "price_after_discount": "number (optional, >= 0)",
   "serial": "string (optional, max 255)",
   "sample_url": "string (optional)",
-  "category_ids": "JSON array of ints (optional, e.g. [1, 3])"
+  "sample_section_id": "number (optional, required if uploading new sample files)",
+  "sample_id": "number (optional, ID of an existing sample to link)",
+  "category_id": "number (optional, e.g. 1)"
 }
 ```
 
 **File Fields:**
 
-| Field       | Type  | Max Size | Description                  |
-| ----------- | ----- | -------- | ---------------------------- |
-| `thumbnail` | image | 150 MB   | Product thumbnail (optional) |
-| `sample`    | PDF   | 150 MB   | Sample file (optional)       |
+| Field          | Type            | Max Size | Description                         |
+| -------------- | --------------- | -------- | ----------------------------------- |
+| `thumbnail`    | image           | 150 MB   | Product thumbnail (optional)        |
+| `high_quality` | PDF/Image/Video | 150 MB   | High-quality sample file (optional) |
+| `low_quality`  | PDF/Image/Video | 150 MB   | Low-quality sample file (optional)  |
 
 **Example — JSON body (no file upload):**
 
@@ -701,14 +731,24 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 
 **Example — form-data (with file upload):**
 
-| Field          | Value          |
-| -------------- | -------------- |
-| `title`        | Algebra Book   |
-| `price`        | 100            |
-| `type`         | Book           |
-| `category_ids` | [1,3]          |
-| `thumbnail`    | _(image file)_ |
-| `sample`       | _(PDF file)_   |
+| Field               | Value          |
+| ------------------- | -------------- |
+| `title`             | Algebra Book   |
+| `price`             | 100            |
+| `type`              | Book           |
+| `category_id`       | 1              |
+| `thumbnail`         | _(image file)_ |
+| `sample_section_id` | 2              |
+| `high_quality`      | _(PDF file)_   |
+| `low_quality`       | _(PDF file)_   |
+
+**Example — form-data (link existing sample):**
+
+| Field       | Value        |
+| ----------- | ------------ |
+| `title`     | Algebra Book |
+| `price`     | 100          |
+| `sample_id` | 42           |
 
 **Success Response (201):**
 
@@ -756,10 +796,19 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 
 ### Update Product
 
-Updates one or more fields on an existing product. All fields are optional.
+Updates one or more fields on an existing product. All fields are optional. Supports `multipart/form-data` for replacing `high_quality` and `low_quality` sample files. **Note**: Thumbnail updates must be performed using the dedicated `POST /:id/thumbnail` endpoint.
+
+**Sample Update Options:**
+
+1. **Upload brand new sample**: Send `high_quality` and/or `low_quality` files + `sample_section_id`. This deletes the old sample and creates a new one.
+2. **Link existing sample**: Send `sample_id` without files. Re-assigns the sample to this product.
+3. **Replace files on existing sample**: Send `sample_id` + `high_quality` and/or `low_quality` files.
+
+> **Validation**: If `high_quality` or `low_quality` files are provided **without** `sample_section_id` **and without** `sample_id`, the request will fail with a `400 Bad Request`.
 
 **Endpoint:** `PATCH /:id`  
 **Auth Required:** Yes (Admin, SubAdmin)
+**Content-Type:** `application/json` or `multipart/form-data`
 
 **URL Parameters:**
 
@@ -778,9 +827,18 @@ Updates one or more fields on an existing product. All fields are optional.
   "price_after_discount": "number (>= 0)",
   "serial": "string (max 255)",
   "sample_url": "string",
+  "sample_section_id": "number (optional, required if uploading brand new sample files)",
+  "sample_id": "number (optional, ID of sample to link/replace files for)",
   "is_archived": "boolean"
 }
 ```
+
+**File Fields (multipart/form-data only):**
+
+| Field          | Type            | Max Size | Description                         |
+| -------------- | --------------- | -------- | ----------------------------------- |
+| `high_quality` | PDF/Image/Video | 150 MB   | High-quality sample file (optional) |
+| `low_quality`  | PDF/Image/Video | 150 MB   | Low-quality sample file (optional)  |
 
 **Example — Update price and archive:**
 
@@ -975,6 +1033,89 @@ Uploads 1–10 images to the product gallery. Images are compressed by default.
 | 400    | `Invalid product ID` | ID is not a number                        |
 | 400    | `No images provided` | No files in request                       |
 | 404    | `Product not found`  | Product does not exist or is soft-deleted |
+
+---
+
+### [NEW] Add Gallery Videos
+
+Uploads a video to the product gallery (multipart, mp4/webm/quicktime, max 100MB).
+
+**Endpoint:** `POST /:id/gallery/videos`  
+**Auth Required:** Yes (Admin, SubAdmin)  
+**Content-Type:** `multipart/form-data`
+
+**URL Parameters:**
+
+| Param | Type   | Description |
+| ----- | ------ | ----------- |
+| `id`  | number | Product ID  |
+
+**File Fields:**
+
+| Field   | Type  | Max Size | Description |
+| ------- | ----- | -------- | ----------- |
+| `video` | video | 100 MB   | Video file  |
+
+**Example Request:**
+
+```bash
+curl -X POST http://localhost:5000/api/v2/products/1/gallery/videos \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: multipart/form-data" \
+  -F "video=@/path/to/myvideo.mp4"
+```
+
+---
+
+### [NEW] Add External Gallery Video
+
+Adds an external video URL to the product gallery.
+
+**Endpoint:** `POST /:id/gallery/videos/external`  
+**Auth Required:** Yes (Admin, SubAdmin)
+
+**URL Parameters:**
+
+| Param | Type   | Description |
+| ----- | ------ | ----------- |
+| `id`  | number | Product ID  |
+
+**Request Body:**
+
+```json
+{
+  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+}
+```
+
+| Field | Type   | Required | Description            |
+| ----- | ------ | -------- | ---------------------- |
+| `url` | string | Yes      | The external video URL |
+
+**Example Request:**
+
+```bash
+curl -X POST http://localhost:5000/api/v2/products/1/gallery/videos/external \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}'
+```
+
+---
+
+### [NEW] Remove Gallery Video
+
+Removes a video from the product gallery.
+
+**Endpoint:** `DELETE /:id/gallery/videos/:videoId`  
+**Auth Required:** Yes (Admin, SubAdmin)
+
+**URL Parameters:**
+
+| Param     | Type   | Description |
+| --------- | ------ | ----------- |
+| `id`      | number | Product ID  |
+| `videoId` | number | Video ID    |
 
 ---
 
