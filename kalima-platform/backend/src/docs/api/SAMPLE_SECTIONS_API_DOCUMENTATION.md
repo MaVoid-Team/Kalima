@@ -102,6 +102,34 @@ Create a new sample section.
 **Endpoint:** `POST /`  
 **Auth Required:** Yes (Admin)
 
+**Request Body:**
+
+```json
+{
+  "title": "Audio Samples",
+  "description": "High quality audio files",
+  "thumbnail_url": "https://example.com/thumb.png",
+  "sort_order": 1,
+  "active": true
+}
+```
+
+| Field           | Type    | Required | Description |
+| --------------- | ------- | -------- | ----------- |
+| `title`         | string  | Yes      | Max 255 chars |
+| `description`   | string  | No       | |
+| `thumbnail_url` | string  | No       | |
+| `sort_order`    | number  | No       | Min 0 |
+| `active`        | boolean | No       | |
+
+**Example Request:**
+```bash
+curl -X POST http://localhost:5000/api/v2/sample-sections \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Audio Samples", "active": true}'
+```
+
 ---
 
 ### [NEW] Update Sample Section
@@ -116,6 +144,31 @@ Update an existing sample section.
 | Param | Type   | Description |
 | ----- | ------ | ----------- |
 | `id`  | string | Section ID  |
+
+**Request Body (All Optional):**
+
+```json
+{
+  "title": "Video Samples",
+  "active": false
+}
+```
+
+| Field           | Type    | Required | Description |
+| --------------- | ------- | -------- | ----------- |
+| `title`         | string  | No       | Max 255 chars |
+| `description`   | string  | No       | |
+| `thumbnail_url` | string  | No       | |
+| `sort_order`    | number  | No       | Min 0 |
+| `active`        | boolean | No       | |
+
+**Example Request:**
+```bash
+curl -X PATCH http://localhost:5000/api/v2/sample-sections/1 \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Video Samples"}'
+```
 
 ---
 
@@ -148,6 +201,24 @@ Create a sample within a specific section. This endpoint accepts multipart form 
 | ----------- | ------ | ----------- |
 | `sectionId` | string | Section ID  |
 
+**Form Data Fields:**
+
+| Field        | Type   | Required | Description |
+| ------------ | ------ | -------- | ----------- |
+| `product_id` | number | Yes      | ID of the product this sample belongs to |
+| `media_type` | enum   | No       | `Video`, `Audio`, `Document`, `Image` |
+| `file`       | file   | Yes      | The actual sample file to upload |
+
+**Example Request:**
+```bash
+curl -X POST http://localhost:5000/api/v2/sample-sections/1/samples \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: multipart/form-data" \
+  -F "product_id=5" \
+  -F "media_type=Audio" \
+  -F "file=@/path/to/sample.mp3"
+```
+
 ---
 
 ### [NEW] Update Sample
@@ -163,6 +234,28 @@ Update an existing sample within a section.
 | ----------- | ------ | ----------- |
 | `sectionId` | string | Section ID  |
 | `id`        | string | Sample ID   |
+
+**Request Body (All Optional):**
+
+```json
+{
+  "product_id": 10,
+  "media_type": "Video"
+}
+```
+
+| Field        | Type   | Required | Description |
+| ------------ | ------ | -------- | ----------- |
+| `product_id` | number | No       | The product ID |
+| `media_type` | enum   | No       | `Video`, `Audio`, `Document`, `Image` |
+
+**Example Request:**
+```bash
+curl -X PATCH http://localhost:5000/api/v2/sample-sections/1/samples/5 \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"media_type": "Video"}'
+```
 
 ---
 
