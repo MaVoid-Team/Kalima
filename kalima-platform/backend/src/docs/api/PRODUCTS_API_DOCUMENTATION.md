@@ -680,6 +680,13 @@ Deletes an existing review.
 
 Creates a new product. Supports `multipart/form-data` with an optional `thumbnail` image and optional `high_quality` and `low_quality` sample files. The `category_ids` array must be sent as a JSON string when using form-data.
 
+**Sample Attachment Options:**
+1. **Upload new sample**: Send `high_quality` and/or `low_quality` files + `sample_section_id`.
+2. **Link existing sample**: Send `sample_id` (ID of an already-uploaded sample) to re-assign it to this product.
+*(If both are provided, `sample_id` takes precedence and files are replaced on the existing sample).*
+
+> **Validation**: If `high_quality` or `low_quality` files are provided **without** `sample_section_id` **and without** `sample_id`, the request will fail with a `400 Bad Request`.
+
 **Endpoint:** `POST /`  
 **Auth Required:** Yes (Admin, SubAdmin)  
 **Content-Type:** `multipart/form-data`
@@ -695,18 +702,19 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
   "price_after_discount": "number (optional, >= 0)",
   "serial": "string (optional, max 255)",
   "sample_url": "string (optional)",
-  "sample_section_id": "number (optional, required if attaching sample files)",
-  "category_id": "JSON array of ints (optional, e.g. [1, 3])"
+  "sample_section_id": "number (optional, required if uploading new sample files)",
+  "sample_id": "number (optional, ID of an existing sample to link)",
+  "category_id": "number (optional, e.g. 1)"
 }
 ```
 
 **File Fields:**
 
-| Field          | Type             | Max Size | Description                  |
-| -------------- | ---------------- | -------- | ---------------------------- |
-| `thumbnail`    | image            | 150 MB   | Product thumbnail (optional) |
-| `high_quality` | PDF/Image/Video  | 150 MB   | High-quality sample file (optional) |
-| `low_quality`  | PDF/Image/Video  | 150 MB   | Low-quality sample file (optional)  |
+| Field          | Type            | Max Size | Description                         |
+| -------------- | --------------- | -------- | ----------------------------------- |
+| `thumbnail`    | image           | 150 MB   | Product thumbnail (optional)        |
+| `high_quality` | PDF/Image/Video | 150 MB   | High-quality sample file (optional) |
+| `low_quality`  | PDF/Image/Video | 150 MB   | Low-quality sample file (optional)  |
 
 **Example — JSON body (no file upload):**
 
@@ -722,16 +730,24 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 
 **Example — form-data (with file upload):**
 
-| Field          | Value          |
-| -------------- | -------------- |
-| `title`        | Algebra Book   |
-| `price`        | 100            |
-| `type`         | Book           |
-| `category_ids` | [1,3]          |
+| Field               | Value          |
+| ------------------- | -------------- |
+| `title`             | Algebra Book   |
+| `price`             | 100            |
+| `type`              | Book           |
+| `category_ids`      | [1,3]          |
 | `thumbnail`         | _(image file)_ |
 | `sample_section_id` | 2              |
 | `high_quality`      | _(PDF file)_   |
 | `low_quality`       | _(PDF file)_   |
+
+**Example — form-data (link existing sample):**
+
+| Field          | Value          |
+| -------------- | -------------- |
+| `title`        | Algebra Book   |
+| `price`        | 100            |
+| `sample_id`    | 42             |
 
 **Success Response (201):**
 
@@ -781,6 +797,13 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 
 Updates one or more fields on an existing product. All fields are optional. Supports `multipart/form-data` for replacing `high_quality` and `low_quality` sample files. **Note**: Thumbnail updates must be performed using the dedicated `POST /:id/thumbnail` endpoint.
 
+**Sample Update Options:**
+1. **Upload brand new sample**: Send `high_quality` and/or `low_quality` files + `sample_section_id`. This deletes the old sample and creates a new one.
+2. **Link existing sample**: Send `sample_id` without files. Re-assigns the sample to this product.
+3. **Replace files on existing sample**: Send `sample_id` + `high_quality` and/or `low_quality` files.
+
+> **Validation**: If `high_quality` or `low_quality` files are provided **without** `sample_section_id` **and without** `sample_id`, the request will fail with a `400 Bad Request`.
+
 **Endpoint:** `PATCH /:id`  
 **Auth Required:** Yes (Admin, SubAdmin)
 **Content-Type:** `application/json` or `multipart/form-data`
@@ -802,17 +825,18 @@ Updates one or more fields on an existing product. All fields are optional. Supp
   "price_after_discount": "number (>= 0)",
   "serial": "string (max 255)",
   "sample_url": "string",
-  "sample_section_id": "number",
+  "sample_section_id": "number (optional, required if uploading brand new sample files)",
+  "sample_id": "number (optional, ID of sample to link/replace files for)",
   "is_archived": "boolean"
 }
 ```
 
 **File Fields (multipart/form-data only):**
 
-| Field          | Type             | Max Size | Description                  |
-| -------------- | ---------------- | -------- | ---------------------------- |
-| `high_quality` | PDF/Image/Video  | 150 MB   | High-quality sample file (optional) |
-| `low_quality`  | PDF/Image/Video  | 150 MB   | Low-quality sample file (optional)  |
+| Field          | Type            | Max Size | Description                         |
+| -------------- | --------------- | -------- | ----------------------------------- |
+| `high_quality` | PDF/Image/Video | 150 MB   | High-quality sample file (optional) |
+| `low_quality`  | PDF/Image/Video | 150 MB   | Low-quality sample file (optional)  |
 
 **Example — Update price and archive:**
 
