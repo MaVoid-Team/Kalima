@@ -69,12 +69,13 @@ export const productController = {
 
       const dto = await validateDto(CreateProductDto, req.body);
       const files = req.files as
-        | { thumbnail?: Express.Multer.File[]; sample?: Express.Multer.File[] }
+        | { thumbnail?: Express.Multer.File[]; high_quality?: Express.Multer.File[]; low_quality?: Express.Multer.File[] }
         | undefined;
       const thumbnailFile = files?.thumbnail?.[0];
-      const sampleFile = files?.sample?.[0];
+      const highQualityFile = files?.high_quality?.[0];
+      const lowQualityFile = files?.low_quality?.[0];
 
-      const product = await productService.createProduct(dto, thumbnailFile, sampleFile);
+      const product = await productService.createProduct(dto, thumbnailFile, highQualityFile, lowQualityFile);
 
       res.status(201).json({
         success: true,
@@ -213,10 +214,11 @@ export const productController = {
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
       const dto = await validateDto(UpdateProductDto, req.body);
-      const files = req.files as { sample?: Express.Multer.File[] } | undefined;
-      const sampleFile = files?.sample?.[0];
+      const files = req.files as { high_quality?: Express.Multer.File[]; low_quality?: Express.Multer.File[] } | undefined;
+      const highQualityFile = files?.high_quality?.[0];
+      const lowQualityFile = files?.low_quality?.[0];
 
-      const product = await productService.updateProduct(id, dto, sampleFile);
+      const product = await productService.updateProduct(id, dto, highQualityFile, lowQualityFile);
 
       res.status(200).json({
         success: true,

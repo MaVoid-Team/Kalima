@@ -103,13 +103,13 @@ function productWithSampleFilter(
   if (file.fieldname === "thumbnail") {
     return imageFilter(_req, file, cb);
   }
-  if (file.fieldname === "sample") {
+  if (file.fieldname === "high_quality" || file.fieldname === "low_quality") {
     if (SAMPLE_SECTION_MIME_TYPES.has(file.mimetype)) {
       cb(null, true);
     } else {
       cb(
         new BadRequestError(
-          "Sample must be a PDF, image, video, Word, or PowerPoint file",
+          `Invalid file type for ${file.fieldname}. Allowed: PDF, images, video, Word, or PowerPoint`,
         ) as any,
         false,
       );
@@ -119,31 +119,32 @@ function productWithSampleFilter(
   cb(null, true);
 }
 
-/** Product create: thumbnail (image) + optional sample (PDF). Max 150 MB per file. */
+/** Product create: thumbnail (image) + sample files (high/low quality). Max 150 MB per file. */
 export const uploadProductWithSample = multer({
   storage: memoryStorage,
   fileFilter: productWithSampleFilter,
   limits: { fileSize: 150 * 1024 * 1024 },
 }).fields([
   { name: "thumbnail", maxCount: 1 },
-  { name: "sample", maxCount: 1 },
+  { name: "high_quality", maxCount: 1 },
+  { name: "low_quality", maxCount: 1 },
 ]);
 
-/** Product update: optional sample (PDF). Max 150 MB. For multipart PATCH. */
+/** Product update: sample files (high/low quality). Max 150 MB. For multipart PATCH. */
 function sampleOnlyFilter(
   _req: Request,
   file: Express.Multer.File,
   cb: FileFilterCallback,
 ): void {
   if (
-    file.fieldname === "sample" &&
+    (file.fieldname === "high_quality" || file.fieldname === "low_quality") &&
     SAMPLE_SECTION_MIME_TYPES.has(file.mimetype)
   ) {
     cb(null, true);
-  } else if (file.fieldname === "sample") {
+  } else if (file.fieldname === "high_quality" || file.fieldname === "low_quality") {
     cb(
       new BadRequestError(
-        "Sample must be a PDF, image, video, Word, or PowerPoint file",
+        `Invalid file type for ${file.fieldname}. Allowed: PDF, images, video, Word, or PowerPoint`,
       ) as any,
       false,
     );
@@ -156,7 +157,10 @@ export const uploadProductUpdate = multer({
   storage: memoryStorage,
   fileFilter: sampleOnlyFilter,
   limits: { fileSize: 150 * 1024 * 1024 },
-}).fields([{ name: "sample", maxCount: 1 }]);
+}).fields([
+  { name: "high_quality", maxCount: 1 },
+  { name: "low_quality", maxCount: 1 },
+]);
 
 // ============================================
 // FAST BUY — payment screenshot + optional product image

@@ -678,7 +678,7 @@ Deletes an existing review.
 
 ### Create Product
 
-Creates a new product. Supports `multipart/form-data` with an optional `thumbnail` image and an optional `sample` PDF. The `category_ids` array must be sent as a JSON string when using form-data.
+Creates a new product. Supports `multipart/form-data` with an optional `thumbnail` image and optional `high_quality` and `low_quality` sample files. The `category_ids` array must be sent as a JSON string when using form-data.
 
 **Endpoint:** `POST /`  
 **Auth Required:** Yes (Admin, SubAdmin)  
@@ -695,16 +695,18 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
   "price_after_discount": "number (optional, >= 0)",
   "serial": "string (optional, max 255)",
   "sample_url": "string (optional)",
-  "category_ids": "JSON array of ints (optional, e.g. [1, 3])"
+  "sample_section_id": "number (optional, required if attaching sample files)",
+  "category_id": "JSON array of ints (optional, e.g. [1, 3])"
 }
 ```
 
 **File Fields:**
 
-| Field       | Type  | Max Size | Description                  |
-| ----------- | ----- | -------- | ---------------------------- |
-| `thumbnail` | image | 150 MB   | Product thumbnail (optional) |
-| `sample`    | PDF   | 150 MB   | Sample file (optional)       |
+| Field          | Type             | Max Size | Description                  |
+| -------------- | ---------------- | -------- | ---------------------------- |
+| `thumbnail`    | image            | 150 MB   | Product thumbnail (optional) |
+| `high_quality` | PDF/Image/Video  | 150 MB   | High-quality sample file (optional) |
+| `low_quality`  | PDF/Image/Video  | 150 MB   | Low-quality sample file (optional)  |
 
 **Example — JSON body (no file upload):**
 
@@ -726,8 +728,10 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 | `price`        | 100            |
 | `type`         | Book           |
 | `category_ids` | [1,3]          |
-| `thumbnail`    | _(image file)_ |
-| `sample`       | _(PDF file)_   |
+| `thumbnail`         | _(image file)_ |
+| `sample_section_id` | 2              |
+| `high_quality`      | _(PDF file)_   |
+| `low_quality`       | _(PDF file)_   |
 
 **Success Response (201):**
 
@@ -775,10 +779,11 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 
 ### Update Product
 
-Updates one or more fields on an existing product. All fields are optional.
+Updates one or more fields on an existing product. All fields are optional. Supports `multipart/form-data` for replacing `high_quality` and `low_quality` sample files. **Note**: Thumbnail updates must be performed using the dedicated `POST /:id/thumbnail` endpoint.
 
 **Endpoint:** `PATCH /:id`  
 **Auth Required:** Yes (Admin, SubAdmin)
+**Content-Type:** `application/json` or `multipart/form-data`
 
 **URL Parameters:**
 
@@ -797,9 +802,17 @@ Updates one or more fields on an existing product. All fields are optional.
   "price_after_discount": "number (>= 0)",
   "serial": "string (max 255)",
   "sample_url": "string",
+  "sample_section_id": "number",
   "is_archived": "boolean"
 }
 ```
+
+**File Fields (multipart/form-data only):**
+
+| Field          | Type             | Max Size | Description                  |
+| -------------- | ---------------- | -------- | ---------------------------- |
+| `high_quality` | PDF/Image/Video  | 150 MB   | High-quality sample file (optional) |
+| `low_quality`  | PDF/Image/Video  | 150 MB   | Low-quality sample file (optional)  |
 
 **Example — Update price and archive:**
 
@@ -1013,11 +1026,12 @@ Uploads a video to the product gallery (multipart, mp4/webm/quicktime, max 100MB
 
 **File Fields:**
 
-| Field   | Type  | Max Size | Description    |
-| ------- | ----- | -------- | -------------- |
-| `video` | video | 100 MB   | Video file     |
+| Field   | Type  | Max Size | Description |
+| ------- | ----- | -------- | ----------- |
+| `video` | video | 100 MB   | Video file  |
 
 **Example Request:**
+
 ```bash
 curl -X POST http://localhost:5000/api/v2/products/1/gallery/videos \
   -H "Authorization: Bearer <access_token>" \
@@ -1048,11 +1062,12 @@ Adds an external video URL to the product gallery.
 }
 ```
 
-| Field | Type   | Required | Description              |
-| ----- | ------ | -------- | ------------------------ |
-| `url` | string | Yes      | The external video URL   |
+| Field | Type   | Required | Description            |
+| ----- | ------ | -------- | ---------------------- |
+| `url` | string | Yes      | The external video URL |
 
 **Example Request:**
+
 ```bash
 curl -X POST http://localhost:5000/api/v2/products/1/gallery/videos/external \
   -H "Authorization: Bearer <access_token>" \

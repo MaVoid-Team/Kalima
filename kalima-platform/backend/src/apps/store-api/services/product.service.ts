@@ -113,7 +113,8 @@ class ProductService {
   async createProduct(
     dto: CreateProductDto,
     thumbnailFile?: Express.Multer.File,
-    sampleFile?: Express.Multer.File,
+    highQualityFile?: Express.Multer.File,
+    lowQualityFile?: Express.Multer.File,
   ): Promise<products> {
     // If category_id provided, verify it exists
     if (dto.category_id) {
@@ -180,11 +181,12 @@ class ProductService {
     }
 
     // Attach sample if provided
-    if (sampleFile && dto.sample_section_id) {
+    if ((highQualityFile || lowQualityFile) && dto.sample_section_id) {
       await this.sampleService.createSample(
         dto.sample_section_id,
         product.id,
-        sampleFile,
+        highQualityFile,
+        lowQualityFile,
       );
     }
 
@@ -309,7 +311,8 @@ class ProductService {
   async updateProduct(
     id: number,
     dto: UpdateProductDto,
-    sampleFile?: Express.Multer.File,
+    highQualityFile?: Express.Multer.File,
+    lowQualityFile?: Express.Multer.File,
   ): Promise<products> {
     const product = await this.db.products.findFirst({
       where: { id, deleted_at: null },
@@ -320,13 +323,13 @@ class ProductService {
     }
 
     // When a new sample file is provided: delete old sample, upload new one
-    if (sampleFile && dto.sample_section_id) {
+    if ((highQualityFile || lowQualityFile) && dto.sample_section_id) {
       if (product.samples && product.samples.length > 0) {
         for (const sample of product.samples) {
           await this.sampleService.deleteSample(sample.id);
         }
       }
-      await this.sampleService.createSample(dto.sample_section_id, id, sampleFile);
+      await this.sampleService.createSample(dto.sample_section_id, id, highQualityFile, lowQualityFile);
       // We don't need to manually update dto.sample_url because the new schema handles it via relations
     }
 
@@ -354,7 +357,8 @@ class ProductService {
     if (
       dto.sample_url !== undefined &&
       dto.sample_url !== null &&
-      !sampleFile &&
+      !highQualityFile &&
+      !lowQualityFile &&
       product.samples &&
       product.samples.length > 0
     ) {
@@ -365,7 +369,7 @@ class ProductService {
       return this.getProductById(id);
     }
 
-    return sampleFile
+    return (highQualityFile || lowQualityFile)
       ? this.getProductById(id)
       : (enrichProductWithReleaseInfo(updated) as products);
   }
