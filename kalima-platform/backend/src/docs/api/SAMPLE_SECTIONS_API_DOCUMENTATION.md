@@ -203,11 +203,14 @@ Create a sample within a specific section. This endpoint accepts multipart form 
 
 **Form Data Fields:**
 
-| Field        | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `product_id` | number | Yes      | ID of the product this sample belongs to |
-| `media_type` | enum   | No       | `Video`, `Audio`, `Document`, `Image` |
-| `file`       | file   | Yes      | The actual sample file to upload |
+| Field          | Type   | Required | Description |
+| -------------- | ------ | -------- | ----------- |
+| `product_id`   | number | Yes      | ID of the product this sample belongs to |
+| `media_type`   | enum   | No       | `Video`, `Audio`, `Document`, `Image` |
+| `high_quality` | file   | No*      | High-quality sample file (protected) |
+| `low_quality`  | file   | No*      | Low-quality sample file (downloadable) |
+
+*\* At least one file must be provided.*
 
 **Example Request:**
 ```bash
@@ -216,7 +219,8 @@ curl -X POST http://localhost:5000/api/v2/sample-sections/1/samples \
   -H "Content-Type: multipart/form-data" \
   -F "product_id=5" \
   -F "media_type=Audio" \
-  -F "file=@/path/to/sample.mp3"
+  -F "high_quality=@/path/to/sample_hq.mp3" \
+  -F "low_quality=@/path/to/sample_lq.mp3"
 ```
 
 ---
@@ -227,6 +231,7 @@ Update an existing sample within a section.
 
 **Endpoint:** `PATCH /:sectionId/samples/:id`  
 **Auth Required:** Yes (Admin)
+**Content-Type:** `multipart/form-data`
 
 **URL Parameters:**
 
@@ -235,26 +240,22 @@ Update an existing sample within a section.
 | `sectionId` | string | Section ID  |
 | `id`        | string | Sample ID   |
 
-**Request Body (All Optional):**
+**Form Data Fields (All Optional):**
 
-```json
-{
-  "product_id": 10,
-  "media_type": "Video"
-}
-```
-
-| Field        | Type   | Required | Description |
-| ------------ | ------ | -------- | ----------- |
-| `product_id` | number | No       | The product ID |
-| `media_type` | enum   | No       | `Video`, `Audio`, `Document`, `Image` |
+| Field          | Type   | Required | Description |
+| -------------- | ------ | -------- | ----------- |
+| `product_id`   | number | No       | The product ID |
+| `media_type`   | enum   | No       | `Video`, `Audio`, `Document`, `Image` |
+| `high_quality` | file   | No       | High-quality sample file (protected) |
+| `low_quality`  | file   | No       | Low-quality sample file (downloadable) |
 
 **Example Request:**
 ```bash
 curl -X PATCH http://localhost:5000/api/v2/sample-sections/1/samples/5 \
   -H "Authorization: Bearer <access_token>" \
-  -H "Content-Type: application/json" \
-  -d '{"media_type": "Video"}'
+  -H "Content-Type: multipart/form-data" \
+  -F "media_type=Video" \
+  -F "high_quality=@/path/to/new_hq.mp4"
 ```
 
 ---
