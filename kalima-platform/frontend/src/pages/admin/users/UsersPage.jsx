@@ -1,0 +1,110 @@
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Users } from 'lucide-react';
+
+import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
+import UserStatsCards from '@/components/admin/users/UserStatsCards';
+import UserFilters from '@/components/admin/users/UserFilters';
+import UsersTable from '@/components/admin/users/UsersTable';
+import CreateUserDialog from '@/components/admin/users/CreateUserDialog';
+
+export default function UsersPage() {
+    const { t } = useTranslation('userManagement');
+
+    const {
+        users,
+        loading,
+        pagination,
+        actionLoading,
+        fetchUsers,
+        approveUser,
+        rejectUser,
+        deleteUser,
+    } = useAdminUsers();
+
+    const [page, setPage]       = useState(1);
+    const [search, setSearch]   = useState('');
+    const [role, setRole]       = useState('');
+
+    // ── Fetch whenever filters / page change ──────────────────────────────
+    const loadUsers = useCallback(() => {
+        fetchUsers({ page, search, role });
+    }, [fetchUsers, page, search, role]);
+
+    useEffect(() => {
+        loadUsers();
+    }, [loadUsers]);
+
+    // ── Filter changes reset to page 1 ────────────────────────────────────
+    const handleFiltersChange = useCallback(({ search: s, role: r }) => {
+        setSearch(s);
+        setRole(r);
+        setPage(1);
+    }, []);
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    // ── Actions (refresh list after) ──────────────────────────────────────
+    const handleApprove = async (userId) => {
+        await approveUser(userId);
+        loadUsers();
+    };
+
+    const handleReject = async (userId) => {
+        await rejectUser(userId);
+        loadUsers();
+    };
+
+    const handleDelete = async (userId) => {
+        await deleteUser(userId);
+        loadUsers();
+    };
+
+    return (
+        <div className="space-y-6" data-testid="admin-users-page">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+                        <Users className="h-8 w-8 text-primary" />
+                        {t('title')}
+                    </h1>
+                    <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    {pagination.total > 0 && (
+                        <p className="text-sm text-muted-foreground hidden sm:block">
+                            {t('totalUsers', { count: pagination.total })}
+                        </p>
+                    )}
+                    <CreateUserDialog onSuccess={loadUsers} />
+                </div>
+            </div>
+
+            {/* Stats */}
+            <UserStatsCards />
+
+            {/* Filters */}
+            <UserFilters
+                initialSearch={search}
+                initialRole={role}
+                onFiltersChange={handleFiltersChange}
+            />
+
+            {/* Table */}
+            <UsersTable
+                users={users}
+                loading={loading}
+                actionLoading={actionLoading}
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                onApprove={handleApprove}
+                onReject={handleReject}
+                onDelete={handleDelete}
+            />
+        </div>
+    );
+}
