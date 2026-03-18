@@ -105,12 +105,12 @@ export default function OrderDetailPage() {
 
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
-                <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                <div className="flex items-center gap-4">
                     <Button variant="ghost" size="icon" onClick={() => navigate('/admin/orders')} className="shrink-0" data-testid="order-detail-back-button">
-                        <ChevronLeft />
+                        <ChevronLeft className="rtl:rotate-180" />
                     </Button>
                     <div>
-                        <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div className="flex items-center gap-3">
                             <h1 className="text-2xl font-bold tracking-tight">
                                 {order.purchase_serial || `#${order.id}`}
                             </h1>
@@ -139,7 +139,7 @@ export default function OrderDetailPage() {
                             className="bg-primary/10 text-primary hover:bg-primary/20"
                             data-testid="order-detail-receive-button"
                         >
-                            <Package className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
+                            <Package className="me-2 h-4 w-4" />
                             {t('orders.actions.receive')}
                         </Button>
                     )}
@@ -151,7 +151,7 @@ export default function OrderDetailPage() {
                             className="bg-success text-success-foreground hover:bg-success/90"
                             data-testid="order-detail-confirm-button"
                         >
-                            <CheckCircle className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
+                            <CheckCircle className="me-2 h-4 w-4" />
                             {t('orders.actions.confirm')}
                         </Button>
                     )}
@@ -164,7 +164,7 @@ export default function OrderDetailPage() {
                             className="text-highlight border-highlight hover:bg-highlight/10"
                             data-testid="order-detail-return-button"
                         >
-                            <RotateCcw className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
+                            <RotateCcw className="me-2 h-4 w-4" />
                             {t('orders.actions.return')}
                         </Button>
                     )}
@@ -173,10 +173,10 @@ export default function OrderDetailPage() {
                         variant="destructive"
                         onClick={() => setDeleteDialogOpen(true)}
                         disabled={actionLoading}
-                        className="ml-auto"
+                        className="ms-auto"
                         data-testid="order-detail-delete-button"
                     >
-                        <Trash2 className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
+                        <Trash2 className="me-2 h-4 w-4" />
                         {t('orders.actions.delete')}
                     </Button>
                 </div>
@@ -297,7 +297,7 @@ export default function OrderDetailPage() {
                                         title={t('orders.details.contactWhatsApp', 'Contact on WhatsApp')}
                                         data-testid="order-detail-whatsapp-link"
                                     >
-                                        <MessageCircle className="h-3 w-3 mr-1.5 rtl:mr-0 rtl:ml-1.5" />
+                                        <MessageCircle className="h-3 w-3 me-1.5" />
                                         WhatsApp
                                     </a>
                                 </div>

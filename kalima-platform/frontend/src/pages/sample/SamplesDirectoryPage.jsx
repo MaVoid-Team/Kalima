@@ -96,14 +96,14 @@ export default function SamplesDirectoryPage() {
                                                 </div>
                                             )}
                                             <div>
-                                                <h3 className="font-semibold text-lg">{section.title}</h3>
-                                                {section.description && <p className="text-sm font-normal text-muted-foreground mt-0.5">{section.description}</p>}
+                                                <h3 className="font-semibold text-lg" dir="auto">{section.title}</h3>
+                                                {section.description && <p className="text-sm font-normal text-muted-foreground mt-0.5" dir="auto">{section.description}</p>}
                                             </div>
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-2 pb-5 border-t border-border/50">
                                         {!section.samples || section.samples.length === 0 ? (
-                                            <p className="text-muted-foreground py-4 text-center">{t('samples.noNestedSamples', 'No samples available in this section yet.')}</p>
+                                            <p className="text-muted-foreground py-4 text-center">{t('samples.noNestedSamples')}</p>
                                         ) : (
                                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
                                                 {section.samples.map((sample) => (
@@ -115,16 +115,16 @@ export default function SamplesDirectoryPage() {
                                                             <div className="flex items-center gap-3 mb-2">
                                                                 {getIconForType(sample.media_type)}
                                                                 <h3 dir="auto" className="font-semibold text-lg line-clamp-2 leading-tight">
-                                                                    Sample #{sample.id}
+                                                                    {t('samples.count')} #{sample.id}
                                                                 </h3>
                                                             </div>
 
                                                             <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-muted-foreground">
                                                                 <span className="font-medium bg-muted px-2 py-0.5 rounded-md text-xs">
-                                                                    {sample.media_type}
+                                                                    {t(`samples.mediaTypes.${sample.media_type}`, sample.media_type)}
                                                                 </span>
-                                                                {sample.high_quality_size > 0 && <span>HQ: {formatFileSize(sample.high_quality_size)}</span>}
-                                                                {sample.low_quality_size > 0 && <span>LQ: {formatFileSize(sample.low_quality_size)}</span>}
+                                                                {sample.high_quality_size > 0 && <span>{t('samples.hq')}: {formatFileSize(sample.high_quality_size)}</span>}
+                                                                {sample.low_quality_size > 0 && <span>{t('samples.lq')}: {formatFileSize(sample.low_quality_size)}</span>}
                                                             </div>
 
                                                             {sample.product_id && (
@@ -133,9 +133,9 @@ export default function SamplesDirectoryPage() {
                                                                     <Link
                                                                         to={`/product/${sample.product_id}`}
                                                                         dir="auto"
-                                                                        className="text-sm text-muted-foreground hover:text-primary transition-colors hover:underline"
+                                                                        className="text-sm text-muted-foreground hover:text-primary transition-colors hover:underline text-start"
                                                                     >
-                                                                        Product #{sample.product_id}
+                                                                        {t('samplePage.viewProduct')}: #{sample.product_id}
                                                                     </Link>
                                                                 </div>
                                                             )}
@@ -149,8 +149,8 @@ export default function SamplesDirectoryPage() {
                                                                     asChild
                                                                 >
                                                                     <a href={sample.high_quality_url} target="_blank" rel="noopener noreferrer">
-                                                                        <ExternalLink className={`${isRtl ? 'ml-2' : 'mr-2'} h-4 w-4`} />
-                                                                        {t("samples.view", "Preview")}
+                                                                        <ExternalLink className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
+                                                                        {t("samples.view")}
                                                                     </a>
                                                                 </Button>
                                                             )}
@@ -162,8 +162,8 @@ export default function SamplesDirectoryPage() {
                                                                     variant="outline"
                                                                     className="flex-1"
                                                                 >
-                                                                    <Download className={`${isRtl ? 'ml-2' : 'mr-2'} h-4 w-4`} />
-                                                                    {t("samples.download", "Download")}
+                                                                    <Download className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
+                                                                    {t("samples.download")}
                                                                 </DownloadWithProgress>
                                                             )}
                                                         </div>

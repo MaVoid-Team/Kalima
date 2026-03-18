@@ -122,6 +122,8 @@ export default function ProductDetailsPage() {
                 productId={productProps.id}
                 sampleUrl={productProps.sample_url}
                 sampleId={productProps.samples?.id ?? null}
+                title={productProps.title}
+                serial={productProps.serial}
               />
 
               {/* Description Text */}

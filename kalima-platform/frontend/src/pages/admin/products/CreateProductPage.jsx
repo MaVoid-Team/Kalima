@@ -10,6 +10,7 @@ import { arSA } from 'react-day-picker/locale';
 
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useAdminCoupons } from '@/hooks/admin/useAdminCoupons';
+import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
 import { useCategories } from '@/hooks/useCategories';
 
 import { Button } from '@/components/ui/button';
@@ -89,7 +90,10 @@ export default function CreateProductPage() {
     } = useCategories();
 
     const [thumbnail, setThumbnail] = useState(null);
-    const [sample, setSample] = useState(null);
+    const [hqSample, setHqSample] = useState(null);
+    const [lqSample, setLqSample] = useState(null);
+    const [sampleSectionId, setSampleSectionId] = useState('');
+    const [mediaType, setMediaType] = useState('Document');
 
     // Category picker state — single category only (up to 3 levels)
     const [selectedRootId, setSelectedRootId] = useState('');
@@ -112,12 +116,20 @@ export default function CreateProductPage() {
     const [quickCouponValue, setQuickCouponValue] = useState('');
     const [quickCouponExpiresAt, setQuickCouponExpiresAt] = useState('');
     const thumbnailInputRef = useRef(null);
-    const sampleInputRef = useRef(null);
+    const hqSampleInputRef = useRef(null);
+    const lqSampleInputRef = useRef(null);
 
-    // Fetch field definitions on mount
+    const {
+        sections: sampleSections,
+        fetchSections: fetchSampleSections,
+        createSample,
+    } = useAdminSampleSections();
+
+    // Fetch definitions and sections on mount
     useEffect(() => {
         fetchFieldDefinitions();
-    }, [fetchFieldDefinitions]);
+        fetchSampleSections();
+    }, [fetchFieldDefinitions, fetchSampleSections]);
 
     const form = useForm({
         resolver: zodResolver(createProductSchema),
@@ -329,6 +341,28 @@ export default function CreateProductPage() {
 
             // Navigate to the new product's detail page
             if (newProductId) {
+                // Upload sample if files are selected
+                if ((hqSample || lqSample) && sampleSectionId) {
+                    setUploadProgress(0);
+                    const sampleFormData = new FormData();
+                    sampleFormData.append('product_id', newProductId);
+                    sampleFormData.append('media_type', mediaType);
+                    if (hqSample) sampleFormData.append('high_quality', hqSample);
+                    if (lqSample) sampleFormData.append('low_quality', lqSample);
+
+                    toast.info(t('products.create.sampleUploading'));
+                    const sampleRes = await createSample(sampleSectionId, sampleFormData, (progressEvent) => {
+                        if (progressEvent.total) {
+                            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                            setUploadProgress(percentCompleted);
+                        }
+                    });
+
+                    if (sampleRes?.success) {
+                        toast.success(t('products.create.sampleSuccess'));
+                    }
+                }
+
                 navigate(`/admin/products/${newProductId}`);
             } else {
                 navigate('/admin/products');
@@ -708,10 +742,10 @@ export default function CreateProductPage() {
                         <h2 className="font-semibold text-foreground">{t('products.detail.media')}</h2>
                         <Separator />
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-6">
                             {/* Thumbnail */}
                             <div className="space-y-1.5">
-                                <span className="text-sm font-medium leading-none">{t('products.form.thumbnail')}</span>
+                                <FormLabel>{t('products.form.thumbnail')}</FormLabel>
                                 <input
                                     ref={thumbnailInputRef}
                                     type="file"
@@ -734,33 +768,94 @@ export default function CreateProductPage() {
                                 </p>
                             </div>
 
-                            {/* Sample — supports images, videos, PDFs, Word & PowerPoint */}
+                            <Separator />
+
+                            {/* Sample Section */}
                             <div className="space-y-1.5">
-                                <span className="text-sm font-medium leading-none">{t('products.form.sample')}</span>
-                                <input
-                                    ref={sampleInputRef}
-                                    type="file"
-                                    accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx"
-                                    onChange={(e) => setSample(e.target.files?.[0] ?? null)}
-                                    className="sr-only"
-                                    data-testid="create-product-sample-input"
-                                />
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="w-full justify-start"
-                                    onClick={() => sampleInputRef.current?.click()}
-                                    data-testid="create-product-sample-button"
-                                >
-                                    {t('products.form.chooseSampleFile')}
-                                </Button>
-                                <p className="text-xs text-muted-foreground truncate">
-                                    {sample?.name || t('products.form.noFileSelected')}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    {t('products.form.sampleFormats', 'Supported: images, videos, PDF, Word, PowerPoint')}
-                                </p>
+                                <FormLabel>{t('products.form.sampleSection')}</FormLabel>
+                                <Select value={sampleSectionId} onValueChange={setSampleSectionId}>
+                                    <SelectTrigger data-testid="create-product-sample-section-select">
+                                        <SelectValue placeholder={t('products.form.selectSampleSection')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {sampleSections.map(sec => (
+                                            <SelectItem key={sec.id} value={String(sec.id)}>{sec.title}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
+
+                            {/* Media Type */}
+                            <div className="space-y-1.5">
+                                <FormLabel>{t('products.form.mediaType')}</FormLabel>
+                                <Select value={mediaType} onValueChange={setMediaType}>
+                                    <SelectTrigger data-testid="create-product-sample-media-type-select">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Document">{t('products.form.mediaTypeDocument', 'Document (PDF, Word, PowerPoint)')}</SelectItem>
+                                        <SelectItem value="Video">{t('products.form.mediaVideo', 'Video')}</SelectItem>
+                                        <SelectItem value="Audio">{t('products.form.mediaAudio', 'Audio')}</SelectItem>
+                                        <SelectItem value="Image">{t('products.form.mediaImage', 'Image')}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {/* HQ Sample */}
+                                <div className="space-y-1.5">
+                                    <FormLabel>{t('products.form.hqFile')}</FormLabel>
+                                    <input
+                                        ref={hqSampleInputRef}
+                                        type="file"
+                                        accept={mediaType === 'Document' ? '.pdf,.doc,.docx,.ppt,.pptx' : mediaType === 'Video' ? 'video/*' : mediaType === 'Image' ? 'image/*' : 'audio/*'}
+                                        onChange={(e) => setHqSample(e.target.files?.[0] ?? null)}
+                                        className="sr-only"
+                                        data-testid="create-product-hq-sample-input"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="w-full justify-start"
+                                        onClick={() => hqSampleInputRef.current?.click()}
+                                        data-testid="create-product-hq-sample-button"
+                                    >
+                                        {t('products.form.chooseSampleFile')}
+                                    </Button>
+                                    <p className="text-xs text-muted-foreground truncate">
+                                        {hqSample?.name || t('products.form.noFileSelected')}
+                                    </p>
+                                </div>
+
+                                {/* LQ Sample */}
+                                <div className="space-y-1.5">
+                                    <FormLabel>{t('products.form.lqFile')}</FormLabel>
+                                    <input
+                                        ref={lqSampleInputRef}
+                                        type="file"
+                                        accept={mediaType === 'Document' ? '.pdf,.doc,.docx,.ppt,.pptx' : mediaType === 'Video' ? 'video/*' : mediaType === 'Image' ? 'image/*' : 'audio/*'}
+                                        onChange={(e) => setLqSample(e.target.files?.[0] ?? null)}
+                                        className="sr-only"
+                                        data-testid="create-product-lq-sample-input"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="w-full justify-start"
+                                        onClick={() => lqSampleInputRef.current?.click()}
+                                        data-testid="create-product-lq-sample-button"
+                                    >
+                                        {t('products.form.chooseSampleFile')}
+                                    </Button>
+                                    <p className="text-xs text-muted-foreground truncate">
+                                        {lqSample?.name || t('products.form.noFileSelected')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p className="text-xs text-muted-foreground">
+                                {t('products.form.sampleFormats', 'Supported: images, videos, PDF, Word, PowerPoint')}
+                            </p>
                         </div>
                     </div>
 

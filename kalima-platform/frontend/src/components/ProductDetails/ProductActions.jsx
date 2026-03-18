@@ -10,6 +10,9 @@ import LoadingSpinner from "@/components/ui/loading-spinner";
 import { useFastBuy } from "@/hooks/useFastBuy";
 import useAuth from "@/hooks/auth/useAuth";
 
+import { buildWhatsAppLink } from "@/lib/whatsappUtils";
+import { FaWhatsapp } from "react-icons/fa";
+
 /**
  * ProductActions
  * Props:
@@ -17,8 +20,10 @@ import useAuth from "@/hooks/auth/useAuth";
  *   - productId: string | number
  *   - sampleUrl: string | null   (legacy fallback — external URL)
  *   - sampleId: number | null    (preferred — links to /samples/:id)
+ *   - title: string
+ *   - serial: string
  */
-export default function ProductActions({ price, productId, sampleUrl, sampleId }) {
+export default function ProductActions({ price, productId, sampleUrl, sampleId, title, serial }) {
   const { t } = useTranslation("product");
   const [quantity, setQuantity] = useState(1);
   const { isAuthenticated } = useAuth();
@@ -56,6 +61,16 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
     }
     startFastBuy(productId, quantity);
   };
+
+  const whatsappMessage = t('actions.whatsappTemplate', {
+    title,
+    serial: serial ? `${t('info.sku', 'Serial')}: ${serial}` : '',
+    price: formatPrice(price),
+    currency: t('info.currency', 'EGP'),
+    url: window.location.href
+  });
+
+  const whatsappHref = buildWhatsAppLink('201000000000', whatsappMessage); // Generic admin phone
 
   return (
     <div className="flex flex-col gap-4 mt-2">
@@ -146,6 +161,13 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
               )}
             </Button>
           )}
+
+          <Button variant="outline" className="w-full h-10 border-success/30 text-success hover:bg-success/5 gap-2" size="sm" asChild>
+            <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
+              <FaWhatsapp className="h-4 w-4" />
+              <span>{t("actions.contactWhatsApp", "Message us")}</span>
+            </a>
+          </Button>
         </div>
       </div>
 
@@ -225,6 +247,17 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId }
             </Button>
           )}
         </div>
+        <Button
+          variant="outline"
+          className="text-sm border-success/30 text-success hover:bg-success/5 gap-2 h-11"
+          size="lg"
+          asChild
+        >
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
+            <FaWhatsapp className="h-4 w-4" />
+            {t("actions.contactWhatsApp", "Message Admin on WhatsApp")}
+          </a>
+        </Button>
       </div >
     </div >
   );

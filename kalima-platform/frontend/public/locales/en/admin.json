@@ -50,7 +50,9 @@
     "refresh": "Refresh",
     "export": {
       "success": "Export successful"
-    }
+    },
+    "uploading": "Uploading...",
+    "processing": "Processing..."
   },
   "gender": {
     "male": "Male",
@@ -297,7 +299,16 @@
       "couponId": "Coupon ID",
       "couponIdPlaceholder": "Coupon ID (optional)",
       "thumbnail": "Thumbnail Image",
-      "sample": "Sample File (PDF)",
+      "sample": "Sample File",
+      "sampleSection": "Sample Section",
+      "selectSampleSection": "Select a sample section...",
+      "mediaType": "Media Type",
+      "mediaDocument": "Document (PDF, Word, PowerPoint)",
+      "mediaVideo": "Video",
+      "mediaAudio": "Audio",
+      "mediaImage": "Image",
+      "hqFile": "High Quality File (Protected Preview)",
+      "lqFile": "Low Quality File (Downloadable)",
       "chooseImage": "Choose image",
       "chooseSampleFile": "Choose sample file",
       "noFileSelected": "No file selected",
@@ -319,9 +330,11 @@
       "dialogTitle": "Create New Product",
       "dialogDescription": "Fill in the product details. You can manage media and fields from the detail page.",
       "submit": "Create Product",
-      "creating": "Creating...",
-      "uploading": "Uploading...",
-      "processing": "Processing..."
+      "creating": "Creating Product...",
+      "uploading": "Uploading Media...",
+      "processing": "Processing...",
+      "sampleUploading": "Uploading Sample...",
+      "sampleSuccess": "Sample uploaded successfully!"
     },
     "edit": {
       "dialogTitle": "Edit Product",
@@ -444,10 +457,47 @@
       "price": "Price",
       "file": "File",
       "product": "Product",
+      "productId": "Product ID",
       "size": "Size",
       "type": "Type",
+      "mediaType": "Media Type",
       "actions": "Actions",
       "selectAll": "Select all samples"
+    },
+    "mediaTypes": {
+      "Video": "Video",
+      "Audio": "Audio",
+      "Image": "Image",
+      "Document": "Document"
+    },
+    "hq": "High Quality",
+    "lq": "Low Quality",
+    "sections": {
+      "title": "Sample Sections",
+      "subtitle": "Manage sample sections to organize your samples.",
+      "addTitle": "Add Section",
+      "editTitle": "Edit Section",
+      "noSections": "No sample sections available yet.",
+      "noSamplesNested": "No samples are nested in this section yet.",
+      "addFromProduct": "You can add samples to this section from the Product details page.",
+      "notFound": "Sample section not found.",
+      "backToSections": "Back to Sections",
+      "manageSamples": "Samples",
+      "sampleRemoved": "Sample removed successfully",
+      "deleteConfirmTitle": "Delete Section?",
+      "deleteConfirmDesc": "Are you sure you want to delete this sample section? This will also remove any samples nested within it.",
+      "titleLabel": "Title",
+      "descriptionLabel": "Description",
+      "thumbnailLabel": "Thumbnail URL",
+      "sortOrderLabel": "Sort Order",
+      "activeLabel": "Active",
+      "table": {
+        "title": "Title",
+        "description": "Description",
+        "order": "Order",
+        "status": "Status",
+        "actions": "Actions"
+      }
     }
   },
   "coupons": {

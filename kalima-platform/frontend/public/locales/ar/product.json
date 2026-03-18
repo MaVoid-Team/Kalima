@@ -10,6 +10,10 @@
     "format": "الشكل",
     "kitAccentColor": "لون المجموعة"
   },
+  "types": {
+    "Product": "منتج",
+    "Book": "كتاب"
+  },
   "formats": {
     "physical": "مجموعة مادية",
     "digital": "رقمي فقط",
@@ -19,7 +23,9 @@
     "addToCart": "إضافة إلى السلة",
     "buyNow": "اشتري الآن",
     "viewSample": "عرض عينة",
-    "follow": "متابعة"
+    "follow": "متابعة",
+    "contactWhatsApp": "مراسلة الإدارة عبر واتساب",
+    "whatsappTemplate": "مرحباً، أنا مهتم بالمنتج التالي:\nاسم المنتج: {{title}}\n{{serial}}\nالسعر: {{price}} {{currency}}\nالرابط: {{url}}\n\nهل يمكنك تزويدي بمزيد من المعلومات؟"
   },
   "info": {
     "sku": "رقم المنتج",
@@ -32,6 +38,7 @@
     "reviews": "مراجعات",
     "createdBy": "تم إنشاؤه بواسطة",
     "currency": "ج",
+    "serial": "الرقم التسلسلي",
     "requiredInfo": "معلومات مطلوبة للشراء:",
     "perks": "مميزات المنتج:"
   },

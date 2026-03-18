@@ -59,7 +59,7 @@ export default function ResetPasswordPage() {
 
     useEffect(() => {
         if (!token) {
-            toast.error("Invalid or missing password reset token.");
+            toast.error(t("resetPassword.invalidToken", "Invalid or missing password reset token."));
             navigate("/login");
         }
     }, [token, navigate]);
