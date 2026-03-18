@@ -1,0 +1,49 @@
+{
+  "layout": {
+    "openSidebar": "فتح القائمة الجانبية"
+  },
+  "portalTitle": "بوابة الطالب",
+  "nav": {
+    "expandSidebar": "توسيع القائمة الجانبية",
+    "collapseSidebar": "طي القائمة الجانبية",
+    "closeSidebar": "إغلاق القائمة الجانبية",
+    "profile": "ملفي الشخصي",
+    "orders": "طلباتي",
+    "settings": "الإعدادات",
+    "themeToggle": "تبديل المظهر",
+    "lightMode": "الوضع المتزن (النهاري)",
+    "darkMode": "الوضع الداكن (الليلي)",
+    "backToStore": "العودة للمتجر",
+    "logout": "تسجيل الخروج"
+  },
+  "profile": {
+    "title": "ملفي الشخصي",
+    "description": "إدارة معلوماتك الشخصية",
+    "student": "طالب",
+    "personalInfo": "المعلومات الشخصية",
+    "name": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "secondaryPhone": "رقم هاتف إضافي",
+    "gender": "الجنس",
+    "selectGender": "اختر الجنس",
+    "male": "ذكر",
+    "female": "أنثى",
+    "studentInfo": "المعلومات الدراسية",
+    "level": "المرحلة الدراسية",
+    "selectLevel": "اختر المرحلة",
+    "faction": "الفصل / المجموعة",
+    "government": "المحافظة",
+    "selectGovernment": "اختر المحافظة",
+    "zone": "المنطقة",
+    "selectZone": "اختر المنطقة",
+    "parentPhone": "رقم هاتف ولي الأمر",
+    "save": "حفظ التغييرات",
+    "loading": "جاري التحميل...",
+    "idTooltip": "شارك هذا الرقم مع ولي أمرك حتى يتمكن من ربط حسابك في بوابة ولي الأمر."
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "cancel": "إلغاء",
+    "save": "حفظ"
+  }
+}

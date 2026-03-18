@@ -29,7 +29,7 @@ export default function SamplesDirectoryPage() {
                 // but the prompt implies listing sections with nested samples, assuming API provides it.
                 // Assuming `res.data` is an array of section objects, and each has `samples` array.
                 // Alternatively, we fetch each section if `samples` doesn't exist, but typically active sections carry it.
-                
+
                 // For safety, let's just use what's returned.
                 setSections(res.data?.filter(s => s.active) ?? []);
             }
@@ -85,7 +85,7 @@ export default function SamplesDirectoryPage() {
                     ) : (
                         <Accordion type="multiple" defaultValue={sections.map(s => String(s.id))} className="space-y-4">
                             {sections.map(section => (
-                                <AccordionItem key={section.id} value={String(section.id)} className="bg-card border border-border rounded-xl px-5 text-card-foreground">
+                                <AccordionItem key={section.id} value={String(section.id)} className=" border border-border rounded-xl px-5 text-card-foreground">
                                     <AccordionTrigger className="hover:no-underline py-4">
                                         <div className="flex items-center gap-4 text-start">
                                             {section.thumbnail_url ? (
@@ -154,7 +154,7 @@ export default function SamplesDirectoryPage() {
                                                                     </a>
                                                                 </Button>
                                                             )}
-                                                            
+
                                                             {sample.low_quality_url && (
                                                                 <DownloadWithProgress
                                                                     url={sample.low_quality_url}

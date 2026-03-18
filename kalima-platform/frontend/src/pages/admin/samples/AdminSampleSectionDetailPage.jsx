@@ -89,7 +89,7 @@ export default function AdminSampleSectionDetailPage() {
                 </div>
             </div>
 
-            <div className="rounded-xl border border-border bg-card overflow-hidden">
+            <div className="rounded-xl border border-border overflow-hidden">
                 {samples.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
                         <FileText className="h-10 w-10 opacity-30 mb-2" />
@@ -139,11 +139,11 @@ export default function AdminSampleSectionDetailPage() {
                                                 </Button>
                                             )}
                                             {sample.low_quality_url && (
-                                                <DownloadWithProgress 
-                                                    url={sample.low_quality_url} 
-                                                    filename={`LQ_Sample_${sample.id}`} 
-                                                    variant="ghost" 
-                                                    size="icon" 
+                                                <DownloadWithProgress
+                                                    url={sample.low_quality_url}
+                                                    filename={`LQ_Sample_${sample.id}`}
+                                                    variant="ghost"
+                                                    size="icon"
                                                     title="Download LQ"
                                                 >
                                                     <Download className="h-4 w-4" />

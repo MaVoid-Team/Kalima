@@ -7,7 +7,8 @@ const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const { isAuthenticated } = useAuth();
-  const { hasAdminAccess } = useRole();
+  const { hasAdminAccess, isStudent, isParent } = useRole();
+  const isStudentOrParent = isStudent || isParent;
   // this hook is only responsible for performing API calls; the provider
   // wraps its results with state and caching.
   const {
@@ -64,12 +65,12 @@ export function CartProvider({ children }) {
   };
 
   useEffect(() => {
-    if (isAuthenticated && !hasAdminAccess) {
+    if (isAuthenticated && !hasAdminAccess && !isStudentOrParent) {
       loadCart();
     } else {
       setCart(EMPTY_CART);
     }
-  }, [isAuthenticated, hasAdminAccess]);
+  }, [isAuthenticated, hasAdminAccess, isStudentOrParent]);
 
   const updateQuantity = async (itemId, quantity) => {
     if (quantity < 1) return;

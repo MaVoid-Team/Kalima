@@ -57,6 +57,16 @@
     "female": "Female",
     "other": "Other"
   },
+  "roles": {
+    "Admin": "Admin",
+    "SubAdmin": "SubAdmin",
+    "Teacher": "Teacher",
+    "Student": "Student",
+    "Parent": "Parent",
+    "Lecturer": "Lecturer",
+    "Moderator": "Moderator",
+    "Assistant": "Assistant"
+  },
   "orders": {
     "stats": {
       "totalPurchases": "Total Purchases",
@@ -759,6 +769,12 @@
       "error": "Upload failed",
       "file": "File"
     },
+    "accountReview": {
+      "title": "Account Review Settings",
+      "description": "Configure which user roles require admin approval upon registration.",
+      "requireReviewDesc": "Require admin review for new {{role}} registrations.",
+      "updateSuccess": "Account review settings updated successfully"
+    },
     "expandSidebar": "Expand Sidebar"
   },
   "paymentMethods": {
@@ -883,14 +899,56 @@
       "confirm": "Delete Field"
     },
     "messages": {
-      "createSuccess": "Field created successfully",
-      "updateSuccess": "Field updated successfully",
-      "deleteSuccess": "Field deleted successfully"
+      "createSuccess": "Required field created successfully.",
+      "createError": "Failed to create required field.",
+      "updateSuccess": "Required field updated successfully.",
+      "updateError": "Failed to update required field.",
+      "deleteSuccess": "Required field deleted successfully.",
+      "deleteError": "Failed to delete required field."
     }
   },
-  "export": {
-    "exporting": "Exporting...",
-    "processing": "Processing your file...",
-    "success": "File exported successfully"
+  "dashboard": {
+    "title": "Dashboard",
+    "totalRevenue": "Total Revenue",
+    "currency": "EGP",
+    "totalPurchases": "Total Purchases",
+    "confirmedRevenue": "Confirmed Revenue",
+    "confirmedPurchases": "Confirmed Purchases",
+    "pendingPurchases": "Pending Purchases",
+    "avgOrderValue": "Avg. Order Value",
+    "totalUsers": "Total Users",
+    "verifiedUsers": "Verified Users",
+    "ofTotal": "of total",
+    "avgResponseTime": "Avg. Response Time",
+    "fastestResponseTime": "Fastest Response Time",
+    "slowestResponseTime": "Slowest Response Time",
+    "analyticsDescription": "In-depth platform statistics",
+    "storeStats": "Store Statistics",
+    "responseTimeStats": "Response Time Statistics",
+    "userStats": "User Statistics",
+    "usersByRole": "Users by Role",
+    "productPerformance": "Product Performance (Top 50)",
+    "employeePerformanceDesc": "Track admins and sub-admins efficiency",
+    "confirmerStats": "Confirmer Statistics",
+    "confirmedPurchasesByAdmin": "Confirmed Purchases by Admin",
+    "allMonths": "All Months",
+    "allYears": "All Years",
+    "createdAccounts": "Created Accounts Statistics",
+    "pickDate": "Pick a date"
+  },
+  "table": {
+    "productName": "Product Name",
+    "serial": "Serial",
+    "timesPurchased": "Times Purchased",
+    "totalValue": "Total Value",
+    "noData": "No data available",
+    "adminName": "Admin Name",
+    "email": "Email",
+    "totalHandled": "Total Handled",
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "month": "Month",
+    "confirmedCount": "Count",
+    "createdAccounts": "Accounts Created"
   }
 }

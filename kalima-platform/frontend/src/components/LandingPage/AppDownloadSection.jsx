@@ -10,7 +10,7 @@ export default function AppDownloadSection() {
   return (
     <section className="py-16" data-testid="landing-page-app-section">
       <div className="container mx-auto px-4 md:px-10">
-        <div className="rounded-3xl border border-border bg-card p-6 shadow-xl md:p-10">
+        <div className="rounded-3xl border border-border p-6 shadow-xl md:p-10">
           <div className="grid items-center gap-6 lg:grid-cols-2">
             <div className="space-y-4">
               <motion.div

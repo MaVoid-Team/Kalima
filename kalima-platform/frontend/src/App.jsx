@@ -56,6 +56,9 @@ const AdminSampleSectionDetailPage = lazy(() => import("./pages/admin/samples/Ad
 const SettingsPage = lazy(() => import("./pages/admin/settings/SettingsPage"))
 const PaymentMethodsPage = lazy(() => import("./pages/admin/payment-methods/PaymentMethodsPage"));
 const RequiredFieldsPage = lazy(() => import("./pages/admin/required-fields/RequiredFieldsPage"));
+const AnalyticsPage = lazy(() => import("./pages/admin/analytics/AnalyticsPage"));
+const EmployeePerformancePage = lazy(() => import("./pages/admin/employee-performance/EmployeePerformancePage"));
+
 // Public viewer (no layout)
 const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
 const SamplesDirectoryPage = lazy(() => import("./pages/sample/SamplesDirectoryPage"));
@@ -67,6 +70,14 @@ const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
 const TeacherLayout = lazy(() => import("./layouts/TeacherLayout"));
 const TeacherProfilePage = lazy(() => import("./pages/teacher/profile/TeacherProfilePage"));
 const TeacherSettingsPage = lazy(() => import("./pages/teacher/settings/TeacherSettingsPage"));
+
+// Student lazy-loaded pages
+const StudentLayout = lazy(() => import("./layouts/StudentLayout"));
+const StudentProfilePage = lazy(() => import("./pages/student/profile/StudentProfilePage"));
+
+// Parent lazy-loaded pages
+const ParentLayout = lazy(() => import("./layouts/ParentLayout"));
+const ParentProfilePage = lazy(() => import("./pages/parent/profile/ParentProfilePage"));
 
 const PageLoader = () => (
   <div className="flex min-h-screen items-center justify-center">
@@ -140,6 +151,8 @@ const router = createBrowserRouter(
           <Route path="/admin/samples/:id" element={<AdminSampleSectionDetailPage />} />
           <Route path="/admin/coupons" element={<CouponsPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
+          <Route path="/admin/analytics" element={<AnalyticsPage />} />
+          <Route path="/admin/employee-performance" element={<EmployeePerformancePage />} />
         </Route>
       </Route>
 
@@ -148,6 +161,20 @@ const router = createBrowserRouter(
         <Route element={<TeacherLayout />}>
           <Route path="/teacher/profile" element={<TeacherProfilePage />} />
           <Route path="/teacher/settings" element={<TeacherSettingsPage />} />
+        </Route>
+      </Route>
+
+      {/* Student Routes */}
+      <Route element={<RoleRoute requiredRole={["Student"]} />}>
+        <Route element={<StudentLayout />}>
+          <Route path="/student/profile" element={<StudentProfilePage />} />
+        </Route>
+      </Route>
+
+      {/* Parent Routes */}
+      <Route element={<RoleRoute requiredRole={["Parent"]} />}>
+        <Route element={<ParentLayout />}>
+          <Route path="/parent/profile" element={<ParentProfilePage />} />
         </Route>
       </Route>
 

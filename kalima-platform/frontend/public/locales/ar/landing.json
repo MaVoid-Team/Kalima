@@ -27,6 +27,9 @@
     },
     "myOrders": "طلباتي",
     "dashboard": "لوحة التحكم",
+    "teacherPortal": "بوابة المعلم",
+    "studentPortal": "بوابة الطالب",
+    "parentPortal": "بوابة ولي الأمر",
     "logout": "تسجيل الخروج"
   },
   "notFound": {
