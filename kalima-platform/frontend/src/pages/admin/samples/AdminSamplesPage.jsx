@@ -25,7 +25,7 @@ export default function AdminSamplesPage() {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingSection, setEditingSection] = useState(null);
-    
+
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [sectionToDelete, setSectionToDelete] = useState(null);
 
@@ -93,7 +93,7 @@ export default function AdminSamplesPage() {
                     <p className="text-sm">{t('samples.sections.noSections', 'No sample sections available yet.')}</p>
                 </div>
             ) : (
-                <div className="rounded-xl border border-border overflow-hidden bg-card" data-testid="admin-sections-list">
+                <div className="rounded-xl border border-border overflow-hidden" data-testid="admin-sections-list">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-muted-foreground">
                             <tr>

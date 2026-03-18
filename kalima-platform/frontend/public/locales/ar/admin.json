@@ -57,6 +57,16 @@
     "female": "أنثى",
     "other": "آخر"
   },
+  "roles": {
+    "Admin": "مدير",
+    "SubAdmin": "نائب مدير",
+    "Teacher": "معلم",
+    "Student": "طالب",
+    "Parent": "ولي أمر",
+    "Lecturer": "محاضر",
+    "Moderator": "مشرف",
+    "Assistant": "مساعد"
+  },
   "orders": {
     "stats": {
       "totalPurchases": "إجمالي المشتريات",
@@ -759,6 +769,12 @@
       "error": "فشل الرفع",
       "file": "ملف"
     },
+    "accountReview": {
+      "title": "إعدادات مراجعة الحسابات",
+      "description": "تكوين أدوار المستخدمين التي تتطلب موافقة المسؤول عند التسجيل.",
+      "requireReviewDesc": "تطلب مراجعة المسؤول لتسجيلات {{role}} الجديدة.",
+      "updateSuccess": "تم تحديث إعدادات مراجعة الحسابات بنجاح"
+    },
     "expandSidebar": "توسيع الشريط الجانبي"
   },
   "paymentMethods": {
@@ -883,14 +899,56 @@
       "confirm": "حذف الحقل"
     },
     "messages": {
-      "createSuccess": "تم إنشاء الحقل بنجاح",
-      "updateSuccess": "تم تحديث الحقل بنجاح",
-      "deleteSuccess": "تم حذف الحقل بنجاح"
+      "createSuccess": "تم إنشاء الحقل المطلوب بنجاح.",
+      "createError": "فشل إنشاء الحقل المطلوب.",
+      "updateSuccess": "تم تحديث الحقل المطلوب بنجاح.",
+      "updateError": "فشل تحديث الحقل المطلوب.",
+      "deleteSuccess": "تم حذف الحقل المطلوب بنجاح.",
+      "deleteError": "فشل حذف الحقل المطلوب."
     }
   },
-  "export": {
-    "exporting": "جاري التصدير...",
-    "processing": "جاري معالجة الملف...",
-    "success": "تم تصدير الملف بنجاح"
+  "dashboard": {
+    "title": "لوحة الإدارة",
+    "totalRevenue": "إجمالي الإيرادات",
+    "currency": "ج.م",
+    "totalPurchases": "إجمالي المشتريات",
+    "confirmedRevenue": "الإيرادات المؤكدة",
+    "confirmedPurchases": "المشتريات المؤكدة",
+    "pendingPurchases": "الطلبات قيد الانتظار",
+    "avgOrderValue": "متوسط قيمة الطلب",
+    "totalUsers": "إجمالي المستخدمين",
+    "verifiedUsers": "المستخدمون الموثقون",
+    "ofTotal": "من الإجمالي",
+    "avgResponseTime": "متوسط ​​وقت الاستجابة",
+    "fastestResponseTime": "أسرع وقت استجابة",
+    "slowestResponseTime": "أبطأ وقت استجابة",
+    "analyticsDescription": "إحصائيات المنصة بالتفصيل",
+    "storeStats": "إحصائيات المتجر",
+    "responseTimeStats": "إحصائيات وقت الاستجابة",
+    "userStats": "إحصائيات المستخدمين",
+    "usersByRole": "المستخدمون حسب الدور",
+    "productPerformance": "أداء المنتجات (أفضل 50)",
+    "employeePerformanceDesc": "تتبع كفاءة المديرين ونواب المديرين",
+    "confirmerStats": "إحصائيات المؤكدين",
+    "confirmedPurchasesByAdmin": "المشتريات المؤكدة حسب المدير",
+    "allMonths": "جميع الأشهر",
+    "allYears": "جميع السنوات",
+    "createdAccounts": "إحصائيات الحسابات المنشأة",
+    "pickDate": "اختر تاريخ"
+  },
+  "table": {
+    "productName": "اسم المنتج",
+    "serial": "الرقم التسلسلي",
+    "timesPurchased": "مرات الشراء",
+    "totalValue": "القيمة الإجمالية",
+    "noData": "لا توجد بيانات متاحة",
+    "adminName": "اسم المدير",
+    "email": "البريد الإلكتروني",
+    "totalHandled": "إجمالي المعالج",
+    "confirmed": "مؤكد",
+    "pending": "قيد الانتظار",
+    "month": "الشهر",
+    "confirmedCount": "العدد",
+    "createdAccounts": "الحسابات المنشأة"
   }
 }

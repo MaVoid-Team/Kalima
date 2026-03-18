@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput, BarChart3, Activity } from 'lucide-react';
+import { ShoppingBag, User, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Settings } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 
-const ADMIN_THEME_STORAGE_KEY = 'adminTheme';
+const PARENT_THEME_STORAGE_KEY = 'parentTheme';
 
-export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
-  const { t, i18n } = useTranslation(['admin', 'userManagement']);
+export default function ParentSidebar({ isMobileOpen, setIsMobileOpen }) {
+  const { t, i18n } = useTranslation('parent');
   const { logout } = useAuth();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -16,7 +16,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
   const isRtl = i18n.dir() === 'rtl';
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem(ADMIN_THEME_STORAGE_KEY);
+    const savedTheme = localStorage.getItem(PARENT_THEME_STORAGE_KEY);
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
 
@@ -32,24 +32,14 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
-    localStorage.setItem(ADMIN_THEME_STORAGE_KEY, nextTheme);
+    localStorage.setItem(PARENT_THEME_STORAGE_KEY, nextTheme);
     document.documentElement.classList.toggle('dark', nextTheme === 'dark');
   };
 
-  // Using userManagement namespace explicitly for the users translation
   const navigation = [
-    { name: t('nav.dashboard', 'Dashboard'), href: '/admin/dashboard', icon: Home, id: 'dashboard' },
-    { name: t('nav.analytics', 'Analytics'), href: '/admin/analytics', icon: BarChart3, id: 'analytics' },
-    { name: t('nav.employeePerformance', 'Employee Performance'), href: '/admin/employee-performance', icon: Activity, id: 'employee-performance' },
-    { name: t('nav.orders'), href: '/admin/orders', icon: ShoppingCart, id: 'orders' },
-    { name: t('nav.products'), href: '/admin/products', icon: Package, id: 'products' },
-    { name: t('nav.samples'), href: '/admin/samples', icon: FileText, id: 'samples' },
-    { name: t('nav.coupons'), href: '/admin/coupons', icon: Ticket, id: 'coupons' },
-    { name: t('nav.categories'), href: '/admin/categories', icon: LayoutGrid, id: 'categories' },
-    { name: t('nav.requiredFields'), href: '/admin/required-fields', icon: FormInput, id: 'required-fields' },
-    { name: t('nav.paymentMethods', 'Payment Methods'), href: '/admin/payment-methods', icon: CreditCard, id: 'payment-methods' },
-    { name: t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users, id: 'users' },
-    { name: t('nav.settings'), href: '/admin/settings', icon: Settings, id: 'settings' },
+    { name: t('nav.profile'), href: '/parent/profile', icon: User, id: 'profile' },
+    // { name: t('nav.orders'), href: '/orders', icon: ShoppingBag, id: 'orders' },
+    // { name: t('nav.settings'), href: '/parent/settings', icon: Settings, id: 'settings' },
   ];
 
   const toggleLanguage = () => {
@@ -73,7 +63,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
         <span
           className={`text-lg font-bold truncate ${isCollapsed ? "lg:hidden" : ""}`}
         >
-          {t("dashboardTitle")}
+          {t("portalTitle")}
         </span>
 
         <div className="flex items-center gap-2">
@@ -82,7 +72,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5 hidden lg:block"
             title={isCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
-            data-testid="admin-sidebar-mobile-toggle-button"
+            data-testid="parent-sidebar-mobile-toggle-button"
           >
             {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} className={isRtl ? "rotate-180" : ""} />}
           </button>
@@ -92,7 +82,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
             className="lg:hidden text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5"
             onClick={() => setIsMobileOpen(false)}
             title={t('nav.closeSidebar')}
-            data-testid="admin-sidebar-mobile-close-button"
+            data-testid="parent-sidebar-mobile-close-button"
           >
             <X size={20} />
           </button>
@@ -108,7 +98,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
               key={item.href}
               to={item.href}
               title={isCollapsed ? item.name : undefined}
-              data-testid={`admin-sidebar-nav-${item.id}`}
+              data-testid={`parent-sidebar-nav-${item.id}`}
               className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive
                 ? "bg-sidebar-primary text-sidebar-primary-foreground"
                 : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
@@ -132,7 +122,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
           onClick={toggleLanguage}
           title={isCollapsed ? (i18n.language === 'ar' ? 'English' : 'العربية') : undefined}
           className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
-          data-testid="admin-sidebar-language-toggle"
+          data-testid="parent-sidebar-language-toggle"
         >
           <Globe className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
           <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{i18n.language === 'ar' ? 'English' : 'العربية'}</span>
@@ -142,7 +132,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
           onClick={toggleTheme}
           title={isCollapsed ? t('nav.themeToggle') : undefined}
           className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
-          data-testid="admin-sidebar-theme-toggle"
+          data-testid="parent-sidebar-theme-toggle"
         >
           {theme === 'dark' ? (
             <Sun className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
@@ -158,7 +148,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
           to="/market"
           title={isCollapsed ? t("nav.backToStore") : undefined}
           className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? "lg:justify-center" : ""}`}
-          data-testid="admin-sidebar-back-store-link"
+          data-testid="parent-sidebar-back-store-link"
         >
           <Home
             className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}
@@ -172,7 +162,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
           onClick={logout}
           title={isCollapsed ? t("nav.logout") : undefined}
           className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 ${isCollapsed ? "lg:justify-center" : ""}`}
-          data-testid="admin-sidebar-logout-button"
+          data-testid="parent-sidebar-logout-button"
         >
           <LogOut
             className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}

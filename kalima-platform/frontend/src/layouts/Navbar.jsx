@@ -19,13 +19,14 @@ import { useCart } from "../contexts/CartContext";
 import { useRole } from "@/hooks/useRole";
 
 export default function Navbar() {
-  const { cart, loading } = useCart();
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
-  const { hasAdminAccess, isTeacher } = useRole();
-  // getCart is now handled by provider; cart data available directly
+  const { hasAdminAccess, isTeacher, isStudent, isParent } = useRole();
+  const isStudentOrParent = isStudent || isParent;
+  // Cart is only relevant for regular store users
+  const { cart, loading } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation("landing");
@@ -122,18 +123,22 @@ export default function Navbar() {
                   <span className="text-xs">{t("navbar.shortcuts.open")}</span>
                 </kbd>
               </Button> */}
-              {/* Market Button */}
-              <Button
-                variant="default"
-                onClick={() => navigate("/market")}
-              >
-                <ShoppingCart className="mr-2 h-4 w-4" />
-                {t("navbar.market")}
-              </Button>
-              <Button variant='default' onClick={() => navigate("/samples")}>
-                <FileText className="mr-2 h-4 w-4"></FileText>
-                {t("navbar.samples")}
-              </Button>
+              {/* Market Button — hidden for student/parent */}
+              {!isStudentOrParent && (
+                <Button
+                  variant="default"
+                  onClick={() => navigate("/market")}
+                >
+                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  {t("navbar.market")}
+                </Button>
+              )}
+              {!isStudentOrParent && (
+                <Button variant='default' onClick={() => navigate("/samples")}>
+                  <FileText className="mr-2 h-4 w-4"></FileText>
+                  {t("navbar.samples")}
+                </Button>
+              )}
               {/* Language Toggle */}
               <Button
                 variant="ghost"
@@ -145,8 +150,8 @@ export default function Navbar() {
                 <Globe className="h-5 w-5" />
               </Button>
 
-              {/* Cart Button Desktop */}
-              {isAuthenticated && <Button
+              {/* Cart Button Desktop — hidden for student/parent */}
+              {isAuthenticated && !isStudentOrParent && <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleCartModal}
@@ -161,14 +166,14 @@ export default function Navbar() {
 
               {isAuthenticated ? (
                 <>
-                  {hasAdminAccess && (
+                   {hasAdminAccess && (
                     <Button
                       variant="default"
                       size="default"
                       className="font-bold px-6"
                       asChild
                     >
-                      <Link to="/admin">{t("navbar.dashboard", "Dashboard")}</Link>
+                      <Link to="/admin">{t("navbar.dashboard")}</Link>
                     </Button>
                   )}
                   {!hasAdminAccess && isTeacher && (
@@ -178,16 +183,36 @@ export default function Navbar() {
                       className="font-bold px-6"
                       asChild
                     >
-                      <Link to="/teacher/profile">{t("navbar.teacherPortal", "Teacher Portal")}</Link>
+                      <Link to="/teacher/profile">{t("navbar.teacherPortal")}</Link>
                     </Button>
                   )}
-                  {!hasAdminAccess && !isTeacher && (
+                  {!hasAdminAccess && !isTeacher && isStudent && (
+                    <Button
+                      variant="default"
+                      size="default"
+                      className="font-bold px-6"
+                      asChild
+                    >
+                      <Link to="/student/profile">{t("navbar.studentPortal")}</Link>
+                    </Button>
+                  )}
+                  {!hasAdminAccess && !isTeacher && !isStudent && isParent && (
+                    <Button
+                      variant="default"
+                      size="default"
+                      className="font-bold px-6"
+                      asChild
+                    >
+                      <Link to="/parent/profile">{t("navbar.parentPortal")}</Link>
+                    </Button>
+                  )}
+                  {!hasAdminAccess && !isTeacher && !isStudent && !isParent && (
                     <Button
                       variant="ghost"
                       className="font-bold hover:bg-transparent hover:text-primary"
                       asChild
                     >
-                      <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
+                      <Link to="/orders">{t("navbar.myOrders")}</Link>
                     </Button>
                   )}
                   <Button
@@ -232,9 +257,8 @@ export default function Navbar() {
               <Search className="h-5 w-5" />
             </Button> */}
 
-            {/* Cart Button */}
-            {/* Note that this button will take the place of login/signup buttons after logging in */}
-            {isAuthenticated && !hasAdminAccess && !isTeacher && <Button
+            {/* Cart Button Mobile — hidden for student/parent */}
+            {isAuthenticated && !hasAdminAccess && !isTeacher && !isStudentOrParent && <Button
               variant="ghost"
               size="icon"
               onClick={toggleCartModal}
@@ -304,14 +328,14 @@ export default function Navbar() {
             <div className="flex flex-col gap-3 pt-4">
               {isAuthenticated ? (
                 <>
-                  {hasAdminAccess && (
+                   {hasAdminAccess && (
                     <Button
                       variant="default"
                       className="w-full font-bold justify-center h-12 text-base"
                       onClick={() => setIsMenuOpen(false)}
                       asChild
                     >
-                      <Link to="/admin">{t("navbar.dashboard", "Dashboard")}</Link>
+                      <Link to="/admin">{t("navbar.dashboard")}</Link>
                     </Button>
                   )}
                   {!hasAdminAccess && isTeacher && (
@@ -321,17 +345,37 @@ export default function Navbar() {
                       onClick={() => setIsMenuOpen(false)}
                       asChild
                     >
-                      <Link to="/teacher/profile">{t("navbar.teacherPortal", "Teacher Portal")}</Link>
+                      <Link to="/teacher/profile">{t("navbar.teacherPortal")}</Link>
                     </Button>
                   )}
-                  {!hasAdminAccess && !isTeacher && (
+                  {!hasAdminAccess && !isTeacher && isStudent && (
                     <Button
                       variant="default"
                       className="w-full font-bold justify-center h-12 text-base"
                       onClick={() => setIsMenuOpen(false)}
                       asChild
                     >
-                      <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
+                      <Link to="/student/profile">{t("navbar.studentPortal")}</Link>
+                    </Button>
+                  )}
+                  {!hasAdminAccess && !isTeacher && !isStudent && isParent && (
+                    <Button
+                      variant="default"
+                      className="w-full font-bold justify-center h-12 text-base"
+                      onClick={() => setIsMenuOpen(false)}
+                      asChild
+                    >
+                      <Link to="/parent/profile">{t("navbar.parentPortal")}</Link>
+                    </Button>
+                  )}
+                  {!hasAdminAccess && !isTeacher && !isStudent && !isParent && (
+                    <Button
+                      variant="default"
+                      className="w-full font-bold justify-center h-12 text-base"
+                      onClick={() => setIsMenuOpen(false)}
+                      asChild
+                    >
+                      <Link to="/orders">{t("navbar.myOrders")}</Link>
                     </Button>
                   )}
                   <Button

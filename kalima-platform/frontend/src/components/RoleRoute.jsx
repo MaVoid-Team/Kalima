@@ -10,14 +10,15 @@ import LoadingSpinner from './ui/loading-spinner';
  */
 const RoleRoute = ({ requiredRole }) => {
     const { isAuthenticated, loading: authLoading } = useAuth();
-    const { storeRoles } = useRole();
+    const { storeRoles, academyRoles } = useRole();
     const location = useLocation();
 
     // Ensure requiredRole is an array for easy checking
     const rolesArray = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
 
-    // Check if user has at least one of the required roles
-    const hasRequiredRole = rolesArray.some(role => storeRoles.includes(role));
+    // Check both store portal roles AND academy portal roles
+    const allRoles = [...storeRoles, ...academyRoles];
+    const hasRequiredRole = rolesArray.some(role => allRoles.includes(role));
 
     if (authLoading) {
         return (

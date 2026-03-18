@@ -42,10 +42,10 @@ export default function SampleManager({ product, loading, onRefresh }) {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [sectionId, setSectionId] = useState('');
     const [mediaType, setMediaType] = useState('Document');
-    
+
     // We can only have one sample per product currently, but it might be tied to a section.
     // Let's assume the backend now populates `product.sample` as an object { id, section_id, media_type, high_quality_url, low_quality_url, sizes, ... }
-    const sample = product?.sample || product?.samples; 
+    const sample = product?.sample || product?.samples;
 
     const hqFileRef = useRef(null);
     const lqFileRef = useRef(null);
@@ -98,7 +98,7 @@ export default function SampleManager({ product, loading, onRefresh }) {
                     setUploadProgress(percentCompleted);
                 }
             }, abortController.signal);
-            
+
             if (res && res.success) {
                 if (onRefresh) onRefresh();
             }
@@ -130,9 +130,9 @@ export default function SampleManager({ product, loading, onRefresh }) {
     if (!sample) {
         return (
             <div className="space-y-4">
-                <form onSubmit={handleUpload} className="space-y-4 max-w-lg bg-card border border-border rounded-xl p-4">
+                <form onSubmit={handleUpload} className="space-y-4 max-w-lg border border-border rounded-xl p-4">
                     <h3 className="font-semibold text-lg">{t('samples.addTitle', 'Add Sample')}</h3>
-                    
+
                     <div className="space-y-2">
                         <Label>{t('samples.sectionLabel', 'Sample Section')}</Label>
                         <Select value={sectionId} onValueChange={setSectionId}>
@@ -207,7 +207,7 @@ export default function SampleManager({ product, loading, onRefresh }) {
 
     return (
         <div className="space-y-4">
-            <div className="border border-border rounded-xl bg-card overflow-hidden">
+            <div className="border border-border rounded-xl overflow-hidden">
                 {/* Inline preview for images */}
                 {mt === 'Image' && sample.high_quality_url && (
                     <div className="w-full max-h-64 overflow-hidden bg-muted flex items-center justify-center">
