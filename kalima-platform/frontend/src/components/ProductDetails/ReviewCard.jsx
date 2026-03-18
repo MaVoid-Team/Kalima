@@ -24,13 +24,13 @@ import RatingDisplay from '@/components/ui/RatingDisplay';
  * @param {boolean} props.showActions - Whether to show action buttons
  * @param {string} props.className - Additional CSS classes
  */
-const ReviewCard = ({ 
-  review, 
-  isOwnReview = false, 
-  canEdit = false, 
-  onEdit, 
-  showActions = false, 
-  className 
+const ReviewCard = ({
+  review,
+  isOwnReview = false,
+  canEdit = false,
+  onEdit,
+  showActions = false,
+  className
 }) => {
   const { t, i18n } = useTranslation('product');
   const isRtl = i18n.dir() === 'rtl';
@@ -58,7 +58,7 @@ const ReviewCard = ({
             <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
               <MessageSquare className="w-5 h-5 text-muted-foreground" />
             </div>
-            
+
             {/* User Info */}
             <div>
               <div className="font-medium text-foreground">
@@ -87,8 +87,8 @@ const ReviewCard = ({
 
         {/* Rating */}
         <div className="mt-3">
-          <RatingDisplay 
-            rating={review.rating} 
+          <RatingDisplay
+            rating={review.rating}
             showCount={false}
             size="sm"
           />

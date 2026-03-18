@@ -1,29 +1,18 @@
 /**
- * Builds a WhatsApp link with an automated message template.
+ * Builds a WhatsApp link with an automated message.
  * @param {string} phone - The phone number to contact
- * @param {object} product - The product details object
+ * @param {string} message - The message to send
  * @returns {string} The full WhatsApp URL with encoded message
  */
-export function buildWhatsAppLink(phone, product) {
+export function buildWhatsAppLink(phone, message = '') {
     if (!phone) return '#';
     
     // Remove '+' and spaces/dashes from phone number
     const formattedPhone = phone.replace(/[\s+-]/g, '');
     
-    if (!product) {
+    if (!message) {
         return `https://wa.me/${formattedPhone}`;
     }
-
-    const priceText = product.price_after_discount 
-        ? `${product.price_after_discount} EGP (discounted from ${product.price} EGP)` 
-        : `${product.price} EGP`;
-
-    const message = `Hello, I am interested in the following product:
-Product Name: ${product.title}
-${product.serial ? `Serial: ${product.serial}\n` : ''}Price: ${priceText}
-URL: ${window.location.href}
-
-Can you please provide more information?`;
 
     return `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
 }

@@ -62,6 +62,7 @@ export default function SampleSectionDialog({ open, onOpenChange, section, onSub
                             id="title"
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            dir="auto"
                             required
                         />
                     </div>
@@ -71,6 +72,7 @@ export default function SampleSectionDialog({ open, onOpenChange, section, onSub
                             id="description"
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            dir="auto"
                         />
                     </div>
                     <div className="space-y-2">

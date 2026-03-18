@@ -50,7 +50,9 @@
     "refresh": "تحديث",
     "export": {
       "success": "تم التصدير بنجاح"
-    }
+    },
+    "uploading": "جاري الرفع...",
+    "processing": "جاري المعالجة..."
   },
   "gender": {
     "male": "ذكر",
@@ -297,7 +299,16 @@
       "couponId": "معرف الكوبون",
       "couponIdPlaceholder": "معرف الكوبون (اختياري)",
       "thumbnail": "صورة الغلاف",
-      "sample": "ملف النموذج (PDF)",
+      "sample": "ملف العينة",
+      "sampleSection": "قسم العينة",
+      "selectSampleSection": "اختر قسم العينة...",
+      "mediaType": "نوع الوسائط",
+      "mediaDocument": "مستند (PDF, Word, PowerPoint)",
+      "mediaVideo": "فيديو",
+      "mediaAudio": "ملف صوتي",
+      "mediaImage": "صورة",
+      "hqFile": "ملف عالي الجودة (معاينة محمية)",
+      "lqFile": "ملف منخفض الجودة (قابل للتنزيل)",
       "chooseImage": "اختر صورة",
       "chooseSampleFile": "اختر ملف العينة",
       "noFileSelected": "لم يتم اختيار ملف",
@@ -319,9 +330,11 @@
       "dialogTitle": "إنشاء منتج جديد",
       "dialogDescription": "أدخل تفاصيل المنتج. يمكنك إدارة الوسائط والحقول من صفحة التفاصيل.",
       "submit": "إنشاء المنتج",
-      "creating": "جاري الإنشاء...",
-      "uploading": "جاري الرفع...",
-      "processing": "جاري المعالجة..."
+      "creating": "جاري إنشاء المنتج...",
+      "uploading": "جاري رفع الوسائط...",
+      "processing": "جاري المعالجة...",
+      "sampleUploading": "جاري رفع العينة...",
+      "sampleSuccess": "تم رفع العينة بنجاح!"
     },
     "edit": {
       "dialogTitle": "تعديل المنتج",
@@ -442,12 +455,49 @@
     "table": {
       "file": "الملف",
       "product": "المنتج",
+      "productId": "كود المنتج",
       "size": "الحجم",
       "type": "النوع",
+      "mediaType": "نوع الملف",
       "name": "الاسم",
       "price": "السعر",
       "actions": "الإجراءات",
       "selectAll": "تحديد جميع العينات"
+    },
+    "mediaTypes": {
+      "Video": "فيديو",
+      "Audio": "ملف صوتي",
+      "Image": "صورة",
+      "Document": "مستند"
+    },
+    "hq": "جودة عالية",
+    "lq": "جودة منخفضة",
+    "sections": {
+      "title": "أقسام العينات",
+      "subtitle": "إدارة أقسام العينات لتنظيم عيناتك.",
+      "addTitle": "إضافة قسم",
+      "editTitle": "تعديل القسم",
+      "noSections": "لا توجد أقسام عينات متاحة بعد.",
+      "noSamplesNested": "لا توجد عينات مدرجة في هذا القسم بعد.",
+      "addFromProduct": "يمكنك إضافة عينات لهذا القسم من صفحة تفاصيل المنتج.",
+      "notFound": "قسم العينة غير موجود.",
+      "backToSections": "العودة للأقسام",
+      "manageSamples": "العينات",
+      "sampleRemoved": "تمت إزالة العينة بنجاح",
+      "deleteConfirmTitle": "حذف القسم؟",
+      "deleteConfirmDesc": "هل أنت متأكد من حذف قسم العينات هذا؟ سيؤدي ذلك أيضاً إلى إزالة جميع العينات الموجودة بداخله.",
+      "titleLabel": "العنوان",
+      "descriptionLabel": "الوصف",
+      "thumbnailLabel": "رابط الصورة المصغرة",
+      "sortOrderLabel": "ترتيب العرض",
+      "activeLabel": "نشط",
+      "table": {
+        "title": "العنوان",
+        "description": "الوصف",
+        "order": "الترتيب",
+        "status": "الحالة",
+        "actions": "الإجراءات"
+      }
     }
   },
   "coupons": {

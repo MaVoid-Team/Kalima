@@ -10,6 +10,10 @@
     "format": "Format",
     "kitAccentColor": "Kit Accent Color"
   },
+  "types": {
+    "Product": "Product",
+    "Book": "Book"
+  },
   "formats": {
     "physical": "Physical Kit",
     "digital": "Digital Only",
@@ -19,7 +23,9 @@
     "addToCart": "Add to Cart",
     "buyNow": "Buy Now",
     "viewSample": "View Sample",
-    "follow": "Follow"
+    "follow": "Follow",
+    "contactWhatsApp": "Message Admin on WhatsApp",
+    "whatsappTemplate": "Hello, I am interested in the following product:\nProduct Name: {{title}}\n{{serial}}\nPrice: {{price}} {{currency}}\nURL: {{url}}\n\nCan you please provide more information?"
   },
   "info": {
     "sku": "SKU",
@@ -32,6 +38,7 @@
     "reviews": "reviews",
     "createdBy": "Created by",
     "currency": "EGP",
+    "serial": "Serial",
     "requiredInfo": "Required Information for Purchase:",
     "perks": "Product Features:"
   },

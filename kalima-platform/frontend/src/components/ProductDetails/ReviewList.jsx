@@ -38,7 +38,7 @@ const ReviewList = ({ productId, averageRating, totalReviews, productReviews = [
   const [editingReview, setEditingReview] = useState(null);
   const [error, setError] = useState(null);
   const location = useLocation();
-  
+
   // Initialize reviews from product data
   useEffect(() => {
     setReviews(productReviews);
@@ -189,7 +189,7 @@ const ReviewList = ({ productId, averageRating, totalReviews, productReviews = [
             </AlertDescription>
           </div>
           <Button asChild size="sm" className="shrink-0 w-full sm:w-auto shadow-sm">
-            <Link to="/login" state={{from: location}} replace>
+            <Link to="/login" state={{ from: location }} replace>
               {t('reviews.loginAction', 'Log in')}
             </Link>
           </Button>

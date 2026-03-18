@@ -26,10 +26,14 @@ export default function ProductInfo({ product }) {
       <div className="flex flex-wrap gap-2">
         {product.is_archived && (
           <Badge variant="destructive">
-            {t("badges.archived") || "Archived"}
+            {t("product:badges.archived") || "Archived"}
           </Badge>
         )}
-        {product.type && <Badge variant="secondary">{product.type}</Badge>}
+        {product.type && (
+          <Badge variant="secondary">
+            {t(`product:types.${product.type}`, product.type)}
+          </Badge>
+        )}
         {product.product_categories?.map((pc) => (
           <Badge key={pc.category_id} variant="outline">
             {pc.categories?.title}
@@ -44,7 +48,7 @@ export default function ProductInfo({ product }) {
         </h1>
         {product.serial && (
           <p className="text-sm text-muted-foreground mt-1">
-            <span className="font-semibold">Serial:</span> {product.serial}
+            <span className="font-semibold">{t("info.serial")}:</span> {product.serial}
           </p>
         )}
       </div>

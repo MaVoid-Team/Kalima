@@ -138,7 +138,17 @@
     "count": "Samples",
     "noSamples": "No samples found.",
     "view": "Preview",
-    "download": "Download"
+    "download": "Download",
+    "hq": "HQ",
+    "lq": "LQ",
+    "noNestedSamples": "No samples available in this section yet.",
+    "addFromProduct": "You can add samples to this section from the Product details page.",
+    "mediaTypes": {
+      "Video": "Video",
+      "Audio": "Audio",
+      "Image": "Image",
+      "Document": "Document"
+    }
   },
   "samplePage": {
     "notFound": "Sample not found",

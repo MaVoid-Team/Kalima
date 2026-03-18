@@ -78,13 +78,13 @@ export default function AdminSampleSectionDetailPage() {
                     <div className="flex items-center gap-2">
                         <Button variant="ghost" size="icon" asChild className="-ms-2">
                             <Link to="/admin/samples">
-                                <ChevronLeft className="h-5 w-5" />
+                                <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
                             </Link>
                         </Button>
-                        <h1 className="text-2xl font-bold tracking-tight">{section.title}</h1>
+                        <h1 className="text-2xl font-bold tracking-tight" dir="auto">{section.title}</h1>
                     </div>
                     {section.description && (
-                        <p className="text-muted-foreground text-sm ps-10">{section.description}</p>
+                        <p className="text-muted-foreground text-sm ps-10" dir="auto">{section.description}</p>
                     )}
                 </div>
             </div>
@@ -100,10 +100,10 @@ export default function AdminSampleSectionDetailPage() {
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-muted-foreground">
                             <tr>
-                                <th className="text-start ps-4 py-3 font-medium">Sample File</th>
-                                <th className="text-start py-3 font-medium">Product ID</th>
-                                <th className="text-start py-3 font-medium hidden sm:table-cell">Media Type</th>
-                                <th className="text-end pe-4 py-3 font-medium">Actions</th>
+                                <th className="text-start ps-4 py-3 font-medium">{t('samples.table.file', 'Sample File')}</th>
+                                <th className="text-start py-3 font-medium">{t('samples.table.productId', 'Product ID')}</th>
+                                <th className="text-start py-3 font-medium hidden sm:table-cell">{t('samples.table.mediaType', 'Media Type')}</th>
+                                <th className="text-end pe-4 py-3 font-medium">{t('common.actions', 'Actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
@@ -113,21 +113,23 @@ export default function AdminSampleSectionDetailPage() {
                                         <div className="flex items-center gap-3">
                                             {getIconForType(sample.media_type)}
                                             <div className="flex flex-col">
-                                                <span className="font-medium">Sample #{sample.id}</span>
+                                                <span className="font-medium">{t('samples.count')} #{sample.id}</span>
                                                 <div className="text-xs text-muted-foreground flex gap-2">
-                                                    {sample.high_quality_url && <span>HQ: {formatFileSize(sample.high_quality_size || 0)}</span>}
-                                                    {sample.low_quality_url && <span>LQ: {formatFileSize(sample.low_quality_size || 0)}</span>}
+                                                    {sample.high_quality_url && <span>{t('samples.hq')}: {formatFileSize(sample.high_quality_size || 0)}</span>}
+                                                    {sample.low_quality_url && <span>{t('samples.lq')}: {formatFileSize(sample.low_quality_size || 0)}</span>}
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="py-3">
                                         <Link to={`/admin/products/${sample.product_id}`} className="text-primary hover:underline">
-                                            Product #{sample.product_id}
+                                            {t('samples.table.product', 'Product')} #{sample.product_id}
                                         </Link>
                                     </td>
                                     <td className="py-3 hidden sm:table-cell">
-                                        <Badge variant="outline">{sample.media_type}</Badge>
+                                        <Badge variant="outline">
+                                            {t(`samples.mediaTypes.${sample.media_type}`, sample.media_type)}
+                                        </Badge>
                                     </td>
                                     <td className="pe-4 py-3 text-end">
                                         <div className="flex items-center justify-end gap-2">
@@ -144,7 +146,7 @@ export default function AdminSampleSectionDetailPage() {
                                                     filename={`LQ_Sample_${sample.id}`}
                                                     variant="ghost"
                                                     size="icon"
-                                                    title="Download LQ"
+                                                    title={t('samples.download', 'Download LQ')}
                                                 >
                                                     <Download className="h-4 w-4" />
                                                 </DownloadWithProgress>
@@ -154,7 +156,7 @@ export default function AdminSampleSectionDetailPage() {
                                                 size="icon"
                                                 onClick={() => handleRemoveSample(sample.id)}
                                                 className="text-destructive hover:bg-destructive/10"
-                                                title="Remove Sample"
+                                                title={t('common.delete', 'Remove Sample')}
                                                 disabled={loading}
                                             >
                                                 <Trash2 className="h-4 w-4" />
