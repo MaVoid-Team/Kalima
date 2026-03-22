@@ -11,7 +11,6 @@ import { errorHandler } from "./libs/errors";
 import { setupStoreSocket } from "./libs/socket/setupStoreSocket";
 import { startPurchaseNotificationConsumer } from "./apps/store-api/services/notificationStream.service";
 import { emitStorePurchaseToAdmins } from "./libs/redis/socketNotificationEmitter";
-import { ensureInitialAdmin } from "./apps/store-api/services/bootstrap-admin.service";
 import cors from "cors";
 import corsOptions from "./config/corsOptions";
 import { registerAllExportResources } from "./apps/store-api/export";
@@ -52,8 +51,6 @@ app.set("io", io);
 
 async function start() {
   try {
-    await ensureInitialAdmin();
-
     if (process.env.REDIS_URL) {
       startPurchaseNotificationConsumer((payload) => {
         emitStorePurchaseToAdmins(io, payload);
