@@ -200,32 +200,7 @@ export default function OrderDetailPage() {
                                                         <span className="text-muted-foreground">
                                                             {field.required_field_definitions?.label || t('orders.details.field', 'Field')}
                                                         </span>
-                                                        {field.required_field_definitions?.field_type === 'image' && field.value ? (
-                                                            (() => {
-                                                                const requiredFieldImage = getImageUrl(field.value);
-                                                                if (!requiredFieldImage) {
-                                                                    return <span className="font-mono break-all">{field.value || '-'}</span>;
-                                                                }
-
-                                                                return (
-                                                                    <a
-                                                                        href={requiredFieldImage}
-                                                                        target="_blank"
-                                                                        rel="noreferrer"
-                                                                        className="block border rounded-md overflow-hidden hover:opacity-90"
-                                                                        data-testid={`order-detail-required-image-${field.id || index}`}
-                                                                    >
-                                                                        <img
-                                                                            src={requiredFieldImage}
-                                                                            alt={field.required_field_definitions?.label || t('orders.details.field', 'Field image')}
-                                                                            className="h-20 w-20 object-cover"
-                                                                        />
-                                                                    </a>
-                                                                );
-                                                            })()
-                                                        ) : (
-                                                            <span className="font-mono break-all">{field.value || '-'}</span>
-                                                        )}
+                                                        <span className="font-mono break-all">{field.value || '-'}</span>
                                                     </div>
                                                 ))}
                                             </div>
