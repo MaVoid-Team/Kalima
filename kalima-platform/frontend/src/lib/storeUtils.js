@@ -39,7 +39,11 @@ export function calculateDiscountPercentage(mainPrice, priceAfterDiscount, preci
  */
 export function getImageUrl(path) {
   if (!path) return null;
-  if (path.startsWith("http")) return path;
+
+  const rawPath = String(path).trim();
+  const normalizedPath = rawPath.replace(/(\.(?:jpe?g|png|webp|gif|svg|avif))\/+$/i, "$1");
+
+  if (/^https?:\/\//i.test(normalizedPath)) return normalizedPath;
 
   // Fallback if env variable is missing
   const baseURL =
@@ -47,7 +51,7 @@ export function getImageUrl(path) {
   // Remove the trailing /api/vX to get the root domain
   const rootURL = baseURL.replace(/\/api\/v\d+$/, "");
 
-  return `${rootURL}${path.startsWith("/") ? "" : "/"}${path}`;
+  return `${rootURL}${normalizedPath.startsWith("/") ? "" : "/"}${normalizedPath}`;
 }
 
 /**
