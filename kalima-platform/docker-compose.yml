@@ -58,8 +58,11 @@ services:
       - APP_URL=https://dev.kalima-edu.com
       - SUPPORT_URL=https://dev.kalima-edu.com/support
     depends_on:
-      - dev-postgres
-      - dev-redis
+      dev-postgres:
+        condition: service_healthy
+      dev-redis:
+        condition: service_healthy
+    restart: unless-stopped
     networks:
       - dev-network
     volumes:
@@ -77,6 +80,12 @@ services:
       - dev-postgres-data:/var/lib/postgresql/data
     networks:
       - dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
 
   dev-redis:
     image: redis:8.6.0-alpine
@@ -86,6 +95,12 @@ services:
       - dev-redis-data:/data
     networks:
       - dev-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
 
 networks:
   dev-network:
