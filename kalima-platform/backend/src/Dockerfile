@@ -36,5 +36,5 @@ COPY src/apps/store-api/prisma/migrations ./src/apps/store-api/prisma/migrations
 
 EXPOSE 5000
 
-# Run pending migrations then start the server
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/server.js"]
+# Retry migrations while database boots, then start server
+CMD ["sh", "-c", "attempt=0; until npx prisma migrate deploy; do attempt=$((attempt+1)); if [ $attempt -ge 30 ]; then echo 'Prisma migrate failed after 30 attempts'; exit 1; fi; echo 'Waiting for database...'; sleep 2; done; node dist/src/server.js"]
