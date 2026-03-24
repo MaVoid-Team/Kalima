@@ -43,7 +43,7 @@ export function getImageUrl(path) {
 
   // Fallback if env variable is missing
   const baseURL =
-    import.meta.env.VITE_API_URL || "http://localhost:5000/api/v2";
+    import.meta.env.VITE_API_URL || "/api/v2";
   // Remove the trailing /api/vX to get the root domain
   const rootURL = baseURL.replace(/\/api\/v\d+$/, "");
 
@@ -55,7 +55,7 @@ export function getImageUrl(path) {
  * @returns {string}
  */
 export function getBaseUrl() {
-  const raw = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v2";
+  const raw = import.meta.env.VITE_API_URL || "/api/v2";
   try {
     return new URL(raw).origin;
   } catch {
