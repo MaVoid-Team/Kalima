@@ -151,6 +151,9 @@ Returns a paginated list of products with optional filters.
       "type": "Book",
       "price": "100.00",
       "price_after_discount": null,
+      "release_at": "2026-04-01T08:00:00.000Z",
+      "is_released": false,
+      "time_until_release_ms": 604800000,
       "serial": "ALG-101",
       "sample_url": null,
       "is_archived": false,
@@ -210,6 +213,9 @@ Returns a single product with linked categories, gallery entries, sample, coupon
     "type": "Book",
     "price": "100.00",
     "price_after_discount": null,
+    "release_at": "2026-04-01T08:00:00.000Z",
+    "is_released": false,
+    "time_until_release_ms": 604800000,
     "serial": "ALG-101",
     "sample_url": null,
     "is_archived": false,
@@ -701,6 +707,7 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
   "type": "Book | Product (optional, default: Product)",
   "description": "string (optional)",
   "price_after_discount": "number (optional, >= 0)",
+  "release_at": "string (optional, ISO 8601 datetime)",
   "serial": "string (optional, max 255)",
   "sample_url": "string (optional)",
   "sample_section_id": "number (optional, required if uploading new sample files)",
@@ -763,6 +770,9 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
     "type": "Book",
     "price": "100.00",
     "price_after_discount": null,
+    "release_at": "2026-04-01T08:00:00.000Z",
+    "is_released": false,
+    "time_until_release_ms": 604800000,
     "serial": null,
     "sample_url": null,
     "is_archived": false,
@@ -825,6 +835,7 @@ Updates one or more fields on an existing product. All fields are optional. Supp
   "type": "Book | Product",
   "price": "number (>= 0)",
   "price_after_discount": "number (>= 0)",
+  "release_at": "string (optional, ISO 8601 datetime)",
   "serial": "string (max 255)",
   "sample_url": "string",
   "sample_section_id": "number (optional, required if uploading brand new sample files)",
@@ -1456,6 +1467,9 @@ Removes a required-field definition from a product.
 - Sample files (PDF, Word) are stored under `/uploads/samples`.
 - `category_ids` may be attached on create; invalid category IDs return 404.
 - Setting `is_archived = true` hides the product from public listings; archiving does not delete the DB record.
+- `release_at` schedules product availability; omitted or null means immediately released.
+- Product read endpoints return computed fields: `is_released` and `time_until_release_ms`.
+- Products with a future `release_at` cannot be added to cart until the release time is reached.
 - Required fields attached to a product are validated at checkout time (the client must fill them before purchase).
 
 ---
