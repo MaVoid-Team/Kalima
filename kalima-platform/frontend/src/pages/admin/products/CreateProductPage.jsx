@@ -63,6 +63,7 @@ export default function CreateProductPage() {
             (val) => (val === '' || val == null ? undefined : val),
             z.coerce.number().int(t('products.form.couponIdMustBeInteger')).positive(t('products.form.couponIdMustBeGreaterThan0')).optional()
         ),
+        release_at: z.string().optional().or(z.literal('')),
         perks: z.string().optional().or(z.literal('')),
     }).refine(
         (data) => !data.price_after_discount || data.price_after_discount < data.price,
@@ -141,6 +142,7 @@ export default function CreateProductPage() {
             price_after_discount: '',
             serial: '',
             coupon_id: '',
+            release_at: '',
             perks: '',
         },
     });
@@ -300,6 +302,7 @@ export default function CreateProductPage() {
         if (values.price_after_discount) formData.append('price_after_discount', values.price_after_discount);
         if (values.serial) formData.append('serial', values.serial);
         if (values.coupon_id) formData.append('coupon_id', values.coupon_id);
+        if (values.release_at) formData.append('release_at', new Date(values.release_at).toISOString());
         if (values.perks) formData.append('perks', values.perks);
         if (pickedCategory) {
             // Keep backward compatibility (category_ids) and support new API contract (category_id)
@@ -307,7 +310,6 @@ export default function CreateProductPage() {
             formData.append('category_ids', JSON.stringify([pickedCategory.id]));
         }
         if (thumbnail) formData.append('thumbnail', thumbnail);
-        if (sample) formData.append('sample', sample);
 
         setUploadProgress(0);
         const res = await createProduct(formData, (progressEvent) => {
@@ -516,6 +518,50 @@ export default function CreateProductPage() {
                             />
                         </div>
 
+                        {/* Release At + Perks */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="release_at"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="flex items-center gap-2">
+                                            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                                            {t('products.form.releaseAt', 'Release Date & Time')}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="datetime-local"
+                                                data-testid="create-product-release-at-input"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="perks"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t('products.form.perks')}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder={t('products.form.perksPlaceholder')}
+                                                data-testid="create-product-perks-input"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <p className="text-[0.8rem] text-muted-foreground mt-1">
+                                            {t('products.form.perksTip')}
+                                        </p>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
                         {/* Description */}
                         <FormField
                             control={form.control}
@@ -531,28 +577,6 @@ export default function CreateProductPage() {
                                             {...field}
                                         />
                                     </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        {/* Perks */}
-                        <FormField
-                            control={form.control}
-                            name="perks"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t('products.form.perks')}</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder={t('products.form.perksPlaceholder')}
-                                            data-testid="create-product-perks-input"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <p className="text-[0.8rem] text-muted-foreground mt-1">
-                                        {t('products.form.perksTip')}
-                                    </p>
                                     <FormMessage />
                                 </FormItem>
                             )}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { CheckCheck, ShoppingCart, Zap } from "lucide-react";
+import { CheckCheck, ShoppingCart, Zap, Clock } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ import LoadingSpinner from "@/components/ui/loading-spinner";
  * The image/title area links to /product/:id.
  * "Add to Cart" and "Buy Now" buttons appear below (not inside the Link).
  */
-const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, isPurchased, rate, rate_count }) => {
+const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, isPurchased, rate, rate_count, is_released = true, release_at }) => {
   const { t, i18n } = useTranslation("market");
   const location = useLocation();
   const navigate = useNavigate();
@@ -50,6 +50,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!is_released) return;
     if (!isAuthenticated) {
       navigate("/login", { state: { from: location }, replace: true });
       return;
@@ -68,6 +69,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   const handleBuyNow = async (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!is_released) return;
     if (!isAuthenticated) {
       navigate("/login", { state: { from: location }, replace: true });
       return;
@@ -86,11 +88,19 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
       <Link to={`/product/${id}`} className="block" data-testid={`market-product-card-${id}-link`}>
         <Card className="border-none shadow-none">
           <CardContent className="p-0 relative overflow-hidden rounded-4xl mb-4 aspect-4/5 sm:aspect-square bg-muted">
-            {hasDiscount && (
-              <Badge variant="destructive" className="absolute top-3 start-3 z-10 px-2.5 py-1 text-[11px] font-semibold rounded-md">
-                {discountPercentage}% {t("product.off", "OFF")}
-              </Badge>
-            )}
+            <div className="absolute top-3 start-3 z-10 flex flex-col gap-2">
+              {hasDiscount && (
+                <Badge variant="destructive" className="px-2.5 py-1 text-[11px] font-semibold rounded-md flex-wrap w-max">
+                  {discountPercentage}% {t("product.off", "OFF")}
+                </Badge>
+              )}
+              {!is_released && release_at && (
+                <Badge variant="secondary" className="px-2.5 py-1 text-[11px] font-semibold rounded-md gap-1 bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800 flex-wrap w-max">
+                  <Clock className="w-3" />
+                  {t("product.comingSoon", "Coming Soon")}
+                </Badge>
+              )}
+            </div>
             {isPurchased && (
               <Badge
                 variant="secondary"
@@ -153,12 +163,17 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
             size="sm"
             className="flex-1 h-8 text-xs font-medium py-2"
             onClick={handleAddToCart}
-            disabled={cartLoading || fastBuyLoading || isAddingToCart}
+            disabled={cartLoading || fastBuyLoading || isAddingToCart || !is_released}
             data-testid={`market-product-card-${id}-add-to-cart`}
             title={t("product.addToCart", "Add to Cart")}
           >
             {isAddingToCart ? (
               <LoadingSpinner className="h-5 w-5 border-primary" />
+            ) : !is_released ? (
+                <>
+                  <Clock className="h-3.5 w-3.5 me-1.5 shrink-0" />
+                  <span className="truncate">{t("product.comingSoon", "Coming Soon")}</span>
+                </>
             ) : (
               <>
                 <ShoppingCart className="h-3.5 w-3.5 me-1.5 shrink-0" />
@@ -173,10 +188,15 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
             onClick={handleBuyNow}
             data-testid={`market-product-card-${id}-buy-now`}
             title={t("product.buyNow", "Buy Now")}
-            disabled={cartLoading || fastBuyLoading || isBuyingNow}
+            disabled={cartLoading || fastBuyLoading || isBuyingNow || !is_released}
           >
             {isBuyingNow ? (
               <LoadingSpinner className="h-5 w-5 border-white" />
+            ) : !is_released ? (
+                <>
+                  <Clock className="h-3.5 w-3.5 me-1.5 shrink-0" />
+                  <span className="truncate">{t("product.comingSoon", "Coming Soon")}</span>
+                </>
             ) : (
               <>
                 <Zap className="h-3.5 w-3.5 me-1.5 shrink-0" />

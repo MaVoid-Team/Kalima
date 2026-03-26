@@ -22,6 +22,7 @@ import CategoriesManager from '@/components/admin/products/CategoriesManager';
 import RequiredFieldsManager from '@/components/admin/products/RequiredFieldsManager';
 import SampleManager from '@/components/admin/products/SampleManager';
 import FileUploadProgress from '@/components/admin/settings/FileUploadProgress';
+import ReviewManager from '@/components/admin/products/ReviewManager';
 import { getDiscountType, getCouponId, isCouponActive } from '@/lib/couponUtils';
 
 export default function ProductDetailPage() {
@@ -545,6 +546,12 @@ export default function ProductDetailPage() {
                     </div>
                 )}
             </div>
+
+            <ReviewManager 
+                productId={product.id} 
+                className="mt-6 rounded-xl border border-border p-5" 
+            />
+
             <EditCouponDialog
                 open={editCouponOpen}
                 onOpenChange={(openState) => {

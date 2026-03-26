@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Minus, Plus, ShoppingCart, Eye, Zap } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Eye, Zap, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,7 @@ import { FaWhatsapp } from "react-icons/fa";
  *   - title: string
  *   - serial: string
  */
-export default function ProductActions({ price, productId, sampleUrl, sampleId, title, serial }) {
+export default function ProductActions({ price, productId, sampleUrl, sampleId, title, serial, isReleased = true }) {
   const { t } = useTranslation("product");
   const [quantity, setQuantity] = useState(1);
   const { isAuthenticated } = useAuth();
@@ -47,6 +47,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
   const formattedPrice = formatPrice(price);
 
   const handleAddToCart = () => {
+    if (!isReleased) return;
     if (!isAuthenticated) {
       navigate("/login", { state: { from: location }, replace: true });
       return;
@@ -55,6 +56,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
   };
 
   const handleBuyNow = () => {
+    if (!isReleased) return;
     if (!isAuthenticated) {
       navigate("/login", { state: { from: location }, replace: true });
       return;
@@ -113,12 +115,17 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
           <div className="grid grid-cols-2 gap-2">
             <Button
               className="h-11 gap-2"
-              disabled={loading}
+              disabled={loading || !isReleased}
               onClick={handleAddToCart}
               data-testid="product-actions-mobile-add-cart-button"
             >
               {loading ? (
                 <LoadingSpinner className="h-5 w-5 border-white" />
+              ) : !isReleased ? (
+                <>
+                  <Clock className="h-5 w-5" />
+                  <span>{t("badges.comingSoon", "Coming Soon")}</span>
+                </>
               ) : (
                 <>
                   <ShoppingCart className="h-5 w-5" />
@@ -131,15 +138,19 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
               variant="secondary"
               className="h-11 gap-2"
               onClick={handleBuyNow}
-              disabled={fastBuyLoading}
+              disabled={fastBuyLoading || !isReleased}
               data-testid="product-actions-mobile-buy-now-button"
             >
               {fastBuyLoading ? (
                 <LoadingSpinner className="h-5 w-5" />
+              ) : !isReleased ? (
+                 <>
+                   <Clock className="h-4 w-4" />
+                   <span>{t("badges.comingSoon", "Coming Soon")}</span>
+                 </>
               ) : (
                 <>
                   <Zap className="h-4 w-4" />
-
                   <span>{t("actions.buyNow")}</span>
                 </>
               )}
@@ -199,9 +210,14 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
           </div> */}
 
           {/* Add to Cart */}
-          <Button className="gap-2 flex-1" size="lg" onClick={handleAddToCart} disabled={loading} data-testid="product-actions-desktop-add-cart-button">
+          <Button className="gap-2 flex-1" size="lg" onClick={handleAddToCart} disabled={loading || !isReleased} data-testid="product-actions-desktop-add-cart-button">
             {loading ? (
               <LoadingSpinner className="h-5 w-5 border-white" />
+            ) : !isReleased ? (
+                <>
+                  <Clock className="h-5 w-5" />
+                  {t("badges.comingSoon", "Coming Soon")}
+                </>
             ) : (
               <>
                 <ShoppingCart className="h-5 w-5" />
@@ -218,11 +234,16 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
             className="text-sm flex-1"
             size="lg"
             onClick={handleBuyNow}
-            disabled={fastBuyLoading}
+            disabled={fastBuyLoading || !isReleased}
             data-testid="product-actions-desktop-buy-now-button"
           >
             {fastBuyLoading ? (
               <LoadingSpinner className="h-5 w-5" />
+            ) : !isReleased ? (
+              <span className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                {t("badges.comingSoon", "Coming Soon")}
+              </span>
             ) : (
               t("actions.buyNow")
             )}
