@@ -1,4 +1,4 @@
-import { Star, StarHalf } from "lucide-react";
+import { Star, StarHalf, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,9 @@ export default function ProductInfo({ product }) {
     ? calculateDiscountPercentage(originalPrice, currentPrice, 0)
     : 0;
 
+  const isReleased = product?.is_released ?? true;
+  const releaseAt = product?.release_at;
+
   return (
     <div className="flex flex-col gap-6">
       {/* Badges / Meta Info */}
@@ -27,6 +30,12 @@ export default function ProductInfo({ product }) {
         {product.is_archived && (
           <Badge variant="destructive">
             {t("product:badges.archived") || "Archived"}
+          </Badge>
+        )}
+        {!isReleased && releaseAt && (
+          <Badge variant="secondary" className="gap-1.5 bg-amber-100 text-amber-800 hover:bg-amber-100/80 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800">
+            <Clock className="w-3.5 h-3.5" />
+            {t("product:badges.comingSoon", "Coming Soon")} - {new Date(releaseAt).toLocaleDateString()}
           </Badge>
         )}
         {product.type && (

@@ -8,14 +8,28 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import useEmailVerification from '@/hooks/auth/useEmailVerification';
 import useAuth from '@/hooks/auth/useAuth';
+import useDeleteAccount from '@/hooks/auth/useDeleteAccount';
+import ConfirmDeleteAccountDialog from './ConfirmDeleteAccountDialog';
+import { AlertTriangle } from 'lucide-react';
 
 export default function SecuritySection() {
     const { t, i18n } = useTranslation('admin');
     const { user } = useAuth();
     const { sendVerification, resendVerification, loading } = useEmailVerification();
+    const { deleteAccount, loading: deletingAccount } = useDeleteAccount();
     
     const [isSending, setIsSending] = useState(false);
     const [lastSentTime, setLastSentTime] = useState(null);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const handleDeleteAccount = async () => {
+        try {
+            await deleteAccount();
+            window.location.href = '/login';
+        } catch (error) {
+            // Error handled by hook
+        }
+    };
 
     useEffect(() => {
         // Load last sent time from localStorage if exists
@@ -170,6 +184,43 @@ export default function SecuritySection() {
                         </div>
                     </div>
                 </div>
+
+                <Separator />
+
+                {/* Danger Zone */}
+                <div className="space-y-4 pt-2">
+                    <h3 className="text-sm font-medium text-destructive flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        {t('settings.account.dangerZone', 'Danger Zone')}
+                    </h3>
+                    
+                    <div className="p-4 border border-destructive/20 bg-destructive/5 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h4 className="font-medium text-destructive">
+                                {t('settings.account.deleteAccount', 'Delete Account')}
+                            </h4>
+                            <p className="text-sm text-muted-foreground mt-1">
+                                {t('settings.account.deleteAccountDesc', 'Permanently remove your account and all associated data. This action is irreversible.')}
+                            </p>
+                        </div>
+                        <Button
+                            variant="destructive"
+                            onClick={() => setShowDeleteDialog(true)}
+                            disabled={deletingAccount}
+                            className="whitespace-nowrap"
+                        >
+                            {deletingAccount ? t('common.loading') : t('settings.account.deleteAccountBtn', 'Delete Account')}
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Delete Account Dialog */}
+                <ConfirmDeleteAccountDialog
+                    open={showDeleteDialog}
+                    onOpenChange={setShowDeleteDialog}
+                    onConfirm={handleDeleteAccount}
+                    loading={deletingAccount}
+                />
             </CardContent>
         </Card>
     );

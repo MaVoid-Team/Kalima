@@ -124,6 +124,7 @@ export default function ProductDetailsPage() {
                 sampleId={productProps.samples?.id ?? null}
                 title={productProps.title}
                 serial={productProps.serial}
+                isReleased={productProps.is_released ?? true}
               />
 
               {/* Description Text */}
