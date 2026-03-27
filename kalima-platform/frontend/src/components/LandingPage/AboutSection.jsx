@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BrainCircuit, ShieldCheck, Users2, Rocket } from "lucide-react";
 
-const ABOUT_IMAGE = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1471&auto=format&fit=crop";
+const ABOUT_IMAGE = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop";
 
 export default function AboutSection() {
   const { t, i18n } = useTranslation("landing");
@@ -48,8 +48,8 @@ export default function AboutSection() {
             <div className="grid gap-4 sm:grid-cols-2">
               {pillars.map((pillar, index) => (
                 <motion.div key={pillar.title} variants={cardReveal} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }} transition={{ delay: index * 0.07 }} whileHover={{ y: -8, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}>
-                  <Card className="flex h-full flex-col border border-white/40 dark:border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] ring-1 ring-inset ring-white/20 dark:ring-white/10 bg-gradient-to-br from-white/30 to-white/5 dark:from-white/10 dark:to-transparent transition-all duration-300 hover:bg-white/20 dark:hover:bg-white/10 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 relative overflow-hidden group">
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <Card className="flex h-full flex-col border border-white/40 dark:border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] ring-1 ring-inset ring-white/20 dark:ring-white/10 bg-linear-to-br from-white/30 to-white/5 dark:from-white/10 dark:to-transparent transition-all duration-300 hover:bg-white/20 dark:hover:bg-white/10 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 relative overflow-hidden group">
+                    <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <CardHeader className="pb-3 relative z-10 text-center sm:text-start">
                       <div className="mb-2 mx-auto sm:mx-0 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/40 dark:bg-white/10 border border-white/30 backdrop-blur-md shadow-sm text-primary transition-transform group-hover:scale-110 duration-300">
                         <pillar.icon className={"h-5 w-5 drop-shadow-sm" + (i18n.language === "ar" ? " scale-x-[-1]" : "")} />
@@ -68,6 +68,9 @@ export default function AboutSection() {
           <motion.img
             src={ABOUT_IMAGE}
             alt={t("landingPage.about.title")}
+            width="800"
+            height="460"
+            loading="lazy"
             className="h-[460px] w-full rounded-3xl object-cover shadow-xl transition-shadow hover:shadow-2xl hover:shadow-primary/10"
             initial={{ opacity: 0, y: 22 }}
             whileInView={{ opacity: 1, y: 0 }}
