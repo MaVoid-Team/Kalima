@@ -5,13 +5,11 @@ import { BookOpen, BriefcaseBusiness, CirclePlay, ShoppingBag } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import useLandingInsights from "@/hooks/useLandingInsights";
 
 const HERO_IMAGE = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop";
 
 export default function WelcomeSection() {
   const { t, i18n } = useTranslation("landing");
-  const { metrics } = useLandingInsights();
 
   const highlights = [
     {
@@ -60,33 +58,6 @@ export default function WelcomeSection() {
             >
               {t("landingPage.hero.description")}
             </motion.p>
-
-            <div className="grid gap-4 sm:grid-cols-3">
-              <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.5 }} transition={{ duration: 0.4, delay: 0.16 }}>
-                <Card className="border border-white/40 dark:border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] ring-1 ring-inset ring-white/20 dark:ring-white/10 bg-linear-to-br from-white/30 to-white/5 dark:from-white/10 dark:to-transparent mx-auto flex aspect-square w-48 flex-col justify-center rounded-full sm:block sm:w-full sm:h-full sm:aspect-auto sm:rounded-xl">
-                  <CardContent className="p-4 text-center z-10 relative">
-                    <p className="text-2xl font-semibold text-foreground drop-shadow-sm">{metrics.activePrograms}+</p>
-                    <p className="text-xs text-muted-foreground font-medium">{t("landingPage.hero.metrics.programs")}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.5 }} transition={{ duration: 0.4, delay: 0.22 }}>
-                <Card className="border border-white/40 dark:border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] ring-1 ring-inset ring-white/20 dark:ring-white/10 bg-linear-to-br from-white/30 to-white/5 dark:from-white/10 dark:to-transparent mx-auto flex aspect-square w-48 flex-col justify-center rounded-full sm:block sm:w-full sm:h-full sm:aspect-auto sm:rounded-xl">
-                  <CardContent className="p-4 text-center z-10 relative">
-                    <p className="text-2xl font-semibold text-foreground drop-shadow-sm">{metrics.learningTracks}+</p>
-                    <p className="text-xs text-muted-foreground font-medium">{t("landingPage.hero.metrics.tracks")}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.5 }} transition={{ duration: 0.4, delay: 0.28 }}>
-                <Card className="border border-white/40 dark:border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] ring-1 ring-inset ring-white/20 dark:ring-white/10 bg-linear-to-br from-white/30 to-white/5 dark:from-white/10 dark:to-transparent mx-auto flex aspect-square w-48 flex-col justify-center rounded-full sm:block sm:w-full sm:h-full sm:aspect-auto sm:rounded-xl">
-                  <CardContent className="p-4 text-center z-10 relative">
-                    <p className="text-2xl font-semibold text-foreground drop-shadow-sm">{t("landingPage.hero.metrics.ratio")}</p>
-                    <p className="text-xs text-muted-foreground font-medium">{t("landingPage.hero.metrics.learningFocus")}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </div>
 
             <motion.div
               className="flex flex-col gap-3 sm:flex-row"
