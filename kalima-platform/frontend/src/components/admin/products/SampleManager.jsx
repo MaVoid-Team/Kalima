@@ -12,25 +12,25 @@ import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
 import { formatFileSize } from '@/lib/storeUtils';
 import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 
-// Helper: resolve accept string per media type
 const getAccept = (mediaType) => {
     switch (mediaType) {
-        case 'Video': return 'video/*';
-        case 'Image': return 'image/*';
-        case 'Audio': return 'audio/*';
-        case 'Document':
+        case 'video': return '.mp4,.webm,.mov,video/mp4,video/webm,video/quicktime';
+        case 'image': return '.jpg,.jpeg,.png,.webp,.gif,.svg,image/*';
+        case 'pdf': return '.pdf,application/pdf';
+        case 'word': return '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        case 'powerpoint': return '.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation';
         default:
-            return '.pdf,.doc,.docx,.ppt,.pptx';
+            return '*/*';
     }
 };
 
 // Helper: is this media type displayable inline?
-const isPreviewable = (mediaType) => mediaType === 'Image' || mediaType === 'Video';
+const isPreviewable = (mediaType) => mediaType === 'image' || mediaType === 'video';
 
 // Helper: icon for media type
 const MediaIcon = ({ mediaType, className }) => {
-    if (mediaType === 'Video') return <FileVideo className={className} />;
-    if (mediaType === 'Image') return <Image className={className} />;
+    if (mediaType === 'video') return <FileVideo className={className} />;
+    if (mediaType === 'image') return <Image className={className} />;
     return <FileText className={className} />;
 };
 
@@ -41,11 +41,15 @@ export default function SampleManager({ product, loading, onRefresh }) {
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [sectionId, setSectionId] = useState('');
-    const [mediaType, setMediaType] = useState('Document');
+    const [mediaType, setMediaType] = useState('pdf');
 
     // We can only have one sample per product currently, but it might be tied to a section.
     // Let's assume the backend now populates `product.sample` as an object { id, section_id, media_type, high_quality_url, low_quality_url, sizes, ... }
     const sample = product?.sample || product?.samples;
+
+    const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
+    const previewUrl = sample ? `${apiUrl}/sample-sections/${sample.section_id}/samples/${sample.id}/preview` : '';
+    const downloadUrl = sample ? `${apiUrl}/sample-sections/${sample.section_id}/samples/${sample.id}/download` : '';
 
     const hqFileRef = useRef(null);
     const lqFileRef = useRef(null);
@@ -154,13 +158,14 @@ export default function SampleManager({ product, loading, onRefresh }) {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="Document">{t('samples.mediaDocument', 'Document (PDF, Word, PowerPoint)')}</SelectItem>
-                                <SelectItem value="Video">{t('samples.mediaVideo', 'Video')}</SelectItem>
-                                <SelectItem value="Audio">{t('samples.mediaAudio', 'Audio')}</SelectItem>
-                                <SelectItem value="Image">{t('samples.mediaImage', 'Image')}</SelectItem>
+                                <SelectItem value="pdf">{t('samples.mediaPdf', 'PDF')}</SelectItem>
+                                <SelectItem value="image">{t('samples.mediaImage', 'Image')}</SelectItem>
+                                <SelectItem value="video">{t('samples.mediaVideo', 'Video')}</SelectItem>
+                                <SelectItem value="word">{t('samples.mediaWord', 'Word')}</SelectItem>
+                                <SelectItem value="powerpoint">{t('samples.mediaPowerpoint', 'PowerPoint')}</SelectItem>
                             </SelectContent>
                         </Select>
-                        {mediaType === 'Document' && (
+                        {(mediaType === 'pdf' || mediaType === 'word' || mediaType === 'powerpoint') && (
                             <p className="text-xs text-muted-foreground">
                                 {t('samples.docFormats', 'Accepted: PDF, Word (.doc/.docx), PowerPoint (.ppt/.pptx) — download only')}
                             </p>
@@ -209,20 +214,20 @@ export default function SampleManager({ product, loading, onRefresh }) {
         <div className="space-y-4">
             <div className="border border-border rounded-xl overflow-hidden">
                 {/* Inline preview for images */}
-                {mt === 'Image' && sample.high_quality_url && (
+                {mt === 'image' && sample.high_quality_url && (
                     <div className="w-full max-h-64 overflow-hidden bg-muted flex items-center justify-center">
                         <img
-                            src={sample.high_quality_url}
+                            src={previewUrl}
                             alt="Sample preview"
                             className="max-h-64 object-contain w-full"
                         />
                     </div>
                 )}
                 {/* Inline preview for videos */}
-                {mt === 'Video' && sample.high_quality_url && (
+                {mt === 'video' && sample.high_quality_url && (
                     <div className="w-full bg-black">
                         <video
-                            src={sample.high_quality_url}
+                            src={previewUrl}
                             controls
                             className="w-full max-h-64"
                         />
@@ -242,7 +247,7 @@ export default function SampleManager({ product, loading, onRefresh }) {
                             </p>
                         )}
                         {/* Word/PowerPoint note */}
-                        {mt === 'Document' && (
+                        {(mt === 'pdf' || mt === 'word' || mt === 'powerpoint') && (
                             <p className="text-xs text-muted-foreground">
                                 {t('samples.docDownloadOnly', 'Word and PowerPoint files are available as download only.')}
                             </p>
@@ -252,20 +257,17 @@ export default function SampleManager({ product, loading, onRefresh }) {
                         {/* For non-previewable types (Document, Audio), show a HQ open link */}
                         {!isPreviewable(mt) && sample.high_quality_url && (
                             <Button variant="outline" size="sm" asChild>
-                                <a href={sample.high_quality_url} target="_blank" rel="noreferrer">
+                                <a href={previewUrl} target="_blank" rel="noreferrer">
                                     <Download className="me-2 h-4 w-4" /> {t('samples.open', 'Open')}
                                 </a>
                             </Button>
                         )}
                         {sample.low_quality_url && (
-                            <DownloadWithProgress
-                                url={sample.low_quality_url}
-                                filename={`LQ_Sample_${sample.id}`}
-                                variant="outline"
-                                size="sm"
-                            >
-                                <Download className="me-2 h-4 w-4" /> {t('samples.lqDownload', 'LQ Download')}
-                            </DownloadWithProgress>
+                            <Button variant="outline" size="sm" asChild>
+                                <a href={downloadUrl} download>
+                                    <Download className="me-2 h-4 w-4" /> {t('samples.lqDownload', 'LQ Download')}
+                                </a>
+                            </Button>
                         )}
                         <Button variant="outline" size="icon" onClick={handleRemoveSample} className="text-destructive hover:bg-destructive/10">
                             <Trash2 className="h-4 w-4" />

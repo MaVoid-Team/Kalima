@@ -35,11 +35,32 @@ export default function DownloadWithProgress({ url, filename, variant = 'outline
                 },
             });
 
+            let finalFilename = filename;
+            const contentDisposition = response.headers['content-disposition'];
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="?([^";]+)"?/i);
+                if (filenameMatch && filenameMatch[1]) {
+                    const headerFilename = filenameMatch[1].trim();
+                    if (filename) {
+                        const headerExt = headerFilename.includes('.') ? headerFilename.split('.').pop() : '';
+                        const providedExt = filename.includes('.') ? filename.split('.').pop() : '';
+                        if (headerExt && headerExt !== providedExt && headerExt !== filename) {
+                            finalFilename = `${filename}.${headerExt}`;
+                        }
+                    } else {
+                        finalFilename = headerFilename;
+                    }
+                }
+            }
+            if (!finalFilename) {
+                finalFilename = url.split('/').pop() || 'download';
+            }
+
             // Create blob link to download
             const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = blobUrl;
-            link.setAttribute('download', filename || url.split('/').pop() || 'download'); // default filename
+            link.setAttribute('download', finalFilename);
             document.body.appendChild(link);
             link.click();
             link.remove();

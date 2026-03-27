@@ -46,12 +46,11 @@ export default function SamplesDirectoryPage() {
     }, [fetchSampleSections]);
 
     const getIconForType = (mediaType) => {
-        switch (mediaType) {
-            case 'Video': return <Video className="h-6 w-6 text-blue-500" />;
-            case 'Audio': return <FileAudio className="h-6 w-6 text-orange-500" />;
-            case 'Image': return <ImageIcon className="h-6 w-6 text-green-500" />;
-            default: return <FileText className="h-6 w-6 text-primary" />;
-        }
+        const mt = mediaType?.toLowerCase();
+        if (mt === 'video') return <Video className="h-6 w-6 text-blue-500" />;
+        if (mt === 'audio') return <FileAudio className="h-6 w-6 text-orange-500" />;
+        if (mt === 'image') return <ImageIcon className="h-6 w-6 text-green-500" />;
+        return <FileText className="h-6 w-6 text-primary" />;
     };
 
     return (
@@ -106,7 +105,12 @@ export default function SamplesDirectoryPage() {
                                             <p className="text-muted-foreground py-4 text-center">{t('samples.noNestedSamples')}</p>
                                         ) : (
                                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-                                                {section.samples.map((sample) => (
+                                                {section.samples.map((sample) => {
+                                                    const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
+                                                    const previewUrl = `${apiUrl}/sample-sections/${section.id}/samples/${sample.id}/preview`;
+                                                    const downloadUrl = `${apiUrl}/sample-sections/${section.id}/samples/${sample.id}/download`;
+
+                                                    return (
                                                     <div
                                                         key={sample.id}
                                                         className="group flex flex-col justify-between rounded-xl border border-border p-5 shadow-sm transition-all hover:shadow-md hover:border-primary/50 bg-background"
@@ -148,7 +152,7 @@ export default function SamplesDirectoryPage() {
                                                                     className="flex-1"
                                                                     asChild
                                                                 >
-                                                                    <a href={sample.high_quality_url} target="_blank" rel="noopener noreferrer">
+                                                                    <a href={previewUrl} target="_blank" rel="noopener noreferrer">
                                                                         <ExternalLink className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
                                                                         {t("samples.view")}
                                                                     </a>
@@ -156,19 +160,17 @@ export default function SamplesDirectoryPage() {
                                                             )}
 
                                                             {sample.low_quality_url && (
-                                                                <DownloadWithProgress
-                                                                    url={sample.low_quality_url}
-                                                                    filename={`Sample_LQ_${sample.id}`}
-                                                                    variant="outline"
-                                                                    className="flex-1"
-                                                                >
-                                                                    <Download className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
-                                                                    {t("samples.download")}
-                                                                </DownloadWithProgress>
+                                                                <Button variant="outline" className="flex-1" asChild>
+                                                                    <a href={downloadUrl} download>
+                                                                        <Download className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
+                                                                        {t("samples.download")}
+                                                                    </a>
+                                                                </Button>
                                                             )}
                                                         </div>
                                                     </div>
-                                                ))}
+                                                    );
+                                                })}
                                             </div>
                                         )}
                                     </AccordionContent>

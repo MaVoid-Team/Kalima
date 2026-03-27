@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Loader2, X, Package, PlusCircle, Calendar as CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, startOfDay } from 'date-fns';
 import { arSA } from 'react-day-picker/locale';
 
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
@@ -38,6 +38,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import FileUploadProgress from '@/components/admin/settings/FileUploadProgress';
 
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -68,6 +69,9 @@ export default function CreateProductPage() {
     }).refine(
         (data) => !data.price_after_discount || data.price_after_discount < data.price,
         { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
+    ).refine(
+        (data) => !data.release_at || new Date(data.release_at) >= startOfDay(new Date()),
+        { message: t('products.form.releaseDateMustBeFuture', 'Release date must be today or in the future'), path: ['release_at'] }
     );
 
     const {
@@ -76,6 +80,9 @@ export default function CreateProductPage() {
         fetchFieldDefinitions,
         fieldDefinitions,
         actionLoading,
+        addGalleryImages,
+        addGalleryVideo,
+        addExternalGalleryVideo,
     } = useAdminProducts();
 
     const {
@@ -94,7 +101,7 @@ export default function CreateProductPage() {
     const [hqSample, setHqSample] = useState(null);
     const [lqSample, setLqSample] = useState(null);
     const [sampleSectionId, setSampleSectionId] = useState('');
-    const [mediaType, setMediaType] = useState('Document');
+    const [mediaType, setMediaType] = useState('pdf');
 
     // Category picker state — single category only (up to 3 levels)
     const [selectedRootId, setSelectedRootId] = useState('');
@@ -110,15 +117,27 @@ export default function CreateProductPage() {
 
     // Upload progress state
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadFileName, setUploadFileName] = useState('');
+    const [uploadError, setUploadError] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
     // Quick coupon state
     const [quickCouponEnabled, setQuickCouponEnabled] = useState(false);
     const [quickCouponCode, setQuickCouponCode] = useState('');
     const [quickCouponType, setQuickCouponType] = useState('PERCENTAGE');
     const [quickCouponValue, setQuickCouponValue] = useState('');
     const [quickCouponExpiresAt, setQuickCouponExpiresAt] = useState('');
+    const uploadAbortControllerRef = useRef(null);
+    const createdProductIdRef = useRef(null);
+
     const thumbnailInputRef = useRef(null);
+    const galleryInputRef = useRef(null);
+    const galleryVideoInputRef = useRef(null);
     const hqSampleInputRef = useRef(null);
     const lqSampleInputRef = useRef(null);
+
+    const [pendingGalleryImages, setPendingGalleryImages] = useState([]);
+    const [pendingGalleryVideo, setPendingGalleryVideo] = useState(null);
+    const [externalVideoUrl, setExternalVideoUrl] = useState('');
 
     const {
         sections: sampleSections,
@@ -285,91 +304,161 @@ export default function CreateProductPage() {
 
     // ─── Submit ───────────────────────────────────────────────────────────────
 
+    const handleCancelUpload = () => {
+        if (uploadAbortControllerRef.current) {
+            uploadAbortControllerRef.current.abort();
+            uploadAbortControllerRef.current = null;
+        }
+        setIsUploading(false);
+        setUploadProgress(0);
+        setUploadError('');
+    };
+
     const onSubmit = async (values) => {
         const quickCouponDraft = quickCouponEnabled
             ? buildQuickCouponPayload('__PENDING_PRODUCT_ID__', Number(values.price))
             : null;
 
-        if (quickCouponEnabled && !quickCouponDraft) {
-            return;
-        }
+        if (quickCouponEnabled && !quickCouponDraft) return;
 
-        const formData = new FormData();
-        formData.append('title', values.title);
-        formData.append('price', values.price);
-        formData.append('type', values.type);
-        if (values.description) formData.append('description', values.description);
-        if (values.price_after_discount) formData.append('price_after_discount', values.price_after_discount);
-        if (values.serial) formData.append('serial', values.serial);
-        if (values.coupon_id) formData.append('coupon_id', values.coupon_id);
-        if (values.release_at) formData.append('release_at', new Date(values.release_at).toISOString());
-        if (values.perks) formData.append('perks', values.perks);
-        if (pickedCategory) {
-            // Keep backward compatibility (category_ids) and support new API contract (category_id)
-            formData.append('category_id', String(pickedCategory.id));
-            formData.append('category_ids', JSON.stringify([pickedCategory.id]));
-        }
-        if (thumbnail) formData.append('thumbnail', thumbnail);
+        // ── Step 1: Create the product (guarded — skip if already created) ──
+        let newProductId = createdProductIdRef.current;
 
-        setUploadProgress(0);
-        const res = await createProduct(formData, (progressEvent) => {
-            if (progressEvent.total) {
-                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                setUploadProgress(percentCompleted);
+        if (!newProductId) {
+            const formData = new FormData();
+            formData.append('title', values.title);
+            formData.append('price', values.price);
+            formData.append('type', values.type);
+            if (values.description) formData.append('description', values.description);
+            if (values.price_after_discount) formData.append('price_after_discount', values.price_after_discount);
+            if (values.serial) formData.append('serial', values.serial);
+            if (values.coupon_id) formData.append('coupon_id', values.coupon_id);
+            if (values.release_at) formData.append('release_at', new Date(values.release_at).toISOString());
+            if (values.perks) formData.append('perks', values.perks);
+            if (pickedCategory) {
+                formData.append('category_id', String(pickedCategory.id));
+                formData.append('category_ids', JSON.stringify([pickedCategory.id]));
             }
-        });
+            if (thumbnail) formData.append('thumbnail', thumbnail);
 
-        if (res?.success) {
-            const newProductId = res.data?.id;
-            // Attach required fields after the product is created
-            if (pickedFields.length > 0 && newProductId) {
-                await attachRequiredFields(
-                    newProductId,
-                    pickedFields.map(f => ({ field_definition_id: f.id, is_required: f.is_required }))
-                );
-            }
+            setUploadProgress(0);
+            setUploadFileName(thumbnail?.name || t('products.create.dialogTitle'));
+            setUploadError('');
+            setIsUploading(true);
+            const abortCtrl = new AbortController();
+            uploadAbortControllerRef.current = abortCtrl;
 
-            if (quickCouponEnabled && newProductId) {
-                try {
-                    const couponPayload = {
-                        ...quickCouponDraft,
-                        product_id: String(newProductId),
-                    };
-                    await createCoupon(couponPayload);
-                } catch {
-                    toast.error(t('products.quickCoupon.createFailed'));
-                }
-            }
-
-            // Navigate to the new product's detail page
-            if (newProductId) {
-                // Upload sample if files are selected
-                if ((hqSample || lqSample) && sampleSectionId) {
-                    setUploadProgress(0);
-                    const sampleFormData = new FormData();
-                    sampleFormData.append('product_id', newProductId);
-                    sampleFormData.append('media_type', mediaType);
-                    if (hqSample) sampleFormData.append('high_quality', hqSample);
-                    if (lqSample) sampleFormData.append('low_quality', lqSample);
-
-                    toast.info(t('products.create.sampleUploading'));
-                    const sampleRes = await createSample(sampleSectionId, sampleFormData, (progressEvent) => {
-                        if (progressEvent.total) {
-                            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                            setUploadProgress(percentCompleted);
-                        }
-                    });
-
-                    if (sampleRes?.success) {
-                        toast.success(t('products.create.sampleSuccess'));
+            let res;
+            try {
+                res = await createProduct(formData, (progressEvent) => {
+                    if (progressEvent.total) {
+                        setUploadProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
                     }
-                }
+                });
+            } catch {
+                setIsUploading(false);
+                uploadAbortControllerRef.current = null;
+                return;
+            }
 
-                navigate(`/admin/products/${newProductId}`);
-            } else {
-                navigate('/admin/products');
+            setIsUploading(false);
+            uploadAbortControllerRef.current = null;
+
+            if (!res?.success) return;
+            newProductId = res.data?.id;
+            createdProductIdRef.current = newProductId; // guard against double-creation on retry
+        }
+
+        if (!newProductId) { navigate('/admin/products'); return; }
+
+        // ── Step 2: Attach required fields ──
+        if (pickedFields.length > 0) {
+            await attachRequiredFields(
+                newProductId,
+                pickedFields.map(f => ({ field_definition_id: f.id, is_required: f.is_required }))
+            );
+        }
+
+        // ── Step 3: Quick coupon ──
+        if (quickCouponEnabled) {
+            try {
+                await createCoupon({ ...quickCouponDraft, product_id: String(newProductId) });
+            } catch {
+                toast.error(t('products.quickCoupon.createFailed'));
             }
         }
+
+        // ── Step 4: Gallery images ──
+        if (pendingGalleryImages.length > 0) {
+            setUploadFileName(t('products.form.galleryImages', 'Gallery images'));
+            setUploadProgress(0); setUploadError(''); setIsUploading(true);
+            const abortCtrl = new AbortController();
+            uploadAbortControllerRef.current = abortCtrl;
+            const galleryFD = new FormData();
+            pendingGalleryImages.forEach(f => galleryFD.append('gallery', f));
+            try {
+                await addGalleryImages(newProductId, galleryFD, (ev) => {
+                    if (ev.total) setUploadProgress(Math.round((ev.loaded * 100) / ev.total));
+                }, abortCtrl.signal);
+            } catch { /* non-fatal */ }
+            setIsUploading(false); uploadAbortControllerRef.current = null;
+        }
+
+        // ── Step 5: Gallery video ──
+        if (pendingGalleryVideo) {
+            setUploadFileName(pendingGalleryVideo.name);
+            setUploadProgress(0); setUploadError(''); setIsUploading(true);
+            const abortCtrl = new AbortController();
+            uploadAbortControllerRef.current = abortCtrl;
+            const videoFD = new FormData();
+            videoFD.append('video', pendingGalleryVideo);
+            try {
+                await addGalleryVideo(newProductId, videoFD, (ev) => {
+                    if (ev.total) setUploadProgress(Math.round((ev.loaded * 100) / ev.total));
+                }, abortCtrl.signal);
+            } catch { /* non-fatal */ }
+            setIsUploading(false); uploadAbortControllerRef.current = null;
+        }
+
+        // ── Step 6: External video ──
+        if (externalVideoUrl.trim()) {
+            try { await addExternalGalleryVideo(newProductId, externalVideoUrl.trim()); } catch { /* non-fatal */ }
+        }
+
+        // ── Step 7: Sample ──
+        if ((hqSample || lqSample) && sampleSectionId) {
+            setUploadProgress(0);
+            setUploadFileName(hqSample?.name || lqSample?.name || 'Sample');
+            setUploadError(''); setIsUploading(true);
+            const abortCtrl = new AbortController();
+            uploadAbortControllerRef.current = abortCtrl;
+            const sampleFD = new FormData();
+            sampleFD.append('product_id', newProductId);
+            sampleFD.append('media_type', mediaType);
+            if (hqSample) sampleFD.append('high_quality', hqSample);
+            if (lqSample) sampleFD.append('low_quality', lqSample);
+            toast.info(t('products.create.sampleUploading'));
+            try {
+                const sampleRes = await createSample(sampleSectionId, sampleFD, (ev) => {
+                    if (ev.total) setUploadProgress(Math.round((ev.loaded * 100) / ev.total));
+                });
+                if (sampleRes?.success) {
+                    toast.success(t('products.create.sampleSuccess'));
+                } else {
+                    setUploadError(sampleRes?.message || 'Sample upload failed');
+                }
+            } catch (err) {
+                if (err?.name !== 'AbortError' && err?.code !== 'ERR_CANCELED') {
+                    setUploadError('Sample upload failed');
+                }
+            } finally {
+                uploadAbortControllerRef.current = null;
+                setIsUploading(false);
+            }
+        }
+
+        createdProductIdRef.current = null;
+        navigate(`/admin/products/${newProductId}`);
     };
 
     // ─── Render ───────────────────────────────────────────────────────────────
@@ -524,18 +613,44 @@ export default function CreateProductPage() {
                                 control={form.control}
                                 name="release_at"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="flex flex-col pt-2.5">
                                         <FormLabel className="flex items-center gap-2">
                                             <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                                            {t('products.form.releaseAt', 'Release Date & Time')}
+                                            {t('products.form.releaseAt', 'Release Date')}
                                         </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="datetime-local"
-                                                data-testid="create-product-release-at-input"
-                                                {...field}
-                                            />
-                                        </FormControl>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        type="button"
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-full pl-3 text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                        data-testid="create-product-release-at-input"
+                                                    >
+                                                        {field.value ? (
+                                                            format(new Date(field.value), "PPP", { locale: isRtl ? arSA : undefined })
+                                                        ) : (
+                                                            <span>{t('products.form.pickDate', 'Pick a date')}</span>
+                                                        )}
+                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value ? new Date(field.value) : undefined}
+                                                    onSelect={(date) => field.onChange(date ? date.toISOString() : '')}
+                                                    disabled={(date) => date < startOfDay(new Date())}
+                                                    initialFocus
+                                                    locale={isRtl ? arSA : undefined}
+                                                    dir={isRtl ? 'rtl' : 'ltr'}
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -794,6 +909,86 @@ export default function CreateProductPage() {
 
                             <Separator />
 
+                            {/* Gallery Images */}
+                            <div className="space-y-1.5">
+                                <FormLabel>{t('products.form.galleryImages', 'Gallery Images')}</FormLabel>
+                                <input
+                                    ref={galleryInputRef}
+                                    type="file"
+                                    accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*"
+                                    multiple
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files ?? []);
+                                        if (files.length) setPendingGalleryImages(prev => [...prev, ...files]);
+                                        e.target.value = '';
+                                    }}
+                                    className="sr-only"
+                                    data-testid="create-product-gallery-input"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                    onClick={() => galleryInputRef.current?.click()}
+                                    data-testid="create-product-gallery-button"
+                                >
+                                    {t('products.detail.addGalleryImages', 'Upload Images')}
+                                </Button>
+                                {pendingGalleryImages.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {pendingGalleryImages.map((f, i) => (
+                                            <div key={i} className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-xs">
+                                                <span className="truncate max-w-[120px]">{f.name}</span>
+                                                <button type="button" onClick={() => setPendingGalleryImages(prev => prev.filter((_, j) => j !== i))} className="text-muted-foreground hover:text-destructive ml-1">&times;</button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Gallery Video */}
+                            <div className="space-y-1.5">
+                                <FormLabel>{t('products.detail.addGalleryVideo', 'Gallery Video')}</FormLabel>
+                                <input
+                                    ref={galleryVideoInputRef}
+                                    type="file"
+                                    accept=".mp4,.webm,.mov,video/mp4,video/webm,video/quicktime"
+                                    onChange={(e) => { setPendingGalleryVideo(e.target.files?.[0] ?? null); e.target.value = ''; }}
+                                    className="sr-only"
+                                    data-testid="create-product-gallery-video-input"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                    onClick={() => galleryVideoInputRef.current?.click()}
+                                    data-testid="create-product-gallery-video-button"
+                                >
+                                    {t('products.detail.addGalleryVideo', 'Upload Video')}
+                                </Button>
+                                {pendingGalleryVideo && (
+                                    <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-xs mt-1">
+                                        <span className="truncate max-w-[200px]">{pendingGalleryVideo.name}</span>
+                                        <button type="button" onClick={() => setPendingGalleryVideo(null)} className="text-muted-foreground hover:text-destructive ml-1">&times;</button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* External Video URL */}
+                            <div className="space-y-1.5">
+                                <FormLabel>{t('products.detail.addExternalVideo', 'External Video URL')}</FormLabel>
+                                <Input
+                                    type="url"
+                                    placeholder="https://youtube.com/..."
+                                    value={externalVideoUrl}
+                                    onChange={(e) => setExternalVideoUrl(e.target.value)}
+                                    data-testid="create-product-external-video-input"
+                                />
+                                <p className="text-xs text-muted-foreground">{t('products.detail.videoUrlHelp', 'Supported link from Youtube, Vimeo, etc.')}</p>
+                            </div>
+
+                            <Separator />
+
                             {/* Sample Section */}
                             <div className="space-y-1.5">
                                 <FormLabel>{t('products.form.sampleSection')}</FormLabel>
@@ -817,10 +1012,11 @@ export default function CreateProductPage() {
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Document">{t('products.form.mediaTypeDocument', 'Document (PDF, Word, PowerPoint)')}</SelectItem>
-                                        <SelectItem value="Video">{t('products.form.mediaVideo', 'Video')}</SelectItem>
-                                        <SelectItem value="Audio">{t('products.form.mediaAudio', 'Audio')}</SelectItem>
-                                        <SelectItem value="Image">{t('products.form.mediaImage', 'Image')}</SelectItem>
+                                        <SelectItem value="pdf">{t('products.form.mediaTypePdf', 'PDF')}</SelectItem>
+                                        <SelectItem value="image">{t('products.form.mediaImage', 'Image')}</SelectItem>
+                                        <SelectItem value="video">{t('products.form.mediaVideo', 'Video')}</SelectItem>
+                                        <SelectItem value="word">{t('products.form.mediaWord', 'Word')}</SelectItem>
+                                        <SelectItem value="powerpoint">{t('products.form.mediaPowerpoint', 'PowerPoint')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -832,7 +1028,7 @@ export default function CreateProductPage() {
                                     <input
                                         ref={hqSampleInputRef}
                                         type="file"
-                                        accept={mediaType === 'Document' ? '.pdf,.doc,.docx,.ppt,.pptx' : mediaType === 'Video' ? 'video/*' : mediaType === 'Image' ? 'image/*' : 'audio/*'}
+                                        accept={mediaType === 'pdf' ? '.pdf,application/pdf' : mediaType === 'word' ? '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document' : mediaType === 'powerpoint' ? '.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation' : mediaType === 'video' ? '.mp4,.webm,.mov,video/mp4,video/webm,video/quicktime' : mediaType === 'image' ? '.jpg,.jpeg,.png,.webp,.gif,.svg,image/*' : '*/*'}
                                         onChange={(e) => setHqSample(e.target.files?.[0] ?? null)}
                                         className="sr-only"
                                         data-testid="create-product-hq-sample-input"
@@ -857,7 +1053,7 @@ export default function CreateProductPage() {
                                     <input
                                         ref={lqSampleInputRef}
                                         type="file"
-                                        accept={mediaType === 'Document' ? '.pdf,.doc,.docx,.ppt,.pptx' : mediaType === 'Video' ? 'video/*' : mediaType === 'Image' ? 'image/*' : 'audio/*'}
+                                        accept={mediaType === 'pdf' ? '.pdf,application/pdf' : mediaType === 'word' ? '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document' : mediaType === 'powerpoint' ? '.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation' : mediaType === 'video' ? '.mp4,.webm,.mov,video/mp4,video/webm,video/quicktime' : mediaType === 'image' ? '.jpg,.jpeg,.png,.webp,.gif,.svg,image/*' : '*/*'}
                                         onChange={(e) => setLqSample(e.target.files?.[0] ?? null)}
                                         className="sr-only"
                                         data-testid="create-product-lq-sample-input"
@@ -884,15 +1080,13 @@ export default function CreateProductPage() {
                     </div>
 
                     {/* ── Upload Progress ── */}
-                    {actionLoading && uploadProgress > 0 && (
-                        <div className="mb-4">
-                            <div className="flex justify-between text-sm mb-1 text-muted-foreground">
-                                <span>{uploadProgress < 100 ? t('products.create.uploading', 'Uploading...') : t('products.create.processing', 'Processing...')}</span>
-                                <span>{uploadProgress}%</span>
-                            </div>
-                            <Progress value={uploadProgress} />
-                        </div>
-                    )}
+                    <FileUploadProgress
+                        progress={uploadProgress}
+                        isUploading={isUploading}
+                        fileName={uploadFileName}
+                        error={uploadError}
+                        onCancel={handleCancelUpload}
+                    />
                     {/* ── Section: Quick Coupon ── */}
                     <div className="rounded-xl border border-border p-5 space-y-4">
                         <h2 className="font-semibold text-foreground">{t('products.quickCoupon.title')}</h2>

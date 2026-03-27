@@ -34,6 +34,7 @@ export default function FileUploadProgress({
                         </div>
                         {isUploading && (
                             <Button
+                                type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={onCancel}
