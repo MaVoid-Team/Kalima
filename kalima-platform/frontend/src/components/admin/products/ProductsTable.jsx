@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { MoreHorizontal, Eye, Pencil, ArchiveRestore, Archive, Trash2, ImageOff } from 'lucide-react';
+import { MoreHorizontal, Eye, Pencil, ArchiveRestore, Archive, Trash2, ImageOff, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getImageUrl, formatCurrency } from '@/lib/storeUtils';
+import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -85,6 +86,7 @@ export default function ProductsTable({
                     {products.map((product) => {
                         const thumbnailUrl = getImageUrl(product.thumbnail_image?.url);
                         const isArchived = product.is_archived;
+                        const isComingSoon = product.release_at && new Date(product.release_at) > new Date();
 
                         return (
                             <TableRow
@@ -186,6 +188,20 @@ export default function ProductsTable({
                                     >
                                         {isArchived ? t('products.status.archived') : t('products.status.active')}
                                     </Badge>
+                                    {isComingSoon && (
+                                        <div className="flex flex-col gap-0.5 mt-1">
+                                            <Badge
+                                                variant="outline"
+                                                className="bg-amber-500/10 text-amber-600 border-amber-500/30 text-xs"
+                                            >
+                                                <Clock className="h-3 w-3 me-1" />
+                                                {t('products.status.comingSoon', 'Coming Soon')}
+                                            </Badge>
+                                            <span className="text-[10px] text-muted-foreground">
+                                                {format(new Date(product.release_at), 'MMM d, yyyy')}
+                                            </span>
+                                        </div>
+                                    )}
                                 </TableCell>
 
                                 {/* Actions */}

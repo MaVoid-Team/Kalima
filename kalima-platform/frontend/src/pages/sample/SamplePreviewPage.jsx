@@ -8,6 +8,7 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import useApiMutation from '@/hooks/useApiMutation';
 import { getImageUrl } from '@/lib/storeUtils';
 import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
+import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 
 /**
  * SamplePreviewPage — full-screen PDF viewer for a single sample.
@@ -53,7 +54,9 @@ export default function SamplePreviewPage() {
         );
     }
 
-    const fileUrl = getImageUrl(sample?.url);
+    const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
+    const fileUrl = sample?.section_id ? `${apiUrl}/sample-sections/${sample.section_id}/samples/${sample.id}/preview` : '';
+    const downloadUrl = sample?.section_id ? `${apiUrl}/sample-sections/${sample.section_id}/samples/${sample.id}/download` : '';
     const isPdf = sample?.mime_type === 'application/pdf';
     const product = sample?.products;
 
@@ -80,7 +83,7 @@ export default function SamplePreviewPage() {
                     <div className="flex h-full flex-col items-center justify-center gap-4 text-muted-foreground">
                         <p className="text-sm">{t('samplePage.previewUnavailable')}</p>
                         <Button asChild data-testid="sample-preview-download-fallback-button">
-                            <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
+                            <a href={downloadUrl} download>
                                 <Download className="me-2 h-4 w-4" />
                                 {t('samplePage.downloadFile')}
                             </a>

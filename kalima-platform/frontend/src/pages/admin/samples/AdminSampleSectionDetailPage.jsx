@@ -39,12 +39,11 @@ export default function AdminSampleSectionDetailPage() {
     };
 
     const getIconForType = (mediaType) => {
-        switch (mediaType) {
-            case 'Video': return <Video className="h-5 w-5 text-blue-500" />;
-            case 'Audio': return <FileAudio className="h-5 w-5 text-orange-500" />;
-            case 'Image': return <Image className="h-5 w-5 text-green-500" />;
-            default: return <FileText className="h-5 w-5 text-primary" />;
-        }
+        const mt = mediaType?.toLowerCase();
+        if (mt === 'video') return <Video className="h-5 w-5 text-blue-500" />;
+        if (mt === 'audio') return <FileAudio className="h-5 w-5 text-orange-500" />;
+        if (mt === 'image') return <Image className="h-5 w-5 text-green-500" />;
+        return <FileText className="h-5 w-5 text-primary" />;
     };
 
     if (fetching) {
@@ -107,7 +106,12 @@ export default function AdminSampleSectionDetailPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
-                            {samples.map((sample) => (
+                            {samples.map((sample) => {
+                                const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
+                                const previewUrl = `${apiUrl}/sample-sections/${id}/samples/${sample.id}/preview`;
+                                const downloadUrl = `${apiUrl}/sample-sections/${id}/samples/${sample.id}/download`;
+
+                                return (
                                 <tr key={sample.id} className="hover:bg-muted/30 transition-colors">
                                     <td className="ps-4 py-3">
                                         <div className="flex items-center gap-3">
@@ -135,21 +139,17 @@ export default function AdminSampleSectionDetailPage() {
                                         <div className="flex items-center justify-end gap-2">
                                             {sample.high_quality_url && (
                                                 <Button variant="ghost" size="icon" asChild title="Preview HQ">
-                                                    <a href={sample.high_quality_url} target="_blank" rel="noreferrer">
+                                                    <a href={previewUrl} target="_blank" rel="noreferrer">
                                                         <ExternalLink className="h-4 w-4" />
                                                     </a>
                                                 </Button>
                                             )}
                                             {sample.low_quality_url && (
-                                                <DownloadWithProgress
-                                                    url={sample.low_quality_url}
-                                                    filename={`LQ_Sample_${sample.id}`}
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    title={t('samples.download', 'Download LQ')}
-                                                >
-                                                    <Download className="h-4 w-4" />
-                                                </DownloadWithProgress>
+                                                <Button variant="ghost" size="icon" asChild title={t('samples.download', 'Download LQ')}>
+                                                    <a href={downloadUrl} download>
+                                                        <Download className="h-4 w-4" />
+                                                    </a>
+                                                </Button>
                                             )}
                                             <Button
                                                 variant="ghost"
@@ -164,7 +164,8 @@ export default function AdminSampleSectionDetailPage() {
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                                );
+                            })}
                         </tbody>
                     </table>
                 )}

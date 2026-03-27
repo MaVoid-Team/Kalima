@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import useApiMutation from '@/hooks/useApiMutation';
 import { getImageUrl, formatFileSize } from '@/lib/storeUtils';
 import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
+import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 
 /**
  * SamplePage — sample details with small preview box for a single sample.
@@ -54,7 +55,9 @@ export default function SamplePage() {
         );
     }
 
-    const fileUrl = getImageUrl(sample?.url);
+    const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
+    const fileUrl = sample?.section_id ? `${apiUrl}/sample-sections/${sample.section_id}/samples/${sample.id}/preview` : '';
+    const downloadUrl = sample?.section_id ? `${apiUrl}/sample-sections/${sample.section_id}/samples/${sample.id}/download` : '';
     const isPdf = sample?.mime_type === 'application/pdf';
     const product = sample?.products;
 
@@ -108,7 +111,7 @@ export default function SamplePage() {
                                         <FileText className="h-16 w-16" />
                                         <p className="text-sm text-center px-4">{t('samplePage.previewUnavailable')}</p>
                                         <Button variant="outline" asChild>
-                                            <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
+                                            <a href={downloadUrl} download>
                                                 <Download className="me-2 h-4 w-4" />
                                                 {t('samplePage.downloadFile')}
                                             </a>
@@ -128,7 +131,7 @@ export default function SamplePage() {
                                 </Button>
 
                                 <Button variant="outline" className="flex-1" asChild>
-                                    <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
+                                    <a href={downloadUrl} download>
                                         <Download className="me-2 h-4 w-4" />
                                         {t('samplePage.download')}
                                     </a>

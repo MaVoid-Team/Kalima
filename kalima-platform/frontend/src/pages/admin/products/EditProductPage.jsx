@@ -36,6 +36,11 @@ import GalleryManager from '@/components/admin/products/GalleryManager';
 import ThumbnailManager from '@/components/admin/products/ThumbnailManager';
 import FileUploadProgress from '@/components/admin/settings/FileUploadProgress';
 import { toast } from 'sonner';
+import { format, startOfDay } from 'date-fns';
+import { arSA } from 'react-day-picker/locale';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 
 
 
@@ -66,6 +71,9 @@ export default function EditProductPage() {
     }).refine(
         (data) => !data.price_after_discount || data.price_after_discount < data.price,
         { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
+    ).refine(
+        (data) => !data.release_at || new Date(data.release_at) >= startOfDay(new Date()),
+        { message: t('products.form.releaseDateMustBeFuture', 'Release date must be today or in the future'), path: ['release_at'] }
     );
 
     const {
@@ -603,18 +611,44 @@ export default function EditProductPage() {
                                 control={form.control}
                                 name="release_at"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="flex flex-col pt-2.5">
                                         <FormLabel className="flex items-center gap-2">
                                             <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                                            {t('products.form.releaseAt', 'Release Date & Time')}
+                                            {t('products.form.releaseAt', 'Release Date')}
                                         </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="datetime-local"
-                                                data-testid="edit-product-release-at-input"
-                                                {...field}
-                                            />
-                                        </FormControl>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        type="button"
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-full pl-3 text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                        data-testid="edit-product-release-at-input"
+                                                    >
+                                                        {field.value ? (
+                                                            format(new Date(field.value), "PPP", { locale: isRtl ? arSA : undefined })
+                                                        ) : (
+                                                            <span>{t('products.form.pickDate', 'Pick a date')}</span>
+                                                        )}
+                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value ? new Date(field.value) : undefined}
+                                                    onSelect={(date) => field.onChange(date ? date.toISOString() : '')}
+                                                    disabled={(date) => date < startOfDay(new Date())}
+                                                    initialFocus
+                                                    locale={isRtl ? arSA : undefined}
+                                                    dir={isRtl ? 'rtl' : 'ltr'}
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
                                         <FormMessage />
                                     </FormItem>
                                 )}

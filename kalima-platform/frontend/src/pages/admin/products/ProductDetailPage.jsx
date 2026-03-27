@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { arSA } from 'react-day-picker/locale';
-import { ChevronLeft, Package, Pencil, Trash2 } from 'lucide-react';
+import { ChevronLeft, Package, Pencil, Trash2, Clock } from 'lucide-react';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useAdminCoupons } from '@/hooks/admin/useAdminCoupons';
 import { formatCurrency } from '@/lib/storeUtils';
@@ -313,6 +313,7 @@ export default function ProductDetailPage() {
     }
 
     const product = selectedProduct;
+    const isComingSoon = product.release_at && new Date(product.release_at) > new Date();
 
     return (
         <div className="space-y-6 no-scrollbar" data-testid="product-detail-page">
@@ -344,7 +345,21 @@ export default function ProductDetailPage() {
                             {product.serial && (
                                 <span className="text-sm text-muted-foreground">{product.serial}</span>
                             )}
+                            {isComingSoon && (
+                                <Badge
+                                    variant="outline"
+                                    className="bg-amber-500/10 text-amber-600 border-amber-500/30"
+                                >
+                                    <Clock className="h-3.5 w-3.5 me-1.5" />
+                                    {t('products.status.comingSoon', 'Coming Soon')}
+                                </Badge>
+                            )}
                         </div>
+                        {isComingSoon && product.release_at && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                                {t('products.detail.releaseDate', 'Release Date')}: {format(new Date(product.release_at), 'PPP', { locale: isRtl ? arSA : undefined })}
+                            </p>
+                        )}
                     </div>
                 </div>
 
