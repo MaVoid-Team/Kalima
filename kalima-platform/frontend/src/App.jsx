@@ -74,6 +74,7 @@ const TeacherSettingsPage = lazy(() => import("./pages/teacher/settings/TeacherS
 // Student lazy-loaded pages
 const StudentLayout = lazy(() => import("./layouts/StudentLayout"));
 const StudentProfilePage = lazy(() => import("./pages/student/profile/StudentProfilePage"));
+const StudentSettingsPage = lazy(() => import("./pages/student/settings/StudentSettingsPage"));
 
 // Parent lazy-loaded pages
 const ParentLayout = lazy(() => import("./layouts/ParentLayout"));
@@ -168,6 +169,7 @@ const router = createBrowserRouter(
       <Route element={<RoleRoute requiredRole={["Student"]} />}>
         <Route element={<StudentLayout />}>
           <Route path="/student/profile" element={<StudentProfilePage />} />
+          <Route path="/student/settings" element={<StudentSettingsPage />} />
         </Route>
       </Route>
 

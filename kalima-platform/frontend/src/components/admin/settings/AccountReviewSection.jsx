@@ -6,17 +6,22 @@ import { Skeleton } from '@/components/ui/skeleton';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { useAccountReviewSettings } from '@/hooks/admin/useAccountReviewSettings';
 import { ROLES } from '@/lib/adminConstants';
-
-// Roles that are meaningful to review (exclude Student/Parent as self-registered)
-const REVIEWABLE_ROLES = ROLES.filter((r) => !['Student', 'Parent'].includes(r));
+import useRole from '@/hooks/useRole';
 
 export default function AccountReviewSection() {
     const { t } = useTranslation('admin');
     const { settings, loading, updateLoading, updateSettings } = useAccountReviewSettings();
+    const { isAdmin } = useRole();
+
+    // Only show elevated roles for super-admins
+    const filteredRoles = ROLES.filter((role) => {
+        if (['Admin', 'SubAdmin'].includes(role)) return isAdmin;
+        return true;
+    });
 
     const handleToggle = async (role, currentValue) => {
         // Build a full settings array updating just this role
-        const updatedSettings = REVIEWABLE_ROLES.map((r) => {
+        const updatedSettings = ROLES.map((r) => {
             const existing = Array.isArray(settings)
                 ? settings.find((s) => s.role === r)
                 : null;
@@ -57,7 +62,7 @@ export default function AccountReviewSection() {
                     </div>
                 ) : (
                     <div className="divide-y divide-border">
-                        {REVIEWABLE_ROLES.map((role) => {
+                        {filteredRoles.map((role) => {
                             const value = getRequiresReview(role);
                             return (
                                 <div

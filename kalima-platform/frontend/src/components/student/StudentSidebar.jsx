@@ -39,7 +39,7 @@ export default function StudentSidebar({ isMobileOpen, setIsMobileOpen }) {
   const navigation = [
     { name: t('nav.profile'), href: '/student/profile', icon: User, id: 'profile' },
     // { name: t('nav.orders'), href: '/orders', icon: ShoppingBag, id: 'orders' },
-    // { name: t('nav.settings'), href: '/student/settings', icon: Settings, id: 'settings' },
+    { name: t('nav.settings'), href: '/student/settings', icon: Settings, id: 'settings' },
   ];
 
   const toggleLanguage = () => {
