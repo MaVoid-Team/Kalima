@@ -117,9 +117,11 @@ export function useFastBuy({ checkout = false } = {}) {
   const computed = useMemo(() => {
     const commonFields = preview?.requiredFields?.common || [];
     const itemsMissingFields = preview?.requiredFields?.itemsMissingFields || [];
+    const total = parseFloat(preview?.total || 0);
+    const isFreeOrder = total <= 0;
 
-    const needsScreenshot = commonFields.some((f) => f.toLowerCase() === "paymentscreenshot");
-    const needsTransferNumber = commonFields.includes("numberTransferredFrom");
+    const needsScreenshot = !isFreeOrder && commonFields.some((f) => f.toLowerCase() === "paymentscreenshot");
+    const needsTransferNumber = !isFreeOrder && commonFields.includes("numberTransferredFrom");
     const transferNumberValue = formData.numberTransferredFrom || "";
     const missingTransNum = needsTransferNumber && !transferNumberValue;
     const invalidTransferNumber =
@@ -129,8 +131,9 @@ export function useFastBuy({ checkout = false } = {}) {
     return {
       items: formatCartItems(preview?.cart_items),
       subtotal: parseFloat(preview?.subtotal || 0),
-      total: parseFloat(preview?.total || 0),
+      total,
       discount: parseFloat(preview?.discount || 0),
+      isFreeOrder,
       needsScreenshot,
       needsTransferNumber,
       itemsMissingFields,
@@ -226,7 +229,7 @@ export function useFastBuy({ checkout = false } = {}) {
       }
 
       const data = new FormData();
-      if (formData.paymentMethodId) {
+      if (!computed.isFreeOrder && formData.paymentMethodId) {
         data.append("payment_method_id", Number(formData.paymentMethodId));
       }
       if (computed.needsTransferNumber && formData.numberTransferredFrom) {

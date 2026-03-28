@@ -18,7 +18,7 @@ import { PhoneInput, egyptPhoneSchema } from "@/components/ui/phone-input";
 export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
     numberTransferredFrom, setNumberTransferredFrom,
     notes, setNotes,
-    screenshotFile, setScreenshotFile, setValidationErrors }) {
+    screenshotFile, setScreenshotFile, setValidationErrors, isFreeOrder = false }) {
     const { t, i18n } = useTranslation('checkout');
     const [methods, setMethods] = useState([]);
     const fileInputRef = useRef(null);
@@ -26,8 +26,8 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
     const [previewUrl, setPreviewUrl] = useState('');
 
     const schema = React.useMemo(() => z.object({
-        numberTransferredFrom: egyptPhoneSchema,
-    }), []);
+        numberTransferredFrom: isFreeOrder ? z.string().optional() : egyptPhoneSchema,
+    }), [isFreeOrder]);
 
     const {
         control,
@@ -67,84 +67,89 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
         <Card>
             <CardHeader>
                 <CardTitle>{t('payment.title')}</CardTitle>
-                <CardDescription>{t('payment.secureNotice')}</CardDescription>
+                <CardDescription>{isFreeOrder ? t('payment.freeOrderNotice') : t('payment.secureNotice')}</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="grid gap-2">
-                    <Label htmlFor="transfer-screenshot" className="text-xs uppercase tracking-wide">
-                        {t('payment.chooseMethod')}
-                        <span className="text-destructive">*</span>
-                    </Label>
-                    <RadioGroup
-                        value={selectedId?.toString()}
-                        onValueChange={val => onSelect && onSelect(Number(val))}
-                        className="grid gap-4"
-                        dir={i18n.dir()}
-                    >
-                        {safeMethods.map(m => (
-                            <div key={m.id} className="border rounded-md overflow-hidden">
-                                <div className="flex justify-between items-center p-4">
-                                    <div className="flex items-center gap-3">
-                                        <RadioGroupItem
-                                            value={m.id.toString()}
-                                            id={`pm-${m.id}`}
-                                            data-testid={`checkout-payment-method-${m.id}`}
-                                        />
-                                        <Label htmlFor={`pm-${m.id}`} className="font-medium cursor-pointer">
-                                            {m.name}
-                                        </Label>
+                {!isFreeOrder && (
+                    <div className="grid gap-2">
+                        <Label htmlFor="transfer-screenshot" className="text-xs uppercase tracking-wide">
+                            {t('payment.chooseMethod')}
+                            <span className="text-destructive">*</span>
+                        </Label>
+                        <RadioGroup
+                            value={selectedId?.toString()}
+                            onValueChange={val => onSelect && onSelect(Number(val))}
+                            className="grid gap-4"
+                            dir={i18n.dir()}
+                            data-testid="checkout-payment-method-list"
+                        >
+                            {safeMethods.map(m => (
+                                <div key={m.id} className="border rounded-md overflow-hidden">
+                                    <div className="flex justify-between items-center p-4">
+                                        <div className="flex items-center gap-3">
+                                            <RadioGroupItem
+                                                value={m.id.toString()}
+                                                id={`pm-${m.id}`}
+                                                data-testid={`checkout-payment-method-${m.id}`}
+                                            />
+                                            <Label htmlFor={`pm-${m.id}`} className="font-medium cursor-pointer">
+                                                {m.name}
+                                            </Label>
+                                        </div>
+                                        {m?.image_url && (
+                                            <img
+                                                src={getImageUrl(m.image_url) || ''}
+                                                alt={m.name}
+                                                className="w-8 h-8 object-contain"
+                                            />
+                                        )}
                                     </div>
-                                    {m?.image_url && (
-                                        <img
-                                            src={getImageUrl(m.image_url) || ''}
-                                            alt={m.name}
-                                            className="w-8 h-8 object-contain"
-                                        />
+                                    {m.phone_number && (
+                                        <div className="p-4 bg-muted/30 border-t border-border text-xs text-muted-foreground">
+                                            {t('payment.phone')}: {m.phone_number}
+                                        </div>
                                     )}
                                 </div>
-                                {m.phone_number && (
-                                    <div className="p-4 bg-muted/30 border-t border-border text-xs text-muted-foreground">
-                                        {t('payment.phone')}: {m.phone_number}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </RadioGroup>
-                </div>
+                            ))}
+                        </RadioGroup>
+                    </div>
+                )}
 
                 {/* bank transfer inputs */}
                 <div className="grid gap-4 mt-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="transfer-number" className="text-xs uppercase tracking-wide">
-                            {t('payment.transferNumber')}
-                            <span className="text-destructive">*</span>
-                        </Label>
-                        <Controller
-                            control={control}
-                            name="numberTransferredFrom"
-                            render={({ field }) => (
-                                <div>
-                                    <PhoneInput
-                                        id="transfer-number"
-                                        dir="ltr"
-                                        {...field}
-                                        onChange={(e) => {
-                                            field.onChange(e);
-                                            setNumberTransferredFrom(e.target.value);
-                                        }}
-                                        onBlur={() => trigger("numberTransferredFrom")}
-                                        className="w-full"
-                                        data-testid="checkout-payment-method-transfer-number"
-                                    />
-                                    {errors.numberTransferredFrom && (
-                                        <p className="text-destructive text-sm mt-1 font-medium">
-                                            {errors.numberTransferredFrom.message?.toString()}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
-                        />
-                    </div>
+                    {!isFreeOrder && (
+                        <div className="grid gap-2">
+                            <Label htmlFor="transfer-number" className="text-xs uppercase tracking-wide">
+                                {t('payment.transferNumber')}
+                                <span className="text-destructive">*</span>
+                            </Label>
+                            <Controller
+                                control={control}
+                                name="numberTransferredFrom"
+                                render={({ field }) => (
+                                    <div>
+                                        <PhoneInput
+                                            id="transfer-number"
+                                            dir="ltr"
+                                            {...field}
+                                            onChange={(e) => {
+                                                field.onChange(e);
+                                                setNumberTransferredFrom(e.target.value);
+                                            }}
+                                            onBlur={() => trigger("numberTransferredFrom")}
+                                            className="w-full"
+                                            data-testid="checkout-payment-method-transfer-number"
+                                        />
+                                        {errors.numberTransferredFrom && (
+                                            <p className="text-destructive text-sm mt-1 font-medium">
+                                                {errors.numberTransferredFrom.message?.toString()}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            />
+                        </div>
+                    )}
                     <div className="grid gap-2">
                         <Label htmlFor="transfer-notes" className="text-xs uppercase tracking-wide">
                             {t('payment.notes')}
@@ -157,63 +162,65 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                             data-testid="checkout-payment-method-notes"
                         />
                     </div>
-                    <div className="grid gap-2">
-                        <Label className="text-xs uppercase tracking-wide flex items-center justify-between">
-                            {t('payment.screenshot')}
-                            <span className="text-destructive">*</span>
-                        </Label>
-                        <div className="flex items-center gap-2">
-                            {screenshotFile ? (
-                                <>
-                                    <Button
-                                        type="button"
-                                        variant="link"
-                                        className="text-sm underline text-primary"
-                                        onClick={() => setShowPreview(true)}
-                                        data-testid="checkout-payment-method-preview-button"
+                    {!isFreeOrder && (
+                        <div className="grid gap-2" data-testid="checkout-payment-method-screenshot-section">
+                            <Label className="text-xs uppercase tracking-wide flex items-center justify-between">
+                                {t('payment.screenshot')}
+                                <span className="text-destructive">*</span>
+                            </Label>
+                            <div className="flex items-center gap-2">
+                                {screenshotFile ? (
+                                    <>
+                                        <Button
+                                            type="button"
+                                            variant="link"
+                                            className="text-sm underline text-primary"
+                                            onClick={() => setShowPreview(true)}
+                                            data-testid="checkout-payment-method-preview-button"
+                                        >
+                                            {screenshotFile.name}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            className="text-destructive"
+                                            onClick={() => {
+                                                setScreenshotFile(null);
+                                                if (fileInputRef.current) fileInputRef.current.value = '';
+                                            }}
+                                            aria-label={t('payment.removeScreenshot', 'Remove screenshot')}
+                                            data-testid="checkout-payment-method-remove-button"
+                                        >
+                                            &times;
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <Label
+                                        htmlFor="transfer-screenshot"
+                                        className="cursor-pointer px-3 py-1 bg-accent text-accent-foreground rounded-sm text-sm"
+                                        data-testid="checkout-payment-method-upload-button"
                                     >
-                                        {screenshotFile.name}
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        className="text-destructive"
-                                        onClick={() => {
-                                            setScreenshotFile(null);
-                                            if (fileInputRef.current) fileInputRef.current.value = '';
-                                        }}
-                                        aria-label={t('payment.removeScreenshot', 'Remove screenshot')}
-                                        data-testid="checkout-payment-method-remove-button"
-                                    >
-                                        &times;
-                                    </Button>
-                                </>
-                            ) : (
-                                <Label
-                                    htmlFor="transfer-screenshot"
-                                    className="cursor-pointer px-3 py-1 bg-accent text-accent-foreground rounded-sm text-sm"
-                                    data-testid="checkout-payment-method-upload-button"
-                                >
-                                    {t('payment.uploadScreenshotButton', 'Upload image')}
-                                </Label>
-                            )}
+                                        {t('payment.uploadScreenshotButton', 'Upload image')}
+                                    </Label>
+                                )}
+                            </div>
+                            {/* hidden input used for selecting file */}
+                            <Input
+                                id="transfer-screenshot"
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                className="sr-only"
+                                onChange={e => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setScreenshotFile(file);
+                                    }
+                                }}
+                                data-testid="checkout-payment-method-file-input"
+                            />
                         </div>
-                        {/* hidden input used for selecting file */}
-                        <Input
-                            id="transfer-screenshot"
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            className="sr-only"
-                            onChange={e => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                    setScreenshotFile(file);
-                                }
-                            }}
-                            data-testid="checkout-payment-method-file-input"
-                        />
-                    </div>
+                    )}
                 </div>
             </CardContent>
             {/* preview dialog */}
