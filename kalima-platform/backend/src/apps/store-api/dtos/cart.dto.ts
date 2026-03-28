@@ -59,14 +59,17 @@ export class UpdateCartItemDto {
 }
 
 export class CheckoutDto {
+  @IsOptional()
   @IsInt()
   @IsPositive()
   @Type(() => Number)
-  payment_method_id: number;
+  payment_method_id?: number;
 
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  numberTransferredFrom: string;
+  @MaxLength(50)
+  numberTransferredFrom?: string;
 
   // @IsOptional()
   // @IsString()
