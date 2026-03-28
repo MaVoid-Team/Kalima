@@ -700,12 +700,18 @@ class CartService {
       return {
         hasBooks: false,
         requiredFields: {
-          common: ["numberTransferredFrom", "paymentScreenShot"],
+          common: [],
           itemsMissingFields: [],
         },
         isCheckoutReady: true,
       };
     }
+
+    const subtotal = this.#calculateSubtotal(cart.cart_items);
+    const discount = this.#calculateDiscount(cart.cart_items);
+    const total = this.#calculateTotal(subtotal, discount);
+    const commonRequiredFields =
+      total > 0 ? ["numberTransferredFrom", "paymentScreenShot"] : [];
 
     const productIds = cart.cart_items.map((i) => i.product_id);
     const cartItemIds = cart.cart_items.map((i) => i.id);
@@ -782,7 +788,7 @@ class CartService {
     return {
       hasBooks,
       requiredFields: {
-        common: ["numberTransferredFrom", "paymentScreenShot"],
+        common: commonRequiredFields,
         itemsMissingFields,
       },
       isCheckoutReady: itemsMissingFields.length === 0,
@@ -795,7 +801,7 @@ class CartService {
   async checkout(
     user_id: number,
     dto: CheckoutDto,
-    payment_screenshot_file: Express.Multer.File,
+    payment_screenshot_file?: Express.Multer.File,
     cartStatus: "active" | "fastbuy" = "active",
   ) {
     // 1. Validate cart and required fields via unified preview logic
@@ -821,26 +827,33 @@ class CartService {
     const discount = this.#calculateDiscount(cart.cart_items);
     const total = this.#calculateTotal(subtotal, discount);
     const itemCount = this.#calculateItemCount(cart.cart_items);
+    const isFreeOrder = total <= 0;
 
     // 4. Validate payment method, process payment, handle payment screenshot
-    if (!dto.payment_method_id) {
-      throw new BadRequestError("Payment method is required");
-    }
+    let payment_screenshot_id: number | null = null;
+    let paymentMethod: { phone_number: string | null } | null = null;
 
-    if (!payment_screenshot_file) {
-      throw new BadRequestError("Payment screenshot is required");
-    }
-    const paymentScreenshot = await imageService.uploadImage(
-      payment_screenshot_file,
-      { compress: true, quality: 80 },
-    );
-    const payment_screenshot_id = paymentScreenshot.id;
+    if (!isFreeOrder) {
+      if (!dto.payment_method_id) {
+        throw new BadRequestError("Payment method is required");
+      }
 
-    const paymentMethod = await validatePaymentForCheckout(this.db, {
-      total,
-      numberTransferredFrom: dto.numberTransferredFrom,
-      payment_method_id: dto.payment_method_id,
-    });
+      if (!payment_screenshot_file) {
+        throw new BadRequestError("Payment screenshot is required");
+      }
+
+      const paymentScreenshot = await imageService.uploadImage(
+        payment_screenshot_file,
+        { compress: true, quality: 80 },
+      );
+      payment_screenshot_id = paymentScreenshot.id;
+
+      paymentMethod = await validatePaymentForCheckout(this.db, {
+        total,
+        numberTransferredFrom: dto.numberTransferredFrom,
+        payment_method_id: dto.payment_method_id,
+      });
+    }
 
     // 5. Assemble purchase payload (typed)
     // We map each cart item directly to a purchase item without flattening
@@ -871,15 +884,19 @@ class CartService {
 
     const purchaseInput: CreatePurchaseDto = {
       user_id,
-      payment_method_id: dto.payment_method_id,
+      payment_method_id: isFreeOrder ? null : (dto.payment_method_id ?? null),
       payment_screenshot_id,
       items: flattenedItems,
       subtotal,
       discount,
       total,
       notes: dto.notes,
-      number_transferred_from: dto.numberTransferredFrom || null,
-      payment_number: paymentMethod?.phone_number || null,
+      number_transferred_from: isFreeOrder
+        ? null
+        : (dto.numberTransferredFrom || null),
+      payment_number: isFreeOrder
+        ? null
+        : (paymentMethod?.phone_number || null),
     };
 
     type PurchaseWithItems = Prisma.purchasesGetPayload<{
