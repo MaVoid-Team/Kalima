@@ -159,6 +159,8 @@ class ProductService {
       priceAfterDiscount = dto.price_after_discount;
     }
 
+    const sampleTitle = dto.sample_title ?? dto.sample_name ?? dto.title;
+
     // Create product
     const product = await this.db.products.create({
       data: {
@@ -206,6 +208,7 @@ class ProductService {
           existingSample.section_id,
           highQualityFile,
           lowQualityFile,
+          sampleTitle,
         );
       }
     } else if ((highQualityFile || lowQualityFile) && dto.sample_section_id) {
@@ -214,6 +217,7 @@ class ProductService {
         product.id,
         highQualityFile,
         lowQualityFile,
+        sampleTitle,
       );
     }
 
@@ -355,6 +359,8 @@ class ProductService {
       throw new NotFoundError("Product not found");
     }
 
+    const sampleTitle = dto.sample_title ?? dto.sample_name;
+
     // Handle sample linking/updating
     if (dto.sample_id) {
       const existingSample = await this.db.samples.findUnique({
@@ -369,12 +375,13 @@ class ProductService {
         data: { product_id: product.id },
       });
 
-      if (highQualityFile || lowQualityFile) {
+      if (highQualityFile || lowQualityFile || sampleTitle !== undefined) {
         await this.sampleService.updateSample(
           dto.sample_id,
           existingSample.section_id,
           highQualityFile,
           lowQualityFile,
+          sampleTitle,
         );
       }
     } else if ((highQualityFile || lowQualityFile) && dto.sample_section_id) {
@@ -383,7 +390,13 @@ class ProductService {
           await this.sampleService.deleteSample(sample.id);
         }
       }
-      await this.sampleService.createSample(dto.sample_section_id, id, highQualityFile, lowQualityFile);
+      await this.sampleService.createSample(
+        dto.sample_section_id,
+        id,
+        highQualityFile,
+        lowQualityFile,
+        sampleTitle,
+      );
     }
 
     const data: any = { updated_at: new Date() };

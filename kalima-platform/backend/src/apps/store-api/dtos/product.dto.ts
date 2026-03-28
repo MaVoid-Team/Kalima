@@ -62,6 +62,16 @@ export class CreateProductDto {
   @IsOptional()
   sample_url?: string;
 
+  @IsString()
+  @MaxLength(255)
+  @IsOptional()
+  sample_title?: string;
+
+  @IsString()
+  @MaxLength(255)
+  @IsOptional()
+  sample_name?: string;
+
   @IsInt()
   @IsPositive()
   @IsOptional()
@@ -133,6 +143,16 @@ export class UpdateProductDto {
   @IsString()
   @IsOptional()
   sample_url?: string;
+
+  @IsString()
+  @MaxLength(255)
+  @IsOptional()
+  sample_title?: string;
+
+  @IsString()
+  @MaxLength(255)
+  @IsOptional()
+  sample_name?: string;
 
   @IsInt()
   @IsPositive()

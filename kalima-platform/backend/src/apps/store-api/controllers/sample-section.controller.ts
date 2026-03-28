@@ -6,6 +6,7 @@ import {
   CreateSampleSectionDto,
   UpdateSampleSectionDto,
   CreateSampleBodyDto,
+  UpdateSampleBodyDto,
 } from "../dtos/sample.dto";
 import { ValidationError, BadRequestError } from "../../../libs/errors";
 import fs from "fs";
@@ -234,6 +235,7 @@ export const sampleSectionController = {
         dto.product_id,
         highQualityFile,
         lowQualityFile,
+        dto.title,
       );
 
       res.status(201).json({
@@ -255,6 +257,8 @@ export const sampleSectionController = {
       const sectionId = parseId(req.params.sectionId, "section ID");
       const sampleId = parseId(req.params.sampleId, "sample ID");
 
+      const dto = await validateDto(UpdateSampleBodyDto, req.body);
+
       const files = req.files as
         | { high_quality?: Express.Multer.File[]; low_quality?: Express.Multer.File[] }
         | undefined;
@@ -266,6 +270,7 @@ export const sampleSectionController = {
         sectionId,
         highQualityFile,
         lowQualityFile,
+        dto.title,
       );
 
       res.status(200).json({
