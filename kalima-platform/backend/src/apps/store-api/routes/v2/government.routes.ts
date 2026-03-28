@@ -10,7 +10,7 @@ const router = Router();
 
 const adminAuth = [
   authenticateToken,
-  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+  requireRole([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator]),
 ];
 const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
 

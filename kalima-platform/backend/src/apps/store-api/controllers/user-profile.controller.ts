@@ -61,6 +61,8 @@ function getAuth(req: Request): {
     ? role_enum.Admin
     : rolesList.includes(role_enum.SubAdmin)
       ? role_enum.SubAdmin
+      : rolesList.includes(role_enum.Moderator)
+        ? role_enum.Moderator
       : rolesList[0] || null;
   return {
     id: user.userId || user.id,
@@ -79,7 +81,11 @@ function resolveTargetUserId(req: Request): number {
   if (req.params.userId) {
     // Admin path
     const auth = getAuth(req);
-    if (auth.role !== role_enum.Admin && auth.role !== role_enum.SubAdmin) {
+    if (
+      auth.role !== role_enum.Admin &&
+      auth.role !== role_enum.SubAdmin &&
+      auth.role !== role_enum.Moderator
+    ) {
       throw new ForbiddenError("Not authorized to manage other users");
     }
     return parseIntParam(req.params.userId, "userId");
@@ -94,6 +100,7 @@ function assertOwnerOrAdmin(req: Request, ownerId: number): void {
   if (
     auth.role !== role_enum.Admin &&
     auth.role !== role_enum.SubAdmin &&
+    auth.role !== role_enum.Moderator &&
     auth.id !== ownerId
   ) {
     throw new ForbiddenError("Not authorized");
@@ -209,7 +216,11 @@ export const userProfileController = {
       const dto = await validateDto(UpdateTeachesAtDto, req.body);
       // Prevent changing ownership unless admin
       const auth = getAuth(req);
-      if (auth.role !== role_enum.Admin && auth.role !== role_enum.SubAdmin) {
+      if (
+        auth.role !== role_enum.Admin &&
+        auth.role !== role_enum.SubAdmin &&
+        auth.role !== role_enum.Moderator
+      ) {
         dto.user_id = auth.id;
       }
 
@@ -276,7 +287,11 @@ export const userProfileController = {
 
       const dto = await validateDto(UpdateSocialMediaDto, req.body);
       const auth = getAuth(req);
-      if (auth.role !== role_enum.Admin && auth.role !== role_enum.SubAdmin) {
+      if (
+        auth.role !== role_enum.Admin &&
+        auth.role !== role_enum.SubAdmin &&
+        auth.role !== role_enum.Moderator
+      ) {
         dto.teacher_user_id = auth.id;
       }
 
@@ -346,7 +361,11 @@ export const userProfileController = {
 
       const dto = await validateDto(UpdateParentChildDto, req.body);
       const auth = getAuth(req);
-      if (auth.role !== role_enum.Admin && auth.role !== role_enum.SubAdmin) {
+      if (
+        auth.role !== role_enum.Admin &&
+        auth.role !== role_enum.SubAdmin &&
+        auth.role !== role_enum.Moderator
+      ) {
         dto.parent_user_id = auth.id;
       }
 
