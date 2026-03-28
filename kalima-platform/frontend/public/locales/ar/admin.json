@@ -984,7 +984,10 @@
     "allMonths": "جميع الأشهر",
     "allYears": "جميع السنوات",
     "createdAccounts": "إحصائيات الحسابات المنشأة",
-    "pickDate": "اختر تاريخ"
+    "pickDate": "اختر تاريخ",
+    "pickMonth": "اختر شهراً",
+    "prevYear": "السنة السابقة",
+    "nextYear": "السنة التالية"
   },
   "table": {
     "productName": "اسم المنتج",
@@ -999,6 +1002,10 @@
     "pending": "قيد الانتظار",
     "month": "الشهر",
     "confirmedCount": "العدد",
-    "createdAccounts": "الحسابات المنشأة"
+    "createdAccounts": "الحسابات المنشأة",
+    "id": "المعرف",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "role": "الدور"
   }
 }

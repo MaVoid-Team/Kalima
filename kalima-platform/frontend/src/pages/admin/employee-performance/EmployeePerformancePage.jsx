@@ -32,11 +32,19 @@ export default function EmployeePerformancePage() {
     const [activeYear, setActiveYear] = useState(new Date().getFullYear());
     const [isOpen, setIsOpen] = useState(false);
 
-    // Get localized months using date-fns
-    const months = Array.from({ length: 12 }, (_, i) => {
-        const d = new Date(2025, i, 1);
-        return { name: format(d, "MMMM"), short: format(d, "MMM"), index: i };
-    });
+    const getMonthName = (monthIndex, type = 'long') => {
+        try {
+            return new Intl.DateTimeFormat(i18n.language, { month: type }).format(new Date(2025, monthIndex, 1));
+        } catch (e) {
+            return format(new Date(2025, monthIndex, 1), type === 'long' ? "MMMM" : "MMM");
+        }
+    };
+
+    const months = Array.from({ length: 12 }, (_, i) => ({
+        name: getMonthName(i, 'long'),
+        short: getMonthName(i, 'short'),
+        index: i
+    }));
 
     useEffect(() => {
         if (date) {
@@ -143,7 +151,7 @@ export default function EmployeePerformancePage() {
                                     data-testid="month-year-picker-trigger"
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {date ? format(date, "MMMM yyyy") : <span>{t('dashboard.pickMonth', 'Pick a month')}</span>}
+                                    {date ? `${getMonthName(date.getMonth(), 'long')} ${date.getFullYear()}` : <span>{t('dashboard.pickMonth', 'Pick a month')}</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-64 p-3" align="end">
@@ -156,7 +164,7 @@ export default function EmployeePerformancePage() {
                                             e.stopPropagation();
                                             setActiveYear(activeYear - 1);
                                         }}
-                                        aria-label="Previous year"
+                                        aria-label={t('dashboard.prevYear', 'Previous year')}
                                     >
                                         <ChevronLeft className={cn("h-4 w-4", i18n.dir() === 'rtl' && "rotate-180")} />
                                     </Button>
@@ -171,7 +179,7 @@ export default function EmployeePerformancePage() {
                                             e.stopPropagation();
                                             setActiveYear(activeYear + 1);
                                         }}
-                                        aria-label="Next year"
+                                        aria-label={t('dashboard.nextYear', 'Next year')}
                                     >
                                         <ChevronRight className={cn("h-4 w-4", i18n.dir() === 'rtl' && "rotate-180")} />
                                     </Button>
@@ -215,11 +223,11 @@ export default function EmployeePerformancePage() {
                         <table className="w-full text-sm text-start">
                             <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
                                 <tr>
-                                    <th className="px-6 py-3 font-medium text-start">ID</th>
-                                    <th className="px-6 py-3 font-medium text-start">{t('table.adminName', 'Name')}</th>
+                                    <th className="px-6 py-3 font-medium text-start">{t('table.id', 'ID')}</th>
+                                    <th className="px-6 py-3 font-medium text-start">{t('table.name', 'Name')}</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.email', 'Email')}</th>
-                                    <th className="px-6 py-3 font-medium text-start">Phone</th>
-                                    <th className="px-6 py-3 font-medium text-start">Role</th>
+                                    <th className="px-6 py-3 font-medium text-start">{t('table.phone', 'Phone')}</th>
+                                    <th className="px-6 py-3 font-medium text-start">{t('table.role', 'Role')}</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.confirmedCount', 'Count')}</th>
                                 </tr>
                             </thead>
@@ -232,14 +240,14 @@ export default function EmployeePerformancePage() {
                                                 <td className="px-6 py-4 font-medium">{item.name || 'Unknown'}</td>
                                                 <td className="px-6 py-4">{item.email}</td>
                                                 <td className="px-6 py-4">{item.phone || '—'}</td>
-                                                <td className="px-6 py-4 capitalize">{item.role}</td>
+                                                <td className="px-6 py-4">{t(`roles.${item.role}`, item.role)}</td>
                                                 <td className="px-6 py-4 tabular-nums font-semibold text-primary">{item.count || 0}</td>
                                             </tr>
                                         )
                                     })
                                 ) : (
                                     <tr>
-                                        <td colSpan="4" className="px-6 py-8 text-center text-muted-foreground">
+                                        <td colSpan="6" className="px-6 py-8 text-center text-muted-foreground">
                                             {t('table.noData', 'No data available')}
                                         </td>
                                     </tr>
