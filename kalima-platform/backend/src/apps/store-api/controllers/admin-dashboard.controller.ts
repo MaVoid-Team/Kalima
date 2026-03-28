@@ -203,7 +203,7 @@ export const adminDashboardController = {
           AVG(EXTRACT(EPOCH FROM (confirmed_at - created_at))/60) as avg_response_minutes,
           MIN(EXTRACT(EPOCH FROM (confirmed_at - created_at))/60) as min_response_minutes,
           MAX(EXTRACT(EPOCH FROM (confirmed_at - created_at))/60) as max_response_minutes
-        FROM purchases
+        FROM kalima.purchases
         WHERE confirmed_at IS NOT NULL AND status = 'Confirmed';
       `;
 
@@ -266,7 +266,7 @@ export const adminDashboardController = {
       // Count Received
       const receivedCounts: any[] = await prisma.$queryRawUnsafe(`
         SELECT received_by as admin_id, COUNT(*) as count
-        FROM purchases
+        FROM kalima.purchases
         WHERE received_by IN (${idList})
         GROUP BY received_by;
       `);
@@ -274,7 +274,7 @@ export const adminDashboardController = {
       // Count Confirmed
       const confirmedCounts: any[] = await prisma.$queryRawUnsafe(`
         SELECT confirmed_by as admin_id, COUNT(*) as count
-        FROM purchases
+        FROM kalima.purchases
         WHERE confirmed_by IN (${idList})
         GROUP BY confirmed_by;
       `);
@@ -282,7 +282,7 @@ export const adminDashboardController = {
       // Count Returned
       const returnedCounts: any[] = await prisma.$queryRawUnsafe(`
         SELECT returned_by as admin_id, COUNT(*) as count
-        FROM purchases
+        FROM kalima.purchases
         WHERE returned_by IN (${idList})
         GROUP BY returned_by;
       `);
@@ -290,7 +290,7 @@ export const adminDashboardController = {
       // Average Response Time (created -> received)
       const responseTimes: any[] = await prisma.$queryRawUnsafe(`
         SELECT received_by as admin_id, AVG(EXTRACT(EPOCH FROM (received_at - created_at))/60) as avg_minutes
-        FROM purchases
+        FROM kalima.purchases
         WHERE received_by IN (${idList}) AND received_at IS NOT NULL
         GROUP BY received_by;
       `);
@@ -298,7 +298,7 @@ export const adminDashboardController = {
       // Average Confrimation Time (received -> confirmed)
       const confirmTimes: any[] = await prisma.$queryRawUnsafe(`
         SELECT confirmed_by as admin_id, AVG(EXTRACT(EPOCH FROM (confirmed_at - received_at))/60) as avg_minutes
-        FROM purchases
+        FROM kalima.purchases
         WHERE confirmed_by IN (${idList}) AND confirmed_at IS NOT NULL AND received_at IS NOT NULL
         GROUP BY confirmed_by;
       `);
