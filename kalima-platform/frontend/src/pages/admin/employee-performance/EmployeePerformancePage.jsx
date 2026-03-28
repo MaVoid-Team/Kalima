@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    Activity, CheckCircle, Users, BarChart3, Filter
+    Activity, CheckCircle, Users, BarChart3, Filter, Calendar as CalendarIcon, X
 } from 'lucide-react';
+import { format } from 'date-fns';
 import { useEmployeePerformance } from '@/hooks/admin/useEmployeePerformance';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import SectionTitle from '@/components/admin/dashboard/SectionTitle';
 
@@ -20,8 +29,7 @@ export default function EmployeePerformancePage() {
         fetchCreatedAccounts
     } = useEmployeePerformance();
 
-    const [month, setMonth] = useState('');
-    const [year, setYear] = useState('');
+    const [date, setDate] = useState(null);
 
     useEffect(() => {
         fetchConfirmerStats();
@@ -30,9 +38,15 @@ export default function EmployeePerformancePage() {
     }, []);
 
     useEffect(() => {
-        fetchConfirmedCount(month, year);
+        if (date) {
+            const m = date.getMonth() + 1;
+            const y = date.getFullYear();
+            fetchConfirmedCount(m, y);
+        } else {
+            fetchConfirmedCount();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [month, year]);
+    }, [date]);
 
     if (loading && !confirmerStats && !confirmedCount && !createdAccounts) {
         return (
@@ -103,28 +117,41 @@ export default function EmployeePerformancePage() {
                     {/* Month/Year Filters */}
                     <div className="flex items-center gap-2">
                         <Filter className="h-4 w-4 text-muted-foreground" />
-                        <select
-                            value={month}
-                            onChange={(e) => setMonth(e.target.value)}
-                            className="bg-background border border-input rounded-md px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                            aria-label="Month"
-                        >
-                            <option value="">{t('dashboard.allMonths', 'All Months')}</option>
-                            {[...Array(12).keys()].map(m => (
-                                <option key={m + 1} value={m + 1}>{m + 1}</option>
-                            ))}
-                        </select>
-                        <select
-                            value={year}
-                            onChange={(e) => setYear(e.target.value)}
-                            className="bg-background border border-input rounded-md px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                            aria-label="Year"
-                        >
-                            <option value="">{t('dashboard.allYears', 'All Years')}</option>
-                            <option value="2025">2025</option>
-                            <option value="2026">2026</option>
-                            <option value="2027">2027</option>
-                        </select>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    size="sm"
+                                    className={cn(
+                                        "w-[240px] justify-start text-left font-normal",
+                                        !date && "text-muted-foreground"
+                                    )}
+                                    data-testid="date-picker-trigger"
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {date ? format(date, "PPP") : <span>{t('dashboard.pickDate', 'Pick a date')}</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="end">
+                                <Calendar
+                                    mode="single"
+                                    selected={date}
+                                    onSelect={setDate}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                        {date && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDate(null)}
+                                className="h-8 px-2 lg:px-3"
+                                data-testid="clear-date-filter"
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                        )}
                     </div>
                 </div>
                 {loading && !confirmedCount && <LoadingSpinner className="h-6 w-6 text-primary mb-4" />}
@@ -133,22 +160,24 @@ export default function EmployeePerformancePage() {
                         <table className="w-full text-sm text-start">
                             <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
                                 <tr>
-                                    <th className="px-6 py-3 font-medium text-start">{t('table.month', 'Month')}</th>
-                                    <th className="px-6 py-3 font-medium text-start">{t('table.adminName', 'Admin Name')}</th>
+                                    <th className="px-6 py-3 font-medium text-start">ID</th>
+                                    <th className="px-6 py-3 font-medium text-start">{t('table.adminName', 'Name')}</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.email', 'Email')}</th>
+                                    <th className="px-6 py-3 font-medium text-start">Phone</th>
+                                    <th className="px-6 py-3 font-medium text-start">Role</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.confirmedCount', 'Count')}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {confirmedCount && confirmedCount.length > 0 ? (
                                     confirmedCount.map((item, idx) => {
-                                        const d = new Date(item.month);
-                                        const formattedMonth = !isNaN(d.getTime()) ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` : item.month;
                                         return (
                                             <tr key={idx} className="border-b border-border hover:bg-muted/50 transition-colors">
-                                                <td className="px-6 py-4">{formattedMonth}</td>
-                                                <td className="px-6 py-4 font-medium">{item.admin_name || 'Unknown'}</td>
-                                                <td className="px-6 py-4">{item.admin_email}</td>
+                                                <td className="px-6 py-4">{item.id}</td>
+                                                <td className="px-6 py-4 font-medium">{item.name || 'Unknown'}</td>
+                                                <td className="px-6 py-4">{item.email}</td>
+                                                <td className="px-6 py-4">{item.phone || '—'}</td>
+                                                <td className="px-6 py-4 capitalize">{item.role}</td>
                                                 <td className="px-6 py-4 tabular-nums font-semibold text-primary">{item.count || 0}</td>
                                             </tr>
                                         )

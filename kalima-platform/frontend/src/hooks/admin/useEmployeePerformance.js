@@ -23,7 +23,7 @@ export const useEmployeePerformance = () => {
             const queries = new URLSearchParams();
             if (month) queries.append('month', month);
             if (year) queries.append('year', year);
-            const data = await fetchApi({ endpoint: `/admin/purchases/confirmed-count?${queries.toString()}`, method: 'get' });
+            const data = await fetchApi({ endpoint: `/purchases/confirmed-count?${queries.toString()}`, method: 'get' });
             if (data?.success) setConfirmedCount(data.data);
         } finally { setLoading(false); }
     }, [fetchApi]);
