@@ -106,6 +106,17 @@ export const sample_media_type_enum = {
 export type sample_media_type_enum = (typeof sample_media_type_enum)[keyof typeof sample_media_type_enum]
 
 
+export const user_flag_enum = {
+  ELITE: 'ELITE',
+  PRO: 'PRO',
+  NORMAL: 'NORMAL',
+  OBSERVER: 'OBSERVER',
+  Warned: 'Warned'
+} as const
+
+export type user_flag_enum = (typeof user_flag_enum)[keyof typeof user_flag_enum]
+
+
 export const coupon_type = {
   percentage: 'percentage',
   fixed: 'fixed'

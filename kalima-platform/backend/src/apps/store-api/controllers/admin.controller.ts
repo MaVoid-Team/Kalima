@@ -16,6 +16,7 @@ import {
   CreateStudentDto,
   CreateParentDto,
   CreateLecturerDto,
+  UpdateUserFlagDto,
 } from "../dtos/admin.dto";
 import { role_enum, portal_enum } from "../generated/prisma/client";
 import {
@@ -54,6 +55,18 @@ async function validateDto<T extends object>(
 
 const VALID_ROLES = Object.values(role_enum);
 const VALID_PORTALS = Object.values(portal_enum);
+
+function canViewOrEditUserFlag(user: any): boolean {
+  const roles: Array<{ role: role_enum }> = user?.roles ?? [];
+  const allowedRoles: role_enum[] = [
+    role_enum.Admin,
+    role_enum.SubAdmin,
+    role_enum.Moderator,
+  ];
+  return roles.some((r) =>
+    allowedRoles.includes(r.role),
+  );
+}
 
 function validateEnums(
   portal: string,
@@ -392,6 +405,7 @@ export const adminController = {
         role: role as role_enum | undefined,
         portal: portal as portal_enum | undefined,
         isDeleted,
+        includeFlag: canViewOrEditUserFlag((req as any).user),
       });
 
       res.status(200).json({ success: true, data: result });
@@ -418,8 +432,48 @@ export const adminController = {
         throw new BadRequestError("Invalid user ID");
       }
 
-      const user = await userManagementService.getUserWithRoles(userId);
+      const user = await userManagementService.getUserWithRolesByPermission(
+        userId,
+        canViewOrEditUserFlag((req as any).user),
+      );
       res.status(200).json({ success: true, data: user });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * PATCH /admin/users/:userId/flag
+   * Body: { flag: "NORMAL" | "PRO" | "ELITE" | ... }
+   */
+  async updateUserFlag(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!canViewOrEditUserFlag((req as any).user)) {
+        throw new ForbiddenError(
+          "Only Admin, SubAdmin, or Moderator can update user flag",
+        );
+      }
+
+      const userId = parseInt(req.params.userId as string, 10);
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user ID");
+      }
+
+      const dto = await validateDto(UpdateUserFlagDto, req.body);
+      const updated = await userManagementService.updateUserFlag(
+        userId,
+        dto.flag,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "User flag updated successfully",
+        data: updated,
+      });
     } catch (error) {
       _next(error);
     }

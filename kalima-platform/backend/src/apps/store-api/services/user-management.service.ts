@@ -31,6 +31,7 @@ import {
   role_enum,
   portal_enum,
   auth_provider_enum,
+  user_flag_enum,
 } from "../generated/prisma/client";
 import {
   ConflictError,
@@ -1073,6 +1074,7 @@ class UserManagementService {
       role?: role_enum;
       portal?: portal_enum;
       isDeleted?: boolean;
+      includeFlag?: boolean;
     } = {},
   ) {
     const page = Math.max(1, options.page ?? 1);
@@ -1112,6 +1114,7 @@ class UserManagementService {
         orderBy: { created_at: "desc" },
         select: {
           ...this.baseUserSelect(),
+          ...(options.includeFlag ? { flag: true } : {}),
           is_deleted: true,
           role: true,
           confirmed: true,
@@ -1139,10 +1142,15 @@ class UserManagementService {
   }
 
   async getUserWithRoles(userId: number) {
+    return this.getUserWithRolesByPermission(userId, false);
+  }
+
+  async getUserWithRolesByPermission(userId: number, includeFlag = false) {
     const user = await this.db.users.findUnique({
       where: { id: userId },
       select: {
         ...this.baseUserSelect(),
+        ...(includeFlag ? { flag: true } : {}),
         role: true,
         is_deleted: true,
         confirmed: true,
@@ -1171,6 +1179,31 @@ class UserManagementService {
     }
 
     return user;
+  }
+
+  async updateUserFlag(userId: number, flag: user_flag_enum) {
+    const user = await this.db.users.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    return this.db.users.update({
+      where: { id: userId },
+      data: {
+        flag,
+        updated_at: new Date(),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        flag: true,
+      },
+    });
   }
 
   // ============================================
