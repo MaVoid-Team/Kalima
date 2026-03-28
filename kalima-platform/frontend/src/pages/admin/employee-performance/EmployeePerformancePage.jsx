@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    Activity, CheckCircle, Users, BarChart3, Filter, Calendar as CalendarIcon, X
+    Activity, CheckCircle, Users, BarChart3, Filter, Calendar as CalendarIcon, X, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useEmployeePerformance } from '@/hooks/admin/useEmployeePerformance';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import {
     Popover,
     PopoverContent,
@@ -18,7 +17,7 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import SectionTitle from '@/components/admin/dashboard/SectionTitle';
 
 export default function EmployeePerformancePage() {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
     const {
         loading,
         confirmerStats,
@@ -30,6 +29,21 @@ export default function EmployeePerformancePage() {
     } = useEmployeePerformance();
 
     const [date, setDate] = useState(null);
+    const [activeYear, setActiveYear] = useState(new Date().getFullYear());
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Get localized months using date-fns
+    const months = Array.from({ length: 12 }, (_, i) => {
+        const d = new Date(2025, i, 1);
+        return { name: format(d, "MMMM"), short: format(d, "MMM"), index: i };
+    });
+
+    useEffect(() => {
+        if (date) {
+            setActiveYear(date.getFullYear());
+        }
+    }, [date]);
+
 
     useEffect(() => {
         fetchConfirmerStats();
@@ -117,7 +131,7 @@ export default function EmployeePerformancePage() {
                     {/* Month/Year Filters */}
                     <div className="flex items-center gap-2">
                         <Filter className="h-4 w-4 text-muted-foreground" />
-                        <Popover>
+                        <Popover open={isOpen} onOpenChange={setIsOpen}>
                             <PopoverTrigger asChild>
                                 <Button
                                     variant={"outline"}
@@ -126,19 +140,60 @@ export default function EmployeePerformancePage() {
                                         "w-[240px] justify-start text-left font-normal",
                                         !date && "text-muted-foreground"
                                     )}
-                                    data-testid="date-picker-trigger"
+                                    data-testid="month-year-picker-trigger"
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {date ? format(date, "PPP") : <span>{t('dashboard.pickDate', 'Pick a date')}</span>}
+                                    {date ? format(date, "MMMM yyyy") : <span>{t('dashboard.pickMonth', 'Pick a month')}</span>}
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="end">
-                                <Calendar
-                                    mode="single"
-                                    selected={date}
-                                    onSelect={setDate}
-                                    initialFocus
-                                />
+                            <PopoverContent className="w-64 p-3" align="end">
+                                <div className="flex items-center justify-between mb-4 px-1">
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-7 w-7"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setActiveYear(activeYear - 1);
+                                        }}
+                                        aria-label="Previous year"
+                                    >
+                                        <ChevronLeft className={cn("h-4 w-4", i18n.dir() === 'rtl' && "rotate-180")} />
+                                    </Button>
+                                    <div className="font-semibold text-sm select-none tabular-nums">
+                                        {activeYear}
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-7 w-7"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setActiveYear(activeYear + 1);
+                                        }}
+                                        aria-label="Next year"
+                                    >
+                                        <ChevronRight className={cn("h-4 w-4", i18n.dir() === 'rtl' && "rotate-180")} />
+                                    </Button>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {months.map((m) => {
+                                        const isSelected = date && date.getMonth() === m.index && date.getFullYear() === activeYear;
+                                        return (
+                                            <Button
+                                                key={m.index}
+                                                variant={isSelected ? "default" : "ghost"}
+                                                className="h-9 text-xs font-medium"
+                                                onClick={() => {
+                                                    setDate(new Date(activeYear, m.index, 1));
+                                                    setIsOpen(false);
+                                                }}
+                                            >
+                                                {m.short}
+                                            </Button>
+                                        );
+                                    })}
+                                </div>
                             </PopoverContent>
                         </Popover>
                         {date && (
