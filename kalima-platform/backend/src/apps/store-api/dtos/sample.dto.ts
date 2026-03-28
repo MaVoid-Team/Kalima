@@ -25,10 +25,6 @@ export class CreateSampleSectionDto {
   @IsOptional()
   description?: string;
 
-  @IsString()
-  @IsOptional()
-  thumbnail_url?: string;
-
   @Type(() => Number)
   @IsInt()
   @Min(0)
@@ -50,10 +46,6 @@ export class UpdateSampleSectionDto {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @IsString()
-  @IsOptional()
-  thumbnail_url?: string;
 
   @Type(() => Number)
   @IsInt()

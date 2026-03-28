@@ -40,7 +40,6 @@ export type Sample_sectionsMinAggregateOutputType = {
   id: number | null
   title: string | null
   description: string | null
-  thumbnail_url: string | null
   sort_order: number | null
   active: boolean | null
   created_at: Date | null
@@ -51,7 +50,6 @@ export type Sample_sectionsMaxAggregateOutputType = {
   id: number | null
   title: string | null
   description: string | null
-  thumbnail_url: string | null
   sort_order: number | null
   active: boolean | null
   created_at: Date | null
@@ -62,7 +60,6 @@ export type Sample_sectionsCountAggregateOutputType = {
   id: number
   title: number
   description: number
-  thumbnail_url: number
   sort_order: number
   active: number
   created_at: number
@@ -85,7 +82,6 @@ export type Sample_sectionsMinAggregateInputType = {
   id?: true
   title?: true
   description?: true
-  thumbnail_url?: true
   sort_order?: true
   active?: true
   created_at?: true
@@ -96,7 +92,6 @@ export type Sample_sectionsMaxAggregateInputType = {
   id?: true
   title?: true
   description?: true
-  thumbnail_url?: true
   sort_order?: true
   active?: true
   created_at?: true
@@ -107,7 +102,6 @@ export type Sample_sectionsCountAggregateInputType = {
   id?: true
   title?: true
   description?: true
-  thumbnail_url?: true
   sort_order?: true
   active?: true
   created_at?: true
@@ -205,7 +199,6 @@ export type Sample_sectionsGroupByOutputType = {
   id: number
   title: string
   description: string | null
-  thumbnail_url: string | null
   sort_order: number
   active: boolean | null
   created_at: Date | null
@@ -239,7 +232,6 @@ export type sample_sectionsWhereInput = {
   id?: Prisma.IntFilter<"sample_sections"> | number
   title?: Prisma.StringFilter<"sample_sections"> | string
   description?: Prisma.StringNullableFilter<"sample_sections"> | string | null
-  thumbnail_url?: Prisma.StringNullableFilter<"sample_sections"> | string | null
   sort_order?: Prisma.IntFilter<"sample_sections"> | number
   active?: Prisma.BoolNullableFilter<"sample_sections"> | boolean | null
   created_at?: Prisma.DateTimeNullableFilter<"sample_sections"> | Date | string | null
@@ -251,7 +243,6 @@ export type sample_sectionsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
-  thumbnail_url?: Prisma.SortOrderInput | Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   active?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -266,7 +257,6 @@ export type sample_sectionsWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.sample_sectionsWhereInput | Prisma.sample_sectionsWhereInput[]
   title?: Prisma.StringFilter<"sample_sections"> | string
   description?: Prisma.StringNullableFilter<"sample_sections"> | string | null
-  thumbnail_url?: Prisma.StringNullableFilter<"sample_sections"> | string | null
   sort_order?: Prisma.IntFilter<"sample_sections"> | number
   active?: Prisma.BoolNullableFilter<"sample_sections"> | boolean | null
   created_at?: Prisma.DateTimeNullableFilter<"sample_sections"> | Date | string | null
@@ -278,7 +268,6 @@ export type sample_sectionsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
-  thumbnail_url?: Prisma.SortOrderInput | Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   active?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -297,7 +286,6 @@ export type sample_sectionsScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"sample_sections"> | number
   title?: Prisma.StringWithAggregatesFilter<"sample_sections"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"sample_sections"> | string | null
-  thumbnail_url?: Prisma.StringNullableWithAggregatesFilter<"sample_sections"> | string | null
   sort_order?: Prisma.IntWithAggregatesFilter<"sample_sections"> | number
   active?: Prisma.BoolNullableWithAggregatesFilter<"sample_sections"> | boolean | null
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"sample_sections"> | Date | string | null
@@ -307,7 +295,6 @@ export type sample_sectionsScalarWhereWithAggregatesInput = {
 export type sample_sectionsCreateInput = {
   title: string
   description?: string | null
-  thumbnail_url?: string | null
   sort_order?: number
   active?: boolean | null
   created_at?: Date | string | null
@@ -319,7 +306,6 @@ export type sample_sectionsUncheckedCreateInput = {
   id?: number
   title: string
   description?: string | null
-  thumbnail_url?: string | null
   sort_order?: number
   active?: boolean | null
   created_at?: Date | string | null
@@ -330,7 +316,6 @@ export type sample_sectionsUncheckedCreateInput = {
 export type sample_sectionsUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnail_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -342,7 +327,6 @@ export type sample_sectionsUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnail_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -354,7 +338,6 @@ export type sample_sectionsCreateManyInput = {
   id?: number
   title: string
   description?: string | null
-  thumbnail_url?: string | null
   sort_order?: number
   active?: boolean | null
   created_at?: Date | string | null
@@ -364,7 +347,6 @@ export type sample_sectionsCreateManyInput = {
 export type sample_sectionsUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnail_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -375,7 +357,6 @@ export type sample_sectionsUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnail_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -391,7 +372,6 @@ export type sample_sectionsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  thumbnail_url?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -407,7 +387,6 @@ export type sample_sectionsMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  thumbnail_url?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -418,7 +397,6 @@ export type sample_sectionsMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  thumbnail_url?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -447,7 +425,6 @@ export type sample_sectionsUpdateOneRequiredWithoutSamplesNestedInput = {
 export type sample_sectionsCreateWithoutSamplesInput = {
   title: string
   description?: string | null
-  thumbnail_url?: string | null
   sort_order?: number
   active?: boolean | null
   created_at?: Date | string | null
@@ -458,7 +435,6 @@ export type sample_sectionsUncheckedCreateWithoutSamplesInput = {
   id?: number
   title: string
   description?: string | null
-  thumbnail_url?: string | null
   sort_order?: number
   active?: boolean | null
   created_at?: Date | string | null
@@ -484,7 +460,6 @@ export type sample_sectionsUpdateToOneWithWhereWithoutSamplesInput = {
 export type sample_sectionsUpdateWithoutSamplesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnail_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -495,7 +470,6 @@ export type sample_sectionsUncheckedUpdateWithoutSamplesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  thumbnail_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -537,7 +511,6 @@ export type sample_sectionsSelect<ExtArgs extends runtime.Types.Extensions.Inter
   id?: boolean
   title?: boolean
   description?: boolean
-  thumbnail_url?: boolean
   sort_order?: boolean
   active?: boolean
   created_at?: boolean
@@ -550,7 +523,6 @@ export type sample_sectionsSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   id?: boolean
   title?: boolean
   description?: boolean
-  thumbnail_url?: boolean
   sort_order?: boolean
   active?: boolean
   created_at?: boolean
@@ -561,7 +533,6 @@ export type sample_sectionsSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   id?: boolean
   title?: boolean
   description?: boolean
-  thumbnail_url?: boolean
   sort_order?: boolean
   active?: boolean
   created_at?: boolean
@@ -572,14 +543,13 @@ export type sample_sectionsSelectScalar = {
   id?: boolean
   title?: boolean
   description?: boolean
-  thumbnail_url?: boolean
   sort_order?: boolean
   active?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type sample_sectionsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "thumbnail_url" | "sort_order" | "active" | "created_at" | "updated_at", ExtArgs["result"]["sample_sections"]>
+export type sample_sectionsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "sort_order" | "active" | "created_at" | "updated_at", ExtArgs["result"]["sample_sections"]>
 export type sample_sectionsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   samples?: boolean | Prisma.sample_sections$samplesArgs<ExtArgs>
   _count?: boolean | Prisma.Sample_sectionsCountOutputTypeDefaultArgs<ExtArgs>
@@ -596,7 +566,6 @@ export type $sample_sectionsPayload<ExtArgs extends runtime.Types.Extensions.Int
     id: number
     title: string
     description: string | null
-    thumbnail_url: string | null
     sort_order: number
     active: boolean | null
     created_at: Date | null
@@ -1028,7 +997,6 @@ export interface sample_sectionsFieldRefs {
   readonly id: Prisma.FieldRef<"sample_sections", 'Int'>
   readonly title: Prisma.FieldRef<"sample_sections", 'String'>
   readonly description: Prisma.FieldRef<"sample_sections", 'String'>
-  readonly thumbnail_url: Prisma.FieldRef<"sample_sections", 'String'>
   readonly sort_order: Prisma.FieldRef<"sample_sections", 'Int'>
   readonly active: Prisma.FieldRef<"sample_sections", 'Boolean'>
   readonly created_at: Prisma.FieldRef<"sample_sections", 'DateTime'>
