@@ -640,6 +640,9 @@ class UserManagementService {
               ],
             },
           },
+          user_analytics: {
+            create: {},
+          },
         },
         select: this.baseUserSelect(),
       });
@@ -685,6 +688,9 @@ class UserManagementService {
               portal: portal_enum.academy,
               role: role_enum.Moderator,
             },
+          },
+          user_analytics: {
+            create: {},
           },
         },
         select: this.baseUserSelect(),
@@ -1435,9 +1441,16 @@ class UserManagementService {
   }
 
   private ensureCreatorIsAdminOrSubAdmin(creator: CreatorContext): void {
-    if (!this.hasRole(creator, role_enum.Admin, role_enum.SubAdmin)) {
+    if (
+      !this.hasRole(
+        creator,
+        role_enum.Admin,
+        role_enum.SubAdmin,
+        role_enum.Moderator,
+      )
+    ) {
       throw new ForbiddenError(
-        "Only Admin or SubAdmin can perform this action",
+        "Only Admin, SubAdmin, or Moderator can perform this action",
       );
     }
   }
@@ -1450,6 +1463,7 @@ class UserManagementService {
       creator,
       role_enum.Admin,
       role_enum.SubAdmin,
+      role_enum.Moderator,
     );
     const isLecturerCreatingOwn =
       this.hasRole(creator, role_enum.Lecturer) &&
@@ -1457,7 +1471,7 @@ class UserManagementService {
 
     if (!isAdminOrSubAdmin && !isLecturerCreatingOwn) {
       throw new ForbiddenError(
-        "Only Admin, SubAdmin, or the Lecturer themselves can create an Assistant",
+        "Only Admin, SubAdmin, Moderator, or the Lecturer themselves can create an Assistant",
       );
     }
   }

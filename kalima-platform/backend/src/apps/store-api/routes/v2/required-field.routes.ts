@@ -10,7 +10,7 @@ const router = Router();
 // All required-field routes require Admin or SubAdmin
 const adminAuth = [
   authenticateToken,
-  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+  requireRole([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator]),
 ];
 
 // ============================================
