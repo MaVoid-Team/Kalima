@@ -33,21 +33,21 @@ export default function PaymentStep({ onBack }) {
     }, []);
 
     const handlePay = async () => {
-        if (!selectedPaymentMethod) {
+        if (!isFreeOrder && !selectedPaymentMethod) {
             toast.error(t('payment.methodRequired') || 'Please select a payment method');
             return;
         }
-        if (!numberTransferredFrom) {
+        if (!isFreeOrder && !numberTransferredFrom) {
             toast.error(t('payment.transferNumberRequired') || 'Please enter the number you transferred from');
             return;
         }
 
-        if (hasValidationErrors) {
+        if (!isFreeOrder && hasValidationErrors) {
             toast.error(t('payment.invalidPhoneNumber', 'Please enter a valid phone number'));
             return;
         }
         // Assuming screenshot might be optional in some cases but required here
-        if (!screenshotFile) {
+        if (!isFreeOrder && !screenshotFile) {
             toast.error(t('payment.screenshotRequired') || 'Please upload payment screenshot');
             return;
         }
@@ -59,10 +59,10 @@ export default function PaymentStep({ onBack }) {
         } catch { }
 
         const formData = new FormData();
-        formData.append('payment_method_id', selectedPaymentMethod);
-        formData.append('numberTransferredFrom', numberTransferredFrom);
+        if (!isFreeOrder && selectedPaymentMethod) formData.append('payment_method_id', selectedPaymentMethod);
+        if (!isFreeOrder && numberTransferredFrom) formData.append('numberTransferredFrom', numberTransferredFrom);
         if (notes) formData.append('notes', notes);
-        if (screenshotFile) formData.append('paymentScreenshot', screenshotFile);
+        if (!isFreeOrder && screenshotFile) formData.append('paymentScreenshot', screenshotFile);
 
         try {
             const data = await checkout(formData);
@@ -95,6 +95,7 @@ export default function PaymentStep({ onBack }) {
         total: cart?.total || 0,
         discount: cart?.discount || 0,
     };
+    const isFreeOrder = Number(pricing.total || 0) <= 0;
 
     const handlePrintReceipt = () => {
         const contentNode = receiptRef.current?.querySelector('[data-print-body]');
@@ -161,6 +162,7 @@ export default function PaymentStep({ onBack }) {
                         screenshotFile={screenshotFile}
                         setScreenshotFile={setScreenshotFile}
                         setValidationErrors={setHasValidationErrors}
+                        isFreeOrder={isFreeOrder}
                     />
                 </div>
 

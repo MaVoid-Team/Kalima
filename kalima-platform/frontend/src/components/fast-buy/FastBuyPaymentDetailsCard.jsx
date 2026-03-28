@@ -20,6 +20,7 @@ export default function FastBuyPaymentDetailsCard({
   updateField,
   needsTransferNumber,
   needsScreenshot,
+  isFreeOrder = false,
   screenshotName,
   paymentMethods,
 }) {
@@ -41,12 +42,14 @@ export default function FastBuyPaymentDetailsCard({
           {t("payment.title", "Payment Details")}
         </CardTitle>
         <CardDescription className="text-sm">
-          {t("payment.secureNotice", "Your payment information is secure")}
+          {isFreeOrder
+            ? t("payment.freeOrderNotice", "No payment details are required for free orders")
+            : t("payment.secureNotice", "Your payment information is secure")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6 pt-6 animate-in fade-in duration-500">
-        {paymentMethods?.length > 0 && (
-          <div className="space-y-3">
+        {!isFreeOrder && paymentMethods?.length > 0 && (
+          <div className="space-y-3" data-testid="fastbuy-payment-methods-section">
             <Label className="font-semibold text-foreground/80">
               {t("payment.method", "Select Payment Method")}
               <span className="text-destructive">*</span>
@@ -93,7 +96,7 @@ export default function FastBuyPaymentDetailsCard({
         )}
 
         {needsTransferNumber && (
-          <div className="space-y-3">
+          <div className="space-y-3" data-testid="fastbuy-payment-transfer-section">
             <Label
               htmlFor="transferNumber"
               className="font-semibold text-foreground/80"
@@ -126,7 +129,7 @@ export default function FastBuyPaymentDetailsCard({
         )}
 
         {needsScreenshot && (
-          <div className="space-y-3">
+          <div className="space-y-3" data-testid="fastbuy-payment-screenshot-section">
             <Label
               htmlFor="screenshot"
               className="font-semibold text-foreground/80"
