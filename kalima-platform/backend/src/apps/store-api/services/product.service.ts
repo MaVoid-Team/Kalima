@@ -248,7 +248,7 @@ class ProductService {
     const limit = filters?.limit ?? 20;
     const skip = (page - 1) * limit;
 
-    const where: any = { deleted_at: null };
+    const where: any = { deleted_at: null, is_archived: false };
 
     if (filters?.is_archived !== undefined) {
       where.is_archived = filters.is_archived;
@@ -418,6 +418,14 @@ class ProductService {
       data,
       include: PRODUCT_INCLUDE,
     });
+
+    // Keep samples archive state in sync with product archive state.
+    if (dto.is_archived !== undefined && dto.is_archived !== product.is_archived) {
+      await this.db.samples.updateMany({
+        where: { product_id: id },
+        data: { is_archived: dto.is_archived },
+      });
+    }
 
     // When sample_url is updated to a non-null value (from DTO, not file), sync to sample record if one exists
     if (

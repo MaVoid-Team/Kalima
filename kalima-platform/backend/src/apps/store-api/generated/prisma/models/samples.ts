@@ -45,6 +45,7 @@ export type SamplesMinAggregateOutputType = {
   section_id: number | null
   product_id: number | null
   title: string | null
+  is_archived: boolean | null
   media_type: $Enums.sample_media_type_enum | null
   high_quality_url: string | null
   low_quality_url: string | null
@@ -60,6 +61,7 @@ export type SamplesMaxAggregateOutputType = {
   section_id: number | null
   product_id: number | null
   title: string | null
+  is_archived: boolean | null
   media_type: $Enums.sample_media_type_enum | null
   high_quality_url: string | null
   low_quality_url: string | null
@@ -75,6 +77,7 @@ export type SamplesCountAggregateOutputType = {
   section_id: number
   product_id: number
   title: number
+  is_archived: number
   media_type: number
   high_quality_url: number
   low_quality_url: number
@@ -106,6 +109,7 @@ export type SamplesMinAggregateInputType = {
   section_id?: true
   product_id?: true
   title?: true
+  is_archived?: true
   media_type?: true
   high_quality_url?: true
   low_quality_url?: true
@@ -121,6 +125,7 @@ export type SamplesMaxAggregateInputType = {
   section_id?: true
   product_id?: true
   title?: true
+  is_archived?: true
   media_type?: true
   high_quality_url?: true
   low_quality_url?: true
@@ -136,6 +141,7 @@ export type SamplesCountAggregateInputType = {
   section_id?: true
   product_id?: true
   title?: true
+  is_archived?: true
   media_type?: true
   high_quality_url?: true
   low_quality_url?: true
@@ -238,6 +244,7 @@ export type SamplesGroupByOutputType = {
   section_id: number
   product_id: number
   title: string | null
+  is_archived: boolean | null
   media_type: $Enums.sample_media_type_enum
   high_quality_url: string | null
   low_quality_url: string | null
@@ -276,6 +283,7 @@ export type samplesWhereInput = {
   section_id?: Prisma.IntFilter<"samples"> | number
   product_id?: Prisma.IntFilter<"samples"> | number
   title?: Prisma.StringNullableFilter<"samples"> | string | null
+  is_archived?: Prisma.BoolNullableFilter<"samples"> | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFilter<"samples"> | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
   low_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
@@ -293,6 +301,7 @@ export type samplesOrderByWithRelationInput = {
   section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_archived?: Prisma.SortOrderInput | Prisma.SortOrder
   media_type?: Prisma.SortOrder
   high_quality_url?: Prisma.SortOrderInput | Prisma.SortOrder
   low_quality_url?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -313,6 +322,7 @@ export type samplesWhereUniqueInput = Prisma.AtLeast<{
   section_id?: Prisma.IntFilter<"samples"> | number
   product_id?: Prisma.IntFilter<"samples"> | number
   title?: Prisma.StringNullableFilter<"samples"> | string | null
+  is_archived?: Prisma.BoolNullableFilter<"samples"> | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFilter<"samples"> | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
   low_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
@@ -330,6 +340,7 @@ export type samplesOrderByWithAggregationInput = {
   section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
+  is_archived?: Prisma.SortOrderInput | Prisma.SortOrder
   media_type?: Prisma.SortOrder
   high_quality_url?: Prisma.SortOrderInput | Prisma.SortOrder
   low_quality_url?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -353,6 +364,7 @@ export type samplesScalarWhereWithAggregatesInput = {
   section_id?: Prisma.IntWithAggregatesFilter<"samples"> | number
   product_id?: Prisma.IntWithAggregatesFilter<"samples"> | number
   title?: Prisma.StringNullableWithAggregatesFilter<"samples"> | string | null
+  is_archived?: Prisma.BoolNullableWithAggregatesFilter<"samples"> | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumWithAggregatesFilter<"samples"> | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.StringNullableWithAggregatesFilter<"samples"> | string | null
   low_quality_url?: Prisma.StringNullableWithAggregatesFilter<"samples"> | string | null
@@ -365,6 +377,7 @@ export type samplesScalarWhereWithAggregatesInput = {
 
 export type samplesCreateInput = {
   title?: string | null
+  is_archived?: boolean | null
   media_type: $Enums.sample_media_type_enum
   high_quality_url?: string | null
   low_quality_url?: string | null
@@ -382,6 +395,7 @@ export type samplesUncheckedCreateInput = {
   section_id: number
   product_id: number
   title?: string | null
+  is_archived?: boolean | null
   media_type: $Enums.sample_media_type_enum
   high_quality_url?: string | null
   low_quality_url?: string | null
@@ -394,6 +408,7 @@ export type samplesUncheckedCreateInput = {
 
 export type samplesUpdateInput = {
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -411,6 +426,7 @@ export type samplesUncheckedUpdateInput = {
   section_id?: Prisma.IntFieldUpdateOperationsInput | number
   product_id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -426,6 +442,7 @@ export type samplesCreateManyInput = {
   section_id: number
   product_id: number
   title?: string | null
+  is_archived?: boolean | null
   media_type: $Enums.sample_media_type_enum
   high_quality_url?: string | null
   low_quality_url?: string | null
@@ -438,6 +455,7 @@ export type samplesCreateManyInput = {
 
 export type samplesUpdateManyMutationInput = {
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -453,6 +471,7 @@ export type samplesUncheckedUpdateManyInput = {
   section_id?: Prisma.IntFieldUpdateOperationsInput | number
   product_id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -478,6 +497,7 @@ export type samplesCountOrderByAggregateInput = {
   section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  is_archived?: Prisma.SortOrder
   media_type?: Prisma.SortOrder
   high_quality_url?: Prisma.SortOrder
   low_quality_url?: Prisma.SortOrder
@@ -500,6 +520,7 @@ export type samplesMaxOrderByAggregateInput = {
   section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  is_archived?: Prisma.SortOrder
   media_type?: Prisma.SortOrder
   high_quality_url?: Prisma.SortOrder
   low_quality_url?: Prisma.SortOrder
@@ -515,6 +536,7 @@ export type samplesMinOrderByAggregateInput = {
   section_id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  is_archived?: Prisma.SortOrder
   media_type?: Prisma.SortOrder
   high_quality_url?: Prisma.SortOrder
   low_quality_url?: Prisma.SortOrder
@@ -622,6 +644,7 @@ export type samplesUncheckedUpdateManyWithoutSample_sectionsNestedInput = {
 
 export type samplesCreateWithoutProductsInput = {
   title?: string | null
+  is_archived?: boolean | null
   media_type: $Enums.sample_media_type_enum
   high_quality_url?: string | null
   low_quality_url?: string | null
@@ -637,6 +660,7 @@ export type samplesUncheckedCreateWithoutProductsInput = {
   id?: number
   section_id: number
   title?: string | null
+  is_archived?: boolean | null
   media_type: $Enums.sample_media_type_enum
   high_quality_url?: string | null
   low_quality_url?: string | null
@@ -681,6 +705,7 @@ export type samplesScalarWhereInput = {
   section_id?: Prisma.IntFilter<"samples"> | number
   product_id?: Prisma.IntFilter<"samples"> | number
   title?: Prisma.StringNullableFilter<"samples"> | string | null
+  is_archived?: Prisma.BoolNullableFilter<"samples"> | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFilter<"samples"> | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
   low_quality_url?: Prisma.StringNullableFilter<"samples"> | string | null
@@ -693,6 +718,7 @@ export type samplesScalarWhereInput = {
 
 export type samplesCreateWithoutSample_sectionsInput = {
   title?: string | null
+  is_archived?: boolean | null
   media_type: $Enums.sample_media_type_enum
   high_quality_url?: string | null
   low_quality_url?: string | null
@@ -708,6 +734,7 @@ export type samplesUncheckedCreateWithoutSample_sectionsInput = {
   id?: number
   product_id: number
   title?: string | null
+  is_archived?: boolean | null
   media_type: $Enums.sample_media_type_enum
   high_quality_url?: string | null
   low_quality_url?: string | null
@@ -748,6 +775,7 @@ export type samplesCreateManyProductsInput = {
   id?: number
   section_id: number
   title?: string | null
+  is_archived?: boolean | null
   media_type: $Enums.sample_media_type_enum
   high_quality_url?: string | null
   low_quality_url?: string | null
@@ -760,6 +788,7 @@ export type samplesCreateManyProductsInput = {
 
 export type samplesUpdateWithoutProductsInput = {
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -775,6 +804,7 @@ export type samplesUncheckedUpdateWithoutProductsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   section_id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -789,6 +819,7 @@ export type samplesUncheckedUpdateManyWithoutProductsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   section_id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -803,6 +834,7 @@ export type samplesCreateManySample_sectionsInput = {
   id?: number
   product_id: number
   title?: string | null
+  is_archived?: boolean | null
   media_type: $Enums.sample_media_type_enum
   high_quality_url?: string | null
   low_quality_url?: string | null
@@ -815,6 +847,7 @@ export type samplesCreateManySample_sectionsInput = {
 
 export type samplesUpdateWithoutSample_sectionsInput = {
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -830,6 +863,7 @@ export type samplesUncheckedUpdateWithoutSample_sectionsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   product_id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -844,6 +878,7 @@ export type samplesUncheckedUpdateManyWithoutSample_sectionsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   product_id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   media_type?: Prisma.Enumsample_media_type_enumFieldUpdateOperationsInput | $Enums.sample_media_type_enum
   high_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   low_quality_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -861,6 +896,7 @@ export type samplesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   section_id?: boolean
   product_id?: boolean
   title?: boolean
+  is_archived?: boolean
   media_type?: boolean
   high_quality_url?: boolean
   low_quality_url?: boolean
@@ -878,6 +914,7 @@ export type samplesSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   section_id?: boolean
   product_id?: boolean
   title?: boolean
+  is_archived?: boolean
   media_type?: boolean
   high_quality_url?: boolean
   low_quality_url?: boolean
@@ -895,6 +932,7 @@ export type samplesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   section_id?: boolean
   product_id?: boolean
   title?: boolean
+  is_archived?: boolean
   media_type?: boolean
   high_quality_url?: boolean
   low_quality_url?: boolean
@@ -912,6 +950,7 @@ export type samplesSelectScalar = {
   section_id?: boolean
   product_id?: boolean
   title?: boolean
+  is_archived?: boolean
   media_type?: boolean
   high_quality_url?: boolean
   low_quality_url?: boolean
@@ -922,7 +961,7 @@ export type samplesSelectScalar = {
   updated_at?: boolean
 }
 
-export type samplesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "section_id" | "product_id" | "title" | "media_type" | "high_quality_url" | "low_quality_url" | "original_name" | "mime_type" | "size" | "created_at" | "updated_at", ExtArgs["result"]["samples"]>
+export type samplesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "section_id" | "product_id" | "title" | "is_archived" | "media_type" | "high_quality_url" | "low_quality_url" | "original_name" | "mime_type" | "size" | "created_at" | "updated_at", ExtArgs["result"]["samples"]>
 export type samplesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sample_sections?: boolean | Prisma.sample_sectionsDefaultArgs<ExtArgs>
   products?: boolean | Prisma.productsDefaultArgs<ExtArgs>
@@ -947,6 +986,7 @@ export type $samplesPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     section_id: number
     product_id: number
     title: string | null
+    is_archived: boolean | null
     media_type: $Enums.sample_media_type_enum
     high_quality_url: string | null
     low_quality_url: string | null
@@ -1384,6 +1424,7 @@ export interface samplesFieldRefs {
   readonly section_id: Prisma.FieldRef<"samples", 'Int'>
   readonly product_id: Prisma.FieldRef<"samples", 'Int'>
   readonly title: Prisma.FieldRef<"samples", 'String'>
+  readonly is_archived: Prisma.FieldRef<"samples", 'Boolean'>
   readonly media_type: Prisma.FieldRef<"samples", 'sample_media_type_enum'>
   readonly high_quality_url: Prisma.FieldRef<"samples", 'String'>
   readonly low_quality_url: Prisma.FieldRef<"samples", 'String'>
