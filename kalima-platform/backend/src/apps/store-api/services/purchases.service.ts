@@ -148,7 +148,9 @@ class PurchasesService {
     const created = await client.purchases.create({
       data: {
         user_id: input.user_id,
-        payment_method_id: isFreeOrder ? null : (input.payment_method_id ?? null),
+        payment_method_id: isFreeOrder
+          ? null
+          : (input.payment_method_id ?? null),
         payment_screenshot_id: isFreeOrder
           ? null
           : (input.payment_screenshot_id ?? null),
@@ -376,6 +378,8 @@ class PurchasesService {
       select: {
         id: true,
         name: true,
+        email: true,
+        phone: true,
         user_roles: {
           select: { role: true },
           where: { role: { in: eligibleRoles } },
@@ -412,6 +416,8 @@ class PurchasesService {
     const stats = admins.map((admin) => ({
       id: admin.id,
       name: admin.name,
+      email: admin.email,
+      phone: admin.phone,
       role: admin.user_roles[0]?.role || null,
       count: countsMap.get(admin.id) || 0,
     }));

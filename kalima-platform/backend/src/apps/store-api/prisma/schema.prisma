@@ -387,6 +387,7 @@ model samples {
   id               Int                   @id @default(autoincrement())
   section_id       Int
   product_id       Int
+  title            String?               @db.VarChar(255)
   media_type       sample_media_type_enum
   high_quality_url String?
   low_quality_url  String?

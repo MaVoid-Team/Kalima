@@ -104,6 +104,7 @@ export interface CreateSampleInput {
 const SAMPLE_LIST_SELECT = {
   id: true,
   media_type: true,
+  title: true,
   high_quality_url: true,
   low_quality_url: true,
   original_name: true,
@@ -127,6 +128,7 @@ interface SampleListFilters {
 interface SampleResponse {
   id: number;
   media_type: sample_media_type_enum;
+  title: string | null;
   high_quality_url: string | null;
   low_quality_url: string | null;
   original_name: string;
@@ -371,6 +373,7 @@ class SampleService {
     productId: number,
     highQualityFile?: Express.Multer.File,
     lowQualityFile?: Express.Multer.File,
+    title?: string,
   ): Promise<samples> {
     if (!highQualityFile && !lowQualityFile) {
       throw new BadRequestError(
@@ -420,6 +423,7 @@ class SampleService {
       data: {
         section_id: sectionId,
         product_id: productId,
+        title,
         media_type: mediaType,
         original_name: originalName,
         mime_type: mimeType,
@@ -439,6 +443,7 @@ class SampleService {
     sectionId: number,
     highQualityFile?: Express.Multer.File,
     lowQualityFile?: Express.Multer.File,
+    title?: string,
   ): Promise<samples> {
     const sample = await this.db.samples.findFirst({
       where: { id: sampleId, section_id: sectionId },
@@ -496,6 +501,7 @@ class SampleService {
     return this.db.samples.update({
       where: { id: sampleId },
       data: {
+        ...(title !== undefined && { title }),
         high_quality_url: highQualityUrl,
         low_quality_url: lowQualityUrl,
         original_name: originalName,

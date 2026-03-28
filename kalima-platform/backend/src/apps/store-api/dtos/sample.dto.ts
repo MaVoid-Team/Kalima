@@ -80,6 +80,11 @@ export class CreateSampleBodyDto {
   @IsEnum(sample_media_type_enum)
   @IsOptional()
   media_type?: sample_media_type_enum;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  title?: string;
 }
 
 export class UpdateSampleBodyDto {
@@ -92,4 +97,9 @@ export class UpdateSampleBodyDto {
   @IsEnum(sample_media_type_enum)
   @IsOptional()
   media_type?: sample_media_type_enum;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  title?: string;
 }

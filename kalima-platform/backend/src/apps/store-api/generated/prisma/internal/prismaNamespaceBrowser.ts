@@ -462,6 +462,7 @@ export const SamplesScalarFieldEnum = {
   id: 'id',
   section_id: 'section_id',
   product_id: 'product_id',
+  title: 'title',
   media_type: 'media_type',
   high_quality_url: 'high_quality_url',
   low_quality_url: 'low_quality_url',
