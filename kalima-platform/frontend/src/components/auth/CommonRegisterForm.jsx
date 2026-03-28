@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import LoadingSpinner from "@/components/ui/loading-spinner";
@@ -34,6 +34,7 @@ import { cn } from "@/lib/utils";
 
 export default function CommonRegisterForm({ role, onBack, children, extraSchema, defaultValues, onSubmit, redirectTo }) {
     const { t, i18n } = useTranslation("auth");
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [firebaseToken, setFirebaseToken] = useState(null);
@@ -110,6 +111,10 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
         try {
             if (onSubmit) {
                 await onSubmit(values, firebaseToken);
+            }
+            if (!firebaseToken) {
+                // For normal (non-social) registration, redirect to login
+                navigate("/login", { replace: true });
             }
         } catch (error) {
             console.error("Form submission error:", error);
