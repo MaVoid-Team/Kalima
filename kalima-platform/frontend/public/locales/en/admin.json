@@ -984,7 +984,10 @@
     "allMonths": "All Months",
     "allYears": "All Years",
     "createdAccounts": "Created Accounts Statistics",
-    "pickDate": "Pick a date"
+    "pickDate": "Pick a date",
+    "pickMonth": "Pick a month",
+    "prevYear": "Previous year",
+    "nextYear": "Next year"
   },
   "table": {
     "productName": "Product Name",
@@ -999,6 +1002,10 @@
     "pending": "Pending",
     "month": "Month",
     "confirmedCount": "Count",
-    "createdAccounts": "Accounts Created"
+    "createdAccounts": "Accounts Created",
+    "id": "ID",
+    "name": "Name",
+    "phone": "Phone",
+    "role": "Role"
   }
 }
