@@ -3580,7 +3580,8 @@ export const UsersScalarFieldEnum = {
   hasUsedPromoCode: 'hasUsedPromoCode',
   email_verified_at: 'email_verified_at',
   role: 'role',
-  created_by: 'created_by'
+  created_by: 'created_by',
+  flag: 'flag'
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
@@ -4221,6 +4222,20 @@ export type ListEnumgender_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'user_flag_enum'
+ */
+export type Enumuser_flag_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'user_flag_enum'>
+    
+
+
+/**
+ * Reference to a field of type 'user_flag_enum[]'
+ */
+export type ListEnumuser_flag_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'user_flag_enum[]'>
     
 
 

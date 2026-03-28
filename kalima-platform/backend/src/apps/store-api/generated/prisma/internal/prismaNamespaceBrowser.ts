@@ -173,7 +173,8 @@ export const UsersScalarFieldEnum = {
   hasUsedPromoCode: 'hasUsedPromoCode',
   email_verified_at: 'email_verified_at',
   role: 'role',
-  created_by: 'created_by'
+  created_by: 'created_by',
+  flag: 'flag'
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]

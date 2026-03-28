@@ -13,7 +13,11 @@ import {
   ArrayMinSize,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { gender_enum, role_enum } from "../generated/prisma/client";
+import {
+  gender_enum,
+  role_enum,
+  user_flag_enum,
+} from "../generated/prisma/client";
 
 // ============================================
 // ADMIN USER CREATION DTOs
@@ -242,4 +246,9 @@ export class UpsertAccountReviewSettingsDto {
   @ValidateNested({ each: true })
   @Type(() => AccountReviewSettingEntryDto)
   settings: AccountReviewSettingEntryDto[];
+}
+
+export class UpdateUserFlagDto {
+  @IsEnum(user_flag_enum)
+  flag: user_flag_enum;
 }

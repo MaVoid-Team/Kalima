@@ -261,6 +261,13 @@ export type Enumrole_enumNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel> | $Enums.role_enum | null
 }
 
+export type Enumuser_flag_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.user_flag_enum | Prisma.Enumuser_flag_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel> | $Enums.user_flag_enum
+}
+
 export type Enumgender_enumNullableWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.gender_enum | Prisma.Enumgender_enumFieldRefInput<$PrismaModel> | null
   in?: $Enums.gender_enum[] | Prisma.ListEnumgender_enumFieldRefInput<$PrismaModel> | null
@@ -287,6 +294,16 @@ export type Enumrole_enumNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel>
+}
+
+export type Enumuser_flag_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.user_flag_enum | Prisma.Enumuser_flag_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumuser_flag_enumWithAggregatesFilter<$PrismaModel> | $Enums.user_flag_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel>
 }
 
 export type DateTimeFilter<$PrismaModel = never> = {
@@ -733,6 +750,13 @@ export type NestedEnumrole_enumNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel> | $Enums.role_enum | null
 }
 
+export type NestedEnumuser_flag_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.user_flag_enum | Prisma.Enumuser_flag_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel> | $Enums.user_flag_enum
+}
+
 export type NestedEnumgender_enumNullableWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.gender_enum | Prisma.Enumgender_enumFieldRefInput<$PrismaModel> | null
   in?: $Enums.gender_enum[] | Prisma.ListEnumgender_enumFieldRefInput<$PrismaModel> | null
@@ -759,6 +783,16 @@ export type NestedEnumrole_enumNullableWithAggregatesFilter<$PrismaModel = never
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumuser_flag_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.user_flag_enum | Prisma.Enumuser_flag_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumuser_flag_enumWithAggregatesFilter<$PrismaModel> | $Enums.user_flag_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel>
 }
 
 export type NestedDateTimeFilter<$PrismaModel = never> = {
