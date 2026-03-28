@@ -55,10 +55,11 @@ export default function EditProductPage() {
         title: z.string().min(1, t('products.form.titleIsRequired')).max(255, t('products.form.titleMaxLength')),
         price: z.coerce.number().min(0, t('products.form.priceMustBeGreaterThan0')),
         type: z.enum(['Product', 'Book']),
+        isFreePreview: z.boolean().optional(),
         description: z.string().optional(),
         price_after_discount: z.preprocess(
             (val) => (val === '' || val == null ? undefined : val),
-            z.coerce.number().positive(t('products.form.discountedPriceMustBeGreaterThan0')).optional()
+            z.coerce.number().min(0, t('products.form.discountedPriceMustBeGreaterThan0')).optional()
         ),
         serial: z.string().max(100, t('products.form.serialMaxLength')).optional().or(z.literal('')),
         coupon_id: z.preprocess(
@@ -69,7 +70,11 @@ export default function EditProductPage() {
         perks: z.string().optional().or(z.literal('')),
         is_archived: z.boolean(),
     }).refine(
-        (data) => !data.price_after_discount || data.price_after_discount < data.price,
+        (data) => {
+            if (data.isFreePreview) return data.price_after_discount === 0;
+            if (data.price_after_discount == null) return true;
+            return data.price_after_discount < data.price;
+        },
         { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
     ).refine(
         (data) => !data.release_at || new Date(data.release_at) >= startOfDay(new Date()),
@@ -135,6 +140,7 @@ export default function EditProductPage() {
             title: '',
             description: '',
             type: 'Product',
+            isFreePreview: false,
             price: '',
             price_after_discount: '',
             serial: '',
@@ -172,6 +178,7 @@ export default function EditProductPage() {
                 description: selectedProduct.description ?? '',
                 type: selectedProduct.type ?? 'Product',
                 price: selectedProduct.price != null ? String(selectedProduct.price) : '',
+                isFreePreview: selectedProduct.price_after_discount === 0,
                 price_after_discount: selectedProduct.price_after_discount != null
                     ? String(selectedProduct.price_after_discount) : '',
                 serial: selectedProduct.serial ?? '',
@@ -416,7 +423,11 @@ export default function EditProductPage() {
             is_archived: values.is_archived,
         };
         if (values.description) payload.description = values.description;
-        if (values.price_after_discount) payload.price_after_discount = values.price_after_discount;
+        if (values.isFreePreview) {
+            payload.price_after_discount = 0;
+        } else if (values.price_after_discount != null && values.price_after_discount !== '') {
+            payload.price_after_discount = values.price_after_discount;
+        }
         if (values.serial) payload.serial = values.serial;
         if (values.coupon_id) payload.coupon_id = values.coupon_id;
         
@@ -566,6 +577,30 @@ export default function EditProductPage() {
                             />
                         </div>
 
+                        <FormField
+                            control={form.control}
+                            name="isFreePreview"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                                    <div className="space-y-0.5">
+                                        <FormLabel>{t('products.form.freePreviewToggle')}</FormLabel>
+                                    </div>
+                                    <FormControl>
+                                        <Switch
+                                            checked={!!field.value}
+                                            onCheckedChange={(checked) => {
+                                                field.onChange(checked);
+                                                if (checked) {
+                                                    form.setValue('price_after_discount', '0', { shouldValidate: true, shouldDirty: true });
+                                                }
+                                            }}
+                                            data-testid="edit-product-free-preview-toggle"
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
@@ -579,6 +614,7 @@ export default function EditProductPage() {
                                                 min="0"
                                                 step="0.01"
                                                 data-testid="edit-product-discount-input"
+                                                disabled={!!form.watch('isFreePreview')}
                                                 {...field}
                                             />
                                         </FormControl>
