@@ -618,7 +618,6 @@ export const Sample_sectionsScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
-  thumbnail_url: 'thumbnail_url',
   sort_order: 'sort_order',
   active: 'active',
   created_at: 'created_at',

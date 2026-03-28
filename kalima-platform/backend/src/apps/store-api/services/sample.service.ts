@@ -78,7 +78,6 @@ const DISPLAYABLE_MEDIA_TYPES = new Set<sample_media_type_enum>([
 export interface CreateSampleSectionInput {
   title: string;
   description?: string;
-  thumbnail_url?: string;
   sort_order?: number;
   active?: boolean;
 }
@@ -86,7 +85,6 @@ export interface CreateSampleSectionInput {
 export interface UpdateSampleSectionInput {
   title?: string;
   description?: string;
-  thumbnail_url?: string;
   sort_order?: number;
   active?: boolean;
 }
@@ -118,6 +116,16 @@ const SAMPLE_LIST_SELECT = {
     },
   },
 };
+
+const SAMPLE_SECTION_SAFE_SELECT = {
+  id: true,
+  title: true,
+  description: true,
+  sort_order: true,
+  active: true,
+  created_at: true,
+  updated_at: true,
+} as const;
 
 interface SampleListFilters {
   search?: string;
@@ -176,8 +184,7 @@ class SampleService {
     mimeType: string,
     fieldName: string,
   ): Promise<string> {
-    const ext =
-      MIME_TO_EXT[mimeType] || path.extname(fieldName) || ".bin";
+    const ext = MIME_TO_EXT[mimeType] || path.extname(fieldName) || ".bin";
     const uniqueId = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
     const filename = `${uniqueId}-${fieldName}${ext}`;
     const filePath = path.join(UPLOAD_DIR, filename);
@@ -205,7 +212,11 @@ class SampleService {
     const where = activeOnly ? { active: true } : {};
     return this.db.sample_sections.findMany({
       where,
-      include: { samples: { include: { products: { select: { id: true, title: true } } } } },
+      include: {
+        samples: {
+          include: { products: { select: { id: true, title: true } } },
+        },
+      },
       orderBy: [{ sort_order: "asc" }, { id: "asc" }],
     });
   }
@@ -228,15 +239,17 @@ class SampleService {
     return section;
   }
 
-  async createSection(data: CreateSampleSectionInput): Promise<sample_sections> {
+  async createSection(
+    data: CreateSampleSectionInput,
+  ): Promise<sample_sections> {
     return this.db.sample_sections.create({
       data: {
         title: data.title,
         description: data.description,
-        thumbnail_url: data.thumbnail_url,
         sort_order: data.sort_order ?? 0,
         active: data.active ?? true,
       },
+      select: SAMPLE_SECTION_SAFE_SELECT,
     });
   }
 
@@ -244,7 +257,10 @@ class SampleService {
     id: number,
     data: UpdateSampleSectionInput,
   ): Promise<sample_sections> {
-    const section = await this.db.sample_sections.findUnique({ where: { id } });
+    const section = await this.db.sample_sections.findUnique({
+      where: { id },
+      select: { id: true },
+    });
     if (!section) {
       throw new NotFoundError("Sample section not found");
     }
@@ -253,12 +269,14 @@ class SampleService {
       where: { id },
       data: {
         ...(data.title !== undefined && { title: data.title }),
-        ...(data.description !== undefined && { description: data.description }),
-        ...(data.thumbnail_url !== undefined && { thumbnail_url: data.thumbnail_url }),
+        ...(data.description !== undefined && {
+          description: data.description,
+        }),
         ...(data.sort_order !== undefined && { sort_order: data.sort_order }),
         ...(data.active !== undefined && { active: data.active }),
         updated_at: new Date(),
       },
+      select: SAMPLE_SECTION_SAFE_SELECT,
     });
   }
 
@@ -301,7 +319,11 @@ class SampleService {
     if (filters?.search) {
       where.OR = [
         { original_name: { contains: filters.search, mode: "insensitive" } },
-        { products: { title: { contains: filters.search, mode: "insensitive" } } },
+        {
+          products: {
+            title: { contains: filters.search, mode: "insensitive" },
+          },
+        },
       ];
     }
 
@@ -382,12 +404,18 @@ class SampleService {
     }
 
     // Validate mime types eagerly before any I/O
-    if (highQualityFile?.buffer && !SAMPLE_MIME_TYPES.has(highQualityFile.mimetype)) {
+    if (
+      highQualityFile?.buffer &&
+      !SAMPLE_MIME_TYPES.has(highQualityFile.mimetype)
+    ) {
       throw new BadRequestError(
         `Invalid high_quality file type: ${highQualityFile.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
       );
     }
-    if (lowQualityFile?.buffer && !SAMPLE_MIME_TYPES.has(lowQualityFile.mimetype)) {
+    if (
+      lowQualityFile?.buffer &&
+      !SAMPLE_MIME_TYPES.has(lowQualityFile.mimetype)
+    ) {
       throw new BadRequestError(
         `Invalid low_quality file type: ${lowQualityFile.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
       );
@@ -396,14 +424,19 @@ class SampleService {
     // Verify section + product exist in parallel
     const [section, product] = await Promise.all([
       this.db.sample_sections.findUnique({ where: { id: sectionId } }),
-      this.db.products.findFirst({ where: { id: productId, deleted_at: null } }),
+      this.db.products.findFirst({
+        where: { id: productId, deleted_at: null },
+      }),
     ]);
     if (!section) throw new NotFoundError("Sample section not found");
     if (!product) throw new NotFoundError("Product not found");
 
     // Determine metadata from primary file
-    const primaryFile = highQualityFile?.buffer ? highQualityFile : lowQualityFile!;
-    const mediaType = MIME_TO_MEDIA_TYPE[primaryFile.mimetype] ?? sample_media_type_enum.pdf;
+    const primaryFile = highQualityFile?.buffer
+      ? highQualityFile
+      : lowQualityFile!;
+    const mediaType =
+      MIME_TO_MEDIA_TYPE[primaryFile.mimetype] ?? sample_media_type_enum.pdf;
     const originalName = primaryFile.originalname;
     const mimeType = primaryFile.mimetype;
     const size = primaryFile.buffer!.length;
@@ -411,10 +444,18 @@ class SampleService {
     // Write files to disk in parallel when both are provided
     const fileWrites: Promise<string | null>[] = [
       highQualityFile?.buffer
-        ? this.saveFileToDisk(highQualityFile.buffer, highQualityFile.mimetype, "high_quality")
+        ? this.saveFileToDisk(
+            highQualityFile.buffer,
+            highQualityFile.mimetype,
+            "high_quality",
+          )
         : Promise.resolve(null),
       lowQualityFile?.buffer
-        ? this.saveFileToDisk(lowQualityFile.buffer, lowQualityFile.mimetype, "low_quality")
+        ? this.saveFileToDisk(
+            lowQualityFile.buffer,
+            lowQualityFile.mimetype,
+            "low_quality",
+          )
         : Promise.resolve(null),
     ];
     const [highQualityUrl, lowQualityUrl] = await Promise.all(fileWrites);
@@ -543,12 +584,18 @@ class SampleService {
   }
 
   /** Get the file path for preview (high quality - protected, no download) */
-  async getPreviewPath(sampleId: number, sectionId?: number): Promise<{
+  async getPreviewPath(
+    sampleId: number,
+    sectionId?: number,
+  ): Promise<{
     path: string;
     mimeType: string;
     originalName: string;
   }> {
-    const sample = await this.getSampleById(sampleId, sectionId) as samples & { high_quality_url?: string | null };
+    const sample = (await this.getSampleById(
+      sampleId,
+      sectionId,
+    )) as samples & { high_quality_url?: string | null };
 
     if (!sample.high_quality_url) {
       throw new NotFoundError("No preview available for this sample");
@@ -564,12 +611,18 @@ class SampleService {
   }
 
   /** Get the file path for download (low quality) */
-  async getDownloadPath(sampleId: number, sectionId?: number): Promise<{
+  async getDownloadPath(
+    sampleId: number,
+    sectionId?: number,
+  ): Promise<{
     path: string;
     mimeType: string;
     originalName: string;
   }> {
-    const sample = await this.getSampleById(sampleId, sectionId) as samples & { low_quality_url?: string | null };
+    const sample = (await this.getSampleById(
+      sampleId,
+      sectionId,
+    )) as samples & { low_quality_url?: string | null };
 
     if (!sample.low_quality_url) {
       throw new NotFoundError("No download available for this sample");
