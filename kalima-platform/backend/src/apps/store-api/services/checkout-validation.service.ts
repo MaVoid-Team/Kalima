@@ -6,7 +6,7 @@ import type { payment_methods } from "../generated/prisma/client";
 export interface PaymentValidationInput {
   total: number;
   numberTransferredFrom?: string;
-  payment_method_id: number;
+  payment_method_id?: number;
 }
 
 /**
@@ -19,7 +19,11 @@ export async function validatePaymentForCheckout(
   db: PrismaClient,
   input: PaymentValidationInput,
   existingPaymentMethod?: payment_methods | null,
-): Promise<payment_methods> {
+): Promise<payment_methods | null> {
+  if (input.total <= 0) {
+    return null;
+  }
+
   if (
     input.total > 0 &&
     (!input.numberTransferredFrom ||
@@ -28,6 +32,10 @@ export async function validatePaymentForCheckout(
     throw new BadRequestError(
       "Number transferred from is required for paid purchases",
     );
+  }
+
+  if (!input.payment_method_id) {
+    throw new BadRequestError("Payment method is required for paid purchases");
   }
 
   const paymentMethod =
