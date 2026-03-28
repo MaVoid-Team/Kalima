@@ -37,10 +37,9 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
 
   const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
 
-  const effectiveOriginalPrice = price;
-  const effectiveFinalPrice = priceAfterDiscount == 0 ? price : priceAfterDiscount;
-  const discountPercentage = calculateDiscountPercentage(effectiveOriginalPrice, effectiveFinalPrice, 0);
-  const hasDiscount = discountPercentage > 0;
+  const hasDiscount = priceAfterDiscount !== null && priceAfterDiscount !== "" && Number(priceAfterDiscount) < Number(price);
+  const finalPrice = (priceAfterDiscount !== null && priceAfterDiscount !== "" && priceAfterDiscount !== undefined) ? priceAfterDiscount : price;
+  const percentageOff = hasDiscount ? Math.round(((Number(price) - Number(priceAfterDiscount)) / Number(price)) * 100) : 0;
 
   const cartLoading = cartCtx?.loading ?? false;
 
@@ -91,7 +90,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
             <div className="absolute top-3 start-3 z-10 flex flex-col gap-2">
               {hasDiscount && (
                 <Badge variant="destructive" className="px-2.5 py-1 text-[11px] font-semibold rounded-md flex-wrap w-max">
-                  {discountPercentage}% {t("product.off", "OFF")}
+                  {percentageOff}% {t("product.off", "OFF")}
                 </Badge>
               )}
               {!is_released && release_at && (
@@ -141,13 +140,15 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
               size="sm"
               className="mt-1"
             />
-            <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className="text-base font-semibold">
-                {formatPrice(effectiveFinalPrice)} {t("product.currency")}
+            <div className="flex items-center gap-2 mt-auto pt-2 flex-wrap">
+              <span className="text-lg md:text-xl font-extrabold text-primary tracking-tight">
+                {formatPrice(finalPrice)}
+                <span className="text-[10px] md:text-xs font-medium ms-1 text-muted-foreground uppercase">{t("product.currency")}</span>
               </span>
               {hasDiscount && (
-                <span className="text-sm text-muted-foreground line-through">
-                  {formatPrice(effectiveOriginalPrice)} {t("product.currency")}
+                <span className="text-xs md:text-sm text-muted-foreground line-through decoration-destructive/40 font-medium">
+                  {formatPrice(price)}
+                  <span className="text-[10px] ms-0.5 uppercase">{t("product.currency")}</span>
                 </span>
               )}
             </div>

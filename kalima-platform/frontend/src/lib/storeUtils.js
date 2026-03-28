@@ -8,6 +8,7 @@
  * @returns {string}
  */
 export function formatPrice(amount) {
+  if (amount === null || amount === undefined) return "0.00";
   const num = parseFloat(amount);
   if (isNaN(num)) return "0.00";
   return num.toFixed(2);
