@@ -1,6 +1,6 @@
 import { PDFViewer } from '@embedpdf/react-pdf-viewer';
-import { useEffect, useMemo, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useMemo } from 'react';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Download, AlertCircle, FileText, Music } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -12,35 +12,44 @@ import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
  * SamplePreviewPage — full-screen media viewer for a single sample.
  * Route: /samples/:id/preview  (public)
  *
- * Handles: Document (PDF/Word), Video, Audio, Image
+ * Uses route params + search params for zero-fetch initialization.
  */
 export default function SamplePreviewPage() {
     const { t, i18n } = useTranslation(['market', 'PDFViewer']);
     const { id } = useParams();
-    const { mutate: fetchApi, loading } = useApiMutation();
-    const [sample, setSample] = useState(null);
-    const [error, setError] = useState(false);
+    const [searchParams] = useSearchParams();
     const viewerI18n = useMemo(() => getPdfViewerI18nConfig(i18n.language), [i18n.language]);
 
-    useEffect(() => {
-        if (!id) return;
-        fetchApi({ endpoint: `/samples/${id}`, method: 'get' })
-            .then(res => {
-                if (res?.success) setSample(res.data);
-                else setError(true);
-            })
-            .catch(() => setError(true));
-    }, [id, fetchApi]);
+    // Construct sample object from URL params
+    const sample = useMemo(() => {
+        if (!id) return null;
+        
+        const mediaType = searchParams.get('media_type');
 
-    if (loading && !sample) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-background" data-testid="sample-preview-loading">
-                <LoadingSpinner className="h-8 w-8 text-primary" />
-            </div>
-        );
-    }
+        // Basic fields
+        const s = {
+            id,
+            section_id: searchParams.get('section_id'),
+            media_type: mediaType,
+            mime_type: searchParams.get('mime_type'),
+            original_name: searchParams.get('original_name'),
+            high_quality_url: searchParams.get('high_quality_url'),
+            low_quality_url: searchParams.get('low_quality_url'),
+            created_at: searchParams.get('created_at'),
+            product_id: searchParams.get('product_id'),
+            // Nested products (simplified for URL)
+            products: searchParams.get('product_title') ? {
+                id: searchParams.get('product_id'),
+                title: searchParams.get('product_title')
+            } : null
+        };
 
-    if (error || (!loading && !sample)) {
+        // Validate minimum required for a preview to function
+        if (!s.section_id || !s.media_type) return null;
+        return s;
+    }, [id, searchParams]);
+
+    if (!sample) {
         return (
             <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background text-center px-4" data-testid="sample-preview-error">
                 <AlertCircle className="h-12 w-12 text-destructive" />
@@ -56,12 +65,13 @@ export default function SamplePreviewPage() {
     }
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
-    const sectionId = sample?.section_id;
-    const previewUrl = sectionId ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/preview` : '';
-    const downloadUrl = sectionId ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download` : '';
+    const apiBase = apiUrl.replace('/api/v2', '');
 
-    const mediaType = sample?.media_type || 'Document';
-    const isPdf = sample?.mime_type === 'application/pdf';
+    const previewUrl = sample?.high_quality_url ? (sample.high_quality_url.startsWith('http') ? sample.high_quality_url : `${apiBase}${sample.high_quality_url}`) : '';
+    const downloadUrl = sample?.low_quality_url ? (sample.low_quality_url.startsWith('http') ? sample.low_quality_url : `${apiBase}${sample.low_quality_url}`) : '';
+
+    const mediaType = sample?.media_type;
+    const isPdf = mediaType === 'pdf' || sample?.mime_type === 'application/pdf';
 
     return (
         <div className="flex flex-col h-screen bg-background" data-testid="sample-preview-page">
@@ -91,7 +101,7 @@ export default function SamplePreviewPage() {
             <div className="flex-1 overflow-hidden flex items-center justify-center bg-muted/20" data-testid="sample-preview-viewer">
 
                 {/* Video */}
-                {mediaType === 'Video' && previewUrl && (
+                {mediaType === 'video' && previewUrl && (
                     <video
                         className="max-h-full max-w-full"
                         controls
@@ -102,27 +112,8 @@ export default function SamplePreviewPage() {
                     </video>
                 )}
 
-                {/* Audio */}
-                {mediaType === 'Audio' && (
-                    <div className="flex flex-col items-center justify-center gap-8 p-8">
-                        <div className="h-32 w-32 rounded-full bg-orange-500/10 flex items-center justify-center">
-                            <Music className="h-16 w-16 text-orange-500" />
-                        </div>
-                        {previewUrl && (
-                            <audio
-                                className="w-full max-w-lg"
-                                controls
-                                src={previewUrl}
-                                data-testid="sample-preview-audio-player"
-                            >
-                                <track kind="captions" />
-                            </audio>
-                        )}
-                    </div>
-                )}
-
                 {/* Image */}
-                {mediaType === 'Image' && previewUrl && (
+                {mediaType === 'image' && previewUrl && (
                     <img
                         src={previewUrl}
                         alt={sample?.original_name || 'Sample'}
@@ -132,7 +123,7 @@ export default function SamplePreviewPage() {
                 )}
 
                 {/* PDF Document */}
-                {mediaType === 'Document' && isPdf && previewUrl && (
+                {isPdf && previewUrl && (
                     <div className="w-full h-full max-w-6xl mx-auto">
                         <PDFViewer
                             config={{
@@ -147,10 +138,9 @@ export default function SamplePreviewPage() {
                     </div>
                 )}
 
-                {/* Word / unsupported — download fallback */}
-                {(mediaType === 'Document' && !isPdf && !previewUrl) ||
-                (mediaType === 'Video' && !previewUrl) ||
-                (mediaType === 'Image' && !previewUrl) ? (
+                {/* Word / PowerPoint / Unknown — download fallback */}
+                {((mediaType === 'word' || mediaType === 'powerpoint') || 
+                  (!isPdf && mediaType !== 'video' && mediaType !== 'image' && !previewUrl)) && (
                     <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground p-8">
                         <FileText className="h-20 w-20 opacity-30" />
                         <p className="text-sm text-center">{t('samplePage.previewUnavailable', 'Preview not available.')}</p>
@@ -163,8 +153,9 @@ export default function SamplePreviewPage() {
                             </Button>
                         )}
                     </div>
-                ) : null}
+                )}
             </div>
         </div>
     );
 }
+
