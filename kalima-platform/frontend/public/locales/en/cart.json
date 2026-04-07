@@ -137,5 +137,7 @@
   "applyToEmptyItems": "Apply ONLY to empty similar fields in other items",
   "fieldSynced": "Value applied to all similar fields",
   "fieldSyncedEmpty": "Value applied to empty similar fields",
-  "valueEmptySync": "Please enter a value before applying to others"
+  "valueEmptySync": "Please enter a value before applying to others",
+  "saveAllChanges": "Save all items",
+  "savingAll": "Saving all changes..."
 }

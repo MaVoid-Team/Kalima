@@ -71,6 +71,17 @@ export default function CartItemRequiredFields({
         return () => window.removeEventListener('sync-cart-field-value', handleSync);
     }, [item.id, item.cart_item_required_fields]);
 
+    // Listen for bulk submit signal
+    useEffect(() => {
+        const handleSubmitAll = () => {
+            if (isDirty && missingFields.length === 0) {
+                handleCartRequiredFieldsSubmit({ preventDefault: () => { } });
+            }
+        };
+        window.addEventListener('submit-all-cart-item-fields', handleSubmitAll);
+        return () => window.removeEventListener('submit-all-cart-item-fields', handleSubmitAll);
+    }, [isDirty, missingFields]);
+
     const isFieldEmpty = (val) => {
         return !val || (typeof val === 'string' && val.trim() === '') || val === '+20';
     };
@@ -204,7 +215,7 @@ export default function CartItemRequiredFields({
     }, [isDirty, missingFields]);
 
     useEffect(() => {
-        if (!item || !isOpen) return;
+        if (!item) return;
         const vals = {};
         const origImgs = {};
         const imgFields = {};
@@ -228,7 +239,7 @@ export default function CartItemRequiredFields({
         setImageFields(prev => ({ ...imgFields, ...prev }));
     }, [item, isOpen, baseURL]);
 
-    const handleCartRequiredFieldsSubmit = async (e) => {
+    async function handleCartRequiredFieldsSubmit(e) {
         e.preventDefault();
         let hasError = false;
         const errors = {};
