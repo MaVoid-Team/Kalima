@@ -1,19 +1,200 @@
 import { PDFViewer } from '@embedpdf/react-pdf-viewer';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, Download, AlertCircle, FileText, Package, Calendar, DollarSign, ExternalLink, Eye } from 'lucide-react';
+import {
+    ArrowLeft,
+    Download,
+    AlertCircle,
+    FileText,
+    Package,
+    ExternalLink,
+    Eye,
+    Video,
+    Music,
+    Image as ImageIcon,
+    HardDrive,
+    Calendar,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import useApiMutation from '@/hooks/useApiMutation';
-import { getImageUrl, formatFileSize } from '@/lib/storeUtils';
+import { getImageUrl, formatFileSize, formatPrice } from '@/lib/storeUtils';
 import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
 import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+const MEDIA_TYPE_META = {
+    Document: {
+        icon: FileText,
+        colorClass: 'text-blue-500',
+        bgClass: 'bg-blue-500/10',
+        label: 'Document',
+    },
+    Video: {
+        icon: Video,
+        colorClass: 'text-purple-500',
+        bgClass: 'bg-purple-500/10',
+        label: 'Video',
+    },
+    Audio: {
+        icon: Music,
+        colorClass: 'text-orange-500',
+        bgClass: 'bg-orange-500/10',
+        label: 'Audio',
+    },
+    Image: {
+        icon: ImageIcon,
+        colorClass: 'text-green-500',
+        bgClass: 'bg-green-500/10',
+        label: 'Image',
+    },
+};
+
+function getMediaMeta(mediaType) {
+    return MEDIA_TYPE_META[mediaType] || MEDIA_TYPE_META.Document;
+}
+
+// ── Media Viewer ──────────────────────────────────────────────────────────────
+
+function MediaViewer({ sample, previewUrl, downloadUrl, viewerI18n, dir, t }) {
+    const mediaType = sample?.media_type;
+    const isPdf = sample?.mime_type === 'application/pdf';
+
+    if (mediaType === 'Video') {
+        return previewUrl ? (
+            <video
+                className="w-full h-full object-contain rounded-xl"
+                controls
+                controlsList="nodownload"
+                src={previewUrl}
+                data-testid="sample-page-video-player"
+            >
+                <track kind="captions" />
+                {t('samplePage.videoNotSupported', 'Your browser does not support the video tag.')}
+            </video>
+        ) : (
+            <MediaFallback downloadUrl={downloadUrl} t={t} />
+        );
+    }
+
+    if (mediaType === 'Audio') {
+        return (
+            <div className="flex flex-col items-center justify-center gap-8 p-8 w-full h-full">
+                <div className="h-24 w-24 rounded-full bg-orange-500/10 flex items-center justify-center">
+                    <Music className="h-12 w-12 text-orange-500" />
+                </div>
+                {previewUrl ? (
+                    <audio
+                        className="w-full max-w-md"
+                        controls
+                        controlsList="nodownload"
+                        src={previewUrl}
+                        data-testid="sample-page-audio-player"
+                    >
+                        <track kind="captions" />
+                    </audio>
+                ) : (
+                    <MediaFallback downloadUrl={downloadUrl} t={t} />
+                )}
+            </div>
+        );
+    }
+
+    if (mediaType === 'Image') {
+        return previewUrl ? (
+            <img
+                src={previewUrl}
+                alt={sample?.original_name || 'Sample'}
+                className="w-full h-full object-contain rounded-xl"
+                data-testid="sample-page-image-viewer"
+            />
+        ) : (
+            <MediaFallback downloadUrl={downloadUrl} t={t} />
+        );
+    }
+
+    // Document — PDF viewer or word download prompt
+    if (isPdf && previewUrl) {
+        return (
+            <PDFViewer
+                config={{
+                    src: previewUrl,
+                    theme: { preference: 'system' },
+                    i18n: viewerI18n,
+                    dir,
+                    disabledCategories: ['annotation', 'redaction', 'file', 'local', 'download'],
+                }}
+                style={{ width: '100%', height: '100%' }}
+            />
+        );
+    }
+
+    // Word / unknown document
+    return (
+        <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground p-8 w-full h-full">
+            <FileText className="h-20 w-20 opacity-40" />
+            <p className="text-sm text-center px-4 max-w-xs">{t('samplePage.previewUnavailable', 'Preview is not available for this file type.')}</p>
+            {downloadUrl && (
+                <Button variant="outline" asChild>
+                    <a href={downloadUrl} download>
+                        <Download className="me-2 h-4 w-4" />
+                        {t('samplePage.downloadFile', 'Download File')}
+                    </a>
+                </Button>
+            )}
+        </div>
+    );
+}
+
+function MediaFallback({ downloadUrl, t }) {
+    return (
+        <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground w-full h-full">
+            <AlertCircle className="h-12 w-12 opacity-40" />
+            <p className="text-sm">{t('samplePage.previewUnavailable', 'Preview unavailable.')}</p>
+            {downloadUrl && (
+                <Button variant="outline" asChild>
+                    <a href={downloadUrl} download>
+                        <Download className="me-2 h-4 w-4" />
+                        {t('samplePage.downloadFile', 'Download File')}
+                    </a>
+                </Button>
+            )}
+        </div>
+    );
+}
+
+// ── Detail Row ────────────────────────────────────────────────────────────────
+
+function DetailRow({ label, value, children }) {
+    return (
+        <div className="flex items-center justify-between py-3 border-b border-border/50 last:border-0">
+            <span className="text-sm text-muted-foreground">{label}</span>
+            {children ?? <span className="text-sm font-medium text-end ms-4">{value}</span>}
+        </div>
+    );
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
+
 /**
- * SamplePage — sample details with small preview box for a single sample.
- * Route: /samples/:id (public)
+ * SamplePage — full sample details page.
+ * Route: /samples/:id  (public)
+ *
+ * Handles media types: Document (PDF/Word), Video, Audio, Image
+ * Uses sample-sections endpoints for preview/download.
  */
 export default function SamplePage() {
     const { t, i18n } = useTranslation(['market', 'PDFViewer']);
@@ -23,9 +204,12 @@ export default function SamplePage() {
     const { mutate: fetchApi, loading } = useApiMutation();
     const [sample, setSample] = useState(null);
     const [error, setError] = useState(false);
+
     const viewerI18n = useMemo(() => getPdfViewerI18nConfig(i18n.language), [i18n.language]);
+    const isRtl = i18n.dir() === 'rtl';
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         if (!id) return;
         fetchApi({ endpoint: `/samples/${id}`, method: 'get' })
             .then(res => {
@@ -35,214 +219,306 @@ export default function SamplePage() {
             .catch(() => setError(true));
     }, [id, fetchApi]);
 
+    // ── Loading ───────────────────────────────────────────────────────────────
     if (loading && !sample) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-background" data-testid="sample-page-loading">
-                <LoadingSpinner className="h-8 w-8 text-primary" />
+            <div className="min-h-screen bg-background" data-testid="sample-page-loading">
+                <div className="container mx-auto px-4 md:px-8 py-8">
+                    <Skeleton className="h-5 w-64 mb-8" />
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                        <div className="lg:col-span-7">
+                            <Skeleton className="w-full aspect-4/3 rounded-2xl" />
+                        </div>
+                        <div className="lg:col-span-5 space-y-4">
+                            <Skeleton className="h-8 w-3/4" />
+                            <Skeleton className="h-5 w-1/3" />
+                            <Skeleton className="h-32 w-full rounded-xl" />
+                            <Skeleton className="h-10 w-full" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
 
+    // ── Error ─────────────────────────────────────────────────────────────────
     if (error || (!loading && !sample)) {
         return (
             <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background text-center px-4" data-testid="sample-page-error">
                 <AlertCircle className="h-12 w-12 text-destructive" />
-                <p className="text-lg font-semibold">{t('samplePage.notFound')}</p>
+                <p className="text-lg font-semibold">{t('samplePage.notFound', 'Sample not found')}</p>
                 <Button variant="ghost" asChild>
-                    <Link to="/market"><ArrowLeft className="me-2 h-4 w-4" />{t('samplePage.backToMarket')}</Link>
+                    <Link to="/market">
+                        <ArrowLeft className="me-2 h-4 w-4" />
+                        {t('samplePage.backToMarket', 'Back to Market')}
+                    </Link>
                 </Button>
             </div>
         );
     }
 
+    // ── Derived values ────────────────────────────────────────────────────────
     const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
-    const fileUrl = sample?.section_id ? `${apiUrl}/sample-sections/${sample.section_id}/samples/${sample.id}/preview` : '';
-    const downloadUrl = sample?.section_id ? `${apiUrl}/sample-sections/${sample.section_id}/samples/${sample.id}/download` : '';
-    const isPdf = sample?.mime_type === 'application/pdf';
+    const sectionId = sample?.section_id;
+    const previewUrl = sectionId ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/preview` : '';
+    const downloadUrl = sectionId ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download` : '';
+
+    const mediaType = sample?.media_type || 'Document';
+    const meta = getMediaMeta(mediaType);
+    const MetaIcon = meta.icon;
     const product = sample?.products;
 
-    return (
-        <div className="min-h-screen bg-background">
-            <div className="container mx-auto px-4 md:px-8 py-8">
-                {/* Breadcrumbs */}
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-                    <Button variant="ghost" size="sm" asChild data-testid="sample-page-back-button">
-                        <Link to={cameFromAdmin ? `/admin/samples` : (product?.id ? `/product/${product.id}` : '/market')}>
-                            <ArrowLeft className="h-4 w-4" />
-                        </Link>
-                    </Button>
-                    <span>/</span>
-                    <Link to="/market" className="hover:text-foreground">{t('breadcrumbs.digitalProducts', 'Digital Products')}</Link>
-                    {product && (
-                        <>
-                            <span>/</span>
-                            <Link to={`/product/${product.id}`} dir="auto" className="hover:text-foreground truncate max-w-[200px]">
-                                {product.title}
-                            </Link>
-                        </>
-                    )}
-                    <span>/</span>
-                    <span dir="auto" className="text-foreground truncate max-w-[200px]">{sample?.original_name}</span>
-                </div>
+    const hasHighQuality = Boolean(sample?.high_quality_url || previewUrl);
+    const hasLowQuality = Boolean(sample?.low_quality_url || downloadUrl);
 
-                {/* Main Content Grid */}
+    const formattedDate = sample?.created_at
+        ? new Date(sample.created_at).toLocaleDateString(i18n.language, { year: 'numeric', month: 'long', day: 'numeric' })
+        : null;
+
+    const backLink = cameFromAdmin
+        ? '/admin/samples'
+        : product?.id
+            ? `/product/${product.id}`
+            : '/samples';
+
+    return (
+        <div className="min-h-screen bg-background" data-testid="sample-details-page">
+            <div className="container mx-auto px-4 md:px-8 py-8">
+
+                {/* Breadcrumbs */}
+                <Breadcrumb className="mb-8">
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link to="/">{t('breadcrumbs.home', 'Home')}</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link to="/samples">{t('breadcrumbs.samples', 'Samples')}</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        {product && (
+                            <>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink asChild>
+                                        <Link to={`/product/${product.id}`} dir="auto" className="max-w-[160px] truncate">
+                                            {product.title}
+                                        </Link>
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                            </>
+                        )}
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage className="max-w-[200px] truncate" dir="auto">
+                                {sample?.original_name || `${t('samples.count', 'Sample')} #${sample?.id}`}
+                            </BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+
+                {/* Main Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                    {/* Left Column: Sample Preview (7 cols) */}
-                    <div className="lg:col-span-7">
-                        <div className="space-y-6">
-                            {/* Preview Box */}
-                            <div className="relative w-full aspect-4/3 rounded-2xl overflow-hidden bg-muted border flex items-center justify-center">
-                                {isPdf && fileUrl ? (
-                                    <div className="w-full h-full max-w-4xl">
-                                        <PDFViewer
-                                            config={{
-                                                src: fileUrl,
-                                                theme: { preference: 'system' },
-                                                i18n: viewerI18n,
-                                                dir: i18n.dir(),
-                                                disabledCategories: ['annotation', 'redaction', 'file', 'local', 'download'],
-                                            }}
-                                            style={{ width: '100%', height: '100%' }}
-                                        />
-                                    </div>
-                                ) : (
-                                    /* Word / other — prompt download */
-                                    <div className="flex h-full flex-col items-center justify-center gap-4 text-muted-foreground">
-                                        <FileText className="h-16 w-16" />
-                                        <p className="text-sm text-center px-4">{t('samplePage.previewUnavailable')}</p>
-                                        <Button variant="outline" asChild>
-                                            <a href={downloadUrl} download>
-                                                <Download className="me-2 h-4 w-4" />
-                                                {t('samplePage.downloadFile')}
-                                            </a>
-                                        </Button>
-                                    </div>
-                                )}
+
+                    {/* ── Left Column: Media Viewer ──────────────────────────── */}
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="lg:col-span-7"
+                    >
+                        <div className="space-y-4">
+                            {/* Viewer Box */}
+                            <div
+                                className="relative w-full aspect-4/3 rounded-2xl overflow-hidden bg-muted border flex items-center justify-center"
+                                data-testid="sample-page-viewer-box"
+                            >
+                                <MediaViewer
+                                    sample={sample}
+                                    previewUrl={previewUrl}
+                                    downloadUrl={downloadUrl}
+                                    viewerI18n={viewerI18n}
+                                    dir={i18n.dir()}
+                                    t={t}
+                                />
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex flex-col sm:flex-row gap-3">
-                                <Button variant="default" className="flex-1" asChild>
-                                    <Link to={`/samples/${id}/preview`} target="_blank" rel="noopener noreferrer">
-                                        <Eye className="me-2 h-4 w-4" />
-                                        {t('samplePage.fullPreview', 'Full Preview')}
-                                        <ExternalLink className="me-2 h-4 w-4" />
-                                    </Link>
-                                </Button>
+                            <div className="flex flex-col sm:flex-row gap-3" data-testid="sample-page-action-buttons">
+                                {hasHighQuality && (mediaType === 'Document' || mediaType === 'Image') && (
+                                    <Button variant="default" className="flex-1 gap-2" asChild data-testid="sample-page-full-preview-button">
+                                        <Link to={`/samples/${id}/preview`} target="_blank" rel="noopener noreferrer">
+                                            <Eye className="h-4 w-4" />
+                                            {t('samplePage.fullPreview', 'Full Preview')}
+                                            <ExternalLink className="h-4 w-4" />
+                                        </Link>
+                                    </Button>
+                                )}
 
-                                <Button variant="outline" className="flex-1" asChild>
-                                    <a href={downloadUrl} download>
-                                        <Download className="me-2 h-4 w-4" />
-                                        {t('samplePage.download')}
-                                    </a>
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right Column: Sample Details (5 cols) */}
-                    <div className="lg:col-span-5">
-                        <div className="lg:sticky lg:top-24 flex flex-col gap-6">
-                            {/* Sample Info */}
-                            <div className="space-y-6">
-                                {/* Sample Details */}
-                                <div className="space-y-4">
-                                    <h1 dir="auto" className="text-2xl font-bold mb-2">{sample?.original_name}</h1>
-                                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                        <Badge variant="outline">
-                                            {isPdf ? 'PDF' : 'Word'}
-                                        </Badge>
-                                        <span>{sample?.size ? formatFileSize(sample.size) : 'N/A'}</span>
-                                    </div>
-                                </div>
-
-                                {/* Sample Details */}
-                                <div className="space-y-4">
-                                    <h2 className="text-lg font-semibold flex items-center gap-2">
-                                        <FileText className="h-5 w-5" />
-                                        {t('samplePage.sampleInfo', 'Sample Information')}
-                                    </h2>
-
-                                    <div className="space-y-3">
-                                        <div className="flex items-center justify-between py-2 border-b border-border/50">
-                                            <span className="text-sm text-muted-foreground">{t('samplePage.fileName', 'File Name')}</span>
-                                            <span dir="auto" className={`text-sm font-medium truncate ${isRtl ? 'mr-2' : 'ml-2'} max-w-[60%]`}>{sample?.original_name}</span>
-                                        </div>
-
-                                        <div className="flex items-center justify-between py-2 border-b border-border/50">
-                                            <span className="text-sm text-muted-foreground">{t('samplePage.fileSize', 'File Size')}</span>
-                                            <span className="text-sm font-medium">{sample?.size ? formatFileSize(sample.size) : 'N/A'}</span>
-                                        </div>
-
-                                        <div className="flex items-center justify-between py-2 border-b border-border/50">
-                                            <span className="text-sm text-muted-foreground">{t('samplePage.fileType', 'File Type')}</span>
-                                            <Badge variant="outline">
-                                                {isPdf ? 'PDF' : 'Word'}
-                                            </Badge>
-                                        </div>
-
-                                        <div className="flex items-center justify-between py-2 border-b border-border/50">
-                                            <span className="text-sm text-muted-foreground">{t('samplePage.uploadDate', 'Upload Date')}</span>
-                                            <span className="text-sm font-medium">
-                                                {sample?.created_at ? new Date(sample.created_at).toLocaleDateString() : 'N/A'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Product Info */}
-                                {product && (
-                                    <div className="space-y-4">
-                                        <h2 className="text-lg font-semibold flex items-center gap-2">
-                                            <Package className="h-5 w-5" />
-                                            {t('samplePage.productInfo', 'Product Information')}
-                                        </h2>
-
-                                        <div className="space-y-3">
-                                            <div className="flex items-center justify-between py-2 border-b border-border/50">
-                                                <span className="text-sm text-muted-foreground">{t('samplePage.productName', 'Product Name')}</span>
-                                                <span dir="auto" className={`text-sm font-medium truncate ${isRtl ? 'mr-2' : 'ml-2'} max-w-[60%]`}>{product.title}</span>
-                                            </div>
-
-                                            <div className="flex items-center justify-between py-2 border-b border-border/50">
-                                                <span className="text-sm text-muted-foreground">{t('samplePage.productType', 'Product Type')}</span>
-                                                <Badge variant="secondary">{product.type}</Badge>
-                                            </div>
-
-                                            <div className="flex items-center justify-between py-2 border-b border-border/50">
-                                                <span className="text-sm text-muted-foreground">{t('samplePage.price', 'Price')}</span>
-                                                <div className="flex items-center gap-2">
-                                                    {product.price_after_discount && product.price_after_discount !== product.price ? (
-                                                        <>
-                                                            <span className="text-sm font-medium">{product.price_after_discount} ج.م</span>
-                                                            <span className="text-xs text-muted-foreground line-through">{product.price} ج.م</span>
-                                                        </>
-                                                    ) : (
-                                                        <span className="text-sm font-medium">{product.price} ج.م</span>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {product.serial && (
-                                                <div className="flex items-center justify-between py-2 border-b border-border/50">
-                                                    <span className="text-sm text-muted-foreground">{t('samplePage.serial', 'Serial')}</span>
-                                                    <span className="text-sm font-medium">{product.serial}</span>
-                                                </div>
+                                {hasLowQuality && (
+                                    <Button variant="outline" className="flex-1 gap-2" asChild data-testid="sample-page-download-lq-button">
+                                        <a href={downloadUrl} download>
+                                            <Download className="h-4 w-4" />
+                                            {t('samplePage.download', 'Download')}
+                                            {sample?.low_quality_size > 0 && (
+                                                <span className="text-xs text-muted-foreground">
+                                                    ({formatFileSize(sample.low_quality_size)})
+                                                </span>
                                             )}
-
-                                            <div className="pt-4">
-                                                <Button variant="default" className="w-full" asChild>
-                                                    <Link to={`/product/${product.id}`}>
-                                                        {t('samplePage.viewProduct', 'View Product')}
-                                                    </Link>
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        </a>
+                                    </Button>
                                 )}
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
+
+                    {/* ── Right Column: Details Panel ───────────────────────── */}
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="lg:col-span-5"
+                    >
+                        <div className="lg:sticky lg:top-24 flex flex-col gap-6">
+
+                            {/* Header */}
+                            <div className="space-y-3">
+                                {/* Media type badge */}
+                                <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${meta.bgClass} ${meta.colorClass}`}>
+                                    <MetaIcon className="h-4 w-4" />
+                                    {t(`samples.mediaTypes.${mediaType}`, meta.label)}
+                                </div>
+
+                                <h1 dir="auto" className="text-2xl font-bold leading-tight" data-testid="sample-page-title">
+                                    {sample?.original_name || `${t('samples.count', 'Sample')} #${sample?.id}`}
+                                </h1>
+
+                                {/* Quality badges */}
+                                <div className="flex flex-wrap gap-2">
+                                    {hasHighQuality && (
+                                        <Badge variant="secondary" className="gap-1 text-xs" data-testid="sample-page-hq-badge">
+                                            <Eye className="h-3 w-3" />
+                                            {t('samples.hq', 'High Quality')}
+                                            {sample?.high_quality_size > 0 && ` · ${formatFileSize(sample.high_quality_size)}`}
+                                        </Badge>
+                                    )}
+                                    {hasLowQuality && (
+                                        <Badge variant="outline" className="gap-1 text-xs" data-testid="sample-page-lq-badge">
+                                            <Download className="h-3 w-3" />
+                                            {t('samples.lq', 'Low Quality')}
+                                            {sample?.low_quality_size > 0 && ` · ${formatFileSize(sample.low_quality_size)}`}
+                                        </Badge>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Sample Details */}
+                            <div className="rounded-xl border border-border bg-card p-5 space-y-1" data-testid="sample-page-details-card">
+                                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                                    <FileText className="h-4 w-4" />
+                                    {t('samplePage.sampleInfo', 'Sample Information')}
+                                </h2>
+
+                                <DetailRow label={t('samplePage.fileType', 'File Type')}>
+                                    <Badge variant="outline">{sample?.mime_type || mediaType}</Badge>
+                                </DetailRow>
+
+                                {sample?.high_quality_size > 0 && (
+                                    <DetailRow
+                                        label={t('samples.hq', 'High Quality')}
+                                        value={formatFileSize(sample.high_quality_size)}
+                                    />
+                                )}
+
+                                {sample?.low_quality_size > 0 && (
+                                    <DetailRow
+                                        label={t('samples.lq', 'Low Quality')}
+                                        value={formatFileSize(sample.low_quality_size)}
+                                    />
+                                )}
+
+                                {formattedDate && (
+                                    <DetailRow label={t('samplePage.uploadDate', 'Uploaded')}>
+                                        <span className="flex items-center gap-1.5 text-sm font-medium">
+                                            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                                            {formattedDate}
+                                        </span>
+                                    </DetailRow>
+                                )}
+                            </div>
+
+                            {/* Product Info */}
+                            {product && (
+                                <div className="rounded-xl border border-border bg-card p-5 space-y-1" data-testid="sample-page-product-card">
+                                    <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                                        <Package className="h-4 w-4" />
+                                        {t('samplePage.productInfo', 'Product Information')}
+                                    </h2>
+
+                                    {/* Thumbnail */}
+                                    {product.thumbnail_image?.url && (
+                                        <div className="mb-4 rounded-lg overflow-hidden bg-muted aspect-video">
+                                            <img
+                                                src={getImageUrl(product.thumbnail_image.url)}
+                                                alt={product.title}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <DetailRow label={t('samplePage.productName', 'Name')}>
+                                        <span dir="auto" className={`text-sm font-medium truncate ${isRtl ? 'mr-2' : 'ml-2'} max-w-[55%]`}>
+                                            {product.title}
+                                        </span>
+                                    </DetailRow>
+
+                                    <DetailRow label={t('samplePage.productType', 'Type')}>
+                                        <Badge variant="secondary">{product.type}</Badge>
+                                    </DetailRow>
+
+                                    <DetailRow label={t('samplePage.price', 'Price')}>
+                                        <div className="flex items-center gap-2">
+                                            {product.price_after_discount && product.price_after_discount !== product.price ? (
+                                                <>
+                                                    <span className="text-sm font-semibold text-primary">
+                                                        {formatPrice(product.price_after_discount)} {t('info.currency', 'EGP')}
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground line-through">
+                                                        {formatPrice(product.price)} {t('info.currency', 'EGP')}
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <span className="text-sm font-semibold">
+                                                    {formatPrice(product.price)} {t('info.currency', 'EGP')}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </DetailRow>
+
+                                    {product.serial && (
+                                        <DetailRow label={t('samplePage.serial', 'Serial')} value={product.serial} />
+                                    )}
+
+                                    <div className="pt-4">
+                                        <Button
+                                            variant="default"
+                                            className="w-full"
+                                            asChild
+                                            data-testid="sample-page-view-product-button"
+                                        >
+                                            <Link to={`/product/${product.id}`}>
+                                                {t('samplePage.viewProduct', 'View Product')}
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
                 </div>
             </div>
         </div>

@@ -8,6 +8,24 @@ export function useRole() {
         }
     };
 
+    /**
+     * Reads the `confirmed` field from the stored user object.
+     * Admins and SubAdmins are always treated as confirmed so they're never blocked.
+     */
+    const getConfirmed = (roles) => {
+        try {
+            const stored = localStorage.getItem('user');
+            if (!stored) return true; // unauthenticated — no restriction
+            const user = JSON.parse(stored);
+            // Admins / SubAdmins bypass confirmation requirements
+            if (roles?.includes('Admin') || roles?.includes('SubAdmin')) return true;
+            // confirmed defaults to true if the field is absent (older sessions)
+            return user.confirmed !== false;
+        } catch {
+            return true;
+        }
+    };
+
     const portalAccess = getPortalAccess();
 
     const storeAccess = portalAccess?.store || { hasAccess: false, roles: [] };
@@ -24,6 +42,13 @@ export function useRole() {
     const hasAdminAccess = isAdmin || isSubAdmin;
     const hasStoreAccess = storeRoles.includes("User") || storeRoles.length > 0;
 
+    /**
+     * Whether the current user's account has been approved by an admin.
+     * Admins / SubAdmins are always considered confirmed.
+     * Defaults to `true` for unauthenticated visitors (no restriction).
+     */
+    const isConfirmed = getConfirmed(storeRoles);
+
     return {
         isAdmin,
         isSubAdmin,
@@ -32,6 +57,7 @@ export function useRole() {
         isParent,
         hasAdminAccess,
         hasStoreAccess,
+        isConfirmed,
         portalAccess,
         storeRoles,
         academyRoles,
