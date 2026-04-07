@@ -244,15 +244,16 @@ export default function ProductDetailPage() {
     };
 
     const handleSampleUpload = async (formData) => {
-        const file = formData.get('sample');
-        if (!file) return;
-
+        const hqFile = formData.get('high_quality');
+        const lqFile = formData.get('low_quality');
+        // We allow updates even without new files (for section/media type updates)
+        
         // Create new AbortController for this upload
         const abortController = new AbortController();
         setUploadAbortController(abortController);
 
         setIsUploading(true);
-        setUploadFileName(file.name);
+        setUploadFileName(hqFile ? hqFile.name : (lqFile ? lqFile.name : 'Metadata update'));
         setUploadError('');
         setUploadProgress(0);
 
@@ -263,15 +264,20 @@ export default function ProductDetailPage() {
                     setUploadProgress(percentCompleted);
                 }
             }, abortController.signal);
+            
             if (res?.success) {
-                // Product refresh is handled in hook
+                // Product refresh is handled in hook/refresh
+                refresh();
+                return true;
             } else {
                 setUploadError(res?.message || 'Upload failed');
+                return false;
             }
         } catch (error) {
             if (error.name !== 'AbortError') {
                 setUploadError(error.message || 'Upload failed');
             }
+            return false;
         } finally {
             setIsUploading(false);
             setUploadProgress(0);
@@ -476,8 +482,9 @@ export default function ProductDetailPage() {
                 <SampleManager
                     product={product}
                     onUpdateSample={handleSampleUpload}
-                    onRemoveSample={removeProductSample}
+                    onRemoveSample={() => removeProductSample(id)}
                     loading={isUploading}
+                    onRefresh={refresh}
                 />
             </div>
 

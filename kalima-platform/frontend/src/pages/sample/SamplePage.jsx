@@ -202,7 +202,7 @@ export default function SamplePage() {
     const cameFromAdmin = Boolean(location.state?.cameFromAdmin);
     const { id } = useParams();
     const { mutate: fetchApi, loading } = useApiMutation();
-    const [sample, setSample] = useState(null);
+    const [sample, setSample] = useState(location.state?.sample || null);
     const [error, setError] = useState(false);
 
     const viewerI18n = useMemo(() => getPdfViewerI18nConfig(i18n.language), [i18n.language]);
@@ -211,13 +211,17 @@ export default function SamplePage() {
     useEffect(() => {
         window.scrollTo(0, 0);
         if (!id) return;
-        fetchApi({ endpoint: `/samples/${id}`, method: 'get' })
+
+        // If we already have the sample from location state, skip fetch
+        if (sample) return;
+
+        fetchApi({ endpoint: `/sample-sections/1/samples/${id}/preview`, method: 'get' })
             .then(res => {
                 if (res?.success) setSample(res.data);
                 else setError(true);
             })
             .catch(() => setError(true));
-    }, [id, fetchApi]);
+    }, [id, fetchApi, sample]);
 
     // ── Loading ───────────────────────────────────────────────────────────────
     if (loading && !sample) {
@@ -351,7 +355,17 @@ export default function SamplePage() {
                             <div className="flex flex-col sm:flex-row gap-3" data-testid="sample-page-action-buttons">
                                 {hasHighQuality && (mediaType === 'Document' || mediaType === 'Image') && (
                                     <Button variant="default" className="flex-1 gap-2" asChild data-testid="sample-page-full-preview-button">
-                                        <Link to={`/samples/${id}/preview`} target="_blank" rel="noopener noreferrer">
+                                        <Link to={`/samples/${id}/preview?${new URLSearchParams({
+                                            section_id: sample.section_id || '',
+                                            media_type: sample.media_type || '',
+                                            mime_type: sample.mime_type || '',
+                                            original_name: sample.original_name || '',
+                                            high_quality_url: sample.high_quality_url || '',
+                                            low_quality_url: sample.low_quality_url || '',
+                                            created_at: sample.created_at || '',
+                                            product_id: sample.product_id || '',
+                                            product_title: sample.products?.title || ''
+                                        }).toString()}`} target="_blank" rel="noopener noreferrer">
                                             <Eye className="h-4 w-4" />
                                             {t('samplePage.fullPreview', 'Full Preview')}
                                             <ExternalLink className="h-4 w-4" />

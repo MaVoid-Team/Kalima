@@ -256,16 +256,36 @@ export async function getFileSizeFromUrl(url) {
   if (!url) return null;
   try {
     const baseURL = import.meta.env.VITE_API_URL || "/api/v2";
-    const rootURL = baseURL.replace(/\/api\/v\d+$/, "");
-    const fullUrl = url.startsWith('http') 
-      ? url 
-      : `${rootURL}${url.startsWith('/') ? '' : '/'}${url}`;
+    // Strips /api/v2 or /api/v1 (with or without trailing slash) to get the site root
+    const rootURL = baseURL.replace(/\/api\/v\d+\/?$/, "");
+    
+    let fullUrl = url;
+    if (!url.startsWith('http')) {
+      fullUrl = `${rootURL}${url.startsWith('/') ? '' : '/'}${url}`;
+    }
 
-    const response = await fetch(fullUrl, { method: 'HEAD' });
+    // Use a small timeout or abort controller to prevent long-hanging fetches
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+    const response = await fetch(fullUrl, { 
+      method: 'HEAD',
+      signal: controller.signal,
+      cache: 'no-cache'
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) return null;
+
     const cl = response.headers.get('content-length');
     return cl ? Number(cl) : null;
   } catch (e) {
-    console.error('Failed to get remote file size', e);
+    // Silent failure for network/CORS errors as they are expected for some external URLs
+    // Only log in development if it's not an AbortError or TypeError (CORS)
+    if (import.meta.env.DEV && e.name !== 'AbortError' && e.name !== 'TypeError') {
+      console.warn('Silent failure getting remote file size for:', url, e.message);
+    }
     return null;
   }
 }
