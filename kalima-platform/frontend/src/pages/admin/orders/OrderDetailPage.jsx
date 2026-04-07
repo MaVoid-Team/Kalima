@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle } from 'lucide-react';
+import { ChevronLeft, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle } from 'lucide-react';
 import useOrders from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -107,7 +107,7 @@ export default function OrderDetailPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" size="icon" onClick={() => navigate('/admin/orders')} className="shrink-0" data-testid="order-detail-back-button">
-                        <ChevronLeft className="rtl:rotate-180" />
+                        <ChevronLeft />
                     </Button>
                     <div>
                         <div className="flex items-center gap-3">
@@ -254,6 +254,31 @@ export default function OrderDetailPage() {
                         initialNote={order.admin_notes}
                         onSaveNote={addAdminNote}
                     />
+
+                    {/* Customer Info */}
+                    <div className="border rounded-md p-4 space-y-3" data-testid="order-detail-customer-info-section">
+                        <h3 className="font-medium text-primary">{t('orders.details.customerInfo')}</h3>
+                        <div className="space-y-1 text-sm overflow-hidden">
+                            <div className="font-medium truncate" title={order.users?.name || 'N/A'}>{order.users?.name || 'N/A'}</div>
+                            <div className="text-muted-foreground truncate" title={order.users?.email}>{order.users?.email}</div>
+                            {order.users?.phone && (
+                                <div className="flex items-center gap-3 mt-2">
+                                    <div className="text-muted-foreground truncate" title={order.users.phone}>{order.users.phone}</div>
+                                    <a
+                                        href={whatsappHref}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground h-7 px-2 py-1 text-success border-success/30 hover:border-success/50"
+                                        title={t('orders.details.contactWhatsApp', 'Contact on WhatsApp')}
+                                        data-testid="order-detail-whatsapp-link"
+                                    >
+                                        <MessageCircle className="h-3 w-3 me-1.5" />
+                                        WhatsApp
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 <div className="space-y-6">
@@ -280,36 +305,13 @@ export default function OrderDetailPage() {
                         </div>
                     </div>
 
-                    {/* Customer Info */}
-                    <div className="border rounded-md p-4 space-y-3">
-                        <h3 className="font-medium">{t('orders.details.customerInfo')}</h3>
-                        <div className="space-y-1 text-sm overflow-hidden">
-                            <div className="font-medium truncate" title={order.users?.name || 'N/A'}>{order.users?.name || 'N/A'}</div>
-                            <div className="text-muted-foreground truncate" title={order.users?.email}>{order.users?.email}</div>
-                            {order.users?.phone && (
-                                <div className="flex items-center gap-3 mt-2">
-                                    <div className="text-muted-foreground truncate" title={order.users.phone}>{order.users.phone}</div>
-                                    <a
-                                        href={whatsappHref}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground h-7 px-2 py-1 text-success border-success/30 hover:border-success/50"
-                                        title={t('orders.details.contactWhatsApp', 'Contact on WhatsApp')}
-                                        data-testid="order-detail-whatsapp-link"
-                                    >
-                                        <MessageCircle className="h-3 w-3 me-1.5" />
-                                        WhatsApp
-                                    </a>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+
 
                     {/* Customer Notes */}
                     {order.notes && (
-                        <div className="border rounded-md p-4 space-y-3">
-                            <h3 className="font-medium">{t('orders.details.customerNotes', 'Customer Notes')}</h3>
-                            <div className="text-sm whitespace-pre-wrap text-muted-foreground">
+                        <div className="bg-destructive/5 border-destructive/20 border rounded-md p-4 space-y-3">
+                            <h3 className="font-medium text-destructive">{t('orders.details.customerNotes', 'Customer Notes')}</h3>
+                            <div className="text-sm whitespace-pre-wrap text-destructive/80">
                                 {order.notes}
                             </div>
                         </div>
