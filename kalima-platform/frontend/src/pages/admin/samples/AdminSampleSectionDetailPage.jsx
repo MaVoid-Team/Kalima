@@ -77,7 +77,7 @@ export default function AdminSampleSectionDetailPage() {
                     <div className="flex items-center gap-2">
                         <Button variant="ghost" size="icon" asChild className="-ms-2">
                             <Link to="/admin/samples">
-                                <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
+                                <ChevronLeft className="h-5 w-5" />
                             </Link>
                         </Button>
                         <h1 className="text-2xl font-bold tracking-tight" dir="auto">{section.title}</h1>
@@ -112,95 +112,95 @@ export default function AdminSampleSectionDetailPage() {
                                 const downloadUrl = `${apiUrl}/sample-sections/${id}/samples/${sample.id}/download`;
 
                                 return (
-                                <tr key={sample.id} className="hover:bg-muted/30 transition-colors">
-                                    <td className="ps-4 py-3">
-                                        <div className="flex items-center gap-3">
-                                            {getIconForType(sample.media_type)}
-                                            <div className="flex flex-col">
-                                                <span className="font-medium">{t('samples.count')} #{sample.id}</span>
-                                                <div className="text-xs text-muted-foreground flex gap-2">
-                                                    {sample.high_quality_url && <span>{t('samples.hq')}: {formatFileSize(sample.high_quality_size || 0)}</span>}
-                                                    {sample.low_quality_url && <span>{t('samples.lq')}: {formatFileSize(sample.low_quality_size || 0)}</span>}
+                                    <tr key={sample.id} className="hover:bg-muted/30 transition-colors">
+                                        <td className="ps-4 py-3">
+                                            <div className="flex items-center gap-3">
+                                                {getIconForType(sample.media_type)}
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium">{t('samples.count')} #{sample.id}</span>
+                                                    <div className="text-xs text-muted-foreground flex gap-2">
+                                                        {sample.high_quality_url && <span>{t('samples.hq')}: {formatFileSize(sample.high_quality_size || 0)}</span>}
+                                                        {sample.low_quality_url && <span>{t('samples.lq')}: {formatFileSize(sample.low_quality_size || 0)}</span>}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td className="py-3">
-                                        <Link to={`/admin/products/${sample.product_id}`} className="text-primary hover:underline">
-                                            {t('samples.table.product', 'Product')} #{sample.product_id}
-                                        </Link>
-                                    </td>
-                                    <td className="py-3 hidden sm:table-cell">
-                                        <Badge variant="outline">
-                                            {t(`samples.mediaTypes.${sample.media_type}`, sample.media_type)}
-                                        </Badge>
-                                    </td>
-                                    <td className="pe-4 py-3 text-end">
-                                        <div className="flex items-center justify-end gap-2">
-                                            {/* View sample details page */}
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                asChild
-                                                title={t('samples.view', 'View Sample')}
-                                                data-testid={`admin-sample-view-${sample.id}`}
-                                            >
-                                                <Link
-                                                    to={`/samples/${sample.id}`}
-                                                    state={{ cameFromAdmin: true }}
-                                                >
-                                                    <Eye className="h-4 w-4" />
-                                                </Link>
-                                            </Button>
-
-                                            {/* Full-screen preview (opens in-app preview page) */}
-                                            {sample.high_quality_url && (
+                                        </td>
+                                        <td className="py-3">
+                                            <Link to={`/admin/products/${sample.product_id}`} className="text-primary hover:underline">
+                                                {t('samples.table.product', 'Product')} #{sample.product_id}
+                                            </Link>
+                                        </td>
+                                        <td className="py-3 hidden sm:table-cell">
+                                            <Badge variant="outline">
+                                                {t(`samples.mediaTypes.${sample.media_type}`, sample.media_type)}
+                                            </Badge>
+                                        </td>
+                                        <td className="pe-4 py-3 text-end">
+                                            <div className="flex items-center justify-end gap-2">
+                                                {/* View sample details page */}
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
                                                     asChild
-                                                    title={t('samples.view', 'Full Preview')}
-                                                    data-testid={`admin-sample-preview-${sample.id}`}
+                                                    title={t('samples.view', 'View Sample')}
+                                                    data-testid={`admin-sample-view-${sample.id}`}
                                                 >
                                                     <Link
-                                                        to={`/samples/${sample.id}/preview`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
+                                                        to={`/samples/${sample.id}`}
+                                                        state={{ cameFromAdmin: true }}
                                                     >
-                                                        <ExternalLink className="h-4 w-4" />
+                                                        <Eye className="h-4 w-4" />
                                                     </Link>
                                                 </Button>
-                                            )}
 
-                                            {/* Download LQ — still a direct anchor */}
-                                            {sample.low_quality_url && (
+                                                {/* Full-screen preview (opens in-app preview page) */}
+                                                {sample.high_quality_url && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        asChild
+                                                        title={t('samples.view', 'Full Preview')}
+                                                        data-testid={`admin-sample-preview-${sample.id}`}
+                                                    >
+                                                        <Link
+                                                            to={`/samples/${sample.id}/preview`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                        >
+                                                            <ExternalLink className="h-4 w-4" />
+                                                        </Link>
+                                                    </Button>
+                                                )}
+
+                                                {/* Download LQ — still a direct anchor */}
+                                                {sample.low_quality_url && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        asChild
+                                                        title={t('samples.download', 'Download LQ')}
+                                                        data-testid={`admin-sample-download-${sample.id}`}
+                                                    >
+                                                        <a href={downloadUrl} download>
+                                                            <Download className="h-4 w-4" />
+                                                        </a>
+                                                    </Button>
+                                                )}
+
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    asChild
-                                                    title={t('samples.download', 'Download LQ')}
-                                                    data-testid={`admin-sample-download-${sample.id}`}
+                                                    onClick={() => handleRemoveSample(sample.id)}
+                                                    className="text-destructive hover:bg-destructive/10"
+                                                    title={t('common.delete', 'Remove Sample')}
+                                                    disabled={loading}
+                                                    data-testid={`admin-sample-delete-${sample.id}`}
                                                 >
-                                                    <a href={downloadUrl} download>
-                                                        <Download className="h-4 w-4" />
-                                                    </a>
+                                                    <Trash2 className="h-4 w-4" />
                                                 </Button>
-                                            )}
-
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleRemoveSample(sample.id)}
-                                                className="text-destructive hover:bg-destructive/10"
-                                                title={t('common.delete', 'Remove Sample')}
-                                                disabled={loading}
-                                                data-testid={`admin-sample-delete-${sample.id}`}
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 );
                             })}
                         </tbody>
