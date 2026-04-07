@@ -234,11 +234,40 @@ export function getStatusColor(status) {
  * @param {number} bytes
  * @returns {string}
  */
+/**
+ * Formats a byte count into a human-readable size string.
+ * @param {number|string} bytes - size in bytes
+ * @returns {string} - formatted size string
+ */
 export function formatFileSize(bytes) {
-  if (!bytes || bytes === 0) return '0 B';
+  const num = Number(bytes);
+  if (!num || num === 0) return '0 B';
   const units = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
+  const i = Math.floor(Math.log(num) / Math.log(1024));
+  return `${(num / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
+}
+
+/**
+ * Attempts to fetch a remote file's size via a HEAD request.
+ * @param {string} url - relative or absolute file URL
+ * @returns {Promise<number|null>} - size in bytes or null if failed
+ */
+export async function getFileSizeFromUrl(url) {
+  if (!url) return null;
+  try {
+    const baseURL = import.meta.env.VITE_API_URL || "/api/v2";
+    const rootURL = baseURL.replace(/\/api\/v\d+$/, "");
+    const fullUrl = url.startsWith('http') 
+      ? url 
+      : `${rootURL}${url.startsWith('/') ? '' : '/'}${url}`;
+
+    const response = await fetch(fullUrl, { method: 'HEAD' });
+    const cl = response.headers.get('content-length');
+    return cl ? Number(cl) : null;
+  } catch (e) {
+    console.error('Failed to get remote file size', e);
+    return null;
+  }
 }
 
 /**
