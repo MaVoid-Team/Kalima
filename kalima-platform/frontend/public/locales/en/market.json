@@ -116,6 +116,11 @@
   "common": {
     "back": "Back"
   },
+  "breadcrumbs": {
+    "home": "Home",
+    "digitalProducts": "Digital Products",
+    "samples": "Samples"
+  },
   "errors": {
     "loadingError": "Error loading data",
     "fetchErrorLog": "Error fetching data:",
@@ -153,6 +158,7 @@
   "samplePage": {
     "notFound": "Sample not found",
     "backToMarket": "Back to Market",
+    "backToSample": "Sample Details",
     "download": "Download",
     "downloadFile": "Download File",
     "previewUnavailable": "Preview unavailable for this file type",
