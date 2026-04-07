@@ -234,10 +234,19 @@ export default function CartItemRequiredFields({
                 vals[rf.field_definition_id] = rf.value || '';
             }
         });
-        setFieldValues(prev => ({ ...vals, ...prev }));
+        setFieldValues(prev => {
+            const next = { ...prev };
+            Object.keys(vals).forEach(id => {
+                const isDefault = !next[id] || next[id] === '' || next[id] === '+20';
+                if (isDefault || !Object.prototype.hasOwnProperty.call(next, id)) {
+                    next[id] = vals[id];
+                }
+            });
+            return next;
+        });
         setOriginalImages(prev => ({ ...origImgs, ...prev }));
         setImageFields(prev => ({ ...imgFields, ...prev }));
-    }, [item, isOpen, baseURL]);
+    }, [item, baseURL]);
 
     async function handleCartRequiredFieldsSubmit(e) {
         e.preventDefault();
@@ -248,7 +257,8 @@ export default function CartItemRequiredFields({
             if (
                 rf.required_field_definitions.field_type === 'image' &&
                 rf.is_required &&
-                !(imageFields[rf.field_definition_id] instanceof File)
+                !(imageFields[rf.field_definition_id] instanceof File) &&
+                !originalImages[rf.field_definition_id]
             ) {
                 hasError = true;
                 errors[rf.field_definition_id] = t('pleaseSelectFile', 'Please select a file');
@@ -312,7 +322,8 @@ export default function CartItemRequiredFields({
 
         const data = Object.entries(fieldValues)
             .filter(([id]) => {
-                return !(imageFields[id] instanceof File) && !activeImageFieldDefIds.includes(Number(id));
+                const rf = item.cart_item_required_fields.find(f => f.field_definition_id === Number(id));
+                return rf?.required_field_definitions.field_type !== 'image';
             })
             .map(([id, value]) => {
                 let finalValue = value;
@@ -589,14 +600,16 @@ export default function CartItemRequiredFields({
                                     )}
                                 </div>
                             ))}
-                            <Button
-                                size="sm"
-                                type="submit"
-                                className={`w-fit self-end m-1 transition-all duration-300 ${highlightSave ? 'scale-105 ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/90' : ''}`}
-                                data-testid={`cart-item-fields-save-${item.id}`}
-                            >
-                                {t('save', 'Save')}
-                            </Button>
+                            {(isDirty || missingFields.length > 0) && (
+                                <Button
+                                    size="sm"
+                                    type="submit"
+                                    className={`w-fit self-end m-1 transition-all duration-300 ${highlightSave ? 'scale-105 ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/90' : ''}`}
+                                    data-testid={`cart-item-fields-save-${item.id}`}
+                                >
+                                    {t('save', 'Save')}
+                                </Button>
+                            )}
                         </form>
                     </AccordionContent>
                 </AccordionItem>
