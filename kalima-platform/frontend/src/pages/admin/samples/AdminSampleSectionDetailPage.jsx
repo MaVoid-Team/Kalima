@@ -8,7 +8,25 @@ import { Badge } from '@/components/ui/badge';
 import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
 import { toast } from 'sonner';
-import { formatFileSize } from '@/lib/storeUtils';
+import { formatFileSize, getFileSizeFromUrl } from '@/lib/storeUtils';
+
+function RemoteFileSize({ url, fallbackSize }) {
+    const [size, setSize] = useState(null);
+
+    useEffect(() => {
+        if (fallbackSize) return;
+        if (!url) return;
+        
+        let isMounted = true;
+        getFileSizeFromUrl(url).then(bytes => {
+            if (isMounted) setSize(bytes);
+        });
+        return () => { isMounted = false; };
+    }, [url, fallbackSize]);
+
+    const displaySize = fallbackSize || size;
+    return displaySize ? formatFileSize(displaySize) : '...';
+}
 
 export default function AdminSampleSectionDetailPage() {
     const { id } = useParams();
@@ -119,8 +137,16 @@ export default function AdminSampleSectionDetailPage() {
                                                 <div className="flex flex-col">
                                                     <span className="font-medium">{t('samples.count')} #{sample.id}</span>
                                                     <div className="text-xs text-muted-foreground flex gap-2">
-                                                        {sample.high_quality_url && <span>{t('samples.hq')}: {formatFileSize(sample.high_quality_size || 0)}</span>}
-                                                        {sample.low_quality_url && <span>{t('samples.lq')}: {formatFileSize(sample.low_quality_size || 0)}</span>}
+                                                        {sample.high_quality_url && (
+                                                            <span>
+                                                                {t('samples.hq')}: <RemoteFileSize url={sample.high_quality_url} fallbackSize={sample.high_quality_size} />
+                                                            </span>
+                                                        )}
+                                                        {sample.low_quality_url && (
+                                                            <span>
+                                                                {t('samples.lq')}: <RemoteFileSize url={sample.low_quality_url} fallbackSize={sample.low_quality_size} />
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
