@@ -19,7 +19,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { formatCurrency, formatOrderDate, getImageUrl, getStatusColor } from '@/lib/storeUtils';
+import { formatCurrency, formatOrderDate, getImageUrl, getStatusColor, formatPhone } from '@/lib/storeUtils';
 
 export default function OrderDetailPage() {
     const { id } = useParams();
@@ -234,7 +234,7 @@ export default function OrderDetailPage() {
                                                                         />
                                                                     </a>
                                                                 ) : (
-                                                                    <span className="font-mono">{field.value || '-'}</span>
+                                                                    <span className="font-mono">{formatPhone(field.value || '-')}</span>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -263,7 +263,7 @@ export default function OrderDetailPage() {
                             <div className="text-muted-foreground truncate" title={order.users?.email}>{order.users?.email}</div>
                             {order.users?.phone && (
                                 <div className="flex items-center gap-3 mt-2">
-                                    <div className="text-muted-foreground truncate" title={order.users.phone}>{order.users.phone}</div>
+                                    <div className="text-muted-foreground truncate" title={formatPhone(order.users.phone)}>{formatPhone(order.users.phone)}</div>
                                     <a
                                         href={whatsappHref}
                                         target="_blank"

@@ -240,3 +240,19 @@ export function formatFileSize(bytes) {
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
   return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
 }
+
+/**
+ * Removes the Egyptian international prefix (+2 or +20) for display.
+ * @param {string} phone
+ * @returns {string}
+ */
+export function formatPhone(phone) {
+  if (!phone) return "";
+  const cleaned = String(phone).trim();
+  // If it starts with +2 (optionally space) 0... or just +2 (optionally space)...
+  // We want to turn +20 or +2 0 into 0, and +2 into ""
+  if (/^\+2[ ]?0/.test(cleaned)) {
+    return "0" + cleaned.replace(/^\+2[ ]?0/, "");
+  }
+  return cleaned.replace(/^\+2[ ]?/, "");
+}
