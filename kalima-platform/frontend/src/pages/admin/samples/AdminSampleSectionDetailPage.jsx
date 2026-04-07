@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, FileText, Trash2, Download, ExternalLink, Image, Video, FileAudio } from 'lucide-react';
+import { ChevronLeft, FileText, Trash2, Download, ExternalLink, Eye, Image, Video, FileAudio } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -137,20 +137,56 @@ export default function AdminSampleSectionDetailPage() {
                                     </td>
                                     <td className="pe-4 py-3 text-end">
                                         <div className="flex items-center justify-end gap-2">
+                                            {/* View sample details page */}
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                asChild
+                                                title={t('samples.view', 'View Sample')}
+                                                data-testid={`admin-sample-view-${sample.id}`}
+                                            >
+                                                <Link
+                                                    to={`/samples/${sample.id}`}
+                                                    state={{ cameFromAdmin: true }}
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
+
+                                            {/* Full-screen preview (opens in-app preview page) */}
                                             {sample.high_quality_url && (
-                                                <Button variant="ghost" size="icon" asChild title="Preview HQ">
-                                                    <a href={previewUrl} target="_blank" rel="noreferrer">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    asChild
+                                                    title={t('samples.view', 'Full Preview')}
+                                                    data-testid={`admin-sample-preview-${sample.id}`}
+                                                >
+                                                    <Link
+                                                        to={`/samples/${sample.id}/preview`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
                                                         <ExternalLink className="h-4 w-4" />
-                                                    </a>
+                                                    </Link>
                                                 </Button>
                                             )}
+
+                                            {/* Download LQ — still a direct anchor */}
                                             {sample.low_quality_url && (
-                                                <Button variant="ghost" size="icon" asChild title={t('samples.download', 'Download LQ')}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    asChild
+                                                    title={t('samples.download', 'Download LQ')}
+                                                    data-testid={`admin-sample-download-${sample.id}`}
+                                                >
                                                     <a href={downloadUrl} download>
                                                         <Download className="h-4 w-4" />
                                                     </a>
                                                 </Button>
                                             )}
+
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
@@ -158,6 +194,7 @@ export default function AdminSampleSectionDetailPage() {
                                                 className="text-destructive hover:bg-destructive/10"
                                                 title={t('common.delete', 'Remove Sample')}
                                                 disabled={loading}
+                                                data-testid={`admin-sample-delete-${sample.id}`}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>

@@ -824,7 +824,10 @@
       "title": "Account Review Settings",
       "description": "Configure which user roles require admin approval upon registration.",
       "requireReviewDesc": "Require admin review for new {{role}} registrations.",
-      "updateSuccess": "Account review settings updated successfully"
+      "updateSuccess": "Account review settings updated successfully",
+      "allAccounts": "All Account Types",
+      "allAccountsDesc": "Enable or disable review requirement for all account types at once.",
+      "partial": "partial"
     },
     "expandSidebar": "Expand Sidebar"
   },

@@ -116,6 +116,11 @@
   "common": {
     "back": "رجوع"
   },
+  "breadcrumbs": {
+    "home": "الرئيسية",
+    "digitalProducts": "المنتجات الرقمية",
+    "samples": "العينات"
+  },
   "errors": {
     "loadingError": "خطأ في تحميل البيانات",
     "fetchErrorLog": "خطأ في جلب البيانات:",
@@ -153,6 +158,7 @@
   "samplePage": {
     "notFound": "العينة غير موجودة",
     "backToMarket": "العودة إلى المتجر",
+    "backToSample": "تفاصيل العينة",
     "download": "تنزيل",
     "downloadFile": "تنزيل الملف",
     "previewUnavailable": "المعاينة غير متاحة لهذا النوع من الملفات.",

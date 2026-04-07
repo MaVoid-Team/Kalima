@@ -1,23 +1,21 @@
 import { PDFViewer } from '@embedpdf/react-pdf-viewer';
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, Download, AlertCircle } from 'lucide-react';
+import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft, Download, AlertCircle, FileText, Music } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import useApiMutation from '@/hooks/useApiMutation';
-import { getImageUrl } from '@/lib/storeUtils';
 import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
-import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 
 /**
- * SamplePreviewPage — full-screen PDF viewer for a single sample.
- * Route: /samples/:id/preview (public)
+ * SamplePreviewPage — full-screen media viewer for a single sample.
+ * Route: /samples/:id/preview  (public)
+ *
+ * Handles: Document (PDF/Word), Video, Audio, Image
  */
 export default function SamplePreviewPage() {
     const { t, i18n } = useTranslation(['market', 'PDFViewer']);
-    const location = useLocation();
-    const cameFromAdmin = Boolean(location.state?.cameFromAdmin);
     const { id } = useParams();
     const { mutate: fetchApi, loading } = useApiMutation();
     const [sample, setSample] = useState(null);
@@ -46,30 +44,99 @@ export default function SamplePreviewPage() {
         return (
             <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background text-center px-4" data-testid="sample-preview-error">
                 <AlertCircle className="h-12 w-12 text-destructive" />
-                <p className="text-lg font-semibold">{t('samplePage.notFound')}</p>
+                <p className="text-lg font-semibold">{t('samplePage.notFound', 'Sample not found')}</p>
                 <Button variant="ghost" asChild>
-                    <Link to="/market"><ArrowLeft className="me-2 h-4 w-4" />{t('samplePage.backToMarket')}</Link>
+                    <Link to={`/samples/${id}`}>
+                        <ArrowLeft className="me-2 h-4 w-4" />
+                        {t('samplePage.backToSample', 'Back to Sample')}
+                    </Link>
                 </Button>
             </div>
         );
     }
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
-    const fileUrl = sample?.section_id ? `${apiUrl}/sample-sections/${sample.section_id}/samples/${sample.id}/preview` : '';
-    const downloadUrl = sample?.section_id ? `${apiUrl}/sample-sections/${sample.section_id}/samples/${sample.id}/download` : '';
+    const sectionId = sample?.section_id;
+    const previewUrl = sectionId ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/preview` : '';
+    const downloadUrl = sectionId ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download` : '';
+
+    const mediaType = sample?.media_type || 'Document';
     const isPdf = sample?.mime_type === 'application/pdf';
-    const product = sample?.products;
 
     return (
         <div className="flex flex-col h-screen bg-background" data-testid="sample-preview-page">
 
-            {/* Full Screen Viewer */}
+            {/* Slim top bar */}
+            <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-background/80 backdrop-blur shrink-0">
+                <Button variant="ghost" size="sm" asChild data-testid="sample-preview-back-button">
+                    <Link to={`/samples/${id}`}>
+                        <ArrowLeft className="h-4 w-4 me-1" />
+                        {t('samplePage.backToSample', 'Sample Details')}
+                    </Link>
+                </Button>
+                <span dir="auto" className="text-sm font-medium truncate text-muted-foreground flex-1">
+                    {sample?.original_name}
+                </span>
+                {downloadUrl && (
+                    <Button variant="outline" size="sm" asChild data-testid="sample-preview-download-button">
+                        <a href={downloadUrl} download>
+                            <Download className="h-4 w-4 me-1" />
+                            {t('samplePage.download', 'Download')}
+                        </a>
+                    </Button>
+                )}
+            </div>
+
+            {/* Full-screen viewer */}
             <div className="flex-1 overflow-hidden flex items-center justify-center bg-muted/20" data-testid="sample-preview-viewer">
-                {isPdf && fileUrl ? (
-                    <div className="w-full h-full max-w-6xl">
+
+                {/* Video */}
+                {mediaType === 'Video' && previewUrl && (
+                    <video
+                        className="max-h-full max-w-full"
+                        controls
+                        src={previewUrl}
+                        data-testid="sample-preview-video-player"
+                    >
+                        <track kind="captions" />
+                    </video>
+                )}
+
+                {/* Audio */}
+                {mediaType === 'Audio' && (
+                    <div className="flex flex-col items-center justify-center gap-8 p-8">
+                        <div className="h-32 w-32 rounded-full bg-orange-500/10 flex items-center justify-center">
+                            <Music className="h-16 w-16 text-orange-500" />
+                        </div>
+                        {previewUrl && (
+                            <audio
+                                className="w-full max-w-lg"
+                                controls
+                                src={previewUrl}
+                                data-testid="sample-preview-audio-player"
+                            >
+                                <track kind="captions" />
+                            </audio>
+                        )}
+                    </div>
+                )}
+
+                {/* Image */}
+                {mediaType === 'Image' && previewUrl && (
+                    <img
+                        src={previewUrl}
+                        alt={sample?.original_name || 'Sample'}
+                        className="max-h-full max-w-full object-contain"
+                        data-testid="sample-preview-image"
+                    />
+                )}
+
+                {/* PDF Document */}
+                {mediaType === 'Document' && isPdf && previewUrl && (
+                    <div className="w-full h-full max-w-6xl mx-auto">
                         <PDFViewer
                             config={{
-                                src: fileUrl,
+                                src: previewUrl,
                                 theme: { preference: 'system' },
                                 i18n: viewerI18n,
                                 dir: i18n.dir(),
@@ -78,18 +145,25 @@ export default function SamplePreviewPage() {
                             style={{ width: '100%', height: '100%' }}
                         />
                     </div>
-                ) : (
-                    /* Word / other — prompt download */
-                    <div className="flex h-full flex-col items-center justify-center gap-4 text-muted-foreground">
-                        <p className="text-sm">{t('samplePage.previewUnavailable')}</p>
-                        <Button asChild data-testid="sample-preview-download-fallback-button">
-                            <a href={downloadUrl} download>
-                                <Download className="me-2 h-4 w-4" />
-                                {t('samplePage.downloadFile')}
-                            </a>
-                        </Button>
-                    </div>
                 )}
+
+                {/* Word / unsupported — download fallback */}
+                {(mediaType === 'Document' && !isPdf && !previewUrl) ||
+                (mediaType === 'Video' && !previewUrl) ||
+                (mediaType === 'Image' && !previewUrl) ? (
+                    <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground p-8">
+                        <FileText className="h-20 w-20 opacity-30" />
+                        <p className="text-sm text-center">{t('samplePage.previewUnavailable', 'Preview not available.')}</p>
+                        {downloadUrl && (
+                            <Button asChild data-testid="sample-preview-download-fallback-button">
+                                <a href={downloadUrl} download>
+                                    <Download className="me-2 h-4 w-4" />
+                                    {t('samplePage.downloadFile', 'Download File')}
+                                </a>
+                            </Button>
+                        )}
+                    </div>
+                ) : null}
             </div>
         </div>
     );
