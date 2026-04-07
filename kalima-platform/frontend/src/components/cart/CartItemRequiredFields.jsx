@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trash, ImageOff, ArrowRight } from 'lucide-react';
+import { Trash, ImageOff, ArrowRight, Copy } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PhoneInput, egyptPhoneSchema } from '@/components/ui/phone-input';
@@ -32,6 +33,67 @@ export default function CartItemRequiredFields({
     const [missingFields, setMissingFields] = useState([]);
     const [highlightSave, setHighlightSave] = useState(false);
     const [highlightedFields, setHighlightedFields] = useState({});
+
+    // Listen for cross-item field synchronization
+    useEffect(() => {
+        const handleSync = (e) => {
+            const { fieldDefinitionId, value, imageFile, sourceItemId, onlyEmpty } = e.detail;
+            if (sourceItemId === item.id) return;
+
+            // Check if this item has this field definition
+            const hasField = item.cart_item_required_fields.some(
+                rf => rf.field_definition_id === fieldDefinitionId
+            );
+
+            if (hasField) {
+                setFieldValues(prev => {
+                    const currentValue = prev[fieldDefinitionId];
+                    const isEmpty = !currentValue || (typeof currentValue === 'string' && currentValue.trim() === '') || currentValue === '+20';
+
+                    if (!onlyEmpty || isEmpty) {
+                        if (imageFile) {
+                            setImageFields(prevImgs => ({
+                                ...prevImgs,
+                                [fieldDefinitionId]: imageFile
+                            }));
+                        }
+                        return {
+                            ...prev,
+                            [fieldDefinitionId]: value
+                        };
+                    }
+                    return prev;
+                });
+            }
+        };
+
+        window.addEventListener('sync-cart-field-value', handleSync);
+        return () => window.removeEventListener('sync-cart-field-value', handleSync);
+    }, [item.id, item.cart_item_required_fields]);
+
+    const isFieldEmpty = (val) => {
+        return !val || (typeof val === 'string' && val.trim() === '') || val === '+20';
+    };
+
+    const syncFieldToAll = (fieldDefinitionId, onlyEmpty = false) => {
+        const value = fieldValues[fieldDefinitionId];
+        const imageFile = imageFields[fieldDefinitionId];
+
+        if (isFieldEmpty(value)) {
+            toast.error(t('valueEmptySync', 'Please enter a value or select an image before applying to others.'));
+            return;
+        }
+
+        window.dispatchEvent(new CustomEvent('sync-cart-field-value', {
+            detail: { fieldDefinitionId, value, imageFile, sourceItemId: item.id, onlyEmpty }
+        }));
+
+        if (onlyEmpty) {
+            toast.info(t('fieldSyncedEmpty', 'Applied to empty similar fields.'));
+        } else {
+            toast.info(t('fieldSynced', 'Applied to all similar fields.'));
+        }
+    };
 
     // Track if any field differs from what's saved
     useEffect(() => {
@@ -286,10 +348,33 @@ export default function CartItemRequiredFields({
                         <form onSubmit={handleCartRequiredFieldsSubmit} className='flex flex-col gap-2 w-full max-w-full overflow-x-hidden'>
                             {item.cart_item_required_fields.map(rf => (
                                 <div key={rf.field_definition_id} className="flex flex-col">
-                                    <label className="text-xs font-medium mb-1">
-                                        {rf.required_field_definitions.label}
-                                        <span className="text-destructive">{rf.is_required ? ' *' : ''}</span>
-                                    </label>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <label className="text-xs font-medium">
+                                            {rf.required_field_definitions.label}
+                                            {rf.is_required && <span className="text-destructive"> *</span>}
+                                        </label>
+                                        {!isFieldEmpty(fieldValues[rf.field_definition_id]) && (
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => syncFieldToAll(rf.field_definition_id, true)}
+                                                    className="text-[10px] text-primary flex items-center gap-1 hover:opacity-80 transition-opacity"
+                                                    title={t('applyToEmptyItems', 'Apply ONLY to empty fields')}
+                                                >
+                                                    <Copy className="w-3 h-3" />
+                                                    {t('applyToEmpty', 'To Empty')}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => syncFieldToAll(rf.field_definition_id, false)}
+                                                    className="text-[10px] text-muted-foreground flex items-center gap-1 hover:text-primary transition-colors border-s ps-2"
+                                                    title={t('copyToAllItems', 'Overwrite all similar fields')}
+                                                >
+                                                    {t('applyToAll', 'To All')}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                     {rf.required_field_definitions.field_type === 'image' ? (
                                         <>
                                             <div className="flex items-center gap-2 min-w-0">
