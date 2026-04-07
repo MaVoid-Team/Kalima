@@ -4,7 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Loader2, X, Package, PlusCircle, Calendar as CalendarIcon } from 'lucide-react';
+import LoadingSpinner from '@/components/ui/loading-spinner';
+import { ChevronLeft, X, Package, PlusCircle, Calendar as CalendarIcon } from 'lucide-react';
 import { format, startOfDay } from 'date-fns';
 import { arSA } from 'react-day-picker/locale';
 
@@ -71,7 +72,8 @@ export default function CreateProductPage() {
         (data) => {
             if (data.isFreePreview) return data.price_after_discount === 0;
             if (data.price_after_discount == null) return true;
-            return data.price_after_discount < data.price;
+            if (data.price > 0) return data.price_after_discount < data.price;
+            return data.price_after_discount === 0;
         },
         { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
     ).refine(
@@ -782,7 +784,7 @@ export default function CreateProductPage() {
                             {selectedRootId && (
                                 childrenLoading ? (
                                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <LoadingSpinner className="h-4 w-4 text-primary-foreground" />
                                         <span>{t('common.loading')}</span>
                                     </div>
                                 ) : hasChildren ? (
@@ -809,7 +811,7 @@ export default function CreateProductPage() {
                             {selectedChildId && (
                                 grandchildrenLoading ? (
                                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <LoadingSpinner className="h-4 w-4 text-primary-foreground" />
                                         <span>{t('common.loading')}</span>
                                     </div>
                                 ) : hasGrandchildren ? (
@@ -1258,7 +1260,7 @@ export default function CreateProductPage() {
                             data-testid="create-product-submit-button"
                         >
                             {actionLoading
-                                ? <><Loader2 className="me-2 h-4 w-4 animate-spin" />{t('products.create.creating')}</>
+                                ? <><LoadingSpinner className="h-4 w-4 text-primary-foreground" />{t('products.create.creating')}</>
                                 : t('products.create.submit')
                             }
                         </Button>
