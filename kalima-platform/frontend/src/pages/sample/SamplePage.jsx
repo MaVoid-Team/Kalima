@@ -455,14 +455,14 @@ export default function SamplePage() {
                                     />
                                 )}
 
-                                {formattedDate && (
+                                {/* {formattedDate && (
                                     <DetailRow label={t('samplePage.uploadDate', 'Uploaded')}>
                                         <span className="flex items-center gap-1.5 text-sm font-medium">
                                             <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                                             {formattedDate}
                                         </span>
                                     </DetailRow>
-                                )}
+                                )} */}
                             </div>
 
                             {/* Product Info */}
