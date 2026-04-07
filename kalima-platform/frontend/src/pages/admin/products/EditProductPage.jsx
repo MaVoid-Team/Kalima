@@ -5,13 +5,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import {
-    ChevronLeft, ChevronRight, PlusCircle, X, Loader2, Package, Save, Calendar as CalendarIcon
+    ChevronLeft, PlusCircle, X, Package, Save, Calendar as CalendarIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 import {
     Form,
     FormControl,
@@ -73,7 +74,8 @@ export default function EditProductPage() {
         (data) => {
             if (data.isFreePreview) return data.price_after_discount === 0;
             if (data.price_after_discount == null) return true;
-            return data.price_after_discount < data.price;
+            if (data.price > 0) return data.price_after_discount < data.price;
+            return data.price_after_discount === 0;
         },
         { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
     ).refine(
@@ -430,7 +432,7 @@ export default function EditProductPage() {
         }
         if (values.serial) payload.serial = values.serial;
         if (values.coupon_id) payload.coupon_id = values.coupon_id;
-        
+
         if (values.release_at) {
             payload.release_at = new Date(values.release_at).toISOString();
         } else {
@@ -839,7 +841,7 @@ export default function EditProductPage() {
                             {selectedRootId && (
                                 childrenLoading ? (
                                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <LoadingSpinner className="h-4 w-4 text-primary-foreground" />
                                         <span>{t('common.loading')}</span>
                                     </div>
                                 ) : hasChildren ? (
@@ -866,7 +868,7 @@ export default function EditProductPage() {
                             {selectedChildId && (
                                 grandchildrenLoading ? (
                                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <LoadingSpinner className="h-4 w-4 text-primary-foreground" />
                                         <span>{t('common.loading')}</span>
                                     </div>
                                 ) : hasGrandchildren ? (
@@ -984,7 +986,7 @@ export default function EditProductPage() {
                             data-testid="edit-product-submit-button"
                         >
                             {actionLoading ? (
-                                <><Loader2 className="me-2 h-4 w-4 animate-spin" />{t('products.edit.saving')}</>
+                                <><LoadingSpinner className="h-4 w-4 text-primary-foreground" />{t('products.edit.saving')}</>
                             ) : (
                                 <><Save className="me-2 h-4 w-4" />{t('products.edit.submit')}</>
                             )}
