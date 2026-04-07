@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { FileText, Download, ExternalLink, Box, Folder, Video, FileAudio, Image as ImageIcon } from "lucide-react";
+import { FileText, Download, Eye, Box, Folder, Video, FileAudio, Image as ImageIcon } from "lucide-react";
 import HeroSection from "@/components/MarketPage/HeroSection";
 import useApiMutation from "@/hooks/useApiMutation";
 import { Button } from "@/components/ui/button";
@@ -145,22 +145,28 @@ export default function SamplesDirectoryPage() {
                                                             )}
                                                         </div>
 
-                                                        <div className="flex items-center gap-2 mt-6 pt-4 border-t border-border">
-                                                            {sample.high_quality_url && (
+                                                    <div className="flex items-center gap-2 mt-6 pt-4 border-t border-border">
+                                                            {/* View — navigates to the sample details page */}
+                                                            <Button
+                                                                variant="default"
+                                                                className="flex-1"
+                                                                asChild
+                                                                data-testid={`samples-directory-view-${sample.id}`}
+                                                            >
+                                                                <Link to={`/samples/${sample.id}`}>
+                                                                    <Eye className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
+                                                                    {t("samples.view")}
+                                                                </Link>
+                                                            </Button>
+
+                                                            {/* Download LQ — still a direct API link */}
+                                                            {sample.low_quality_url && (
                                                                 <Button
-                                                                    variant="default"
+                                                                    variant="outline"
                                                                     className="flex-1"
                                                                     asChild
+                                                                    data-testid={`samples-directory-download-${sample.id}`}
                                                                 >
-                                                                    <a href={previewUrl} target="_blank" rel="noopener noreferrer">
-                                                                        <ExternalLink className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
-                                                                        {t("samples.view")}
-                                                                    </a>
-                                                                </Button>
-                                                            )}
-
-                                                            {sample.low_quality_url && (
-                                                                <Button variant="outline" className="flex-1" asChild>
                                                                     <a href={downloadUrl} download>
                                                                         <Download className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
                                                                         {t("samples.download")}

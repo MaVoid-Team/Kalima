@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Minus, Plus, ShoppingCart, Eye, Zap, Clock } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Eye, Zap, Clock, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,7 @@ import { useCart } from "@/contexts/CartContext";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { useFastBuy } from "@/hooks/useFastBuy";
 import useAuth from "@/hooks/auth/useAuth";
+import useRole from "@/hooks/useRole";
 
 import { buildWhatsAppLink } from "@/lib/whatsappUtils";
 import { FaWhatsapp } from "react-icons/fa";
@@ -27,6 +28,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
   const { t } = useTranslation("product");
   const [quantity, setQuantity] = useState(1);
   const { isAuthenticated } = useAuth();
+  const { isConfirmed } = useRole();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -46,8 +48,11 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
 
   const formattedPrice = formatPrice(price);
 
+  // Unconfirmed authenticated users can browse but cannot purchase
+  const isPurchaseBlocked = isAuthenticated && !isConfirmed;
+
   const handleAddToCart = () => {
-    if (!isReleased) return;
+    if (!isReleased || isPurchaseBlocked) return;
     if (!isAuthenticated) {
       navigate("/login", { state: { from: location }, replace: true });
       return;
@@ -56,7 +61,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
   };
 
   const handleBuyNow = () => {
-    if (!isReleased) return;
+    if (!isReleased || isPurchaseBlocked) return;
     if (!isAuthenticated) {
       navigate("/login", { state: { from: location }, replace: true });
       return;
@@ -76,6 +81,19 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
 
   return (
     <div className="flex flex-col gap-4 mt-2">
+      {/* Pending Review Banner */}
+      {isPurchaseBlocked && (
+        <div
+          className="flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-400"
+          data-testid="product-actions-pending-review-banner"
+        >
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          <p className="leading-relaxed">
+            {t("actions.pendingReview", "Your account is pending admin review. You can browse freely but cannot make purchases until your account is approved.")}
+          </p>
+        </div>
+      )}
+
       {/* Mobile Sticky Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-30 md:hidden border-t bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 shadow-lg">
         <div className="p-3 space-y-3">
@@ -115,7 +133,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
           <div className="grid grid-cols-2 gap-2">
             <Button
               className="h-11 gap-2"
-              disabled={loading || !isReleased}
+              disabled={loading || !isReleased || isPurchaseBlocked}
               onClick={handleAddToCart}
               data-testid="product-actions-mobile-add-cart-button"
             >
@@ -138,7 +156,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
               variant="secondary"
               className="h-11 gap-2"
               onClick={handleBuyNow}
-              disabled={fastBuyLoading || !isReleased}
+              disabled={fastBuyLoading || !isReleased || isPurchaseBlocked}
               data-testid="product-actions-mobile-buy-now-button"
             >
               {fastBuyLoading ? (
@@ -210,7 +228,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
           </div> */}
 
           {/* Add to Cart */}
-          <Button className="gap-2 flex-1" size="lg" onClick={handleAddToCart} disabled={loading || !isReleased} data-testid="product-actions-desktop-add-cart-button">
+          <Button className="gap-2 flex-1" size="lg" onClick={handleAddToCart} disabled={loading || !isReleased || isPurchaseBlocked} data-testid="product-actions-desktop-add-cart-button">
             {loading ? (
               <LoadingSpinner className="h-5 w-5 border-white" />
             ) : !isReleased ? (
@@ -234,7 +252,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
             className="text-sm flex-1"
             size="lg"
             onClick={handleBuyNow}
-            disabled={fastBuyLoading || !isReleased}
+            disabled={fastBuyLoading || !isReleased || isPurchaseBlocked}
             data-testid="product-actions-desktop-buy-now-button"
           >
             {fastBuyLoading ? (
