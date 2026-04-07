@@ -99,6 +99,20 @@ export class CreateProductDto {
   @IsOptional()
   release_at?: string;
 
+  @IsDateString()
+  @IsOptional()
+  release_date?: string;
+
+  @IsInt()
+  @IsOptional()
+  @Type(() => Number)
+  release_hour?: number;
+
+  @IsInt()
+  @IsOptional()
+  @Type(() => Number)
+  release_minute?: number;
+
   @IsString()
   @IsOptional()
   perks?: string;
@@ -175,6 +189,20 @@ export class UpdateProductDto {
   @IsDateString()
   @IsOptional()
   release_at?: string;
+
+  @IsDateString()
+  @IsOptional()
+  release_date?: string;
+
+  @IsInt()
+  @IsOptional()
+  @Type(() => Number)
+  release_hour?: number;
+
+  @IsInt()
+  @IsOptional()
+  @Type(() => Number)
+  release_minute?: number;
 
   @IsString()
   @IsOptional()

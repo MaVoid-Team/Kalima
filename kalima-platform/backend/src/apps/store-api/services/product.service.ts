@@ -32,7 +32,7 @@ import { sampleService as defaultSampleService } from "./sample.service";
 /** Enrich product with computed release fields (not stored in DB) */
 function enrichProductWithReleaseInfo<T extends { release_at?: Date | null }>(
   product: T,
-): T & { is_released: boolean; time_until_release_ms: number | null } {
+): T & { is_released: boolean; time_until_release_ms: number | null; exact_minute: number | null } {
   const releaseAt = product.release_at ? new Date(product.release_at) : null;
   const now = new Date();
   const isReleased = !releaseAt || releaseAt <= now;
@@ -42,7 +42,8 @@ function enrichProductWithReleaseInfo<T extends { release_at?: Date | null }>(
     ...product,
     is_released: isReleased,
     time_until_release_ms: timeUntilReleaseMs,
-  } as T & { is_released: boolean; time_until_release_ms: number | null };
+    exact_minute: releaseAt ? releaseAt.getMinutes() : null,
+  } as T & { is_released: boolean; time_until_release_ms: number | null; exact_minute: number | null };
 }
 
 /** Minimal include for product list (getAllProducts) */
@@ -143,7 +144,18 @@ class ProductService {
       thumbnailId = image.id;
     }
 
-    const releaseAt = dto.release_at ? new Date(dto.release_at) : null;
+    let releaseAt = dto.release_at ? new Date(dto.release_at) : null;
+    if ((dto as any).release_date && (dto as any).release_hour !== undefined && (dto as any).release_minute !== undefined) {
+      const d = new Date((dto as any).release_date);
+      d.setHours(Number((dto as any).release_hour));
+      d.setMinutes(Number((dto as any).release_minute));
+      d.setSeconds(0);
+      d.setMilliseconds(0);
+      releaseAt = d;
+    } else if (releaseAt) {
+      releaseAt.setSeconds(0);
+      releaseAt.setMilliseconds(0);
+    }
 
     if (dto.price < 0) {
       throw new BadRequestError("Price cannot be negative");
@@ -409,8 +421,25 @@ class ProductService {
     if (dto.serial !== undefined) data.serial = dto.serial;
     if (dto.sample_url !== undefined) data.sample_url = dto.sample_url;
     if (dto.is_archived !== undefined) data.is_archived = dto.is_archived;
-    if (dto.release_at !== undefined)
-      data.release_at = dto.release_at ? new Date(dto.release_at) : null;
+    if ((dto as any).release_date !== undefined && (dto as any).release_hour !== undefined && (dto as any).release_minute !== undefined) {
+      if ((dto as any).release_date) {
+        const d = new Date((dto as any).release_date);
+        d.setHours(Number((dto as any).release_hour));
+        d.setMinutes(Number((dto as any).release_minute));
+        d.setSeconds(0);
+        d.setMilliseconds(0);
+        data.release_at = d;
+      } else {
+        data.release_at = null;
+      }
+    } else if (dto.release_at !== undefined) {
+      let releaseAt = dto.release_at ? new Date(dto.release_at) : null;
+      if (releaseAt) {
+        releaseAt.setSeconds(0);
+        releaseAt.setMilliseconds(0);
+      }
+      data.release_at = releaseAt;
+    }
     if (dto.perks !== undefined) data.perks = dto.perks;
 
     const updated = await this.db.products.update({
