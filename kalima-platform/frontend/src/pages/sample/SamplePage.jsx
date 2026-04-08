@@ -35,37 +35,7 @@ import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
 import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-const MEDIA_TYPE_META = {
-    Document: {
-        icon: FileText,
-        colorClass: 'text-blue-500',
-        bgClass: 'bg-blue-500/10',
-        label: 'Document',
-    },
-    Video: {
-        icon: Video,
-        colorClass: 'text-purple-500',
-        bgClass: 'bg-purple-500/10',
-        label: 'Video',
-    },
-    Audio: {
-        icon: Music,
-        colorClass: 'text-orange-500',
-        bgClass: 'bg-orange-500/10',
-        label: 'Audio',
-    },
-    Image: {
-        icon: ImageIcon,
-        colorClass: 'text-green-500',
-        bgClass: 'bg-green-500/10',
-        label: 'Image',
-    },
-};
-
-function getMediaMeta(mediaType) {
-    return MEDIA_TYPE_META[mediaType] || MEDIA_TYPE_META.Document;
-}
+// ── Media Viewer ──────────────────────────────────────────────────────────────
 
 // ── Media Viewer ──────────────────────────────────────────────────────────────
 
@@ -207,6 +177,35 @@ export default function SamplePage() {
 
     const viewerI18n = useMemo(() => getPdfViewerI18nConfig(i18n.language), [i18n.language]);
     const isRtl = i18n.dir() === 'rtl';
+
+    const mediaTypeMeta = useMemo(() => ({
+        Document: {
+            icon: FileText,
+            colorClass: 'text-blue-500',
+            bgClass: 'bg-blue-500/10',
+            label: t('samples.mediaTypes.Document', 'Document'),
+        },
+        Video: {
+            icon: Video,
+            colorClass: 'text-purple-500',
+            bgClass: 'bg-purple-500/10',
+            label: t('samples.mediaTypes.Video', 'Video'),
+        },
+        Audio: {
+            icon: Music,
+            colorClass: 'text-orange-500',
+            bgClass: 'bg-orange-500/10',
+            label: t('samples.mediaTypes.Audio', 'Audio'),
+        },
+        Image: {
+            icon: ImageIcon,
+            colorClass: 'text-green-500',
+            bgClass: 'bg-green-500/10',
+            label: t('samples.mediaTypes.Image', 'Image'),
+        },
+    }), [t]);
+
+    const getMediaMeta = (type) => mediaTypeMeta[type] || mediaTypeMeta.Document;
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -404,7 +403,7 @@ export default function SamplePage() {
                                 {/* Media type badge */}
                                 <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${meta.bgClass} ${meta.colorClass}`}>
                                     <MetaIcon className="h-4 w-4" />
-                                    {t(`samples.mediaTypes.${mediaType}`, meta.label)}
+                                    {meta.label}
                                 </div>
 
                                 <h1 dir="auto" className="text-2xl font-bold leading-tight" data-testid="sample-page-title">
@@ -438,7 +437,9 @@ export default function SamplePage() {
                                 </h2>
 
                                 <DetailRow label={t('samplePage.fileType', 'File Type')}>
-                                    <Badge variant="outline">{sample?.mime_type || mediaType}</Badge>
+                                    <Badge variant="outline">
+                                        {sample?.mime_type || t(`samples.mediaTypes.${mediaType}`, mediaType)}
+                                    </Badge>
                                 </DetailRow>
 
                                 {sample?.high_quality_size > 0 && (
