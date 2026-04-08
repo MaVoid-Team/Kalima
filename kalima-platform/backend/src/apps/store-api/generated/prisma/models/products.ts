@@ -698,6 +698,11 @@ export type productsSumOrderByAggregateInput = {
   thumbnail_id?: Prisma.SortOrder
 }
 
+export type ProductsNullableScalarRelationFilter = {
+  is?: Prisma.productsWhereInput | null
+  isNot?: Prisma.productsWhereInput | null
+}
+
 export type ProductsListRelationFilter = {
   every?: Prisma.productsWhereInput
   some?: Prisma.productsWhereInput
@@ -782,10 +787,12 @@ export type productsCreateNestedOneWithoutSamplesInput = {
   connect?: Prisma.productsWhereUniqueInput
 }
 
-export type productsUpdateOneRequiredWithoutSamplesNestedInput = {
+export type productsUpdateOneWithoutSamplesNestedInput = {
   create?: Prisma.XOR<Prisma.productsCreateWithoutSamplesInput, Prisma.productsUncheckedCreateWithoutSamplesInput>
   connectOrCreate?: Prisma.productsCreateOrConnectWithoutSamplesInput
   upsert?: Prisma.productsUpsertWithoutSamplesInput
+  disconnect?: Prisma.productsWhereInput | boolean
+  delete?: Prisma.productsWhereInput | boolean
   connect?: Prisma.productsWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.productsUpdateToOneWithWhereWithoutSamplesInput, Prisma.productsUpdateWithoutSamplesInput>, Prisma.productsUncheckedUpdateWithoutSamplesInput>
 }

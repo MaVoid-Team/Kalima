@@ -166,6 +166,33 @@ export const sampleSectionController = {
   // SAMPLES — PUBLIC
   // ──────────────────────────────────────────
 
+  async getAllSamples(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20;
+      const search = req.query.search as string;
+
+      const results = await sampleService.getAllSamples({ page, limit, search });
+
+      res.status(200).json({
+        success: true,
+        results: results.data.length,
+        data: results.data,
+        pagination: {
+          total: results.total,
+          page: results.page,
+          limit: results.limit,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async getSamplesBySection(
     req: Request,
     res: Response,
@@ -193,7 +220,7 @@ export const sampleSectionController = {
   ): Promise<void> {
     try {
       const sampleId = parseId(req.params.sampleId, "sample ID");
-      const sectionId = parseId(req.params.sectionId, "section ID");
+      const sectionId = req.params.sectionId ? parseId(req.params.sectionId, "section ID") : undefined;
       const sample = await sampleService.getSampleById(sampleId, sectionId);
 
       res.status(200).json({
@@ -219,7 +246,7 @@ export const sampleSectionController = {
 
       // Parse product_id from body (may be JSON string in form-data)
       let body = req.body;
-      if (typeof body.product_id === "string") {
+      if (typeof body.product_id === "string" && body.product_id.trim() !== "") {
         body = { ...body, product_id: parseInt(body.product_id, 10) };
       }
       const dto = await validateDto(CreateSampleBodyDto, body);
