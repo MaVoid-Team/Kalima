@@ -6,6 +6,7 @@ import categoryRoutes from "./category.routes";
 import productRoutes from "./product.routes";
 import purchaseRoutes from "./purchase.routes";
 import sampleSectionRoutes from "./sample-section.routes";
+import sampleRoutes from "./sample.routes";
 import governmentRoutes from "./government.routes";
 import zonesRoutes from "./zones.routes";
 import sitesRoutes from "./sites.routes";
@@ -25,6 +26,7 @@ router.use("/categories", categoryRoutes);
 router.use("/products", productRoutes);
 router.use("/purchases", purchaseRoutes);
 router.use("/sample-sections", sampleSectionRoutes);
+router.use("/samples", sampleRoutes);
 
 // Lookup / reference-data endpoints
 router.use("/governments", governmentRoutes);

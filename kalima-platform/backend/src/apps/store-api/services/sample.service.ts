@@ -143,11 +143,12 @@ interface SampleResponse {
   mime_type: string;
   size: number;
   created_at: Date | null;
-  products: {
+  products?: {
     id: number;
     title: string;
-  };
+  } | null;
   is_displayable?: boolean;
+  thumbnail?: string | null;
 }
 
 interface SampleListResponse {
@@ -392,7 +393,7 @@ class SampleService {
 
   async createSample(
     sectionId: number,
-    productId: number,
+    productId: number | undefined,
     highQualityFile?: Express.Multer.File,
     lowQualityFile?: Express.Multer.File,
     title?: string,
@@ -424,12 +425,14 @@ class SampleService {
     // Verify section + product exist in parallel
     const [section, product] = await Promise.all([
       this.db.sample_sections.findUnique({ where: { id: sectionId } }),
-      this.db.products.findFirst({
-        where: { id: productId, deleted_at: null },
-      }),
+      productId !== undefined
+        ? this.db.products.findFirst({
+            where: { id: productId, deleted_at: null },
+          })
+        : Promise.resolve(null),
     ]);
     if (!section) throw new NotFoundError("Sample section not found");
-    if (!product) throw new NotFoundError("Product not found");
+    if (productId !== undefined && !product) throw new NotFoundError("Product not found");
 
     // Determine metadata from primary file
     const primaryFile = highQualityFile?.buffer
@@ -637,13 +640,14 @@ class SampleService {
     };
   }
 
-  /** Enrich sample with computed is_displayable (for API responses) */
-  enrichSample<T extends { media_type: sample_media_type_enum }>(
+  /** Enrich sample with computed is_displayable and thumbnail (for API responses) */
+  enrichSample<T extends { media_type: sample_media_type_enum; high_quality_url?: string | null; low_quality_url?: string | null }>(
     sample: T,
-  ): T & { is_displayable: boolean } {
+  ): T & { is_displayable: boolean; thumbnail: string | null } {
     return {
       ...sample,
       is_displayable: this.isDisplayable(sample.media_type),
+      thumbnail: sample.high_quality_url || sample.low_quality_url || null,
     };
   }
 }

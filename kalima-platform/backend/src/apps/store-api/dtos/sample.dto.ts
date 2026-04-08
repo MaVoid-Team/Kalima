@@ -67,7 +67,8 @@ export class CreateSampleBodyDto {
   @Type(() => Number)
   @IsInt()
   @IsPositive()
-  product_id: number;
+  @IsOptional()
+  product_id?: number;
 
   @IsEnum(sample_media_type_enum)
   @IsOptional()
