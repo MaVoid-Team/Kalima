@@ -26,7 +26,14 @@ export default function SampleTableRow({ sample, sectionId, onEdit, onDelete, lo
                 <div className="flex items-center gap-3">
                     {getIconForType(sample.media_type)}
                     <div className="flex flex-col">
-                        <span className="font-medium">{t('samples.sampleLabel', 'Sample')} #{sample.id}</span>
+                        <div className="flex items-center gap-2">
+                            <span className="font-medium">{sample.title || `${t('samples.count', 'Sample')} #${sample.id}`}</span>
+                            {sample.is_archived && (
+                                <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4" title={t('samples.is_archived_hint')}>
+                                    {t('samples.archived', 'Archived')}
+                                </Badge>
+                            )}
+                        </div>
                         <div className="text-xs text-muted-foreground flex gap-2">
                             {sample.high_quality_url && (
                                 <span>
@@ -95,7 +102,8 @@ export default function SampleTableRow({ sample, sectionId, onEdit, onDelete, lo
                                 low_quality_url: sample.low_quality_url || '',
                                 created_at: sample.created_at || '',
                                 product_id: sample.product_id || '',
-                                product_title: sample.products?.title || ''
+                                product_title: sample.products?.title || '',
+                                title: sample.title || ''
                             }).toString()}`}
                             target="_blank"
                             rel="noopener noreferrer"

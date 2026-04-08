@@ -318,7 +318,7 @@ export default function SamplePage() {
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
                             <BreadcrumbPage className="max-w-[200px] truncate" dir="auto">
-                                {sample?.original_name || `${t('samples.count', 'Sample')} #${sample?.id}`}
+                                {sample?.title || sample?.original_name || `${t('samples.count', 'Sample')} #${sample?.id}`}
                             </BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
@@ -363,7 +363,8 @@ export default function SamplePage() {
                                             low_quality_url: sample.low_quality_url || '',
                                             created_at: sample.created_at || '',
                                             product_id: sample.product_id || '',
-                                            product_title: sample.products?.title || ''
+                                            product_title: sample.products?.title || '',
+                                            title: sample.title || ''
                                         }).toString()}`} target="_blank" rel="noopener noreferrer">
                                             <Eye className="h-4 w-4" />
                                             {t('samplePage.fullPreview', 'Full Preview')}
@@ -407,7 +408,7 @@ export default function SamplePage() {
                                 </div>
 
                                 <h1 dir="auto" className="text-2xl font-bold leading-tight" data-testid="sample-page-title">
-                                    {sample?.original_name || `${t('samples.count', 'Sample')} #${sample?.id}`}
+                                    {sample?.title || sample?.original_name || `${t('samples.count', 'Sample')} #${sample?.id}`}
                                 </h1>
 
                                 {/* Quality badges */}

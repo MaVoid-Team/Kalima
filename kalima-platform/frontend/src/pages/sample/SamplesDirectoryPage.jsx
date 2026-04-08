@@ -121,7 +121,7 @@ export default function SamplesDirectoryPage() {
                                                                     <div className="flex items-center gap-3 mb-2">
                                                                         {getIconForType(sample.media_type)}
                                                                         <h3 dir="auto" className="font-semibold text-lg line-clamp-2 leading-tight">
-                                                                            {t('samples.count')} #{sample.id}
+                                                                            {sample.title || `${t('samples.count')} #${sample.id}`}
                                                                         </h3>
                                                                     </div>
 
