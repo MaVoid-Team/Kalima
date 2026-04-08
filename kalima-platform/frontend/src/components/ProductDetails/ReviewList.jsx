@@ -143,7 +143,7 @@ const ReviewList = ({ productId, averageRating, totalReviews, productReviews = [
         {isAuthenticated && (
           <Button
             onClick={() => setShowForm(true)}
-            disabled={loading}
+            disabled={loading || !canReview}
             className="w-full sm:w-auto"
             data-testid="write-review-button"
           >
