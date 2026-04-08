@@ -120,7 +120,8 @@
   },
   "badges": {
     "bestSeller": "Best Seller",
-    "interactive": "Interactive"
+    "interactive": "Interactive",
+    "comingSoon": "Coming Soon"
   },
   "booklet": {
     "selectFormat": "SELECT FORMAT",

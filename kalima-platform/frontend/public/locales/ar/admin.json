@@ -274,7 +274,8 @@
     },
     "status": {
       "active": "نشط",
-      "archived": "مؤرشف"
+      "archived": "مؤرشف",
+      "comingSoon": "قريباً"
     },
     "type": {
       "Book": "كتاب",
@@ -321,6 +322,8 @@
       "perks": "المميزات",
       "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code",
       "perksTip": "يمكنك استخدام الفواصل الإنجليزية (,) أو الفواصل العربية (،) للفصل بين المميزات.",
+      "releaseAt": "تاريخ الإصدار",
+      "releaseDateMustBeFuture": "يجب أن يكون تاريخ الإصدار اليوم أو في المستقبل",
       "titleIsRequired": "العنوان مطلوب",
       "titleMaxLength": "يجب ألا يزيد العنوان عن 255 حرفًا",
       "priceMustBeGreaterThan0": "السعر يجب أن يكون أكبر من او يساوي 0",
@@ -369,7 +372,9 @@
     },
     "detail": {
       "info": "معلومات المنتج",
+      "releaseDate": "تاريخ الإصدار",
       "media": "الوسائط",
+      "addMedia": "إضافة وسائط",
       "thumbnail": "صورة الغلاف",
       "gallery": "معرض الصور",
       "categories": "الفئات",

@@ -274,7 +274,8 @@
     },
     "status": {
       "active": "Active",
-      "archived": "Archived"
+      "archived": "Archived",
+      "comingSoon": "Coming Soon"
     },
     "type": {
       "Book": "Book",
@@ -321,6 +322,8 @@
       "perks": "Perks (Features)",
       "perksPlaceholder": "e.g. Carton Cover, 200 pages, QR code",
       "perksTip": "You can use English commas (,) or Arabic commas (،) to separate perks.",
+      "releaseAt": "Release Date",
+      "releaseDateMustBeFuture": "Release date must be today or in the future",
       "titleIsRequired": "Title is required",
       "titleMaxLength": "Title must be at most 255 characters",
       "priceMustBeGreaterThan0": "Price must be greater than or equal to 0",
@@ -369,7 +372,9 @@
     },
     "detail": {
       "info": "Product Info",
+      "releaseDate": "Release Date",
       "media": "Media",
+      "addMedia": "Add Media",
       "thumbnail": "Thumbnail",
       "gallery": "Gallery",
       "categories": "Categories",

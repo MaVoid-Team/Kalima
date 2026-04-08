@@ -650,7 +650,7 @@ export default function CreateProductPage() {
                                 control={form.control}
                                 name="release_at"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-col pt-2.5">
+                                    <FormItem className="flex flex-col">
                                         <FormLabel className="flex items-center gap-2">
                                             <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                                             {t('products.form.releaseAt', 'Release Date')}

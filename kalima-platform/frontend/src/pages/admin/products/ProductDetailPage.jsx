@@ -363,7 +363,7 @@ export default function ProductDetailPage() {
                         </div>
                         {isComingSoon && product.release_at && (
                             <p className="text-sm text-muted-foreground mt-1">
-                                {t('products.detail.releaseDate', 'Release Date')}: {format(new Date(product.release_at), 'PPP', { locale: isRtl ? arSA : undefined })}
+                                {t('products.detail.releaseDate', 'Release Date')}: {new Date(product.release_at).toLocaleDateString(i18n.language, { dateStyle: 'long' })}
                             </p>
                         )}
                     </div>

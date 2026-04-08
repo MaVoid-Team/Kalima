@@ -62,7 +62,8 @@
     "purchased": "PURCHASED",
     "new": "NEW",
     "off": "OFF",
-    "cart": "Cart"
+    "cart": "Cart",
+    "comingSoon": "Coming Soon"
   },
   "products": {
     "trending": {
