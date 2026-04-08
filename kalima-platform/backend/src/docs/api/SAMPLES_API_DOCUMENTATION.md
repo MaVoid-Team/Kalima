@@ -10,13 +10,13 @@
 
 ## Overview
 
-Product samples are downloadable files (PDF or Word documents) that provide a preview of a product. Each product can have at most **one** sample file. Samples are stored on the server and linked to products via `product_id`.
+Samples are rich media files (PDFs, images, videos, Word, PowerPoint) used to display previews of courses or products. They can stand alone within a sample section or be strictly linked to a `product_id`.
 
 | Aspect | Details |
 |--------|---------|
 | **Read access** | Public — no authentication required |
-| **Create** | Via product creation (`POST /api/v2/products`) with `sample` file |
-| **Relation** | One-to-one: one sample per product |
+| **Create/Update/Delete**| Managed via Sample Sections (`POST /api/v2/sample-sections/:sectionId/samples`) |
+| **Relation** | Standalone or Many-to-One with products (optional `product_id`) |
 
 ---
 
@@ -40,12 +40,17 @@ Product samples are downloadable files (PDF or Word documents) that provide a pr
 
 ### Get All Samples
 
-Returns all product samples, ordered by creation date (newest first). Each sample includes its linked product.
+Returns all samples globally, typically supporting pagination and search.
 
 **Endpoint:** `GET /api/v2/samples`  
 **Auth Required:** No
 
-**Request Body:** None
+**Query Parameters:**
+| Param  | Type   | Description                               |
+| ------ | ------ | ----------------------------------------- |
+| `page` | number | Page number (default: 1)                  |
+| `limit`| number | Items per page (default: 20)              |
+| `search`| string | Search by file name or attached product   |
 
 **Success Response (200):**
 
@@ -56,55 +61,41 @@ Returns all product samples, ordered by creation date (newest first). Each sampl
   "data": [
     {
       "id": 1,
-      "product_id": 5,
-      "url": "/uploads/samples/1739876543210-a1b2c3d4.pdf",
+      "media_type": "pdf",
+      "title": "Sample Curriculum",
+      "high_quality_url": "/uploads/samples/123-hq.pdf",
+      "low_quality_url": "/uploads/samples/123-lq.pdf",
       "original_name": "Math_Curriculum_Sample.pdf",
       "mime_type": "application/pdf",
       "size": 102400,
       "created_at": "2026-02-20T10:30:00.000Z",
       "products": {
         "id": 5,
-        "title": "Grade 3 Math Curriculum",
-        "description": "Full curriculum for grade 3 mathematics.",
-        "type": "Book",
-        "price": "150.00",
-        "price_after_discount": "120.00",
-        "serial": "MATH-G3-001",
-        "thumbnail_id": 12,
-        "sample_url": null,
-        "is_archived": false,
-        "mongo_id": null,
-        "created_at": "2026-02-20T10:00:00.000Z",
-        "updated_at": null,
-        "deleted_at": null
-      }
+        "title": "Grade 3 Math Curriculum"
+      },
+      "is_displayable": true,
+      "thumbnail": "/uploads/samples/123-hq.pdf"
     },
     {
       "id": 2,
-      "product_id": 7,
-      "url": "/uploads/samples/1739876500000-e5f6g7h8.docx",
+      "media_type": "word",
+      "title": "Independent Science Guide",
+      "high_quality_url": "/uploads/samples/456-hq.docx",
+      "low_quality_url": null,
       "original_name": "Science_Unit1_Sample.docx",
       "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "size": 25600,
       "created_at": "2026-02-19T14:00:00.000Z",
-      "products": {
-        "id": 7,
-        "title": "Grade 4 Science Unit 1",
-        "description": "Introduction to life sciences.",
-        "type": "Product",
-        "price": "80.00",
-        "price_after_discount": null,
-        "serial": "SCI-G4-U1",
-        "thumbnail_id": 15,
-        "sample_url": null,
-        "is_archived": false,
-        "mongo_id": null,
-        "created_at": "2026-02-19T13:45:00.000Z",
-        "updated_at": null,
-        "deleted_at": null
-      }
+      "products": null,
+      "is_displayable": false,
+      "thumbnail": "/uploads/samples/456-hq.docx"
     }
-  ]
+  ],
+  "pagination": {
+    "total": 2,
+    "page": 1,
+    "limit": 20
+  }
 }
 ```
 
@@ -130,28 +121,20 @@ Returns a single sample by its ID. Includes the linked product. Returns 404 if t
   "success": true,
   "data": {
     "id": 1,
-    "product_id": 5,
-    "url": "/uploads/samples/1739876543210-a1b2c3d4.pdf",
+    "media_type": "pdf",
+    "title": "Sample Curriculum",
+    "high_quality_url": "/uploads/samples/123-hq.pdf",
+    "low_quality_url": "/uploads/samples/123-lq.pdf",
     "original_name": "Math_Curriculum_Sample.pdf",
     "mime_type": "application/pdf",
-    "size": 102100,
+    "size": 102400,
     "created_at": "2026-02-20T10:30:00.000Z",
     "products": {
       "id": 5,
-      "title": "Grade 3 Math Curriculum",
-      "description": "Full curriculum for grade 3 mathematics.",
-      "type": "Book",
-      "price": "150.00",
-      "price_after_discount": "120.00",
-      "serial": "MATH-G3-001",
-      "thumbnail_id": 12,
-      "sample_url": null,
-      "is_archived": false,
-      "mongo_id": null,
-      "created_at": "2026-02-20T10:00:00.000Z",
-      "updated_at": null,
-      "deleted_at": null
-    }
+      "title": "Grade 3 Math Curriculum"
+    },
+    "is_displayable": true,
+    "thumbnail": "/uploads/samples/123-hq.pdf"
   }
 }
 ```
@@ -167,10 +150,10 @@ Returns a single sample by its ID. Includes the linked product. Returns 404 if t
 
 ## Sample Creation
 
-Samples are **not** created via the Samples API. They are created when an Admin or SubAdmin creates a product and uploads a sample file.
+Samples are typically managed implicitly through Sample Sections endpoints.
 
-**Endpoint:** `POST /api/v2/products`  
-**Auth Required:** Yes (Admin, SubAdmin)
+**Endpoint:** `POST /api/v2/sample-sections/:sectionId/samples`  
+**Auth Required:** Yes (Admin, SubAdmin, Moderator)
 
 **Content-Type:** `multipart/form-data`
 
@@ -178,51 +161,42 @@ Samples are **not** created via the Samples API. They are created when an Admin 
 
 | Field           | Type   | Required | Description                          |
 | --------------- | ------ | -------- | ------------------------------------ |
-| `title`         | string | Yes      | Product title                        |
-| `description`   | string | No       | Product description                  |
-| `type`          | string | Yes      | `"Book"` or `"Product"`              |
-| `price`         | number | Yes      | Product price                        |
-| `price_after_discount` | number | No  | Discounted price                     |
-| `serial`        | string | No       | Product serial number                |
-| `sample_url`    | string | No       | External sample URL (alternative to file) |
-| `category_ids`  | string | No       | JSON array of category IDs, e.g. `"[1,2,3]"` |
-| `thumbnail`     | file   | No       | Thumbnail image                      |
-| `sample`        | file   | No       | Sample file — PDF or Word (.doc, .docx) |
+| `title`         | string | No       | Sample title                         |
+| `product_id`    | number | No       | Tied product ID (can be missing)     |
+| `media_type`    | enum   | No       | Automatically interpreted if omitted |
+| `high_quality`  | file   | No*      | Primary dense file upload            |
+| `low_quality`   | file   | No*      | Lightweight variant                  |
+
+*\* At least one file (`high_quality` or `low_quality`) is fully required.*
 
 **Example Request (cURL):**
 
 ```bash
-curl -X POST "https://api.example.com/api/v2/products" \
+curl -X POST "https://api.example.com/api/v2/sample-sections/3/samples" \
   -H "Authorization: Bearer <access_token>" \
-  -F "title=Grade 3 Math Curriculum" \
-  -F "description=Full curriculum for grade 3" \
-  -F "type=Book" \
-  -F "price=150" \
-  -F "category_ids=[1,2]" \
-  -F "thumbnail=@/path/to/thumbnail.jpg" \
-  -F "sample=@/path/to/sample.pdf"
+  -F "title=Sample Preview" \
+  -F "product_id=5" \
+  -F "high_quality=@/path/to/hq.pdf"
 ```
-
-**Notes:**
-
-- Max file size per file: **150 MB**
-- If both `sample` (file) and `sample_url` (string) are provided, the uploaded file takes precedence
-- Products can have either an uploaded sample file, a `sample_url`, or neither — not both at once
-- Deleting a product cascades to its sample (file and database record)
 
 ---
 
 ## Sample Object
 
-| Field         | Type   | Description                                      |
-| ------------- | ------ | ------------------------------------------------ |
-| `id`          | number | Unique identifier (auto-increment PK)           |
-| `product_id`  | number | Product this sample belongs to (unique per sample) |
-| `url`         | string | Path to the file (e.g. `/uploads/samples/...`)   |
-| `original_name` | string | Original filename when uploaded                 |
-| `mime_type`   | string | MIME type of the file                            |
-| `size`        | number | File size in bytes                               |
-| `created_at`  | string | ISO 8601 timestamp                               |
+| Field              | Type    | Description                                              |
+| ------------------ | ------- | -------------------------------------------------------- |
+| `id`               | number  | Unique identifier (auto-increment PK)                    |
+| `product_id`       | number  | Tied product (nullable)                                  |
+| `section_id`       | number  | Tied sample-section ID                                   |
+| `media_type`       | enum    | E.g. `pdf`, `image`, `video`, `word`, `powerpoint`       |
+| `high_quality_url` | string  | Path/url to HD artifact (nullable)                       |
+| `low_quality_url`  | string  | Path/url to LD artifact (nullable)                       |
+| `thumbnail`        | string  | Auto-inferred fallback thumbnail link                    |
+| `is_displayable`   | boolean | If the client can preview it globally inline             |
+| `original_name`    | string  | Original filename when uploaded                          |
+| `mime_type`        | string  | MIME type of the file                                    |
+| `size`             | number  | File size in bytes                                       |
+| `created_at`       | string  | ISO 8601 timestamp                                       |
 
 ---
 
@@ -230,11 +204,15 @@ curl -X POST "https://api.example.com/api/v2/products" \
 
 Only the following MIME types are accepted for sample uploads:
 
-| MIME Type                                                                 | Extension | Description          |
-| ------------------------------------------------------------------------ | --------- | -------------------- |
-| `application/pdf`                                                         | `.pdf`    | PDF document         |
-| `application/msword`                                                      | `.doc`    | Microsoft Word 97-03 |
-| `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | `.docx`   | Microsoft Word 2007+  |
+| MIME Type                                                                 | Extension            | Description             |
+| ------------------------------------------------------------------------ | -------------------- | ----------------------- |
+| `application/pdf`                                                         | `.pdf`               | PDF document            |
+| `image/jpeg`, `image/png`, `image/webp`, `image/gif`                      | `.jpg`, `.png`, etc. | Images                  |
+| `video/mp4`, `video/webm`, `video/quicktime`                              | `.mp4`, `.mov`       | Videos                  |
+| `application/msword`                                                      | `.doc`               | Microsoft Word 97-03    |
+| `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | `.docx`              | Microsoft Word 2007+    |
+| `application/vnd.ms-powerpoint`                                           | `.ppt`               | Microsoft PowerPoint    |
+| `application/vnd.openxmlformats-officedocument.presentationml.presentation`| `.pptx`              | Microsoft PPTX        |
 
 Uploading a file with any other MIME type returns **400 Bad Request** with:
 
