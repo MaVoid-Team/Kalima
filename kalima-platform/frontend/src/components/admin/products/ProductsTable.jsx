@@ -198,7 +198,7 @@ export default function ProductsTable({
                                                 {t('products.status.comingSoon', 'Coming Soon')}
                                             </Badge>
                                             <span className="text-[10px] text-muted-foreground">
-                                                {format(new Date(product.release_at), 'MMM d, yyyy')}
+                                                {new Date(product.release_at).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric', year: 'numeric' })}
                                             </span>
                                         </div>
                                     )}

@@ -10,6 +10,11 @@
     "format": "الشكل",
     "kitAccentColor": "لون المجموعة"
   },
+  "status": {
+    "active": "نشط",
+    "archived": "مؤرشف",
+    "comingSoon": "قريباً"
+  },
   "types": {
     "Product": "منتج",
     "Book": "كتاب"
@@ -120,7 +125,8 @@
   },
   "badges": {
     "bestSeller": "الأكثر مبيعاً",
-    "interactive": "تفاعلي"
+    "interactive": "تفاعلي",
+    "comingSoon": "قريباً"
   },
   "booklet": {
     "selectFormat": "اختر الصيغة",
