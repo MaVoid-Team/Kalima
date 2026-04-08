@@ -2,15 +2,19 @@ import { useState, useEffect, useCallback } from 'react';
 import useApiMutation from './useApiMutation';
 import { buildProductImages, buildProductMedia } from '../lib/storeUtils';
 
-export const useProducts = (id = null) => {
+export const useProducts = (idOrConfig = null) => {
+    // Handle both single ID argument and config object
+    const config = (typeof idOrConfig === 'object' && idOrConfig !== null) ? idOrConfig : { id: idOrConfig };
+    const { id = null, initialParams = {} } = config;
+
     const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
 
     // List state
     const [products, setProducts] = useState([]);
     const [pagination, setPagination] = useState({
         total: 0,
-        page: 1,
-        limit: 8
+        page: initialParams.page ?? 1,
+        limit: initialParams.limit ?? 8
     });
     const [filters, setFilters] = useState({
         search: '',
@@ -28,11 +32,16 @@ export const useProducts = (id = null) => {
 
     const fetchProducts = useCallback(async () => {
         try {
-            const query = new URLSearchParams({
-                page: pagination.page,
-                limit: pagination.limit,
-                is_archived: false,
-            });
+            const query = new URLSearchParams();
+            
+            if (initialParams.page !== null && pagination.page) query.append('page', pagination.page);
+            if (initialParams.limit !== null && pagination.limit) query.append('limit', pagination.limit);
+            
+            // Handle is_archived: default to false unless null/specified
+            const isArchived = initialParams.is_archived !== undefined ? initialParams.is_archived : false;
+            if (isArchived !== null) {
+                query.append('is_archived', isArchived);
+            }
 
             if (filters.search) {
                 query.append('search', filters.search);

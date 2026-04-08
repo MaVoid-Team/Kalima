@@ -37,6 +37,7 @@ export default function SamplePreviewPage() {
             low_quality_url: searchParams.get('low_quality_url'),
             created_at: searchParams.get('created_at'),
             product_id: searchParams.get('product_id'),
+            title: searchParams.get('title'),
             // Nested products (simplified for URL)
             products: searchParams.get('product_title') ? {
                 id: searchParams.get('product_id'),
@@ -85,7 +86,7 @@ export default function SamplePreviewPage() {
                     </Link>
                 </Button>
                 <span dir="auto" className="text-sm font-medium truncate text-muted-foreground flex-1">
-                    {sample?.original_name}
+                    {sample?.title || sample?.original_name}
                 </span>
                 {downloadUrl && (
                     <Button variant="outline" size="sm" asChild data-testid="sample-preview-download-button">

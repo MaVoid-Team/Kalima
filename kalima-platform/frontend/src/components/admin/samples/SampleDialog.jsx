@@ -55,9 +55,16 @@ const detectMediaType = (file) => {
 
 export default function SampleDialog({ open, onOpenChange, sectionId, sample, onCreate, onUpdate }) {
     const { t, i18n } = useTranslation('admin');
-    const { products, setSearch, loading: productsLoading } = useProducts();
+    const { products, setSearch, loading: productsLoading } = useProducts({
+        initialParams: {
+            page: null,
+            limit: null,
+            is_archived: null
+        }
+    });
 
     const [productId, setProductId] = useState('');
+    const [title, setTitle] = useState('');
     const [productSearch, setProductSearch] = useState('');
     const [openPicker, setOpenPicker] = useState(false);
 
@@ -76,12 +83,14 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
     useEffect(() => {
         if (sample) {
             setProductId(sample.product_id ? String(sample.product_id) : '');
+            setTitle(sample.title || '');
             setMediaType(sample.media_type || 'pdf');
             const name = sample.original_name || '';
             setHqFileName(sample.high_quality_url ? name : '');
             setLqFileName(sample.low_quality_url ? name : '');
         } else {
             setProductId('');
+            setTitle('');
             setMediaType('pdf');
             setHqFileName('');
             setLqFileName('');
@@ -119,8 +128,12 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
         return { hqExists, lqExists, hqType, lqType };
     };
 
-    const validateFiles = (newHq = null, newLq = null) => {
+    const validateFiles = (newHq = null, newLq = null, overrideTitle = null) => {
         const { hqExists, lqExists, hqType, lqType } = getTypes(newHq, newLq);
+
+        const currentTitle = overrideTitle !== null ? overrideTitle : title;
+        if (!currentTitle.trim()) return t('samples.errors.titleRequired');
+        if (!hqExists) return t('samples.errors.noHqFile');
 
         // Check for unsupported formats first
         if (hqExists && !hqType && (newHq || hqFileRef.current?.files?.[0])) return t('samples.errors.unsupportedType');
@@ -157,6 +170,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
         const formData = new FormData();
         formData.append('media_type', finalMediaType);
         if (productId) formData.append('product_id', productId);
+        if (title) formData.append('title', title);
 
         const hqFile = hqFileRef.current?.files?.[0];
         const lqFile = lqFileRef.current?.files?.[0];
@@ -213,6 +227,17 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+                    <div className="grid gap-2">
+                        <Label htmlFor="title">{t('samples.titleLabel', 'Sample Title')} *</Label>
+                        <Input
+                            id="title"
+                            placeholder={t('samples.titlePlaceholder')}
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            disabled={uploading}
+                        />
+                    </div>
+
                     <div className="grid gap-2">
                         <Label>{t('samples.table.product', 'Associated Product')}</Label>
                         <Popover open={openPicker} onOpenChange={setOpenPicker}>
@@ -281,7 +306,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="hq-file">{t('samples.hqFileLabel', 'High Quality File (Protected)')}</Label>
+                        <Label htmlFor="hq-file">{t('samples.hqFileLabel', 'High Quality File (Protected)')} *</Label>
                         <div className="flex flex-col gap-2">
                             <Button
                                 type="button"
@@ -304,7 +329,14 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                                     const file = e.target.files?.[0];
                                     if (file) {
                                         setHqFileName(file.name);
-                                        const error = validateFiles(file, null);
+                                        // Auto-populate title from filename if currently empty
+                                        let updatedTitle = title;
+                                        if (!title.trim()) {
+                                            const nameWithoutExt = file.name.split('.').slice(0, -1).join('.');
+                                            updatedTitle = nameWithoutExt || file.name;
+                                            setTitle(updatedTitle);
+                                        }
+                                        const error = validateFiles(file, null, updatedTitle);
                                         setValidationError(error);
                                         
                                         const detected = detectMediaType(file);
@@ -347,7 +379,14 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                                     const file = e.target.files?.[0];
                                     if (file) {
                                         setLqFileName(file.name);
-                                        const error = validateFiles(null, file);
+                                        // Auto-populate title from filename if currently empty
+                                        let updatedTitle = title;
+                                        if (!title.trim()) {
+                                            const nameWithoutExt = file.name.split('.').slice(0, -1).join('.');
+                                            updatedTitle = nameWithoutExt || file.name;
+                                            setTitle(updatedTitle);
+                                        }
+                                        const error = validateFiles(null, file, updatedTitle);
                                         setValidationError(error);
                                         
                                         const detected = detectMediaType(file);

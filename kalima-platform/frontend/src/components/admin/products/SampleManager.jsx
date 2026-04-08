@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileText, FileVideo, Image, Upload, Trash2, X, Download, File, Pencil, Eye, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -70,10 +71,12 @@ const SampleUploadForm = ({
     initialSectionId,
     initialMediaType,
     initialHqName,
-    initialLqName
+    initialLqName,
+    initialTitle
 }) => {
     const { t, i18n } = useTranslation('admin');
 
+    const [title, setTitle] = useState(initialTitle || '');
     const [sectionId, setSectionId] = useState(initialSectionId || '');
     const [mediaType, setMediaType] = useState(initialMediaType || 'pdf');
     const [hqFileName, setHqFileName] = useState(initialHqName || '');
@@ -91,10 +94,15 @@ const SampleUploadForm = ({
         return { hqFile, lqFile, hqType, lqType };
     };
 
-    const validateFiles = (newHq = null, newLq = null) => {
+    const validateFiles = (newHq = null, newLq = null, overrideTitle = null) => {
         const { hqFile, lqFile, hqType, lqType } = getTypes(newHq, newLq);
         const hqExists = hqFile || (sample && sample.high_quality_url);
         const lqExists = lqFile || (sample && sample.low_quality_url);
+
+        const currentTitle = overrideTitle !== null ? overrideTitle : title;
+        if (!currentTitle.trim()) return t('samples.errors.titleRequired');
+        if (!sectionId) return t('samples.errors.noSection');
+        if (!hqExists) return t('samples.errors.noHqFile');
 
         if (hqExists && hqFile && !hqType) return t('samples.errors.unsupportedType');
         if (lqExists && lqFile && !lqType) return t('samples.errors.unsupportedType');
@@ -114,16 +122,7 @@ const SampleUploadForm = ({
         const { hqFile, lqFile, hqType, lqType } = getTypes();
         const finalMediaType = hqType || lqType || mediaType;
 
-        if (!sectionId) {
-            toast.error(t('samples.errors.noSection'));
-            return;
-        }
-        if (!hqFile && !lqFile && !sample) {
-            toast.error(t('samples.errors.noFile'));
-            return;
-        }
-
-        onSubmit({ sectionId, mediaType: finalMediaType, hqFile, lqFile });
+        onSubmit({ sectionId, mediaType: finalMediaType, title, hqFile, lqFile });
     };
 
     return (
@@ -140,8 +139,25 @@ const SampleUploadForm = ({
             </div>
 
             <div className="space-y-2">
-                <Label>{t('samples.sectionLabel', 'Sample Section')}</Label>
-                <Select dir={i18n.dir()} value={sectionId} onValueChange={setSectionId}>
+                <Label htmlFor="sample-title">{t('samples.titleLabel', 'Sample Title')} *</Label>
+                <Input
+                    id="sample-title"
+                    placeholder={t('samples.titlePlaceholder')}
+                    value={title}
+                    onChange={(e) => {
+                        setTitle(e.target.value);
+                        if (validationError) setValidationError(validateFiles(null, null, e.target.value));
+                    }}
+                    disabled={uploading}
+                />
+            </div>
+
+            <div className="space-y-2">
+                <Label>{t('samples.sectionLabel', 'Sample Section')} *</Label>
+                <Select dir={i18n.dir()} value={sectionId} onValueChange={(val) => {
+                    setSectionId(val);
+                    if (validationError) setValidationError(validateFiles());
+                }}>
                     <SelectTrigger>
                         <SelectValue placeholder={t('samples.selectSection', 'Select a section...')} />
                     </SelectTrigger>
@@ -162,7 +178,7 @@ const SampleUploadForm = ({
             </div>
 
             <div className="space-y-2">
-                <Label>{t('samples.hqFileLabel', 'High Quality File')}</Label>
+                <Label>{t('samples.hqFileLabel', 'High Quality File')} *</Label>
                 <Button
                     type="button"
                     variant="outline"
@@ -181,7 +197,14 @@ const SampleUploadForm = ({
                         const file = e.target.files?.[0];
                         if (file) {
                             setHqFileName(file.name);
-                            setValidationError(validateFiles(file, null));
+                            // Auto-populate title from filename if currently empty
+                            let updatedTitle = title;
+                            if (!title.trim()) {
+                                const nameWithoutExt = file.name.split('.').slice(0, -1).join('.');
+                                updatedTitle = nameWithoutExt || file.name;
+                                setTitle(updatedTitle);
+                            }
+                            setValidationError(validateFiles(file, null, updatedTitle));
                             const detected = detectMediaType(file);
                             if (detected) setMediaType(detected);
                         } else {
@@ -212,9 +235,16 @@ const SampleUploadForm = ({
                         const file = e.target.files?.[0];
                         if (file) {
                             setLqFileName(file.name);
-                            setValidationError(validateFiles(null, file));
-                            
+                            // Auto-populate title from filename if currently empty
+                            let updatedTitle = title;
+                            if (!title.trim()) {
+                                const nameWithoutExt = file.name.split('.').slice(0, -1).join('.');
+                                updatedTitle = nameWithoutExt || file.name;
+                                setTitle(updatedTitle);
+                            }
+                            setValidationError(validateFiles(null, file, updatedTitle));
                             const detected = detectMediaType(file);
+                            if (detected) setMediaType(detected);
                             // Only override if HQ isn't selected or if HQ matches
                             if (detected && !hqFileRef.current?.files?.[0]) {
                                 setMediaType(detected);
@@ -288,7 +318,7 @@ const SamplePreviewDisplay = ({ sample, product, previewUrl, downloadUrl, onEdit
                     <div className="flex items-center gap-2">
                         <MediaIcon mediaType={mt} className="h-5 w-5 text-primary" />
                         <span className="font-medium text-foreground">
-                            {t('samples.productSampleName', { title: product.title })}
+                            {sample.title || t('samples.productSampleName', { title: product.title })}
                         </span>
                         <Badge variant="outline">{t(`samples.mediaTypes.${mt}`)}</Badge>
                     </div>
@@ -358,11 +388,12 @@ export default function SampleManager({ product, loading, onUpdateSample, onRemo
         setUploadProgress(0);
     };
 
-    const handleUploadSubmit = async ({ sectionId, mediaType, hqFile, lqFile }) => {
+    const handleUploadSubmit = async ({ sectionId, mediaType, title, hqFile, lqFile }) => {
         const formData = new FormData();
         formData.append('product_id', product.id);
         formData.append('sample_section_id', sectionId);
         formData.append('media_type', mediaType);
+        if (title) formData.append('title', title);
         
         if (hqFile) formData.append('high_quality', hqFile);
         if (lqFile) formData.append('low_quality', lqFile);
@@ -492,6 +523,7 @@ export default function SampleManager({ product, loading, onUpdateSample, onRemo
                         initialMediaType={currentEditSample?.media_type || 'pdf'}
                         initialHqName={currentEditSample?.original_name || ''}
                         initialLqName={currentEditSample?.original_name || ''}
+                        initialTitle={currentEditSample?.title || ''}
                     />
                 </div>
             )}
