@@ -4,9 +4,8 @@ import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Download, AlertCircle, FileText, Music } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import LoadingSpinner from '@/components/ui/loading-spinner';
-import useApiMutation from '@/hooks/useApiMutation';
 import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
+import { getImageUrl } from '@/lib/storeUtils';
 
 /**
  * SamplePreviewPage — full-screen media viewer for a single sample.
@@ -65,13 +64,10 @@ export default function SamplePreviewPage() {
         );
     }
 
-    const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
-    const apiBase = apiUrl.replace('/api/v2', '');
-
-    const previewUrl = sample?.high_quality_url ? (sample.high_quality_url.startsWith('http') ? sample.high_quality_url : `${apiBase}${sample.high_quality_url}`) : '';
-    const downloadUrl = sample?.low_quality_url ? (sample.low_quality_url.startsWith('http') ? sample.low_quality_url : `${apiBase}${sample.low_quality_url}`) : '';
-
-    const mediaType = sample?.media_type;
+    const mediaType = String(sample?.media_type || '').toLowerCase();
+    const highQualityUrl = getImageUrl(sample?.high_quality_url) || '';
+    const downloadUrl = getImageUrl(sample?.low_quality_url) || '';
+    const previewUrl = highQualityUrl || (['image', 'video', 'audio'].includes(mediaType) ? downloadUrl : '');
     const isPdf = mediaType === 'pdf' || sample?.mime_type === 'application/pdf';
 
     return (

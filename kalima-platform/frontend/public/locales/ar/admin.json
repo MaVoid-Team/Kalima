@@ -331,7 +331,10 @@
       "serialMaxLength": "يجب ألا يزيد الرقم التسلسلي عن 100 حرف",
       "couponIdMustBeInteger": "معرف الكوبون يجب أن يكون رقمًا صحيحًا",
       "couponIdMustBeGreaterThan0": "معرف الكوبون يجب أن يكون أكبر من 0",
-      "discountedPriceMustBeLessThanOriginalPrice": "السعر بعد الخصم يجب أن يكون أقل من السعر الأصلي"
+      "discountedPriceMustBeLessThanOriginalPrice": "السعر بعد الخصم يجب أن يكون أقل من السعر الأصلي",
+      "sampleTitle": "عنوان العينة",
+      "sampleTitlePlaceholder": "أدخل عنوان العينة",
+      "sampleTitleRequired": "عنوان العينة مطلوب عند إرفاق عينة"
     },
     "create": {
       "dialogTitle": "إنشاء منتج جديد",
@@ -497,6 +500,7 @@
     "errors": {
       "titleRequired": "عنوان العينة مطلوب.",
       "noHqFile": "الملف عالي الجودة مطلوب.",
+      "noLqFile": "الملف منخفض الجودة مطلوب لهذا النوع.",
       "noProduct": "يرجى إدخال معرف المنتج.",
       "uploadFailed": "فشل رفع العينة.",
       "noSection": "يرجى اختيار قسم العينة.",

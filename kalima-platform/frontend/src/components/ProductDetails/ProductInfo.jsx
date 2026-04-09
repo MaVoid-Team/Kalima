@@ -2,7 +2,7 @@ import { Star, StarHalf, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { calculateDiscountPercentage, formatPrice } from "@/lib/storeUtils";
+import { calculateDiscountPercentage, formatPrice, formatTimeUntilRelease } from "@/lib/storeUtils";
 
 export default function ProductInfo({ product }) {
   const { t } = useTranslation(["product", "checkout"]);
@@ -22,6 +22,12 @@ export default function ProductInfo({ product }) {
 
   const isReleased = product?.is_released ?? true;
   const releaseAt = product?.release_at;
+  const fallbackTimeUntilReleaseMs = releaseAt ? Math.max(new Date(releaseAt).getTime() - Date.now(), 0) : 0;
+  const countdownText = formatTimeUntilRelease(
+    Number.isFinite(Number(product?.time_until_release_ms))
+      ? product.time_until_release_ms
+      : fallbackTimeUntilReleaseMs
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -35,7 +41,7 @@ export default function ProductInfo({ product }) {
         {!isReleased && releaseAt && (
           <Badge variant="secondary" className="gap-1.5 bg-amber-100 text-amber-800 hover:bg-amber-100/80 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800">
             <Clock className="w-3.5 h-3.5" />
-            {t("product:badges.comingSoon", "Coming Soon")} - {new Date(releaseAt).toLocaleDateString()}
+            {t("product:badges.comingSoon", "Coming Soon")} - {countdownText}
           </Badge>
         )}
         {product.type && (

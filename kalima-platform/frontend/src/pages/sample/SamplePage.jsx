@@ -28,11 +28,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import LoadingSpinner from '@/components/ui/loading-spinner';
 import useApiMutation from '@/hooks/useApiMutation';
 import { getImageUrl, formatFileSize, formatPrice } from '@/lib/storeUtils';
 import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
-import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 // ── Media Viewer ──────────────────────────────────────────────────────────────
@@ -40,10 +38,10 @@ import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 // ── Media Viewer ──────────────────────────────────────────────────────────────
 
 function MediaViewer({ sample, previewUrl, downloadUrl, viewerI18n, dir, t }) {
-    const mediaType = sample?.media_type;
-    const isPdf = sample?.mime_type === 'application/pdf';
+    const mediaType = String(sample?.media_type || '').toLowerCase();
+    const isPdf = sample?.mime_type === 'application/pdf' || mediaType === 'pdf';
 
-    if (mediaType === 'Video') {
+    if (mediaType === 'video') {
         return previewUrl ? (
             <video
                 className="w-full h-full object-contain rounded-xl"
@@ -60,7 +58,7 @@ function MediaViewer({ sample, previewUrl, downloadUrl, viewerI18n, dir, t }) {
         );
     }
 
-    if (mediaType === 'Audio') {
+    if (mediaType === 'audio') {
         return (
             <div className="flex flex-col items-center justify-center gap-8 p-8 w-full h-full">
                 <div className="h-24 w-24 rounded-full bg-orange-500/10 flex items-center justify-center">
@@ -83,7 +81,7 @@ function MediaViewer({ sample, previewUrl, downloadUrl, viewerI18n, dir, t }) {
         );
     }
 
-    if (mediaType === 'Image') {
+    if (mediaType === 'image') {
         return previewUrl ? (
             <img
                 src={previewUrl}
@@ -97,7 +95,7 @@ function MediaViewer({ sample, previewUrl, downloadUrl, viewerI18n, dir, t }) {
     }
 
     // Document — PDF viewer or word download prompt
-    if (isPdf && previewUrl) {
+    if ((isPdf || mediaType === 'pdf') && previewUrl) {
         return (
             <PDFViewer
                 config={{
@@ -127,6 +125,15 @@ function MediaViewer({ sample, previewUrl, downloadUrl, viewerI18n, dir, t }) {
             )}
         </div>
     );
+}
+
+function resolveSampleMediaUrls(sample) {
+    const mediaType = String(sample?.media_type || '').toLowerCase();
+    const highQualityUrl = sample?.high_quality_url ? getImageUrl(sample.high_quality_url) : '';
+    const lowQualityUrl = sample?.low_quality_url ? getImageUrl(sample.low_quality_url) : '';
+    const previewUrl = highQualityUrl || (['image', 'video', 'audio'].includes(mediaType) ? lowQualityUrl : '');
+
+    return { mediaType, highQualityUrl, lowQualityUrl, previewUrl };
 }
 
 function MediaFallback({ downloadUrl, t }) {
@@ -179,33 +186,51 @@ export default function SamplePage() {
     const isRtl = i18n.dir() === 'rtl';
 
     const mediaTypeMeta = useMemo(() => ({
-        Document: {
+        document: {
             icon: FileText,
             colorClass: 'text-blue-500',
             bgClass: 'bg-blue-500/10',
-            label: t('samples.mediaTypes.Document', 'Document'),
+            label: t('samples.mediaTypes.pdf', 'Document'),
         },
-        Video: {
+        pdf: {
+            icon: FileText,
+            colorClass: 'text-blue-500',
+            bgClass: 'bg-blue-500/10',
+            label: t('samples.mediaTypes.pdf', 'PDF'),
+        },
+        word: {
+            icon: FileText,
+            colorClass: 'text-blue-500',
+            bgClass: 'bg-blue-500/10',
+            label: t('samples.mediaTypes.word', 'Word'),
+        },
+        powerpoint: {
+            icon: FileText,
+            colorClass: 'text-red-500',
+            bgClass: 'bg-red-500/10',
+            label: t('samples.mediaTypes.powerpoint', 'PowerPoint'),
+        },
+        video: {
             icon: Video,
             colorClass: 'text-purple-500',
             bgClass: 'bg-purple-500/10',
-            label: t('samples.mediaTypes.Video', 'Video'),
+            label: t('samples.mediaTypes.video', 'Video'),
         },
-        Audio: {
+        audio: {
             icon: Music,
             colorClass: 'text-orange-500',
             bgClass: 'bg-orange-500/10',
-            label: t('samples.mediaTypes.Audio', 'Audio'),
+            label: t('samples.mediaTypes.audio', 'Audio'),
         },
-        Image: {
+        image: {
             icon: ImageIcon,
             colorClass: 'text-green-500',
             bgClass: 'bg-green-500/10',
-            label: t('samples.mediaTypes.Image', 'Image'),
+            label: t('samples.mediaTypes.image', 'Image'),
         },
     }), [t]);
 
-    const getMediaMeta = (type) => mediaTypeMeta[type] || mediaTypeMeta.Document;
+    const getMediaMeta = (type) => mediaTypeMeta[type?.toLowerCase()] || mediaTypeMeta.pdf;
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -214,7 +239,7 @@ export default function SamplePage() {
         // If we already have the sample from location state, skip fetch
         if (sample) return;
 
-        fetchApi({ endpoint: `/sample-sections/1/samples/${id}/preview`, method: 'get' })
+        fetchApi({ endpoint: `/samples/${id}`, method: 'get' })
             .then(res => {
                 if (res?.success) setSample(res.data);
                 else setError(true);
@@ -262,17 +287,17 @@ export default function SamplePage() {
     }
 
     // ── Derived values ────────────────────────────────────────────────────────
-    const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
-    const sectionId = sample?.section_id;
-    const previewUrl = sectionId ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/preview` : '';
-    const downloadUrl = sectionId ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download` : '';
-
-    const mediaType = sample?.media_type || 'Document';
+    const {
+        mediaType,
+        highQualityUrl,
+        lowQualityUrl: downloadUrl,
+        previewUrl,
+    } = resolveSampleMediaUrls(sample);
     const meta = getMediaMeta(mediaType);
     const MetaIcon = meta.icon;
     const product = sample?.products;
 
-    const hasHighQuality = Boolean(sample?.high_quality_url || previewUrl);
+    const hasHighQuality = Boolean(sample?.high_quality_url || highQualityUrl);
     const hasLowQuality = Boolean(sample?.low_quality_url || downloadUrl);
 
     const formattedDate = sample?.created_at
@@ -352,30 +377,19 @@ export default function SamplePage() {
 
                             {/* Action Buttons */}
                             <div className="flex flex-col sm:flex-row gap-3" data-testid="sample-page-action-buttons">
-                                {hasHighQuality && (mediaType === 'Document' || mediaType === 'Image') && (
+                                {hasHighQuality && ['pdf', 'image'].includes(mediaType?.toLowerCase()) && (
                                     <Button variant="default" className="flex-1 gap-2" asChild data-testid="sample-page-full-preview-button">
-                                        <Link to={`/samples/${id}/preview?${new URLSearchParams({
-                                            section_id: sample.section_id || '',
-                                            media_type: sample.media_type || '',
-                                            mime_type: sample.mime_type || '',
-                                            original_name: sample.original_name || '',
-                                            high_quality_url: sample.high_quality_url || '',
-                                            low_quality_url: sample.low_quality_url || '',
-                                            created_at: sample.created_at || '',
-                                            product_id: sample.product_id || '',
-                                            product_title: sample.products?.title || '',
-                                            title: sample.title || ''
-                                        }).toString()}`} target="_blank" rel="noopener noreferrer">
+                                        <a href={previewUrl} target="_blank" rel="noopener noreferrer">
                                             <Eye className="h-4 w-4" />
                                             {t('samplePage.fullPreview', 'Full Preview')}
                                             <ExternalLink className="h-4 w-4" />
-                                        </Link>
+                                        </a>
                                     </Button>
                                 )}
 
                                 {hasLowQuality && (
                                     <Button variant="outline" className="flex-1 gap-2" asChild data-testid="sample-page-download-lq-button">
-                                        <a href={downloadUrl} download>
+                                        <a href={downloadUrl} target="_blank" rel="noopener noreferrer" download>
                                             <Download className="h-4 w-4" />
                                             {t('samplePage.download', 'Download')}
                                             {sample?.low_quality_size > 0 && (
@@ -431,7 +445,7 @@ export default function SamplePage() {
                             </div>
 
                             {/* Sample Details */}
-                            <div className="rounded-xl border border-border bg-card p-5 space-y-1" data-testid="sample-page-details-card">
+                            <div className="rounded-xl border border-border p-5 space-y-1" data-testid="sample-page-details-card">
                                 <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
                                     <FileText className="h-4 w-4" />
                                     {t('samplePage.sampleInfo', 'Sample Information')}
@@ -469,7 +483,7 @@ export default function SamplePage() {
 
                             {/* Product Info */}
                             {product && (
-                                <div className="rounded-xl border border-border bg-card p-5 space-y-1" data-testid="sample-page-product-card">
+                                <div className="rounded-xl border border-border p-5 space-y-1" data-testid="sample-page-product-card">
                                     <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
                                         <Package className="h-4 w-4" />
                                         {t('samplePage.productInfo', 'Product Information')}

@@ -5,7 +5,7 @@ import { CheckCheck, ShoppingCart, Zap, Clock } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { calculateDiscountPercentage, formatPrice } from "@/lib/storeUtils";
+import { calculateDiscountPercentage, formatPrice, formatTimeUntilRelease } from "@/lib/storeUtils";
 import useAuth from "@/hooks/auth/useAuth";
 import { useCart } from "@/contexts/CartContext";
 import useRole from "@/hooks/useRole";
@@ -18,7 +18,7 @@ import LoadingSpinner from "@/components/ui/loading-spinner";
  * The image/title area links to /product/:id.
  * "Add to Cart" and "Buy Now" buttons appear below (not inside the Link).
  */
-const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, isPurchased, rate, rate_count, is_released = true, release_at }) => {
+const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, isPurchased, rate, rate_count, is_released = true, release_at, time_until_release_ms }) => {
   const { t, i18n } = useTranslation("market");
   const location = useLocation();
   const navigate = useNavigate();
@@ -45,6 +45,10 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
 
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
+  const fallbackTimeUntilReleaseMs = release_at ? Math.max(new Date(release_at).getTime() - Date.now(), 0) : 0;
+  const countdownText = formatTimeUntilRelease(
+    Number.isFinite(Number(time_until_release_ms)) ? time_until_release_ms : fallbackTimeUntilReleaseMs
+  );
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
@@ -96,7 +100,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
               {!is_released && release_at && (
                 <Badge variant="secondary" className="px-2.5 py-1 text-[11px] font-semibold rounded-md gap-1 bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800 flex-wrap w-max">
                   <Clock className="w-3" />
-                  {t("product.comingSoon", "Coming Soon")}
+                  {t("product.comingSoon", "Coming Soon")} · {countdownText}
                 </Badge>
               )}
             </div>

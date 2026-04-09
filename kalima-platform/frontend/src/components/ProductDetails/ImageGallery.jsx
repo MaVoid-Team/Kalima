@@ -90,7 +90,8 @@ export default function ImageGallery({ images, badge }) {
 
     const { type, url, thumbnail, source_type } = mediaItem;
     const isVideo = type === 'video';
-    const isExternal = isVideo && source_type === 'external';
+    const isExternalVideoUrl = typeof url === "string" && (url.includes("youtube.com") || url.includes("youtu.be") || url.includes("vimeo.com"));
+    const isExternal = isVideo && (source_type === 'external' || isExternalVideoUrl);
 
     // Thumbnail specific rendering
     if (isThumbnail) {
@@ -133,13 +134,17 @@ export default function ImageGallery({ images, badge }) {
         const isYoutube = url?.includes('youtube.com') || url?.includes('youtu.be');
         let embedUrl = url;
         if (isYoutube) {
-           let videoId = '';
-           if (url.includes('youtube.com/watch')) {
-               videoId = new URL(url).searchParams.get('v');
-           } else if (url.includes('youtu.be/')) {
-               videoId = url.split('youtu.be/')[1].split(/[?#]/)[0];
-           }
-           if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0`;
+          let videoId = '';
+          try {
+            if (url.includes('youtube.com/watch')) {
+              videoId = new URL(url).searchParams.get('v');
+            } else if (url.includes('youtu.be/')) {
+              videoId = url.split('youtu.be/')[1].split(/[?#]/)[0];
+            }
+          } catch (_) {
+            videoId = '';
+          }
+          if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0`;
         }
         return (
           <iframe

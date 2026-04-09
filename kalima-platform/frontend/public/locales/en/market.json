@@ -150,6 +150,12 @@
     "noNestedSamples": "No samples available in this section yet.",
     "addFromProduct": "You can add samples to this section from the Product details page.",
     "mediaTypes": {
+      "pdf": "PDF",
+      "image": "Image",
+      "video": "Video",
+      "word": "Word",
+      "powerpoint": "PowerPoint",
+      "audio": "Audio",
       "Video": "Video",
       "Audio": "Audio",
       "Image": "Image",
