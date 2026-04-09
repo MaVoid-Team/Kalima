@@ -150,6 +150,12 @@
     "noNestedSamples": "لا توجد عينات متاحة في هذا القسم بعد.",
     "addFromProduct": "يمكنك إضافة عينات لهذا القسم من صفحة تفاصيل المنتج.",
     "mediaTypes": {
+      "pdf": "PDF",
+      "image": "صورة",
+      "video": "فيديو",
+      "word": "ملف Word",
+      "powerpoint": "ملف PowerPoint",
+      "audio": "ملف صوتي",
       "Video": "فيديو",
       "Audio": "ملف صوتي",
       "Image": "صورة",

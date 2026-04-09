@@ -17,14 +17,17 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
 import SampleSectionDialog from '@/components/admin/samples/SampleSectionDialog';
+import SampleDialog from '@/components/admin/samples/SampleDialog';
 import { toast } from 'sonner';
 
 export default function AdminSamplesPage() {
     const { t, i18n } = useTranslation('admin');
-    const { sections, loading, fetchSections, createSection, updateSection, deleteSection } = useAdminSampleSections();
+    const { sections, loading, fetchSections, createSection, updateSection, deleteSection, createSample } = useAdminSampleSections();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingSection, setEditingSection] = useState(null);
+
+    const [isSampleDialogOpen, setIsSampleDialogOpen] = useState(false);
 
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [sectionToDelete, setSectionToDelete] = useState(null);
@@ -65,6 +68,19 @@ export default function AdminSamplesPage() {
             setSectionToDelete(null);
         }
     };
+    
+    // Create Sample from root 
+    const handleCreateSample = async (formData, onProgress, abortSignal) => {
+        const secId = formData.get('sample_section_id');
+        if (!secId) return false;
+        const res = await createSample(secId, formData, onProgress, abortSignal);
+        if (res?.success) {
+            toast.success(t('samples.sections.sampleAdded', 'Sample added successfully'));
+            fetchSections();
+            return true;
+        }
+        return false;
+    };
 
     return (
         <div className="space-y-6" data-testid="admin-sample-sections-page">
@@ -74,6 +90,10 @@ export default function AdminSamplesPage() {
                     <p className="text-muted-foreground text-sm mt-1">{t('samples.sections.subtitle', 'Manage sample sections to organize your samples.')}</p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <Button variant="outline" onClick={() => setIsSampleDialogOpen(true)} data-testid="samples-add-button">
+                        <Plus className="me-2 h-4 w-4" />
+                        {t('samples.sections.addSample', 'Add Sample')}
+                    </Button>
                     <Button onClick={handleOpenAddDialog} data-testid="sections-add-button">
                         <Plus className="me-2 h-4 w-4" />
                         {t('samples.sections.addTitle', 'Add Section')}
@@ -181,6 +201,15 @@ export default function AdminSamplesPage() {
                 section={editingSection}
                 onSubmit={handleDialogSubmit}
                 loading={loading}
+            />
+
+            <SampleDialog
+                open={isSampleDialogOpen}
+                onOpenChange={setIsSampleDialogOpen}
+                sectionId={null} 
+                sample={null}
+                onCreate={handleCreateSample}
+                showMediaTypeSelector
             />
 
             <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>

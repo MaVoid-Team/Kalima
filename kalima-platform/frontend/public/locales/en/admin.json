@@ -331,7 +331,10 @@
       "serialMaxLength": "Serial must be at most 100 characters",
       "couponIdMustBeInteger": "Coupon ID must be an integer",
       "couponIdMustBeGreaterThan0": "Coupon ID must be greater than 0",
-      "discountedPriceMustBeLessThanOriginalPrice": "Discounted price must be less than the original price"
+      "discountedPriceMustBeLessThanOriginalPrice": "Discounted price must be less than the original price",
+      "sampleTitle": "Sample Title",
+      "sampleTitlePlaceholder": "Enter a title for the sample",
+      "sampleTitleRequired": "Sample title is required when attaching a sample"
     },
     "create": {
       "dialogTitle": "Create New Product",
@@ -497,6 +500,7 @@
     "errors": {
       "titleRequired": "Sample title is required.",
       "noHqFile": "High quality file is required.",
+      "noLqFile": "Low quality file is required for this media type.",
       "noProduct": "Please enter a product ID.",
       "uploadFailed": "Failed to upload sample.",
       "noSection": "Please select a sample section.",

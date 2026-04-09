@@ -29,6 +29,9 @@ export default function ProductDetailsPage() {
   }, []);
 
   const { product: productProps, media, loading, notFound } = useProducts(id);
+  const primarySampleId = Array.isArray(productProps?.samples)
+    ? (productProps.samples.find((sample) => !sample?.is_archived)?.id ?? productProps.samples[0]?.id ?? null)
+    : (productProps?.samples?.id ?? null);
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) {
@@ -121,7 +124,7 @@ export default function ProductDetailsPage() {
                 price={productProps.price_after_discount == 0 ? productProps.price : productProps.price_after_discount}
                 productId={productProps.id}
                 sampleUrl={productProps.sample_url}
-                sampleId={productProps.samples?.id ?? null}
+                sampleId={primarySampleId}
                 title={productProps.title}
                 serial={productProps.serial}
                 isReleased={productProps.is_released ?? true}

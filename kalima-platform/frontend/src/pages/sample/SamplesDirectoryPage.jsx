@@ -109,32 +109,70 @@ export default function SamplesDirectoryPage() {
                                             return (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
                                                     {filteredSamples.map((sample) => {
-                                                        const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
-                                                        const downloadUrl = `${apiUrl}/sample-sections/${section.id}/samples/${sample.id}/download`;
+                                                        const mt = sample.media_type?.toLowerCase();
+                                                        const downloadUrl = sample.low_quality_url
+                                                            ? getImageUrl(sample.low_quality_url)
+                                                            : '';
+                                                        // Only image/video media types have a displayable thumbnail
+                                                        const hasThumbnail = sample.thumbnail && (mt === 'image' || mt === 'video');
 
                                                         return (
                                                             <div
                                                                 key={sample.id}
-                                                                className="group flex flex-col justify-between rounded-xl border border-border p-5 shadow-sm transition-all hover:shadow-md hover:border-primary/50 bg-background"
+                                                                className="group flex flex-col rounded-xl border border-border shadow-sm transition-all hover:shadow-md hover:border-primary/50 bg-background overflow-hidden"
                                                             >
-                                                                <div className="space-y-4">
-                                                                    <div className="flex items-center gap-3 mb-2">
+                                                                {/* Thumbnail / Media preview */}
+                                                                {hasThumbnail ? (
+                                                                    <div className="w-full aspect-video overflow-hidden bg-muted relative">
+                                                                        {mt === 'video' ? (
+                                                                            <video
+                                                                                src={getImageUrl(sample.thumbnail)}
+                                                                                className="w-full h-full object-cover"
+                                                                                muted
+                                                                                preload="metadata"
+                                                                                data-testid={`samples-directory-thumb-${sample.id}`}
+                                                                            />
+                                                                        ) : (
+                                                                            <img
+                                                                                src={getImageUrl(sample.thumbnail)}
+                                                                                alt={sample.title || ''}
+                                                                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                                                data-testid={`samples-directory-thumb-${sample.id}`}
+                                                                            />
+                                                                        )}
+                                                                        <div className="absolute top-2 start-2">
+                                                                            <span className="font-medium bg-black/60 text-white px-2 py-0.5 rounded-md text-xs backdrop-blur-sm">
+                                                                                {t(`samples.mediaTypes.${sample.media_type}`, sample.media_type)}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="w-full aspect-video bg-muted flex items-center justify-center">
                                                                         {getIconForType(sample.media_type)}
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Card body */}
+                                                                <div className="p-5 flex flex-col flex-1 gap-4">
+                                                                    <div className="flex items-center gap-3">
+                                                                        {!hasThumbnail && getIconForType(sample.media_type)}
                                                                         <h3 dir="auto" className="font-semibold text-lg line-clamp-2 leading-tight">
                                                                             {sample.title || `${t('samples.count')} #${sample.id}`}
                                                                         </h3>
                                                                     </div>
 
-                                                                    <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-muted-foreground">
-                                                                        <span className="font-medium bg-muted px-2 py-0.5 rounded-md text-xs">
-                                                                            {t(`samples.mediaTypes.${sample.media_type}`, sample.media_type)}
-                                                                        </span>
+                                                                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                                                                        {!hasThumbnail && (
+                                                                            <span className="font-medium bg-muted px-2 py-0.5 rounded-md text-xs">
+                                                                                {t(`samples.mediaTypes.${sample.media_type}`, sample.media_type)}
+                                                                            </span>
+                                                                        )}
                                                                         {sample.high_quality_size > 0 && <span>{t('samples.hq')}: {formatFileSize(sample.high_quality_size)}</span>}
                                                                         {sample.low_quality_size > 0 && <span>{t('samples.lq')}: {formatFileSize(sample.low_quality_size)}</span>}
                                                                     </div>
 
                                                                     {sample.product_id && (
-                                                                        <div className="flex items-start gap-2 pt-3 border-t border-border line-clamp-2">
+                                                                        <div className="flex items-start gap-2 border-t border-border pt-3 line-clamp-2">
                                                                             <Box className="h-4 w-4 shrink-0 text-muted-foreground relative top-0.5" />
                                                                             <Link
                                                                                 to={`/product/${sample.product_id}`}
@@ -145,34 +183,34 @@ export default function SamplesDirectoryPage() {
                                                                             </Link>
                                                                         </div>
                                                                     )}
-                                                                </div>
 
-                                                                <div className="flex items-center gap-2 mt-6 pt-4 border-t border-border">
-                                                                    <Button
-                                                                        variant="default"
-                                                                        className="flex-1"
-                                                                        asChild
-                                                                        data-testid={`samples-directory-view-${sample.id}`}
-                                                                    >
-                                                                        <Link to={`/samples/${sample.id}`} state={{ sample }}>
-                                                                            <Eye className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
-                                                                            {t("samples.view")}
-                                                                        </Link>
-                                                                    </Button>
-
-                                                                    {sample.low_quality_url && (
+                                                                    <div className="flex items-center gap-2 mt-auto pt-4 border-t border-border">
                                                                         <Button
-                                                                            variant="outline"
+                                                                            variant="default"
                                                                             className="flex-1"
                                                                             asChild
-                                                                            data-testid={`samples-directory-download-${sample.id}`}
+                                                                            data-testid={`samples-directory-view-${sample.id}`}
                                                                         >
-                                                                            <a href={downloadUrl} download>
-                                                                                <Download className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
-                                                                                {t("samples.download")}
-                                                                            </a>
+                                                                            <Link to={`/samples/${sample.id}`} state={{ sample }}>
+                                                                                <Eye className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
+                                                                                {t("samples.view")}
+                                                                            </Link>
                                                                         </Button>
-                                                                    )}
+
+                                                                        {sample.low_quality_url && (
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                className="flex-1"
+                                                                                asChild
+                                                                                data-testid={`samples-directory-download-${sample.id}`}
+                                                                            >
+                                                                                <a href={downloadUrl} download>
+                                                                                    <Download className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
+                                                                                    {t("samples.download")}
+                                                                                </a>
+                                                                            </Button>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         );

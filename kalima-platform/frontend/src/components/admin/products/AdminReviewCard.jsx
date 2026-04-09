@@ -22,11 +22,11 @@ const AdminReviewCard = ({ review, onDelete, loading, className }) => {
   if (!review) return null;
 
   const { id, rating, comment, content, user, created_at, createdAt } = review;
-  
+
   // Support both property names for safety
   const reviewText = comment || content || '';
   const reviewDate = created_at || createdAt;
-  
+
   const formattedDate = reviewDate ? new Intl.DateTimeFormat('en-US', {
     dateStyle: 'medium',
   }).format(new Date(reviewDate)) : '';
@@ -37,7 +37,7 @@ const AdminReviewCard = ({ review, onDelete, loading, className }) => {
   const avatarUrl = user?.avatar || user?.profile_image;
 
   return (
-    <Card className={cn("overflow-hidden border-border bg-card", className)} data-testid={`admin-review-card-${id}`}>
+    <Card className={cn("overflow-hidden border-border", className)} data-testid={`admin-review-card-${id}`}>
       <CardContent className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row gap-4">
           {/* User Info & Avatar */}
@@ -46,7 +46,7 @@ const AdminReviewCard = ({ review, onDelete, loading, className }) => {
               <AvatarImage src={avatarUrl} alt={userName} />
               <AvatarFallback className="bg-muted text-muted-foreground">{userInitials}</AvatarFallback>
             </Avatar>
-            
+
             <div className="flex-1 space-y-1">
               <div className="flex items-center justify-between sm:justify-start gap-2">
                 <h4 className="font-semibold text-sm text-foreground">{userName}</h4>
@@ -54,11 +54,11 @@ const AdminReviewCard = ({ review, onDelete, loading, className }) => {
                   <span className="text-xs text-muted-foreground">{formattedDate}</span>
                 )}
               </div>
-              
+
               <div className="flex items-center space-x-1 rtl:space-x-reverse">
                 <RatingDisplay rating={rating || 0} size="sm" showCount={false} />
               </div>
-              
+
               {reviewText && (
                 <p className="text-sm text-foreground mt-2">{reviewText}</p>
               )}

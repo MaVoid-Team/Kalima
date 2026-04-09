@@ -131,12 +131,14 @@ export default function AdminSampleSectionDetailPage() {
 
             {/* Modal */}
             <SampleDialog
+                key={editingSample ? `edit-${editingSample.id}` : 'create'}
                 open={openDialog}
                 onOpenChange={setOpenDialog}
                 sectionId={id}
                 sample={editingSample}
                 onCreate={handleCreateSample}
                 onUpdate={handleUpdateSample}
+                showMediaTypeSelector
             />
         </div>
     );

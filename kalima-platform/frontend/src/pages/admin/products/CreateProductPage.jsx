@@ -107,6 +107,7 @@ export default function CreateProductPage() {
     const [thumbnail, setThumbnail] = useState(null);
     const [hqSample, setHqSample] = useState(null);
     const [lqSample, setLqSample] = useState(null);
+    const [sampleTitle, setSampleTitle] = useState('');
     const [sampleSectionId, setSampleSectionId] = useState('');
     const [mediaType, setMediaType] = useState('pdf');
 
@@ -439,6 +440,11 @@ export default function CreateProductPage() {
 
         // ── Step 7: Sample ──
         if ((hqSample || lqSample) && sampleSectionId) {
+            if (!sampleTitle.trim()) {
+                toast.error(t('products.form.sampleTitleRequired', 'Sample title is required when attaching a sample'));
+                setIsUploading(false);
+                return;
+            }
             setUploadProgress(0);
             setUploadFileName(hqSample?.name || lqSample?.name || 'Sample');
             setUploadError(''); setIsUploading(true);
@@ -447,6 +453,7 @@ export default function CreateProductPage() {
             const sampleFD = new FormData();
             sampleFD.append('product_id', newProductId);
             sampleFD.append('media_type', mediaType);
+            if (sampleTitle) sampleFD.append('title', sampleTitle);
             if (hqSample) sampleFD.append('high_quality', hqSample);
             if (lqSample) sampleFD.append('low_quality', lqSample);
             toast.info(t('products.create.sampleUploading'));
@@ -1027,6 +1034,16 @@ export default function CreateProductPage() {
                             <Separator />
 
                             {/* Sample Section */}
+                            <div className="space-y-1.5">
+                                <FormLabel>{t('products.form.sampleTitle', 'Sample Title')}</FormLabel>
+                                <Input 
+                                    placeholder={t('products.form.sampleTitlePlaceholder', 'Enter a title for the sample')}
+                                    value={sampleTitle}
+                                    onChange={(e) => setSampleTitle(e.target.value)}
+                                    data-testid="create-product-sample-title-input"
+                                />
+                            </div>
+
                             <div className="space-y-1.5">
                                 <FormLabel>{t('products.form.sampleSection')}</FormLabel>
                                 <Select value={sampleSectionId} onValueChange={setSampleSectionId}>
