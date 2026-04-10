@@ -305,3 +305,30 @@ export function formatPhone(phone) {
   }
   return cleaned.replace(/^\+2[ ]?/, "");
 }
+
+/**
+ * Formats a time interval in milliseconds to a human-readable string.
+ * @param {number|string} ms - milliseconds until release
+ * @param {function} t - translation function (optional)
+ * @returns {string} - e.g. "2d 5h", "10h 30m", "45m 12s", or "12s"
+ */
+export function formatTimeUntilRelease(ms, t) {
+  const diff = Number(ms);
+  
+  const d = t ? t("countdown.days", "d") : "d";
+  const h = t ? t("countdown.hours", "h") : "h";
+  const m = t ? t("countdown.minutes", "m") : "m";
+  const s = t ? t("countdown.seconds", "s") : "s";
+
+  if (isNaN(diff) || diff <= 0) return `0${s}`;
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  if (days > 0) return `${days}${d} ${hours}${h}`;
+  if (hours > 0) return `${hours}${h} ${minutes}${m}`;
+  if (minutes > 0) return `${minutes}${m} ${seconds}${s}`;
+  return `${seconds}${s}`;
+}

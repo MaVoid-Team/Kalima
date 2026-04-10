@@ -65,6 +65,12 @@
     "cart": "العربة",
     "comingSoon": "قريباً"
   },
+  "countdown": {
+    "days": "ي",
+    "hours": "س",
+    "minutes": "د",
+    "seconds": "ث"
+  },
   "products": {
     "trending": {
       "calculus": {

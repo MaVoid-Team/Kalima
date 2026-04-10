@@ -47,7 +47,8 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   const [isBuyingNow, setIsBuyingNow] = useState(false);
   const fallbackTimeUntilReleaseMs = release_at ? Math.max(new Date(release_at).getTime() - Date.now(), 0) : 0;
   const countdownText = formatTimeUntilRelease(
-    Number.isFinite(Number(time_until_release_ms)) ? time_until_release_ms : fallbackTimeUntilReleaseMs
+    Number.isFinite(Number(time_until_release_ms)) ? time_until_release_ms : fallbackTimeUntilReleaseMs,
+    t
   );
 
   const handleAddToCart = async (e) => {

@@ -133,5 +133,11 @@
   },
   "common": {
     "cancel": "Cancel"
+  },
+  "countdown": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s"
   }
 }

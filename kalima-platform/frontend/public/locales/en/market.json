@@ -65,6 +65,12 @@
     "cart": "Cart",
     "comingSoon": "Coming Soon"
   },
+  "countdown": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s"
+  },
   "products": {
     "trending": {
       "calculus": {
