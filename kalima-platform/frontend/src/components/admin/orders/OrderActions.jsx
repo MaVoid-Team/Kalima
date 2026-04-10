@@ -22,9 +22,12 @@ import {
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from "@/components/ui/button";
 import useOrders from '@/hooks/useOrders';
 
@@ -40,32 +43,43 @@ export default function OrderActions({ order, onActionSuccess }) {
         const type = product?.type || '-';
         const price = item?.price_at_purchase ?? product?.price ?? 0;
         return [
-            `- منتج ${index + 1}`,
-            `  الاسم: ${title}`,
-            `  النوع: ${type}`,
-            `  السعر: ${price} جم`,
+            `- ${t('orders.details.item', 'Item')} ${index + 1}`,
+            `  ${t('common.name', 'Name')}: ${title}`,
+            `  ${t('orders.items.type', 'Type')}: ${type}`,
+            `  ${t('orders.items.price', 'Price')}: ${price} ${t('common.currencyEGP', 'EGP')}`,
         ].join('\n');
     });
+
     const whatsappMessage = [
-        `هلاً بك أ/ ${order?.users?.name || '-'}`,
-        'تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.',
+        t('orders.actions.whatsappGreeting', 'Greetings {{name}}!', { name: order?.users?.name || '-' }),
+        t('orders.actions.whatsappSuccess', 'Your order has been received and is being processed.'),
         '',
-        `رقم الطلب: ${orderSerial}`,
+        t('orders.actions.whatsappOrderDetails', 'Order Serial: {{serial}}', { serial: orderSerial }),
         '',
-        'المنتجات:',
+        t('orders.actions.whatsappItems', 'Items:'),
         whatsappItems.length ? whatsappItems.join('\n') : '-',
         '',
-        `الإجمالي: ${order?.total ?? 0} جنية`,
+        t('orders.actions.whatsappTotal', 'Total: {{total}} {{currency}}', { total: order?.total ?? 0, currency: t('common.currencyEGP', 'EGP') }),
         '',
-        'لو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.',
-        'نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا!',
-        '',
-        'مع تحيات فريق عمل',
-        'منصة كلمة',
-    ].join('\n');
+        t('orders.actions.whatsappSupport', 'If you have any questions, feel free to contact us.'),
+        t('orders.actions.whatsappClosing', 'Thank you for choosing Kalima Platform!'),
+    ].filter(Boolean).join('\n');
     const whatsappHref = whatsappPhone
-        ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(whatsappMessage)}`
+        ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(editableWhatsAppMessage || whatsappMessage)}`
         : '#';
+
+    const openWhatsAppDialog = (e) => {
+        if (e) e.preventDefault();
+        setEditableWhatsAppMessage(whatsappMessage);
+        setIsWhatsAppDialogOpen(true);
+    };
+
+    const handleWhatsAppSend = () => {
+        if (whatsappPhone && whatsappHref !== '#') {
+            window.open(whatsappHref, '_blank', 'noopener,noreferrer');
+            setIsWhatsAppDialogOpen(false);
+        }
+    };
 
     const handleAction = async (actionFn) => {
         const res = await actionFn();
@@ -76,6 +90,8 @@ export default function OrderActions({ order, onActionSuccess }) {
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [noteDialogOpen, setNoteDialogOpen] = useState(false);
+    const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
+    const [editableWhatsAppMessage, setEditableWhatsAppMessage] = useState('');
 
     const handleDelete = async () => {
         const res = await deleteOrder(order.id);
@@ -117,6 +133,38 @@ export default function OrderActions({ order, onActionSuccess }) {
                 </DialogContent>
             </Dialog>
 
+            <Dialog open={isWhatsAppDialogOpen} onOpenChange={setIsWhatsAppDialogOpen}>
+                <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                        <DialogTitle>{t('orders.actions.editWhatsAppMessage', 'Edit WhatsApp Message')}</DialogTitle>
+                        <DialogDescription>
+                            {t('orders.actions.editWhatsAppMessageDesc', 'Review and edit the message before sending it to the customer.')}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <Textarea
+                            value={editableWhatsAppMessage}
+                            onChange={(e) => setEditableWhatsAppMessage(e.target.value)}
+                            rows={10}
+                            className="font-sans text-sm resize-none"
+                            placeholder={t('orders.actions.whatsappPlaceholder', 'Type your message here...')}
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsWhatsAppDialogOpen(false)}>
+                            {t('common.cancel', 'Cancel')}
+                        </Button>
+                        <Button
+                            onClick={handleWhatsAppSend}
+                            className="bg-success text-success-foreground hover:bg-success/90"
+                        >
+                            <MessageCircle className="h-4 w-4 me-2" />
+                            {t('orders.actions.sendOnWhatsApp', 'Send on WhatsApp')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
             {order.admin_notes && (
                 <Button
                     variant="ghost"
@@ -148,17 +196,13 @@ export default function OrderActions({ order, onActionSuccess }) {
                     <DropdownMenuSeparator />
 
                     {whatsappPhone && (
-                        <DropdownMenuItem asChild>
-                            <a
-                                href={whatsappHref}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="cursor-pointer flex items-center text-success focus:text-success focus:bg-success/10"
-                                data-testid="admin-orders-action-whatsapp-link"
-                            >
-                                <MessageCircle className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
-                                {t('orders.actions.whatsapp', 'Contact WhatsApp')}
-                            </a>
+                        <DropdownMenuItem
+                            onClick={openWhatsAppDialog}
+                            className="cursor-pointer flex items-center text-success focus:text-success focus:bg-success/10"
+                            data-testid="admin-orders-action-whatsapp-item"
+                        >
+                            <MessageCircle className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
+                            {t('orders.actions.whatsapp', 'Contact WhatsApp')}
                         </DropdownMenuItem>
                     )}
 
