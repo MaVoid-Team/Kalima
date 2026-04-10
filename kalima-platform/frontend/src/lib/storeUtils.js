@@ -305,3 +305,46 @@ export function formatPhone(phone) {
   }
   return cleaned.replace(/^\+2[ ]?/, "");
 }
+
+/**
+ * Formats the time remaining until a product is released into a human-readable string.
+ * Uses the `time_until_release_ms` field from the product API response.
+ *
+ * @param {number|null} timeUntilReleaseMs - milliseconds until release (from product.time_until_release_ms)
+ * @param {boolean} isReleased             - whether the product is already released
+ * @param {string}  lang                   - locale key, e.g. 'ar' or 'en'
+ * @returns {string}
+ */
+export function formatTimeUntilRelease(timeUntilReleaseMs, isReleased = false, lang = 'en') {
+  const isAr = lang === 'ar';
+
+  if (isReleased || timeUntilReleaseMs === null || timeUntilReleaseMs === undefined) {
+    return isAr ? 'متاح الآن' : 'Available now';
+  }
+
+  const ms = Number(timeUntilReleaseMs);
+  if (isNaN(ms) || ms <= 0) {
+    return isAr ? 'متاح الآن' : 'Available now';
+  }
+
+  const totalSeconds = Math.floor(ms / 1000);
+  const days    = Math.floor(totalSeconds / 86400);
+  const hours   = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+  if (isAr) {
+    const parts = [];
+    if (days > 0)    parts.push(`${days} يوم`);
+    if (hours > 0)   parts.push(`${hours} ساعة`);
+    if (minutes > 0) parts.push(`${minutes} دقيقة`);
+    if (parts.length === 0) parts.push('أقل من دقيقة');
+    return `بعد ${parts.join(' و ')}`;
+  }
+
+  const parts = [];
+  if (days > 0)    parts.push(`${days}d`);
+  if (hours > 0)   parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}m`);
+  if (parts.length === 0) parts.push('< 1m');
+  return `In ${parts.join(' ')}`;
+}

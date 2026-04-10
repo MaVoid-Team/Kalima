@@ -65,8 +65,16 @@ export default function SamplePreviewPage() {
     }
 
     const mediaType = String(sample?.media_type || '').toLowerCase();
-    const highQualityUrl = getImageUrl(sample?.high_quality_url) || '';
-    const downloadUrl = getImageUrl(sample?.low_quality_url) || '';
+    const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
+    const sectionId = sample?.section_id;
+
+    // Prefer API-served endpoints (proper Content-Type headers, bypasses nginx static cache)
+    const highQualityUrl = sectionId && sample?.high_quality_url
+        ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/preview`
+        : (getImageUrl(sample?.high_quality_url) || '');
+    const downloadUrl = sectionId && sample?.low_quality_url
+        ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download`
+        : (getImageUrl(sample?.low_quality_url) || '');
     const previewUrl = highQualityUrl || (['image', 'video', 'audio'].includes(mediaType) ? downloadUrl : '');
     const isPdf = mediaType === 'pdf' || sample?.mime_type === 'application/pdf';
 
