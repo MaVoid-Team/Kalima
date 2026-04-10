@@ -35,6 +35,11 @@ export default function OrderActions({ order, onActionSuccess }) {
     const { t, i18n } = useTranslation('admin');
     const { receiveOrder, confirmOrder, returnOrder, deleteOrder } = useOrders();
 
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [noteDialogOpen, setNoteDialogOpen] = useState(false);
+    const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
+    const [editableWhatsAppMessage, setEditableWhatsAppMessage] = useState('');
+
     const whatsappPhone = order?.users?.phone?.replaceAll(/\D/g, '');
     const orderSerial = order?.purchase_serial || `#${order?.id ?? '-'}`;
     const whatsappItems = (order?.purchase_items ?? []).map((item, index) => {
@@ -87,11 +92,6 @@ export default function OrderActions({ order, onActionSuccess }) {
             onActionSuccess();
         }
     };
-
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [noteDialogOpen, setNoteDialogOpen] = useState(false);
-    const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
-    const [editableWhatsAppMessage, setEditableWhatsAppMessage] = useState('');
 
     const handleDelete = async () => {
         const res = await deleteOrder(order.id);
