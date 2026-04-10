@@ -84,7 +84,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border/40">
+      <header className="sticky top-0 z-50 w-full bg-transparent backdrop-blur-md border-b border-border/40">
         <div className="container md:px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 decoration-0">
@@ -169,7 +169,7 @@ export default function Navbar() {
 
               {isAuthenticated ? (
                 <>
-                   {hasAdminAccess && (
+                  {hasAdminAccess && (
                     <Button
                       variant="default"
                       size="default"
@@ -331,7 +331,7 @@ export default function Navbar() {
             <div className="flex flex-col gap-3 pt-4">
               {isAuthenticated ? (
                 <>
-                   {hasAdminAccess && (
+                  {hasAdminAccess && (
                     <Button
                       variant="default"
                       className="w-full font-bold justify-center h-12 text-base"
