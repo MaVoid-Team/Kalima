@@ -6,7 +6,7 @@ import HeroSection from "@/components/MarketPage/HeroSection";
 import useApiMutation from "@/hooks/useApiMutation";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getImageUrl, formatFileSize } from "@/lib/storeUtils";
+import { formatFileSize } from "@/lib/storeUtils";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 
@@ -110,11 +110,17 @@ export default function SamplesDirectoryPage() {
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
                                                     {filteredSamples.map((sample) => {
                                                         const mt = sample.media_type?.toLowerCase();
-                                                        const downloadUrl = sample.low_quality_url
-                                                            ? getImageUrl(sample.low_quality_url)
+                                                        const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
+                                                        const sectionId = sample.section_id || section.id;
+                                                        // Use API-served endpoints for proper Content-Type headers
+                                                        const downloadUrl = sectionId && sample.low_quality_url
+                                                            ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download`
+                                                            : '';
+                                                        const thumbnailUrl = sectionId && sample.high_quality_url
+                                                            ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/preview`
                                                             : '';
                                                         // Only image/video media types have a displayable thumbnail
-                                                        const hasThumbnail = sample.thumbnail && (mt === 'image' || mt === 'video');
+                                                        const hasThumbnail = (sample.thumbnail || sample.high_quality_url) && (mt === 'image' || mt === 'video');
 
                                                         return (
                                                             <div
@@ -126,7 +132,7 @@ export default function SamplesDirectoryPage() {
                                                                     <div className="w-full aspect-video overflow-hidden bg-muted relative">
                                                                         {mt === 'video' ? (
                                                                             <video
-                                                                                src={getImageUrl(sample.thumbnail)}
+                                                                                src={thumbnailUrl}
                                                                                 className="w-full h-full object-cover"
                                                                                 muted
                                                                                 preload="metadata"
@@ -134,7 +140,7 @@ export default function SamplesDirectoryPage() {
                                                                             />
                                                                         ) : (
                                                                             <img
-                                                                                src={getImageUrl(sample.thumbnail)}
+                                                                                src={thumbnailUrl}
                                                                                 alt={sample.title || ''}
                                                                                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                                                                 data-testid={`samples-directory-thumb-${sample.id}`}
