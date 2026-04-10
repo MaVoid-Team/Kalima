@@ -19,6 +19,15 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { formatCurrency, formatOrderDate, getImageUrl, getStatusColor, formatPhone } from '@/lib/storeUtils';
 
 export default function OrderDetailPage() {
@@ -39,6 +48,8 @@ export default function OrderDetailPage() {
     } = useOrders(id);
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
+    const [editableWhatsAppMessage, setEditableWhatsAppMessage] = useState('');
 
     if (loading) {
         return <div className="p-8 text-center text-muted-foreground">{t('orders.details.loading', 'Loading details...')}</div>;
@@ -71,18 +82,42 @@ export default function OrderDetailPage() {
     const whatsappPhone = order.users?.phone?.replace(/\D/g, '');
     const whatsappItems = (order?.purchase_items ?? []).map((item, index) => {
         const title = item.products?.title || item.product?.title || item.title || `#${item.id}`;
-        return `${index + 1}. ${title} (${item.quantity}x ${item.price} EGP)`;
+        return `- منتج ${index + 1}: ${title} (${item.quantity}x ${item.price} جم)`;
     });
+    
     const whatsappMessage = [
-        t('orders.actions.whatsappGreeting', 'Greetings from Kalima Platform!'),
-        t('orders.actions.whatsappOrderDetails', 'Regarding your order: {{serial}}', { serial: order.purchase_serial || `#${order.id}` }),
-        t('orders.actions.whatsappTotal', 'Total amount: {{total}} {{currency}}', { total: order.total, currency: 'EGP' }),
-        t('orders.actions.whatsappItems', 'Items:'),
+        `هلاً بك أ/ ${order?.users?.name || '-'}`,
+        'تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.',
+        '',
+        `رقم الطلب: ${order.purchase_serial || `#${order.id}`}`,
+        '',
+        'المنتجات:',
         whatsappItems.length ? whatsappItems.join('\n') : '-',
-    ].join('\n\n');
+        '',
+        `الإجمالي: ${order.total} جنية`,
+        '',
+        'لو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.',
+        'نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا!',
+        '',
+        'مع تحيات فريق عمل',
+        'منصة كلمة',
+    ].join('\n');
+
     const whatsappHref = whatsappPhone
-        ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(whatsappMessage)}`
+        ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(editableWhatsAppMessage || whatsappMessage)}`
         : '#';
+
+    const openWhatsAppDialog = () => {
+        setEditableWhatsAppMessage(whatsappMessage);
+        setIsWhatsAppDialogOpen(true);
+    };
+
+    const handleWhatsAppSend = () => {
+        if (whatsappPhone && whatsappHref !== '#') {
+            window.open(whatsappHref, '_blank', 'noopener,noreferrer');
+            setIsWhatsAppDialogOpen(false);
+        }
+    };
 
     return (
         <div className="max-w-6xl mx-auto space-y-6">
@@ -102,6 +137,37 @@ export default function OrderDetailPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            <Dialog open={isWhatsAppDialogOpen} onOpenChange={setIsWhatsAppDialogOpen}>
+                <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
+                    <DialogHeader className="p-6 pb-0">
+                        <DialogTitle>{t('orders.actions.editWhatsAppMessage', 'Edit WhatsApp Message')}</DialogTitle>
+                        <DialogDescription>
+                            {t('orders.actions.editWhatsAppMessageDesc', 'Review and edit the message before sending it to the customer.')}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex-1 overflow-y-auto p-6">
+                        <Textarea
+                            value={editableWhatsAppMessage}
+                            onChange={(e) => setEditableWhatsAppMessage(e.target.value)}
+                            className="font-sans text-sm min-h-[300px] leading-relaxed resize-none"
+                            placeholder={t('orders.actions.whatsappPlaceholder', 'Type your message here...')}
+                        />
+                    </div>
+                    <DialogFooter className="p-6 pt-0">
+                        <Button variant="outline" onClick={() => setIsWhatsAppDialogOpen(false)}>
+                            {t('common.cancel', 'Cancel')}
+                        </Button>
+                        <Button
+                            onClick={handleWhatsAppSend}
+                            className="bg-success text-success-foreground hover:bg-success/90"
+                        >
+                            <MessageCircle className="h-4 w-4 me-2" />
+                            {t('orders.actions.sendOnWhatsApp', 'Send on WhatsApp')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
@@ -280,17 +346,17 @@ export default function OrderDetailPage() {
                             {order.users?.phone && (
                                 <div className="flex items-center gap-3 mt-2">
                                     <div className="text-muted-foreground truncate" title={formatPhone(order.users.phone)}>{formatPhone(order.users.phone)}</div>
-                                    <a
-                                        href={whatsappHref}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground h-7 px-2 py-1 text-success border-success/30 hover:border-success/50"
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={openWhatsAppDialog}
+                                        className="h-7 px-2 py-1 text-success border border-success/30 hover:bg-success/10 hover:border-success/50 hover:text-success text-xs font-medium flex items-center gap-1.5"
                                         title={t('orders.details.contactWhatsApp', 'Contact on WhatsApp')}
-                                        data-testid="order-detail-whatsapp-link"
+                                        data-testid="order-detail-whatsapp-button"
                                     >
-                                        <MessageCircle className="h-3 w-3 me-1.5" />
+                                        <MessageCircle className="h-3 w-3" />
                                         WhatsApp
-                                    </a>
+                                    </Button>
                                 </div>
                             )}
                         </div>
