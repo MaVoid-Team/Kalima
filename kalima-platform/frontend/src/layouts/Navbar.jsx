@@ -76,7 +76,10 @@ export default function Navbar() {
 
   const NAV_LINKS = [
     { label: t("navbar.market"), href: "/market" },
-  ];
+  ].filter(link => {
+    if (link.href === "/market" && isStudentOrParent) return false;
+    return true;
+  });
 
 
   return (
@@ -424,9 +427,11 @@ export default function Navbar() {
         <CommandList>
           <CommandEmpty>{t("navbar.noResults")}</CommandEmpty>
           <CommandGroup heading={t("navbar.pages")}>
-            <CommandItem value="/market" onSelect={() => runCommand(() => navigate("/market"))}>
-              {t("navbar.market")}
-            </CommandItem>
+            {!isStudentOrParent && (
+              <CommandItem value="/market" onSelect={() => runCommand(() => navigate("/market"))}>
+                {t("navbar.market")}
+              </CommandItem>
+            )}
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading={t("navbar.settings")}>

@@ -125,7 +125,7 @@ export function useFastBuy({ checkout = false } = {}) {
     const transferNumberValue = formData.numberTransferredFrom || "";
     const missingTransNum = needsTransferNumber && !transferNumberValue;
     const invalidTransferNumber =
-      needsTransferNumber && !egyptPhoneSchema.safeParse(transferNumberValue).success;
+      needsTransferNumber && !egyptPhoneSchema(t).safeParse(transferNumberValue).success;
     const missingScreenshot = needsScreenshot && !formData.paymentScreenshot;
 
     return {

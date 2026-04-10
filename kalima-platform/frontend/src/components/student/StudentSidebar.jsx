@@ -144,19 +144,7 @@ export default function StudentSidebar({ isMobileOpen, setIsMobileOpen }) {
           </span>
         </button>
 
-        <Link
-          to="/market"
-          title={isCollapsed ? t("nav.backToStore") : undefined}
-          className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? "lg:justify-center" : ""}`}
-          data-testid="student-sidebar-back-store-link"
-        >
-          <Home
-            className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}
-          />
-          <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
-            {t("nav.backToStore")}
-          </span>
-        </Link>
+
 
         <button
           onClick={logout}

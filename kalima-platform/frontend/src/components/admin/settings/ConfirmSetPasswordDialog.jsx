@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Lock, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -18,24 +18,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-// Password validation schema
-const passwordSetSchema = z.object({
-    password: z.string()
-        .min(8, 'Password must be at least 8 characters')
-        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one uppercase letter, one lowercase letter, and one number'),
-    confirmPassword: z.string().min(1, 'Please confirm your password')
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-});
-
-export default function ConfirmSetPasswordDialog({ 
-    open, 
-    onOpenChange, 
-    onConfirm, 
-    loading 
+export default function ConfirmSetPasswordDialog({
+    open,
+    onOpenChange,
+    onConfirm,
+    loading,
+    ns = 'admin'
 }) {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation(ns);
+
+    // Localized validation schema
+    const passwordSetSchema = useMemo(() => z.object({
+        password: z.string()
+            .min(8, t('validation.password_min', 'Password must be at least 8 characters'))
+            .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, t('validation.password_requirements', 'Password must contain at least one uppercase letter, one lowercase letter, and one number')),
+        confirmPassword: z.string().min(1, t('validation.confirm_password_required', 'Please confirm your password'))
+    }).refine((data) => data.password === data.confirmPassword, {
+        message: t('validation.passwords_mismatch', "Passwords don't match"),
+        path: ["confirmPassword"],
+    }), [t]);
+
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -71,7 +73,7 @@ export default function ConfirmSetPasswordDialog({
                         {t('settings.password.confirmSet')}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                
+
                 <form onSubmit={handleSubmit(handleConfirm)} className="space-y-4 py-4">
                     <div className="space-y-2">
                         <Label htmlFor="set-password">
@@ -79,6 +81,7 @@ export default function ConfirmSetPasswordDialog({
                         </Label>
                         <div className="relative">
                             <Input
+                                dir="ltr"
                                 id="set-password"
                                 type={showPassword ? "text" : "password"}
                                 {...register('password')}
@@ -115,6 +118,7 @@ export default function ConfirmSetPasswordDialog({
                         </Label>
                         <div className="relative">
                             <Input
+                                dir="ltr"
                                 id="confirm-set-password"
                                 type={showConfirmPassword ? "text" : "password"}
                                 {...register('confirmPassword')}

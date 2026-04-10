@@ -38,8 +38,7 @@ export default function ParentSidebar({ isMobileOpen, setIsMobileOpen }) {
 
   const navigation = [
     { name: t('nav.profile'), href: '/parent/profile', icon: User, id: 'profile' },
-    // { name: t('nav.orders'), href: '/orders', icon: ShoppingBag, id: 'orders' },
-    // { name: t('nav.settings'), href: '/parent/settings', icon: Settings, id: 'settings' },
+    { name: t('nav.settings'), href: '/parent/settings', icon: Settings, id: 'settings' },
   ];
 
   const toggleLanguage = () => {
@@ -144,19 +143,7 @@ export default function ParentSidebar({ isMobileOpen, setIsMobileOpen }) {
           </span>
         </button>
 
-        <Link
-          to="/market"
-          title={isCollapsed ? t("nav.backToStore") : undefined}
-          className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? "lg:justify-center" : ""}`}
-          data-testid="parent-sidebar-back-store-link"
-        >
-          <Home
-            className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}
-          />
-          <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
-            {t("nav.backToStore")}
-          </span>
-        </Link>
+
 
         <button
           onClick={logout}

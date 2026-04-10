@@ -8,18 +8,20 @@ import LoadingSpinner from './ui/loading-spinner';
  * RoleRoute - A general purpose route guard for role-based access control.
  * It checks if the authenticated user has at least one of the required roles.
  */
-const RoleRoute = ({ requiredRole }) => {
+const RoleRoute = ({ requiredRole, excludedRole }) => {
     const { isAuthenticated, loading: authLoading } = useAuth();
     const { storeRoles, academyRoles } = useRole();
     const location = useLocation();
 
-    // Ensure requiredRole is an array for easy checking
-    const rolesArray = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    // Ensure props are arrays for easy checking
+    const requiredRolesArray = requiredRole ? (Array.isArray(requiredRole) ? requiredRole : [requiredRole]) : [];
+    const excludedRolesArray = excludedRole ? (Array.isArray(excludedRole) ? excludedRole : [excludedRole]) : [];
 
     // Check both store portal roles AND academy portal roles
     const allRoles = [...storeRoles, ...academyRoles];
-    const hasRequiredRole = rolesArray.some(role => allRoles.includes(role));
-
+    
+    const hasRequiredRole = requiredRolesArray.length === 0 || requiredRolesArray.some(role => allRoles.includes(role));
+    const isExcluded = excludedRolesArray.some(role => allRoles.includes(role));
     if (authLoading) {
         return (
             <div className="flex h-[50vh] items-center justify-center">
@@ -28,11 +30,18 @@ const RoleRoute = ({ requiredRole }) => {
         );
     }
 
-    if (!isAuthenticated) {
+    // Only force login if the route REQUIRE a specific role
+    if (!isAuthenticated && requiredRolesArray.length > 0) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    if (!hasRequiredRole) {
+    // If authenticated, check for exclusion
+    if (isAuthenticated && isExcluded) {
+        return <Navigate to="/" replace />;
+    }
+
+    // If authenticated, check for requirement
+    if (isAuthenticated && !hasRequiredRole) {
         return <Navigate to="/" replace />;
     }
 
