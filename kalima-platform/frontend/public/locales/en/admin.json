@@ -16,7 +16,10 @@
     "settings": "Settings",
     "expandSidebar": "Expand Sidebar",
     "collapseSidebar": "Collapse Sidebar",
-    "closeSidebar": "Close Sidebar"
+    "closeSidebar": "Close Sidebar",
+    "analytics": "Analytics",
+    "dashboard": "Dashboard",
+    "employeePerformance": "Employee Performance"
   },
   "common": {
     "currencyEGP": "EGP",
@@ -1052,7 +1055,8 @@
     "pickDate": "Pick a date",
     "pickMonth": "Pick a month",
     "prevYear": "Previous year",
-    "nextYear": "Next year"
+    "nextYear": "Next year",
+    "minutes": "min"
   },
   "table": {
     "productName": "Product Name",

@@ -119,19 +119,19 @@ export default function AnalyticsPage() {
         {
             icon: Clock,
             label: t('dashboard.avgResponseTime', 'Avg. Response Time'),
-            value: responseTime?.averageResponseTimeMinutes !== undefined ? `${fmt(responseTime.averageResponseTimeMinutes)} min` : '—',
+            value: responseTime?.averageResponseTimeMinutes !== undefined ? `${fmt(responseTime.averageResponseTimeMinutes)} ${t('dashboard.minutes', 'min')}` : '—',
             color: 'text-blue-500',
         },
         {
             icon: TrendingUp,
             label: t('dashboard.fastestResponseTime', 'Fastest Response Time'),
-            value: responseTime?.fastestResponseTimeMinutes !== undefined ? `${fmt(responseTime.fastestResponseTimeMinutes)} min` : '—',
+            value: responseTime?.fastestResponseTimeMinutes !== undefined ? `${fmt(responseTime.fastestResponseTimeMinutes)} ${t('dashboard.minutes', 'min')}` : '—',
             color: 'text-emerald-500',
         },
         {
             icon: Clock,
             label: t('dashboard.slowestResponseTime', 'Slowest Response Time'),
-            value: responseTime?.slowestResponseTimeMinutes !== undefined ? `${fmt(responseTime.slowestResponseTimeMinutes)} min` : '—',
+            value: responseTime?.slowestResponseTimeMinutes !== undefined ? `${fmt(responseTime.slowestResponseTimeMinutes)} ${t('dashboard.minutes', 'min')}` : '—',
             color: 'text-orange-500',
         },
     ];
