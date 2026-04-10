@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle } from 'lucide-react';
+import { ChevronLeft, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle, ExternalLink } from 'lucide-react';
 import useOrders from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -209,7 +209,8 @@ export default function OrderDetailPage() {
 
                                             <div className="space-y-4 sm:space-y-2">
                                                 {requiredFields.map((field, index) => {
-                                                    const isFile = field.required_field_definitions?.type === 'file';
+                                                    const fieldType = field.required_field_definitions?.field_type;
+                                                    const isFile = fieldType === 'file' || fieldType === 'image';
                                                     return (
                                                         <div
                                                             key={field.id || `${item.id || itemIndex}-${field.field_definition_id || index}`}
@@ -220,19 +221,34 @@ export default function OrderDetailPage() {
                                                             </span>
                                                             <div className="sm:max-w-[70%] text-right overflow-hidden break-all">
                                                                 {isFile && field.value ? (
-                                                                    <a
-                                                                        href={getImageUrl(field.value)}
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        className="inline-block border rounded-md overflow-hidden hover:opacity-90 transition-opacity"
-                                                                    >
-                                                                        <img
-                                                                            src={getImageUrl(field.value)}
-                                                                            alt="User Upload"
-                                                                            className="h-16 w-auto object-cover max-w-full"
-                                                                            data-testid={`order-detail-required-file-${field.id}`}
-                                                                        />
-                                                                    </a>
+                                                                    <div className="flex flex-col items-end gap-1.5">
+                                                                        <a
+                                                                            href={getImageUrl(field.value)}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="inline-block border rounded-md overflow-hidden hover:opacity-90 transition-opacity shadow-sm bg-muted"
+                                                                        >
+                                                                            <img
+                                                                                src={getImageUrl(field.value)}
+                                                                                alt="User Upload"
+                                                                                className="h-16 w-auto object-cover max-w-full"
+                                                                                data-testid={`order-detail-required-file-${field.id}`}
+                                                                                onError={(e) => {
+                                                                                    // If image fails, hide it and just show the link
+                                                                                    e.target.style.display = 'none';
+                                                                                }}
+                                                                            />
+                                                                        </a>
+                                                                        <a
+                                                                            href={getImageUrl(field.value)}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="text-[10px] text-primary hover:underline flex items-center gap-1 font-medium"
+                                                                        >
+                                                                            <ExternalLink className="h-3 w-3" />
+                                                                            {t('orders.details.viewImage', 'View Image')}
+                                                                        </a>
+                                                                    </div>
                                                                 ) : (
                                                                     <span className="font-mono">{formatPhone(field.value || '-')}</span>
                                                                 )}
