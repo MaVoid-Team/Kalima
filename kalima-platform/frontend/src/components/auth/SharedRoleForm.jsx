@@ -10,10 +10,11 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/auth/useAuth";
 
 export default function SharedRoleForm({ role, onBack, registerFn, registerFirebaseFn, redirectTo }) {
+    const { t } = useTranslation("auth");
     // Memoize the schema to prevent recreation on every render
     const sharedSchema = React.useMemo(() => z.object({
-        secondary_phone: z.union([egyptPhoneSchema, z.literal(""), z.undefined()]),
-    }), []);
+        secondary_phone: egyptPhoneSchema(t).optional(),
+    }), [t]);
     const navigate = useNavigate();
     const { loginSuccess } = useAuth();
 
@@ -64,10 +65,10 @@ function SharedFields() {
             control={control}
             name="secondary_phone"
             render={({ field }) => (
-                <FormItem>
-                    <FormLabel>{t("signup.fields.secondaryPhone")}</FormLabel>
+                <FormItem dir="ltr">
+                    <FormLabel dir={i18n.dir()}>{t("signup.fields.secondaryPhone")}</FormLabel>
                     <FormControl>
-                        <PhoneInput dir="ltr" placeholder={t("signup.fields.secondaryPhonePlaceholder")} {...field} data-testid="auth-register-secondary-phone-input" />
+                        <PhoneInput dir="ltr" {...field} data-testid="auth-register-secondary-phone-input" />
                     </FormControl>
                     <FormMessage />
                 </FormItem>

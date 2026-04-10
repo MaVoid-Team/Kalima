@@ -13,8 +13,8 @@ import { useAccountProviders } from '@/hooks/useAccountProviders';
 import { providerIcons, GoogleIcon } from './ProviderIcons';
 import { getFirebaseIdToken } from '@/utils/firebaseAuth';
 
-export default function AccountSection() {
-    const { t, i18n } = useTranslation('admin');
+export default function AccountSection({ ns = 'admin' }) {
+    const { t, i18n } = useTranslation(ns);
     const { user } = useAuth();
     const { linkFirebaseAccount, unlinkProvider } = useLinkAccounts();
     const {

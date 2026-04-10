@@ -26,7 +26,9 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
     const [previewUrl, setPreviewUrl] = useState('');
 
     const schema = React.useMemo(() => z.object({
-        numberTransferredFrom: isFreeOrder ? z.string().optional() : egyptPhoneSchema,
+        numberTransferredFrom: isFreeOrder 
+            ? z.string().optional() 
+            : egyptPhoneSchema(t).refine(val => val && val !== "+20", { message: t('validation.required', 'Required') }),
     }), [isFreeOrder]);
 
     const {

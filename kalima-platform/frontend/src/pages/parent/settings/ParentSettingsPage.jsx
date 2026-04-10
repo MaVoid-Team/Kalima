@@ -6,12 +6,12 @@ import SecuritySection from '@/components/admin/settings/SecuritySection';
 import SessionSection from '@/components/admin/settings/SessionSection';
 import ProfileSection from '@/components/admin/settings/ProfileSection';
 
-export default function StudentSettingsPage() {
-    const { t, i18n } = useTranslation('student');
+export default function ParentSettingsPage() {
+    const { t, i18n } = useTranslation('parent');
     const isRtl = i18n.dir() === 'rtl';
 
     return (
-        <div className="space-y-6" dir={isRtl ? 'rtl' : 'ltr'} data-testid="student-settings-page">
+        <div className="space-y-6" dir={isRtl ? 'rtl' : 'ltr'} data-testid="parent-settings-page">
             <div className="flex items-center gap-3">
                 <Settings className="h-8 w-8 text-primary" />
                 <div>
@@ -25,11 +25,11 @@ export default function StudentSettingsPage() {
             </div>
 
             <div className="grid gap-6">
-                <ProfileSection ns="student" />
-                <PasswordSection ns="student" />
-                <AccountSection ns="student" />
-                <SecuritySection ns="student" />
-                <SessionSection ns="student" />
+                <ProfileSection ns="parent" />
+                <PasswordSection ns="parent" />
+                <AccountSection ns="parent" />
+                <SecuritySection ns="parent" />
+                <SessionSection ns="parent" />
             </div>
         </div>
     );

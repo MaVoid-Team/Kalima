@@ -14,8 +14,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export default function ConfirmDeleteAccountDialog({ open, onOpenChange, onConfirm, loading }) {
-    const { t } = useTranslation('admin');
+export default function ConfirmDeleteAccountDialog({ open, onOpenChange, onConfirm, loading, ns = 'admin' }) {
+    const { t } = useTranslation(ns);
     const [confirmText, setConfirmText] = useState('');
 
     const expectedText = t('settings.account.deleteConfirmationText', 'Delete My Account');

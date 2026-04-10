@@ -148,7 +148,7 @@ export default function CartItemRequiredFields({
                     if (!val || String(val).trim() === '') {
                         missing.push(rf.field_definition_id);
                     } else {
-                        const parsed = egyptPhoneSchema.safeParse(val || "");
+                        const parsed = egyptPhoneSchema(t).safeParse(val || "");
                         if (!parsed.success) {
                             missing.push(rf.field_definition_id);
                         }
@@ -267,7 +267,7 @@ export default function CartItemRequiredFields({
                 const rawVal = String(val || "").trim();
 
                 if (rf.is_required || (rawVal !== '' && rawVal !== '+' && rawVal !== '+2' && rawVal !== '+20')) {
-                    const parsed = egyptPhoneSchema.safeParse(rawVal);
+                    const parsed = egyptPhoneSchema(t).safeParse(rawVal);
                     if (!parsed.success) {
                         hasError = true;
                         errors[rf.field_definition_id] = t('invalidPhone', 'Invalid Egyptian mobile number');

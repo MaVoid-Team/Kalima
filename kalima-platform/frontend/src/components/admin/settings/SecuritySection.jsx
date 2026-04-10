@@ -12,8 +12,8 @@ import useDeleteAccount from '@/hooks/auth/useDeleteAccount';
 import ConfirmDeleteAccountDialog from './ConfirmDeleteAccountDialog';
 import { AlertTriangle } from 'lucide-react';
 
-export default function SecuritySection() {
-    const { t, i18n } = useTranslation('admin');
+export default function SecuritySection({ ns = 'admin' }) {
+    const { t, i18n } = useTranslation(ns);
     const { user } = useAuth();
     const { sendVerification, resendVerification, loading } = useEmailVerification();
     const { deleteAccount, loading: deletingAccount } = useDeleteAccount();
@@ -220,6 +220,7 @@ export default function SecuritySection() {
                     onOpenChange={setShowDeleteDialog}
                     onConfirm={handleDeleteAccount}
                     loading={deletingAccount}
+                    ns={ns}
                 />
             </CardContent>
         </Card>

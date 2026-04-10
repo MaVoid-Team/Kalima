@@ -35,7 +35,7 @@ export default function RegisterStudent({ onBack, redirectTo }) {
         level_id: z.string().min(1, { message: t("validation.required") }),
         government_id: z.string().min(1, { message: t("validation.required") }),
         zone_id: z.string().min(1, { message: t("validation.required") }),
-        parent_phone_number: egyptPhoneSchema,
+        parent_phone_number: egyptPhoneSchema(t).refine(val => val && val !== "+20", { message: t("validation.required") }),
         studentCode: z.string().optional(),
         faction: z.string().default("Alpha"),
     });
@@ -190,10 +190,10 @@ function StudentFields() {
                 control={control}
                 name="parent_phone_number"
                 render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{t("signup.fields.parentPhone")}</FormLabel>
+                    <FormItem dir="ltr">
+                        <FormLabel dir={i18n.dir()}>{t("signup.fields.parentPhone")}</FormLabel>
                         <FormControl>
-                            <PhoneInput dir="ltr" placeholder={t("signup.fields.parentPhonePlaceholder")} {...field} data-testid="auth-register-student-parent-phone-input" />
+                            <PhoneInput dir="ltr" {...field} data-testid="auth-register-student-parent-phone-input" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
