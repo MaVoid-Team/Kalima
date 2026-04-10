@@ -1059,6 +1059,7 @@
   },
   "dashboard": {
     "title": "لوحة الإدارة",
+    "description": "نظرة عامة على أداء المتجر",
     "totalRevenue": "إجمالي الإيرادات",
     "currency": "ج.م",
     "totalPurchases": "إجمالي المشتريات",
