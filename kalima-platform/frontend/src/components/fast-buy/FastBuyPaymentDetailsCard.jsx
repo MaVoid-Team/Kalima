@@ -29,7 +29,10 @@ export default function FastBuyPaymentDetailsCard({
 
   const transferNumberError = useMemo(() => {
     if (!needsTransferNumber) return "";
-    const parsed = egyptPhoneSchema.safeParse(state.numberTransferredFrom || "");
+    if (!state.numberTransferredFrom || state.numberTransferredFrom === "+20") {
+      return t("validation.required", "Required");
+    }
+    const parsed = egyptPhoneSchema(t).safeParse(state.numberTransferredFrom);
     if (parsed.success) return "";
     return parsed.error.issues?.[0]?.message?.toString() || "";
   }, [needsTransferNumber, state.numberTransferredFrom]);

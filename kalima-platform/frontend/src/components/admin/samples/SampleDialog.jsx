@@ -66,7 +66,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
             is_archived: null
         }
     });
-    
+
     const { sections, fetchSections, loading: sectionsLoading } = useAdminSampleSections();
     const [title, setTitle] = useState(sample?.title || '');
     const [selectedSectionId, setSelectedSectionId] = useState(sectionId?.toString() || '');
@@ -108,7 +108,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
         }
         setValidationError('');
     }, [sample, open, sectionId]);
-    
+
     useEffect(() => {
         if (open && !sectionId && sections.length === 0) {
             fetchSections();
@@ -154,7 +154,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
 
         const currentTitle = overrideTitle !== null ? overrideTitle : title;
         if (!currentTitle.trim()) return t('samples.errors.titleRequired');
-        
+
         const hqExists = !!sample?.high_quality_url || !!hqFileToCheck;
         const lqExists = !!sample?.low_quality_url || !!lqFileToCheck;
 
@@ -173,9 +173,12 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
         return '';
     };
 
+    const isInvalid = !title.trim() || (!sectionId && !selectedSectionId) || (showHQ && !hqFileName && !sample?.high_quality_url);
+    const isSubmitDisabled = uploading || isInvalid;
+
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
-        
+
         const error = validateFiles();
         if (error) {
             setValidationError(error);
@@ -183,9 +186,9 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
         }
 
         const { hqType, lqType } = getTypes();
-        const finalMediaType = (hqFileRef.current?.files?.[0] ? detectMediaType(hqFileRef.current.files[0]) : null) || 
-                              (lqFileRef.current?.files?.[0] ? detectMediaType(lqFileRef.current.files[0]) : null) || 
-                              mediaType;
+        const finalMediaType = (hqFileRef.current?.files?.[0] ? detectMediaType(hqFileRef.current.files[0]) : null) ||
+            (lqFileRef.current?.files?.[0] ? detectMediaType(lqFileRef.current.files[0]) : null) ||
+            mediaType;
 
         if (!finalMediaType) {
             setValidationError(t('samples.errors.unsupportedType', 'Unable to determine media type.'));
@@ -273,7 +276,10 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                                     <Button
                                         variant="outline"
                                         role="combobox"
-                                        className="justify-between w-full font-normal"
+                                        className={cn(
+                                            "justify-between w-full font-normal",
+                                            uploading && "!bg-neutral-800 !text-neutral-500 !opacity-30 !cursor-not-allowed grayscale"
+                                        )}
                                         disabled={uploading}
                                     >
                                         {selectedSectionId ? sections.find(s => String(s.id) === String(selectedSectionId))?.title : t('samples.selectSection', 'Select a section...')}
@@ -315,7 +321,10 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                                     variant="outline"
                                     role="combobox"
                                     aria-expanded={openPicker}
-                                    className="justify-between w-full font-normal"
+                                    className={cn(
+                                        "justify-between w-full font-normal",
+                                        uploading && "!bg-neutral-800 !text-neutral-500 !opacity-30 !cursor-not-allowed grayscale"
+                                    )}
                                     disabled={uploading}
                                 >
                                     {productId ? (
@@ -409,48 +418,51 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                                     variant="outline"
                                     onClick={() => hqFileRef.current?.click()}
                                     disabled={uploading}
-                                    className="justify-start font-normal text-muted-foreground h-10 px-3"
+                                    className={cn(
+                                        "justify-start font-normal text-muted-foreground h-10 px-3",
+                                        uploading && "!bg-neutral-800 !text-neutral-500 !opacity-30 !cursor-not-allowed grayscale"
+                                    )}
                                 >
-                                <Upload className="h-4 w-4 me-2 shrink-0" />
-                                <span className="truncate">
-                                    {hqFileName || t('common.chooseFile', 'Choose File')}
-                                </span>
-                            </Button>
-                            <input
-                                id="hq-file"
-                                type="file"
-                                ref={hqFileRef}
-                                className="hidden"
-                                accept={mediaType === 'pdf' ? '.pdf,application/pdf' : mediaType === 'video' ? '.mp4,.webm,.mov,video/mp4,video/webm,video/quicktime' : mediaType === 'audio' ? '.mp3,.wav,.ogg,.aac,.m4a,audio/*' : mediaType === 'image' ? '.jpg,.jpeg,.png,.webp,.gif,.svg,image/*' : '*/*'}
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                        setHqFileName(file.name);
-                                        // Auto-populate title from filename if currently empty
-                                        let updatedTitle = title;
-                                        if (!title.trim()) {
-                                            const nameWithoutExt = file.name.split('.').slice(0, -1).join('.');
-                                            updatedTitle = nameWithoutExt || file.name;
-                                            setTitle(updatedTitle);
+                                    <Upload className="h-4 w-4 me-2 shrink-0" />
+                                    <span className="truncate">
+                                        {hqFileName || t('common.chooseFile', 'Choose File')}
+                                    </span>
+                                </Button>
+                                <input
+                                    id="hq-file"
+                                    type="file"
+                                    ref={hqFileRef}
+                                    className="hidden"
+                                    accept={mediaType === 'pdf' ? '.pdf,application/pdf' : mediaType === 'video' ? '.mp4,.webm,.mov,video/mp4,video/webm,video/quicktime' : mediaType === 'audio' ? '.mp3,.wav,.ogg,.aac,.m4a,audio/*' : mediaType === 'image' ? '.jpg,.jpeg,.png,.webp,.gif,.svg,image/*' : '*/*'}
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            setHqFileName(file.name);
+                                            // Auto-populate title from filename if currently empty
+                                            let updatedTitle = title;
+                                            if (!title.trim()) {
+                                                const nameWithoutExt = file.name.split('.').slice(0, -1).join('.');
+                                                updatedTitle = nameWithoutExt || file.name;
+                                                setTitle(updatedTitle);
+                                            }
+                                            const error = validateFiles(file, null, updatedTitle);
+                                            setValidationError(error);
+
+                                            const detected = detectMediaType(file);
+                                            if (detected) {
+                                                setMediaType(detected);
+                                            }
+                                        } else {
+                                            setHqFileName('');
+                                            setValidationError(validateFiles(null, null));
                                         }
-                                        const error = validateFiles(file, null, updatedTitle);
-                                        setValidationError(error);
-                                        
-                                        const detected = detectMediaType(file);
-                                        if (detected) {
-                                            setMediaType(detected);
-                                        }
-                                    } else {
-                                        setHqFileName('');
-                                        setValidationError(validateFiles(null, null));
-                                    }
-                                }}
-                                disabled={uploading}
-                                required={!sample}
-                            />
+                                    }}
+                                    disabled={uploading}
+                                    required={!sample}
+                                />
+                            </div>
+                            <p className="text-[10px] text-muted-foreground">{t('samples.hqNote', 'Used for in-app protected preview.')}</p>
                         </div>
-                        <p className="text-[10px] text-muted-foreground">{t('samples.hqNote', 'Used for in-app protected preview.')}</p>
-                    </div>
                     )}
 
                     <div className="grid gap-2">
@@ -461,7 +473,10 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                                 variant="outline"
                                 onClick={() => lqFileRef.current?.click()}
                                 disabled={uploading}
-                                className="justify-start font-normal text-muted-foreground h-10 px-3"
+                                    className={cn(
+                                        "justify-start font-normal text-muted-foreground h-10 px-3",
+                                        uploading && "!bg-neutral-800 !text-neutral-500 !opacity-30 !cursor-not-allowed grayscale"
+                                    )}
                             >
                                 <Upload className="h-4 w-4 me-2 shrink-0" />
                                 <span className="truncate">
@@ -487,7 +502,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                                         }
                                         const error = validateFiles(null, file, updatedTitle);
                                         setValidationError(error);
-                                        
+
                                         const detected = detectMediaType(file);
                                         if (detected && !hqFileRef.current?.files?.[0]) {
                                             setMediaType(detected);
@@ -535,10 +550,17 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                             variant="outline"
                             disabled={uploading && uploadProgress === 0}
                             onClick={() => uploading ? handleCancelUpload() : onOpenChange(false)}
+                            className={cn(uploading && "!bg-neutral-800 !text-neutral-500 !opacity-30 !cursor-not-allowed grayscale")}
                         >
                             {uploading ? <><X className="h-4 w-4 me-2" /> {t('common.cancel')}</> : t('common.cancel')}
                         </Button>
-                        <Button type="submit" disabled={uploading || !!validationError}>
+                        <Button 
+                            type="submit" 
+                            disabled={isSubmitDisabled}
+                            className={cn(
+                                isSubmitDisabled && "!bg-neutral-800 !text-neutral-500 !opacity-30 !cursor-not-allowed grayscale !border-transparent"
+                            )}
+                        >
                             {uploading ? (
                                 <>
                                     <Loader2 className="h-4 w-4 me-2 animate-spin" />

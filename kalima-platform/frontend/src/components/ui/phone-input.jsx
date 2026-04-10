@@ -5,15 +5,16 @@ import { cn } from "@/lib/utils";
 import i18n from "@/i18n";
 import { useTranslation } from "react-i18next";
 
-export const egyptPhoneSchema = z.string().superRefine((value, ctx) => {
-    const valid = /^\+20\d{10}$/.test(value || "");
+export const egyptPhoneSchema = (t) => z.string().superRefine((value, ctx) => {
+    // Allow empty during base validation.
+    if (!value || value === "+20" || value === "") return;
+
+    // Strict validation: +20 followed by exactly 10 digits
+    const valid = /^\+20\d{10}$/.test(value);
     if (!valid) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: i18n.t(
-                "cart:validation.invalidEgyptPhone",
-                "Invalid Egyptian phone number. Must start with +20 followed by 10 digits.",
-            ),
+            message: t ? t("common:validation.invalidEgyptPhone", "Invalid Egyptian phone number. Must follow the prefix with 10 digits.") : "Invalid Egyptian phone number."
         });
     }
 });
@@ -37,37 +38,30 @@ export const PhoneInput = forwardRef(
         const countryLabel = i18n.language === "ar" ? "مصر" : "Egypt";
         const countryShortLabel = i18n.language === "ar" ? "مصر" : "EG";
         const { t } = useTranslation("common");
-        const normalizeEgyptPhone = (rawValue) => {
-            const cleaned = String(rawValue || "").replaceAll(/[^\d+]/g, "");
 
-            if (!cleaned) return "";
-            if (cleaned === "+" || cleaned === "+2" || cleaned === "+20") return cleaned;
-
-            let digits = cleaned;
-            if (digits.startsWith("+")) digits = digits.slice(1);
-            if (digits.startsWith("20")) digits = digits.slice(2);
-            if (digits.startsWith("0")) digits = digits.slice(1);
-
-            digits = digits.replaceAll(/\D/g, "").slice(0, 10);
-            return `${egyptPrefix}${digits}`;
-        };
 
         useEffect(() => {
             if (!hasInitialized) {
-                if (!value) {
-                    const syntheticEvent = {
-                        target: {
-                            value: "+20",
-                        },
-                    };
-                    onChange?.(syntheticEvent);
-                }
+                // We keep this to inform the parent form that we are using the egypt prefix,
+                // but we let it be empty if no digits are provided.
                 setHasInitialized(true);
             }
-        }, [hasInitialized, onChange, value]);
+        }, [hasInitialized]);
+
+        const displayValue = (value || "").startsWith("+20") ? value.slice(3) : (value || "");
 
         const handlePhoneChange = (e) => {
-            const normalized = normalizeEgyptPhone(e.target.value);
+            // Keep only digits and slice to 10
+            let digits = e.target.value.replaceAll(/\D/g, "");
+
+            // If they are pasting a number that starts with 0 or 20, clean it up
+            if (digits.startsWith("20")) digits = digits.slice(2);
+            if (digits.startsWith("0")) digits = digits.slice(1);
+
+            digits = digits.slice(0, 10);
+
+            const normalized = digits ? `${egyptPrefix}${digits}` : "";
+
             const syntheticEvent = {
                 ...e,
                 target: { ...e.target, value: normalized },
@@ -76,32 +70,30 @@ export const PhoneInput = forwardRef(
         };
 
         const inputClasses = cn(
-            "group relative flex h-11 w-full items-center gap-2 rounded-lg border border-input bg-background px-3 shadow-xs transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30 disabled:opacity-50 disabled:cursor-not-allowed",
+            "group relative flex h-11 w-full items-center gap-0 rounded-lg border border-input bg-background shadow-xs transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden",
             inline && "rounded-s-none",
             className
         );
 
         return (
             <div className={inputClasses}>
-                {!inline && (
-                    <div
-                        className="shrink-0 p-2 rounded-md bg-muted flex items-center justify-center text-sm leading-none border border-border/60"
-                        title={countryLabel}
-                    >
-                        <span aria-hidden="true">{countryShortLabel}</span>
-                        <span className="sr-only">{countryLabel}</span>
-                    </div>
-                )}
+                <div
+                    className="flex items-center gap-2 h-full px-3 bg-muted/30 border-e border-input/50 text-sm font-bold tracking-tight select-none no-drag"
+                    dir="ltr"
+                >
+                    <span className="text-muted-foreground select-none">{countryShortLabel}</span>
+                    <span className="text-primary font-extrabold select-none">{egyptPrefix}</span>
+                </div>
                 <input
                     ref={ref}
-                    value={value}
+                    value={displayValue}
                     onChange={handlePhoneChange}
-                    placeholder={placeholder || t("common:enterNumber", "Enter number")}
+                    placeholder={placeholder || "1X XXXX XXXX"}
                     type="tel"
                     autoComplete="tel"
                     name="phone"
                     dir="ltr"
-                    className="h-full w-full border-none bg-transparent p-0 text-sm font-medium tracking-wide text-foreground placeholder:text-muted-foreground outline-none"
+                    className="h-full w-full border-none bg-transparent px-3 text-sm font-semibold tracking-widest text-foreground placeholder:text-muted-foreground/50 outline-none"
                     {...props}
                 />
             </div>

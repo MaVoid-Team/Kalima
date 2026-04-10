@@ -3,7 +3,8 @@
         "required": "This field is required",
         "email": "Please enter a valid email address",
         "minLength": "Must be at least {{min}} characters",
-        "invalidPhone": "Invalid Egyptian phone number"
+        "invalidPhone": "Invalid Egyptian phone number",
+        "invalidEgyptPhone": "Invalid Egyptian phone number. Must follow the prefix with 10 digits (e.g., 1234567890)."
     },
     "roles": {
         "Admin": "Admin",

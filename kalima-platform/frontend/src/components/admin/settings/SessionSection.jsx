@@ -38,8 +38,8 @@ const deviceIcons = {
     default: Globe
 };
 
-export default function SessionSection() {
-    const { t, i18n } = useTranslation('admin');
+export default function SessionSection({ ns = 'admin' }) {
+    const { t, i18n } = useTranslation(ns);
     const { logout, logoutAll, loading } = useLogout();
     
     const [showLogoutAllDialog, setShowLogoutAllDialog] = useState(false);

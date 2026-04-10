@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,17 +29,13 @@ import { getImageUrl } from '@/lib/storeUtils';
 const getProfileSchema = (t) => z.object({
     name: z.string().min(1, t('settings.profile.validation.nameRequired', 'Name is required')).max(255),
     email: z.string().email(t('settings.profile.validation.emailInvalid', 'Invalid email address')),
-    phone: z.string().optional().refine(val => !val || egyptPhoneSchema.safeParse(val).success, {
-        message: t('settings.profile.validation.invalidPhone', 'Invalid Egyptian phone number')
-    }),
-    secondary_phone: z.string().optional().refine(val => !val || egyptPhoneSchema.safeParse(val).success, {
-        message: t('settings.profile.validation.invalidPhone', 'Invalid Egyptian phone number')
-    }),
+    phone: egyptPhoneSchema(t).optional(),
+    secondary_phone: egyptPhoneSchema(t).optional(),
     gender: z.string().optional()
 });
 
-export default function ProfileSection() {
-    const { t, i18n } = useTranslation('admin');
+export default function ProfileSection({ ns = 'admin' }) {
+    const { t, i18n } = useTranslation(ns);
     const isRtl = i18n.dir() === 'rtl';
     const [isEditing, setIsEditing] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -264,8 +261,8 @@ export default function ProfileSection() {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="male">{t('gender.male', 'Male')}</SelectItem>
-                                                    <SelectItem value="female">{t('gender.female', 'Female')}</SelectItem>
+                                                    <SelectItem value="male">{t('profile.male', 'Male')}</SelectItem>
+                                                    <SelectItem value="female">{t('profile.female', 'Female')}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -274,8 +271,12 @@ export default function ProfileSection() {
                                 />
                             </div>
                             <div className="flex gap-2">
-                                <Button type="submit" disabled={loading}>
-                                    {loading ? t('common.loading') : t('common.save')}
+                                <Button
+                                    type="submit"
+                                    disabled={loading || !form.formState.isDirty}
+                                >
+                                    {loading && <LoadingSpinner className="h-4 w-4" />}
+                                    {t('common.save')}
                                 </Button>
                                 <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
                                     {t('common.cancel')}
@@ -318,7 +319,7 @@ export default function ProfileSection() {
                                     {t('settings.profile.gender')}
                                 </Label>
                                 <Badge variant="secondary">
-                                    {profile?.gender || t('common.notSpecified')}
+                                    {t(`profile.${profile?.gender}`) || t('common.notSpecified')}
                                 </Badge>
                             </div>
                         </div>

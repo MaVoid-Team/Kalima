@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { MoreHorizontal, Eye, Pencil, ArchiveRestore, Archive, Trash2, ImageOff, Clock } from 'lucide-react';
+import { MoreHorizontal, Eye, Pencil, ArchiveRestore, Archive, Trash2, ImageOff, Clock, PackageX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getImageUrl, formatCurrency } from '@/lib/storeUtils';
 import { format } from 'date-fns';
@@ -51,7 +51,7 @@ export default function ProductsTable({
     if (!products.length) {
         return (
             <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="products-table-empty">
-                <ImageOff className="h-12 w-12 text-muted-foreground mb-3" />
+                <PackageX className="h-12 w-12 text-muted-foreground mb-3" />
                 <p className="text-muted-foreground font-medium">{t('products.noProducts')}</p>
                 <p className="text-sm text-muted-foreground mt-1">{t('products.noProductsDescription')}</p>
             </div>
@@ -182,7 +182,7 @@ export default function ProductsTable({
                                         variant={isArchived ? 'destructive' : 'default'}
                                         className={cn(
                                             isArchived
-                                                ? 'bg-destructive/20 text-destructive border-destructive/50'
+                                                ? 'bg-destructive/20 text-white border-destructive/50'
                                                 : 'bg-success/20 text-success border-success/50'
                                         )}
                                     >

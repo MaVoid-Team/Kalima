@@ -112,7 +112,7 @@ export function buildProductMedia(product) {
           videoId = v.url.split('youtu.be/')[1].split(/[?#]/)[0];
         }
         if (videoId) thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-      } catch (e) {}
+      } catch (e) { }
     }
     return {
       type: 'video',
@@ -123,7 +123,7 @@ export function buildProductMedia(product) {
     };
   }).filter(v => v.url);
 
-  const thumbnails = [...galleryImages, ...galleryVideos].sort((a,b) => a.sort_order - b.sort_order);
+  const thumbnails = [...galleryImages, ...galleryVideos].sort((a, b) => a.sort_order - b.sort_order);
   return { main, thumbnails };
 }
 
@@ -258,7 +258,7 @@ export async function getFileSizeFromUrl(url) {
     const baseURL = import.meta.env.VITE_API_URL || "/api/v2";
     // Strips /api/v2 or /api/v1 (with or without trailing slash) to get the site root
     const rootURL = baseURL.replace(/\/api\/v\d+\/?$/, "");
-    
+
     let fullUrl = url;
     if (!url.startsWith('http')) {
       fullUrl = `${rootURL}${url.startsWith('/') ? '' : '/'}${url}`;
@@ -268,14 +268,14 @@ export async function getFileSizeFromUrl(url) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-    const response = await fetch(fullUrl, { 
+    const response = await fetch(fullUrl, {
       method: 'HEAD',
       signal: controller.signal,
       cache: 'no-cache'
     });
-    
+
     clearTimeout(timeoutId);
-    
+
     if (!response.ok) return null;
 
     const cl = response.headers.get('content-length');
@@ -307,44 +307,28 @@ export function formatPhone(phone) {
 }
 
 /**
- * Formats the time remaining until a product is released into a human-readable string.
- * Uses the `time_until_release_ms` field from the product API response.
- *
- * @param {number|null} timeUntilReleaseMs - milliseconds until release (from product.time_until_release_ms)
- * @param {boolean} isReleased             - whether the product is already released
- * @param {string}  lang                   - locale key, e.g. 'ar' or 'en'
- * @returns {string}
+ * Formats a time interval in milliseconds to a human-readable string.
+ * @param {number|string} ms - milliseconds until release
+ * @param {function} t - translation function (optional)
+ * @returns {string} - e.g. "2d 5h", "10h 30m", "45m 12s", or "12s"
  */
-export function formatTimeUntilRelease(timeUntilReleaseMs, isReleased = false, lang = 'en') {
-  const isAr = lang === 'ar';
+export function formatTimeUntilRelease(ms, t) {
+  const diff = Number(ms);
 
-  if (isReleased || timeUntilReleaseMs === null || timeUntilReleaseMs === undefined) {
-    return isAr ? 'متاح الآن' : 'Available now';
-  }
+  const d = t ? t("countdown.days", "d") : "d";
+  const h = t ? t("countdown.hours", "h") : "h";
+  const m = t ? t("countdown.minutes", "m") : "m";
+  const s = t ? t("countdown.seconds", "s") : "s";
 
-  const ms = Number(timeUntilReleaseMs);
-  if (isNaN(ms) || ms <= 0) {
-    return isAr ? 'متاح الآن' : 'Available now';
-  }
+  if (isNaN(diff) || diff <= 0) return `0${s}`;
 
-  const totalSeconds = Math.floor(ms / 1000);
-  const days    = Math.floor(totalSeconds / 86400);
-  const hours   = Math.floor((totalSeconds % 86400) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
 
-  if (isAr) {
-    const parts = [];
-    if (days > 0)    parts.push(`${days} يوم`);
-    if (hours > 0)   parts.push(`${hours} ساعة`);
-    if (minutes > 0) parts.push(`${minutes} دقيقة`);
-    if (parts.length === 0) parts.push('أقل من دقيقة');
-    return `بعد ${parts.join(' و ')}`;
-  }
-
-  const parts = [];
-  if (days > 0)    parts.push(`${days}d`);
-  if (hours > 0)   parts.push(`${hours}h`);
-  if (minutes > 0) parts.push(`${minutes}m`);
-  if (parts.length === 0) parts.push('< 1m');
-  return `In ${parts.join(' ')}`;
+  if (days > 0) return `${days}${d} ${hours}${h}`;
+  if (hours > 0) return `${hours}${h} ${minutes}${m}`;
+  if (minutes > 0) return `${minutes}${m} ${seconds}${s}`;
+  return `${seconds}${s}`;
 }
