@@ -16,7 +16,10 @@
     "settings": "الإعدادات",
     "expandSidebar": "توسيع الشريط الجانبي",
     "collapseSidebar": "طي الشريط الجانبي",
-    "closeSidebar": "إغلاق الشريط الجانبي"
+    "closeSidebar": "إغلاق الشريط الجانبي",
+    "analytics": "الإحصائيات",
+    "dashboard": "لوحة التحكم",
+    "employeePerformance": "أداء الموظفين"
   },
   "common": {
     "currencyEGP": "ج.م",
@@ -1052,7 +1055,8 @@
     "pickDate": "اختر تاريخ",
     "pickMonth": "اختر شهراً",
     "prevYear": "السنة السابقة",
-    "nextYear": "السنة التالية"
+    "nextYear": "السنة التالية",
+    "minutes": "دقيقة"
   },
   "table": {
     "productName": "اسم المنتج",
