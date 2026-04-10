@@ -6,6 +6,7 @@ import { arSA } from 'react-day-picker/locale';
 import { ChevronLeft, Package, Pencil, Trash2, Clock } from 'lucide-react';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useAdminCoupons } from '@/hooks/admin/useAdminCoupons';
+import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
 import { formatCurrency } from '@/lib/storeUtils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -62,6 +63,8 @@ export default function ProductDetailPage() {
         apiLoading: couponLoading,
     } = useAdminCoupons();
 
+    const { deleteSample } = useAdminSampleSections();
+
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [productCoupons, setProductCoupons] = useState([]);
     const [couponsLoading, setCouponsLoading] = useState(false);
@@ -102,14 +105,23 @@ export default function ProductDetailPage() {
     }, [loadProductCoupons]);
 
     const handleDelete = () => {
-        if (product?.samples || product?.sample_url) {
-            toast.error(t('products.delete.hasSampleError', 'Cannot delete product with linked sample. Please remove the sample first.'));
-            return;
-        }
         setDeleteOpen(true);
     };
 
     const handleDeleteConfirm = async () => {
+        // Delete linked samples first if any
+        const samplesToDelete = Array.isArray(selectedProduct?.samples) 
+            ? selectedProduct.samples 
+            : (selectedProduct?.sample ? [selectedProduct.sample] : []);
+
+        if (samplesToDelete.length > 0) {
+            for (const sample of samplesToDelete) {
+                if (sample.section_id && sample.id) {
+                    await deleteSample(sample.section_id, sample.id);
+                }
+            }
+        }
+
         const res = await deleteProduct(id);
         if (res?.success) navigate('/admin/products');
     };
@@ -600,6 +612,7 @@ export default function ProductDetailPage() {
                 onConfirm={handleDeleteConfirm}
                 loading={actionLoading}
                 productTitle={product?.title}
+                hasSample={(product?.samples?.length > 0) || !!product?.sample}
             />
         </div>
     );

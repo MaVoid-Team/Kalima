@@ -15,7 +15,7 @@ import {
  * Reusable confirmation dialog for product deletion.
  * Controlled externally via `open` + `onOpenChange`.
  */
-export default function DeleteProductDialog({ open, onOpenChange, onConfirm, loading, productTitle }) {
+export default function DeleteProductDialog({ open, onOpenChange, onConfirm, loading, productTitle, hasSample }) {
     const { t } = useTranslation('admin');
 
     return (
@@ -26,12 +26,18 @@ export default function DeleteProductDialog({ open, onOpenChange, onConfirm, loa
                         <Trash2 className="h-5 w-5 text-destructive" />
                         {t('products.delete.confirmTitle')}
                     </AlertDialogTitle>
-                    <AlertDialogDescription>
-                        {t('products.delete.confirm')}
+                    <AlertDialogDescription className="space-y-3">
+                        <p>{t('products.delete.confirm')}</p>
                         {productTitle && (
-                            <span className="block mt-1 font-medium text-foreground">
+                            <span className="block font-medium text-foreground">
                                 &ldquo;{productTitle}&rdquo;
                             </span>
+                        )}
+                        {hasSample && (
+                            <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium">
+                                <Trash2 className="h-4 w-4 mt-0.5 shrink-0" />
+                                <p>{t('products.delete.sampleWarning', 'Warning: This product has linked samples. Deleting the product will also permanently delete all its associated samples.')}</p>
+                            </div>
                         )}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
