@@ -831,7 +831,18 @@
         "github": "جيت هاب",
         "firebase": "فايربيز",
         "email": "البريد الإلكتروني"
-      }
+      },
+      "dangerZone": "منطقة الخطر",
+      "deleteAccount": "حذف الحساب",
+      "deleteAccountDesc": "حذف حسابك وجميع البيانات المرتبطة به نهائياً. هذا الإجراء لا يمكن التراجع عنه.",
+      "deleteAccountBtn": "حذف الحساب",
+      "deleteConfirmationText": "حذف حسابي",
+      "deleteTitle": "حذف الحساب",
+      "deleteWarning1": "هذا الإجراء لا يمكن التراجع عنه.",
+      "deleteWarning2": "سيتم حذف جميع بياناتك ومحتوياتك وتقدمك بشكل نهائي.",
+      "deleteTypePrompt": "يرجى كتابة",
+      "deleteToConfirm": "للتأكيد.",
+      "deleteConfirmButton": "حذف نهائي"
     },
     "email": {
       "title": "التحقق من البريد الإلكتروني",
