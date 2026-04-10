@@ -26,7 +26,8 @@ export default function ProductInfo({ product }) {
   const countdownText = formatTimeUntilRelease(
     Number.isFinite(Number(product?.time_until_release_ms))
       ? product.time_until_release_ms
-      : fallbackTimeUntilReleaseMs
+      : fallbackTimeUntilReleaseMs,
+    t
   );
 
   return (

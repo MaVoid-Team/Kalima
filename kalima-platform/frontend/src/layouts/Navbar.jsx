@@ -76,12 +76,15 @@ export default function Navbar() {
 
   const NAV_LINKS = [
     { label: t("navbar.market"), href: "/market" },
-  ];
+  ].filter(link => {
+    if (link.href === "/market" && isStudentOrParent) return false;
+    return true;
+  });
 
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border/40">
+      <header className="sticky top-0 z-50 w-full bg-transparent backdrop-blur-md border-b border-border/40">
         <div className="container md:px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 decoration-0">
@@ -166,7 +169,7 @@ export default function Navbar() {
 
               {isAuthenticated ? (
                 <>
-                   {hasAdminAccess && (
+                  {hasAdminAccess && (
                     <Button
                       variant="default"
                       size="default"
@@ -328,7 +331,7 @@ export default function Navbar() {
             <div className="flex flex-col gap-3 pt-4">
               {isAuthenticated ? (
                 <>
-                   {hasAdminAccess && (
+                  {hasAdminAccess && (
                     <Button
                       variant="default"
                       className="w-full font-bold justify-center h-12 text-base"
@@ -424,9 +427,11 @@ export default function Navbar() {
         <CommandList>
           <CommandEmpty>{t("navbar.noResults")}</CommandEmpty>
           <CommandGroup heading={t("navbar.pages")}>
-            <CommandItem value="/market" onSelect={() => runCommand(() => navigate("/market"))}>
-              {t("navbar.market")}
-            </CommandItem>
+            {!isStudentOrParent && (
+              <CommandItem value="/market" onSelect={() => runCommand(() => navigate("/market"))}>
+                {t("navbar.market")}
+              </CommandItem>
+            )}
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading={t("navbar.settings")}>

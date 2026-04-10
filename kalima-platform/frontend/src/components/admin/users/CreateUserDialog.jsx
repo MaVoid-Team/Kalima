@@ -64,8 +64,8 @@ export default function CreateUserDialog({ onSuccess }) {
         email: z.string().email({ message: t('common:validation.email', 'Invalid email') }),
         password: z.string().min(6, { message: t('common:validation.minLength', { min: 6, defaultValue: 'Min 6 chars' }) }),
         confirm_password: z.string().min(6, { message: t('common:validation.minLength', { min: 6, defaultValue: 'Min 6 chars' }) }),
-        phone: egyptPhoneSchema,
-        secondary_phone: z.union([egyptPhoneSchema, z.literal(""), z.literal("+20"), z.undefined(), z.null()]),
+        phone: egyptPhoneSchema(t).refine(val => val && val !== "+20", { message: t('common:validation.required', 'Required') }),
+        secondary_phone: z.union([egyptPhoneSchema(t), z.literal(""), z.literal("+20"), z.undefined(), z.null()]),
         gender: z.enum(['male', 'female'], { message: t('common:validation.required', 'Required') }),
         // Teacher-specific fields (validated conditionally)
         government_id: z.string().optional(),
@@ -77,7 +77,7 @@ export default function CreateUserDialog({ onSuccess }) {
         // Additional properties
         lecturer_user_id: z.string().optional(),
         level_id: z.string().optional(),
-        parent_phone_number: z.union([egyptPhoneSchema, z.literal(""), z.literal("+20"), z.undefined(), z.null()]).optional(),
+        parent_phone_number: z.union([egyptPhoneSchema(t), z.literal(""), z.literal("+20"), z.undefined(), z.null()]).optional(),
         faction: z.string().optional(),
     }).superRefine((data, ctx) => {
         if (data.password !== data.confirm_password) {

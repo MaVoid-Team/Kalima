@@ -138,5 +138,11 @@
   },
   "common": {
     "cancel": "إلغاء"
+  },
+  "countdown": {
+    "days": "ي",
+    "hours": "س",
+    "minutes": "د",
+    "seconds": "ث"
   }
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Lock, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -18,25 +18,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-// Password validation schema
-const passwordChangeSchema = z.object({
-    currentPassword: z.string().min(1, 'Current password is required'),
-    newPassword: z.string()
-        .min(8, 'Password must be at least 8 characters')
-        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one uppercase letter, one lowercase letter, and one number'),
-    confirmPassword: z.string().min(1, 'Please confirm your password')
-}).refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-});
-
-export default function ConfirmPasswordChangeDialog({ 
-    open, 
-    onOpenChange, 
-    onConfirm, 
-    loading 
+export default function ConfirmPasswordChangeDialog({
+    open,
+    onOpenChange,
+    onConfirm,
+    loading,
+    ns = 'admin'
 }) {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation(ns);
+
+    // Localized validation schema
+    const passwordChangeSchema = useMemo(() => z.object({
+        currentPassword: z.string().min(1, t('validation.current_password_required', 'Current password is required')),
+        newPassword: z.string()
+            .min(8, t('validation.password_min', 'Password must be at least 8 characters'))
+            .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, t('validation.password_requirements', 'Password must contain at least one uppercase letter, one lowercase letter, and one number')),
+        confirmPassword: z.string().min(1, t('validation.confirm_password_required', 'Please confirm your password'))
+    }).refine((data) => data.newPassword === data.confirmPassword, {
+        message: t('validation.passwords_mismatch', "Passwords don't match"),
+        path: ["confirmPassword"],
+    }), [t]);
+
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -73,7 +75,7 @@ export default function ConfirmPasswordChangeDialog({
                         {t('settings.password.confirmChange')}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                
+
                 <form onSubmit={handleSubmit(handleConfirm)} className="space-y-4 py-4">
                     <div className="space-y-2">
                         <Label htmlFor="current-password">
@@ -81,6 +83,7 @@ export default function ConfirmPasswordChangeDialog({
                         </Label>
                         <div className="relative">
                             <Input
+                                dir="ltr"
                                 id="current-password"
                                 type={showCurrentPassword ? "text" : "password"}
                                 {...register('currentPassword')}
@@ -117,6 +120,7 @@ export default function ConfirmPasswordChangeDialog({
                         </Label>
                         <div className="relative">
                             <Input
+                                dir="ltr"
                                 id="new-password"
                                 type={showNewPassword ? "text" : "password"}
                                 {...register('newPassword')}
@@ -153,6 +157,7 @@ export default function ConfirmPasswordChangeDialog({
                         </Label>
                         <div className="relative">
                             <Input
+                                dir="ltr"
                                 id="confirm-new-password"
                                 type={showConfirmPassword ? "text" : "password"}
                                 {...register('confirmPassword')}

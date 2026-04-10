@@ -1,4 +1,11 @@
 {
+  "validation": {
+    "password_min": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+    "password_requirements": "يجب أن تحتوي كلمة المرور على حرف كبير وحرف صغير ورقم واحد على الأقل",
+    "confirm_password_required": "يرجى تأكيد كلمة المرور الخاصة بك",
+    "passwords_mismatch": "كلمات المرور غير متطابقة",
+    "current_password_required": "كلمة المرور الحالية مطلوبة"
+  },
   "dashboardTitle": "لوحة الإدارة",
   "nav": {
     "orders": "الطلبات",
@@ -16,7 +23,10 @@
     "settings": "الإعدادات",
     "expandSidebar": "توسيع الشريط الجانبي",
     "collapseSidebar": "طي الشريط الجانبي",
-    "closeSidebar": "إغلاق الشريط الجانبي"
+    "closeSidebar": "إغلاق الشريط الجانبي",
+    "analytics": "الإحصائيات",
+    "dashboard": "لوحة التحكم",
+    "employeePerformance": "أداء الموظفين"
   },
   "common": {
     "currencyEGP": "ج.م",
@@ -185,6 +195,17 @@
       "delete": "حذف الطلب",
       "deleteItem": "إزالة العنصر",
       "whatsapp": "تواصل عبر واتساب",
+      "whatsappGreeting": "هلاً بك أ/ {{name}}",
+      "whatsappSuccess": "تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.",
+      "whatsappOrderDetails": "رقم الطلب: {{serial}}",
+      "whatsappItems": "المنتجات:",
+      "whatsappTotal": "الإجمالي: {{total}} {{currency}}",
+      "whatsappSupport": "لو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.",
+      "whatsappClosing": "نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا!\n\nمع تحيات فريق عمل منصة كلمة",
+      "editWhatsAppMessage": "تعديل رسالة واتساب",
+      "editWhatsAppMessageDesc": "راجع وقم بتعديل الرسالة قبل إرسالها للعميل.",
+      "whatsappPlaceholder": "اكتب رسالتك هنا...",
+      "sendOnWhatsApp": "إرسال عبر واتساب",
       "collapseItems": "طي",
       "expandItems": "توسيع",
       "viewNote": "عرض الملاحظة",
@@ -241,7 +262,8 @@
       "loading": "جاري تحميل التفاصيل...",
       "addAdminNote": "إضافة ملاحظة إدارية",
       "noteLimitReached": "تم الوصول للحد الأقصى للملاحظات",
-      "notFound": "الطلب غير موجود"
+      "notFound": "الطلب غير موجود",
+      "viewImage": "عرض الصورة"
     }
   },
   "products": {
@@ -369,9 +391,11 @@
       "createFailed": "تم حفظ المنتج ولكن فشل إنشاء القسيمة"
     },
     "delete": {
-      "confirm": "هل تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
+      "confirm": "هل أنت متأكد أنك تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
       "confirmTitle": "حذف المنتج",
-      "success": "تم حذف المنتج بنجاح"
+      "success": "تم حذف المنتج بنجاح",
+      "hasSampleError": "لا يمكن حذف المنتج الذي يحتوي على عينة مرتبطة. يرجى إزالة العينة أولاً.",
+      "sampleWarning": "تنبيه: هذا المنتج يحتوي على عينات مرتبطة. حذف المنتج سيؤدي أيضاً إلى حذف جميع العينات المرتبطة به نهائياً."
     },
     "detail": {
       "info": "معلومات المنتج",
@@ -828,7 +852,18 @@
         "github": "جيت هاب",
         "firebase": "فايربيز",
         "email": "البريد الإلكتروني"
-      }
+      },
+      "dangerZone": "منطقة الخطر",
+      "deleteAccount": "حذف الحساب",
+      "deleteAccountDesc": "حذف حسابك وجميع البيانات المرتبطة به نهائياً. هذا الإجراء لا يمكن التراجع عنه.",
+      "deleteAccountBtn": "حذف الحساب",
+      "deleteConfirmationText": "حذف حسابي",
+      "deleteTitle": "حذف الحساب",
+      "deleteWarning1": "هذا الإجراء لا يمكن التراجع عنه.",
+      "deleteWarning2": "سيتم حذف جميع بياناتك ومحتوياتك وتقدمك بشكل نهائي.",
+      "deleteTypePrompt": "يرجى كتابة",
+      "deleteToConfirm": "للتأكيد.",
+      "deleteConfirmButton": "حذف نهائي"
     },
     "email": {
       "title": "التحقق من البريد الإلكتروني",
@@ -1024,6 +1059,7 @@
   },
   "dashboard": {
     "title": "لوحة الإدارة",
+    "description": "نظرة عامة على أداء المتجر",
     "totalRevenue": "إجمالي الإيرادات",
     "currency": "ج.م",
     "totalPurchases": "إجمالي المشتريات",
@@ -1052,7 +1088,8 @@
     "pickDate": "اختر تاريخ",
     "pickMonth": "اختر شهراً",
     "prevYear": "السنة السابقة",
-    "nextYear": "السنة التالية"
+    "nextYear": "السنة التالية",
+    "minutes": "دقيقة"
   },
   "table": {
     "productName": "اسم المنتج",

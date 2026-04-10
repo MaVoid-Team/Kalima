@@ -1,14 +1,16 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { User, Loader2 } from 'lucide-react';
+import { User } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { PhoneInput, egyptPhoneSchema } from '@/components/ui/phone-input';
 import {
     Select,
     SelectContent,
@@ -16,11 +18,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import LoadingSpinner from '../../ui/loading-spinner';
 
-const profileSchema = z.object({
-    name: z.string().min(1, 'Name is required').max(255),
-    phone: z.string().max(50).optional().or(z.literal('')),
-    secondary_phone: z.string().max(50).optional().or(z.literal('')),
+const getProfileSchema = (t) => z.object({
+    name: z.string().min(1, t('common:validation.required', 'Required')).max(255),
+    phone: egyptPhoneSchema(t).optional(),
+    secondary_phone: egyptPhoneSchema(t).optional(),
     gender: z.enum(['male', 'female']).optional(),
     government_id: z.coerce.number().optional(),
     zone_id: z.coerce.number().optional(),
@@ -42,9 +45,10 @@ export default function ParentProfileForm({
         handleSubmit,
         setValue,
         watch,
+        control,
         formState: { errors, isDirty },
     } = useForm({
-        resolver: zodResolver(profileSchema),
+        resolver: zodResolver(getProfileSchema(t)),
         defaultValues
     });
 
@@ -80,15 +84,44 @@ export default function ParentProfileForm({
                         {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
                     </div>
 
-                    {/* Phone */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
+                        <div dir="ltr">
                             <Label htmlFor="phone">{t('profile.phone', 'Phone')}</Label>
-                            <Input id="phone" {...register('phone')} className="mt-1" dir="ltr" data-testid="parent-profile-phone-input" />
+                            <Controller
+                                name="phone"
+                                control={control}
+                                render={({ field }) => (
+                                    <div className="space-y-1">
+                                        <PhoneInput
+                                            id="phone"
+                                            data-testid="parent-profile-phone-input"
+                                            disabled={loading}
+                                            className="mt-1"
+                                            {...field}
+                                        />
+                                        {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
+                                    </div>
+                                )}
+                            />
                         </div>
-                        <div>
+                        <div dir="ltr">
                             <Label htmlFor="secondary_phone">{t('profile.secondaryPhone', 'Secondary Phone')}</Label>
-                            <Input id="secondary_phone" {...register('secondary_phone')} className="mt-1" dir="ltr" data-testid="parent-profile-secondary-phone-input" />
+                            <Controller
+                                name="secondary_phone"
+                                control={control}
+                                render={({ field }) => (
+                                    <div className="space-y-1">
+                                        <PhoneInput
+                                            id="secondary_phone"
+                                            data-testid="parent-profile-secondary-phone-input"
+                                            disabled={loading}
+                                            className="mt-1"
+                                            {...field}
+                                        />
+                                        {errors.secondary_phone && <p className="text-xs text-destructive">{errors.secondary_phone.message}</p>}
+                                    </div>
+                                )}
+                            />
                         </div>
                     </div>
 
@@ -146,8 +179,12 @@ export default function ParentProfileForm({
                     </div>
 
                     <div className="flex justify-end pt-2">
-                        <Button type="submit" disabled={loading || !isDirty} data-testid="parent-profile-save-button">
-                            {loading && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
+                        <Button 
+                            type="submit" 
+                            disabled={loading || !isDirty} 
+                            data-testid="parent-profile-save-button"
+                        >
+                            {loading && <LoadingSpinner className="h-4 w-4" />}
                             {t('profile.save', 'Save Changes')}
                         </Button>
                     </div>

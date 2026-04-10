@@ -79,6 +79,7 @@ const StudentSettingsPage = lazy(() => import("./pages/student/settings/StudentS
 // Parent lazy-loaded pages
 const ParentLayout = lazy(() => import("./layouts/ParentLayout"));
 const ParentProfilePage = lazy(() => import("./pages/parent/profile/ParentProfilePage"));
+const ParentSettingsPage = lazy(() => import("./pages/parent/settings/ParentSettingsPage"));
 
 const PageLoader = () => (
   <div className="flex min-h-screen items-center justify-center">
@@ -109,24 +110,28 @@ const router = createBrowserRouter(
       {/* Public Routes with MainLayout (Navbar & Footer) */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/market" element={<MarketPage />} />
+        
+        {/* Market and Product Routes - Restricted for Students and Parents */}
+        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+          <Route path="/market" element={<MarketPage />} />
+          <Route path="/product/:id" element={<ProductDetailsPage />} />
+          <Route path="/booklet/:id" element={<BookletDetailsPage />} />
+        </Route>
         <Route path="/samples" element={<SamplesDirectoryPage />} />
         <Route path="/samples/:id" element={<SamplePage />} />
         <Route path="/samples/:id/preview" element={<SamplePreview />} />
-        <Route path="/product/:id" element={<ProductDetailsPage />} />
-        <Route path="/booklet/:id" element={<BookletDetailsPage />} />
 
-        {/* Protected Routes inside MainLayout */}
-        <Route element={<ProtectedRoute requireAuth={true} />}>
-          <Route path="/cart" element={<WizardCheckoutPage />} />
-          <Route path="/checkout" element={<WizardCheckoutPage />} />
-          <Route path="/orders" element={<MyOrdersPage />} />
-          {/* <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} /> */}
-          <Route
-            path="/fast-buy/checkout"
-            element={<FastBuyCheckoutPage />}
-          />
+        {/* Protected Store Routes (Auth Required) - Also Restricted for Students and Parents */}
+        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+          <Route element={<ProtectedRoute requireAuth={true} />}>
+            <Route path="/cart" element={<WizardCheckoutPage />} />
+            <Route path="/checkout" element={<WizardCheckoutPage />} />
+            <Route path="/orders" element={<MyOrdersPage />} />
+            <Route
+              path="/fast-buy/checkout"
+              element={<FastBuyCheckoutPage />}
+            />
+          </Route>
         </Route>
 
         {/* 404 Fallback */}
@@ -177,6 +182,7 @@ const router = createBrowserRouter(
       <Route element={<RoleRoute requiredRole={["Parent"]} />}>
         <Route element={<ParentLayout />}>
           <Route path="/parent/profile" element={<ParentProfilePage />} />
+          <Route path="/parent/settings" element={<ParentSettingsPage />} />
         </Route>
       </Route>
 
