@@ -187,9 +187,10 @@ export default function UsersTable({
                                                     className="h-8 w-8 text-success hover:text-success hover:bg-success/10"
                                                     onClick={() => onApprove(user.id)}
                                                     disabled={actionLoading}
+                                                    title={t('actions.approve')}
                                                     data-testid={`users-table-approve-${user.id}`}
                                                 >
-                                                    <CheckCircle2 className="h-4 w-4" />
+                                                    <CheckCircle2 className={"h-4 w-4" + (isRtl ? " scale-x-[-1]" : "")} />
                                                 </Button>
                                             )}
 
@@ -201,6 +202,7 @@ export default function UsersTable({
                                                     className="h-8 w-8 text-warning hover:text-warning hover:bg-warning/10"
                                                     onClick={() => onReject(user.id)}
                                                     disabled={actionLoading}
+                                                    title={t('actions.reject')}
                                                     data-testid={`users-table-reject-${user.id}`}
                                                 >
                                                     <XCircle className="h-4 w-4" />
@@ -264,7 +266,7 @@ export default function UsersTable({
                             disabled={page <= 1 || loading}
                             data-testid="users-table-prev-page"
                         >
-                            {isRtl ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                            <ChevronLeft className="h-4 w-4" />
                             {t('pagination.previous')}
                         </Button>
                         <span className="text-sm text-muted-foreground">
@@ -278,7 +280,7 @@ export default function UsersTable({
                             data-testid="users-table-next-page"
                         >
                             {t('pagination.next')}
-                            {isRtl ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                            <ChevronRight className="h-4 w-4" />
                         </Button>
                     </div>
                 </div>
