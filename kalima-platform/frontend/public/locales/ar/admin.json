@@ -321,6 +321,8 @@
       "price": "السعر (ج.م)",
       "priceAfterDiscount": "السعر بعد الخصم (ج.م)",
       "freePreviewToggle": "معاينة منتج مجاني",
+      "freePreviewHint": "تفعيل هذا الخيار سيجعل الخصم على المنتج 100% (مجاني).",
+      "freePreviewHintAria": "تلميح المعاينة المجانية",
       "serial": "الرقم التسلسلي",
       "serialPlaceholder": "مثل: ALG-101 (اختياري)",
       "couponId": "معرف الكوبون",
