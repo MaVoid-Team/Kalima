@@ -10,6 +10,7 @@ import PrintableReceipt from '@/components/checkout/PrintableReceipt';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { getBaseUrl, getImageUrl } from '@/lib/storeUtils';
+import { motion } from 'framer-motion';
 
 export default function PaymentStep({ onBack }) {
     const { cart, checkout, getPaymentMethods } = useCart();
@@ -141,10 +142,19 @@ export default function PaymentStep({ onBack }) {
     };
 
     return (
-        <div className="w-full">
-            <div className="mb-6 flex items-center justify-between">
-                <Button variant="ghost" className="gap-2 text-muted-foreground" onClick={onBack} data-testid="checkout-payment-step-back-button">
-                    <ArrowLeft className="w-4 h-4" />
+        <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="w-full"
+        >
+            <div className="mb-10">
+                <Button 
+                    variant="ghost" 
+                    className="group gap-2 text-primary font-bold hover:bg-primary/5 transition-all" 
+                    onClick={onBack} 
+                    data-testid="checkout-payment-step-back-button"
+                >
+                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                     {t('payment.backToCart', 'Back to Cart')}
                 </Button>
             </div>
@@ -212,6 +222,6 @@ export default function PaymentStep({ onBack }) {
                 </AlertDialogContent>
             </AlertDialog>
             <PrintableReceipt purchase={purchase} paymentMethodName={paymentMethodName} baseURL={baseURL} receiptRef={receiptRef} dir={i18n.dir()} />
-        </div>
+        </motion.div>
     );
 }

@@ -261,7 +261,7 @@ export default function SamplePage() {
     // ── Loading ───────────────────────────────────────────────────────────────
     if (loading && !sample) {
         return (
-            <div className="min-h-screen bg-background" data-testid="sample-page-loading">
+            <div className="min-h-screen" data-testid="sample-page-loading">
                 <div className="container mx-auto px-4 md:px-8 py-8">
                     <Skeleton className="h-5 w-64 mb-8" />
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -322,7 +322,7 @@ export default function SamplePage() {
             : '/samples';
 
     return (
-        <div className="min-h-screen bg-background" data-testid="sample-details-page">
+        <div className="min-h-screen" data-testid="sample-details-page">
             <div className="container mx-auto px-4 md:px-8 py-8">
 
                 {/* Breadcrumbs */}
@@ -456,14 +456,16 @@ export default function SamplePage() {
                             </div>
 
                             {/* Sample Details */}
-                            <div className="rounded-xl border border-border p-5 space-y-1" data-testid="sample-page-details-card">
-                                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-                                    <FileText className="h-4 w-4" />
+                            <div className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-md p-6 space-y-2 shadow-xs" data-testid="sample-page-details-card">
+                                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                                    <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                                        <FileText className="h-4 w-4" />
+                                    </div>
                                     {t('samplePage.sampleInfo', 'Sample Information')}
                                 </h2>
 
                                 <DetailRow label={t('samplePage.fileType', 'File Type')}>
-                                    <Badge variant="outline">
+                                    <Badge variant="secondary" className="bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary">
                                         {sample?.mime_type || t(`samples.mediaTypes.${mediaType}`, mediaType)}
                                     </Badge>
                                 </DetailRow>
@@ -494,9 +496,11 @@ export default function SamplePage() {
 
                             {/* Product Info */}
                             {product && (
-                                <div className="rounded-xl border border-border p-5 space-y-1" data-testid="sample-page-product-card">
-                                    <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-                                        <Package className="h-4 w-4" />
+                                <div className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur-md p-6 space-y-2 shadow-xs" data-testid="sample-page-product-card">
+                                    <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                                        <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                                            <Package className="h-4 w-4" />
+                                        </div>
                                         {t('samplePage.productInfo', 'Product Information')}
                                     </h2>
 
@@ -544,10 +548,10 @@ export default function SamplePage() {
                                         <DetailRow label={t('samplePage.serial', 'Serial')} value={product.serial} />
                                     )}
 
-                                    <div className="pt-4">
+                                    <div className="pt-6">
                                         <Button
                                             variant="default"
-                                            className="w-full"
+                                            className="w-full rounded-xl shadow-lg shadow-primary/20"
                                             asChild
                                             data-testid="sample-page-view-product-button"
                                         >

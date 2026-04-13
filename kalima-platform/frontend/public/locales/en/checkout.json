@@ -77,6 +77,8 @@
     "complete_purchase": "Complete Purchase",
     "completePurchase": "Complete Purchase",
     "screenshot": "Payment Screenshot",
+    "completeOrder": "Complete Your Order",
+    "summaryDesc": "Fast Buy Checkout — Secure and Easy",
     "method": "Select Payment Method"
   },
   "orderSummary": {

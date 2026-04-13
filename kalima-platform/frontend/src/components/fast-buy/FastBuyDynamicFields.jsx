@@ -1,8 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload } from "lucide-react";
+import { Upload, Package } from "lucide-react";
 import { PhoneInput } from "@/components/ui/phone-input";
+import { motion } from "framer-motion";
 
 export default function FastBuyDynamicFields({
   itemsMissingFields,
@@ -12,16 +13,25 @@ export default function FastBuyDynamicFields({
   if (!itemsMissingFields?.length) return null;
 
   return (
-    <div className="space-y-4">
-      {itemsMissingFields.map((missingItem) => (
-        <div
+    <div className="space-y-6">
+      {itemsMissingFields.map((missingItem, index) => (
+        <motion.div
           key={missingItem.cart_item_id}
-          className="p-6 border rounded-xl shadow-sm space-y-5"
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: index * 0.1 }}
+          className="p-6 border border-border/40 bg-card/60 backdrop-blur-md rounded-2xl shadow-sm space-y-6"
         >
-          <h4 className="font-bold text-lg text-primary">
-            {missingItem.product_name}
-          </h4>
-          <div className="space-y-4">
+          <div className="flex items-center gap-3">
+             <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <Package className="w-5 h-5" />
+             </div>
+             <h4 className="font-bold text-lg text-foreground tracking-tight">
+               {missingItem.product_name}
+             </h4>
+          </div>
+
+          <div className="space-y-6 pt-2">
             {missingItem.missing_fields.map((field) => (
               <DynamicFieldInput
                 key={field.id}
@@ -32,7 +42,7 @@ export default function FastBuyDynamicFields({
               />
             ))}
           </div>
-        </div>
+        </motion.div>
       ))}
     </div>
   );
@@ -55,31 +65,33 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
 
   return (
     <div className="space-y-3">
-      <Label className="font-semibold text-foreground/80">
+      <Label className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
         {field?.label}
-        <span className="text-destructive">*</span>
+        <span className="text-destructive ms-1">*</span>
       </Label>
       {isImage ? (
         <>
-          <div
-            className="border-2 border-dashed border-muted-foreground/30 rounded-xl p-5 flex flex-col items-center justify-center gap-3 cursor-pointer "
+          <motion.div
+            whileHover={{ scale: 1.005 }}
+            whileTap={{ scale: 0.995 }}
+            className="border-2 border-dashed border-primary/20 hover:border-primary/40 rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer bg-primary/5 hover:bg-primary/10 transition-all group"
             onClick={() => document.getElementById(inputId).click()}
             data-testid="fastbuy-dynamic-fields-upload-button"
           >
-            <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+            <div className="h-10 w-10 rounded-full bg-primary/20 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
               <Upload className="w-5 h-5" />
             </div>
             <div className="text-center">
-              <p className="font-medium text-foreground">
+              <p className="font-bold text-foreground">
                 {value?.name
                   ? value.name
                   : t("payment.upload", "Click to upload")}
               </p>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs font-medium text-muted-foreground mt-1 opacity-80">
                 {t("payment.uploadHint", "PNG, JPG up to 5MB")}
               </p>
             </div>
-          </div>
+          </motion.div>
           <input
             id={inputId}
             type="file"
@@ -94,7 +106,7 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
           dir="ltr"
           value={value || ""}
           onChange={handleChange}
-          className="bg-background focus-visible:ring-primary/20"
+          className="h-12 bg-background/50 backdrop-blur-xs rounded-xl focus-visible:ring-primary/20"
           data-testid="fastbuy-dynamic-fields-phone-input"
         />
       ) : (
@@ -105,7 +117,7 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
           })}
           value={value || ""}
           onChange={handleChange}
-          className="h-12 bg-background focus-visible:ring-primary/20"
+          className="h-12 bg-background/50 backdrop-blur-xs rounded-xl border-border/30 focus-visible:ring-primary/20 mt-1"
           data-testid="fastbuy-dynamic-fields-text-input"
         />
       )}

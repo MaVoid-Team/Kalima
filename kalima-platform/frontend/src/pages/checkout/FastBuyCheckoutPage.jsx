@@ -5,6 +5,7 @@ import FastBuyCheckoutForm from "@/components/fast-buy/FastBuyCheckoutForm";
 import FastBuyClearDialog from "@/components/fast-buy/FastBuyClearDialog";
 import { useFastBuy } from "@/hooks/useFastBuy";
 import LoadingSpinner from "../../components/ui/loading-spinner";
+import { motion } from "framer-motion";
 
 export default function FastBuyCheckoutPage() {
   const { t } = useTranslation("checkout");
@@ -69,8 +70,22 @@ export default function FastBuyCheckoutPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-background relative selection:bg-primary/10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <div className="min-h-screen relative selection:bg-primary/10 pb-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-12 space-y-2"
+          >
+            <h1 className="text-4xl font-black tracking-tight text-foreground uppercase">
+              {t("payment.completeOrder", "Complete Your Order")}
+            </h1>
+            <p className="text-muted-foreground font-medium">
+              {t("payment.summaryDesc", "Fast Buy Checkout — Secure and Easy")}
+            </p>
+          </motion.div>
+
           <FastBuyCheckoutForm form={checkout} onApplyCoupon={applyCoupon} loading={isSubmitting} />
         </div>
       </div>

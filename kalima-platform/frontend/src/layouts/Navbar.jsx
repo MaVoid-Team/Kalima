@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Menu, X, Globe, ShoppingCart, FileText } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   CommandDialog,
@@ -31,6 +33,27 @@ export default function Navbar() {
   const location = useLocation();
   const { t, i18n } = useTranslation("landing");
   const [commandValue, setCommandValue] = useState("");
+  const [scrolled, setScrolled] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleScroll();
+    handleResize();
+
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const down = (e) => {
@@ -84,219 +107,204 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 w-full bg-transparent backdrop-blur-md border-b border-border/40">
-        <div className="container md:px-6 h-16 flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 decoration-0">
-            <img
-              src={logo}
-              alt="Kalima Logo"
-              className="h-8 w-auto object-contain"
-            />
-            <span className="text-xl font-bold text-foreground tracking-tight">
-              {t("navbar.brand")}
-            </span>
-          </Link>
+      <div className={cn(
+        "fixed inset-x-0 z-50 flex justify-center pointer-events-none transition-all duration-700",
+        (scrolled && !isMobile) ? "top-4 px-4" : "top-0"
+      )}>
+        <motion.header
+          initial={false}
+          animate={{
+            width: (scrolled && !isMobile) ? "min(1200px, 95vw)" : "100%",
+            height: (scrolled && !isMobile) ? 64 : (isMobile ? 64 : 80),
+            borderRadius: (scrolled && !isMobile) ? 32 : 0,
+            backgroundColor: scrolled 
+              ? "color-mix(in oklch, var(--background), transparent 30%)" 
+              : "color-mix(in oklch, var(--background), transparent 100%)",
+            backdropFilter: scrolled ? "blur(24px)" : "blur(0px)",
+            border: (scrolled && !isMobile) 
+              ? "1px solid color-mix(in oklch, var(--primary), transparent 80%)" 
+              : "0px solid transparent",
+            borderBottom: (!scrolled || isMobile)
+              ? "1px solid color-mix(in oklch, var(--border), transparent 60%)"
+              : "1px solid color-mix(in oklch, var(--primary), transparent 80%)",
+          }}
+          transition={{ duration: 0.8, ease: [0.215, 0.61, 0.355, 1] }}
+          className={cn(
+            "pointer-events-auto relative flex items-center transition-all overflow-hidden",
+            (scrolled && !isMobile) ? "shadow-[0_20px_50px_rgba(0,0,0,0.1)]" : "w-full"
+          )}
+        >
+          <div className={cn(
+            "h-full flex items-center justify-between transition-all duration-700 w-full relative",
+            (scrolled && !isMobile) ? "px-8 md:px-10" : "container md:px-6"
+          )}>
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3 decoration-0 shrink-0">
+              <img
+                src={logo}
+                alt="Kalima Logo"
+                className="h-8 w-auto object-contain"
+              />
+              <span className="text-xl font-bold text-foreground tracking-tight">
+                {t("navbar.brand")}
+              </span>
+            </Link>
 
-          {/* Desktop Navigation & Actions */}
-          <div className="hidden md:flex items-center gap-8">
-            {/* <nav className="flex items-center gap-6">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.label}
-                  to={link.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav> */}
-
-            <div className="flex items-center gap-3">
-              {/* Search Trigger */}
-              {/* <Button
-                variant="outline"
-                className="w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64"
-                onClick={() => setOpen(true)}
-              >
-                <Search className="mr-2 h-4 w-4" />
-                <span className="hidden lg:inline-flex">{t("navbar.searchButtonLong")}</span>
-                <span className="inline-flex lg:hidden">{t("navbar.searchButtonShort")}</span>
-                <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-                  <span className="text-xs">{t("navbar.shortcuts.open")}</span>
-                </kbd>
-              </Button> */}
-              {/* Market Button — hidden for student/parent */}
-              {!isStudentOrParent && (
+            {/* Desktop Navigation & Actions */}
+            <div className="hidden md:flex items-center gap-4 lg:gap-8">
+              <div className="flex items-center gap-2 lg:gap-3">
+                {!isStudentOrParent && (
+                  <Button
+                    variant="default"
+                    onClick={() => navigate("/market")}
+                    className="h-9 px-4"
+                  >
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    {t("navbar.market")}
+                  </Button>
+                )}
+                {!isStudentOrParent && (
+                  <Button 
+                    variant='secondary' 
+                    onClick={() => navigate("/samples")}
+                    className="h-9 px-4"
+                  >
+                    <FileText className="mr-2 h-4 w-4"></FileText>
+                    {t("navbar.samples")}
+                  </Button>
+                )}
+                
+                {/* Language Toggle */}
                 <Button
-                  variant="default"
-                  onClick={() => navigate("/market")}
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleLanguage}
+                  className="hover:bg-primary/10 hover:text-primary h-9 w-9"
+                  title={t("navbar.languageToggle")}
                 >
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  {t("navbar.market")}
+                  <Globe className="h-5 w-5" />
+                </Button>
+
+                {/* Cart Button Desktop */}
+                {isAuthenticated && !isStudentOrParent && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleCartModal}
+                    className="relative hover:bg-primary/10 hover:text-primary h-9 w-9"
+                    title={t("navbar.cartToggle")}
+                  >
+                    <ShoppingCart className="h-5 w-5" />
+                    <span className={cn(
+                      "absolute -top-1 w-5 h-5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center z-10",
+                      i18n.language === 'ar' ? 'left-0' : 'right-0'
+                    )}>
+                      {loading ? "..." : cart.cart_items.length}
+                    </span>
+                  </Button>
+                )}
+
+                <div className="h-6 w-[1px] bg-border mx-2" />
+
+                {isAuthenticated ? (
+                  <div className="flex items-center gap-2">
+                    {hasAdminAccess && (
+                      <Button variant="default" size="sm" className="font-bold whitespace-nowrap" asChild>
+                        <Link to="/admin">{t("navbar.dashboard")}</Link>
+                      </Button>
+                    )}
+                    {!hasAdminAccess && isTeacher && (
+                      <Button variant="default" size="sm" className="font-bold whitespace-nowrap" asChild>
+                        <Link to="/teacher/profile">{t("navbar.teacherPortal")}</Link>
+                      </Button>
+                    )}
+                    {!hasAdminAccess && !isTeacher && isStudent && (
+                      <Button variant="default" size="sm" className="font-bold whitespace-nowrap" asChild>
+                        <Link to="/student/profile">{t("navbar.studentPortal")}</Link>
+                      </Button>
+                    )}
+                    {!hasAdminAccess && !isTeacher && !isStudent && isParent && (
+                      <Button variant="default" size="sm" className="font-bold whitespace-nowrap" asChild>
+                        <Link to="/parent/profile">{t("navbar.parentPortal")}</Link>
+                      </Button>
+                    )}
+                    {!hasAdminAccess && !isTeacher && !isStudent && !isParent && (
+                      <Button variant="ghost" size="sm" className="font-bold whitespace-nowrap" asChild>
+                        <Link to="/orders">{t("navbar.myOrders")}</Link>
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="font-bold text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
+                      onClick={logout}
+                    >
+                      {t("navbar.logout", "Log out")}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="font-bold hover:bg-primary/10 hover:text-primary"
+                      asChild
+                    >
+                      <Link to="/login" state={{ from: location }} replace>{t("navbar.login")}</Link>
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="font-bold px-4"
+                      asChild
+                    >
+                      <Link to="/signup" state={{ from: location }}>{t("navbar.signup")}</Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile Actions */}
+            <div className="flex items-center gap-2 md:hidden">
+              {isAuthenticated && !hasAdminAccess && !isTeacher && !isStudentOrParent && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleCartModal}
+                  className="relative hover:bg-primary/10 hover:text-primary h-9 w-9"
+                  title={t("navbar.cartToggle")}
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  <span className={cn(
+                    "absolute -top-1 w-5 h-5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center z-10",
+                    i18n.language === 'ar' ? 'left-0' : 'right-0'
+                  )}>
+                    {cart.cart_items.length}
+                  </span>
                 </Button>
               )}
-              {!isStudentOrParent && (
-                <Button variant='default' onClick={() => navigate("/samples")}>
-                  <FileText className="mr-2 h-4 w-4"></FileText>
-                  {t("navbar.samples")}
-                </Button>
-              )}
-              {/* Language Toggle */}
+
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={toggleLanguage}
-                className="hover:bg-transparent hover:text-primary"
-                title={t("navbar.languageToggle")}
+                className="text-muted-foreground h-9 w-9"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                title={isMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
               >
-                <Globe className="h-5 w-5" />
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
-
-              {/* Cart Button Desktop — hidden for student/parent */}
-              {isAuthenticated && !isStudentOrParent && <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleCartModal}
-                className="relative hover:bg-transparent hover:text-primary"
-                title={t("navbar.cartToggle")}
-              >
-                <ShoppingCart className="h-5 w-5" />
-                <span className={`absolute -top-1 ${i18n.language === 'ar' ? 'left-0' : 'right-0'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
-                  {loading ? "..." : cart.cart_items.length}
-                </span>
-              </Button>}
-
-              {isAuthenticated ? (
-                <>
-                  {hasAdminAccess && (
-                    <Button
-                      variant="default"
-                      size="default"
-                      className="font-bold px-6"
-                      asChild
-                    >
-                      <Link to="/admin">{t("navbar.dashboard")}</Link>
-                    </Button>
-                  )}
-                  {!hasAdminAccess && isTeacher && (
-                    <Button
-                      variant="default"
-                      size="default"
-                      className="font-bold px-6"
-                      asChild
-                    >
-                      <Link to="/teacher/profile">{t("navbar.teacherPortal")}</Link>
-                    </Button>
-                  )}
-                  {!hasAdminAccess && !isTeacher && isStudent && (
-                    <Button
-                      variant="default"
-                      size="default"
-                      className="font-bold px-6"
-                      asChild
-                    >
-                      <Link to="/student/profile">{t("navbar.studentPortal")}</Link>
-                    </Button>
-                  )}
-                  {!hasAdminAccess && !isTeacher && !isStudent && isParent && (
-                    <Button
-                      variant="default"
-                      size="default"
-                      className="font-bold px-6"
-                      asChild
-                    >
-                      <Link to="/parent/profile">{t("navbar.parentPortal")}</Link>
-                    </Button>
-                  )}
-                  {!hasAdminAccess && !isTeacher && !isStudent && !isParent && (
-                    <Button
-                      variant="ghost"
-                      className="font-bold hover:bg-transparent hover:text-primary"
-                      asChild
-                    >
-                      <Link to="/orders">{t("navbar.myOrders")}</Link>
-                    </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    size="default"
-                    className="font-bold px-6 text-destructive hover:text-destructive/90 hover:bg-destructive/10 border-destructive/20"
-                    onClick={logout}
-                  >
-                    {t("navbar.logout", "Log out")}
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    variant="ghost"
-                    className="font-bold hover:bg-transparent hover:text-primary"
-                    asChild
-                  >
-                    <Link to="/login" state={{ from: location }} replace>{t("navbar.login")}</Link>
-                  </Button>
-                  <Button
-                    variant="default"
-                    size="default"
-                    className="font-bold px-6"
-                    asChild
-                  >
-                    <Link to="/signup" state={{ from: location }}>{t("navbar.signup")}</Link>
-                  </Button>
-                </>
-              )}
             </div>
           </div>
 
-          {/* Mobile Menu Button with Search Icon nearby if needed, or just keep inside menu */}
-          <div className="flex items-center gap-2 md:hidden">
-            {/* <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setOpen(true)}
-              className="text-muted-foreground"
-            >
-              <Search className="h-5 w-5" />
-            </Button> */}
-
-            {/* Cart Button Mobile — hidden for student/parent */}
-            {isAuthenticated && !hasAdminAccess && !isTeacher && !isStudentOrParent && <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleCartModal}
-              className="relative hover:bg-transparent hover:text-primary"
-              title={t("navbar.cartToggle")}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              <span className={`absolute -top-1 ${i18n.language === 'ar' ? 'left-0' : 'right-0'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
-                {cart.cart_items.length}
-              </span>
-            </Button>}
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              title={isMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
-            >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </Button>
-          </div>
-        </div>
-
-        <CartPreview
-          open={isCartModalOpen}
-          onOpenChange={setIsCartModalOpen}
-          cart={cart}
-          onViewFullCart={handleViewFullCart}
-        />
-      </header>
+          <CartPreview
+            open={isCartModalOpen}
+            onOpenChange={setIsCartModalOpen}
+            cart={cart}
+            onViewFullCart={handleViewFullCart}
+          />
+        </motion.header>
+      </div>
 
       {/* Mobile Menu */}
       <div

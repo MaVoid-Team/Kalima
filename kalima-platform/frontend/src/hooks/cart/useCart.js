@@ -15,26 +15,32 @@ export default function useCart() {
             });
             if (res.success) {
                 return res.data;
+            } else if (res?.message?.toLowerCase().includes("not found")) {
+                return null;
             } else {
                 const msg = res?.message || "Failed to fetch cart";
                 toast.error(msg);
                 throw new Error(msg);
             }
         } catch (error) {
+            const isNotFound = error?.response?.status === 404 || error?.response?.data?.message?.toLowerCase().includes("not found") || error?.message?.toLowerCase().includes("not found");
+            if (isNotFound) {
+                return null;
+            }
             console.error("Failed to fetch cart:", error);
             throw error;
         }
-    }, []);
+    }, [mutate]);
 
     const addToCart = useCallback(async (productId) => {
         try {
             // Fetch current cart to check for duplicates
             const currentCart = await getCart();
-            const items = currentCart.cart_items || [];
-            
+            const items = currentCart?.cart_items || [];
+
             // Check if product is already in cart
             const exists = items.some(item => (item.product_id === productId || item.products?.id === productId));
-            
+
             if (exists) {
                 toast.info(t("itemAlreadyInCart", "This item is already in your cart"));
                 return null;
@@ -150,7 +156,7 @@ export default function useCart() {
             const res = await mutate({
                 method: "PATCH",
                 endpoint: `/cart/items/required-fields`,
-                data: {"cart_item_id": itemId, "required_fields": requiredFieldsData}
+                data: { "cart_item_id": itemId, "required_fields": requiredFieldsData }
             });
             if (res.success) {
                 toast.success(t("requiredFieldsUpdated", "Required fields updated"));
