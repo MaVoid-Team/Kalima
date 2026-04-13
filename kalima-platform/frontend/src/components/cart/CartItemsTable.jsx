@@ -18,7 +18,6 @@ import CartItem from './CartItem';
 
 export default function CartItemsTable({
   cartItems,
-  updateQuantity,
   removeFromCart,
   applyCoupon,
   removeCoupon,
@@ -108,7 +107,6 @@ export default function CartItemsTable({
             item={item}
             idx={idx}
             baseURL={baseURL}
-            updateQuantity={updateQuantity}
             onRemoveClick={(id) => { setItemToDelete(id); setDialogOpen(true); }}
             onApplyCouponClick={(id) => { setItemForCoupon(id); setCouponValue(''); setCouponDialogOpen(true); }}
             removeCoupon={handleRemoveCoupon}

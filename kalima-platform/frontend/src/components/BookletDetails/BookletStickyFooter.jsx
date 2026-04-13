@@ -27,7 +27,7 @@ export default function BookletStickyFooter({ productId, price, onAddToCart }) {
         <Button
           className="flex-2 gap-2 font-bold bg-primary hover:bg-primary/90 text-primary-foreground"
           size="lg"
-          onClick={() => startFastBuy(productId, 1)}
+          onClick={() => startFastBuy(productId)}
           disabled={fastBuyLoading}
           data-testid="booklet-footer-buy-now-button"
         >

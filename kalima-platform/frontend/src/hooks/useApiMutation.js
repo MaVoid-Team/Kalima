@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import axios from '../api/axios';
 import { toast } from 'sonner';
+import { translateBackendMessage } from '../lib/utils';
 
 /**
  * Generic hook for handling API mutations.
@@ -31,9 +32,10 @@ export default function useApiMutation() {
 
       const response = await axios(axiosConfig);
 
-      const message = response.data?.message || defaultSuccessMessage;
-      if (message && showToast) {
-        toast.success(message);
+      const rawMessage = response.data?.message || defaultSuccessMessage;
+      const translatedMessage = translateBackendMessage(rawMessage);
+      if (translatedMessage && showToast) {
+        toast.success(translatedMessage);
       }
 
       return response.data;

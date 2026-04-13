@@ -10,7 +10,6 @@ export default function CartItem({
     item,
     idx,
     baseURL,
-    updateQuantity,
     onRemoveClick,
     onApplyCouponClick,
     removeCoupon,
@@ -39,39 +38,12 @@ export default function CartItem({
                         <h3 className="text-sm font-bold text-foreground line-clamp-2 mb-1 leading-snug">{item?.products?.title}</h3>
                         <p className="text-xs text-muted-foreground line-clamp-1 mb-2">{item?.products?.description}</p>
                     </div>
-
-                    <div className="flex items-center justify-between">
-                        <div className="text-base font-bold">{item?.final_price} {t('L.E')}</div>
-                    </div>
                 </div>
             </div>
 
             <div className="mt-4 flex items-center justify-between gap-4">
-                {/* <div className="flex items-center border rounded-lg h-9">
-                    <Button
-                        aria-label={t('decreaseQuantity')}
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 text-muted-foreground hover:text-foreground"
-                        data-testid={`cart-item-decrease-${item.id}`}
-                    >
-                        <Minus className="w-4 h-4" />
-                    </Button>
-                    <span className="text-sm font-semibold w-8 text-center">{item.quantity}</span>
-                    <Button
-                        aria-label={t('increaseQuantity')}
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 text-muted-foreground hover:text-foreground"
-                        data-testid={`cart-item-increase-${item.id}`}
-                    >
-                        <Plus className="w-4 h-4" />
-                    </Button>
-                </div> */}
-                <div className="text-xs text-muted-foreground font-medium">
-                    {t('each', { price: `${item?.price_at_add} ${t('L.E')}` })}
+                <div className="text-sm font-bold text-primary">
+                    {item?.final_price} {t('L.E')}
                 </div>
             </div>
 

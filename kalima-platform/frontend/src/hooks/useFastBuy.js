@@ -147,12 +147,12 @@ export function useFastBuy({ checkout = false } = {}) {
     };
   }, [preview, formData, itemFields]);
 
-  const startFastBuy = async (productId, quantity = 1) => {
+  const startFastBuy = async (productId) => {
     try {
       await mutate({
         endpoint: "/cart/fast-buy/start",
         method: "post",
-        data: { product_id: productId, quantity },
+        data: { product_id: productId, quantity: 1 },
         showToast: false,
       });
 

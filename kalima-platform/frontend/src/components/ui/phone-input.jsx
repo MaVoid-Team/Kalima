@@ -76,7 +76,7 @@ export const PhoneInput = forwardRef(
         );
 
         return (
-            <div className={inputClasses}>
+            <div className={inputClasses} dir="ltr">
                 <div
                     className="flex items-center gap-2 h-full px-3 bg-muted/30 border-e border-input/50 text-sm font-bold tracking-tight select-none no-drag"
                     dir="ltr"
