@@ -96,76 +96,84 @@ export default function CartOrderSummary({
     }
   };
   return (
-    <div className="space-y-6 sticky top-20">
-      <Card className="rounded-lg shadow-sm border border-border">
-        <CardHeader className="pb-0">
-          <CardTitle className="text-xl font-bold">
+    <div className="space-y-6 sticky top-24">
+      <Card className="rounded-3xl shadow-xl border border-border/40 bg-card/60 backdrop-blur-md overflow-hidden">
+        <CardHeader className="pb-4 bg-muted/20 border-b border-border/10">
+          <CardTitle className="text-xl font-bold tracking-tight">
             {t("orderSummary")}
           </CardTitle>
         </CardHeader>
-        <CardContent className="pt-4">
+        <CardContent className="pt-6">
           <div className="space-y-4 mb-6">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{t('subtotal')}</span>
-              <span className="font-semibold">{subtotal} {t('L.E')}</span>
+              <span className="text-muted-foreground font-medium">{t('subtotal')}</span>
+              <span className="font-bold">{subtotal} <span className="text-[10px] opacity-70 uppercase">{t('L.E')}</span></span>
             </div>
             {discount && discount !== '0' && (
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t('discount', 'Discount')}</span>
-                <span className="font-semibold">-{discount} {t('L.E')}</span>
+              <div className="flex justify-between text-sm text-destructive font-bold">
+                <span className="">{t('discount', 'Discount')}</span>
+                <span className="">-{discount} <span>{t('L.E')}</span></span>
               </div>
             )}
           </div>
 
-          <div className="flex justify-between items-center py-4 border-t border-b border-border mb-6">
-            <span className="text-base font-bold">{t('total')}</span>
-            <span className="text-2xl font-bold">{total} {t('L.E')}</span>
+          <div className="flex justify-between items-end pt-6 border-t border-border/10 mb-8">
+            <span className="text-base font-bold text-foreground">{t('total')}</span>
+            <div className="flex flex-col items-end">
+              <span className="text-3xl font-black text-primary tracking-tighter leading-none">{total}</span>
+              <span className="text-[10px] font-black uppercase text-muted-foreground mt-1">{t('L.E')}</span>
+            </div>
           </div>
 
-          {hasDirty && (
+          <div className="space-y-3">
+            {hasDirty && (
+              <Button
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('submit-all-cart-item-fields'));
+                  toast.success(t('savingAll', 'Saving all changes...'));
+                }}
+                variant="outline"
+                className={`w-full h-12 rounded-xl transition-all duration-300 font-bold border-primary/20 hover:border-primary/40 hover:bg-primary/5 text-primary ${highlightSaveAll ? 'ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/10' : ''}`}
+                data-testid="cart-summary-save-all-button"
+              >
+                {t('saveAllChanges', 'Save all items')}
+              </Button>
+            )}
+
             <Button
-              onClick={() => {
-                window.dispatchEvent(new CustomEvent('submit-all-cart-item-fields'));
-                toast.success(t('savingAll', 'Saving all changes...'));
-              }}
-              variant="outline"
-              className={`w-full mb-3 border-primary text-primary hover:bg-primary/5 font-semibold py-4 transition-all duration-300 ${highlightSaveAll ? 'ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/10' : ''}`}
-              data-testid="cart-summary-save-all-button"
+              onClick={handleCheckout}
+              className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3 shadow-xl shadow-primary/20 transition-all duration-300 active:scale-[0.98]"
+              data-testid="cart-summary-checkout-button"
             >
-              {t('saveAllChanges', 'Save all items')}
+              {t('proceedToCheckout')}
+              <ArrowRight className="w-5 h-5" />
             </Button>
-          )}
-
-          <Button onClick={handleCheckout} className="w-full text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 mb-4" data-testid="cart-summary-checkout-button">
-            {t('proceedToCheckout')}
-            <span>
-              <ArrowRight className="w-4 h-4" />
-            </span>
-          </Button>
-
-          <div className="flex items-center justify-center gap-2 text-xs">
-            <Lock className="w-3 h-3" />
-            <span>{t("secureCheckout")}</span>
           </div>
+
+          {/* <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-6 opacity-60">
+            <Lock className="w-3.5 h-3.5" />
+            <span>{t("secureCheckout")}</span>
+          </div> */}
         </CardContent>
       </Card>
 
-      <Card className="rounded-lg shadow-sm border border-border mt-6">
+      <Card className="rounded-3xl shadow-lg border border-border/30 bg-card/40 backdrop-blur-md overflow-hidden hover:bg-card/60 transition-colors">
         <CardContent className="p-6">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0">
-              <MessageCircle className="w-5 h-5 text-primary" />
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <MessageCircle className="w-6 h-6" />
             </div>
             <div className="flex-1">
-              <h3 className="text-sm font-bold mb-1">{t("needHelp")}</h3>
-              <p className="text-xs mb-3">{t("needHelpText")}</p>
+              <h3 className="text-sm font-black uppercase tracking-tight mb-1">{t("needHelp")}</h3>
+              <p className="text-xs font-medium text-muted-foreground leading-relaxed mb-4">{t("needHelpText")}</p>
               <Button
                 asChild
-                variant="link"
-                className="text-xs font-semibold text-primary hover:text-primary/80 p-0 h-auto"
+                variant="outline"
+                className="h-9 px-4 rounded-xl font-bold text-xs border-primary/20 text-primary hover:bg-primary/5 hover:border-primary/40"
                 data-testid="cart-summary-chat-button"
               >
-                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                  <MessageCircle className="w-3.5 h-3.5" />
                   {t("chatWithUs")}
                 </a>
               </Button>

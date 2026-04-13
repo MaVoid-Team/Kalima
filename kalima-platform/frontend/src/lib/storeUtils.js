@@ -221,7 +221,7 @@ export function formatOrderDate(dateString, lang = 'en') {
  */
 export function getStatusColor(status) {
   switch (status?.toLowerCase()) {
-    case 'pending': return 'bg-highlight/20 text-highlight hover:bg-highlight/30 border-highlight/50';
+    case 'pending': return 'bg-highlight/10 text-highlight hover:bg-highlight/30 border-highlight/50';
     case 'received': return 'bg-primary/20 text-primary hover:bg-primary/30 border-primary/50';
     case 'confirmed': return 'bg-success/20 text-success hover:bg-success/30 border-success/50';
     case 'returned': return 'bg-destructive/20 text-destructive hover:bg-destructive/30 border-destructive/50';

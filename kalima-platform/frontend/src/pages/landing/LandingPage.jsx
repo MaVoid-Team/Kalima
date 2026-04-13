@@ -20,7 +20,7 @@ export default function LandingPage() {
 
   return (
     <>
-      <BackgroundAnimation />
+      {/* <BackgroundAnimation /> */}
       <main className="relative z-10 w-full">
         {sections.map((section, index) => (
           <section

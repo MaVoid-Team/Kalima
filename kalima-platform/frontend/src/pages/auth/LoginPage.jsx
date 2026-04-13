@@ -119,7 +119,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="container relative grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden py-8 lg:max-w-none lg:grid-cols-1 lg:px-0">
+        <div className="relative w-full grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden py-8 lg:max-w-none lg:grid-cols-1 lg:px-0 px-4">
             <AuthAnimatedBackground variant="login" />
 
             <div className="relative w-full lg:p-8">

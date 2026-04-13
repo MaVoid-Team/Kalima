@@ -22,7 +22,7 @@ export default function SamplePreviewPage() {
     // Construct sample object from URL params
     const sample = useMemo(() => {
         if (!id) return null;
-        
+
         const mediaType = searchParams.get('media_type');
 
         // Basic fields
@@ -79,7 +79,7 @@ export default function SamplePreviewPage() {
     const isPdf = mediaType === 'pdf' || sample?.mime_type === 'application/pdf';
 
     return (
-        <div className="flex flex-col h-screen bg-background" data-testid="sample-preview-page">
+        <div className="flex flex-col h-screen" data-testid="sample-preview-page">
 
             {/* Slim top bar */}
             <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-background/80 backdrop-blur shrink-0">
@@ -144,21 +144,21 @@ export default function SamplePreviewPage() {
                 )}
 
                 {/* Word / PowerPoint / Unknown — download fallback */}
-                {((mediaType === 'word' || mediaType === 'powerpoint') || 
-                  (!isPdf && mediaType !== 'video' && mediaType !== 'image' && !previewUrl)) && (
-                    <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground p-8">
-                        <FileText className="h-20 w-20 opacity-30" />
-                        <p className="text-sm text-center">{t('samplePage.previewUnavailable', 'Preview not available.')}</p>
-                        {downloadUrl && (
-                            <Button asChild data-testid="sample-preview-download-fallback-button">
-                                <a href={downloadUrl} download>
-                                    <Download className="me-2 h-4 w-4" />
-                                    {t('samplePage.downloadFile', 'Download File')}
-                                </a>
-                            </Button>
-                        )}
-                    </div>
-                )}
+                {((mediaType === 'word' || mediaType === 'powerpoint') ||
+                    (!isPdf && mediaType !== 'video' && mediaType !== 'image' && !previewUrl)) && (
+                        <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground p-8">
+                            <FileText className="h-20 w-20 opacity-30" />
+                            <p className="text-sm text-center">{t('samplePage.previewUnavailable', 'Preview not available.')}</p>
+                            {downloadUrl && (
+                                <Button asChild data-testid="sample-preview-download-fallback-button">
+                                    <a href={downloadUrl} download>
+                                        <Download className="me-2 h-4 w-4" />
+                                        {t('samplePage.downloadFile', 'Download File')}
+                                    </a>
+                                </Button>
+                            )}
+                        </div>
+                    )}
             </div>
         </div>
     );

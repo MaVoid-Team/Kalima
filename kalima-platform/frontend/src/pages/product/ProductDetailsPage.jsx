@@ -65,7 +65,7 @@ export default function ProductDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 md:px-8 py-8">
         {/* Breadcrumbs */}
         <Breadcrumb className="mb-8">
