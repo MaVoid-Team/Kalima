@@ -310,6 +310,8 @@
       "price": "Price (EGP)",
       "priceAfterDiscount": "Price After Discount (EGP)",
       "freePreviewToggle": "Free Product Preview",
+      "freePreviewHint": "Enabling this will set the product discount to 100% (free).",
+      "freePreviewHintAria": "Free preview hint",
       "serial": "Serial",
       "serialPlaceholder": "e.g. ALG-101 (optional)",
       "couponId": "Coupon ID",

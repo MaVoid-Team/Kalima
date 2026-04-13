@@ -112,7 +112,7 @@ export function buildProductMedia(product) {
           videoId = v.url.split('youtu.be/')[1].split(/[?#]/)[0];
         }
         if (videoId) thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-      } catch (e) {}
+      } catch (e) { }
     }
     return {
       type: 'video',
@@ -123,7 +123,7 @@ export function buildProductMedia(product) {
     };
   }).filter(v => v.url);
 
-  const thumbnails = [...galleryImages, ...galleryVideos].sort((a,b) => a.sort_order - b.sort_order);
+  const thumbnails = [...galleryImages, ...galleryVideos].sort((a, b) => a.sort_order - b.sort_order);
   return { main, thumbnails };
 }
 
@@ -258,7 +258,7 @@ export async function getFileSizeFromUrl(url) {
     const baseURL = import.meta.env.VITE_API_URL || "/api/v2";
     // Strips /api/v2 or /api/v1 (with or without trailing slash) to get the site root
     const rootURL = baseURL.replace(/\/api\/v\d+\/?$/, "");
-    
+
     let fullUrl = url;
     if (!url.startsWith('http')) {
       fullUrl = `${rootURL}${url.startsWith('/') ? '' : '/'}${url}`;
@@ -268,14 +268,14 @@ export async function getFileSizeFromUrl(url) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-    const response = await fetch(fullUrl, { 
+    const response = await fetch(fullUrl, {
       method: 'HEAD',
       signal: controller.signal,
       cache: 'no-cache'
     });
-    
+
     clearTimeout(timeoutId);
-    
+
     if (!response.ok) return null;
 
     const cl = response.headers.get('content-length');
@@ -314,7 +314,7 @@ export function formatPhone(phone) {
  */
 export function formatTimeUntilRelease(ms, t) {
   const diff = Number(ms);
-  
+
   const d = t ? t("countdown.days", "d") : "d";
   const h = t ? t("countdown.hours", "h") : "h";
   const m = t ? t("countdown.minutes", "m") : "m";
