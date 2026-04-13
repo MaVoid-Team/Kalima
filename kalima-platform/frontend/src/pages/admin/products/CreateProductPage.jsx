@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { ChevronLeft, X, Package, PlusCircle, Calendar as CalendarIcon } from 'lucide-react';
+import { ChevronLeft, X, Package, PlusCircle, Calendar as CalendarIcon, CircleHelp } from 'lucide-react';
 import { format, startOfDay } from 'date-fns';
 import { arSA } from 'react-day-picker/locale';
 
@@ -35,6 +35,12 @@ import {
 } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
@@ -592,7 +598,25 @@ export default function CreateProductPage() {
                             render={({ field }) => (
                                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                                     <div className="space-y-0.5">
-                                        <FormLabel>{t('products.form.freePreviewToggle')}</FormLabel>
+                                        <FormLabel className="flex items-center gap-1.5">
+                                            {t('products.form.freePreviewToggle')}
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <button
+                                                            type="button"
+                                                            className="text-muted-foreground hover:text-foreground transition-colors"
+                                                            aria-label={t('products.form.freePreviewHintAria', 'Free preview hint')}
+                                                        >
+                                                            <CircleHelp className="h-4 w-4" />
+                                                        </button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent side="top" className="max-w-[260px]">
+                                                        {t('products.form.freePreviewHint', 'Enabling this will set the product discount to 100% (free).')}
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        </FormLabel>
                                     </div>
                                     <FormControl>
                                         <Switch

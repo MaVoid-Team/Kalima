@@ -129,12 +129,23 @@ function MediaViewer({ sample, previewUrl, downloadUrl, viewerI18n, dir, t }) {
 
 function resolveSampleMediaUrls(sample) {
     const mediaType = String(sample?.media_type || '').toLowerCase();
-    const highQualityUrl = sample?.high_quality_url ? getImageUrl(sample.high_quality_url) : '';
-    const lowQualityUrl = sample?.low_quality_url ? getImageUrl(sample.low_quality_url) : '';
+    const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
+    const sectionId = sample?.section_id;
+
+    // Prefer API-served endpoints (proper Content-Type headers, bypasses nginx static cache)
+    // Falls back to raw static URLs if section_id is unavailable
+    const highQualityUrl = sectionId && sample?.high_quality_url
+        ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/preview`
+        : (sample?.high_quality_url ? getImageUrl(sample.high_quality_url) : '');
+    const lowQualityUrl = sectionId && sample?.low_quality_url
+        ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download`
+        : (sample?.low_quality_url ? getImageUrl(sample.low_quality_url) : '');
+
     const previewUrl = highQualityUrl || (['image', 'video', 'audio'].includes(mediaType) ? lowQualityUrl : '');
 
     return { mediaType, highQualityUrl, lowQualityUrl, previewUrl };
 }
+
 
 function MediaFallback({ downloadUrl, t }) {
     return (

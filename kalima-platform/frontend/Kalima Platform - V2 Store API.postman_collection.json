@@ -7413,6 +7413,72 @@
               ],
               "cookie": [],
               "body": "{\n    \"success\": true,\n    \"results\": 4,\n    \"pagination\": {\n        \"total\": 4,\n        \"page\": 1,\n        \"pages\": 1,\n        \"limit\": 10\n    },\n    \"data\": {\n        \"purchases\": [\n            {\n                \"id\": 5,\n                \"user_id\": 1802,\n                \"status\": \"confirmed\",\n                \"subtotal\": \"200\",\n                \"discount\": \"0\",\n                \"total\": \"200\",\n                \"payment_method_id\": 1,\n                \"payment_screenshot_id\": 18,\n                \"watermark_id\": null,\n                \"purchase_serial\": \"1802-CP-20260223-003\",\n                \"number_transferred_from\": \"0100000000000\",\n                \"payment_number\": \"0100000000\",\n                \"notes\": \"\",\n                \"admin_notes\": null,\n                \"admin_note_by\": null,\n                \"received_at\": \"2026-02-23T20:05:44.666Z\",\n                \"received_by\": 1805,\n                \"confirmed_at\": \"2026-02-23T20:05:48.925Z\",\n                \"confirmed_by\": 1805,\n                \"returned_at\": null,\n                \"returned_by\": null,\n                \"created_at\": \"2026-02-23T20:02:52.901Z\",\n                \"updated_at\": \"2026-02-23T20:05:48.925Z\",\n                \"deleted_at\": null,\n                \"purchase_items\": [\n                    {\n                        \"id\": 15,\n                        \"purchase_id\": 5,\n                        \"product_id\": 8,\n                        \"price_at_purchase\": \"100\",\n                        \"discount\": \"0\",\n                        \"required_fields_filled\": false,\n                        \"created_at\": \"2026-02-23T20:02:52.938Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 19,\n                                \"purchase_item_id\": 15,\n                                \"field_definition_id\": 1,\n                                \"value\": \"book\",\n                                \"created_at\": \"2026-02-23T20:02:52.943Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 1,\n                                    \"label\": \"Teacher Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-20T04:21:02.199Z\",\n                                    \"updated_at\": \"2026-02-22T17:01:19.872Z\",\n                                    \"deleted_at\": null\n                                }\n                            },\n                            {\n                                \"id\": 20,\n                                \"purchase_item_id\": 15,\n                                \"field_definition_id\": 3,\n                                \"value\": \"100\",\n                                \"created_at\": \"2026-02-23T20:02:52.943Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 3,\n                                    \"label\": \"Book Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-22T19:19:48.130Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 8,\n                            \"title\": \"Algebra Book\",\n                            \"serial\": null,\n                            \"type\": \"Book\",\n                            \"price\": \"100\",\n                            \"thumbnail_image\": {\n                                \"id\": 16,\n                                \"url\": \"/uploads/images/1771820885790-ed825df2fde9.webp\"\n                            }\n                        }\n                    },\n                    {\n                        \"id\": 16,\n                        \"purchase_id\": 5,\n                        \"product_id\": 8,\n                        \"price_at_purchase\": \"100\",\n                        \"discount\": \"0\",\n                        \"required_fields_filled\": false,\n                        \"created_at\": \"2026-02-23T20:02:52.938Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 21,\n                                \"purchase_item_id\": 16,\n                                \"field_definition_id\": 1,\n                                \"value\": \"book\",\n                                \"created_at\": \"2026-02-23T20:02:52.943Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 1,\n                                    \"label\": \"Teacher Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-20T04:21:02.199Z\",\n                                    \"updated_at\": \"2026-02-22T17:01:19.872Z\",\n                                    \"deleted_at\": null\n                                }\n                            },\n                            {\n                                \"id\": 22,\n                                \"purchase_item_id\": 16,\n                                \"field_definition_id\": 3,\n                                \"value\": \"100\",\n                                \"created_at\": \"2026-02-23T20:02:52.943Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 3,\n                                    \"label\": \"Book Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-22T19:19:48.130Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 8,\n                            \"title\": \"Algebra Book\",\n                            \"serial\": null,\n                            \"type\": \"Book\",\n                            \"price\": \"100\",\n                            \"thumbnail_image\": {\n                                \"id\": 16,\n                                \"url\": \"/uploads/images/1771820885790-ed825df2fde9.webp\"\n                            }\n                        }\n                    }\n                ],\n                \"users\": {\n                    \"id\": 1802,\n                    \"name\": \" teacher test\",\n                    \"email\": \"test.teacher@frontend.com\",\n                    \"phone\": \"0100000000000\"\n                },\n                \"received_by_user\": {\n                    \"id\": 1805,\n                    \"name\": \"Ahmed Samir\"\n                },\n                \"confirmed_by_user\": {\n                    \"id\": 1805,\n                    \"name\": \"Ahmed Samir\"\n                },\n                \"returned_by_user\": null,\n                \"payment_methods\": {\n                    \"id\": 1,\n                    \"name\": \"test payment\",\n                    \"phone_number\": \"0100000000\"\n                },\n                \"payment_screenshot\": {\n                    \"id\": 18,\n                    \"url\": \"/uploads/images/1771876972687-3ad027041b4b.webp\"\n                },\n                \"watermark\": null,\n                \"coupon_usages\": []\n            },\n            {\n                \"id\": 4,\n                \"user_id\": 1802,\n                \"status\": \"returned\",\n                \"subtotal\": \"200\",\n                \"discount\": \"0\",\n                \"total\": \"200\",\n                \"payment_method_id\": 1,\n                \"payment_screenshot_id\": 17,\n                \"watermark_id\": null,\n                \"purchase_serial\": \"1802-CP-20260223-002\",\n                \"number_transferred_from\": \"0100000000000\",\n                \"payment_number\": \"0100000000\",\n                \"notes\": \"\",\n                \"admin_notes\": null,\n                \"admin_note_by\": null,\n                \"received_at\": \"2026-02-23T20:05:58.891Z\",\n                \"received_by\": 1805,\n                \"confirmed_at\": \"2026-02-23T20:09:28.321Z\",\n                \"confirmed_by\": 1805,\n                \"returned_at\": \"2026-02-23T20:09:30.282Z\",\n                \"returned_by\": 1805,\n                \"created_at\": \"2026-02-23T18:01:16.171Z\",\n                \"updated_at\": \"2026-02-23T20:09:30.282Z\",\n                \"deleted_at\": null,\n                \"purchase_items\": [\n                    {\n                        \"id\": 13,\n                        \"purchase_id\": 4,\n                        \"product_id\": 8,\n                        \"price_at_purchase\": \"100\",\n                        \"discount\": \"0\",\n                        \"required_fields_filled\": false,\n                        \"created_at\": \"2026-02-23T18:01:16.250Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 15,\n                                \"purchase_item_id\": 13,\n                                \"field_definition_id\": 1,\n                                \"value\": \"name\",\n                                \"created_at\": \"2026-02-23T18:01:16.320Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 1,\n                                    \"label\": \"Teacher Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-20T04:21:02.199Z\",\n                                    \"updated_at\": \"2026-02-22T17:01:19.872Z\",\n                                    \"deleted_at\": null\n                                }\n                            },\n                            {\n                                \"id\": 16,\n                                \"purchase_item_id\": 13,\n                                \"field_definition_id\": 3,\n                                \"value\": \"book\",\n                                \"created_at\": \"2026-02-23T18:01:16.320Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 3,\n                                    \"label\": \"Book Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-22T19:19:48.130Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 8,\n                            \"title\": \"Algebra Book\",\n                            \"serial\": null,\n                            \"type\": \"Book\",\n                            \"price\": \"100\",\n                            \"thumbnail_image\": {\n                                \"id\": 16,\n                                \"url\": \"/uploads/images/1771820885790-ed825df2fde9.webp\"\n                            }\n                        }\n                    },\n                    {\n                        \"id\": 14,\n                        \"purchase_id\": 4,\n                        \"product_id\": 8,\n                        \"price_at_purchase\": \"100\",\n                        \"discount\": \"0\",\n                        \"required_fields_filled\": false,\n                        \"created_at\": \"2026-02-23T18:01:16.250Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 17,\n                                \"purchase_item_id\": 14,\n                                \"field_definition_id\": 1,\n                                \"value\": \"name\",\n                                \"created_at\": \"2026-02-23T18:01:16.320Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 1,\n                                    \"label\": \"Teacher Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-20T04:21:02.199Z\",\n                                    \"updated_at\": \"2026-02-22T17:01:19.872Z\",\n                                    \"deleted_at\": null\n                                }\n                            },\n                            {\n                                \"id\": 18,\n                                \"purchase_item_id\": 14,\n                                \"field_definition_id\": 3,\n                                \"value\": \"book\",\n                                \"created_at\": \"2026-02-23T18:01:16.320Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 3,\n                                    \"label\": \"Book Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-22T19:19:48.130Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 8,\n                            \"title\": \"Algebra Book\",\n                            \"serial\": null,\n                            \"type\": \"Book\",\n                            \"price\": \"100\",\n                            \"thumbnail_image\": {\n                                \"id\": 16,\n                                \"url\": \"/uploads/images/1771820885790-ed825df2fde9.webp\"\n                            }\n                        }\n                    }\n                ],\n                \"users\": {\n                    \"id\": 1802,\n                    \"name\": \" teacher test\",\n                    \"email\": \"test.teacher@frontend.com\",\n                    \"phone\": \"0100000000000\"\n                },\n                \"received_by_user\": {\n                    \"id\": 1805,\n                    \"name\": \"Ahmed Samir\"\n                },\n                \"confirmed_by_user\": {\n                    \"id\": 1805,\n                    \"name\": \"Ahmed Samir\"\n                },\n                \"returned_by_user\": {\n                    \"id\": 1805,\n                    \"name\": \"Ahmed Samir\"\n                },\n                \"payment_methods\": {\n                    \"id\": 1,\n                    \"name\": \"test payment\",\n                    \"phone_number\": \"0100000000\"\n                },\n                \"payment_screenshot\": {\n                    \"id\": 17,\n                    \"url\": \"/uploads/images/1771869675657-81d46102aa56.webp\"\n                },\n                \"watermark\": null,\n                \"coupon_usages\": []\n            },\n            {\n                \"id\": 3,\n                \"user_id\": 1802,\n                \"status\": \"pending\",\n                \"subtotal\": \"200\",\n                \"discount\": \"0\",\n                \"total\": \"200\",\n                \"payment_method_id\": 1,\n                \"payment_screenshot_id\": 12,\n                \"watermark_id\": null,\n                \"purchase_serial\": \"1802-CP-20260223-001\",\n                \"number_transferred_from\": \"010000230420\",\n                \"payment_number\": \"0100000000\",\n                \"notes\": \"Please deliver before Thursday\",\n                \"admin_notes\": null,\n                \"admin_note_by\": null,\n                \"received_at\": null,\n                \"received_by\": null,\n                \"confirmed_at\": null,\n                \"confirmed_by\": null,\n                \"returned_at\": null,\n                \"returned_by\": null,\n                \"created_at\": \"2026-02-22T23:19:24.011Z\",\n                \"updated_at\": null,\n                \"deleted_at\": null,\n                \"purchase_items\": [\n                    {\n                        \"id\": 11,\n                        \"purchase_id\": 3,\n                        \"product_id\": 1,\n                        \"price_at_purchase\": \"100\",\n                        \"discount\": \"0\",\n                        \"required_fields_filled\": false,\n                        \"created_at\": \"2026-02-22T23:19:24.095Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 11,\n                                \"purchase_item_id\": 11,\n                                \"field_definition_id\": 3,\n                                \"value\": \"Book Name\",\n                                \"created_at\": \"2026-02-22T23:19:24.168Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 3,\n                                    \"label\": \"Book Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-22T19:19:48.130Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null\n                                }\n                            },\n                            {\n                                \"id\": 12,\n                                \"purchase_item_id\": 11,\n                                \"field_definition_id\": 1,\n                                \"value\": \"Teacher Name\",\n                                \"created_at\": \"2026-02-22T23:19:24.168Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 1,\n                                    \"label\": \"Teacher Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-20T04:21:02.199Z\",\n                                    \"updated_at\": \"2026-02-22T17:01:19.872Z\",\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 1,\n                            \"title\": \"Sample Product\",\n                            \"serial\": null,\n                            \"type\": \"Book\",\n                            \"price\": \"100\",\n                            \"thumbnail_image\": {\n                                \"id\": 6,\n                                \"url\": \"/uploads/images/1771728896779-84ccd6bebeca.webp\"\n                            }\n                        }\n                    },\n                    {\n                        \"id\": 12,\n                        \"purchase_id\": 3,\n                        \"product_id\": 1,\n                        \"price_at_purchase\": \"100\",\n                        \"discount\": \"0\",\n                        \"required_fields_filled\": false,\n                        \"created_at\": \"2026-02-22T23:19:24.239Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 13,\n                                \"purchase_item_id\": 12,\n                                \"field_definition_id\": 3,\n                                \"value\": \"Book Name\",\n                                \"created_at\": \"2026-02-22T23:19:24.305Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 3,\n                                    \"label\": \"Book Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-22T19:19:48.130Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null\n                                }\n                            },\n                            {\n                                \"id\": 14,\n                                \"purchase_item_id\": 12,\n                                \"field_definition_id\": 1,\n                                \"value\": \"Teacher Name\",\n                                \"created_at\": \"2026-02-22T23:19:24.305Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 1,\n                                    \"label\": \"Teacher Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-20T04:21:02.199Z\",\n                                    \"updated_at\": \"2026-02-22T17:01:19.872Z\",\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 1,\n                            \"title\": \"Sample Product\",\n                            \"serial\": null,\n                            \"type\": \"Book\",\n                            \"price\": \"100\",\n                            \"thumbnail_image\": {\n                                \"id\": 6,\n                                \"url\": \"/uploads/images/1771728896779-84ccd6bebeca.webp\"\n                            }\n                        }\n                    }\n                ],\n                \"users\": {\n                    \"id\": 1802,\n                    \"name\": \" teacher test\",\n                    \"email\": \"test.teacher@frontend.com\",\n                    \"phone\": \"0100000000000\"\n                },\n                \"received_by_user\": null,\n                \"confirmed_by_user\": null,\n                \"returned_by_user\": null,\n                \"payment_methods\": {\n                    \"id\": 1,\n                    \"name\": \"test payment\",\n                    \"phone_number\": \"0100000000\"\n                },\n                \"payment_screenshot\": {\n                    \"id\": 12,\n                    \"url\": \"/uploads/images/1771802363436-d8019494dd04.webp\"\n                },\n                \"watermark\": null,\n                \"coupon_usages\": []\n            },\n            {\n                \"id\": 2,\n                \"user_id\": 1801,\n                \"status\": \"pending\",\n                \"subtotal\": \"500\",\n                \"discount\": \"100\",\n                \"total\": \"400\",\n                \"payment_method_id\": 1,\n                \"payment_screenshot_id\": 9,\n                \"watermark_id\": null,\n                \"purchase_serial\": \"1801-CP-20260222-001\",\n                \"number_transferred_from\": \"010000230420\",\n                \"payment_number\": \"0100000000\",\n                \"notes\": \"Please deliver before Thursday\",\n                \"admin_notes\": null,\n                \"admin_note_by\": null,\n                \"received_at\": null,\n                \"received_by\": null,\n                \"confirmed_at\": null,\n                \"confirmed_by\": null,\n                \"returned_at\": null,\n                \"returned_by\": null,\n                \"created_at\": \"2026-02-22T18:10:37.048Z\",\n                \"updated_at\": null,\n                \"deleted_at\": null,\n                \"purchase_items\": [\n                    {\n                        \"id\": 6,\n                        \"purchase_id\": 2,\n                        \"product_id\": 1,\n                        \"price_at_purchase\": \"100\",\n                        \"discount\": \"20\",\n                        \"required_fields_filled\": false,\n                        \"created_at\": \"2026-02-22T18:10:37.123Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 6,\n                                \"purchase_item_id\": 6,\n                                \"field_definition_id\": 1,\n                                \"value\": \"test teacher name\",\n                                \"created_at\": \"2026-02-22T18:10:37.197Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 1,\n                                    \"label\": \"Teacher Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-20T04:21:02.199Z\",\n                                    \"updated_at\": \"2026-02-22T17:01:19.872Z\",\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 1,\n                            \"title\": \"Sample Product\",\n                            \"serial\": null,\n                            \"type\": \"Book\",\n                            \"price\": \"100\",\n                            \"thumbnail_image\": {\n                                \"id\": 6,\n                                \"url\": \"/uploads/images/1771728896779-84ccd6bebeca.webp\"\n                            }\n                        }\n                    },\n                    {\n                        \"id\": 7,\n                        \"purchase_id\": 2,\n                        \"product_id\": 1,\n                        \"price_at_purchase\": \"100\",\n                        \"discount\": \"20\",\n                        \"required_fields_filled\": false,\n                        \"created_at\": \"2026-02-22T18:10:37.266Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 7,\n                                \"purchase_item_id\": 7,\n                                \"field_definition_id\": 1,\n                                \"value\": \"test teacher name\",\n                                \"created_at\": \"2026-02-22T18:10:37.338Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 1,\n                                    \"label\": \"Teacher Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-20T04:21:02.199Z\",\n                                    \"updated_at\": \"2026-02-22T17:01:19.872Z\",\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 1,\n                            \"title\": \"Sample Product\",\n                            \"serial\": null,\n                            \"type\": \"Book\",\n                            \"price\": \"100\",\n                            \"thumbnail_image\": {\n                                \"id\": 6,\n                                \"url\": \"/uploads/images/1771728896779-84ccd6bebeca.webp\"\n                            }\n                        }\n                    },\n                    {\n                        \"id\": 8,\n                        \"purchase_id\": 2,\n                        \"product_id\": 1,\n                        \"price_at_purchase\": \"100\",\n                        \"discount\": \"20\",\n                        \"required_fields_filled\": false,\n                        \"created_at\": \"2026-02-22T18:10:37.403Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 8,\n                                \"purchase_item_id\": 8,\n                                \"field_definition_id\": 1,\n                                \"value\": \"test teacher name\",\n                                \"created_at\": \"2026-02-22T18:10:37.471Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 1,\n                                    \"label\": \"Teacher Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-20T04:21:02.199Z\",\n                                    \"updated_at\": \"2026-02-22T17:01:19.872Z\",\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 1,\n                            \"title\": \"Sample Product\",\n                            \"serial\": null,\n                            \"type\": \"Book\",\n                            \"price\": \"100\",\n                            \"thumbnail_image\": {\n                                \"id\": 6,\n                                \"url\": \"/uploads/images/1771728896779-84ccd6bebeca.webp\"\n                            }\n                        }\n                    },\n                    {\n                        \"id\": 9,\n                        \"purchase_id\": 2,\n                        \"product_id\": 1,\n                        \"price_at_purchase\": \"100\",\n                        \"discount\": \"20\",\n                        \"required_fields_filled\": false,\n                        \"created_at\": \"2026-02-22T18:10:37.538Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 9,\n                                \"purchase_item_id\": 9,\n                                \"field_definition_id\": 1,\n                                \"value\": \"test teacher name\",\n                                \"created_at\": \"2026-02-22T18:10:37.605Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 1,\n                                    \"label\": \"Teacher Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-20T04:21:02.199Z\",\n                                    \"updated_at\": \"2026-02-22T17:01:19.872Z\",\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 1,\n                            \"title\": \"Sample Product\",\n                            \"serial\": null,\n                            \"type\": \"Book\",\n                            \"price\": \"100\",\n                            \"thumbnail_image\": {\n                                \"id\": 6,\n                                \"url\": \"/uploads/images/1771728896779-84ccd6bebeca.webp\"\n                            }\n                        }\n                    },\n                    {\n                        \"id\": 10,\n                        \"purchase_id\": 2,\n                        \"product_id\": 1,\n                        \"price_at_purchase\": \"100\",\n                        \"discount\": \"20\",\n                        \"required_fields_filled\": false,\n                        \"created_at\": \"2026-02-22T18:10:37.672Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 10,\n                                \"purchase_item_id\": 10,\n                                \"field_definition_id\": 1,\n                                \"value\": \"test teacher name\",\n                                \"created_at\": \"2026-02-22T18:10:37.741Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 1,\n                                    \"label\": \"Teacher Name\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-02-20T04:21:02.199Z\",\n                                    \"updated_at\": \"2026-02-22T17:01:19.872Z\",\n                                    \"deleted_at\": null\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 1,\n                            \"title\": \"Sample Product\",\n                            \"serial\": null,\n                            \"type\": \"Book\",\n                            \"price\": \"100\",\n                            \"thumbnail_image\": {\n                                \"id\": 6,\n                                \"url\": \"/uploads/images/1771728896779-84ccd6bebeca.webp\"\n                            }\n                        }\n                    }\n                ],\n                \"users\": {\n                    \"id\": 1801,\n                    \"name\": \"Admin Updated\",\n                    \"email\": \"test.t@gmail.com\",\n                    \"phone\": \"0100000000000\"\n                },\n                \"received_by_user\": null,\n                \"confirmed_by_user\": null,\n                \"returned_by_user\": null,\n                \"payment_methods\": {\n                    \"id\": 1,\n                    \"name\": \"test payment\",\n                    \"phone_number\": \"0100000000\"\n                },\n                \"payment_screenshot\": {\n                    \"id\": 9,\n                    \"url\": \"/uploads/images/1771783836193-08ac44933725.webp\"\n                },\n                \"watermark\": null,\n                \"coupon_usages\": [\n                    {\n                        \"id\": 2,\n                        \"user_id\": 1801,\n                        \"coupon_id\": 31,\n                        \"purchase_id\": 2,\n                        \"created_at\": \"2026-02-22T18:10:38.831Z\",\n                        \"coupons\": {\n                            \"id\": 31,\n                            \"code\": \"C056C7\",\n                            \"discount_amount\": \"0\",\n                            \"discount_percentage\": 20\n                        }\n                    }\n                ]\n            }\n        ]\n    }\n}"
+            },
+            {
+              "name": "Get All Purchases (Admin)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/purchases",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "purchases"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "7527"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1d67-gEcxNRzTZopJq4cachB75iG/d3U\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 08 Apr 2026 13:07:39 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"results\": 4,\n    \"pagination\": {\n        \"total\": 4,\n        \"page\": 1,\n        \"pages\": 1,\n        \"limit\": 10\n    },\n    \"data\": {\n        \"purchases\": [\n            {\n                \"id\": 4,\n                \"user_id\": 7293,\n                \"status\": \"confirmed\",\n                \"subtotal\": \"0\",\n                \"discount\": \"0\",\n                \"total\": \"0\",\n                \"payment_method_id\": null,\n                \"payment_screenshot_id\": null,\n                \"watermark_id\": null,\n                \"purchase_serial\": \"7293-CP-20260407-001\",\n                \"number_transferred_from\": null,\n                \"payment_number\": null,\n                \"notes\": \"test test\",\n                \"admin_notes\": null,\n                \"admin_note_by\": null,\n                \"received_at\": \"2026-04-08T13:05:11.691Z\",\n                \"received_by\": 5467,\n                \"confirmed_at\": \"2026-04-08T13:05:18.131Z\",\n                \"confirmed_by\": 5467,\n                \"returned_at\": null,\n                \"returned_by\": null,\n                \"created_at\": \"2026-04-07T13:02:00.482Z\",\n                \"updated_at\": \"2026-04-08T13:05:18.131Z\",\n                \"deleted_at\": null,\n                \"is_deleted\": false,\n                \"purchase_items\": [\n                    {\n                        \"id\": 4,\n                        \"purchase_id\": 4,\n                        \"product_id\": 13,\n                        \"price_at_purchase\": \"0\",\n                        \"discount\": \"0\",\n                        \"required_fields_filled\": false,\n                        \"final_price\": \"0\",\n                        \"quantity\": 1,\n                        \"coupon_id\": null,\n                        \"created_at\": \"2026-04-07T13:02:00.486Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"is_deleted\": false,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 4,\n                                \"purchase_item_id\": 4,\n                                \"field_definition_id\": 3,\n                                \"value\": \"/uploads/images/1775558487286-9643e3b9ace8.webp\",\n                                \"created_at\": \"2026-04-07T13:02:00.491Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 3,\n                                    \"label\": \"image\",\n                                    \"field_type\": \"image\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-04-06T20:41:55.537Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null,\n                                    \"is_deleted\": false\n                                }\n                            },\n                            {\n                                \"id\": 5,\n                                \"purchase_item_id\": 4,\n                                \"field_definition_id\": 2,\n                                \"value\": \",,n,n\",\n                                \"created_at\": \"2026-04-07T13:02:00.491Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 2,\n                                    \"label\": \"dwad\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-04-06T20:41:47.485Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null,\n                                    \"is_deleted\": false\n                                }\n                            },\n                            {\n                                \"id\": 6,\n                                \"purchase_item_id\": 4,\n                                \"field_definition_id\": 5,\n                                \"value\": \"+201556548385\",\n                                \"created_at\": \"2026-04-07T13:02:00.491Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 5,\n                                    \"label\": \"check num\",\n                                    \"field_type\": \"number\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-04-07T10:31:17.868Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null,\n                                    \"is_deleted\": false\n                                }\n                            },\n                            {\n                                \"id\": 7,\n                                \"purchase_item_id\": 4,\n                                \"field_definition_id\": 4,\n                                \"value\": \"kljlkjlj\",\n                                \"created_at\": \"2026-04-07T13:02:00.491Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 4,\n                                    \"label\": \"check text\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-04-07T10:31:08.396Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null,\n                                    \"is_deleted\": false\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 13,\n                            \"title\": \"jsdlfkj\",\n                            \"serial\": null,\n                            \"type\": \"Product\",\n                            \"price\": \"0\",\n                            \"thumbnail_image\": null\n                        }\n                    }\n                ],\n                \"users\": {\n                    \"id\": 7293,\n                    \"name\": \"Ibrahim Omar\",\n                    \"email\": \"zoaa3054@gmail.com\",\n                    \"phone\": \"+201205912251\"\n                },\n                \"received_by_user\": {\n                    \"id\": 5467,\n                    \"name\": \"Admin\"\n                },\n                \"confirmed_by_user\": {\n                    \"id\": 5467,\n                    \"name\": \"Admin\"\n                },\n                \"returned_by_user\": null,\n                \"payment_methods\": null,\n                \"payment_screenshot\": null,\n                \"watermark\": null,\n                \"coupon_usages\": []\n            },\n            {\n                \"id\": 3,\n                \"user_id\": 7291,\n                \"status\": \"pending\",\n                \"subtotal\": \"0\",\n                \"discount\": \"0\",\n                \"total\": \"0\",\n                \"payment_method_id\": null,\n                \"payment_screenshot_id\": null,\n                \"watermark_id\": null,\n                \"purchase_serial\": \"7291-CP-20260406-003\",\n                \"number_transferred_from\": null,\n                \"payment_number\": null,\n                \"notes\": null,\n                \"admin_notes\": null,\n                \"admin_note_by\": null,\n                \"received_at\": null,\n                \"received_by\": null,\n                \"confirmed_at\": null,\n                \"confirmed_by\": null,\n                \"returned_at\": null,\n                \"returned_by\": null,\n                \"created_at\": \"2026-04-06T21:06:03.779Z\",\n                \"updated_at\": null,\n                \"deleted_at\": null,\n                \"is_deleted\": false,\n                \"purchase_items\": [\n                    {\n                        \"id\": 3,\n                        \"purchase_id\": 3,\n                        \"product_id\": 12,\n                        \"price_at_purchase\": \"0\",\n                        \"discount\": \"0\",\n                        \"required_fields_filled\": false,\n                        \"final_price\": \"0\",\n                        \"quantity\": 1,\n                        \"coupon_id\": null,\n                        \"created_at\": \"2026-04-06T21:06:03.781Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"is_deleted\": false,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 2,\n                                \"purchase_item_id\": 3,\n                                \"field_definition_id\": 2,\n                                \"value\": \"dwa\",\n                                \"created_at\": \"2026-04-06T21:06:03.783Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 2,\n                                    \"label\": \"dwad\",\n                                    \"field_type\": \"text\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-04-06T20:41:47.485Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null,\n                                    \"is_deleted\": false\n                                }\n                            },\n                            {\n                                \"id\": 3,\n                                \"purchase_item_id\": 3,\n                                \"field_definition_id\": 3,\n                                \"value\": \"/uploads/images/1775509561078-eccb3be05cb7.webp\",\n                                \"created_at\": \"2026-04-06T21:06:03.783Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 3,\n                                    \"label\": \"image\",\n                                    \"field_type\": \"image\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-04-06T20:41:55.537Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null,\n                                    \"is_deleted\": false\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 12,\n                            \"title\": \"dwadwad\",\n                            \"serial\": null,\n                            \"type\": \"Product\",\n                            \"price\": \"0\",\n                            \"thumbnail_image\": null\n                        }\n                    }\n                ],\n                \"users\": {\n                    \"id\": 7291,\n                    \"name\": \"Ziad Nasr Eldin\",\n                    \"email\": \"admin1112@gmail.com\",\n                    \"phone\": \"+201204923432\"\n                },\n                \"received_by_user\": null,\n                \"confirmed_by_user\": null,\n                \"returned_by_user\": null,\n                \"payment_methods\": null,\n                \"payment_screenshot\": null,\n                \"watermark\": null,\n                \"coupon_usages\": []\n            },\n            {\n                \"id\": 2,\n                \"user_id\": 7291,\n                \"status\": \"pending\",\n                \"subtotal\": \"0\",\n                \"discount\": \"0\",\n                \"total\": \"0\",\n                \"payment_method_id\": null,\n                \"payment_screenshot_id\": null,\n                \"watermark_id\": null,\n                \"purchase_serial\": \"7291-CP-20260406-002\",\n                \"number_transferred_from\": null,\n                \"payment_number\": null,\n                \"notes\": null,\n                \"admin_notes\": null,\n                \"admin_note_by\": null,\n                \"received_at\": null,\n                \"received_by\": null,\n                \"confirmed_at\": null,\n                \"confirmed_by\": null,\n                \"returned_at\": null,\n                \"returned_by\": null,\n                \"created_at\": \"2026-04-06T21:05:19.608Z\",\n                \"updated_at\": null,\n                \"deleted_at\": null,\n                \"is_deleted\": false,\n                \"purchase_items\": [\n                    {\n                        \"id\": 2,\n                        \"purchase_id\": 2,\n                        \"product_id\": 11,\n                        \"price_at_purchase\": \"0\",\n                        \"discount\": \"0\",\n                        \"required_fields_filled\": false,\n                        \"final_price\": \"0\",\n                        \"quantity\": 1,\n                        \"coupon_id\": null,\n                        \"created_at\": \"2026-04-06T21:05:19.613Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"is_deleted\": false,\n                        \"purchase_item_required_fields\": [],\n                        \"products\": {\n                            \"id\": 11,\n                            \"title\": \"dwada\",\n                            \"serial\": \"dwad\",\n                            \"type\": \"Product\",\n                            \"price\": \"0\",\n                            \"thumbnail_image\": null\n                        }\n                    }\n                ],\n                \"users\": {\n                    \"id\": 7291,\n                    \"name\": \"Ziad Nasr Eldin\",\n                    \"email\": \"admin1112@gmail.com\",\n                    \"phone\": \"+201204923432\"\n                },\n                \"received_by_user\": null,\n                \"confirmed_by_user\": null,\n                \"returned_by_user\": null,\n                \"payment_methods\": null,\n                \"payment_screenshot\": null,\n                \"watermark\": null,\n                \"coupon_usages\": []\n            },\n            {\n                \"id\": 1,\n                \"user_id\": 7291,\n                \"status\": \"pending\",\n                \"subtotal\": \"3\",\n                \"discount\": \"0\",\n                \"total\": \"3\",\n                \"payment_method_id\": 1,\n                \"payment_screenshot_id\": 10,\n                \"watermark_id\": null,\n                \"purchase_serial\": \"7291-CP-20260406-001\",\n                \"number_transferred_from\": \"+201204923435\",\n                \"payment_number\": \"123123131\",\n                \"notes\": \"daw\",\n                \"admin_notes\": \"[April 6, 2026 at 10:49 PM - Admin]\\ndwa\",\n                \"admin_note_by\": 5467,\n                \"received_at\": null,\n                \"received_by\": null,\n                \"confirmed_at\": null,\n                \"confirmed_by\": null,\n                \"returned_at\": null,\n                \"returned_by\": null,\n                \"created_at\": \"2026-04-06T20:46:39.145Z\",\n                \"updated_at\": \"2026-04-06T20:49:28.800Z\",\n                \"deleted_at\": null,\n                \"is_deleted\": false,\n                \"purchase_items\": [\n                    {\n                        \"id\": 1,\n                        \"purchase_id\": 1,\n                        \"product_id\": 10,\n                        \"price_at_purchase\": \"3\",\n                        \"discount\": \"0\",\n                        \"required_fields_filled\": false,\n                        \"final_price\": \"3\",\n                        \"quantity\": 1,\n                        \"coupon_id\": null,\n                        \"created_at\": \"2026-04-06T20:46:39.149Z\",\n                        \"updated_at\": null,\n                        \"deleted_at\": null,\n                        \"is_deleted\": false,\n                        \"purchase_item_required_fields\": [\n                            {\n                                \"id\": 1,\n                                \"purchase_item_id\": 1,\n                                \"field_definition_id\": 3,\n                                \"value\": \"/uploads/images/1775508324798-1de59e592ab4.webp\",\n                                \"created_at\": \"2026-04-06T20:46:39.152Z\",\n                                \"updated_at\": null,\n                                \"required_field_definitions\": {\n                                    \"id\": 3,\n                                    \"label\": \"image\",\n                                    \"field_type\": \"image\",\n                                    \"active\": true,\n                                    \"created_at\": \"2026-04-06T20:41:55.537Z\",\n                                    \"updated_at\": null,\n                                    \"deleted_at\": null,\n                                    \"is_deleted\": false\n                                }\n                            }\n                        ],\n                        \"products\": {\n                            \"id\": 10,\n                            \"title\": \"dwad\",\n                            \"serial\": null,\n                            \"type\": \"Product\",\n                            \"price\": \"22\",\n                            \"thumbnail_image\": {\n                                \"id\": 6,\n                                \"url\": \"/uploads/images/1775508188098-db3c37748c4e.webp\"\n                            }\n                        }\n                    }\n                ],\n                \"users\": {\n                    \"id\": 7291,\n                    \"name\": \"Ziad Nasr Eldin\",\n                    \"email\": \"admin1112@gmail.com\",\n                    \"phone\": \"+201204923432\"\n                },\n                \"received_by_user\": null,\n                \"confirmed_by_user\": null,\n                \"returned_by_user\": null,\n                \"payment_methods\": {\n                    \"id\": 1,\n                    \"name\": \"tes\",\n                    \"phone_number\": \"123123131\"\n                },\n                \"payment_screenshot\": {\n                    \"id\": 10,\n                    \"url\": \"/uploads/images/1775508399089-205ec0aa1887.webp\"\n                },\n                \"watermark\": null,\n                \"coupon_usages\": []\n            }\n        ]\n    }\n}"
             }
           ]
         },
@@ -7859,6 +7925,73 @@
               ],
               "cookie": [],
               "body": "{\n    \"success\": true,\n    \"data\": [\n        {\n            \"id\": 1019,\n            \"name\": \"Ahmed Hamed\",\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 1822,\n            \"name\": \"Ibrahim Mohamed Elsayed Moustafa Omar\",\n            \"role\": \"Moderator\",\n            \"count\": 0\n        },\n        {\n            \"id\": 1,\n            \"name\": \"Super Admin\",\n            \"role\": \"Admin\",\n            \"count\": 2\n        },\n        {\n            \"id\": 1219,\n            \"name\": \"mod test\",\n            \"role\": \"Moderator\",\n            \"count\": 0\n        },\n        {\n            \"id\": 641,\n            \"name\": \"testsubadmin\",\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 640,\n            \"name\": \"testsubadmin\",\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 4,\n            \"name\": \"أحمد محمد أحمد خليفة\",\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 1661,\n            \"name\": \"أدهم وليد علي توفيق\",\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 122,\n            \"name\": \"السيد محمد سرور\",\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 714,\n            \"name\": \"بسنت أحمد محمد عبد السلام\",\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        }\n    ],\n    \"pagination\": {\n        \"total\": 26,\n        \"page\": 1,\n        \"pages\": 3,\n        \"limit\": 10\n    }\n}"
+            },
+            {
+              "name": "NEW $$$Get Monthly Confirmed Count (Admin)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/purchases/confirmed-count",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "purchases",
+                    "confirmed-count"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "1256"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"4e8-5SXKh5cSfsX3/Sixdie5iVBKbJ4\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sat, 28 Mar 2026 18:37:02 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"data\": [\n        {\n            \"id\": 5467,\n            \"name\": \"Admin\",\n            \"email\": \"admin@gmail.com\",\n            \"phone\": null,\n            \"role\": \"Admin\",\n            \"count\": 1\n        },\n        {\n            \"id\": 6479,\n            \"name\": \"Ahmed Hamed\",\n            \"email\": \"ahmadmohamedhamed92@gmail.com\",\n            \"phone\": null,\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 7293,\n            \"name\": \"Sohaila\",\n            \"email\": \"sohaila@gmail.com\",\n            \"phone\": \"+201204923431\",\n            \"role\": \"SubAdmin\",\n            \"count\": 1\n        },\n        {\n            \"id\": 6679,\n            \"name\": \"mod test\",\n            \"email\": \"modtest1@gmail.com\",\n            \"phone\": null,\n            \"role\": \"Moderator\",\n            \"count\": 0\n        },\n        {\n            \"id\": 6101,\n            \"name\": \"testsubadmin\",\n            \"email\": \"mod2.assistant@example.com\",\n            \"phone\": null,\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 6100,\n            \"name\": \"testsubadmin\",\n            \"email\": \"mod1.assistant@example.com\",\n            \"phone\": null,\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 5470,\n            \"name\": \"أحمد محمد أحمد خليفة\",\n            \"email\": \"modykhalifa779@gmail.com\",\n            \"phone\": null,\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 7127,\n            \"name\": \"أدهم وليد علي توفيق\",\n            \"email\": \"domyadhm124@gmail.com\",\n            \"phone\": null,\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 5586,\n            \"name\": \"السيد محمد سرور\",\n            \"email\": \"elsayedsoror585@gmail.com\",\n            \"phone\": null,\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        },\n        {\n            \"id\": 6174,\n            \"name\": \"بسنت أحمد محمد عبد السلام\",\n            \"email\": \"ahmedbasant927@gmail.com\",\n            \"phone\": null,\n            \"role\": \"SubAdmin\",\n            \"count\": 0\n        }\n    ],\n    \"pagination\": {\n        \"total\": 28,\n        \"page\": 1,\n        \"pages\": 3,\n        \"limit\": 10\n    }\n}"
             }
           ]
         },
@@ -16827,14 +16960,27 @@
                   "description": "optional",
                   "type": "file",
                   "uuid": "bbc3f7d9-9e0b-451f-8363-3d1e8004e02e",
-                  "src": "/home/mohamed/Pictures/Anime&Managa/تيم.jpg"
+                  "src": "/home/mohamed/Pictures/Anime&Managa/619af107-8200-4d85-ba74-f12bd0f21708.jpg"
                 },
                 {
-                  "key": "sample",
+                  "key": "high_quality",
                   "description": "optional",
                   "type": "file",
                   "uuid": "175cac8d-17d3-4c2a-b0cb-2f59e2105c41",
-                  "src": "/home/mohamed/collage/paperes/1901.07429v2.pdf"
+                  "src": "/home/mohamed/Documents/test 4.pdf"
+                },
+                {
+                  "key": "low_quality",
+                  "type": "file",
+                  "uuid": "e826f668-4200-4a46-b720-0083b2610fbd",
+                  "src": "/home/mohamed/Documents/test 3.pdf"
+                },
+                {
+                  "key": "sample_section_id",
+                  "value": "1",
+                  "description": "requird if there high_quality or low_quality",
+                  "type": "text",
+                  "uuid": "e597879b-f5d2-4765-ada9-d0888af4f036"
                 },
                 {
                   "key": "perks",
@@ -16844,11 +16990,23 @@
                   "uuid": "7a410140-dbb8-491b-870b-ad17b02006d1"
                 },
                 {
-                  "key": "release_at",
-                  "value": "2026-03-25",
-                  "description": "optional",
+                  "key": "sample_title",
+                  "value": "HAHAHAHA",
                   "type": "text",
-                  "uuid": "fcc0e6d4-a8b9-4ca2-b7c7-c64343fe99aa"
+                  "uuid": "1f19ea7d-3223-40b3-92f9-862db70756e8"
+                },
+                {
+                  "key": "release_at",
+                  "value": "2026-04-20T14:30",
+                  "type": "text",
+                  "uuid": "319b688c-be3f-40a8-979a-3a8c7607f08f"
+                },
+                {
+                  "key": "",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "793f51a5-a5e0-4315-af73-102219b05d19",
+                  "disabled": true
                 }
               ]
             },
@@ -19511,7 +19669,80 @@
                   ]
                 }
               },
-              "response": []
+              "response": [
+                {
+                  "name": "Response Time Analytics",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{token}}"
+                      },
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/v2/admin/dashboard/response-time",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v2",
+                        "admin",
+                        "dashboard",
+                        "response-time"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "X-Powered-By",
+                      "value": "Express"
+                    },
+                    {
+                      "key": "Vary",
+                      "value": "Origin"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Credentials",
+                      "value": "true"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "118"
+                    },
+                    {
+                      "key": "ETag",
+                      "value": "W/\"76-cksFKmHOfy4xwJIENorkuk9H/T0\""
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Sat, 28 Mar 2026 17:56:08 GMT"
+                    },
+                    {
+                      "key": "Connection",
+                      "value": "keep-alive"
+                    },
+                    {
+                      "key": "Keep-Alive",
+                      "value": "timeout=5"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"success\": true,\n    \"data\": {\n        \"averageResponseTimeMinutes\": 0,\n        \"fastestResponseTimeMinutes\": 0,\n        \"slowestResponseTimeMinutes\": 0\n    }\n}"
+                }
+              ]
             },
             {
               "name": "User Statistics",
@@ -19616,6 +19847,103 @@
                   ],
                   "cookie": [],
                   "body": "{\n    \"success\": true,\n    \"data\": {\n        \"totalUsers\": 1787,\n        \"totalVerifiedUsers\": 1784,\n        \"byRole\": {\n            \"Admin\": 2\n        }\n    }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Delete a Product Review",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v2/admin/reviews/:reviewId",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "admin",
+                    "reviews",
+                    ":reviewId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "reviewId",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "New Request",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/api/v2/admin/reviews/:reviewId",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v2",
+                        "admin",
+                        "reviews",
+                        ":reviewId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "reviewId",
+                          "value": "1"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "X-Powered-By",
+                      "value": "Express"
+                    },
+                    {
+                      "key": "Vary",
+                      "value": "Origin"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Credentials",
+                      "value": "true"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "56"
+                    },
+                    {
+                      "key": "ETag",
+                      "value": "W/\"38-jxJ1JtcaBbSo9ccWodgsZETBEvI\""
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 08 Apr 2026 13:06:42 GMT"
+                    },
+                    {
+                      "key": "Connection",
+                      "value": "keep-alive"
+                    },
+                    {
+                      "key": "Keep-Alive",
+                      "value": "timeout=5"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"success\": true,\n    \"message\": \"Review deleted successfully\"\n}"
                 }
               ]
             }
@@ -21751,7 +22079,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"title\": \"Audios Samples\",\n  \"description\": \"High quality audio files\",\n  \"thumbnail_url\": \"https://picsum.photos/20/237/200/300\",\n  \"sort_order\": 1,\n  \"active\": true\n}",
+                  "raw": "{\n  \"title\": \"Audios Samples\",\n  \"description\": \"High quality audio files\",\n//   \"thumbnail_url\": \"https://picsum.photos/20/237/200/300\",\n  \"sort_order\": 1,\n  \"active\": true\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -21842,6 +22170,77 @@
                   ],
                   "cookie": [],
                   "body": "{\n    \"success\": true,\n    \"message\": \"Sample section created successfully\",\n    \"data\": {\n        \"id\": 2,\n        \"title\": \"Audio Samples\",\n        \"description\": \"High quality audio files\",\n        \"thumbnail_url\": \"https://picsum.photos/20/237/200/300\",\n        \"sort_order\": 1,\n        \"active\": true,\n        \"created_at\": \"2026-03-11T00:23:26.340Z\",\n        \"updated_at\": null\n    }\n}"
+                },
+                {
+                  "name": "Create Sample Section",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"title\": \"Audios Samples\",\n  \"description\": \"High quality audio files\",\n//   \"thumbnail_url\": \"https://picsum.photos/20/237/200/300\",\n  \"sort_order\": 1,\n  \"active\": true\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/v2/sample-sections/",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v2",
+                        "sample-sections",
+                        ""
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "X-Powered-By",
+                      "value": "Express"
+                    },
+                    {
+                      "key": "Vary",
+                      "value": "Origin"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Credentials",
+                      "value": "true"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "233"
+                    },
+                    {
+                      "key": "ETag",
+                      "value": "W/\"e9-PHJ0gMOzcrta7ezTFGqXItyFsWY\""
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Sat, 28 Mar 2026 20:15:34 GMT"
+                    },
+                    {
+                      "key": "Connection",
+                      "value": "keep-alive"
+                    },
+                    {
+                      "key": "Keep-Alive",
+                      "value": "timeout=5"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"success\": true,\n    \"message\": \"Sample section created successfully\",\n    \"data\": {\n        \"id\": 2,\n        \"title\": \"Audios Samples\",\n        \"description\": \"High quality audio files\",\n        \"sort_order\": 1,\n        \"active\": true,\n        \"created_at\": \"2026-03-28T20:15:34.524Z\",\n        \"updated_at\": null\n    }\n}"
                 }
               ]
             },
@@ -22065,7 +22464,8 @@
                       "key": "product_id",
                       "value": "10",
                       "type": "text",
-                      "uuid": "d1467f99-075d-4863-af35-f285bfa4a51e"
+                      "uuid": "d1467f99-075d-4863-af35-f285bfa4a51e",
+                      "disabled": true
                     },
                     {
                       "key": "media_type",
@@ -22085,6 +22485,12 @@
                       "type": "file",
                       "uuid": "7efbd2cd-6b3e-41e7-8c13-71c5d1787b43",
                       "src": "/home/mohamed/collage/DD/Lab_1/Lab 1_ OLAP.docx.pdf"
+                    },
+                    {
+                      "key": "title",
+                      "value": "Hello world",
+                      "type": "text",
+                      "uuid": "4b9371a3-6bc2-4c77-b7a1-63a31c5e236e"
                     }
                   ]
                 },
@@ -22103,7 +22509,7 @@
                   "variable": [
                     {
                       "key": "sectionId",
-                      "value": "2"
+                      "value": "1"
                     }
                   ]
                 }
@@ -22212,6 +22618,111 @@
                   ],
                   "cookie": [],
                   "body": "{\n    \"success\": true,\n    \"message\": \"Sample created successfully\",\n    \"data\": {\n        \"id\": 4,\n        \"section_id\": 2,\n        \"product_id\": 10,\n        \"media_type\": \"pdf\",\n        \"high_quality_url\": \"/uploads/samples/1773189793221-991f93cf271c-high_quality.pdf\",\n        \"low_quality_url\": \"/uploads/samples/1773189793221-b177d81b610a-low_quality.pdf\",\n        \"original_name\": \"Lab 1_ OLAP.docx.pdf\",\n        \"mime_type\": \"application/pdf\",\n        \"size\": 277379,\n        \"created_at\": \"2026-03-11T00:43:13.231Z\",\n        \"updated_at\": null,\n        \"products\": {\n            \"id\": 10,\n            \"title\": \"ISTQB Foundation Level\"\n        },\n        \"sample_sections\": {\n            \"id\": 2,\n            \"title\": \"Audio Samples\"\n        },\n        \"is_displayable\": true\n    }\n}"
+                },
+                {
+                  "name": "Create Sample",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "product_id",
+                          "value": "10",
+                          "type": "text",
+                          "uuid": "d1467f99-075d-4863-af35-f285bfa4a51e"
+                        },
+                        {
+                          "key": "media_type",
+                          "value": "pdf",
+                          "description": "enum: pdf, image, video, word, powerpoint",
+                          "type": "text",
+                          "uuid": "6ae77cf3-e9d1-4952-8360-852c1cd74089"
+                        },
+                        {
+                          "key": "high_quality",
+                          "type": "file",
+                          "uuid": "2d7f73a3-ba67-4ba8-8df8-8e6ea38715e3",
+                          "src": "/home/mohamed/Documents/test 4.pdf"
+                        },
+                        {
+                          "key": "low_quality",
+                          "type": "file",
+                          "uuid": "7efbd2cd-6b3e-41e7-8c13-71c5d1787b43",
+                          "src": "/home/mohamed/Documents/test 4.pdf"
+                        },
+                        {
+                          "key": "title",
+                          "value": "Hello world",
+                          "type": "text",
+                          "uuid": "4b9371a3-6bc2-4c77-b7a1-63a31c5e236e"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/v2/sample-sections/:sectionId/samples",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v2",
+                        "sample-sections",
+                        ":sectionId",
+                        "samples"
+                      ],
+                      "variable": [
+                        {
+                          "key": "sectionId",
+                          "value": "1"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "X-Powered-By",
+                      "value": "Express"
+                    },
+                    {
+                      "key": "Vary",
+                      "value": "Origin"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Credentials",
+                      "value": "true"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "546"
+                    },
+                    {
+                      "key": "ETag",
+                      "value": "W/\"222-wdZPR+rf8QjngDESliSAZ9JmaYo\""
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Sat, 28 Mar 2026 18:49:17 GMT"
+                    },
+                    {
+                      "key": "Connection",
+                      "value": "keep-alive"
+                    },
+                    {
+                      "key": "Keep-Alive",
+                      "value": "timeout=5"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"success\": true,\n    \"message\": \"Sample created successfully\",\n    \"data\": {\n        \"id\": 4,\n        \"section_id\": 1,\n        \"product_id\": 10,\n        \"title\": \"Hello world\",\n        \"media_type\": \"pdf\",\n        \"high_quality_url\": \"/uploads/samples/1774723757385-6618b86cd3c7-high_quality.pdf\",\n        \"low_quality_url\": \"/uploads/samples/1774723757385-4856048e8039-low_quality.pdf\",\n        \"original_name\": \"test 4.pdf\",\n        \"mime_type\": \"application/pdf\",\n        \"size\": 1244488,\n        \"created_at\": \"2026-03-28T18:49:17.389Z\",\n        \"updated_at\": null,\n        \"products\": {\n            \"id\": 10,\n            \"title\": \"wa\"\n        },\n        \"sample_sections\": {\n            \"id\": 1,\n            \"title\": \"Audios Samples\"\n        },\n        \"is_displayable\": true\n    }\n}"
                 }
               ]
             },
@@ -22321,6 +22832,210 @@
                   "body": "{\n    \"success\": true,\n    \"message\": \"Sample deleted successfully\"\n}"
                 }
               ]
+            },
+            {
+              "name": "Get Sample by ID",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n //parent\n//  \"email\":\"kiim2o211@example.com\",   \n//student1\n// \"phoneNumber\":\"01157281011\",\n//student2\n//\"phoneNumber\":\"0120521556\",\n//teacher\n// \"email\": \"test12tea3cher12@example.com\",\n// \"email\":\"abdelrhman020@gmail.com\",\n// \"email\":\"test2222@example.com\",\n//Admin\n \"email\": \"super-admin@kalima-edu.com\",\n// Lecturer\n    // \"email\" : \"testprofile@gmail.com\",\n//SubAdmin\n// \"email\": \"secondsubadmin@gmail.com\",\n//student \n// \"email\":\"abmawogud@examples.com\",\n// \"email\":\"karim@example.com\",\n//\"email\":\"karimmohamedgad9@gmail.com\",\n// \"email\":\"ahmedsamir@testings.com\",\n// \"email\":\"test102@gmail.com\",\n// \"email\": \"damn@damn.com\",\n//\"email\" : \"ahmed@noir.com\",\n//lecturer\n//\"email\":\"sheko@example.com\",\n//assistant\n// //no assistants\n// \"password\": \"Kalima1234\"\n// \"password\":\"pass12321\"\n// \"password\": \"pass1234\"\n\"password\" : \"Kalima1234\" //pass for super admin (normal admin with username super admin) is Kalima1234\n    // \"password\" : \"holyjett\"\n } \n"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v2/samples/:id",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "samples",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "2"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Get Sample by ID",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n //parent\n//  \"email\":\"kiim2o211@example.com\",   \n//student1\n// \"phoneNumber\":\"01157281011\",\n//student2\n//\"phoneNumber\":\"0120521556\",\n//teacher\n// \"email\": \"test12tea3cher12@example.com\",\n// \"email\":\"abdelrhman020@gmail.com\",\n// \"email\":\"test2222@example.com\",\n//Admin\n \"email\": \"super-admin@kalima-edu.com\",\n// Lecturer\n    // \"email\" : \"testprofile@gmail.com\",\n//SubAdmin\n// \"email\": \"secondsubadmin@gmail.com\",\n//student \n// \"email\":\"abmawogud@examples.com\",\n// \"email\":\"karim@example.com\",\n//\"email\":\"karimmohamedgad9@gmail.com\",\n// \"email\":\"ahmedsamir@testings.com\",\n// \"email\":\"test102@gmail.com\",\n// \"email\": \"damn@damn.com\",\n//\"email\" : \"ahmed@noir.com\",\n//lecturer\n//\"email\":\"sheko@example.com\",\n//assistant\n// //no assistants\n// \"password\": \"Kalima1234\"\n// \"password\":\"pass12321\"\n// \"password\": \"pass1234\"\n\"password\" : \"Kalima1234\" //pass for super admin (normal admin with username super admin) is Kalima1234\n    // \"password\" : \"holyjett\"\n } \n"
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/v2/samples/:id",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v2",
+                        "samples",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "2"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "X-Powered-By",
+                      "value": "Express"
+                    },
+                    {
+                      "key": "Vary",
+                      "value": "Origin"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Credentials",
+                      "value": "true"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "637"
+                    },
+                    {
+                      "key": "ETag",
+                      "value": "W/\"27d-pFM/cGML5zsCx52rAlaW4nXtZVE\""
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 08 Apr 2026 12:11:40 GMT"
+                    },
+                    {
+                      "key": "Connection",
+                      "value": "keep-alive"
+                    },
+                    {
+                      "key": "Keep-Alive",
+                      "value": "timeout=5"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": 2,\n        \"section_id\": 1,\n        \"product_id\": 14,\n        \"title\": null,\n        \"is_archived\": false,\n        \"media_type\": \"pdf\",\n        \"high_quality_url\": \"/uploads/samples/1775591228693-a6dbeaf3a973-high_quality.jpg\",\n        \"low_quality_url\": \"/uploads/samples/1775591501963-1303aab77f58-low_quality.pdf\",\n        \"original_name\": \"429e1744ee16ffc918aa2508c970494e.jpg\",\n        \"mime_type\": \"image/jpeg\",\n        \"size\": 96455,\n        \"created_at\": \"2026-04-07T13:07:18.115Z\",\n        \"updated_at\": \"2026-04-07T19:51:41.965Z\",\n        \"products\": {\n            \"id\": 14,\n            \"title\": \"new test product\"\n        },\n        \"sample_sections\": {\n            \"id\": 1,\n            \"title\": \"test\"\n        },\n        \"is_displayable\": true,\n        \"thumbnail\": \"/uploads/samples/1775591228693-a6dbeaf3a973-high_quality.jpg\"\n    }\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Get All Samples",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n //parent\n//  \"email\":\"kiim2o211@example.com\",   \n//student1\n// \"phoneNumber\":\"01157281011\",\n//student2\n//\"phoneNumber\":\"0120521556\",\n//teacher\n// \"email\": \"test12tea3cher12@example.com\",\n// \"email\":\"abdelrhman020@gmail.com\",\n// \"email\":\"test2222@example.com\",\n//Admin\n \"email\": \"super-admin@kalima-edu.com\",\n// Lecturer\n    // \"email\" : \"testprofile@gmail.com\",\n//SubAdmin\n// \"email\": \"secondsubadmin@gmail.com\",\n//student \n// \"email\":\"abmawogud@examples.com\",\n// \"email\":\"karim@example.com\",\n//\"email\":\"karimmohamedgad9@gmail.com\",\n// \"email\":\"ahmedsamir@testings.com\",\n// \"email\":\"test102@gmail.com\",\n// \"email\": \"damn@damn.com\",\n//\"email\" : \"ahmed@noir.com\",\n//lecturer\n//\"email\":\"sheko@example.com\",\n//assistant\n// //no assistants\n// \"password\": \"Kalima1234\"\n// \"password\":\"pass12321\"\n// \"password\": \"pass1234\"\n\"password\" : \"Kalima1234\" //pass for super admin (normal admin with username super admin) is Kalima1234\n    // \"password\" : \"holyjett\"\n } \n"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/samples",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "samples"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get All Samples",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n //parent\n//  \"email\":\"kiim2o211@example.com\",   \n//student1\n// \"phoneNumber\":\"01157281011\",\n//student2\n//\"phoneNumber\":\"0120521556\",\n//teacher\n// \"email\": \"test12tea3cher12@example.com\",\n// \"email\":\"abdelrhman020@gmail.com\",\n// \"email\":\"test2222@example.com\",\n//Admin\n \"email\": \"super-admin@kalima-edu.com\",\n// Lecturer\n    // \"email\" : \"testprofile@gmail.com\",\n//SubAdmin\n// \"email\": \"secondsubadmin@gmail.com\",\n//student \n// \"email\":\"abmawogud@examples.com\",\n// \"email\":\"karim@example.com\",\n//\"email\":\"karimmohamedgad9@gmail.com\",\n// \"email\":\"ahmedsamir@testings.com\",\n// \"email\":\"test102@gmail.com\",\n// \"email\": \"damn@damn.com\",\n//\"email\" : \"ahmed@noir.com\",\n//lecturer\n//\"email\":\"sheko@example.com\",\n//assistant\n// //no assistants\n// \"password\": \"Kalima1234\"\n// \"password\":\"pass12321\"\n// \"password\": \"pass1234\"\n\"password\" : \"Kalima1234\" //pass for super admin (normal admin with username super admin) is Kalima1234\n    // \"password\" : \"holyjett\"\n } \n"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v2/samples",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "samples"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "1500"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"5dc-ftSUQCBDSxbmPAMDLite1CXnceE\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 08 Apr 2026 12:10:17 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"results\": 3,\n    \"data\": [\n        {\n            \"id\": 8,\n            \"media_type\": \"pdf\",\n            \"title\": null,\n            \"high_quality_url\": \"/uploads/samples/1775597559920-d0c9b6e196a3-high_quality.pdf\",\n            \"low_quality_url\": \"/uploads/samples/1775597559920-69da264a84d5-low_quality.pdf\",\n            \"original_name\": \"Sheet 3.pdf\",\n            \"mime_type\": \"application/pdf\",\n            \"size\": 186836,\n            \"created_at\": \"2026-04-07T21:32:39.924Z\",\n            \"products\": {\n                \"id\": 16,\n                \"title\": \"Algebra Book\"\n            },\n            \"is_displayable\": true,\n            \"thumbnail\": \"/uploads/samples/1775597559920-d0c9b6e196a3-high_quality.pdf\"\n        },\n        {\n            \"id\": 6,\n            \"media_type\": \"image\",\n            \"title\": null,\n            \"high_quality_url\": \"/uploads/samples/1775594861613-e6763dc222ff-high_quality.jpg\",\n            \"low_quality_url\": \"/uploads/samples/1775594861613-bde73be4e917-low_quality.jpg\",\n            \"original_name\": \"429e1744ee16ffc918aa2508c970494e.jpg\",\n            \"mime_type\": \"image/jpeg\",\n            \"size\": 96455,\n            \"created_at\": \"2026-04-07T20:47:41.614Z\",\n            \"products\": {\n                \"id\": 16,\n                \"title\": \"Algebra Book\"\n            },\n            \"is_displayable\": true,\n            \"thumbnail\": \"/uploads/samples/1775594861613-e6763dc222ff-high_quality.jpg\"\n        },\n        {\n            \"id\": 2,\n            \"media_type\": \"pdf\",\n            \"title\": null,\n            \"high_quality_url\": \"/uploads/samples/1775591228693-a6dbeaf3a973-high_quality.jpg\",\n            \"low_quality_url\": \"/uploads/samples/1775591501963-1303aab77f58-low_quality.pdf\",\n            \"original_name\": \"429e1744ee16ffc918aa2508c970494e.jpg\",\n            \"mime_type\": \"image/jpeg\",\n            \"size\": 96455,\n            \"created_at\": \"2026-04-07T13:07:18.115Z\",\n            \"products\": {\n                \"id\": 14,\n                \"title\": \"new test product\"\n            },\n            \"is_displayable\": true,\n            \"thumbnail\": \"/uploads/samples/1775591228693-a6dbeaf3a973-high_quality.jpg\"\n        }\n    ],\n    \"pagination\": {\n        \"total\": 3,\n        \"page\": 1,\n        \"limit\": 20\n    }\n}"
             }
           ]
         }
