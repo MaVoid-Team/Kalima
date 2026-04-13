@@ -19,14 +19,21 @@ export default function LearningJourneySection() {
   ];
 
   return (
-    <section className="bg-transparent py-16" data-testid="landing-page-learning-journey-section">
+    <motion.section
+      className="bg-transparent py-16 will-change-transform"
+      data-testid="landing-page-learning-journey-section"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+    >
       <div className="container mx-auto px-4 md:px-10">
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <motion.h2
             className="text-3xl font-bold text-foreground md:text-4xl"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.7 }}
+            viewport={{ once: true, amount: 0.7 }}
             transition={{ type: "spring", stiffness: 50, damping: 20 }}
           >
             {t("landingPage.learningJourney.title")}
@@ -35,7 +42,7 @@ export default function LearningJourneySection() {
             className="mt-3 text-muted-foreground"
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.7 }}
+            viewport={{ once: true, amount: 0.7 }}
             transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.08 }}
           >
             {t("landingPage.learningJourney.description")}
@@ -44,7 +51,7 @@ export default function LearningJourneySection() {
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {journeySteps.map((step, index) => (
-            <motion.div key={step.title} variants={stepReveal} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }} transition={{ delay: index * 0.08 }} whileHover={{ y: -8, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}>
+            <motion.div key={step.title} variants={stepReveal} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} transition={{ delay: index * 0.08 }} whileHover={{ y: -8, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}>
               <Card className="flex h-full flex-col border border-white/40 dark:border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] ring-1 ring-inset ring-white/20 dark:ring-white/10 bg-gradient-to-br from-white/30 to-white/5 dark:from-white/10 dark:to-transparent transition-all duration-300 hover:bg-white/20 dark:hover:bg-white/10 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 relative overflow-hidden group">
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <CardHeader className="relative z-10">
@@ -65,6 +72,6 @@ export default function LearningJourneySection() {
           ))}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

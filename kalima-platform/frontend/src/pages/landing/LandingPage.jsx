@@ -23,7 +23,10 @@ export default function LandingPage() {
       <BackgroundAnimation />
       <main className="relative z-10 w-full">
         {sections.map((section, index) => (
-          <section key={section.key} className={`min-h-screen ${index === 0 ? 'pb-6 md:pb-10' : 'py-6 md:py-10'}`}>
+          <section
+            key={section.key}
+            className={`min-h-screen will-change-transform ${index === 0 ? 'pb-6 md:pb-10' : 'py-6 md:py-10'}`}
+          >
             <Suspense fallback={<div className="min-h-screen animate-pulse bg-muted/5 rounded-3xl m-10" />}>
               {section.component}
             </Suspense>
