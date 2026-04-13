@@ -21,7 +21,14 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="bg-transparent py-16" data-testid="landing-page-about-section">
+    <motion.section
+      className="bg-transparent py-16 will-change-transform"
+      data-testid="landing-page-about-section"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+    >
       <div className="container mx-auto px-4 md:px-10">
         <div className="grid items-center gap-8 lg:grid-cols-2">
           <div className="space-y-5">
@@ -29,7 +36,7 @@ export default function AboutSection() {
               className="text-3xl font-bold text-foreground md:text-4xl"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.6 }}
+              viewport={{ once: true, amount: 0.6 }}
               transition={{ type: "spring", stiffness: 50, damping: 20 }}
             >
               {t("landingPage.about.titleStart")}
@@ -40,14 +47,14 @@ export default function AboutSection() {
               className="text-muted-foreground"
               initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.6 }}
+              viewport={{ once: true, amount: 0.6 }}
               transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.07 }}
             >
               {t("landingPage.about.description")}
             </motion.p>
             <div className="grid gap-4 sm:grid-cols-2">
               {pillars.map((pillar, index) => (
-                <motion.div key={pillar.title} variants={cardReveal} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.3 }} transition={{ delay: index * 0.07 }} whileHover={{ y: -8, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}>
+                <motion.div key={pillar.title} variants={cardReveal} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} transition={{ delay: index * 0.07 }} whileHover={{ y: -8, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}>
                   <Card className="flex h-full flex-col border border-white/40 dark:border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] ring-1 ring-inset ring-white/20 dark:ring-white/10 bg-linear-to-br from-white/30 to-white/5 dark:from-white/10 dark:to-transparent transition-all duration-300 hover:bg-white/20 dark:hover:bg-white/10 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 relative overflow-hidden group">
                     <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <CardHeader className="pb-3 relative z-10 text-center sm:text-start">
@@ -75,11 +82,11 @@ export default function AboutSection() {
             initial={{ opacity: 0, y: 22 }}
             whileInView={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.02 }}
-            viewport={{ once: false, amount: 0.35 }}
+            viewport={{ once: true, amount: 0.35 }}
             transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.12 }}
           />
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

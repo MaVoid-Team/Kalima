@@ -84,7 +84,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-transparent backdrop-blur-md border-b border-border/40">
+      <header className="fixed inset-x-0 top-0 z-50 w-full bg-transparent backdrop-blur-md border-b border-border/40">
         <div className="container md:px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 decoration-0">

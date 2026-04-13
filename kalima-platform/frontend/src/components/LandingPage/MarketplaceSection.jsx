@@ -16,7 +16,14 @@ export default function MarketplaceSection() {
   };
 
   return (
-    <section className="bg-transparent py-16" data-testid="landing-page-marketplace-section">
+    <motion.section
+      className="bg-transparent py-16 will-change-transform"
+      data-testid="landing-page-marketplace-section"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+    >
       <div className="container mx-auto px-4 md:px-10">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -24,7 +31,7 @@ export default function MarketplaceSection() {
               className="text-3xl font-bold text-foreground md:text-4xl drop-shadow-[0_0_15px_hsl(var(--primary)/0.3)]"
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.7 }}
+              viewport={{ once: true, amount: 0.7 }}
               transition={{ type: "spring", stiffness: 50, damping: 20 }}
             >
               {t("landingPage.marketplace.title")}
@@ -33,7 +40,7 @@ export default function MarketplaceSection() {
               className="mt-3 max-w-2xl text-base text-muted-foreground font-medium"
               initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.7 }}
+              viewport={{ once: true, amount: 0.7 }}
               transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.08 }}
             >
               {t("landingPage.marketplace.description")}
@@ -42,7 +49,7 @@ export default function MarketplaceSection() {
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.7 }}
+            viewport={{ once: true, amount: 0.7 }}
             transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.12 }}
           >
             <Button asChild variant="outline" className="border border-white/40 dark:border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(31,38,135,0.1)] ring-1 ring-inset ring-white/20 dark:ring-white/10 hover:bg-white/20 dark:hover:bg-white/10 hover:border-primary/50 transition-all font-medium text-foreground" data-testid="landing-page-marketplace-view-all-button">
@@ -58,7 +65,7 @@ export default function MarketplaceSection() {
               variants={cardReveal}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: false, amount: 0.3 }}
+              viewport={{ once: true, amount: 0.3 }}
               transition={{ delay: index * 0.08 }}
               whileHover={{ y: -6, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}
             >
@@ -82,6 +89,6 @@ export default function MarketplaceSection() {
           ))}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
@@ -79,13 +78,20 @@ export default function SuccessStoriesSection() {
   };
 
   return (
-    <section className="bg-transparent py-16" data-testid="landing-page-stories-section">
+    <motion.section
+      className="bg-transparent py-16 will-change-transform"
+      data-testid="landing-page-stories-section"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+    >
       <div className="container mx-auto px-4 md:px-10">
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.8 }}
+            viewport={{ once: true, amount: 0.8 }}
             transition={{ type: "spring", stiffness: 50, damping: 20 }}
           >
             <Badge variant="outline" className="mb-3">{t("landingPage.stories.badge")}</Badge>
@@ -94,7 +100,7 @@ export default function SuccessStoriesSection() {
             className="text-3xl font-bold text-foreground md:text-4xl"
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.8 }}
+            viewport={{ once: true, amount: 0.8 }}
             transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.08 }}
           >
             {t("landingPage.stories.titleStart")}
@@ -110,7 +116,7 @@ export default function SuccessStoriesSection() {
               variants={cardReveal}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: false, amount: 0.3 }}
+              viewport={{ once: true, amount: 0.3 }}
               transition={{ delay: index * 0.08 }}
               whileHover={{ y: -6, scale: 1.02, rotate: 1, transition: { type: "spring", stiffness: 300, damping: 15 } }}
             >
@@ -141,7 +147,7 @@ export default function SuccessStoriesSection() {
           className="mx-auto mt-12 max-w-3xl"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.4 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{ type: "spring", stiffness: 50, damping: 20 }}
         >
           <Card className="border border-white/40 dark:border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] ring-1 ring-inset ring-white/20 dark:ring-white/10 bg-gradient-to-br from-white/30 to-white/5 dark:from-white/10 dark:to-transparent transition-all duration-300 hover:border-primary/50 overflow-hidden relative">
@@ -172,6 +178,6 @@ export default function SuccessStoriesSection() {
           </Card>
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }

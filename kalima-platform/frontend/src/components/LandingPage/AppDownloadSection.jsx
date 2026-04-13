@@ -8,16 +8,23 @@ export default function AppDownloadSection() {
   const { t } = useTranslation("landing");
 
   return (
-    <section className="py-16" data-testid="landing-page-app-section">
+    <motion.section
+      className="py-16 will-change-transform"
+      data-testid="landing-page-app-section"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+    >
       <div className="container mx-auto px-4 md:px-10">
-        <div className="rounded-3xl border border-border p-6 shadow-xl md:p-10">
+        <div className="rounded-3xl border border-border p-6 shadow-xl md:p-10 will-change-transform">
           <div className="grid items-center gap-6 lg:grid-cols-2">
             <div className="space-y-4">
               <motion.div
                 className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary"
                 initial={{ opacity: 0, y: 14 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.8 }}
+                viewport={{ once: true, amount: 0.8 }}
                 transition={{ type: "spring", stiffness: 50, damping: 20 }}
               >
                 <Sparkles className="h-4 w-4" />
@@ -27,7 +34,7 @@ export default function AppDownloadSection() {
                 className="text-3xl font-bold text-foreground md:text-4xl"
                 initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.8 }}
+                viewport={{ once: true, amount: 0.8 }}
                 transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.05 }}
               >
                 {t("landingPage.download.title")}
@@ -36,7 +43,7 @@ export default function AppDownloadSection() {
                 className="text-muted-foreground"
                 initial={{ opacity: 0, y: 14 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.8 }}
+                viewport={{ once: true, amount: 0.8 }}
                 transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.1 }}
               >
                 {t("landingPage.download.description")}
@@ -45,7 +52,7 @@ export default function AppDownloadSection() {
                 className="flex flex-col gap-3 sm:flex-row"
                 initial={{ opacity: 0, y: 14 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.8 }}
+                viewport={{ once: true, amount: 0.8 }}
                 transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.14 }}
               >
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
@@ -66,7 +73,7 @@ export default function AppDownloadSection() {
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               whileHover={{ y: -5, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}
-              viewport={{ once: false, amount: 0.35 }}
+              viewport={{ once: true, amount: 0.35 }}
               transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.12 }}
             >
               <p className="text-sm font-semibold text-foreground">{t("landingPage.download.mixTitle")}</p>
@@ -81,7 +88,7 @@ export default function AppDownloadSection() {
                       className="h-2 w-4/5 rounded-full bg-primary"
                       initial={{ width: "0%" }}
                       whileInView={{ width: "20%" }}
-                      viewport={{ once: false, amount: 0.7 }}
+                      viewport={{ once: true, amount: 0.7 }}
                       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                     />
                   </div>
@@ -96,7 +103,7 @@ export default function AppDownloadSection() {
                       className="h-2 w-1/5 rounded-full bg-primary"
                       initial={{ width: "0%" }}
                       whileInView={{ width: "80%" }}
-                      viewport={{ once: false, amount: 0.7 }}
+                      viewport={{ once: true, amount: 0.7 }}
                       transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
                     />
                   </div>
@@ -106,6 +113,6 @@ export default function AppDownloadSection() {
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
