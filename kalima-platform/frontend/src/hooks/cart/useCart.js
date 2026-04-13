@@ -26,12 +26,24 @@ export default function useCart() {
         }
     }, []);
 
-    const addToCart = useCallback(async (productId, quantity) => {
+    const addToCart = useCallback(async (productId) => {
         try {
+            // Fetch current cart to check for duplicates
+            const currentCart = await getCart();
+            const items = currentCart.cart_items || [];
+            
+            // Check if product is already in cart
+            const exists = items.some(item => (item.product_id === productId || item.products?.id === productId));
+            
+            if (exists) {
+                toast.info(t("itemAlreadyInCart", "This item is already in your cart"));
+                return null;
+            }
+
             const res = await mutate({
                 method: "POST",
                 endpoint: "/cart/items",
-                data: { productId, quantity, required_fields: [] }
+                data: { productId, quantity: 1, required_fields: [] }
             });
             if (res.success) {
                 toast.success(t("itemAddedToCart", "Item added to cart"));
@@ -45,7 +57,7 @@ export default function useCart() {
             console.error("Failed to add item to cart:", error);
             throw error;
         }
-    }, []);
+    }, [getCart, mutate, t]);
 
     const changeItemQuantity = useCallback(async (itemId, quantity) => {
         try {

@@ -72,16 +72,6 @@ export function CartProvider({ children }) {
     }
   }, [isAuthenticated, hasAdminAccess, isStudentOrParent]);
 
-  const updateQuantity = async (itemId, quantity) => {
-    if (quantity < 1) return;
-    try {
-      await changeItemQuantity(itemId, quantity);
-      await loadCart();
-    } catch (e) {
-      console.error('failed update quantity', e);
-      loadCart();
-    }
-  };
 
   const removeItem = async id => {
     try {
@@ -93,8 +83,8 @@ export function CartProvider({ children }) {
     }
   };
 
-  const addProductToCart = async (productId, quantity) => {
-    await addToCart(productId, quantity);
+  const addProductToCart = async (productId) => {
+    await addToCart(productId);
     await loadCart();
   };
 
@@ -150,7 +140,6 @@ export function CartProvider({ children }) {
     error,
     loadCart,
     addToCart: addProductToCart,
-    updateQuantity,
     clearCart,
     removeFromCart: removeItem,
     applyCoupon,

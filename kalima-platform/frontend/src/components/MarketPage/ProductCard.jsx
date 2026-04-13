@@ -62,7 +62,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
     if (!cartCtx?.addToCart) return;
     try {
       setIsAddingToCart(true);
-      await cartCtx.addToCart(id, 1);
+      await cartCtx.addToCart(id);
     } catch (_) {
       // error handled by hook
     } finally {
@@ -80,7 +80,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
     }
     try {
       setIsBuyingNow(true);
-      await startFastBuy(id, 1);
+      await startFastBuy(id);
     } finally {
       setIsBuyingNow(false);
     }

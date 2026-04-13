@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Minus, Plus, ShoppingCart, Eye, Zap, Clock, ShieldAlert } from "lucide-react";
+import { ShoppingCart, Eye, Zap, Clock, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { formatPrice, getImageUrl } from "@/lib/storeUtils";
@@ -26,7 +25,6 @@ import { FaWhatsapp } from "react-icons/fa";
  */
 export default function ProductActions({ price, productId, sampleUrl, sampleId, title, serial, isReleased = true }) {
   const { t } = useTranslation("product");
-  const [quantity, setQuantity] = useState(1);
   const { isAuthenticated } = useAuth();
   const { isConfirmed } = useRole();
   const location = useLocation();
@@ -43,8 +41,6 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
   const addToCart = cartCtx?.addToCart;
   const loading = cartCtx?.loading ?? false;
   const { startFastBuy, loading: fastBuyLoading } = useFastBuy();
-  const handleIncrement = () => setQuantity((prev) => prev + 1);
-  const handleDecrement = () => setQuantity((prev) => Math.max(1, prev - 1));
 
   const formattedPrice = formatPrice(price);
 
@@ -57,7 +53,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
       navigate("/login", { state: { from: location }, replace: true });
       return;
     }
-    if (addToCart) addToCart(productId, quantity);
+    if (addToCart) addToCart(productId);
   };
 
   const handleBuyNow = () => {
@@ -66,7 +62,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
       navigate("/login", { state: { from: location }, replace: true });
       return;
     }
-    startFastBuy(productId, quantity);
+    startFastBuy(productId, 1);
   };
 
   const whatsappMessage = t('actions.whatsappTemplate', {
@@ -106,28 +102,6 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
                 {formattedPrice} {t("info.currency")}
               </span>
             </div>
-
-            {/* <div className="flex items-center gap-1 shrink-0">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleDecrement}
-                disabled={quantity <= 1}
-                className="h-9 w-9"
-                data-testid="product-actions-mobile-decrement-button"
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <Input
-                type="text"
-                value={quantity}
-                readOnly
-                className="w-12 h-9 text-center font-bold shadow-none px-0"
-              />
-              <Button variant="outline" size="icon" onClick={handleIncrement} className="h-9 w-9" data-testid="product-actions-mobile-increment-button">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div> */}
           </div>
 
           <div className="grid grid-cols-2 gap-2">

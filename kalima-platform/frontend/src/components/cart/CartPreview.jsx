@@ -28,7 +28,7 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
   const { t, i18n } = useTranslation('cart');
   const navigate = useNavigate();
   const baseURL = useMemo(() => getBaseUrl(), []);
-  const { updateQuantity, removeFromCart, clearCart, loading } = useCart();
+  const { removeFromCart, clearCart, loading } = useCart();
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
   const [isClearingCart, setIsClearingCart] = useState(false);
@@ -38,14 +38,6 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
     navigate('/market');
   }
 
-  const handleUpdateQuantity = async (itemId, newQuantity) => {
-    if (newQuantity < 1) return;
-    try {
-      await updateQuantity(itemId, newQuantity);
-    } catch (error) {
-      console.error('Failed to update quantity:', error);
-    }
-  };
 
   const handleRemoveItem = async (itemId) => {
     try {
@@ -146,9 +138,6 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
                           <span className="font-semibold">
                             {item?.final_price}{t('L.E')}
                           </span>
-                          <span className="text-muted-foreground ms-1">
-                            {t('each', { price: `${item?.price_at_add}${t('L.E')}` })}
-                          </span>
                         </div>
                         {item?.coupons &&
                           <div className='flex justify-center items-center gap-1'>
@@ -170,43 +159,6 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
-                      
-                      {/* Quantity Controls */}
-                      {/* <div className="flex items-center justify-between">
-                        <div className="flex items-center border rounded-lg h-8">
-                          <Button
-                            aria-label={t('decreaseQuantity')}
-                            onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                            data-testid={`cart-preview-decrease-${item.id}`}
-                          >
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                          <span className="text-sm font-semibold w-8 text-center">{item.quantity}</span>
-                          <Button
-                            aria-label={t('increaseQuantity')}
-                            onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                            data-testid={`cart-preview-increase-${item.id}`}
-                          >
-                            <Plus className="w-3 h-3" />
-                          </Button>
-                        </div>
-                        
-                        <Button
-                          onClick={() => setItemToRemove(item.id)}
-                          variant="ghost"
-                          size="sm"
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10 p-1 h-auto"
-                          data-testid={`cart-preview-remove-${item.id}`}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div> */}
                     </div>
                   </div>
                 ))}

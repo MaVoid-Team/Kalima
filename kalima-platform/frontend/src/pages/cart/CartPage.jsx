@@ -10,7 +10,7 @@ import LoadingSpinner from "@/components/ui/loading-spinner";
 
 export default function CartPage() {
   const navigate = useNavigate();
-  const { cart, loading, updateQuantity, removeFromCart, applyCoupon, removeCoupon, updateCartItemRequiredFields, updateCartItemRequiredFieldsImage } = useCart();
+   const { cart, loading, removeFromCart, applyCoupon, removeCoupon, updateCartItemRequiredFields, updateCartItemRequiredFieldsImage } = useCart();
   const [promoCode, setPromoCode] = useState("");
 
 
@@ -44,7 +44,6 @@ export default function CartPage() {
           <div className="lg:col-span-2">
             <CartItemsTable
               cartItems={cartItems}
-              updateQuantity={updateQuantity}
               removeFromCart={removeFromCart}
               applyCoupon={applyCoupon}
               removeCoupon={removeCoupon}

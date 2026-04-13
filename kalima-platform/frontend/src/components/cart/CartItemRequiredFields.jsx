@@ -34,35 +34,66 @@ export default function CartItemRequiredFields({
     const [highlightSave, setHighlightSave] = useState(false);
     const [highlightedFields, setHighlightedFields] = useState({});
 
+    // Use a ref to keep track of current fieldValues for the event listener 
+    // to safely perform side effects based on current state.
+    const fieldValuesRef = React.useRef(fieldValues);
+    useEffect(() => {
+        fieldValuesRef.current = fieldValues;
+    }, [fieldValues]);
+
     // Listen for cross-item field synchronization
     useEffect(() => {
         const handleSync = (e) => {
             const { fieldDefinitionId, value, imageFile, sourceItemId, onlyEmpty } = e.detail;
             if (sourceItemId === item.id) return;
 
-            // Check if this item has this field definition
-            const hasField = item.cart_item_required_fields.some(
-                rf => rf.field_definition_id === fieldDefinitionId
+            // Find the target field to verify it belongs to this item
+            const targetRf = item.cart_item_required_fields.find(
+                rf => Number(rf.field_definition_id) === Number(fieldDefinitionId)
             );
 
-            if (hasField) {
-                setFieldValues(prev => {
-                    const currentValue = prev[fieldDefinitionId];
-                    const isEmpty = !currentValue || (typeof currentValue === 'string' && currentValue.trim() === '') || currentValue === '+20';
+            if (targetRf) {
+                const id = targetRf.field_definition_id;
+                const isImage = targetRf.required_field_definitions.field_type === 'image';
 
-                    if (!onlyEmpty || isEmpty) {
-                        if (imageFile) {
-                            setImageFields(prevImgs => ({
-                                ...prevImgs,
-                                [fieldDefinitionId]: imageFile
-                            }));
+                // Check empty condition using the REF to avoid side-effects in setters
+                const currentValue = fieldValuesRef.current[id];
+                const isEmpty = isFieldEmpty(currentValue);
+                if (onlyEmpty && !isEmpty) return;
+
+                // Safely perform state updates independently
+                setFieldValues(prev => ({ ...prev, [id]: value }));
+
+                if (isImage) {
+                    setImageFields(prev => {
+                        const next = { ...prev };
+                        if (imageFile instanceof File) {
+                            next[id] = imageFile;
+                        } else {
+                            delete next[id];
                         }
-                        return {
-                            ...prev,
-                            [fieldDefinitionId]: value
-                        };
+                        return next;
+                    });
+
+                    if (typeof value === 'string' && value.trim() !== '' && !value.startsWith('blob:')) {
+                        setOriginalImages(prev => {
+                            if (prev[id]) return prev;
+                            return { ...prev, [id]: value };
+                        });
                     }
-                    return prev;
+
+                    setBrokenPreviews(prev => {
+                        const next = { ...prev };
+                        delete next[`${id}_new`];
+                        delete next[`${id}_old`];
+                        return next;
+                    });
+                }
+
+                setFileErrors(prev => {
+                    const next = { ...prev };
+                    delete next[id];
+                    return next;
                 });
             }
         };
@@ -106,13 +137,46 @@ export default function CartItemRequiredFields({
         }
     };
 
+    const syncAllFieldsToOthers = (onlyEmpty = false) => {
+        let itemsSynced = 0;
+        item.cart_item_required_fields.forEach(rf => {
+            const id = rf.field_definition_id;
+            const value = fieldValues[id];
+            const imageFile = imageFields[id];
+
+            if (!isFieldEmpty(value)) {
+                window.dispatchEvent(new CustomEvent('sync-cart-field-value', {
+                    detail: { fieldDefinitionId: id, value, imageFile, sourceItemId: item.id, onlyEmpty }
+                }));
+                itemsSynced++;
+            }
+        });
+
+        if (itemsSynced === 0) {
+            toast.error(t('noFieldsToSync', 'No fields have values to apply to others.'));
+            return;
+        }
+
+        if (onlyEmpty) {
+            toast.info(t('allFieldsSyncedEmpty', 'All non-empty fields applied to other empty fields.'));
+        } else {
+            toast.info(t('allFieldsSynced', 'All non-empty fields applied to all other items.'));
+        }
+    };
+
     // Track if any field differs from what's saved
     useEffect(() => {
         let dirty = false;
         if (item && item.cart_item_required_fields) {
             item.cart_item_required_fields.forEach(rf => {
                 if (rf.required_field_definitions.field_type === 'image') {
-                    if (imageFields[rf.field_definition_id] instanceof File) {
+                    const id = rf.field_definition_id;
+                    const currentValue = fieldValues[id];
+                    const savedValue = rf.value ? new URL(rf.value, baseURL).toString() : '';
+
+                    if (imageFields[id] instanceof File) {
+                        dirty = true;
+                    } else if (typeof currentValue === 'string' && currentValue.trim() !== '' && currentValue !== savedValue) {
                         dirty = true;
                     }
                 } else {
@@ -128,7 +192,7 @@ export default function CartItemRequiredFields({
             });
         }
         setIsDirty(dirty);
-    }, [fieldValues, imageFields, item]);
+    }, [fieldValues, imageFields, item, baseURL]);
 
     // Track missing fields
     useEffect(() => {
@@ -248,29 +312,46 @@ export default function CartItemRequiredFields({
         setImageFields(prev => ({ ...imgFields, ...prev }));
     }, [item, baseURL]);
 
+    const getFileFromUrl = async (url, defaultName) => {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Failed to fetch image from ${url}`);
+            const blob = await response.blob();
+            const filename = defaultName || url.split('/').pop().split('?')[0] || 'image';
+            return new File([blob], filename, { type: blob.type || 'application/octet-stream' });
+        } catch (error) {
+            console.error('Unable to convert image URL to file:', error);
+            return null;
+        }
+    };
+
     async function handleCartRequiredFieldsSubmit(e) {
         e.preventDefault();
         let hasError = false;
         const errors = {};
 
         item.cart_item_required_fields.forEach(rf => {
-            if (
-                rf.required_field_definitions.field_type === 'image' &&
-                rf.is_required &&
-                !(imageFields[rf.field_definition_id] instanceof File) &&
-                !originalImages[rf.field_definition_id]
-            ) {
-                hasError = true;
-                errors[rf.field_definition_id] = t('pleaseSelectFile', 'Please select a file');
+            const id = rf.field_definition_id;
+            const isImage = rf.required_field_definitions.field_type === 'image';
+
+            if (isImage && rf.is_required) {
+                const hasNewFile = imageFields[id] instanceof File || (imageFields[id] && imageFields[id].name);
+                const hasOriginal = !!originalImages[id];
+                const hasSyncedUrl = fieldValues[id] && typeof fieldValues[id] === 'string' && !fieldValues[id].startsWith('blob:');
+
+                if (!hasNewFile && !hasOriginal && !hasSyncedUrl) {
+                    hasError = true;
+                    errors[id] = t('pleaseSelectFile', 'Please select a file');
+                }
             } else if (rf.required_field_definitions.field_type === 'number') {
-                const val = fieldValues[rf.field_definition_id];
+                const val = fieldValues[id];
                 const rawVal = String(val || "").trim();
 
                 if (rf.is_required || (rawVal !== '' && rawVal !== '+' && rawVal !== '+2' && rawVal !== '+20')) {
                     const parsed = egyptPhoneSchema(t).safeParse(rawVal);
                     if (!parsed.success) {
                         hasError = true;
-                        errors[rf.field_definition_id] = t('invalidPhone', 'Invalid Egyptian mobile number');
+                        errors[id] = t('invalidPhone', 'Invalid Egyptian mobile number');
                     }
                 }
             }
@@ -284,26 +365,30 @@ export default function CartItemRequiredFields({
 
         setFileErrors({});
 
-        const activeImageFieldDefIds = [];
         const imagePromises = [];
         for (const rf of item.cart_item_required_fields) {
             if (rf.required_field_definitions.field_type === 'image') {
-                const file = imageFields[rf.field_definition_id];
+                const id = rf.field_definition_id;
+                let file = imageFields[id];
+
+                if (!(file instanceof File) && typeof fieldValues[id] === 'string' && fieldValues[id].trim() !== '') {
+                    file = await getFileFromUrl(fieldValues[id], `required-field-${id}`);
+                }
+
                 if (file instanceof File) {
-                    activeImageFieldDefIds.push(rf.field_definition_id);
                     const p = updateCartItemRequiredFieldsImage(
                         item.id,
-                        rf.field_definition_id,
+                        id,
                         file
                     ).then(() => {
-                        setImageFields(prev => ({ ...prev, [rf.field_definition_id]: null }));
+                        setImageFields(prev => ({ ...prev, [id]: null }));
                         setOriginalImages(prev => {
                             const copy = { ...prev };
-                            delete copy[rf.field_definition_id];
+                            delete copy[id];
                             return copy;
                         });
-                        setFieldValues(prev => ({ ...prev, [rf.field_definition_id]: '' }));
-                        const inputEl = document.getElementById(`file-${item.id}-${rf.field_definition_id}`);
+                        setFieldValues(prev => ({ ...prev, [id]: '' }));
+                        const inputEl = document.getElementById(`file-${item.id}-${id}`);
                         if (inputEl) inputEl.value = '';
                     }).catch(err => {
                         console.error('Required fields image update failed:', err);
@@ -364,7 +449,28 @@ export default function CartItemRequiredFields({
             >
                 <AccordionItem value="fields">
                     <AccordionTrigger className={"text-sm " + (item.required_fields_filled ? "text-success" : "text-primary")} data-testid={`cart-item-fields-accordion-${item.id}`}>
-                        {isOpen ? t('hideRequiredFields', 'Hide required fields') : t('viewRequiredFields', 'View required fields')}
+                        <div className="flex items-center justify-between w-full px-1">
+                            <span>{isOpen ? t('hideRequiredFields', 'Hide required fields') : t('viewRequiredFields', 'View required fields')}</span>
+                            <div className="flex items-center gap-2 me-4" onClick={e => e.stopPropagation()}>
+                                <button
+                                    type="button"
+                                    onClick={() => syncAllFieldsToOthers(true)}
+                                    className="text-[10px] text-primary flex items-center gap-1 hover:opacity-80 transition-opacity whitespace-nowrap"
+                                    title={t('applyAllToEmptyItems', 'Apply ALL fields to empty ones')}
+                                >
+                                    <Copy className="w-3 h-3" />
+                                    {t('applyAllToEmpty', 'All to Empty')}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => syncAllFieldsToOthers(false)}
+                                    className="text-[10px] text-muted-foreground flex items-center gap-1 hover:text-primary transition-colors border-s ps-2 whitespace-nowrap"
+                                    title={t('copyAllToAllItems', 'Overwrite ALL fields in similar items')}
+                                >
+                                    {t('applyAllToAll', 'All to All')}
+                                </button>
+                            </div>
+                        </div>
                     </AccordionTrigger>
                     <AccordionContent className="mt-2 space-y-2 p-2 border rounded overflow-x-hidden min-w-0 w-full box-border max-w-full">
                         <form onSubmit={handleCartRequiredFieldsSubmit} className='flex flex-col gap-2 w-full max-w-full overflow-x-hidden'>
@@ -485,11 +591,12 @@ export default function CartItemRequiredFields({
                                                     const originalUrl = originalImages[rf.field_definition_id];
                                                     const hasSelectedFile = !!(imageFields[rf.field_definition_id] instanceof File);
                                                     const selectedUrl = fieldValues[rf.field_definition_id];
+                                                    const isReplacingImage = originalUrl && selectedUrl && selectedUrl !== originalUrl;
 
                                                     const brokenOld = !!brokenPreviews[`${rf.field_definition_id}_old`];
                                                     const brokenNew = !!brokenPreviews[`${rf.field_definition_id}_new`];
 
-                                                    if (originalUrl && hasSelectedFile) {
+                                                    if (isReplacingImage) {
                                                         return (
                                                             <div className="mt-2 flex flex-wrap items-center gap-3 max-w-full min-w-0">
                                                                 <div className="w-20 h-20 overflow-hidden rounded bg-muted border shrink-0">
@@ -552,7 +659,6 @@ export default function CartItemRequiredFields({
                                     ) : rf?.required_field_definitions?.field_type === 'number' ? (
                                         <>
                                             <PhoneInput
-                                                dir="ltr"
                                                 value={fieldValues[rf.field_definition_id] || '+20'}
                                                 required={rf?.is_required}
                                                 onChange={e => {

@@ -133,11 +133,17 @@
   },
   "applyToAll": "To All",
   "applyToEmpty": "To Empty",
+  "applyAllToAll": "All to All",
+  "applyAllToEmpty": "All to Empty",
   "copyToAllItems": "Overwrite all similar fields in other items",
   "applyToEmptyItems": "Apply ONLY to empty similar fields in other items",
   "fieldSynced": "Value applied to all similar fields",
   "fieldSyncedEmpty": "Value applied to empty similar fields",
+  "allFieldsSynced": "All non-empty fields applied to all other items.",
+  "allFieldsSyncedEmpty": "All non-empty fields applied to empty similar fields.",
+  "noFieldsToSync": "No fields have values to apply to others.",
   "valueEmptySync": "Please enter a value before applying to others",
   "saveAllChanges": "Save all items",
-  "savingAll": "Saving all changes..."
+  "savingAll": "Saving all changes...",
+  "itemAlreadyInCart": "This item is already in your cart"
 }

@@ -14,12 +14,12 @@ export default function OrderItem({ item }) {
                     alt={item?.name}
                     className="w-16 h-16 rounded-lg object-cover border border-border"
                 />
-                <Badge
+                {/* <Badge
                     variant="secondary"
                     className="absolute -top-2 -end-0 w-5 h-5 flex items-center justify-center rounded-full p-0 text-xs"
                 >
                     {item?.quantity}
-                </Badge>
+                </Badge> */}
             </div>
 
             <div className="flex-1 min-w-0">
