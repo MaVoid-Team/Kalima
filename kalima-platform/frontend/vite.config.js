@@ -23,7 +23,13 @@ export default defineConfig({
           if (id.includes('firebase')) {
             return 'firebase-bundle';
           }
-          if (id.includes('framer-motion') || id.includes('lucide-react') || id.includes('lenis') || id.includes('radix-ui')) {
+          if (id.includes('@embedpdf') || id.includes('pdfjs-dist')) {
+            return 'pdf-viewer';
+          }
+          if (id.includes('libphonenumber-js') || id.includes('country-data-list') || id.includes('lodash') || id.includes('date-fns')) {
+            return 'heavy-utils';
+          }
+          if (id.includes('framer-motion') || id.includes('lucide-react') || id.includes('lenis') || id.includes('@radix-ui')) {
             return 'ui-frameworks';
           }
           if (id.includes('node_modules')) {
