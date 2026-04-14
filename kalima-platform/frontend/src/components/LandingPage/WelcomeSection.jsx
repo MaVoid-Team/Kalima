@@ -5,7 +5,7 @@ import { BookOpen, BriefcaseBusiness, CirclePlay, ShoppingBag } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-const HERO_IMAGE = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop";
+const HERO_IMAGE = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?fm=webp&q=60&w=800&auto=format&fit=crop";
 
 export default function WelcomeSection() {
   const { t, i18n } = useTranslation("landing");
