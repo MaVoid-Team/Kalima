@@ -15,13 +15,15 @@ export default function SettingsPage() {
     return (
         <div className="space-y-6" dir={isRtl ? 'rtl' : 'ltr'} data-testid="admin-settings-page">
             {/* Header */}
-            <div className="flex items-center gap-3">
-                <Settings className="h-8 w-8 text-primary" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div className="p-2 sm:p-3 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Settings className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                </div>
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">
+                    <h1 className="text-xl sm:text-3xl font-black tracking-tight text-foreground">
                         {t('settings.title')}
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-xs sm:text-base text-muted-foreground mt-0.5 sm:mt-1 font-medium">
                         {t('settings.description')}
                     </p>
                 </div>

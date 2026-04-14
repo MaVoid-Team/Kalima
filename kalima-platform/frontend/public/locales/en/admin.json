@@ -803,7 +803,9 @@
         "nameRequired": "Name is required",
         "emailInvalid": "Invalid email address",
         "invalidPhone": "Invalid Egyptian phone number"
-      }
+      },
+      "save": "Save",
+      "cancel": "Cancel"
     },
     "password": {
       "title": "Password Management",

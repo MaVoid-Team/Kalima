@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ShoppingCart, Eye, Zap, Clock, ShieldAlert } from "lucide-react";
+import { useState, useRef } from "react";
+import { ShoppingCart, Eye, Zap, Clock, ShieldAlert, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -12,6 +12,9 @@ import useRole from "@/hooks/useRole";
 
 import { buildWhatsAppLink } from "@/lib/whatsappUtils";
 import { FaWhatsapp } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+
 
 /**
  * ProductActions
@@ -43,6 +46,10 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
   const { startFastBuy, loading: fastBuyLoading } = useFastBuy();
 
   const formattedPrice = formatPrice(price);
+
+  // Draggable Sheet State
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const sheetRef = useRef(null);
 
   // Unconfirmed authenticated users can browse but cannot purchase
   const isPurchaseBlocked = isAuthenticated && !isConfirmed;
@@ -90,89 +97,175 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
         </div>
       )}
 
-      {/* Mobile Sticky Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 md:hidden border-t bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 shadow-lg">
-        <div className="p-3 space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex flex-col min-w-0">
-              <span className="text-[11px] text-muted-foreground leading-none">
-                {t("info.totalPrice")}
-              </span>
-              <span className="text-lg font-black truncate">
-                {formattedPrice} {t("info.currency")}
-              </span>
+      {/* Mobile Sticky Bar - Draggable Bottom Sheet */}
+      <AnimatePresence>
+        <motion.div
+          ref={sheetRef}
+          drag="y"
+          dragConstraints={{ top: 0, bottom: 260 }}
+          dragElastic={0.15}
+          onDragEnd={(_, info) => {
+            // If dragging down fast or past 100px, collapse it
+            if (info.offset.y > 100 || info.velocity.y > 50) {
+              setIsCollapsed(true);
+            } else if (info.offset.y < -50 || info.velocity.y < -50) {
+              setIsCollapsed(false);
+            }
+          }}
+          initial={{ y: 300 }}
+          animate={isCollapsed ? { y: 260 } : { y: 0 }}
+          exit={{ y: 300 }}
+          transition={{
+            type: "spring",
+            damping: 30,
+            stiffness: 300,
+            duration: 0.6
+          }}
+          style={{ touchAction: "none" }} // Prevents browser pull-to-refresh
+          className={cn(
+            "fixed bottom-0 left-0 right-0 z-40 md:hidden",
+            "flex flex-col bg-background/80 backdrop-blur-3xl border-t border-border/40 shadow-[0_-15px_40px_rgba(0,0,0,0.1)] rounded-t-[2.5rem] pb-safe",
+            "select-none cursor-default active:cursor-grabbing"
+          )}
+        >
+          {/* Visual Handle Area */}
+          <div
+            className="flex flex-col items-center py-4 w-full cursor-grab active:cursor-grabbing group"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            <div className="h-1.5 w-14 rounded-full bg-border/60 group-hover:bg-border/80 transition-colors mb-2" />
+
+            {/* Contextual Label if collapsed */}
+            {isCollapsed && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex items-center gap-2 mb-2"
+              >
+                <ChevronUp className="h-4 w-4 text-primary animate-bounce" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary">
+                  {t("actions.viewOptions", "View Options")}
+                </span>
+                <span className="text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded ml-1">
+                  {formattedPrice}{t("info.currency")}
+                </span>
+              </motion.div>
+            )}
+            {!isCollapsed && (
+              <div className="h-4" /> // Spacer to match collapsed height
+            )}
+          </div>
+
+          {/* Main Actions Container */}
+          <div className="px-6 pb-6 pt-2 space-y-6 overflow-hidden">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60 leading-none mb-1.5 px-0.5">
+                  {t("info.totalPrice")}
+                </span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-3xl font-black text-foreground tracking-tight">
+                    {formattedPrice}
+                  </span>
+                  <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                    {t("info.currency")}
+                  </span>
+                </div>
+              </div>
+
+              {!isReleased && (
+                <div className="bg-amber-500/10 text-amber-500 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 border border-amber-500/20">
+                  <Clock className="h-3 w-3" />
+                  {t("badges.comingSoon", "Coming Soon")}
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                size="lg"
+                className="h-14 rounded-2xl gap-1.5 font-bold shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 transition-all active:scale-95 px-2"
+                disabled={loading || !isReleased || isPurchaseBlocked}
+                onClick={handleAddToCart}
+                data-testid="product-actions-mobile-add-cart-button"
+              >
+                {loading ? (
+                  <LoadingSpinner className="h-5 w-5 border-white" />
+                ) : (
+                  <>
+                    <ShoppingCart className="h-4 w-4 shrink-0" />
+                    <span className="text-[12px] leading-none tracking-tight">{t("actions.addToCart")}</span>
+                  </>
+                )}
+              </Button>
+
+              <Button
+                variant="secondary"
+                size="lg"
+                className="h-14 rounded-2xl gap-1.5 font-bold bg-secondary/80 backdrop-blur-md border border-border/40 transition-all active:scale-95 shadow-lg shadow-black/5 px-2"
+                onClick={handleBuyNow}
+                disabled={fastBuyLoading || !isReleased || isPurchaseBlocked}
+                data-testid="product-actions-mobile-buy-now-button"
+              >
+                {fastBuyLoading ? (
+                  <LoadingSpinner className="h-5 w-5" />
+                ) : (
+                  <>
+                    <Zap className="h-4 w-4 shrink-0 fill-current" />
+                    <span className="text-[12px] leading-none tracking-tight">{t("actions.buyNow")}</span>
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {(sampleId || sampleUrl) && (
+                <Button
+                  variant="ghost"
+                  className="h-12 rounded-xl border border-border/40 bg-muted/30 hover:bg-muted/50 gap-1.5 transition-all active:scale-95 px-2"
+                  size="sm"
+                  asChild
+                  data-testid="product-actions-mobile-view-sample-button"
+                >
+                  {sampleId ? (
+                    <Link to={`/samples/${sampleId}`} state={{ cameFromAdmin: false }}>
+                      <Eye className="h-4 w-4 shrink-0" />
+                      <span className="text-[10px] font-black uppercase tracking-wider truncate">{t("actions.viewSample")}</span>
+                    </Link>
+                  ) : (
+                    <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
+                      <Eye className="h-4 w-4 shrink-0" />
+                      <span className="text-[10px] font-black uppercase tracking-wider truncate">{t("actions.viewSample")}</span>
+                    </a>
+                  )}
+                </Button>
+              )}
+
+              <Button
+                variant="ghost"
+                className={cn(
+                  "h-12 rounded-xl border border-success/20 bg-success/5 text-success hover:bg-success/10 gap-1.5 transition-all active:scale-95 px-2",
+                  !(sampleId || sampleUrl) && "col-span-2"
+                )}
+                size="sm"
+                asChild
+              >
+                <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
+                  <FaWhatsapp className="h-4 w-4 shrink-0" />
+                  <span className="text-[10px] font-black uppercase tracking-wider truncate">
+                    <span className="hidden min-[420px]:inline">
+                      {t("actions.contactWhatsAppLong", "Message Admin on WhatsApp")}
+                    </span>
+                    <span className="min-[420px]:hidden">
+                      {t("actions.contactWhatsAppShort", "Message")}
+                    </span>
+                  </span>
+                </a>
+              </Button>
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              className="h-11 gap-2"
-              disabled={loading || !isReleased || isPurchaseBlocked}
-              onClick={handleAddToCart}
-              data-testid="product-actions-mobile-add-cart-button"
-            >
-              {loading ? (
-                <LoadingSpinner className="h-5 w-5 border-white" />
-              ) : !isReleased ? (
-                <>
-                  <Clock className="h-5 w-5" />
-                  <span>{t("badges.comingSoon", "Coming Soon")}</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="h-5 w-5" />
-                  <span>{t("actions.addToCart")}</span>
-                </>
-              )}
-            </Button>
-
-            <Button
-              variant="secondary"
-              className="h-11 gap-2"
-              onClick={handleBuyNow}
-              disabled={fastBuyLoading || !isReleased || isPurchaseBlocked}
-              data-testid="product-actions-mobile-buy-now-button"
-            >
-              {fastBuyLoading ? (
-                <LoadingSpinner className="h-5 w-5" />
-              ) : !isReleased ? (
-                 <>
-                   <Clock className="h-4 w-4" />
-                   <span>{t("badges.comingSoon", "Coming Soon")}</span>
-                 </>
-              ) : (
-                <>
-                  <Zap className="h-4 w-4" />
-                  <span>{t("actions.buyNow")}</span>
-                </>
-              )}
-            </Button>
-          </div>
-
-          {(sampleId || sampleUrl) && (
-            <Button variant="outline" className="w-full h-10" size="sm" asChild data-testid="product-actions-mobile-view-sample-button">
-              {sampleId ? (
-                <Link to={`/samples/${sampleId}`} state={{ cameFromAdmin: false }}>
-                  <Eye className="h-4 w-4" />
-                  <span className="ms-2">{t("actions.viewSample")}</span>
-                </Link>
-              ) : (
-                <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
-                  <Eye className="h-4 w-4" />
-                  <span className="ms-2">{t("actions.viewSample")}</span>
-                </a>
-              )}
-            </Button>
-          )}
-
-          <Button variant="outline" className="w-full h-10 border-success/30 text-success hover:bg-success/5 gap-2" size="sm" asChild>
-            <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-              <FaWhatsapp className="h-4 w-4" />
-              <span>{t("actions.contactWhatsApp", "Message us")}</span>
-            </a>
-          </Button>
-        </div>
-      </div>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Desktop Layout */}
       <div className="hidden md:flex flex-col gap-4">
@@ -206,10 +299,10 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
             {loading ? (
               <LoadingSpinner className="h-5 w-5 border-white" />
             ) : !isReleased ? (
-                <>
-                  <Clock className="h-5 w-5" />
-                  {t("badges.comingSoon", "Coming Soon")}
-                </>
+              <>
+                <Clock className="h-5 w-5" />
+                {t("badges.comingSoon", "Coming Soon")}
+              </>
             ) : (
               <>
                 <ShoppingCart className="h-5 w-5" />
@@ -268,7 +361,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
         >
           <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
             <FaWhatsapp className="h-4 w-4" />
-            {t("actions.contactWhatsApp", "Message Admin on WhatsApp")}
+            {t("actions.contactWhatsAppLong", "Message Admin on WhatsApp")}
           </a>
         </Button>
       </div >

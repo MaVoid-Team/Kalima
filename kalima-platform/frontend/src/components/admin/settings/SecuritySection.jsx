@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Mail, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
-
+import { Mail, CheckCircle, AlertCircle, RefreshCw, AlertTriangle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +10,6 @@ import useEmailVerification from '@/hooks/auth/useEmailVerification';
 import useAuth from '@/hooks/auth/useAuth';
 import useDeleteAccount from '@/hooks/auth/useDeleteAccount';
 import ConfirmDeleteAccountDialog from './ConfirmDeleteAccountDialog';
-import { AlertTriangle } from 'lucide-react';
 
 export default function SecuritySection({ ns = 'admin' }) {
     const { t, i18n } = useTranslation(ns);
@@ -89,27 +88,32 @@ export default function SecuritySection({ ns = 'admin' }) {
                 <div className="space-y-4">
                     <h3 className="text-sm font-medium">{t('settings.email.verificationStatus')}</h3>
                     
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center gap-3">
-                            {isEmailVerified ? (
-                                <CheckCircle className={"h-5 w-5 text-green-600" + (i18n.language=="ar" ? ' scale-x-[-1]' : '')} />
-                            ) : (
-                                <AlertCircle className={"h-5 w-5 text-amber-600" + (i18n.language=="ar" ? ' scale-x-[-1]' : '')} />
-                            )}
-                            <div>
-                                <p className="font-medium">
-                                    {isEmailVerified 
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-2xl bg-muted/20 gap-4">
+                        <div className="flex items-center gap-4 min-w-0">
+                            <div className={cn(
+                                "h-10 w-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm border",
+                                isEmailVerified ? "bg-green-500/10 border-green-500/20" : "bg-amber-500/10 border-amber-500/20"
+                            )}>
+                                {isEmailVerified ? (
+                                    <CheckCircle className={cn("h-5 w-5 text-green-600", i18n.language === "ar" && 'scale-x-[-1]')} />
+                                ) : (
+                                    <AlertCircle className={cn("h-5 w-5 text-amber-600", i18n.language === "ar" && 'scale-x-[-1]')} />
+                                )}
+                            </div>
+                            <div className="min-w-0">
+                                <p className="font-bold text-sm text-foreground mb-0.5">
+                                    {isEmailVerified
                                         ? t('settings.email.verified', 'Email Verified')
                                         : t('settings.email.notVerified', 'Email Not Verified')
                                     }
                                 </p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-xs text-muted-foreground truncate max-w-[200px] sm:max-w-none" title={user?.email}>
                                     {user?.email}
                                 </p>
                             </div>
                         </div>
-                        <Badge variant={isEmailVerified ? "default" : "secondary"}>
-                            {isEmailVerified 
+                        <Badge variant={isEmailVerified ? "default" : "secondary"} className="rounded-lg px-2 py-0.5 font-bold text-[10px] uppercase tracking-wider self-end sm:self-auto">
+                            {isEmailVerified
                                 ? t('settings.email.verified', 'Verified')
                                 : t('settings.email.pending', 'Pending')
                             }

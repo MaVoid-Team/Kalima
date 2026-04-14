@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Globe, ShoppingCart, FileText } from "lucide-react";
+import { Menu, X, Globe, ShoppingCart, ShoppingBag, FileText } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -68,6 +68,20 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+      document.documentElement.style.overflow = "unset";
+    };
+  }, [isMenuOpen]);
+
+  useEffect(() => {
     if (!open) return;
 
     const routeValues = ["/market"];
@@ -98,9 +112,10 @@ export default function Navbar() {
   };
 
   const NAV_LINKS = [
-    { label: t("navbar.market"), href: "/market" },
-  ].filter(link => {
-    if (link.href === "/market" && isStudentOrParent) return false;
+    { label: t("navbar.market"), href: "/market", icon: ShoppingCart },
+    { label: t("navbar.samples"), href: "/samples", icon: FileText }
+  ].filter(() => {
+    if (isStudentOrParent) return false;
     return true;
   });
 
@@ -108,7 +123,7 @@ export default function Navbar() {
   return (
     <>
       <div className={cn(
-        "fixed inset-x-0 z-50 flex justify-center pointer-events-none transition-all duration-700",
+        "fixed inset-x-0 z-[70] flex justify-center pointer-events-none transition-all duration-700",
         (scrolled && !isMobile) ? "top-4 px-4" : "top-0"
       )}>
         <motion.header
@@ -117,12 +132,12 @@ export default function Navbar() {
             width: (scrolled && !isMobile) ? "min(1200px, 95vw)" : "100%",
             height: (scrolled && !isMobile) ? 64 : (isMobile ? 64 : 80),
             borderRadius: (scrolled && !isMobile) ? 32 : 0,
-            backgroundColor: scrolled 
-              ? "color-mix(in oklch, var(--background), transparent 30%)" 
+            backgroundColor: scrolled
+              ? "color-mix(in oklch, var(--background), transparent 30%)"
               : "color-mix(in oklch, var(--background), transparent 100%)",
             backdropFilter: scrolled ? "blur(24px)" : "blur(0px)",
-            border: (scrolled && !isMobile) 
-              ? "1px solid color-mix(in oklch, var(--primary), transparent 80%)" 
+            border: (scrolled && !isMobile)
+              ? "1px solid color-mix(in oklch, var(--primary), transparent 80%)"
               : "0px solid transparent",
             borderBottom: (!scrolled || isMobile)
               ? "1px solid color-mix(in oklch, var(--border), transparent 60%)"
@@ -164,8 +179,8 @@ export default function Navbar() {
                   </Button>
                 )}
                 {!isStudentOrParent && (
-                  <Button 
-                    variant='secondary' 
+                  <Button
+                    variant='secondary'
                     onClick={() => navigate("/samples")}
                     className="h-9 px-4"
                   >
@@ -173,7 +188,7 @@ export default function Navbar() {
                     {t("navbar.samples")}
                   </Button>
                 )}
-                
+
                 {/* Language Toggle */}
                 <Button
                   variant="ghost"
@@ -194,7 +209,7 @@ export default function Navbar() {
                     className="relative hover:bg-primary/10 hover:text-primary h-9 w-9"
                     title={t("navbar.cartToggle")}
                   >
-                    <ShoppingCart className="h-5 w-5" />
+                    <ShoppingBag className="h-5 w-5" />
                     <span className={cn(
                       "absolute -top-1 w-5 h-5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center z-10",
                       i18n.language === 'ar' ? 'left-0' : 'right-0'
@@ -267,7 +282,7 @@ export default function Navbar() {
 
             {/* Mobile Actions */}
             <div className="flex items-center gap-2 md:hidden">
-              {isAuthenticated && !hasAdminAccess && !isTeacher && !isStudentOrParent && (
+              {isAuthenticated && !hasAdminAccess && !isStudentOrParent && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -275,7 +290,7 @@ export default function Navbar() {
                   className="relative hover:bg-primary/10 hover:text-primary h-9 w-9"
                   title={t("navbar.cartToggle")}
                 >
-                  <ShoppingCart className="h-5 w-5" />
+                  <ShoppingBag className="h-5 w-5" />
                   <span className={cn(
                     "absolute -top-1 w-5 h-5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center z-10",
                     i18n.language === 'ar' ? 'left-0' : 'right-0'
@@ -307,123 +322,216 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      <div
-        className={`md:hidden fixed inset-x-0 top-16 bottom-0 z-40 bg-background border-t border-border p-6 transition-all duration-300 ease-in-out ${isMenuOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-4 pointer-events-none"}`}
-      >
-        <nav className="flex flex-col gap-4 overflow-y-auto pb-8 h-full">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.label}
-              to={link.href}
-              className="text-lg font-medium text-foreground hover:text-primary transition-colors px-2 py-2 border-b border-border/50"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="md:hidden fixed inset-x-0 top-16 bottom-0 z-[60] bg-background/95 backdrop-blur-2xl border-t border-border overflow-hidden"
+          >
+            <nav className="flex flex-col h-full p-6 md:p-8 overflow-y-auto overscroll-contain">
+              <div className="flex flex-col gap-6">
+                {NAV_LINKS.length > 0 && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-2 px-2">
+                      {t("navbar.navigation", "Navigation")}
+                    </span>
+                    {NAV_LINKS.map((link, idx) => {
+                      const Icon = link.icon;
+                      return (
+                        <motion.div
+                          key={link.label}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.1 + idx * 0.05 }}
+                        >
+                          <Link
+                            to={link.href}
+                            className={cn(
+                              "group flex items-center gap-4 text-xl font-bold p-3 rounded-2xl transition-all duration-300",
+                              location.pathname === link.href
+                                ? "bg-primary/10 text-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)]"
+                                : "text-foreground hover:bg-muted/50"
+                            )}
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <div className={cn(
+                              "h-12 w-12 rounded-xl flex items-center justify-center transition-all duration-300",
+                              location.pathname === link.href
+                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                                : "bg-muted group-hover:bg-primary/10 group-hover:text-primary"
+                            )}>
+                              <Icon className="h-6 w-6" />
+                            </div>
+                            <span className="flex-1">{link.label}</span>
+                            <div className="h-1.5 w-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </Link>
+                        </motion.div>
+                      );
+                    })}
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between px-2 py-2 border-b border-border/50">
-              <span className="text-base font-medium text-muted-foreground">{t("navbar.languageToggle")}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleLanguage}
-                className="gap-2"
+                    {/* Add Cart Link for Mobile Menu
+                    {isAuthenticated && !hasAdminAccess && !isStudentOrParent && (
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 + NAV_LINKS.length * 0.05 }}
+                      >
+                        <button
+                          className="group flex items-center gap-4 w-full text-xl font-bold p-3 rounded-2xl text-foreground hover:bg-muted/50 transition-all duration-300"
+                          onClick={toggleCartModal}
+                        >
+                          <div className="h-12 w-12 rounded-xl bg-muted group-hover:bg-primary/10 group-hover:text-primary flex items-center justify-center transition-all duration-300 relative">
+                            <ShoppingCart className="h-6 w-6" />
+                            {cart.cart_items.length > 0 && (
+                              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-background shadow-sm">
+                                {cart.cart_items.length}
+                              </span>
+                            )}
+                          </div>
+                          <span className="flex-1 text-left rtl:text-right">
+                             {t("navbar.cartToggle", "Cart")}
+                          </span>
+                          <div className="h-1.5 w-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                      </motion.div>
+                    )} */}
+                  </div>
+                )}
+
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.25 }}
+                  className="h-px bg-linear-to-r from-border/0 via-border to-border/0"
+                />
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex items-center justify-between bg-muted/30 p-4 rounded-2xl border border-border/40"
+                >
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold text-foreground">
+                      {t("navbar.language", "Language")}
+                    </span>
+                    <span className="text-xs text-muted-foreground uppercase">
+                      {i18n.language === 'ar' ? 'العربية' : 'English'}
+                    </span>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={toggleLanguage}
+                    className="gap-2 rounded-xl px-4 h-10 border border-border/40 shadow-xs"
+                  >
+                    <Globe className="h-4 w-4" />
+                    <span className="font-bold tracking-wider text-[10px]">
+                      {i18n.language === 'ar' ? 'English' : 'العربية'}
+                    </span>
+                  </Button>
+                </motion.div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="mt-auto flex flex-col gap-3 pb-8"
               >
-                <Globe className="h-5 w-5" />
-                <span className="uppercase">{i18n.language}</span>
-              </Button>
-            </div>
-
-            <div className="flex flex-col gap-3 pt-4">
-              {isAuthenticated ? (
-                <>
-                  {hasAdminAccess && (
+                {isAuthenticated ? (
+                  <>
+                    <div className="grid grid-cols-1 gap-3">
+                      {hasAdminAccess && (
+                        <Button
+                          variant="default"
+                          className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
+                          onClick={() => setIsMenuOpen(false)}
+                          asChild
+                        >
+                          <Link to="/admin">{t("navbar.dashboard")}</Link>
+                        </Button>
+                      )}
+                      {!hasAdminAccess && isTeacher && (
+                        <Button
+                          variant="default"
+                          className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
+                          onClick={() => setIsMenuOpen(false)}
+                          asChild
+                        >
+                          <Link to="/teacher/profile">{t("navbar.teacherPortal")}</Link>
+                        </Button>
+                      )}
+                      {!hasAdminAccess && !isTeacher && isStudent && (
+                        <Button
+                          variant="default"
+                          className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
+                          onClick={() => setIsMenuOpen(false)}
+                          asChild
+                        >
+                          <Link to="/student/profile">{t("navbar.studentPortal")}</Link>
+                        </Button>
+                      )}
+                      {!hasAdminAccess && !isTeacher && !isStudent && isParent && (
+                        <Button
+                          variant="default"
+                          className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
+                          onClick={() => setIsMenuOpen(false)}
+                          asChild
+                        >
+                          <Link to="/parent/profile">{t("navbar.parentPortal")}</Link>
+                        </Button>
+                      )}
+                      {!hasAdminAccess && !isTeacher && !isStudent && !isParent && (
+                        <Button
+                          variant="default"
+                          className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
+                          onClick={() => setIsMenuOpen(false)}
+                          asChild
+                        >
+                          <Link to="/orders">{t("navbar.myOrders")}</Link>
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        className="w-full font-bold justify-center h-14 text-base text-destructive hover:text-destructive hover:bg-destructive/10 rounded-2xl transition-colors mt-2"
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          logout();
+                        }}
+                      >
+                        {t("navbar.logout", "Log out")}
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col gap-3">
                     <Button
-                      variant="default"
-                      className="w-full font-bold justify-center h-12 text-base"
+                      variant="outline"
+                      className="w-full font-bold justify-center h-14 text-base rounded-2xl border-border/60"
                       onClick={() => setIsMenuOpen(false)}
                       asChild
                     >
-                      <Link to="/admin">{t("navbar.dashboard")}</Link>
+                      <Link to="/login" state={{ from: location }} replace>{t("navbar.login")}</Link>
                     </Button>
-                  )}
-                  {!hasAdminAccess && isTeacher && (
                     <Button
                       variant="default"
-                      className="w-full font-bold justify-center h-12 text-base"
+                      className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
                       onClick={() => setIsMenuOpen(false)}
                       asChild
                     >
-                      <Link to="/teacher/profile">{t("navbar.teacherPortal")}</Link>
+                      <Link to="/signup" state={{ from: location }}>{t("navbar.signup")}</Link>
                     </Button>
-                  )}
-                  {!hasAdminAccess && !isTeacher && isStudent && (
-                    <Button
-                      variant="default"
-                      className="w-full font-bold justify-center h-12 text-base"
-                      onClick={() => setIsMenuOpen(false)}
-                      asChild
-                    >
-                      <Link to="/student/profile">{t("navbar.studentPortal")}</Link>
-                    </Button>
-                  )}
-                  {!hasAdminAccess && !isTeacher && !isStudent && isParent && (
-                    <Button
-                      variant="default"
-                      className="w-full font-bold justify-center h-12 text-base"
-                      onClick={() => setIsMenuOpen(false)}
-                      asChild
-                    >
-                      <Link to="/parent/profile">{t("navbar.parentPortal")}</Link>
-                    </Button>
-                  )}
-                  {!hasAdminAccess && !isTeacher && !isStudent && !isParent && (
-                    <Button
-                      variant="default"
-                      className="w-full font-bold justify-center h-12 text-base"
-                      onClick={() => setIsMenuOpen(false)}
-                      asChild
-                    >
-                      <Link to="/orders">{t("navbar.myOrders")}</Link>
-                    </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    className="w-full font-bold justify-center h-12 text-base text-destructive hover:text-destructive/90 hover:bg-destructive/10 border-destructive/20 mt-2"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      logout();
-                    }}
-                  >
-                    {t("navbar.logout", "Log out")}
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    variant="outline"
-                    className="w-full font-bold justify-center h-12 text-base"
-                    onClick={() => setIsMenuOpen(false)}
-                    asChild
-                  >
-                    <Link to="/login" state={{ from: location }} replace>{t("navbar.login")}</Link>
-                  </Button>
-                  <Button
-                    variant="default"
-                    className="w-full font-bold justify-center h-12 text-base"
-                    onClick={() => setIsMenuOpen(false)}
-                    asChild
-                  >
-                    <Link to="/signup" state={{ from: location }}>{t("navbar.signup")}</Link>
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
-        </nav>
-      </div>
+                  </div>
+                )}
+              </motion.div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
 
       <CommandDialog

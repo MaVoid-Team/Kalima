@@ -19,5 +19,7 @@
         "male": "Male",
         "female": "Female"
     },
+    "save": "Save",
+    "cancel": "Cancel",
     "enterNumber": "Enter number"
 }
