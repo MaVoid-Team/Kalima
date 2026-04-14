@@ -97,6 +97,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
                 <AnimatePresence>
                   {hasDiscount && (
                     <motion.div
+                      key="discount-badge"
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -10 }}
@@ -108,6 +109,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
                   )}
                   {!is_released && release_at && (
                     <motion.div
+                      key="release-badge"
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       delay={0.1}

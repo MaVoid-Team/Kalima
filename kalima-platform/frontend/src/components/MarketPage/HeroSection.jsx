@@ -55,7 +55,7 @@ export default function HeroSection({ onSearch }) {
 
       <motion.p
         variants={itemVariants}
-        className="text-muted-foreground text-base md:text-xl max-w-2xl mb-6 md:mb-8 font-light text-balance px-4"
+        className="hidden md:block text-muted-foreground text-base md:text-xl max-w-2xl mb-6 md:mb-8 font-light text-balance px-4"
       >
         {t("hero.subtitle")}
       </motion.p>
