@@ -7,6 +7,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { useNavigate } from "react-router-dom";
 import useRole from "@/hooks/useRole";
+import { cn } from "@/lib/utils";
 
 export default function MarketPage() {
   const { t } = useTranslation("market");
