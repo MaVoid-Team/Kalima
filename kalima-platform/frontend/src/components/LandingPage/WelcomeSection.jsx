@@ -29,13 +29,9 @@ export default function WelcomeSection() {
   ];
 
   return (
-    <motion.section
+    <section
       className="relative overflow-hidden bg-transparent pt-10 pb-10 md:pb-16 will-change-transform"
       data-testid="landing-page-hero-section"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
     >
       <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-primary/10 via-transparent to-transparent" />
       <div className="container relative z-10 mx-auto px-4 md:px-10">
@@ -81,11 +77,7 @@ export default function WelcomeSection() {
             </motion.div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.35 }}
-            transition={{ duration: 0.5, delay: 0.12 }}
+          <div
             className="relative"
           >
             <img src={HERO_IMAGE} alt={t("landingPage.hero.title")} fetchPriority="high" width="800" height="460" className="h-[460px] w-full rounded-3xl object-cover shadow-2xl" />
@@ -115,9 +107,9 @@ export default function WelcomeSection() {
                 ))}
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
