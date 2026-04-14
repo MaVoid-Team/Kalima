@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { CheckCheck, ShoppingCart, Zap, Clock, Info } from "lucide-react";
+import { CheckCheck, ShoppingBag, Zap, Clock, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +31,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   try {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     cartCtx = useCart();
-  } catch (_) {}
+  } catch (_) { }
 
   const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
 
@@ -42,7 +42,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   const cartLoading = cartCtx?.loading ?? false;
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
-  
+
   const fallbackTimeUntilReleaseMs = release_at ? Math.max(new Date(release_at).getTime() - Date.now(), 0) : 0;
   const countdownText = formatTimeUntilRelease(
     Number.isFinite(Number(time_until_release_ms)) ? time_until_release_ms : fallbackTimeUntilReleaseMs,
@@ -76,7 +76,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="group flex flex-col h-full perspective-1000"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -84,9 +84,9 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
       transition={{ duration: 0.5 }}
       data-testid={`market-product-card-${id}`}
     >
-      <Link 
-        to={`/product/${id}`} 
-        className="block flex-1 mb-3" 
+      <Link
+        to={`/product/${id}`}
+        className="block flex-1 mb-3"
         data-testid={`market-product-card-${id}-link`}
       >
         <Card className="h-full border border-border/40 bg-card/50 backdrop-blur-xs shadow-xs group-hover:shadow-md group-hover:border-primary/20 transition-all duration-500 rounded-3xl overflow-hidden flex flex-col p-0 gap-0">
@@ -141,12 +141,12 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
               />
               <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
-            
+
             {/* Floating Info on Hover */}
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
-               <div className="bg-white/10 backdrop-blur-md border border-white/20 p-2 rounded-full shadow-2xl">
-                  <Info className="w-5 h-5 text-white" />
-               </div>
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 p-2 rounded-full shadow-2xl">
+                <Info className="w-5 h-5 text-white" />
+              </div>
             </div>
           </CardContent>
 
@@ -197,7 +197,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
               <Clock className="h-4 w-4" />
             ) : (
               <div className="flex items-center justify-center gap-1.5">
-                <ShoppingCart className="h-4 w-4" />
+                <ShoppingBag className="h-4 w-4" />
                 <span className="text-xs font-bold hidden sm:block">{t("product.addToCart", "Add")}</span>
               </div>
             )}

@@ -92,16 +92,18 @@ export default function AccountSection({ ns = 'admin' }) {
                                 return (
                                     <div
                                         key={index}
-                                        className="flex items-center justify-between p-3 border rounded-lg"
+                                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-2xl bg-muted/20 gap-4"
                                     >
-                                        <div className="flex items-center gap-3">
-                                            {typeof IconComponent === 'function' ? (
-                                                <IconComponent className="h-5 w-5" />
-                                            ) : (
-                                                <IconComponent className="h-5 w-5" />
-                                            )}
-                                            <div>
-                                                <p className="font-medium">
+                                        <div className="flex items-center gap-4 min-w-0">
+                                            <div className="h-10 w-10 rounded-xl bg-background flex items-center justify-center shrink-0 shadow-sm border border-border/40">
+                                                {typeof IconComponent === 'function' ? (
+                                                    <IconComponent className="h-5 w-5" />
+                                                ) : (
+                                                    <IconComponent className="h-5 w-5" />
+                                                )}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="font-bold text-sm text-foreground">
                                                     {provider.provider === 'local'
                                                         ? t('settings.account.providers.local', 'Email Account')
                                                         : ['firebase', 'google'].includes(provider.provider)
@@ -109,23 +111,24 @@ export default function AccountSection({ ns = 'admin' }) {
                                                             : t(`settings.account.providers.${provider.provider}`, provider.provider)
                                                     }
                                                 </p>
-                                                <p className="text-sm text-muted-foreground">
+                                                <p className="text-xs text-muted-foreground truncate max-w-[180px] sm:max-w-none" title={provider.providerEmail}>
                                                     {provider.providerEmail}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Badge variant="secondary" className="capitalize">
+                                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                                            <Badge variant="secondary" className="rounded-lg px-2 py-0.5 font-bold text-[10px] uppercase tracking-wider bg-background/50">
                                                 {t('settings.account.connected', 'Connected')}
                                             </Badge>
                                             {linkedProviders.length > 1 && (
                                                 <Button
-                                                    variant="outline"
+                                                    variant="ghost"
                                                     size="sm"
                                                     onClick={() => handleUnlinkProvider(provider)}
                                                     disabled={loading}
+                                                    className="h-8 rounded-lg font-bold text-[10px] uppercase tracking-wider text-destructive hover:text-destructive hover:bg-destructive/10 border-transparent ml-auto"
                                                 >
-                                                    <Unlink className="h-4 w-4 mr-1" />
+                                                    <Unlink className="h-3.5 w-3.5 mr-1.5" />
                                                     {t('settings.account.unlink', 'Unlink')}
                                                 </Button>
                                             )}

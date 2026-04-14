@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import { Minus, Plus, TicketCheck, TicketPlus, Trash } from 'lucide-react';
+import { useState } from 'react';
+import { TicketCheck, TicketPlus, Trash } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import CartItemRequiredFields from './CartItemRequiredFields';
 
 export default function CartItem({
@@ -30,12 +29,12 @@ export default function CartItem({
             <div className="flex flex-col sm:flex-row gap-6">
                 {/* Product Thumbnail */}
                 <div className="w-24 h-24 shrink-0 rounded-2xl overflow-hidden bg-white border border-border/50 shadow-xs relative">
-                    <img 
+                    <img
                         src={item?.products?.thumbnail_image?.url
                             ? new URL(item.products.thumbnail_image.url, baseURL).toString()
-                            : 'https://via.placeholder.com/150'} 
-                        alt={item?.products?.title} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                            : 'https://via.placeholder.com/150'}
+                        alt={item?.products?.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                 </div>
 
@@ -55,26 +54,26 @@ export default function CartItem({
                         </p>
                     </div>
 
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+                    <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
                         {/* Coupon Section */}
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-[120px]">
                             {item.coupons ? (
-                                <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-2 bg-success/10 text-success px-3 py-1 rounded-full border border-success/20">
-                                        <TicketCheck className="w-4 h-4" />
+                                <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 bg-success/10 text-success px-3 py-1.5 rounded-full border border-success/20">
+                                        <TicketCheck className="w-4 h-4 shrink-0" />
                                         <span className="text-xs font-bold uppercase tracking-wider">{item?.coupons?.code}</span>
-                                        <div className="w-px h-3 bg-success/20 mx-1" />
-                                        <span className="text-xs font-bold">
-                                            {item?.coupons?.discount_percentage !== 0 
-                                                ? `-${item?.coupons?.discount_percentage}%` 
+                                        <div className="w-px h-3 bg-success/20 mx-0.5" />
+                                        <span className="text-xs font-bold whitespace-nowrap">
+                                            {item?.coupons?.discount_percentage !== 0
+                                                ? `-${item?.coupons?.discount_percentage}%`
                                                 : `-${item?.coupons?.discount_amount} ${t('L.E')}`}
                                         </span>
                                     </div>
-                                    <Button 
-                                        size="icon" 
-                                        variant="ghost" 
-                                        className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive text-muted-foreground/60"
-                                        onClick={() => removeCoupon(item.id)} 
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive text-muted-foreground/60 shrink-0"
+                                        onClick={() => removeCoupon(item.id)}
                                         data-testid={`cart-item-remove-coupon-${item.id}`}
                                     >
                                         <Trash className="w-3.5 h-3.5" />
@@ -89,16 +88,19 @@ export default function CartItem({
                                     <Button
                                         size="sm"
                                         variant="secondary"
-                                        className="bg-primary/5 hover:bg-primary/15 text-primary border border-primary/10 rounded-full h-9 px-4 font-bold flex items-center gap-2"
+                                        className="bg-primary/5 hover:bg-primary/15 text-primary border border-primary/10 rounded-full h-10 px-5 font-bold flex items-center gap-2 group/btn transition-all"
                                         onClick={() => onApplyCouponClick(item.id)}
                                         data-testid={`cart-item-apply-coupon-${item.id}`}
                                     >
-                                        <TicketPlus className="w-4 h-4" />
+                                        <TicketPlus className="w-4 h-4 shrink-0" />
+                                        <span className="text-xs sm:hidden">
+                                            {t('applyCoupon', 'Apply Coupon')}
+                                        </span>
                                         <motion.span
                                             initial={{ maxWidth: 0, opacity: 0 }}
                                             animate={hoveredCouponItem ? { maxWidth: 120, opacity: 1 } : { maxWidth: 0, opacity: 0 }}
                                             transition={{ duration: 0.2 }}
-                                            className="overflow-hidden whitespace-nowrap block text-xs"
+                                            className="hidden sm:block overflow-hidden whitespace-nowrap text-xs"
                                         >
                                             {t('applyCoupon', 'Apply Coupon')}
                                         </motion.span>
@@ -108,14 +110,14 @@ export default function CartItem({
                         </div>
 
                         {/* Remove Action */}
-                        <Button 
-                            variant="ghost" 
+                        <Button
+                            variant="ghost"
                             size="sm"
-                            className="text-destructive hover:bg-destructive/10 font-bold gap-2 rounded-xl"
-                            onClick={() => onRemoveClick(item.id)} 
+                            className="text-destructive hover:bg-destructive/10 font-bold gap-2 rounded-xl h-10 px-4 shrink-0"
+                            onClick={() => onRemoveClick(item.id)}
                             data-testid={`cart-item-remove-${item.id}`}
                         >
-                            <Trash className="w-4 h-4" />
+                            <Trash className="w-4 h-4 shrink-0" />
                             <span className="text-xs">{t('removeFromCart', 'Remove')}</span>
                         </Button>
                     </div>

@@ -19,5 +19,7 @@
         "male": "ذكر",
         "female": "أنثى"
     },
+    "save": "حفظ",
+    "cancel": "إلغاء",
     "enterNumber": "أدخل الرقم"
 }

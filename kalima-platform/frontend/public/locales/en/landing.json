@@ -30,7 +30,9 @@
     "teacherPortal": "Teacher Portal",
     "studentPortal": "Student Portal",
     "parentPortal": "Parent Portal",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "navigation": "Navigation",
+    "language": "Language"
   },
   "notFound": {
     "title": "404",

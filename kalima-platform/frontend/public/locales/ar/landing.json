@@ -30,7 +30,9 @@
     "teacherPortal": "بوابة المعلم",
     "studentPortal": "بوابة الطالب",
     "parentPortal": "بوابة ولي الأمر",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "navigation": "التصفح",
+    "language": "اللغة"
   },
   "notFound": {
     "title": "404",

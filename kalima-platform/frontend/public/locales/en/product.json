@@ -24,9 +24,12 @@
     "buyNow": "Buy Now",
     "viewSample": "View Sample",
     "follow": "Follow",
-    "contactWhatsApp": "Message Admin on WhatsApp",
+    "contactWhatsApp": "Message",
+    "contactWhatsAppLong": "Message Admin on WhatsApp",
+    "contactWhatsAppShort": "Message",
     "whatsappTemplate": "Hello, I am interested in the following product:\nProduct Name: {{title}}\n{{serial}}\nPrice: {{price}} {{currency}}\nURL: {{url}}\n\nCan you please provide more information?",
-    "pendingReview": "Your account is pending admin review. You can browse freely but cannot make purchases until your account is approved."
+    "pendingReview": "Your account is pending admin review. You can browse freely but cannot make purchases until your account is approved.",
+    "viewOptions": "View Options"
   },
   "info": {
     "sku": "SKU",

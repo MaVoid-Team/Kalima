@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PhoneInput, egyptPhoneSchema } from '@/components/ui/phone-input';
+import { cn } from '@/lib/utils';
 import {
     Accordion,
     AccordionItem,
@@ -209,7 +210,7 @@ export default function CartItemRequiredFields({
                     }
                 } else if (rf.required_field_definitions.field_type === 'number') {
                     const val = fieldValues[rf.field_definition_id];
-                    if (!val || String(val).trim() === '') {
+                    if (isFieldEmpty(val)) {
                         missing.push(rf.field_definition_id);
                     } else {
                         const parsed = egyptPhoneSchema(t).safeParse(val || "");
@@ -449,26 +450,32 @@ export default function CartItemRequiredFields({
             >
                 <AccordionItem value="fields">
                     <AccordionTrigger className={"text-sm " + (item.required_fields_filled ? "text-success" : "text-primary")} data-testid={`cart-item-fields-accordion-${item.id}`}>
-                        <div className="flex items-center justify-between w-full px-1">
-                            <span>{isOpen ? t('hideRequiredFields', 'Hide required fields') : t('viewRequiredFields', 'View required fields')}</span>
-                            <div className="flex items-center gap-2 me-4" onClick={e => e.stopPropagation()}>
-                                <button
-                                    type="button"
+                        <div className="flex flex-wrap items-center justify-between w-full gap-x-4 gap-y-2 px-1">
+                            <span className="font-bold flex-1 min-w-[140px] text-left rtl:text-right">
+                                {isOpen ? t('hideRequiredFields', 'Hide required fields') : t('viewRequiredFields', 'View required fields')}
+                            </span>
+                            <div className="flex items-center gap-3 me-2 border-primary/10 sm:border-s sm:ps-3" onClick={e => e.stopPropagation()}>
+                                <span
+                                    role="button"
+                                    tabIndex={0}
                                     onClick={() => syncAllFieldsToOthers(true)}
-                                    className="text-[10px] text-primary flex items-center gap-1 hover:opacity-80 transition-opacity whitespace-nowrap"
+                                    onKeyDown={e => e.key === 'Enter' && syncAllFieldsToOthers(true)}
+                                    className="text-[10px] font-bold text-primary flex items-center gap-1.5 hover:opacity-80 transition-opacity whitespace-nowrap cursor-pointer select-none bg-primary/5 px-2 py-1 rounded-lg"
                                     title={t('applyAllToEmptyItems', 'Apply ALL fields to empty ones')}
                                 >
                                     <Copy className="w-3 h-3" />
                                     {t('applyAllToEmpty', 'All to Empty')}
-                                </button>
-                                <button
-                                    type="button"
+                                </span>
+                                <span
+                                    role="button"
+                                    tabIndex={0}
                                     onClick={() => syncAllFieldsToOthers(false)}
-                                    className="text-[10px] text-muted-foreground flex items-center gap-1 hover:text-primary transition-colors border-s ps-2 whitespace-nowrap"
+                                    onKeyDown={e => e.key === 'Enter' && syncAllFieldsToOthers(false)}
+                                    className="text-[10px] font-bold text-muted-foreground flex items-center gap-1.5 hover:text-primary transition-colors border-s border-border/40 ps-3 whitespace-nowrap cursor-pointer select-none"
                                     title={t('copyAllToAllItems', 'Overwrite ALL fields in similar items')}
                                 >
                                     {t('applyAllToAll', 'All to All')}
-                                </button>
+                                </span>
                             </div>
                         </div>
                     </AccordionTrigger>
@@ -476,30 +483,34 @@ export default function CartItemRequiredFields({
                         <form onSubmit={handleCartRequiredFieldsSubmit} className='flex flex-col gap-2 w-full max-w-full overflow-x-hidden'>
                             {item.cart_item_required_fields.map(rf => (
                                 <div key={rf.field_definition_id} className="flex flex-col">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <label className="text-xs font-medium">
+                                    <div className="flex flex-wrap items-center justify-between mb-1.5 gap-2">
+                                        <label className="text-xs font-bold text-foreground/80">
                                             {rf.required_field_definitions.label}
-                                            {rf.is_required && <span className="text-destructive"> *</span>}
+                                            {rf.is_required && <span className="text-destructive ms-0.5">*</span>}
                                         </label>
                                         {!isFieldEmpty(fieldValues[rf.field_definition_id]) && (
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    type="button"
+                                            <div className="flex items-center gap-3">
+                                                <span
+                                                    role="button"
+                                                    tabIndex={0}
                                                     onClick={() => syncFieldToAll(rf.field_definition_id, true)}
-                                                    className="text-[10px] text-primary flex items-center gap-1 hover:opacity-80 transition-opacity"
+                                                    onKeyDown={e => e.key === 'Enter' && syncFieldToAll(rf.field_definition_id, true)}
+                                                    className="text-[9px] font-bold text-primary flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer select-none"
                                                     title={t('applyToEmptyItems', 'Apply ONLY to empty fields')}
                                                 >
-                                                    <Copy className="w-3 h-3" />
+                                                    <Copy className="w-2.5 h-2.5" />
                                                     {t('applyToEmpty', 'To Empty')}
-                                                </button>
-                                                <button
-                                                    type="button"
+                                                </span>
+                                                <span
+                                                    role="button"
+                                                    tabIndex={0}
                                                     onClick={() => syncFieldToAll(rf.field_definition_id, false)}
-                                                    className="text-[10px] text-muted-foreground flex items-center gap-1 hover:text-primary transition-colors border-s ps-2"
+                                                    onKeyDown={e => e.key === 'Enter' && syncFieldToAll(rf.field_definition_id, false)}
+                                                    className="text-[9px] font-bold text-muted-foreground flex items-center gap-1 hover:text-primary transition-colors border-s border-border/40 ps-2.5 cursor-pointer select-none"
                                                     title={t('copyToAllItems', 'Overwrite all similar fields')}
                                                 >
                                                     {t('applyToAll', 'To All')}
-                                                </button>
+                                                </span>
                                             </div>
                                         )}
                                     </div>
@@ -707,14 +718,19 @@ export default function CartItemRequiredFields({
                                 </div>
                             ))}
                             {(isDirty || missingFields.length > 0) && (
-                                <Button
-                                    size="sm"
-                                    type="submit"
-                                    className={`w-fit self-end m-1 transition-all duration-300 ${highlightSave ? 'scale-105 ring-2 ring-primary ring-offset-2 animate-pulse bg-primary/90' : ''}`}
-                                    data-testid={`cart-item-fields-save-${item.id}`}
-                                >
-                                    {t('save', 'Save')}
-                                </Button>
+                                <div className="flex justify-center sm:justify-end mt-4 p-2">
+                                    <Button
+                                        size="lg"
+                                        type="submit"
+                                        className={cn(
+                                            "w-full sm:w-auto font-bold rounded-xl shadow-lg transition-all duration-300",
+                                            highlightSave ? 'scale-[1.02] ring-4 ring-primary/20 animate-pulse bg-primary/90' : ''
+                                        )}
+                                        data-testid={`cart-item-fields-save-${item.id}`}
+                                    >
+                                        {t('save', 'Save Changes')}
+                                    </Button>
+                                </div>
                             )}
                         </form>
                     </AccordionContent>

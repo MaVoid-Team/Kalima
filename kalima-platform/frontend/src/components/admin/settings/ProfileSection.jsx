@@ -131,19 +131,35 @@ export default function ProfileSection({ ns = 'admin' }) {
             </CardHeader>
             <CardContent className="space-y-6">
                 {/* Avatar Section */}
-                <div className="flex items-center gap-4">
-                    <Avatar className="h-20 w-20">
-                        <AvatarImage src={getImageUrl(profile?.profile_pic_url)} />
-                        <AvatarFallback>
-                            {profile?.name?.charAt(0)?.toUpperCase()}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div className="space-y-2">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 pt-2">
+                    <div className="relative group shrink-0 p-1">
+                        <Avatar className="h-24 w-24 ring-4 ring-muted transition-all group-hover:ring-primary/20">
+                            <AvatarImage src={getImageUrl(profile?.profile_pic_url)} className="object-cover" />
+                            <AvatarFallback className="text-xl font-bold bg-primary/5 text-primary">
+                                {profile?.name?.charAt(0)?.toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
+                        <Label htmlFor="avatar-upload" className="absolute bottom-0 right-0 cursor-pointer">
+                            <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors">
+                                <Camera className="h-4 w-4" />
+                            </div>
+                        </Label>
+                    </div>
+
+                    <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-3 flex-1">
                         <div>
+                            <h3 className="text-sm font-bold text-foreground">
+                                {t('settings.profile.avatarTitle', 'Profile Picture')}
+                            </h3>
+                            <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
+                                {t('settings.profile.avatarHint', 'JPG, PNG or GIF. Max size 2MB.')}
+                            </p>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                             <Label htmlFor="avatar-upload" className="cursor-pointer">
-                                <Button variant="outline" size="sm" asChild disabled={isUploading}>
+                                <Button variant="secondary" size="sm" asChild disabled={isUploading} className="pointer-events-none rounded-xl font-bold text-[10px] uppercase tracking-wider">
                                     <span>
-                                        <Upload className="h-4 w-4 mr-2" />
+                                        <Upload className="h-3.5 w-3.5 mr-1.5" />
                                         {isUploading ? t('common.loading') : t('settings.profile.uploadAvatar')}
                                     </span>
                                 </Button>
@@ -157,9 +173,6 @@ export default function ProfileSection({ ns = 'admin' }) {
                                 disabled={isUploading}
                             />
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                            {t('settings.profile.avatarHint', 'JPG, PNG or GIF. Max size 2MB.')}
-                        </p>
                     </div>
                 </div>
 
@@ -261,8 +274,8 @@ export default function ProfileSection({ ns = 'admin' }) {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="male">{t('profile.male', 'Male')}</SelectItem>
-                                                    <SelectItem value="female">{t('profile.female', 'Female')}</SelectItem>
+                                                    <SelectItem value="male">{t('common:gender.male', 'Male')}</SelectItem>
+                                                    <SelectItem value="female">{t('common:gender.female', 'Female')}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -276,51 +289,65 @@ export default function ProfileSection({ ns = 'admin' }) {
                                     disabled={loading || !form.formState.isDirty}
                                 >
                                     {loading && <LoadingSpinner className="h-4 w-4" />}
-                                    {t('common.save')}
+                                    {t('common:save', 'Save')}
                                 </Button>
                                 <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
-                                    {t('common.cancel')}
+                                    {t('common:cancel', 'Cancel')}
                                 </Button>
                             </div>
                         </form>
                     </Form>
                 ) : (
                     <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label className="text-sm font-medium text-muted-foreground">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60">
                                     {t('settings.profile.name')}
                                 </Label>
-                                <p className="flex items-center gap-2">
-                                    <User className="h-4 w-4 text-muted-foreground" />
-                                    {profile?.name || t('common.notSpecified')}
-                                </p>
+                                <div className="flex items-center gap-2 px-1">
+                                    <div className="p-1.5 rounded-lg bg-muted/50">
+                                        <User className="h-3.5 w-3.5 text-muted-foreground" />
+                                    </div>
+                                    <p className="font-bold text-sm text-foreground">
+                                        {profile?.name || t('common.notSpecified')}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label className="text-sm font-medium text-muted-foreground">
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60">
                                     {t('settings.profile.email')}
                                 </Label>
-                                <p className="flex items-center gap-2">
-                                    <Mail className="h-4 w-4 text-muted-foreground" />
-                                    {profile?.email || t('common.notSpecified')}
-                                </p>
+                                <div className="flex items-center gap-2 px-1">
+                                    <div className="p-1.5 rounded-lg bg-muted/50">
+                                        <Mail className="h-3.5 w-3.5 text-muted-foreground" />
+                                    </div>
+                                    <p className="font-bold text-sm text-foreground truncate max-w-[200px]" title={profile?.email}>
+                                        {profile?.email || t('common.notSpecified')}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label className="text-sm font-medium text-muted-foreground">
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60">
                                     {t('settings.profile.phone')}
                                 </Label>
-                                <p className="flex items-center gap-2" dir="ltr">
-                                    <Phone className="h-4 w-4 text-muted-foreground" />
-                                    {profile?.phone || t('common.notSpecified')}
-                                </p>
+                                <div className="flex items-center gap-2 px-1" dir="ltr">
+                                    <div className="p-1.5 rounded-lg bg-muted/50">
+                                        <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+                                    </div>
+                                    <p className="font-bold text-sm text-foreground">
+                                        {profile?.phone || t('common.notSpecified')}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label className="text-sm font-medium text-muted-foreground">
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60">
                                     {t('settings.profile.gender')}
                                 </Label>
-                                <Badge variant="secondary">
-                                    {t(`profile.${profile?.gender}`) || t('common.notSpecified')}
-                                </Badge>
+                                <div className="flex items-center gap-2 px-1">
+                                    <Badge variant="secondary" className="rounded-lg px-2 py-0.5 font-bold text-[10px]">
+                                        {t(`profile.${profile?.gender}`) || t('common.notSpecified')}
+                                    </Badge>
+                                </div>
                             </div>
                         </div>
                         <Button onClick={() => setIsEditing(true)} variant="outline">

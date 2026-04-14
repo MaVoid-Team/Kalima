@@ -117,9 +117,12 @@ const router = createBrowserRouter(
           <Route path="/product/:id" element={<ProductDetailsPage />} />
           <Route path="/booklet/:id" element={<BookletDetailsPage />} />
         </Route>
-        <Route path="/samples" element={<SamplesDirectoryPage />} />
-        <Route path="/samples/:id" element={<SamplePage />} />
-        <Route path="/samples/:id/preview" element={<SamplePreview />} />
+        {/* Samples Routes - Restricted for Students and Parents */}
+        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+          <Route path="/samples" element={<SamplesDirectoryPage />} />
+          <Route path="/samples/:id" element={<SamplePage />} />
+          <Route path="/samples/:id/preview" element={<SamplePreview />} />
+        </Route>
 
         {/* Protected Store Routes (Auth Required) - Also Restricted for Students and Parents */}
         <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
