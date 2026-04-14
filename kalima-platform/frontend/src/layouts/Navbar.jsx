@@ -14,7 +14,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import logo from "../assets/Logo.png";
+import logo from "../assets/Logo.webp";
 import CartPreview from "../components/cart/CartPreview";
 import useAuth from "../hooks/auth/useAuth";
 import { useCart } from "../contexts/CartContext";

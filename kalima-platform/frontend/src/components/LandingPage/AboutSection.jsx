@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BrainCircuit, ShieldCheck, Users2, Rocket } from "lucide-react";
 
-const ABOUT_IMAGE = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop";
+const ABOUT_IMAGE = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?fm=webp&q=60&w=800&auto=format&fit=crop";
 
 export default function AboutSection() {
   const { t, i18n } = useTranslation("landing");

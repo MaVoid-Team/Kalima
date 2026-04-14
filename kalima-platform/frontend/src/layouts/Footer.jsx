@@ -3,7 +3,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import logo from "../assets/Logo.png";
+import logo from "../assets/Logo.webp";
 
 const SOCIAL_LINKS = [
   { Icon: FacebookIcon, href: "https://www.facebook.com/kalima010", label: "Facebook" },
