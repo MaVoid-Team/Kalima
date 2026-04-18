@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BrainCircuit, ShieldCheck, Users2, Rocket } from "lucide-react";
 
-const ABOUT_IMAGE = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?fm=webp&q=60&w=800&auto=format&fit=crop";
+const ABOUT_IMAGE_DESKTOP = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?fm=webp&q=60&w=800&auto=format&fit=crop";
+const ABOUT_IMAGE_MOBILE = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?fm=webp&q=30&w=300&auto=format&fit=crop";
 
 export default function AboutSection() {
   const { t, i18n } = useTranslation("landing");
@@ -73,7 +74,9 @@ export default function AboutSection() {
           </div>
 
           <motion.img
-            src={ABOUT_IMAGE}
+            src={ABOUT_IMAGE_DESKTOP}
+            srcSet={`${ABOUT_IMAGE_MOBILE} 480w, ${ABOUT_IMAGE_DESKTOP} 800w`}
+            sizes="(max-width: 640px) 480px, 800px"
             alt={t("landingPage.about.title")}
             width="800"
             height="460"
