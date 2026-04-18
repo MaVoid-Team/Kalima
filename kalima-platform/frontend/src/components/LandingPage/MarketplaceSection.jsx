@@ -6,6 +6,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import useLandingInsights from "@/hooks/useLandingInsights";
 
+const sectionContainer = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut", staggerChildren: 0.08 },
+  },
+};
+
+const childFade = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50, damping: 20 } },
+};
+
 export default function MarketplaceSection() {
   const { t } = useTranslation("landing");
   const { featuredProducts } = useLandingInsights();
@@ -17,40 +31,31 @@ export default function MarketplaceSection() {
 
   return (
     <motion.section
-      className="bg-transparent py-16 will-change-transform"
+      className="bg-transparent py-16"
       data-testid="landing-page-marketplace-section"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
+      variants={sectionContainer}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.15 }}
     >
       <div className="container mx-auto px-4 md:px-10">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <motion.h2
               className="text-3xl font-bold text-foreground md:text-4xl drop-shadow-[0_0_15px_hsl(var(--primary)/0.3)]"
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.7 }}
-              transition={{ type: "spring", stiffness: 50, damping: 20 }}
+              variants={childFade}
             >
               {t("landingPage.marketplace.title")}
             </motion.h2>
             <motion.p
               className="mt-3 max-w-2xl text-base text-muted-foreground font-medium"
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.7 }}
-              transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.08 }}
+              variants={childFade}
             >
               {t("landingPage.marketplace.description")}
             </motion.p>
           </div>
           <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.7 }}
-            transition={{ type: "spring", stiffness: 50, damping: 20, delay: 0.12 }}
+            variants={childFade}
           >
             <Button asChild variant="outline" className="border border-white/40 dark:border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_4px_16px_0_rgba(31,38,135,0.1)] ring-1 ring-inset ring-white/20 dark:ring-white/10 hover:bg-white/20 dark:hover:bg-white/10 hover:border-primary/50 transition-all font-medium text-foreground" data-testid="landing-page-marketplace-view-all-button">
               <Link to="/market">{t("landingPage.marketplace.viewAll")}</Link>
@@ -59,14 +64,10 @@ export default function MarketplaceSection() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          {featuredProducts.map((item, index) => (
+          {featuredProducts.map((item) => (
             <motion.div
               key={item.id}
               variants={cardReveal}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ delay: index * 0.08 }}
               whileHover={{ y: -6, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}
             >
               <Card className="flex h-full flex-col border border-white/40 dark:border-white/20 bg-white/10 dark:bg-black/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] ring-1 ring-inset ring-white/20 dark:ring-white/10 bg-gradient-to-br from-white/30 to-white/5 dark:from-white/10 dark:to-transparent transition-all duration-300 hover:bg-white/20 dark:hover:bg-white/10 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 relative overflow-hidden group">
