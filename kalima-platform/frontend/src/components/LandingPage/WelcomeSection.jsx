@@ -93,15 +93,15 @@ export default function WelcomeSection() {
           </div>
 
           <div className="relative">
-            <img 
-              src={HERO_IMAGE_DESKTOP} 
+            <img
+              src={HERO_IMAGE_DESKTOP}
               srcSet={`${HERO_IMAGE_MOBILE} 480w, ${HERO_IMAGE_DESKTOP} 800w`}
               sizes="(max-width: 640px) 480px, 800px"
-              alt={t("landingPage.hero.title")} 
-              fetchPriority="high" 
-              width="800" 
-              height="460" 
-              className="h-[460px] w-full rounded-3xl object-cover shadow-2xl" 
+              alt={t("landingPage.hero.title")}
+              fetchPriority="high"
+              width="800"
+              height="460"
+              className="h-[460px] w-full rounded-3xl object-cover shadow-2xl"
             />
             <motion.div
               className="absolute -bottom-5 start-4 w-[92%] rounded-2xl border border-border/60 bg-background/95 p-4 shadow-lg"
