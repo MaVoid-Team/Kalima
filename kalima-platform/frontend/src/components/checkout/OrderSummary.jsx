@@ -10,19 +10,15 @@ export default function OrderSummary({ items, pricing, onPay }) {
     const { t } = useTranslation('checkout');
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{t('orderSummary.title')}</CardTitle>
+        <Card className="border border-border/40 bg-card/60 backdrop-blur-md shadow-xl rounded-3xl overflow-hidden">
+            <CardHeader className="bg-muted/20 border-b border-border/5 pb-4">
+                <CardTitle className="text-xl font-black uppercase tracking-tight">{t('orderSummary.title')}</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-6">
-                <div className="flex flex-col gap-4">
+            <CardContent className="p-6">
+                <div className="flex flex-col gap-5 mb-8">
                     {items.map(item => (
                         <OrderItem key={item.id} item={item} />
                     ))}
-                </div>
-
-                <div className="grid gap-6">
-                    <Separator />
                 </div>
 
                 <PricingSummary pricing={pricing} onPay={onPay} />

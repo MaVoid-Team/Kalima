@@ -87,6 +87,36 @@ export const location_type_enum = {
 export type location_type_enum = (typeof location_type_enum)[keyof typeof location_type_enum]
 
 
+export const video_source_type_enum = {
+  upload: 'upload',
+  external: 'external'
+} as const
+
+export type video_source_type_enum = (typeof video_source_type_enum)[keyof typeof video_source_type_enum]
+
+
+export const sample_media_type_enum = {
+  pdf: 'pdf',
+  image: 'image',
+  video: 'video',
+  word: 'word',
+  powerpoint: 'powerpoint'
+} as const
+
+export type sample_media_type_enum = (typeof sample_media_type_enum)[keyof typeof sample_media_type_enum]
+
+
+export const user_flag_enum = {
+  ELITE: 'ELITE',
+  PRO: 'PRO',
+  NORMAL: 'NORMAL',
+  OBSERVER: 'OBSERVER',
+  Warned: 'Warned'
+} as const
+
+export type user_flag_enum = (typeof user_flag_enum)[keyof typeof user_flag_enum]
+
+
 export const coupon_type = {
   percentage: 'percentage',
   fixed: 'fixed'

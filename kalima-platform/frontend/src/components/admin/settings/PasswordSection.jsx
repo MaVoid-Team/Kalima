@@ -9,8 +9,8 @@ import ConfirmSetPasswordDialog from './ConfirmSetPasswordDialog';
 import usePassword from '@/hooks/auth/usePassword';
 import { useAccountProviders } from '@/hooks/useAccountProviders';
 
-export default function PasswordSection() {
-    const { t, i18n } = useTranslation('admin');
+export default function PasswordSection({ ns = 'admin' }) {
+    const { t, i18n } = useTranslation(ns);
     const { changePassword, setPassword, loading } = usePassword();
     const { hasOAuthProviders } = useAccountProviders();
     
@@ -85,6 +85,7 @@ export default function PasswordSection() {
                     onOpenChange={setShowChangeDialog}
                     onConfirm={handleChangePassword}
                     loading={loading}
+                    ns={ns}
                 />
 
                 {/* Set Password Confirmation Dialog */}
@@ -94,6 +95,7 @@ export default function PasswordSection() {
                         onOpenChange={setShowSetDialog}
                         onConfirm={handleSetPassword}
                         loading={loading}
+                        ns={ns}
                     />
                 )}
             </CardContent>

@@ -37,7 +37,7 @@
   "total": "الإجمالي",
   "promoLabel": "رمز العرض",
   "promoPlaceholder": "أدخل الرمز",
-  "applyCoupon": " تطبيق القسيمة",
+  "applyCoupon": " تطبيق قسيمة",
   "proceedToCheckout": "المتابعة إلى الدفع",
   "secureCheckout": "دفع مشفر SSL آمن",
   "needHelp": "تحتاج مساعدة؟",
@@ -130,5 +130,20 @@
   },
   "validation": {
     "invalidEgyptPhone": "رقم هاتف مصري غير صالح. يجب أن يبدأ بـ +20 متبوعًا بـ 10 أرقام."
-  }
+  },
+  "applyToAll": "للكل",
+  "applyToEmpty": "للفارغة",
+  "applyAllToAll": "تطبيق الكل للكل",
+  "applyAllToEmpty": "تطبيق الكل للفارغة",
+  "copyToAllItems": "تطبيق على جميع العناصر المشابهة",
+  "applyToEmptyItems": "تطبيق فقط على الخانات الفارغة المشابهة",
+  "fieldSynced": "تم تطبيق القيمة على جميع العناصر المشابهة",
+  "fieldSyncedEmpty": "تم تطبيق القيمة على الخانات الفارغة المشابهة",
+  "allFieldsSynced": "تم تطبيق جميع الحقول على جميع العناصر",
+  "allFieldsSyncedEmpty": "تم تطبيق جميع الحقول على الخانات الفارغة المشابهة",
+  "noFieldsToSync": "لا توجد حقول تحتوي على قيم لتطبيقها",
+  "valueEmptySync": "يرجى إدخال قيمة قبل التطبيق على الآخرين",
+  "saveAllChanges": "حفظ جميع العناصر",
+  "savingAll": "جاري حفظ جميع التغييرات...",
+  "itemAlreadyInCart": "هذا المنتج موجود بالفعل في عربة التسوق"
 }

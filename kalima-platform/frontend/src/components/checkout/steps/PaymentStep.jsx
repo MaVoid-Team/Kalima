@@ -10,6 +10,7 @@ import PrintableReceipt from '@/components/checkout/PrintableReceipt';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { getBaseUrl, getImageUrl } from '@/lib/storeUtils';
+import { motion } from 'framer-motion';
 
 export default function PaymentStep({ onBack }) {
     const { cart, checkout, getPaymentMethods } = useCart();
@@ -33,21 +34,21 @@ export default function PaymentStep({ onBack }) {
     }, []);
 
     const handlePay = async () => {
-        if (!selectedPaymentMethod) {
+        if (!isFreeOrder && !selectedPaymentMethod) {
             toast.error(t('payment.methodRequired') || 'Please select a payment method');
             return;
         }
-        if (!numberTransferredFrom) {
+        if (!isFreeOrder && !numberTransferredFrom) {
             toast.error(t('payment.transferNumberRequired') || 'Please enter the number you transferred from');
             return;
         }
 
-        if (hasValidationErrors) {
+        if (!isFreeOrder && hasValidationErrors) {
             toast.error(t('payment.invalidPhoneNumber', 'Please enter a valid phone number'));
             return;
         }
         // Assuming screenshot might be optional in some cases but required here
-        if (!screenshotFile) {
+        if (!isFreeOrder && !screenshotFile) {
             toast.error(t('payment.screenshotRequired') || 'Please upload payment screenshot');
             return;
         }
@@ -59,10 +60,10 @@ export default function PaymentStep({ onBack }) {
         } catch { }
 
         const formData = new FormData();
-        formData.append('payment_method_id', selectedPaymentMethod);
-        formData.append('numberTransferredFrom', numberTransferredFrom);
+        if (!isFreeOrder && selectedPaymentMethod) formData.append('payment_method_id', selectedPaymentMethod);
+        if (!isFreeOrder && numberTransferredFrom) formData.append('numberTransferredFrom', numberTransferredFrom);
         if (notes) formData.append('notes', notes);
-        if (screenshotFile) formData.append('paymentScreenshot', screenshotFile);
+        if (!isFreeOrder && screenshotFile) formData.append('paymentScreenshot', screenshotFile);
 
         try {
             const data = await checkout(formData);
@@ -95,6 +96,7 @@ export default function PaymentStep({ onBack }) {
         total: cart?.total || 0,
         discount: cart?.discount || 0,
     };
+    const isFreeOrder = Number(pricing.total || 0) <= 0;
 
     const handlePrintReceipt = () => {
         const contentNode = receiptRef.current?.querySelector('[data-print-body]');
@@ -140,10 +142,19 @@ export default function PaymentStep({ onBack }) {
     };
 
     return (
-        <div className="w-full">
-            <div className="mb-6 flex items-center justify-between">
-                <Button variant="ghost" className="gap-2 text-muted-foreground" onClick={onBack} data-testid="checkout-payment-step-back-button">
-                    <ArrowLeft className="w-4 h-4" />
+        <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="w-full"
+        >
+            <div className="mb-10">
+                <Button 
+                    variant="ghost" 
+                    className="group gap-2 text-primary font-bold hover:bg-primary/5 transition-all" 
+                    onClick={onBack} 
+                    data-testid="checkout-payment-step-back-button"
+                >
+                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                     {t('payment.backToCart', 'Back to Cart')}
                 </Button>
             </div>
@@ -161,6 +172,7 @@ export default function PaymentStep({ onBack }) {
                         screenshotFile={screenshotFile}
                         setScreenshotFile={setScreenshotFile}
                         setValidationErrors={setHasValidationErrors}
+                        isFreeOrder={isFreeOrder}
                     />
                 </div>
 
@@ -210,6 +222,6 @@ export default function PaymentStep({ onBack }) {
                 </AlertDialogContent>
             </AlertDialog>
             <PrintableReceipt purchase={purchase} paymentMethodName={paymentMethodName} baseURL={baseURL} receiptRef={receiptRef} dir={i18n.dir()} />
-        </div>
+        </motion.div>
     );
 }

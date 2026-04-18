@@ -28,7 +28,10 @@ export default function ProductDetailsPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  const { product: productProps, images, loading, notFound } = useProducts(id);
+  const { product: productProps, media, loading, notFound } = useProducts(id);
+  const primarySampleId = Array.isArray(productProps?.samples)
+    ? (productProps.samples.find((sample) => !sample?.is_archived)?.id ?? productProps.samples[0]?.id ?? null)
+    : (productProps?.samples?.id ?? null);
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) {
@@ -62,7 +65,7 @@ export default function ProductDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 md:px-8 py-8">
         {/* Breadcrumbs */}
         <Breadcrumb className="mb-8">
@@ -104,7 +107,7 @@ export default function ProductDetailsPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="lg:col-span-7"
           >
-            <ImageGallery images={images} />
+            <ImageGallery images={media} />
           </motion.div>
 
           {/* Right Column: Product Info (5 cols) */}
@@ -121,7 +124,10 @@ export default function ProductDetailsPage() {
                 price={productProps.price_after_discount == 0 ? productProps.price : productProps.price_after_discount}
                 productId={productProps.id}
                 sampleUrl={productProps.sample_url}
-                sampleId={productProps.samples?.id ?? null}
+                sampleId={primarySampleId}
+                title={productProps.title}
+                serial={productProps.serial}
+                isReleased={productProps.is_released ?? true}
               />
 
               {/* Description Text */}

@@ -33,6 +33,7 @@ export default function AdminLayout() {
                         type="button"
                         className="text-muted-foreground border-border px-2 focus:outline-none lg:hidden -ml-2"
                         onClick={() => setIsMobileOpen(true)}
+                        data-testid="admin-layout-mobile-sidebar-button"
                     >
                         <span className="sr-only">Open sidebar</span>
                         <Menu className="h-6 w-6" aria-hidden="true" />
@@ -46,7 +47,7 @@ export default function AdminLayout() {
                 </header>
 
                 {/* Main Content Area */}
-                <main className="flex-1 p-4 sm:p-12 lg:p-16">
+                <main className="flex-1 p-4 sm:p-12 lg:p-16" data-testid="admin-layout-main-content">
                     <Outlet />
                 </main>
             </div>

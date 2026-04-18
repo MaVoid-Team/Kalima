@@ -1,70 +1,56 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { FileText, Download, ExternalLink, Box } from "lucide-react";
+import { FileText, Download, Eye, Box, Folder, Video, FileAudio, Image as ImageIcon } from "lucide-react";
 import HeroSection from "@/components/MarketPage/HeroSection";
 import useApiMutation from "@/hooks/useApiMutation";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getImageUrl, formatFileSize } from "@/lib/storeUtils";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationPrevious,
-    PaginationNext,
-    PaginationEllipsis,
-    generatePaginationLinks,
-} from "@/components/ui/pagination";
-
-const LIMIT = 8;
+import { formatFileSize } from "@/lib/storeUtils";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 
 export default function SamplesDirectoryPage() {
     const { t, i18n } = useTranslation("market");
     const { mutate, loading } = useApiMutation();
 
-    const [samples, setSamples] = React.useState([]);
-    const [fetched, setFetched] = React.useState(false);
-    const [page, setPage] = React.useState(1);
-    const [paginationMeta, setPaginationMeta] = React.useState({ total: 0, page: 1, limit: LIMIT });
+    const [sections, setSections] = useState([]);
+    const [fetched, setFetched] = useState(false);
 
     const isRtl = i18n.dir() === 'rtl';
 
-    const fetchSamples = useCallback((currentPage) => {
+    const fetchSampleSections = useCallback(async () => {
         setFetched(false);
-        const query = new URLSearchParams({ page: currentPage, limit: LIMIT });
-        mutate({ endpoint: `/samples?${query.toString()}`, method: 'get' })
-            .then(res => {
-                if (res?.success) {
-                    setSamples(res.data ?? []);
-                    setPaginationMeta({
-                        total: res.total ?? (res.data?.length ?? 0),
-                        page: res.page ?? currentPage,
-                        limit: res.limit ?? LIMIT,
-                    });
-                }
-                setFetched(true);
-            })
-            .catch(() => setFetched(true));
+        try {
+            // Depending on backend, /sample-sections might return fully populated nested samples
+            const res = await mutate({ endpoint: '/sample-sections', method: 'get' }, false);
+            if (res && res.success) {
+                // If the sections response doesn't embed samples, we could fetch them here, 
+                // but the prompt implies listing sections with nested samples, assuming API provides it.
+                // Assuming `res.data` is an array of section objects, and each has `samples` array.
+                // Alternatively, we fetch each section if `samples` doesn't exist, but typically active sections carry it.
+
+                // For safety, let's just use what's returned.
+                setSections(res.data?.filter(s => s.active) ?? []);
+            }
+        } catch (error) {
+            console.error("Failed to fetch sample sections", error);
+        } finally {
+            setFetched(true);
+        }
     }, [mutate]);
 
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, []);
+        fetchSampleSections();
+    }, [fetchSampleSections]);
 
-    useEffect(() => {
-        fetchSamples(page);
-    }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    const totalPages = Math.ceil(paginationMeta.total / paginationMeta.limit) || 1;
-    const currentPage = paginationMeta.page;
-    const paginationLinks = generatePaginationLinks(currentPage, totalPages);
-
-    const handlePageChange = (newPage) => {
-        if (newPage < 1 || newPage > totalPages) return;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setPage(newPage);
+    const getIconForType = (mediaType) => {
+        const mt = mediaType?.toLowerCase();
+        if (mt === 'video') return <Video className="h-6 w-6 text-blue-500" />;
+        if (mt === 'audio') return <FileAudio className="h-6 w-6 text-orange-500" />;
+        if (mt === 'image') return <ImageIcon className="h-6 w-6 text-green-500" />;
+        return <FileText className="h-6 w-6 text-primary" />;
     };
 
     return (
@@ -73,6 +59,7 @@ export default function SamplesDirectoryPage() {
                 onSearch={() => { }}
                 title={t("samples.heroTitle", "Explore Free Samples")}
                 subtitle={t("samples.heroSubtitle", "Download or preview high quality resources.")}
+                hideSearch={true}
             />
 
             <div className="container py-12">
@@ -81,146 +68,166 @@ export default function SamplesDirectoryPage() {
                         <h2 className="text-2xl font-bold tracking-tight">
                             {t("samples.availableSamples", "Available Samples")}
                         </h2>
-                        {fetched && !loading && (
-                            <span className="text-muted-foreground text-sm font-medium">
-                                {paginationMeta.total} {t("samples.count", "Samples")}
-                            </span>
-                        )}
                     </div>
 
                     {loading && !fetched ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {[...Array(LIMIT)].map((_, i) => (
-                                <div key={i} className="flex flex-col gap-3 rounded-xl border border-border p-4">
-                                    <Skeleton className="h-12 w-12 rounded-lg" />
-                                    <Skeleton className="h-5 w-3/4" />
-                                    <Skeleton className="h-4 w-1/2" />
-                                    <div className="mt-4 flex gap-2">
-                                        <Skeleton className="h-9 flex-1" />
-                                        <Skeleton className="h-9 flex-1" />
-                                    </div>
-                                </div>
+                        <div className="space-y-4">
+                            {[...Array(3)].map((_, i) => (
+                                <Skeleton key={i} className="h-16 w-full rounded-xl" />
                             ))}
                         </div>
-                    ) : samples.length === 0 ? (
+                    ) : sections.length === 0 ? (
                         <div className="flex flex-col items-center justify-center gap-4 py-24 text-muted-foreground bg-muted/30 rounded-2xl border border-dashed border-border">
-                            <FileText className="h-16 w-16 opacity-30" />
+                            <Folder className="h-16 w-16 opacity-30" />
                             <p className="text-lg font-medium">{t("samples.noSamples", "No samples found")}</p>
                         </div>
                     ) : (
-                        <>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {samples.map((sample) => {
-                                    const isPdf = sample.mime_type === 'application/pdf';
-                                    return (
-                                        <div
-                                            key={sample.id}
-                                            className="group flex flex-col justify-between rounded-xl border border-border p-5 shadow-sm transition-all hover:shadow-md hover:border-primary/50"
-                                        >
-                                            <div className="space-y-4">
-                                                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-2">
-                                                    <FileText className="h-6 w-6" />
+                        <Accordion type="multiple" defaultValue={sections.map(s => String(s.id))} className="space-y-4">
+                            {sections.map(section => (
+                                <AccordionItem key={section.id} value={String(section.id)} className=" border border-border rounded-xl px-5 text-card-foreground">
+                                    <AccordionTrigger className="hover:no-underline py-4">
+                                        <div className="flex items-center gap-4 text-start">
+                                            {section.thumbnail_url ? (
+                                                <img src={section.thumbnail_url} alt="" className="w-10 h-10 rounded-md object-cover" />
+                                            ) : (
+                                                <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                                                    <Folder className="h-5 w-5" />
                                                 </div>
-
-                                                <div>
-                                                    <h3 className="font-semibold text-lg line-clamp-2 leading-tight" title={sample.original_name}>
-                                                        {sample.original_name}
-                                                    </h3>
-                                                    <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
-                                                        <span className="font-medium bg-muted px-2 py-0.5 rounded-md text-xs">
-                                                            {isPdf ? 'PDF' : 'DOC'}
-                                                        </span>
-                                                        <span>{formatFileSize(sample.size)}</span>
-                                                    </div>
-                                                </div>
-
-                                                {sample.products && (
-                                                    <div className="flex items-start gap-2 pt-3 border-t border-border line-clamp-2">
-                                                        <Box className="h-4 w-4 shrink-0 text-muted-foreground relative top-0.5" />
-                                                        <Link
-                                                            to={`/product/${sample.products.id}`}
-                                                            className="text-sm text-muted-foreground hover:text-primary transition-colors hover:underline"
-                                                        >
-                                                            {sample.products.title}
-                                                        </Link>
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="flex items-center gap-2 mt-6 pt-4 border-t border-border">
-                                                <Button
-                                                    variant={isPdf ? "default" : "outline"}
-                                                    className="flex-1"
-                                                    asChild
-                                                >
-                                                    <Link to={`/samples/${sample.id}`} state={{ cameFromAdmin: false }}>
-                                                        <ExternalLink className={`${isRtl ? 'ml-2' : 'mr-2'} h-4 w-4`} />
-                                                        {t("samples.view", "Preview")}
-                                                    </Link>
-                                                </Button>
-
-                                                <Button
-                                                    variant={isPdf ? "outline" : "default"}
-                                                    className="flex-1"
-                                                    asChild
-                                                >
-                                                    <a href={getImageUrl(sample.url)} download target="_blank" rel="noopener noreferrer">
-                                                        <Download className={`${isRtl ? 'ml-2' : 'mr-2'} h-4 w-4`} />
-                                                        {t("samples.download", "Download")}
-                                                    </a>
-                                                </Button>
+                                            )}
+                                            <div>
+                                                <h3 className="font-semibold text-lg" dir="auto">{section.title}</h3>
+                                                {section.description && <p className="text-sm font-normal text-muted-foreground mt-0.5" dir="auto">{section.description}</p>}
                                             </div>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="pt-2 pb-5 border-t border-border/50">
+                                        {(() => {
+                                            const filteredSamples = section.samples?.filter((s) => !s.is_archived) || [];
+                                            if (filteredSamples.length === 0) {
+                                                return <p className="text-muted-foreground py-4 text-center">{t('samples.noNestedSamples')}</p>;
+                                            }
+                                            return (
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+                                                    {filteredSamples.map((sample) => {
+                                                        const mt = sample.media_type?.toLowerCase();
+                                                        const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
+                                                        const sectionId = sample.section_id || section.id;
+                                                        // Use API-served endpoints for proper Content-Type headers
+                                                        const downloadUrl = sectionId && sample.low_quality_url
+                                                            ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download`
+                                                            : '';
+                                                        const thumbnailUrl = sectionId && sample.high_quality_url
+                                                            ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/preview`
+                                                            : '';
+                                                        // Only image/video media types have a displayable thumbnail
+                                                        const hasThumbnail = (sample.thumbnail || sample.high_quality_url) && (mt === 'image' || mt === 'video');
 
-                            {/* Pagination */}
-                            {totalPages > 1 && (
-                                <Pagination className="mt-4">
-                                    <PaginationContent>
-                                        <PaginationItem>
-                                            <PaginationPrevious
-                                                onClick={() => handlePageChange(currentPage - 1)}
-                                                aria-disabled={currentPage <= 1}
-                                                className={currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                                text={t("pagination.prev", "Previous")}
-                                                data-testid="samples-pagination-prev-button"
-                                            />
-                                        </PaginationItem>
+                                                        return (
+                                                            <div
+                                                                key={sample.id}
+                                                                className="group flex flex-col rounded-xl border border-border shadow-sm transition-all hover:shadow-md hover:border-primary/50 bg-background overflow-hidden"
+                                                            >
+                                                                {/* Thumbnail / Media preview */}
+                                                                {hasThumbnail ? (
+                                                                    <div className="w-full aspect-video overflow-hidden bg-muted relative">
+                                                                        {mt === 'video' ? (
+                                                                            <video
+                                                                                src={thumbnailUrl}
+                                                                                className="w-full h-full object-cover"
+                                                                                muted
+                                                                                preload="metadata"
+                                                                                data-testid={`samples-directory-thumb-${sample.id}`}
+                                                                            />
+                                                                        ) : (
+                                                                            <img
+                                                                                src={thumbnailUrl}
+                                                                                alt={sample.title || ''}
+                                                                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                                                data-testid={`samples-directory-thumb-${sample.id}`}
+                                                                            />
+                                                                        )}
+                                                                        <div className="absolute top-2 start-2">
+                                                                            <span className="font-medium bg-black/60 text-white px-2 py-0.5 rounded-md text-xs backdrop-blur-sm">
+                                                                                {t(`samples.mediaTypes.${sample.media_type}`, sample.media_type)}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="w-full aspect-video bg-muted flex items-center justify-center">
+                                                                        {getIconForType(sample.media_type)}
+                                                                    </div>
+                                                                )}
 
-                                        {paginationLinks.map((link, idx) =>
-                                            link === "ellipsis" ? (
-                                                <PaginationItem key={`ellipsis-${idx}`}>
-                                                    <PaginationEllipsis />
-                                                </PaginationItem>
-                                            ) : (
-                                                <PaginationItem key={link}>
-                                                    <PaginationLink
-                                                        isActive={link === currentPage}
-                                                        onClick={() => handlePageChange(link)}
-                                                        className="cursor-pointer"
-                                                        data-testid={`samples-pagination-page-${link}`}
-                                                    >
-                                                        {link}
-                                                    </PaginationLink>
-                                                </PaginationItem>
-                                            )
-                                        )}
+                                                                {/* Card body */}
+                                                                <div className="p-5 flex flex-col flex-1 gap-4">
+                                                                    <div className="flex items-center gap-3">
+                                                                        {!hasThumbnail && getIconForType(sample.media_type)}
+                                                                        <h3 dir="auto" className="font-semibold text-lg line-clamp-2 leading-tight">
+                                                                            {sample.title || `${t('samples.count')} #${sample.id}`}
+                                                                        </h3>
+                                                                    </div>
 
-                                        <PaginationItem>
-                                            <PaginationNext
-                                                onClick={() => handlePageChange(currentPage + 1)}
-                                                aria-disabled={currentPage >= totalPages}
-                                                className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                                text={t("pagination.next", "Next")}
-                                                data-testid="samples-pagination-next-button"
-                                            />
-                                        </PaginationItem>
-                                    </PaginationContent>
-                                </Pagination>
-                            )}
-                        </>
+                                                                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                                                                        {!hasThumbnail && (
+                                                                            <span className="font-medium bg-muted px-2 py-0.5 rounded-md text-xs">
+                                                                                {t(`samples.mediaTypes.${sample.media_type}`, sample.media_type)}
+                                                                            </span>
+                                                                        )}
+                                                                        {sample.high_quality_size > 0 && <span>{t('samples.hq')}: {formatFileSize(sample.high_quality_size)}</span>}
+                                                                        {sample.low_quality_size > 0 && <span>{t('samples.lq')}: {formatFileSize(sample.low_quality_size)}</span>}
+                                                                    </div>
+
+                                                                    {sample.product_id && (
+                                                                        <div className="flex items-start gap-2 border-t border-border pt-3 line-clamp-2">
+                                                                            <Box className="h-4 w-4 shrink-0 text-muted-foreground relative top-0.5" />
+                                                                            <Link
+                                                                                to={`/product/${sample.product_id}`}
+                                                                                dir="auto"
+                                                                                className="text-sm text-muted-foreground hover:text-primary transition-colors hover:underline text-start"
+                                                                            >
+                                                                                {t('samplePage.viewProduct')}: #{sample.product_id}
+                                                                            </Link>
+                                                                        </div>
+                                                                    )}
+
+                                                                    <div className="flex items-center gap-2 mt-auto pt-4 border-t border-border">
+                                                                        <Button
+                                                                            variant="default"
+                                                                            className="flex-1"
+                                                                            asChild
+                                                                            data-testid={`samples-directory-view-${sample.id}`}
+                                                                        >
+                                                                            <Link to={`/samples/${sample.id}`} state={{ sample }}>
+                                                                                <Eye className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
+                                                                                {t("samples.view")}
+                                                                            </Link>
+                                                                        </Button>
+
+                                                                        {sample.low_quality_url && (
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                className="flex-1"
+                                                                                asChild
+                                                                                data-testid={`samples-directory-download-${sample.id}`}
+                                                                            >
+                                                                                <a href={downloadUrl} download>
+                                                                                    <Download className={`${isRtl ? 'ms-2' : 'me-2'} h-4 w-4`} />
+                                                                                    {t("samples.download")}
+                                                                                </a>
+                                                                            </Button>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            );
+                                        })()}
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
                     )}
                 </div>
             </div>

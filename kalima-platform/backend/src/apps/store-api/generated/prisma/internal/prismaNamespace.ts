@@ -388,6 +388,7 @@ export const ModelName = {
   user_analytics: 'user_analytics',
   user_roles: 'user_roles',
   users: 'users',
+  account_review_settings: 'account_review_settings',
   refresh_tokens: 'refresh_tokens',
   assistants: 'assistants',
   government: 'government',
@@ -420,8 +421,10 @@ export const ModelName = {
   purchase_items: 'purchase_items',
   purchase_item_required_fields: 'purchase_item_required_fields',
   payment_methods: 'payment_methods',
+  sample_sections: 'sample_sections',
   images: 'images',
-  product_gallery: 'product_gallery'
+  product_gallery: 'product_gallery',
+  product_gallery_videos: 'product_gallery_videos'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -437,7 +440,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "images" | "product_gallery"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -734,6 +737,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.usersCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UsersCountAggregateOutputType> | number
+        }
+      }
+    }
+    account_review_settings: {
+      payload: Prisma.$account_review_settingsPayload<ExtArgs>
+      fields: Prisma.account_review_settingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.account_review_settingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.account_review_settingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        findFirst: {
+          args: Prisma.account_review_settingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.account_review_settingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        findMany: {
+          args: Prisma.account_review_settingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>[]
+        }
+        create: {
+          args: Prisma.account_review_settingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        createMany: {
+          args: Prisma.account_review_settingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.account_review_settingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>[]
+        }
+        delete: {
+          args: Prisma.account_review_settingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        update: {
+          args: Prisma.account_review_settingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.account_review_settingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.account_review_settingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.account_review_settingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.account_review_settingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        aggregate: {
+          args: Prisma.Account_review_settingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccount_review_settings>
+        }
+        groupBy: {
+          args: Prisma.account_review_settingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Account_review_settingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.account_review_settingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Account_review_settingsCountAggregateOutputType> | number
         }
       }
     }
@@ -3105,6 +3182,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    sample_sections: {
+      payload: Prisma.$sample_sectionsPayload<ExtArgs>
+      fields: Prisma.sample_sectionsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.sample_sectionsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.sample_sectionsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        findFirst: {
+          args: Prisma.sample_sectionsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.sample_sectionsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        findMany: {
+          args: Prisma.sample_sectionsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>[]
+        }
+        create: {
+          args: Prisma.sample_sectionsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        createMany: {
+          args: Prisma.sample_sectionsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.sample_sectionsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>[]
+        }
+        delete: {
+          args: Prisma.sample_sectionsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        update: {
+          args: Prisma.sample_sectionsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        deleteMany: {
+          args: Prisma.sample_sectionsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.sample_sectionsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.sample_sectionsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>[]
+        }
+        upsert: {
+          args: Prisma.sample_sectionsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        aggregate: {
+          args: Prisma.Sample_sectionsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSample_sections>
+        }
+        groupBy: {
+          args: Prisma.sample_sectionsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Sample_sectionsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.sample_sectionsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Sample_sectionsCountAggregateOutputType> | number
+        }
+      }
+    }
     images: {
       payload: Prisma.$imagesPayload<ExtArgs>
       fields: Prisma.imagesFieldRefs
@@ -3253,6 +3404,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    product_gallery_videos: {
+      payload: Prisma.$product_gallery_videosPayload<ExtArgs>
+      fields: Prisma.product_gallery_videosFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.product_gallery_videosFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_gallery_videosPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.product_gallery_videosFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_gallery_videosPayload>
+        }
+        findFirst: {
+          args: Prisma.product_gallery_videosFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_gallery_videosPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.product_gallery_videosFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_gallery_videosPayload>
+        }
+        findMany: {
+          args: Prisma.product_gallery_videosFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_gallery_videosPayload>[]
+        }
+        create: {
+          args: Prisma.product_gallery_videosCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_gallery_videosPayload>
+        }
+        createMany: {
+          args: Prisma.product_gallery_videosCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.product_gallery_videosCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_gallery_videosPayload>[]
+        }
+        delete: {
+          args: Prisma.product_gallery_videosDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_gallery_videosPayload>
+        }
+        update: {
+          args: Prisma.product_gallery_videosUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_gallery_videosPayload>
+        }
+        deleteMany: {
+          args: Prisma.product_gallery_videosDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.product_gallery_videosUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.product_gallery_videosUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_gallery_videosPayload>[]
+        }
+        upsert: {
+          args: Prisma.product_gallery_videosUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_gallery_videosPayload>
+        }
+        aggregate: {
+          args: Prisma.Product_gallery_videosAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProduct_gallery_videos>
+        }
+        groupBy: {
+          args: Prisma.product_gallery_videosGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Product_gallery_videosGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.product_gallery_videosCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Product_gallery_videosCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3355,10 +3580,22 @@ export const UsersScalarFieldEnum = {
   hasUsedPromoCode: 'hasUsedPromoCode',
   email_verified_at: 'email_verified_at',
   role: 'role',
-  created_by: 'created_by'
+  created_by: 'created_by',
+  flag: 'flag'
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
+
+
+export const Account_review_settingsScalarFieldEnum = {
+  id: 'id',
+  role: 'role',
+  requires_review: 'requires_review',
+  updated_at: 'updated_at',
+  updated_by: 'updated_by'
+} as const
+
+export type Account_review_settingsScalarFieldEnum = (typeof Account_review_settingsScalarFieldEnum)[keyof typeof Account_review_settingsScalarFieldEnum]
 
 
 export const Refresh_tokensScalarFieldEnum = {
@@ -3604,6 +3841,7 @@ export const ProductsScalarFieldEnum = {
   thumbnail_id: 'thumbnail_id',
   sample_url: 'sample_url',
   is_archived: 'is_archived',
+  release_at: 'release_at',
   mongo_id: 'mongo_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
@@ -3630,12 +3868,18 @@ export type Product_reviewsScalarFieldEnum = (typeof Product_reviewsScalarFieldE
 
 export const SamplesScalarFieldEnum = {
   id: 'id',
+  section_id: 'section_id',
   product_id: 'product_id',
-  url: 'url',
+  title: 'title',
+  is_archived: 'is_archived',
+  media_type: 'media_type',
+  high_quality_url: 'high_quality_url',
+  low_quality_url: 'low_quality_url',
   original_name: 'original_name',
   mime_type: 'mime_type',
   size: 'size',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type SamplesScalarFieldEnum = (typeof SamplesScalarFieldEnum)[keyof typeof SamplesScalarFieldEnum]
@@ -3779,6 +4023,19 @@ export const Payment_methodsScalarFieldEnum = {
 export type Payment_methodsScalarFieldEnum = (typeof Payment_methodsScalarFieldEnum)[keyof typeof Payment_methodsScalarFieldEnum]
 
 
+export const Sample_sectionsScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  sort_order: 'sort_order',
+  active: 'active',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Sample_sectionsScalarFieldEnum = (typeof Sample_sectionsScalarFieldEnum)[keyof typeof Sample_sectionsScalarFieldEnum]
+
+
 export const ImagesScalarFieldEnum = {
   id: 'id',
   url: 'url',
@@ -3801,6 +4058,22 @@ export const Product_galleryScalarFieldEnum = {
 } as const
 
 export type Product_galleryScalarFieldEnum = (typeof Product_galleryScalarFieldEnum)[keyof typeof Product_galleryScalarFieldEnum]
+
+
+export const Product_gallery_videosScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  url: 'url',
+  source_type: 'source_type',
+  original_name: 'original_name',
+  mime_type: 'mime_type',
+  size: 'size',
+  sort_order: 'sort_order',
+  active: 'active',
+  created_at: 'created_at'
+} as const
+
+export type Product_gallery_videosScalarFieldEnum = (typeof Product_gallery_videosScalarFieldEnum)[keyof typeof Product_gallery_videosScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -3953,6 +4226,20 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'user_flag_enum'
+ */
+export type Enumuser_flag_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'user_flag_enum'>
+    
+
+
+/**
+ * Reference to a field of type 'user_flag_enum[]'
+ */
+export type ListEnumuser_flag_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'user_flag_enum[]'>
+    
+
+
+/**
  * Reference to a field of type 'location_type_enum'
  */
 export type Enumlocation_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'location_type_enum'>
@@ -3995,6 +4282,20 @@ export type ListEnumproduct_type_enumFieldRefInput<$PrismaModel> = FieldRefInput
 
 
 /**
+ * Reference to a field of type 'sample_media_type_enum'
+ */
+export type Enumsample_media_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'sample_media_type_enum'>
+    
+
+
+/**
+ * Reference to a field of type 'sample_media_type_enum[]'
+ */
+export type ListEnumsample_media_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'sample_media_type_enum[]'>
+    
+
+
+/**
  * Reference to a field of type 'field_type_enum'
  */
 export type Enumfield_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'field_type_enum'>
@@ -4019,6 +4320,20 @@ export type Enumimage_mime_type_enumFieldRefInput<$PrismaModel> = FieldRefInputT
  * Reference to a field of type 'image_mime_type_enum[]'
  */
 export type ListEnumimage_mime_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'image_mime_type_enum[]'>
+    
+
+
+/**
+ * Reference to a field of type 'video_source_type_enum'
+ */
+export type Enumvideo_source_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'video_source_type_enum'>
+    
+
+
+/**
+ * Reference to a field of type 'video_source_type_enum[]'
+ */
+export type ListEnumvideo_source_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'video_source_type_enum[]'>
     
 
 
@@ -4134,6 +4449,7 @@ export type GlobalOmitConfig = {
   user_analytics?: Prisma.user_analyticsOmit
   user_roles?: Prisma.user_rolesOmit
   users?: Prisma.usersOmit
+  account_review_settings?: Prisma.account_review_settingsOmit
   refresh_tokens?: Prisma.refresh_tokensOmit
   assistants?: Prisma.assistantsOmit
   government?: Prisma.governmentOmit
@@ -4166,8 +4482,10 @@ export type GlobalOmitConfig = {
   purchase_items?: Prisma.purchase_itemsOmit
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsOmit
   payment_methods?: Prisma.payment_methodsOmit
+  sample_sections?: Prisma.sample_sectionsOmit
   images?: Prisma.imagesOmit
   product_gallery?: Prisma.product_galleryOmit
+  product_gallery_videos?: Prisma.product_gallery_videosOmit
 }
 
 /* Types for Logging */

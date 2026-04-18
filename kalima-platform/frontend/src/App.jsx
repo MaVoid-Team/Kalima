@@ -5,7 +5,7 @@ import LoadingSpinner from "@/components/ui/loading-spinner";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AdminRoute from "./components/AdminRoute";
+import RoleRoute from "./components/RoleRoute"; // REPLACED AdminRoute
 import MainLayout from "./layouts/MainLayout";
 import CouponsPage from "./pages/admin/coupons/CouponsPage";
 
@@ -37,6 +37,7 @@ const CartPage = lazy(() => import("./pages/cart/CartPage"));
 
 // Admin lazy-loaded pages
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
+const DashboardPage = lazy(() => import("./pages/admin/dashboard/DashboardPage"));
 const OrdersPage = lazy(() => import("./pages/admin/orders/OrdersPage"));
 const OrderDetailPage = lazy(
   () => import("./pages/admin/orders/OrderDetailPage"),
@@ -51,15 +52,34 @@ const CategoriesPage = lazy(
 const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
 const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
 const AdminSamplesPage = lazy(() => import("./pages/admin/samples/AdminSamplesPage"));
+const AdminSampleSectionDetailPage = lazy(() => import("./pages/admin/samples/AdminSampleSectionDetailPage"));
 const SettingsPage = lazy(() => import("./pages/admin/settings/SettingsPage"))
 const PaymentMethodsPage = lazy(() => import("./pages/admin/payment-methods/PaymentMethodsPage"));
 const RequiredFieldsPage = lazy(() => import("./pages/admin/required-fields/RequiredFieldsPage"));
+const AnalyticsPage = lazy(() => import("./pages/admin/analytics/AnalyticsPage"));
+const EmployeePerformancePage = lazy(() => import("./pages/admin/employee-performance/EmployeePerformancePage"));
+
 // Public viewer (no layout)
 const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
 const SamplesDirectoryPage = lazy(() => import("./pages/sample/SamplesDirectoryPage"));
 const SamplePreview = lazy(() => import("./pages/sample/SamplePreviewPage"))
 // User lazy-loaded pages
 const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
+
+// Teacher lazy-loaded pages
+const TeacherLayout = lazy(() => import("./layouts/TeacherLayout"));
+const TeacherProfilePage = lazy(() => import("./pages/teacher/profile/TeacherProfilePage"));
+const TeacherSettingsPage = lazy(() => import("./pages/teacher/settings/TeacherSettingsPage"));
+
+// Student lazy-loaded pages
+const StudentLayout = lazy(() => import("./layouts/StudentLayout"));
+const StudentProfilePage = lazy(() => import("./pages/student/profile/StudentProfilePage"));
+const StudentSettingsPage = lazy(() => import("./pages/student/settings/StudentSettingsPage"));
+
+// Parent lazy-loaded pages
+const ParentLayout = lazy(() => import("./layouts/ParentLayout"));
+const ParentProfilePage = lazy(() => import("./pages/parent/profile/ParentProfilePage"));
+const ParentSettingsPage = lazy(() => import("./pages/parent/settings/ParentSettingsPage"));
 
 const PageLoader = () => (
   <div className="flex min-h-screen items-center justify-center">
@@ -90,32 +110,41 @@ const router = createBrowserRouter(
       {/* Public Routes with MainLayout (Navbar & Footer) */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/market" element={<MarketPage />} />
-        <Route path="/samples" element={<SamplesDirectoryPage />} />
-        <Route path="/samples/:id" element={<SamplePage />} />
-        <Route path="/samples/:id/preview" element={<SamplePreview />} />
-        <Route path="/product/:id" element={<ProductDetailsPage />} />
-        <Route path="/booklet/:id" element={<BookletDetailsPage />} />
+        
+        {/* Market and Product Routes - Restricted for Students and Parents */}
+        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+          <Route path="/market" element={<MarketPage />} />
+          <Route path="/product/:id" element={<ProductDetailsPage />} />
+          <Route path="/booklet/:id" element={<BookletDetailsPage />} />
+        </Route>
+        {/* Samples Routes - Restricted for Students and Parents */}
+        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+          <Route path="/samples" element={<SamplesDirectoryPage />} />
+          <Route path="/samples/:id" element={<SamplePage />} />
+          <Route path="/samples/:id/preview" element={<SamplePreview />} />
+        </Route>
 
-        {/* Protected Routes inside MainLayout */}
-        <Route element={<ProtectedRoute requireAuth={true} />}>
-          <Route path="/cart" element={<WizardCheckoutPage />} />
-          <Route path="/checkout" element={<WizardCheckoutPage />} />
-          <Route path="/orders" element={<MyOrdersPage />} />
-          {/* <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} /> */}
-          <Route
-            path="/fast-buy/checkout"
-            element={<FastBuyCheckoutPage />}
-          />
+        {/* Protected Store Routes (Auth Required) - Also Restricted for Students and Parents */}
+        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+          <Route element={<ProtectedRoute requireAuth={true} />}>
+            <Route path="/cart" element={<WizardCheckoutPage />} />
+            <Route path="/checkout" element={<WizardCheckoutPage />} />
+            <Route path="/orders" element={<MyOrdersPage />} />
+            <Route
+              path="/fast-buy/checkout"
+              element={<FastBuyCheckoutPage />}
+            />
+          </Route>
         </Route>
 
         {/* 404 Fallback */}
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       {/* Admin Routes */}
-      <Route element={<AdminRoute />}>
+      <Route element={<RoleRoute requiredRole={["Admin", "SubAdmin"]} />}>
         <Route element={<AdminLayout />}>
+          <Route path="/admin" element={<DashboardPage />} />
+          <Route path="/admin/dashboard" element={<DashboardPage />} />
           <Route path="/admin/orders" element={<OrdersPage />} />
           <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
           <Route path="/admin/products" element={<ProductsPage />} />
@@ -128,8 +157,35 @@ const router = createBrowserRouter(
           <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/admin/users/:id" element={<UserDetailPage />} />
           <Route path="/admin/samples" element={<AdminSamplesPage />} />
+          <Route path="/admin/samples/:id" element={<AdminSampleSectionDetailPage />} />
           <Route path="/admin/coupons" element={<CouponsPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
+          <Route path="/admin/analytics" element={<AnalyticsPage />} />
+          <Route path="/admin/employee-performance" element={<EmployeePerformancePage />} />
+        </Route>
+      </Route>
+
+      {/* Teacher Routes */}
+      <Route element={<RoleRoute requiredRole={["Teacher"]} />}>
+        <Route element={<TeacherLayout />}>
+          <Route path="/teacher/profile" element={<TeacherProfilePage />} />
+          <Route path="/teacher/settings" element={<TeacherSettingsPage />} />
+        </Route>
+      </Route>
+
+      {/* Student Routes */}
+      <Route element={<RoleRoute requiredRole={["Student"]} />}>
+        <Route element={<StudentLayout />}>
+          <Route path="/student/profile" element={<StudentProfilePage />} />
+          <Route path="/student/settings" element={<StudentSettingsPage />} />
+        </Route>
+      </Route>
+
+      {/* Parent Routes */}
+      <Route element={<RoleRoute requiredRole={["Parent"]} />}>
+        <Route element={<ParentLayout />}>
+          <Route path="/parent/profile" element={<ParentProfilePage />} />
+          <Route path="/parent/settings" element={<ParentSettingsPage />} />
         </Route>
       </Route>
 

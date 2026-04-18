@@ -5,13 +5,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import {
-    ChevronLeft, ChevronRight, PlusCircle, X, Loader2, Package, Save
+    ChevronLeft, PlusCircle, X, Package, Save, Calendar as CalendarIcon, CircleHelp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 import {
     Form,
     FormControl,
@@ -30,12 +31,23 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useCategories } from '@/hooks/useCategories';
 import GalleryManager from '@/components/admin/products/GalleryManager';
 import ThumbnailManager from '@/components/admin/products/ThumbnailManager';
 import FileUploadProgress from '@/components/admin/settings/FileUploadProgress';
 import { toast } from 'sonner';
+import { format, startOfDay } from 'date-fns';
+import { arSA } from 'react-day-picker/locale';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 
 
 
@@ -50,21 +62,31 @@ export default function EditProductPage() {
         title: z.string().min(1, t('products.form.titleIsRequired')).max(255, t('products.form.titleMaxLength')),
         price: z.coerce.number().min(0, t('products.form.priceMustBeGreaterThan0')),
         type: z.enum(['Product', 'Book']),
+        isFreePreview: z.boolean().optional(),
         description: z.string().optional(),
         price_after_discount: z.preprocess(
             (val) => (val === '' || val == null ? undefined : val),
-            z.coerce.number().positive(t('products.form.discountedPriceMustBeGreaterThan0')).optional()
+            z.coerce.number().min(0, t('products.form.discountedPriceMustBeGreaterThan0')).optional()
         ),
         serial: z.string().max(100, t('products.form.serialMaxLength')).optional().or(z.literal('')),
         coupon_id: z.preprocess(
             (val) => (val === '' || val == null ? undefined : val),
             z.coerce.number().int(t('products.form.couponIdMustBeInteger')).positive(t('products.form.couponIdMustBeGreaterThan0')).optional()
         ),
+        release_at: z.string().optional().or(z.literal('')),
         perks: z.string().optional().or(z.literal('')),
         is_archived: z.boolean(),
     }).refine(
-        (data) => !data.price_after_discount || data.price_after_discount < data.price,
+        (data) => {
+            if (data.isFreePreview) return data.price_after_discount === 0;
+            if (data.price_after_discount == null) return true;
+            if (data.price > 0) return data.price_after_discount < data.price;
+            return data.price_after_discount === 0;
+        },
         { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
+    ).refine(
+        (data) => !data.release_at || new Date(data.release_at) >= startOfDay(new Date()),
+        { message: t('products.form.releaseDateMustBeFuture', 'Release date must be today or in the future'), path: ['release_at'] }
     );
 
     const {
@@ -85,6 +107,9 @@ export default function EditProductPage() {
         addGalleryImages,
         updateGalleryEntry,
         removeGalleryEntry,
+        addGalleryVideo,
+        addExternalGalleryVideo,
+        removeGalleryVideo,
     } = useAdminProducts();
 
     const {
@@ -123,10 +148,12 @@ export default function EditProductPage() {
             title: '',
             description: '',
             type: 'Product',
+            isFreePreview: false,
             price: '',
             price_after_discount: '',
             serial: '',
             coupon_id: '',
+            release_at: '',
             perks: '',
             is_archived: false,
         },
@@ -159,10 +186,12 @@ export default function EditProductPage() {
                 description: selectedProduct.description ?? '',
                 type: selectedProduct.type ?? 'Product',
                 price: selectedProduct.price != null ? String(selectedProduct.price) : '',
+                isFreePreview: selectedProduct.price_after_discount === 0,
                 price_after_discount: selectedProduct.price_after_discount != null
                     ? String(selectedProduct.price_after_discount) : '',
                 serial: selectedProduct.serial ?? '',
                 coupon_id: selectedProduct.coupon_id != null ? String(selectedProduct.coupon_id) : '',
+                release_at: selectedProduct.release_at ? new Date(new Date(selectedProduct.release_at).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '',
                 perks: selectedProduct.perks ?? '',
                 is_archived: selectedProduct.is_archived ?? false,
             });
@@ -305,6 +334,51 @@ export default function EditProductPage() {
         }
     };
 
+    const handleGalleryVideoUpload = async (formData) => {
+        const abortController = new AbortController();
+        setUploadAbortController(abortController);
+
+        setIsUploading(true);
+        setUploadFileName('Gallery video');
+        setUploadError('');
+        setUploadProgress(0);
+
+        try {
+            const res = await addGalleryVideo(id, formData, (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
+            }, abortController.signal);
+            if (!res?.success) {
+                setUploadError(res?.message || 'Upload failed');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                setUploadError(error.message || 'Upload failed');
+            }
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadFileName('');
+            setUploadAbortController(null);
+        }
+    };
+
+    const handleGalleryExternalVideo = async (url) => {
+        setIsUploading(true);
+        try {
+            const res = await addExternalGalleryVideo(id, url);
+            if (!res?.success) {
+                toast.error(res?.message || 'Failed to add external video');
+            }
+        } catch (error) {
+            toast.error(error.message || 'Failed to add external video');
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     const handleUploadCancel = () => {
         if (uploadAbortController) {
             uploadAbortController.abort();
@@ -357,9 +431,20 @@ export default function EditProductPage() {
             is_archived: values.is_archived,
         };
         if (values.description) payload.description = values.description;
-        if (values.price_after_discount) payload.price_after_discount = values.price_after_discount;
+        if (values.isFreePreview) {
+            payload.price_after_discount = 0;
+        } else if (values.price_after_discount != null && values.price_after_discount !== '') {
+            payload.price_after_discount = values.price_after_discount;
+        }
         if (values.serial) payload.serial = values.serial;
         if (values.coupon_id) payload.coupon_id = values.coupon_id;
+
+        if (values.release_at) {
+            payload.release_at = new Date(values.release_at).toISOString();
+        } else {
+            payload.release_at = null;
+        }
+
         payload.perks = values.perks || '';
 
         const res = await updateProduct(id, payload);
@@ -500,6 +585,48 @@ export default function EditProductPage() {
                             />
                         </div>
 
+                        <FormField
+                            control={form.control}
+                            name="isFreePreview"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                                    <div className="space-y-0.5">
+                                        <FormLabel className="flex items-center gap-1.5">
+                                            {t('products.form.freePreviewToggle')}
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <button
+                                                            type="button"
+                                                            className="text-muted-foreground hover:text-foreground transition-colors"
+                                                            aria-label={t('products.form.freePreviewHintAria', 'Free preview hint')}
+                                                        >
+                                                            <CircleHelp className="h-4 w-4" />
+                                                        </button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent side="top" className="max-w-[260px]">
+                                                        {t('products.form.freePreviewHint', 'Enabling this will set the product discount to 100% (free).')}
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        </FormLabel>
+                                    </div>
+                                    <FormControl>
+                                        <Switch
+                                            checked={!!field.value}
+                                            onCheckedChange={(checked) => {
+                                                field.onChange(checked);
+                                                if (checked) {
+                                                    form.setValue('price_after_discount', '0', { shouldValidate: true, shouldDirty: true });
+                                                }
+                                            }}
+                                            data-testid="edit-product-free-preview-toggle"
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
@@ -513,6 +640,7 @@ export default function EditProductPage() {
                                                 min="0"
                                                 step="0.01"
                                                 data-testid="edit-product-discount-input"
+                                                disabled={!!form.watch('isFreePreview')}
                                                 {...field}
                                             />
                                         </FormControl>
@@ -539,6 +667,76 @@ export default function EditProductPage() {
                             />
                         </div>
 
+                        {/* Release At + Perks */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="release_at"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col">
+                                        <FormLabel className="flex items-center gap-2">
+                                            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                                            {t('products.form.releaseAt', 'Release Date')}
+                                        </FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        type="button"
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-full pl-3 text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                        data-testid="edit-product-release-at-input"
+                                                    >
+                                                        {field.value ? (
+                                                            format(new Date(field.value), "PPP", { locale: isRtl ? arSA : undefined })
+                                                        ) : (
+                                                            <span>{t('products.form.pickDate', 'Pick a date')}</span>
+                                                        )}
+                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value ? new Date(field.value) : undefined}
+                                                    onSelect={(date) => field.onChange(date ? date.toISOString() : '')}
+                                                    disabled={(date) => date < startOfDay(new Date())}
+                                                    initialFocus
+                                                    locale={isRtl ? arSA : undefined}
+                                                    dir={isRtl ? 'rtl' : 'ltr'}
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="perks"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t('products.form.perks')}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder={t('products.form.perksPlaceholder')}
+                                                data-testid="edit-product-perks-input"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <p className="text-[0.8rem] text-muted-foreground mt-1">
+                                            {t('products.form.perksTip')}
+                                        </p>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
                         <FormField
                             control={form.control}
                             name="description"
@@ -552,27 +750,6 @@ export default function EditProductPage() {
                                             {...field}
                                         />
                                     </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="perks"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t('products.form.perks')}</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder={t('products.form.perksPlaceholder')}
-                                            data-testid="edit-product-perks-input"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <p className="text-[0.8rem] text-muted-foreground mt-1">
-                                        {t('products.form.perksTip')}
-                                    </p>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -618,8 +795,11 @@ export default function EditProductPage() {
                         <GalleryManager
                             product={selectedProduct}
                             onAddImages={handleGalleryUpload}
+                            onAddVideo={handleGalleryVideoUpload}
+                            onAddExternalVideo={handleGalleryExternalVideo}
                             onUpdateEntry={(galleryId, data) => updateGalleryEntry(id, galleryId, data)}
-                            onRemoveEntry={(galleryId) => removeGalleryEntry(id, galleryId)}
+                            onRemoveImage={(galleryId) => removeGalleryEntry(id, galleryId)}
+                            onRemoveVideo={(videoId) => removeGalleryVideo(id, videoId)}
                             loading={isUploading}
                         />
                     </div>
@@ -685,7 +865,7 @@ export default function EditProductPage() {
                             {selectedRootId && (
                                 childrenLoading ? (
                                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <LoadingSpinner className="h-4 w-4 text-primary-foreground" />
                                         <span>{t('common.loading')}</span>
                                     </div>
                                 ) : hasChildren ? (
@@ -712,7 +892,7 @@ export default function EditProductPage() {
                             {selectedChildId && (
                                 grandchildrenLoading ? (
                                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <LoadingSpinner className="h-4 w-4 text-primary-foreground" />
                                         <span>{t('common.loading')}</span>
                                     </div>
                                 ) : hasGrandchildren ? (
@@ -830,7 +1010,7 @@ export default function EditProductPage() {
                             data-testid="edit-product-submit-button"
                         >
                             {actionLoading ? (
-                                <><Loader2 className="me-2 h-4 w-4 animate-spin" />{t('products.edit.saving')}</>
+                                <><LoadingSpinner className="h-4 w-4 text-primary-foreground" />{t('products.edit.saving')}</>
                             ) : (
                                 <><Save className="me-2 h-4 w-4" />{t('products.edit.submit')}</>
                             )}

@@ -5,10 +5,20 @@ import CategorySidebar from "@/components/MarketPage/CategorySidebar";
 import ProductGrid from "@/components/MarketPage/ProductGrid";
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
+import { useNavigate } from "react-router-dom";
+import useRole from "@/hooks/useRole";
 import { cn } from "@/lib/utils";
 
 export default function MarketPage() {
   const { t } = useTranslation("market");
+  const { isStudent } = useRole();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (isStudent) {
+      navigate("/", { replace: true });
+    }
+  }, [isStudent, navigate]);
 
   React.useEffect(() => {
     window.scrollTo(0, 0);

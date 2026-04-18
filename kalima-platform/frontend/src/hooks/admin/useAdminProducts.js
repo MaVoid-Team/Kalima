@@ -96,6 +96,17 @@ export const useAdminProducts = () => {
             });
 
             if (data?.success) {
+                // Fetch full gallery directly
+                const galleryData = await fetchApi({
+                    endpoint: `/products/${productId}/gallery/full`,
+                    method: 'get'
+                });
+                if (galleryData?.success) {
+                    const { images, videos } = galleryData.data;
+                    data.data.product_gallery_full = [...(images || []), ...(videos || [])].sort((a, b) => a.sort_order - b.sort_order);
+                } else {
+                    data.data.product_gallery_full = [];
+                }
                 setSelectedProduct(data.data);
             } else {
                 setSelectedProduct(null);
@@ -207,6 +218,41 @@ export const useAdminProducts = () => {
     const removeGalleryEntry = (productId, galleryId) =>
         handleAction(() => fetchApi({
             endpoint: `/products/${productId}/gallery/${galleryId}`,
+            method: 'delete',
+        }).then(res => {
+            if (res?.success) fetchProductById(productId);
+            return res;
+        }));
+
+    const addGalleryVideo = (productId, formData, onUploadProgress, signal) => {
+        setActionLoading(true);
+        return fetchApi({
+            endpoint: `/products/${productId}/gallery/videos`,
+            method: 'post',
+            data: formData,
+            onUploadProgress,
+            signal,
+        }).then(res => {
+            if (res?.success) fetchProductById(productId);
+            return res;
+        }).finally(() => {
+            setActionLoading(false);
+        });
+    };
+
+    const addExternalGalleryVideo = (productId, url) =>
+        handleAction(() => fetchApi({
+            endpoint: `/products/${productId}/gallery/videos/external`,
+            method: 'post',
+            data: { url },
+        }).then(res => {
+            if (res?.success) fetchProductById(productId);
+            return res;
+        }));
+
+    const removeGalleryVideo = (productId, videoId) =>
+        handleAction(() => fetchApi({
+            endpoint: `/products/${productId}/gallery/videos/${videoId}`,
             method: 'delete',
         }).then(res => {
             if (res?.success) fetchProductById(productId);
@@ -391,6 +437,9 @@ export const useAdminProducts = () => {
         addGalleryImages,
         updateGalleryEntry,
         removeGalleryEntry,
+        addGalleryVideo,
+        addExternalGalleryVideo,
+        removeGalleryVideo,
 
         // Categories
         attachCategories,

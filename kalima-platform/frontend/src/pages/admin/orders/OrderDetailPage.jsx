@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle } from 'lucide-react';
+import { ChevronLeft, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle, ExternalLink } from 'lucide-react';
 import useOrders from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +19,16 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { formatCurrency, formatOrderDate, getImageUrl, getStatusColor } from '@/lib/storeUtils';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { formatCurrency, formatOrderDate, getImageUrl, getStatusColor, formatPhone } from '@/lib/storeUtils';
 
 export default function OrderDetailPage() {
     const { id } = useParams();
@@ -39,6 +48,8 @@ export default function OrderDetailPage() {
     } = useOrders(id);
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
+    const [editableWhatsAppMessage, setEditableWhatsAppMessage] = useState('');
 
     if (loading) {
         return <div className="p-8 text-center text-muted-foreground">{t('orders.details.loading', 'Loading details...')}</div>;
@@ -68,6 +79,46 @@ export default function OrderDetailPage() {
         (item) => (item.purchase_item_required_fields ?? []).length > 0
     );
 
+    const whatsappPhone = order.users?.phone?.replace(/\D/g, '');
+    const whatsappItems = (order?.purchase_items ?? []).map((item, index) => {
+        const title = item.products?.title || item.product?.title || item.title || `#${item.id}`;
+        return `- منتج ${index + 1}: ${title} (${item.quantity}x ${item.price} جم)`;
+    });
+    
+    const whatsappMessage = [
+        `هلاً بك أ/ ${order?.users?.name || '-'}`,
+        'تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.',
+        '',
+        `رقم الطلب: ${order.purchase_serial || `#${order.id}`}`,
+        '',
+        'المنتجات:',
+        whatsappItems.length ? whatsappItems.join('\n') : '-',
+        '',
+        `الإجمالي: ${order.total} جنية`,
+        '',
+        'لو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.',
+        'نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا!',
+        '',
+        'مع تحيات فريق عمل',
+        'منصة كلمة',
+    ].join('\n');
+
+    const whatsappHref = whatsappPhone
+        ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(editableWhatsAppMessage || whatsappMessage)}`
+        : '#';
+
+    const openWhatsAppDialog = () => {
+        setEditableWhatsAppMessage(whatsappMessage);
+        setIsWhatsAppDialogOpen(true);
+    };
+
+    const handleWhatsAppSend = () => {
+        if (whatsappPhone && whatsappHref !== '#') {
+            window.open(whatsappHref, '_blank', 'noopener,noreferrer');
+            setIsWhatsAppDialogOpen(false);
+        }
+    };
+
     return (
         <div className="max-w-6xl mx-auto space-y-6">
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -87,14 +138,45 @@ export default function OrderDetailPage() {
                 </AlertDialogContent>
             </AlertDialog>
 
+            <Dialog open={isWhatsAppDialogOpen} onOpenChange={setIsWhatsAppDialogOpen}>
+                <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col p-0 overflow-hidden">
+                    <DialogHeader className="p-6 pb-0">
+                        <DialogTitle>{t('orders.actions.editWhatsAppMessage', 'Edit WhatsApp Message')}</DialogTitle>
+                        <DialogDescription>
+                            {t('orders.actions.editWhatsAppMessageDesc', 'Review and edit the message before sending it to the customer.')}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex-1 overflow-y-auto p-6">
+                        <Textarea
+                            value={editableWhatsAppMessage}
+                            onChange={(e) => setEditableWhatsAppMessage(e.target.value)}
+                            className="font-sans text-sm min-h-[300px] leading-relaxed resize-none"
+                            placeholder={t('orders.actions.whatsappPlaceholder', 'Type your message here...')}
+                        />
+                    </div>
+                    <DialogFooter className="p-6 pt-0">
+                        <Button variant="outline" onClick={() => setIsWhatsAppDialogOpen(false)}>
+                            {t('common.cancel', 'Cancel')}
+                        </Button>
+                        <Button
+                            onClick={handleWhatsAppSend}
+                            className="bg-success text-success-foreground hover:bg-success/90"
+                        >
+                            <MessageCircle className="h-4 w-4 me-2" />
+                            {t('orders.actions.sendOnWhatsApp', 'Send on WhatsApp')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
-                <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                <div className="flex items-center gap-4">
                     <Button variant="ghost" size="icon" onClick={() => navigate('/admin/orders')} className="shrink-0" data-testid="order-detail-back-button">
                         <ChevronLeft />
                     </Button>
                     <div>
-                        <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div className="flex items-center gap-3">
                             <h1 className="text-2xl font-bold tracking-tight">
                                 {order.purchase_serial || `#${order.id}`}
                             </h1>
@@ -123,7 +205,7 @@ export default function OrderDetailPage() {
                             className="bg-primary/10 text-primary hover:bg-primary/20"
                             data-testid="order-detail-receive-button"
                         >
-                            <Package className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
+                            <Package className="me-2 h-4 w-4" />
                             {t('orders.actions.receive')}
                         </Button>
                     )}
@@ -135,7 +217,7 @@ export default function OrderDetailPage() {
                             className="bg-success text-success-foreground hover:bg-success/90"
                             data-testid="order-detail-confirm-button"
                         >
-                            <CheckCircle className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
+                            <CheckCircle className="me-2 h-4 w-4" />
                             {t('orders.actions.confirm')}
                         </Button>
                     )}
@@ -148,7 +230,7 @@ export default function OrderDetailPage() {
                             className="text-highlight border-highlight hover:bg-highlight/10"
                             data-testid="order-detail-return-button"
                         >
-                            <RotateCcw className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
+                            <RotateCcw className="me-2 h-4 w-4" />
                             {t('orders.actions.return')}
                         </Button>
                     )}
@@ -157,10 +239,10 @@ export default function OrderDetailPage() {
                         variant="destructive"
                         onClick={() => setDeleteDialogOpen(true)}
                         disabled={actionLoading}
-                        className="ml-auto"
+                        className="ms-auto"
                         data-testid="order-detail-delete-button"
                     >
-                        <Trash2 className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2 rtl:scale-x-[-1]" />
+                        <Trash2 className="me-2 h-4 w-4" />
                         {t('orders.actions.delete')}
                     </Button>
                 </div>
@@ -191,18 +273,55 @@ export default function OrderDetailPage() {
                                                 {t('orders.details.item', 'Item')} {itemIndex + 1}: {item.products?.title || item.product?.title || item.title || `#${item.id}`}
                                             </div>
 
-                                            <div className="space-y-2">
-                                                {requiredFields.map((field, index) => (
-                                                    <div
-                                                        key={field.id || `${item.id || itemIndex}-${field.field_definition_id || index}`}
-                                                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3 text-sm"
-                                                    >
-                                                        <span className="text-muted-foreground">
-                                                            {field.required_field_definitions?.label || t('orders.details.field', 'Field')}
-                                                        </span>
-                                                        <span className="font-mono break-all">{field.value || '-'}</span>
-                                                    </div>
-                                                ))}
+                                            <div className="space-y-4 sm:space-y-2">
+                                                {requiredFields.map((field, index) => {
+                                                    const fieldType = field.required_field_definitions?.field_type;
+                                                    const isFile = fieldType === 'file' || fieldType === 'image';
+                                                    return (
+                                                        <div
+                                                            key={field.id || `${item.id || itemIndex}-${field.field_definition_id || index}`}
+                                                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 text-sm"
+                                                        >
+                                                            <span className="text-muted-foreground font-medium shrink-0">
+                                                                {field.required_field_definitions?.label || t('orders.details.field', 'Field')}
+                                                            </span>
+                                                            <div className="sm:max-w-[70%] text-right overflow-hidden break-all">
+                                                                {isFile && field.value ? (
+                                                                    <div className="flex flex-col items-end gap-1.5">
+                                                                        <a
+                                                                            href={getImageUrl(field.value)}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="inline-block border rounded-md overflow-hidden hover:opacity-90 transition-opacity shadow-sm bg-muted"
+                                                                        >
+                                                                            <img
+                                                                                src={getImageUrl(field.value)}
+                                                                                alt="User Upload"
+                                                                                className="h-16 w-auto object-cover max-w-full"
+                                                                                data-testid={`order-detail-required-file-${field.id}`}
+                                                                                onError={(e) => {
+                                                                                    // If image fails, hide it and just show the link
+                                                                                    e.target.style.display = 'none';
+                                                                                }}
+                                                                            />
+                                                                        </a>
+                                                                        <a
+                                                                            href={getImageUrl(field.value)}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="text-[10px] text-primary hover:underline flex items-center gap-1 font-medium"
+                                                                        >
+                                                                            <ExternalLink className="h-3 w-3" />
+                                                                            {t('orders.details.viewImage', 'View Image')}
+                                                                        </a>
+                                                                    </div>
+                                                                ) : (
+                                                                    <span className="font-mono">{formatPhone(field.value || '-')}</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     );
@@ -217,6 +336,31 @@ export default function OrderDetailPage() {
                         initialNote={order.admin_notes}
                         onSaveNote={addAdminNote}
                     />
+
+                    {/* Customer Info */}
+                    <div className="border rounded-md p-4 space-y-3" data-testid="order-detail-customer-info-section">
+                        <h3 className="font-medium text-primary">{t('orders.details.customerInfo')}</h3>
+                        <div className="space-y-1 text-sm overflow-hidden">
+                            <div className="font-medium truncate" title={order.users?.name || 'N/A'}>{order.users?.name || 'N/A'}</div>
+                            <div className="text-muted-foreground truncate" title={order.users?.email}>{order.users?.email}</div>
+                            {order.users?.phone && (
+                                <div className="flex items-center gap-3 mt-2">
+                                    <div className="text-muted-foreground truncate" title={formatPhone(order.users.phone)}>{formatPhone(order.users.phone)}</div>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={openWhatsAppDialog}
+                                        className="h-7 px-2 py-1 text-success border border-success/30 hover:bg-success/10 hover:border-success/50 hover:text-success text-xs font-medium flex items-center gap-1.5"
+                                        title={t('orders.details.contactWhatsApp', 'Contact on WhatsApp')}
+                                        data-testid="order-detail-whatsapp-button"
+                                    >
+                                        <MessageCircle className="h-3 w-3" />
+                                        WhatsApp
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 <div className="space-y-6">
@@ -243,36 +387,13 @@ export default function OrderDetailPage() {
                         </div>
                     </div>
 
-                    {/* Customer Info */}
-                    <div className="border rounded-md p-4 space-y-3">
-                        <h3 className="font-medium">{t('orders.details.customerInfo')}</h3>
-                        <div className="space-y-1 text-sm overflow-hidden">
-                            <div className="font-medium truncate" title={order.users?.name || 'N/A'}>{order.users?.name || 'N/A'}</div>
-                            <div className="text-muted-foreground truncate" title={order.users?.email}>{order.users?.email}</div>
-                            {order.users?.phone && (
-                                <div className="flex items-center gap-3 mt-2">
-                                    <div className="text-muted-foreground truncate" title={order.users.phone}>{order.users.phone}</div>
-                                    <a
-                                        href={`https://wa.me/${order.users.phone.replace(/\D/g, '')}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground h-7 px-2 py-1 text-success border-success/30 hover:border-success/50"
-                                        title={t('orders.details.contactWhatsApp', 'Contact on WhatsApp')}
-                                        data-testid="order-detail-whatsapp-link"
-                                    >
-                                        <MessageCircle className="h-3 w-3 mr-1.5 rtl:mr-0 rtl:ml-1.5" />
-                                        WhatsApp
-                                    </a>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+
 
                     {/* Customer Notes */}
                     {order.notes && (
-                        <div className="border rounded-md p-4 space-y-3">
-                            <h3 className="font-medium">{t('orders.details.customerNotes', 'Customer Notes')}</h3>
-                            <div className="text-sm whitespace-pre-wrap text-muted-foreground">
+                        <div className="bg-destructive/5 border-destructive/20 border rounded-md p-4 space-y-3">
+                            <h3 className="font-medium text-destructive">{t('orders.details.customerNotes', 'Customer Notes')}</h3>
+                            <div className="text-sm whitespace-pre-wrap text-destructive/80">
                                 {order.notes}
                             </div>
                         </div>

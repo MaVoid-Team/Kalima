@@ -1,87 +1,92 @@
-import { Search } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Search, X } from 'lucide-react';
+
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useCallback, useEffect, useState } from 'react';
-import { ROLES, PORTALS } from '@/lib/adminConstants';
-import debounce from 'lodash/debounce';
+import { Button } from '@/components/ui/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { ROLES } from '@/lib/adminConstants';
 
-export default function UserFilters({ filters, onSearchChange, onRoleChange, onPortalChange, onIsDeletedChange }) {
+export default function UserFilters({ onFiltersChange, initialSearch = '', initialRole = '' }) {
     const { t, i18n } = useTranslation('userManagement');
-    const [searchValue, setSearchValue] = useState(filters.search || '');
 
-    // Debounce search to avoid spamming the API
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const debouncedSearch = useCallback(
-        debounce((value) => {
-            onSearchChange(value);
-        }, 500),
-        [onSearchChange]
-    );
+    const [search, setSearch] = useState(initialSearch);
+    const [role, setRole] = useState(initialRole);
+    const debounceRef = useRef(null);
 
+    // Debounce search input
     useEffect(() => {
-        setSearchValue(filters.search || '');
-    }, [filters.search]);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            onFiltersChange({ search, role });
+        }, 400);
+        return () => clearTimeout(debounceRef.current);
+    }, [search, role, onFiltersChange]);
 
-    const handleSearchChange = (e) => {
-        const val = e.target.value;
-        setSearchValue(val);
-        debouncedSearch(val);
+    const handleRoleChange = (value) => {
+        const newRole = value === 'all' ? '' : value;
+        setRole(newRole);
     };
 
+    const handleClear = () => {
+        setSearch('');
+        setRole('');
+    };
+
+    const hasActiveFilters = search || role;
+
     return (
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3" data-testid="users-page-filters">
+            {/* Search */}
             <div className="relative flex-1">
-                <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                 <Input
+                    className="ps-9"
                     placeholder={t('searchPlaceholder')}
-                    value={searchValue}
-                    onChange={handleSearchChange}
-                    className="ps-10"
-                    data-testid="admin-users-filters-search-input"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    data-testid="users-page-search-input"
                 />
             </div>
 
-            <div className="flex gap-4">
-                <Select dir={i18n.dir()} value={filters.role || 'all'} onValueChange={onRoleChange}>
-                    <SelectTrigger className="w-[160px]">
-                        <SelectValue placeholder={t('filters.allRoles')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">{t('filters.allRoles')}</SelectItem>
-                        {ROLES.map(role => (
-                            <SelectItem key={role} value={role}>
-                                {t(`roles.${role}`)}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+            {/* Role filter */}
+            <Select
+                dir={i18n.dir()}
+                value={role || 'all'}
+                onValueChange={handleRoleChange}
+            >
+                <SelectTrigger className="w-full sm:w-[180px]" data-testid="users-page-role-filter">
+                    <SelectValue placeholder={t('filters.allRoles')} />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">{t('filters.allRoles')}</SelectItem>
+                    {ROLES.map((r) => (
+                        <SelectItem key={r} value={r}>
+                            {t(`roles.${r}`, r)}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
 
-                <Select dir={i18n.dir()} value={filters.portal || 'all'} onValueChange={onPortalChange}>
-                    <SelectTrigger className="w-[160px]">
-                        <SelectValue placeholder={t('filters.allPortals')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">{t('filters.allPortals')}</SelectItem>
-                        {PORTALS.map(portal => (
-                            <SelectItem key={portal} value={portal}>
-                                {t(`portals.${portal}`)}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-
-                <Select dir={i18n.dir()} value={String(filters.isDeleted || 'all')} onValueChange={onIsDeletedChange}>
-                    <SelectTrigger className="w-[160px]">
-                        <SelectValue placeholder={t('filters.allStatuses', 'All Statuses')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">{t('filters.allAccounts', 'All Accounts')}</SelectItem>
-                        <SelectItem value="false">{t('filters.activeAccounts', 'Active')}</SelectItem>
-                        <SelectItem value="true">{t('filters.deletedAccounts', 'Deleted')}</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
+            {/* Clear filters */}
+            {hasActiveFilters && (
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClear}
+                    className="gap-2 shrink-0"
+                    data-testid="users-page-clear-filters"
+                >
+                    <X className="h-4 w-4" />
+                    {t('filters.clearFilters')}
+                </Button>
+            )}
         </div>
     );
 }

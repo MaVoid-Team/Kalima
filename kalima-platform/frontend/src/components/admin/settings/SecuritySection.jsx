@@ -1,21 +1,34 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Mail, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
-
+import { Mail, CheckCircle, AlertCircle, RefreshCw, AlertTriangle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import useEmailVerification from '@/hooks/auth/useEmailVerification';
 import useAuth from '@/hooks/auth/useAuth';
+import useDeleteAccount from '@/hooks/auth/useDeleteAccount';
+import ConfirmDeleteAccountDialog from './ConfirmDeleteAccountDialog';
 
-export default function SecuritySection() {
-    const { t, i18n } = useTranslation('admin');
+export default function SecuritySection({ ns = 'admin' }) {
+    const { t, i18n } = useTranslation(ns);
     const { user } = useAuth();
     const { sendVerification, resendVerification, loading } = useEmailVerification();
+    const { deleteAccount, loading: deletingAccount } = useDeleteAccount();
     
     const [isSending, setIsSending] = useState(false);
     const [lastSentTime, setLastSentTime] = useState(null);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const handleDeleteAccount = async () => {
+        try {
+            await deleteAccount();
+            window.location.href = '/login';
+        } catch (error) {
+            // Error handled by hook
+        }
+    };
 
     useEffect(() => {
         // Load last sent time from localStorage if exists
@@ -75,27 +88,32 @@ export default function SecuritySection() {
                 <div className="space-y-4">
                     <h3 className="text-sm font-medium">{t('settings.email.verificationStatus')}</h3>
                     
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center gap-3">
-                            {isEmailVerified ? (
-                                <CheckCircle className={"h-5 w-5 text-green-600" + (i18n.language=="ar" ? ' scale-x-[-1]' : '')} />
-                            ) : (
-                                <AlertCircle className={"h-5 w-5 text-amber-600" + (i18n.language=="ar" ? ' scale-x-[-1]' : '')} />
-                            )}
-                            <div>
-                                <p className="font-medium">
-                                    {isEmailVerified 
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-2xl bg-muted/20 gap-4">
+                        <div className="flex items-center gap-4 min-w-0">
+                            <div className={cn(
+                                "h-10 w-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm border",
+                                isEmailVerified ? "bg-green-500/10 border-green-500/20" : "bg-amber-500/10 border-amber-500/20"
+                            )}>
+                                {isEmailVerified ? (
+                                    <CheckCircle className={cn("h-5 w-5 text-green-600", i18n.language === "ar" && 'scale-x-[-1]')} />
+                                ) : (
+                                    <AlertCircle className={cn("h-5 w-5 text-amber-600", i18n.language === "ar" && 'scale-x-[-1]')} />
+                                )}
+                            </div>
+                            <div className="min-w-0">
+                                <p className="font-bold text-sm text-foreground mb-0.5">
+                                    {isEmailVerified
                                         ? t('settings.email.verified', 'Email Verified')
                                         : t('settings.email.notVerified', 'Email Not Verified')
                                     }
                                 </p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-xs text-muted-foreground truncate max-w-[200px] sm:max-w-none" title={user?.email}>
                                     {user?.email}
                                 </p>
                             </div>
                         </div>
-                        <Badge variant={isEmailVerified ? "default" : "secondary"}>
-                            {isEmailVerified 
+                        <Badge variant={isEmailVerified ? "default" : "secondary"} className="rounded-lg px-2 py-0.5 font-bold text-[10px] uppercase tracking-wider self-end sm:self-auto">
+                            {isEmailVerified
                                 ? t('settings.email.verified', 'Verified')
                                 : t('settings.email.pending', 'Pending')
                             }
@@ -170,6 +188,44 @@ export default function SecuritySection() {
                         </div>
                     </div>
                 </div>
+
+                <Separator />
+
+                {/* Danger Zone */}
+                <div className="space-y-4 pt-2">
+                    <h3 className="text-sm font-medium text-destructive flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        {t('settings.account.dangerZone', 'Danger Zone')}
+                    </h3>
+                    
+                    <div className="p-4 border border-destructive/20 bg-destructive/5 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h4 className="font-medium text-destructive">
+                                {t('settings.account.deleteAccount', 'Delete Account')}
+                            </h4>
+                            <p className="text-sm text-muted-foreground mt-1">
+                                {t('settings.account.deleteAccountDesc', 'Permanently remove your account and all associated data. This action is irreversible.')}
+                            </p>
+                        </div>
+                        <Button
+                            variant="destructive"
+                            onClick={() => setShowDeleteDialog(true)}
+                            disabled={deletingAccount}
+                            className="whitespace-nowrap"
+                        >
+                            {deletingAccount ? t('common.loading') : t('settings.account.deleteAccountBtn', 'Delete Account')}
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Delete Account Dialog */}
+                <ConfirmDeleteAccountDialog
+                    open={showDeleteDialog}
+                    onOpenChange={setShowDeleteDialog}
+                    onConfirm={handleDeleteAccount}
+                    loading={deletingAccount}
+                    ns={ns}
+                />
             </CardContent>
         </Card>
     );

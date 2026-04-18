@@ -62,7 +62,14 @@
     "purchased": "تم الشراء",
     "new": "جديد",
     "off": "خصم",
-    "cart": "العربة"
+    "cart": "العربة",
+    "comingSoon": "قريباً"
+  },
+  "countdown": {
+    "days": "ي",
+    "hours": "س",
+    "minutes": "د",
+    "seconds": "ث"
   },
   "products": {
     "trending": {
@@ -116,6 +123,11 @@
   "common": {
     "back": "رجوع"
   },
+  "breadcrumbs": {
+    "home": "الرئيسية",
+    "digitalProducts": "المنتجات الرقمية",
+    "samples": "العينات"
+  },
   "errors": {
     "loadingError": "خطأ في تحميل البيانات",
     "fetchErrorLog": "خطأ في جلب البيانات:",
@@ -138,11 +150,28 @@
     "count": "عينات",
     "noSamples": "لا توجد عينات متاحة.",
     "view": "معاينة",
-    "download": "تنزيل"
+    "download": "تنزيل",
+    "hq": "جودة عالية",
+    "lq": "جودة منخفضة",
+    "noNestedSamples": "لا توجد عينات متاحة في هذا القسم بعد.",
+    "addFromProduct": "يمكنك إضافة عينات لهذا القسم من صفحة تفاصيل المنتج.",
+    "mediaTypes": {
+      "pdf": "PDF",
+      "image": "صورة",
+      "video": "فيديو",
+      "word": "ملف Word",
+      "powerpoint": "ملف PowerPoint",
+      "audio": "ملف صوتي",
+      "Video": "فيديو",
+      "Audio": "ملف صوتي",
+      "Image": "صورة",
+      "Document": "مستند"
+    }
   },
   "samplePage": {
     "notFound": "العينة غير موجودة",
     "backToMarket": "العودة إلى المتجر",
+    "backToSample": "تفاصيل العينة",
     "download": "تنزيل",
     "downloadFile": "تنزيل الملف",
     "previewUnavailable": "المعاينة غير متاحة لهذا النوع من الملفات.",

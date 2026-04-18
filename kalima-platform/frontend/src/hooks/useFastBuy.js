@@ -117,20 +117,23 @@ export function useFastBuy({ checkout = false } = {}) {
   const computed = useMemo(() => {
     const commonFields = preview?.requiredFields?.common || [];
     const itemsMissingFields = preview?.requiredFields?.itemsMissingFields || [];
+    const total = parseFloat(preview?.total || 0);
+    const isFreeOrder = total <= 0;
 
-    const needsScreenshot = commonFields.some((f) => f.toLowerCase() === "paymentscreenshot");
-    const needsTransferNumber = commonFields.includes("numberTransferredFrom");
+    const needsScreenshot = !isFreeOrder && commonFields.some((f) => f.toLowerCase() === "paymentscreenshot");
+    const needsTransferNumber = !isFreeOrder && commonFields.includes("numberTransferredFrom");
     const transferNumberValue = formData.numberTransferredFrom || "";
     const missingTransNum = needsTransferNumber && !transferNumberValue;
     const invalidTransferNumber =
-      needsTransferNumber && !egyptPhoneSchema.safeParse(transferNumberValue).success;
+      needsTransferNumber && !egyptPhoneSchema(t).safeParse(transferNumberValue).success;
     const missingScreenshot = needsScreenshot && !formData.paymentScreenshot;
 
     return {
       items: formatCartItems(preview?.cart_items),
       subtotal: parseFloat(preview?.subtotal || 0),
-      total: parseFloat(preview?.total || 0),
+      total,
       discount: parseFloat(preview?.discount || 0),
+      isFreeOrder,
       needsScreenshot,
       needsTransferNumber,
       itemsMissingFields,
@@ -144,12 +147,12 @@ export function useFastBuy({ checkout = false } = {}) {
     };
   }, [preview, formData, itemFields]);
 
-  const startFastBuy = async (productId, quantity = 1) => {
+  const startFastBuy = async (productId) => {
     try {
       await mutate({
         endpoint: "/cart/fast-buy/start",
         method: "post",
-        data: { product_id: productId, quantity },
+        data: { product_id: productId, quantity: 1 },
         showToast: false,
       });
 
@@ -226,7 +229,7 @@ export function useFastBuy({ checkout = false } = {}) {
       }
 
       const data = new FormData();
-      if (formData.paymentMethodId) {
+      if (!computed.isFreeOrder && formData.paymentMethodId) {
         data.append("payment_method_id", Number(formData.paymentMethodId));
       }
       if (computed.needsTransferNumber && formData.numberTransferredFrom) {
@@ -239,12 +242,20 @@ export function useFastBuy({ checkout = false } = {}) {
         data.append("notes", formData.notes);
       }
 
-      await mutate({
+      const res = await mutate({
         endpoint: "/cart/fast-buy/checkout",
         method: "post",
         data,
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      if (typeof window !== 'undefined' && window.fbq) {
+        const reducedPrice = parseFloat(computed.total || 0) * 0.75;
+        window.fbq('track', 'Purchase', {
+            value: Number(reducedPrice.toFixed(2)),
+            currency: 'EGP'
+        });
+      }
 
       toast.success(t("fastBuy.checkoutSuccess", "Checkout successful! Redirecting to market..."));
       navigate("/orders", { replace: true, state: { skipFastBuyClear: true } });

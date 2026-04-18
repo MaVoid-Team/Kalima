@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { MoreHorizontal, Eye, Pencil, ArchiveRestore, Archive, Trash2, ImageOff } from 'lucide-react';
+import { MoreHorizontal, Eye, Pencil, ArchiveRestore, Archive, Trash2, ImageOff, Clock, PackageX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getImageUrl, formatCurrency } from '@/lib/storeUtils';
+import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -50,7 +51,7 @@ export default function ProductsTable({
     if (!products.length) {
         return (
             <div className="flex flex-col items-center justify-center py-16 text-center" data-testid="products-table-empty">
-                <ImageOff className="h-12 w-12 text-muted-foreground mb-3" />
+                <PackageX className="h-12 w-12 text-muted-foreground mb-3" />
                 <p className="text-muted-foreground font-medium">{t('products.noProducts')}</p>
                 <p className="text-sm text-muted-foreground mt-1">{t('products.noProductsDescription')}</p>
             </div>
@@ -85,6 +86,7 @@ export default function ProductsTable({
                     {products.map((product) => {
                         const thumbnailUrl = getImageUrl(product.thumbnail_image?.url);
                         const isArchived = product.is_archived;
+                        const isComingSoon = product.release_at && new Date(product.release_at) > new Date();
 
                         return (
                             <TableRow
@@ -180,12 +182,26 @@ export default function ProductsTable({
                                         variant={isArchived ? 'destructive' : 'default'}
                                         className={cn(
                                             isArchived
-                                                ? 'bg-destructive/20 text-destructive border-destructive/50'
+                                                ? 'bg-destructive/20 text-white border-destructive/50'
                                                 : 'bg-success/20 text-success border-success/50'
                                         )}
                                     >
                                         {isArchived ? t('products.status.archived') : t('products.status.active')}
                                     </Badge>
+                                    {isComingSoon && (
+                                        <div className="flex flex-col gap-0.5 mt-1">
+                                            <Badge
+                                                variant="outline"
+                                                className="bg-amber-500/10 text-amber-600 border-amber-500/30 text-xs"
+                                            >
+                                                <Clock className="h-3 w-3 me-1" />
+                                                {t('products.status.comingSoon', 'Coming Soon')}
+                                            </Badge>
+                                            <span className="text-[10px] text-muted-foreground">
+                                                {new Date(product.release_at).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </span>
+                                        </div>
+                                    )}
                                 </TableCell>
 
                                 {/* Actions */}

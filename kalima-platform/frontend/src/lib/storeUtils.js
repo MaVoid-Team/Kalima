@@ -8,6 +8,7 @@
  * @returns {string}
  */
 export function formatPrice(amount) {
+  if (amount === null || amount === undefined) return "0.00";
   const num = parseFloat(amount);
   if (isNaN(num)) return "0.00";
   return num.toFixed(2);
@@ -43,7 +44,7 @@ export function getImageUrl(path) {
 
   // Fallback if env variable is missing
   const baseURL =
-    import.meta.env.VITE_API_URL || "http://localhost:5000/api/v2";
+    import.meta.env.VITE_API_URL || "/api/v2";
   // Remove the trailing /api/vX to get the root domain
   const rootURL = baseURL.replace(/\/api\/v\d+$/, "");
 
@@ -55,7 +56,7 @@ export function getImageUrl(path) {
  * @returns {string}
  */
 export function getBaseUrl() {
-  const raw = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v2";
+  const raw = import.meta.env.VITE_API_URL || "/api/v2";
   try {
     return new URL(raw).origin;
   } catch {
@@ -81,6 +82,48 @@ export function buildProductImages(product, gallery = []) {
       getImageUrl(item?.url ?? item?.image_url ?? item?.images?.url ?? item),
     )
     .filter((url) => typeof url === "string" && url.length > 0);
+  return { main, thumbnails };
+}
+
+/**
+ * Builds a unified media array (images + videos) for advanced galleries.
+ * @param {object} product
+ * @returns {{ main: object|null, thumbnails: object[] }}
+ */
+export function buildProductMedia(product) {
+  const mainImage = getImageUrl(product?.thumbnail_image?.url);
+  const main = mainImage ? { type: 'image', url: mainImage, isMain: true } : null;
+
+  const galleryImages = (product?.product_gallery || []).map(g => ({
+    type: 'image',
+    url: getImageUrl(g?.images?.url),
+    sort_order: g.sort_order || 0
+  })).filter(g => g.url);
+
+  const galleryVideos = (product?.product_gallery_videos || []).map(v => {
+    const isYoutube = v.url?.includes('youtube.com') || v.url?.includes('youtu.be');
+    let thumbnail = null;
+    if (isYoutube) {
+      try {
+        let videoId = '';
+        if (v.url.includes('youtube.com/watch')) {
+          videoId = new URL(v.url).searchParams.get('v');
+        } else if (v.url.includes('youtu.be/')) {
+          videoId = v.url.split('youtu.be/')[1].split(/[?#]/)[0];
+        }
+        if (videoId) thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      } catch (e) { }
+    }
+    return {
+      type: 'video',
+      url: getImageUrl(v.url),
+      thumbnail,
+      source_type: v.source_type,
+      sort_order: v.sort_order || 0
+    };
+  }).filter(v => v.url);
+
+  const thumbnails = [...galleryImages, ...galleryVideos].sort((a, b) => a.sort_order - b.sort_order);
   return { main, thumbnails };
 }
 
@@ -178,7 +221,7 @@ export function formatOrderDate(dateString, lang = 'en') {
  */
 export function getStatusColor(status) {
   switch (status?.toLowerCase()) {
-    case 'pending': return 'bg-highlight/20 text-highlight hover:bg-highlight/30 border-highlight/50';
+    case 'pending': return 'bg-highlight/10 text-highlight hover:bg-highlight/30 border-highlight/50';
     case 'received': return 'bg-primary/20 text-primary hover:bg-primary/30 border-primary/50';
     case 'confirmed': return 'bg-success/20 text-success hover:bg-success/30 border-success/50';
     case 'returned': return 'bg-destructive/20 text-destructive hover:bg-destructive/30 border-destructive/50';
@@ -191,9 +234,101 @@ export function getStatusColor(status) {
  * @param {number} bytes
  * @returns {string}
  */
+/**
+ * Formats a byte count into a human-readable size string.
+ * @param {number|string} bytes - size in bytes
+ * @returns {string} - formatted size string
+ */
 export function formatFileSize(bytes) {
-  if (!bytes || bytes === 0) return '0 B';
+  const num = Number(bytes);
+  if (!num || num === 0) return '0 B';
   const units = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
+  const i = Math.floor(Math.log(num) / Math.log(1024));
+  return `${(num / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
+}
+
+/**
+ * Attempts to fetch a remote file's size via a HEAD request.
+ * @param {string} url - relative or absolute file URL
+ * @returns {Promise<number|null>} - size in bytes or null if failed
+ */
+export async function getFileSizeFromUrl(url) {
+  if (!url) return null;
+  try {
+    const baseURL = import.meta.env.VITE_API_URL || "/api/v2";
+    // Strips /api/v2 or /api/v1 (with or without trailing slash) to get the site root
+    const rootURL = baseURL.replace(/\/api\/v\d+\/?$/, "");
+
+    let fullUrl = url;
+    if (!url.startsWith('http')) {
+      fullUrl = `${rootURL}${url.startsWith('/') ? '' : '/'}${url}`;
+    }
+
+    // Use a small timeout or abort controller to prevent long-hanging fetches
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+    const response = await fetch(fullUrl, {
+      method: 'HEAD',
+      signal: controller.signal,
+      cache: 'no-cache'
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) return null;
+
+    const cl = response.headers.get('content-length');
+    return cl ? Number(cl) : null;
+  } catch (e) {
+    // Silent failure for network/CORS errors as they are expected for some external URLs
+    // Only log in development if it's not an AbortError or TypeError (CORS)
+    if (import.meta.env.DEV && e.name !== 'AbortError' && e.name !== 'TypeError') {
+      console.warn('Silent failure getting remote file size for:', url, e.message);
+    }
+    return null;
+  }
+}
+
+/**
+ * Removes the Egyptian international prefix (+2 or +20) for display.
+ * @param {string} phone
+ * @returns {string}
+ */
+export function formatPhone(phone) {
+  if (!phone) return "";
+  const cleaned = String(phone).trim();
+  // If it starts with +2 (optionally space) 0... or just +2 (optionally space)...
+  // We want to turn +20 or +2 0 into 0, and +2 into ""
+  if (/^\+2[ ]?0/.test(cleaned)) {
+    return "0" + cleaned.replace(/^\+2[ ]?0/, "");
+  }
+  return cleaned.replace(/^\+2[ ]?/, "");
+}
+
+/**
+ * Formats a time interval in milliseconds to a human-readable string.
+ * @param {number|string} ms - milliseconds until release
+ * @param {function} t - translation function (optional)
+ * @returns {string} - e.g. "2d 5h", "10h 30m", "45m 12s", or "12s"
+ */
+export function formatTimeUntilRelease(ms, t) {
+  const diff = Number(ms);
+
+  const d = t ? t("countdown.days", "d") : "d";
+  const h = t ? t("countdown.hours", "h") : "h";
+  const m = t ? t("countdown.minutes", "m") : "m";
+  const s = t ? t("countdown.seconds", "s") : "s";
+
+  if (isNaN(diff) || diff <= 0) return `0${s}`;
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  if (days > 0) return `${days}${d} ${hours}${h}`;
+  if (hours > 0) return `${hours}${h} ${minutes}${m}`;
+  if (minutes > 0) return `${minutes}${m} ${seconds}${s}`;
+  return `${seconds}${s}`;
 }

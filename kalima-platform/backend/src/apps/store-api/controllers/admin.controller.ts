@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 import { userManagementService } from "../services/user-management.service";
+import { accountReviewService } from "../services/account-review.service";
 import {
   AssignRoleDto,
   RevokeRoleDto,
@@ -10,10 +11,12 @@ import {
   CreateSubAdminDto,
   CreateModeratorDto,
   CreateAssistantDto,
+  UpsertAccountReviewSettingsDto,
   CreateTeacherDto,
   CreateStudentDto,
   CreateParentDto,
   CreateLecturerDto,
+  UpdateUserFlagDto,
 } from "../dtos/admin.dto";
 import { role_enum, portal_enum } from "../generated/prisma/client";
 import {
@@ -52,6 +55,18 @@ async function validateDto<T extends object>(
 
 const VALID_ROLES = Object.values(role_enum);
 const VALID_PORTALS = Object.values(portal_enum);
+
+function canViewOrEditUserFlag(user: any): boolean {
+  const roles: Array<{ role: role_enum }> = user?.roles ?? [];
+  const allowedRoles: role_enum[] = [
+    role_enum.Admin,
+    role_enum.SubAdmin,
+    role_enum.Moderator,
+  ];
+  return roles.some((r) =>
+    allowedRoles.includes(r.role),
+  );
+}
 
 function validateEnums(
   portal: string,
@@ -390,6 +405,7 @@ export const adminController = {
         role: role as role_enum | undefined,
         portal: portal as portal_enum | undefined,
         isDeleted,
+        includeFlag: canViewOrEditUserFlag((req as any).user),
       });
 
       res.status(200).json({ success: true, data: result });
@@ -416,8 +432,48 @@ export const adminController = {
         throw new BadRequestError("Invalid user ID");
       }
 
-      const user = await userManagementService.getUserWithRoles(userId);
+      const user = await userManagementService.getUserWithRolesByPermission(
+        userId,
+        canViewOrEditUserFlag((req as any).user),
+      );
       res.status(200).json({ success: true, data: user });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * PATCH /admin/users/:userId/flag
+   * Body: { flag: "NORMAL" | "PRO" | "ELITE" | ... }
+   */
+  async updateUserFlag(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!canViewOrEditUserFlag((req as any).user)) {
+        throw new ForbiddenError(
+          "Only Admin, SubAdmin, or Moderator can update user flag",
+        );
+      }
+
+      const userId = parseInt(req.params.userId as string, 10);
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user ID");
+      }
+
+      const dto = await validateDto(UpdateUserFlagDto, req.body);
+      const updated = await userManagementService.updateUserFlag(
+        userId,
+        dto.flag,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "User flag updated successfully",
+        data: updated,
+      });
     } catch (error) {
       _next(error);
     }
@@ -570,6 +626,104 @@ export const adminController = {
           name: user.name,
           roles: user.user_roles,
         },
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  // ============================================
+  // ACCOUNT REVIEW
+  // ============================================
+
+  /**
+   * GET /admin/account-review-settings
+   */
+  async getAccountReviewSettings(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const settings = await accountReviewService.getAllSettings();
+      res.status(200).json({ success: true, data: settings });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * PUT /admin/account-review-settings
+   * Body: { settings: [{ role, requires_review }, ...] }
+   */
+  async upsertAccountReviewSettings(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const dto = await validateDto(UpsertAccountReviewSettingsDto, req.body);
+      const adminId = (req as any).user?.userId ?? (req as any).user?.id;
+
+      for (const entry of dto.settings) {
+        await accountReviewService.upsertSetting(
+          entry.role,
+          entry.requires_review,
+          adminId,
+        );
+      }
+
+      const settings = await accountReviewService.getAllSettings();
+      res.status(200).json({ success: true, data: settings });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * POST /admin/users/:userId/approve
+   */
+  async approveUser(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = parseInt(req.params.userId as string, 10);
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user ID");
+      }
+
+      const user = await accountReviewService.approveUser(userId);
+      res.status(200).json({
+        success: true,
+        message: "User approved",
+        data: user,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * POST /admin/users/:userId/reject
+   */
+  async rejectUser(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = parseInt(req.params.userId as string, 10);
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user ID");
+      }
+
+      const user = await accountReviewService.rejectUser(userId);
+      res.status(200).json({
+        success: true,
+        message: "User rejected",
+        data: user,
       });
     } catch (error) {
       _next(error);

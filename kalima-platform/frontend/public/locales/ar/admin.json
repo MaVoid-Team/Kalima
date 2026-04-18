@@ -1,4 +1,11 @@
 {
+  "validation": {
+    "password_min": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+    "password_requirements": "يجب أن تحتوي كلمة المرور على حرف كبير وحرف صغير ورقم واحد على الأقل",
+    "confirm_password_required": "يرجى تأكيد كلمة المرور الخاصة بك",
+    "passwords_mismatch": "كلمات المرور غير متطابقة",
+    "current_password_required": "كلمة المرور الحالية مطلوبة"
+  },
   "dashboardTitle": "لوحة الإدارة",
   "nav": {
     "orders": "الطلبات",
@@ -16,7 +23,10 @@
     "settings": "الإعدادات",
     "expandSidebar": "توسيع الشريط الجانبي",
     "collapseSidebar": "طي الشريط الجانبي",
-    "closeSidebar": "إغلاق الشريط الجانبي"
+    "closeSidebar": "إغلاق الشريط الجانبي",
+    "analytics": "الإحصائيات",
+    "dashboard": "لوحة التحكم",
+    "employeePerformance": "أداء الموظفين"
   },
   "common": {
     "currencyEGP": "ج.م",
@@ -26,6 +36,9 @@
     "cancel": "إلغاء",
     "confirm": "تأكيد",
     "save": "حفظ",
+    "add": "إضافة",
+    "chooseFile": "اختر الملف",
+    "noFileSelected": "لم يتم اختيار ملف",
     "notSpecified": "غير محدد",
     "file": "ملف",
     "select": "اختر",
@@ -50,12 +63,24 @@
     "refresh": "تحديث",
     "export": {
       "success": "تم التصدير بنجاح"
-    }
+    },
+    "uploading": "جاري الرفع...",
+    "processing": "جاري المعالجة..."
   },
   "gender": {
     "male": "ذكر",
     "female": "أنثى",
     "other": "آخر"
+  },
+  "roles": {
+    "Admin": "مدير",
+    "SubAdmin": "نائب مدير",
+    "Teacher": "معلم",
+    "Student": "طالب",
+    "Parent": "ولي أمر",
+    "Lecturer": "محاضر",
+    "Moderator": "مشرف",
+    "Assistant": "مساعد"
   },
   "orders": {
     "stats": {
@@ -170,6 +195,17 @@
       "delete": "حذف الطلب",
       "deleteItem": "إزالة العنصر",
       "whatsapp": "تواصل عبر واتساب",
+      "whatsappGreeting": "هلاً بك أ/ {{name}}",
+      "whatsappSuccess": "تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.",
+      "whatsappOrderDetails": "رقم الطلب: {{serial}}",
+      "whatsappItems": "المنتجات:",
+      "whatsappTotal": "الإجمالي: {{total}} {{currency}}",
+      "whatsappSupport": "لو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.",
+      "whatsappClosing": "نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا!\n\nمع تحيات فريق عمل منصة كلمة",
+      "editWhatsAppMessage": "تعديل رسالة واتساب",
+      "editWhatsAppMessageDesc": "راجع وقم بتعديل الرسالة قبل إرسالها للعميل.",
+      "whatsappPlaceholder": "اكتب رسالتك هنا...",
+      "sendOnWhatsApp": "إرسال عبر واتساب",
       "collapseItems": "طي",
       "expandItems": "توسيع",
       "viewNote": "عرض الملاحظة",
@@ -226,7 +262,8 @@
       "loading": "جاري تحميل التفاصيل...",
       "addAdminNote": "إضافة ملاحظة إدارية",
       "noteLimitReached": "تم الوصول للحد الأقصى للملاحظات",
-      "notFound": "الطلب غير موجود"
+      "notFound": "الطلب غير موجود",
+      "viewImage": "عرض الصورة"
     }
   },
   "products": {
@@ -259,7 +296,8 @@
     },
     "status": {
       "active": "نشط",
-      "archived": "مؤرشف"
+      "archived": "مؤرشف",
+      "comingSoon": "قريباً"
     },
     "type": {
       "Book": "كتاب",
@@ -282,12 +320,24 @@
       "type": "النوع",
       "price": "السعر (ج.م)",
       "priceAfterDiscount": "السعر بعد الخصم (ج.م)",
+      "freePreviewToggle": "معاينة منتج مجاني",
+      "freePreviewHint": "تفعيل هذا الخيار سيجعل الخصم على المنتج 100% (مجاني).",
+      "freePreviewHintAria": "تلميح المعاينة المجانية",
       "serial": "الرقم التسلسلي",
       "serialPlaceholder": "مثل: ALG-101 (اختياري)",
       "couponId": "معرف الكوبون",
       "couponIdPlaceholder": "معرف الكوبون (اختياري)",
       "thumbnail": "صورة الغلاف",
-      "sample": "ملف النموذج (PDF)",
+      "sample": "ملف العينة",
+      "sampleSection": "قسم العينة",
+      "selectSampleSection": "اختر قسم العينة...",
+      "mediaType": "نوع الوسائط",
+      "mediaDocument": "مستند (PDF, Word, PowerPoint)",
+      "mediaVideo": "فيديو",
+      "mediaAudio": "ملف صوتي",
+      "mediaImage": "صورة",
+      "hqFile": "ملف عالي الجودة (معاينة محمية)",
+      "lqFile": "ملف منخفض الجودة (قابل للتنزيل)",
       "chooseImage": "اختر صورة",
       "chooseSampleFile": "اختر ملف العينة",
       "noFileSelected": "لم يتم اختيار ملف",
@@ -296,22 +346,29 @@
       "perks": "المميزات",
       "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code",
       "perksTip": "يمكنك استخدام الفواصل الإنجليزية (,) أو الفواصل العربية (،) للفصل بين المميزات.",
+      "releaseAt": "تاريخ الإصدار",
+      "releaseDateMustBeFuture": "يجب أن يكون تاريخ الإصدار اليوم أو في المستقبل",
       "titleIsRequired": "العنوان مطلوب",
       "titleMaxLength": "يجب ألا يزيد العنوان عن 255 حرفًا",
       "priceMustBeGreaterThan0": "السعر يجب أن يكون أكبر من او يساوي 0",
-      "discountedPriceMustBeGreaterThan0": "السعر بعد الخصم يجب أن يكون أكبر من 0",
+      "discountedPriceMustBeGreaterThan0": "السعر بعد الخصم يجب أن يكون أكبر من أو يساوي 0",
       "serialMaxLength": "يجب ألا يزيد الرقم التسلسلي عن 100 حرف",
       "couponIdMustBeInteger": "معرف الكوبون يجب أن يكون رقمًا صحيحًا",
       "couponIdMustBeGreaterThan0": "معرف الكوبون يجب أن يكون أكبر من 0",
-      "discountedPriceMustBeLessThanOriginalPrice": "السعر بعد الخصم يجب أن يكون أقل من السعر الأصلي"
+      "discountedPriceMustBeLessThanOriginalPrice": "السعر بعد الخصم يجب أن يكون أقل من السعر الأصلي",
+      "sampleTitle": "عنوان العينة",
+      "sampleTitlePlaceholder": "أدخل عنوان العينة",
+      "sampleTitleRequired": "عنوان العينة مطلوب عند إرفاق عينة"
     },
     "create": {
       "dialogTitle": "إنشاء منتج جديد",
       "dialogDescription": "أدخل تفاصيل المنتج. يمكنك إدارة الوسائط والحقول من صفحة التفاصيل.",
       "submit": "إنشاء المنتج",
-      "creating": "جاري الإنشاء...",
-      "uploading": "جاري الرفع...",
-      "processing": "جاري المعالجة..."
+      "creating": "جاري إنشاء المنتج...",
+      "uploading": "جاري رفع الوسائط...",
+      "processing": "جاري المعالجة...",
+      "sampleUploading": "جاري رفع العينة...",
+      "sampleSuccess": "تم رفع العينة بنجاح!"
     },
     "edit": {
       "dialogTitle": "تعديل المنتج",
@@ -336,13 +393,17 @@
       "createFailed": "تم حفظ المنتج ولكن فشل إنشاء القسيمة"
     },
     "delete": {
-      "confirm": "هل تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
+      "confirm": "هل أنت متأكد أنك تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
       "confirmTitle": "حذف المنتج",
-      "success": "تم حذف المنتج بنجاح"
+      "success": "تم حذف المنتج بنجاح",
+      "hasSampleError": "لا يمكن حذف المنتج الذي يحتوي على عينة مرتبطة. يرجى إزالة العينة أولاً.",
+      "sampleWarning": "تنبيه: هذا المنتج يحتوي على عينات مرتبطة. حذف المنتج سيؤدي أيضاً إلى حذف جميع العينات المرتبطة به نهائياً."
     },
     "detail": {
       "info": "معلومات المنتج",
+      "releaseDate": "تاريخ الإصدار",
       "media": "الوسائط",
+      "addMedia": "إضافة وسائط",
       "thumbnail": "صورة الغلاف",
       "gallery": "معرض الصور",
       "categories": "الفئات",
@@ -423,21 +484,108 @@
   },
   "samples": {
     "title": "إدارة العينات",
+    "open": "فتح",
     "subtitle": "جميع ملفات عينات المنتجات في المتجر",
     "count": "عينات",
+    "sampleLabel": "عينة",
+    "archived": "مؤرشف",
+    "is_archived_hint": "هذه العينة مؤرشفة لأن المنتج المرتبط بها مؤرشف",
+    "titleLabel": "عنوان العينة",
+    "titlePlaceholder": "مثلاً: الفصل الأول",
+    "sectionLabel": "قسم العينة",
+    "selectSection": "اختر قسم العينة...",
     "noSamples": "لا توجد ملفات عينات.",
+    "idLabel": "كود",
+    "upload": "رفع",
+    "uploading": "جاري الرفع...",
+    "update": "تحديث",
     "copyLink": "نسخ الرابط",
+    "change": "تغيير",
+    "docFormats": "مقبول: PDF، Word (.doc/.docx)، PowerPoint (.ppt/.pptx) — للتنزيل فقط",
+    "docDownloadOnly": "ملفات Word و PowerPoint متاحة للتنزيل فقط.",
     "linkCopied": "تم نسخ رابط العينة!",
     "linkCopyError": "فشل نسخ الرابط",
+    "view": "عرض العينة",
+    "openPreview": "معاينة كاملة",
+    "download": "تحميل",
+    "addTitle": "إضافة عينة",
+    "editTitle": "تعديل العينة",
+    "description": "ارفع ملفات العينات للمعاينة المحمية والتنزيل.",
+    "mediaTypeLabel": "نوع الوسائط",
+    "hqFileLabel": "ملف عالي الجودة (محمي)",
+    "hqNote": "يستخدم للمعاينة المحمية داخل التطبيق.",
+    "lqFileLabel": "ملف منخفض الجودة (قابل للتنزيل)",
+    "lqNote": "اختياري. الملف المتاح لتنزيل المستخدم.",
+    "addAnother": "إضافة عينة أخرى",
+    "addFirstHint": "أضف عينة لتوفير معاينات للمنتج.",
+    "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذه العينة؟",
+    "deleteDescription": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف ملف العينة نهائياً من المنتج.",
+    "noAssociatedProduct": "بدون منتج مرتبط",
+    "productHint": "اختياري. اربط هذه العينة بمنتج معين.",
+    "detectedType": "نوع الملف المكتشف",
+    "errors": {
+      "titleRequired": "عنوان العينة مطلوب.",
+      "noHqFile": "الملف عالي الجودة مطلوب.",
+      "noLqFile": "الملف منخفض الجودة مطلوب لهذا النوع.",
+      "noProduct": "يرجى إدخال معرف المنتج.",
+      "uploadFailed": "فشل رفع العينة.",
+      "noSection": "يرجى اختيار قسم العينة.",
+      "noFile": "يرجى اختيار ملف واحد على الأقل للرفع.",
+      "mismatchedTypes": "يجب أن يكون الملف عالي الجودة ومنخفض الجودة من نفس النوع.",
+      "unsupportedType": "نوع الملف المختار غير مدعوم."
+    },
     "table": {
       "file": "الملف",
       "product": "المنتج",
+      "productId": "كود المنتج",
       "size": "الحجم",
       "type": "النوع",
+      "mediaType": "نوع الملف",
       "name": "الاسم",
       "price": "السعر",
       "actions": "الإجراءات",
       "selectAll": "تحديد جميع العينات"
+    },
+    "mediaTypes": {
+      "pdf": "ملف PDF",
+      "image": "صورة",
+      "video": "فيديو",
+      "word": "ملف Word",
+      "powerpoint": "ملف PowerPoint"
+    },
+    "previewAlt": "معاينة العينة",
+    "productSampleName": "عينة {{title}}",
+    "hq": "جودة عالية",
+    "lq": "جودة منخفضة",
+    "sections": {
+      "title": "أقسام العينات",
+      "subtitle": "إدارة أقسام العينات لتنظيم عيناتك.",
+      "addTitle": "إضافة قسم",
+      "addSample": "إضافة عينة",
+      "editTitle": "تعديل القسم",
+      "noSections": "لا توجد أقسام عينات متاحة بعد.",
+      "noSamplesNested": "لا توجد عينات مدرجة في هذا القسم بعد.",
+      "addFromProduct": "يمكنك إضافة عينات لهذا القسم من صفحة تفاصيل المنتج.",
+      "notFound": "قسم العينة غير موجود.",
+      "backToSections": "العودة للأقسام",
+      "manageSamples": "العينات",
+      "sampleRemoved": "تمت إزالة العينة بنجاح",
+      "sampleAdded": "تمت إضافة العينة بنجاح",
+      "sampleUpdated": "تم تحديث العينة بنجاح",
+      "deleteConfirmTitle": "حذف القسم؟",
+      "deleteConfirmDesc": "هل أنت متأكد من حذف قسم العينات هذا؟ سيؤدي ذلك أيضاً إلى إزالة جميع العينات الموجودة بداخله.",
+      "titleLabel": "العنوان",
+      "descriptionLabel": "الوصف",
+      "thumbnailLabel": "رابط الصورة المصغرة",
+      "sortOrderLabel": "ترتيب العرض",
+      "activeLabel": "نشط",
+      "table": {
+        "title": "العنوان",
+        "description": "الوصف",
+        "order": "الترتيب",
+        "status": "الحالة",
+        "actions": "الإجراءات"
+      }
     }
   },
   "coupons": {
@@ -666,7 +814,9 @@
         "nameRequired": "الاسم مطلوب",
         "emailInvalid": "عنوان البريد الإلكتروني غير صالح",
         "invalidPhone": "رقم هاتف محمول غير صالح"
-      }
+      },
+      "save": "حفظ",
+      "cancel": "إلغاء"
     },
     "password": {
       "title": "إدارة كلمة المرور",
@@ -706,7 +856,18 @@
         "github": "جيت هاب",
         "firebase": "فايربيز",
         "email": "البريد الإلكتروني"
-      }
+      },
+      "dangerZone": "منطقة الخطر",
+      "deleteAccount": "حذف الحساب",
+      "deleteAccountDesc": "حذف حسابك وجميع البيانات المرتبطة به نهائياً. هذا الإجراء لا يمكن التراجع عنه.",
+      "deleteAccountBtn": "حذف الحساب",
+      "deleteConfirmationText": "حذف حسابي",
+      "deleteTitle": "حذف الحساب",
+      "deleteWarning1": "هذا الإجراء لا يمكن التراجع عنه.",
+      "deleteWarning2": "سيتم حذف جميع بياناتك ومحتوياتك وتقدمك بشكل نهائي.",
+      "deleteTypePrompt": "يرجى كتابة",
+      "deleteToConfirm": "للتأكيد.",
+      "deleteConfirmButton": "حذف نهائي"
     },
     "email": {
       "title": "التحقق من البريد الإلكتروني",
@@ -758,6 +919,15 @@
       "cancelled": "تم إلغاء الرفع",
       "error": "فشل الرفع",
       "file": "ملف"
+    },
+    "accountReview": {
+      "title": "إعدادات مراجعة الحسابات",
+      "description": "تكوين أدوار المستخدمين التي تتطلب موافقة المسؤول عند التسجيل.",
+      "requireReviewDesc": "تطلب مراجعة المسؤول لتسجيلات {{role}} الجديدة.",
+      "updateSuccess": "تم تحديث إعدادات مراجعة الحسابات بنجاح",
+      "allAccounts": "جميع أنواع الحسابات",
+      "allAccountsDesc": "تفعيل أو تعطيل متطلب المراجعة لجميع أنواع الحسابات دفعة واحدة.",
+      "partial": "جزئي"
     },
     "expandSidebar": "توسيع الشريط الجانبي"
   },
@@ -883,14 +1053,65 @@
       "confirm": "حذف الحقل"
     },
     "messages": {
-      "createSuccess": "تم إنشاء الحقل بنجاح",
-      "updateSuccess": "تم تحديث الحقل بنجاح",
-      "deleteSuccess": "تم حذف الحقل بنجاح"
+      "createSuccess": "تم إنشاء الحقل المطلوب بنجاح.",
+      "createError": "فشل إنشاء الحقل المطلوب.",
+      "updateSuccess": "تم تحديث الحقل المطلوب بنجاح.",
+      "updateError": "فشل تحديث الحقل المطلوب.",
+      "deleteSuccess": "تم حذف الحقل المطلوب بنجاح.",
+      "deleteError": "فشل حذف الحقل المطلوب."
     }
   },
-  "export": {
-    "exporting": "جاري التصدير...",
-    "processing": "جاري معالجة الملف...",
-    "success": "تم تصدير الملف بنجاح"
+  "dashboard": {
+    "title": "لوحة الإدارة",
+    "description": "نظرة عامة على أداء المتجر",
+    "totalRevenue": "إجمالي الإيرادات",
+    "currency": "ج.م",
+    "totalPurchases": "إجمالي المشتريات",
+    "confirmedRevenue": "الإيرادات المؤكدة",
+    "confirmedPurchases": "المشتريات المؤكدة",
+    "pendingPurchases": "الطلبات قيد الانتظار",
+    "avgOrderValue": "متوسط قيمة الطلب",
+    "totalUsers": "إجمالي المستخدمين",
+    "verifiedUsers": "المستخدمون الموثقون",
+    "ofTotal": "من الإجمالي",
+    "avgResponseTime": "متوسط ​​وقت الاستجابة",
+    "fastestResponseTime": "أسرع وقت استجابة",
+    "slowestResponseTime": "أبطأ وقت استجابة",
+    "analyticsDescription": "إحصائيات المنصة بالتفصيل",
+    "storeStats": "إحصائيات المتجر",
+    "responseTimeStats": "إحصائيات وقت الاستجابة",
+    "userStats": "إحصائيات المستخدمين",
+    "usersByRole": "المستخدمون حسب الدور",
+    "productPerformance": "أداء المنتجات (أفضل 50)",
+    "employeePerformanceDesc": "تتبع كفاءة المديرين ونواب المديرين",
+    "confirmerStats": "إحصائيات المؤكدين",
+    "confirmedPurchasesByAdmin": "المشتريات المؤكدة حسب المدير",
+    "allMonths": "جميع الأشهر",
+    "allYears": "جميع السنوات",
+    "createdAccounts": "إحصائيات الحسابات المنشأة",
+    "pickDate": "اختر تاريخ",
+    "pickMonth": "اختر شهراً",
+    "prevYear": "السنة السابقة",
+    "nextYear": "السنة التالية",
+    "minutes": "دقيقة"
+  },
+  "table": {
+    "productName": "اسم المنتج",
+    "serial": "الرقم التسلسلي",
+    "timesPurchased": "مرات الشراء",
+    "totalValue": "القيمة الإجمالية",
+    "noData": "لا توجد بيانات متاحة",
+    "adminName": "اسم المدير",
+    "email": "البريد الإلكتروني",
+    "totalHandled": "إجمالي المعالج",
+    "confirmed": "مؤكد",
+    "pending": "قيد الانتظار",
+    "month": "الشهر",
+    "confirmedCount": "العدد",
+    "createdAccounts": "الحسابات المنشأة",
+    "id": "المعرف",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "role": "الدور"
   }
 }

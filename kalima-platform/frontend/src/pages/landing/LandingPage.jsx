@@ -1,10 +1,12 @@
+import { Suspense, lazy } from "react";
 import WelcomeSection from "@/components/LandingPage/WelcomeSection";
-import AboutSection from "@/components/LandingPage/AboutSection";
-import LearningJourneySection from "@/components/LandingPage/LearningJourneySection";
-import MarketplaceSection from "@/components/LandingPage/MarketplaceSection";
-import SuccessStoriesSection from "@/components/LandingPage/SuccessStoriesSection";
-import AppDownloadSection from "@/components/LandingPage/AppDownloadSection";
 import BackgroundAnimation from "@/components/LandingPage/BackgroundAnimation";
+
+const AboutSection = lazy(() => import("@/components/LandingPage/AboutSection"));
+const LearningJourneySection = lazy(() => import("@/components/LandingPage/LearningJourneySection"));
+const MarketplaceSection = lazy(() => import("@/components/LandingPage/MarketplaceSection"));
+const SuccessStoriesSection = lazy(() => import("@/components/LandingPage/SuccessStoriesSection"));
+const AppDownloadSection = lazy(() => import("@/components/LandingPage/AppDownloadSection"));
 
 export default function LandingPage() {
   const sections = [
@@ -18,11 +20,16 @@ export default function LandingPage() {
 
   return (
     <>
-      <BackgroundAnimation />
+      {/* <BackgroundAnimation /> */}
       <main className="relative z-10 w-full">
         {sections.map((section, index) => (
-          <section key={section.key} className={`min-h-screen ${index === 0 ? 'pb-6 md:pb-10' : 'py-6 md:py-10'}`}>
-            {section.component}
+          <section
+            key={section.key}
+            className={`min-h-screen will-change-transform ${index === 0 ? 'pb-6 md:pb-10' : 'py-6 md:py-10'}`}
+          >
+            <Suspense fallback={<div className="min-h-screen animate-pulse bg-muted/5 rounded-3xl m-10" />}>
+              {section.component}
+            </Suspense>
           </section>
         ))}
       </main>

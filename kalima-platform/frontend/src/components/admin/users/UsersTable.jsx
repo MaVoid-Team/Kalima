@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { arSA } from 'date-fns/locale';
-import { Link } from 'react-router-dom';
-import { Eye, Trash2 } from 'lucide-react';
+import { Eye, CheckCircle2, XCircle, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import {
     Table,
@@ -12,151 +12,279 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
-export default function UsersTable({ users, loading, selectedIds = [], onSelect, onSelectAll, onDeleteReq }) {
+export default function UsersTable({
+    users = [],
+    loading,
+    actionLoading,
+    pagination,
+    onPageChange,
+    onApprove,
+    onReject,
+    onDelete,
+}) {
     const { t, i18n } = useTranslation('userManagement');
     const isRtl = i18n.dir() === 'rtl';
 
-    if (loading) {
+    // ── Skeleton rows ──────────────────────────────────────────────────────
+    if (loading && users.length === 0) {
         return (
-            <div className="flex h-48 items-center justify-center border rounded-md">
-                <LoadingSpinner className="h-8 w-8 text-primary" />
+            <div className="rounded-md border" data-testid="users-table-skeleton">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            {[...Array(6)].map((_, i) => (
+                                <TableHead key={i}><Skeleton className="h-4 w-24" /></TableHead>
+                            ))}
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {[...Array(8)].map((_, i) => (
+                            <TableRow key={i}>
+                                <TableCell><div className="flex items-center gap-3"><Skeleton className="h-9 w-9 rounded-full" /><Skeleton className="h-4 w-32" /></div></TableCell>
+                                <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                                <TableCell><Skeleton className="h-4 w-28" /></TableCell>
+                                <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
+                                <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
+                                <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
             </div>
         );
     }
 
-    if (!users?.length) {
+    // ── Empty state ────────────────────────────────────────────────────────
+    if (!loading && users.length === 0) {
         return (
-            <div className="flex h-48 flex-col items-center justify-center border rounded-md text-muted-foreground">
-                <p>{t('table.noUsersFound')}</p>
+            <div className="rounded-md border flex flex-col items-center justify-center py-16 text-center" data-testid="users-table-empty">
+                <p className="text-lg font-semibold">{t('noUsers')}</p>
+                <p className="text-muted-foreground text-sm mt-1">{t('noUsersDescription')}</p>
             </div>
         );
     }
+
+    const { page, totalPages, total } = pagination;
+    const from = (page - 1) * (pagination.limit ?? 20) + 1;
+    const to = Math.min(page * (pagination.limit ?? 20), total);
 
     return (
-        <div className="rounded-md border custom-scrollbar">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="w-10">
-                            <Checkbox
-                                className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
-                                checked={users.length > 0 && selectedIds.length === users.length}
-                                onCheckedChange={onSelectAll}
-                                aria-label={t('table.selectAll', 'Select all users')}
-                                data-testid="users-table-select-all"
-                            />
-                        </TableHead>
-                        <TableHead>{t('table.name')}</TableHead>
-                        <TableHead>{t('table.email')}</TableHead>
-                        <TableHead>{t('table.phone')}</TableHead>
-                        <TableHead>{t('table.role')}</TableHead>
-                        <TableHead>{t('table.status')}</TableHead>
-                        <TableHead>{t('table.joined')}</TableHead>
-                        <TableHead>{t('table.actions')}</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {users.map((user) => {
-                        const displayEmail = user.email?.includes('_deleted_') ? user.email.split('_deleted_')[0] : user.email;
-                        const displayPhone = user.phone?.includes('_deleted_') ? user.phone.split('_deleted_')[0] : user.phone;
+        <div className="space-y-4">
+            <div className="rounded-md border" data-testid="users-table">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>{t('table.user')}</TableHead>
+                            <TableHead>{t('table.email')}</TableHead>
+                            <TableHead>{t('table.phone')}</TableHead>
+                            <TableHead>{t('table.role')}</TableHead>
+                            <TableHead>{t('table.status')}</TableHead>
+                            <TableHead className="text-end">{t('table.actions')}</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {users.map((user) => {
+                            const primaryRole = user.role || user.user_roles?.[0]?.role;
+                            const displayEmail = user.email?.includes('_deleted_')
+                                ? user.email.split('_deleted_')[0]
+                                : user.email;
+                            const displayPhone = user.phone?.includes('_deleted_')
+                                ? user.phone.split('_deleted_')[0]
+                                : user.phone;
 
-                        return (
-                            <TableRow
-                                key={user.id}
-                                data-state={selectedIds.includes(user.id) && 'selected'}
-                                data-testid={`users-table-row-${user.id}`}
-                            >
-                                <TableCell onClick={(e) => e.stopPropagation()}>
-                                    <Checkbox
-                                        className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
-                                        checked={selectedIds.includes(user.id)}
-                                        onCheckedChange={(checked) => onSelect?.(user.id, checked)}
-                                        aria-label={`Select user ${user.name}`}
-                                        data-testid={`users-table-select-${user.id}`}
-                                    />
-                                </TableCell>
-                                <TableCell className="font-medium">
-                                    <div className="flex items-center gap-3">
-                                        <Avatar className="h-8 w-8 shrink-0">
-                                            <AvatarImage src={user.profile_pic_url} alt={user.name} />
-                                            <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                                                {user.name?.charAt(0)?.toUpperCase()}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <span>{user.name}</span>
-                                    </div>
-                                </TableCell>
-                                <TableCell dir="ltr">{displayEmail || '—'}</TableCell>
-                                <TableCell dir="ltr">{displayPhone || '—'}</TableCell>
-                                <TableCell>
-                                    {user.role ? (
-                                        <Badge variant="secondary">
-                                            {t(`roles.${user.role}`, user.role)}
-                                        </Badge>
-                                    ) : (
-                                        <span className="text-muted-foreground">—</span>
-                                    )}
-                                </TableCell>
-                                <TableCell>
-                                    {user.is_deleted ? (
-                                        <Badge variant="destructive">
-                                            {t('status.deleted', 'Deleted')}
-                                        </Badge>
-                                    ) : user.is_email_verified ? (
-                                        <Badge variant="default">
-                                            {t('status.verified', 'Verified')}
-                                        </Badge>
-                                    ) : (
-                                        <Badge variant="outline">
-                                            {t('status.pending', 'Pending')}
-                                        </Badge>
-                                    )}
-                                </TableCell>
-                                <TableCell>
-                                    {user.created_at
-                                        ? format(new Date(user.created_at), 'MMM d, yyyy', { locale: isRtl ? arSA : undefined })
-                                        : '—'}
-                                </TableCell>
-                                <TableCell>
-                                    <div className="">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            asChild
-                                        >
-                                            <Link to={`/admin/users/${user.id}`} data-testid={`admin-users-table-view-link-${user.id}`}>
-                                                <Eye className="h-4 w-4 text-muted-foreground" />
-                                                <span className="sr-only">{t('actions.view')}</span>
-                                            </Link>
-                                        </Button>
-                                        {!user.is_deleted && (
+                            return (
+                                <TableRow key={user.id} data-testid={`users-table-row-${user.id}`}>
+                                    {/* User */}
+                                    <TableCell>
+                                        <div className="flex items-center gap-3">
+                                            <Avatar className="h-9 w-9 shrink-0">
+                                                <AvatarImage src={user.profile_pic_url} alt={user.name} className="object-cover" />
+                                                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm uppercase">
+                                                    {user.name?.charAt(0) || 'U'}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="min-w-0">
+                                                <p className="font-medium text-sm truncate max-w-[160px]">{user.name}</p>
+                                                {user.created_at && (
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {format(new Date(user.created_at), 'PP', { locale: isRtl ? arSA : undefined })}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </TableCell>
+
+                                    {/* Email */}
+                                    <TableCell>
+                                        <span className="text-sm truncate max-w-[200px] block" dir="ltr">
+                                            {displayEmail || '—'}
+                                        </span>
+                                    </TableCell>
+
+                                    {/* Phone */}
+                                    <TableCell>
+                                        <span className="text-sm" dir="ltr">{displayPhone || '—'}</span>
+                                    </TableCell>
+
+                                    {/* Role */}
+                                    <TableCell>
+                                        {primaryRole ? (
+                                            <Badge variant="secondary">{t(`roles.${primaryRole}`, primaryRole)}</Badge>
+                                        ) : (
+                                            <span className="text-muted-foreground text-sm">—</span>
+                                        )}
+                                    </TableCell>
+
+                                    {/* Verification status */}
+                                    <TableCell>
+                                        {user.is_deleted ? (
+                                            <Badge variant="destructive">{t('status.deleted')}</Badge>
+                                        ) : user.is_email_verified ? (
+                                            <Badge variant="default" className="bg-success/15 text-success border-success/30">{t('status.verified')}</Badge>
+                                        ) : (
+                                            <Badge variant="outline">{t('status.pending')}</Badge>
+                                        )}
+                                    </TableCell>
+
+                                    {/* Actions */}
+                                    <TableCell>
+                                        <div className="flex items-center justify-end gap-1">
+                                            {/* View */}
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    onDeleteReq?.(user);
-                                                }}
-                                                data-testid={`admin-users-table-delete-btn-${user.id}`}
+                                                className="h-8 w-8"
+                                                asChild
+                                                data-testid={`users-table-view-${user.id}`}
                                             >
-                                                <Trash2 className="h-4 w-4" />
-                                                <span className="sr-only">{t('actions.delete', 'Delete')}</span>
+                                                <Link to={`/admin/users/${user.id}`}>
+                                                    <Eye className="h-4 w-4" />
+                                                </Link>
                                             </Button>
-                                        )}
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        )
-                    })}
-                </TableBody>
-            </Table>
+
+                                            {/* Approve */}
+                                            {!user.is_deleted && !user.confirmed && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-success hover:text-success hover:bg-success/10"
+                                                    onClick={() => onApprove(user.id)}
+                                                    disabled={actionLoading}
+                                                    title={t('actions.approve')}
+                                                    data-testid={`users-table-approve-${user.id}`}
+                                                >
+                                                    <CheckCircle2 className={"h-4 w-4" + (isRtl ? " scale-x-[-1]" : "")} />
+                                                </Button>
+                                            )}
+
+                                            {/* Reject */}
+                                            {!user.is_deleted && user.confirmed && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-warning hover:text-warning hover:bg-warning/10"
+                                                    onClick={() => onReject(user.id)}
+                                                    disabled={actionLoading}
+                                                    title={t('actions.reject')}
+                                                    data-testid={`users-table-reject-${user.id}`}
+                                                >
+                                                    <XCircle className="h-4 w-4" />
+                                                </Button>
+                                            )}
+
+                                            {/* Delete */}
+                                            {!user.is_deleted && (
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                            disabled={actionLoading}
+                                                            data-testid={`users-table-delete-${user.id}`}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent dir={i18n.dir()}>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>{t('details.confirmDeleteTitle')}</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                {t('details.confirmDeleteDesc')}
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel disabled={actionLoading}>{t('actions.cancel')}</AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                onClick={() => onDelete(user.id)}
+                                                                disabled={actionLoading}
+                                                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                            >
+                                                                {actionLoading ? <LoadingSpinner className="h-4 w-4" /> : t('actions.delete')}
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-between" data-testid="users-table-pagination">
+                    <p className="text-sm text-muted-foreground">
+                        {t('pagination.showing', { from, to, total })}
+                    </p>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onPageChange(page - 1)}
+                            disabled={page <= 1 || loading}
+                            data-testid="users-table-prev-page"
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                            {t('pagination.previous')}
+                        </Button>
+                        <span className="text-sm text-muted-foreground">
+                            {t('pagination.page')} {page} {t('pagination.of')} {totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onPageChange(page + 1)}
+                            disabled={page >= totalPages || loading}
+                            data-testid="users-table-next-page"
+                        >
+                            {t('pagination.next')}
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -3,7 +3,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import logo from "../assets/Logo.png";
+import logo from "../assets/Logo.webp";
 
 const SOCIAL_LINKS = [
   { Icon: FacebookIcon, href: "https://www.facebook.com/kalima010", label: "Facebook" },
@@ -25,7 +25,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="border-t text-muted-foreground py-8 md:py-12">
+    <footer className="border-t text-muted-foreground py-10 md:py-12">
       <div className="container px-6 md:px-6">
         <div className="flex flex-row justify-between items-center">
           {/* Brand */}

@@ -27,7 +27,12 @@
     },
     "myOrders": "My Orders",
     "dashboard": "Dashboard",
-    "logout": "Log Out"
+    "teacherPortal": "Teacher Portal",
+    "studentPortal": "Student Portal",
+    "parentPortal": "Parent Portal",
+    "logout": "Log Out",
+    "navigation": "Navigation",
+    "language": "Language"
   },
   "notFound": {
     "title": "404",

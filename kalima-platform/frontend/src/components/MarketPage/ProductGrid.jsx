@@ -117,7 +117,7 @@ export default function ProductGrid({
                                 onClick={(e) => { e.preventDefault(); if (currentPage > 1) onPageChange(currentPage - 1); }}
                                 aria-disabled={currentPage <= 1}
                                 className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
-                                text={isRtl ? t("pagination.next", "التالي") : t("pagination.prev", "السابق")}
+                                text={t("pagination.prev", "السابق")}
                                 data-testid="market-grid-prev-page-button"
                             />
                         </PaginationItem>
@@ -147,7 +147,7 @@ export default function ProductGrid({
                                 onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) onPageChange(currentPage + 1); }}
                                 aria-disabled={currentPage >= totalPages}
                                 className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
-                                text={isRtl ? t("pagination.prev", "السابق") : t("pagination.next", "التالي")}
+                                text={t("pagination.next", "التالي")}
                                 data-testid="market-grid-next-page-button"
                             />
                         </PaginationItem>

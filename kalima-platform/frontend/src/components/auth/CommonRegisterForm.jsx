@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import LoadingSpinner from "@/components/ui/loading-spinner";
@@ -34,6 +34,7 @@ import { cn } from "@/lib/utils";
 
 export default function CommonRegisterForm({ role, onBack, children, extraSchema, defaultValues, onSubmit, redirectTo }) {
     const { t, i18n } = useTranslation("auth");
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [firebaseToken, setFirebaseToken] = useState(null);
@@ -61,7 +62,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
         const baseShape = {
             name: z.string().min(2, { message: t("validation.required", "Name is required") }).optional().or(z.literal("")),
             email: z.string().email({ message: t("validation.emailInvalid", "Invalid email") }).optional().or(z.literal("")),
-            phone: egyptPhoneSchema,
+            phone: egyptPhoneSchema(t).refine(val => val && val !== "+20", { message: t("validation.required", "Phone is required") }),
             gender: z.enum(["male", "female"], { required_error: t("validation.required", "Gender is required") }),
             password: z.string().optional().or(z.literal("")),
             confirmPassword: z.string().optional().or(z.literal("")),
@@ -111,8 +112,26 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
             if (onSubmit) {
                 await onSubmit(values, firebaseToken);
             }
+            if (!firebaseToken) {
+                // For normal (non-social) registration, redirect to login
+                navigate("/login", { replace: true });
+            }
         } catch (error) {
             console.error("Form submission error:", error);
+            const errData = error?.response?.data;
+            const errors = errData?.errors || errData?.details;
+            if (errors) {
+                if (Array.isArray(errors)) {
+                    errors.forEach(err => {
+                        const path = err.path || err.field || err.param;
+                        if (path) form.setError(path, { type: "server", message: err.message || err.msg });
+                    });
+                } else if (typeof errors === 'object') {
+                    Object.entries(errors).forEach(([field, msg]) => {
+                        form.setError(field, { type: "server", message: Array.isArray(msg) ? msg[0] : msg });
+                    });
+                }
+            }
         } finally {
             setIsLoading(false);
         }
@@ -204,8 +223,8 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                         name="phone"
                         render={({ field }) => (
                             <motion.div variants={itemVariants}>
-                                <FormItem>
-                                    <FormLabel htmlFor="phone">{t("signup.fields.phone")}</FormLabel>
+                                <FormItem dir="ltr">
+                                    <FormLabel dir={i18n.dir()} htmlFor="phone">{t("signup.fields.phone")}</FormLabel>
                                     <FormControl>
                                         <PhoneInput id="phone" dir="ltr" {...field} data-testid="auth-register-phone-input" />
                                     </FormControl>

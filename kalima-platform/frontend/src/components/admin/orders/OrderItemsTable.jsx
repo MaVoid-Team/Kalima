@@ -129,7 +129,7 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                                     title={item.is_deleted ? t('orders.deleted', 'Deleted') : items.length <= 1 ? "Cannot delete the only item" : t('orders.actions.deleteItem')}
                                                     data-testid={`admin-orders-item-delete-${item.id}`}
                                                 >
-                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                    <Trash2 className="h-4 w-4 text-destructive hover:scale-110 cursor-pointer" />
                                                 </Button>
                                             </TableCell>
                                         </TableRow>

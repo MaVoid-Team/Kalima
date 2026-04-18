@@ -85,7 +85,24 @@ export default function LoginPage() {
             navigate(from, { replace: true });
         } catch (error) {
             console.error("Login failed:", error);
-            // Error is handled by interceptor/hook (toast)
+            const errData = error?.response?.data;
+            const errors = errData?.errors || errData?.details;
+            if (errors) {
+                if (Array.isArray(errors)) {
+                    errors.forEach(err => {
+                        const path = err.path || err.field || err.param;
+                        if (path) form.setError(path, { type: "server", message: err.message || err.msg });
+                    });
+                } else if (typeof errors === 'object') {
+                    Object.entries(errors).forEach(([field, msg]) => {
+                        form.setError(field, { type: "server", message: Array.isArray(msg) ? msg[0] : msg });
+                    });
+                }
+            } else if (error?.response?.status === 401) {
+                const invalidCredsMsg = t("errors.invalid_credentials", "Invalid email or password");
+                form.setError("email", { type: "server", message: invalidCredsMsg });
+                form.setError("password", { type: "server", message: invalidCredsMsg });
+            }
         }
     };
 
@@ -102,7 +119,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="container relative grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden py-8 lg:max-w-none lg:grid-cols-1 lg:px-0">
+        <div className="relative w-full grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden py-8 lg:max-w-none lg:grid-cols-1 lg:px-0 px-4">
             <AuthAnimatedBackground variant="login" />
 
             <div className="relative w-full lg:p-8">

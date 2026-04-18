@@ -38,8 +38,8 @@ const deviceIcons = {
     default: Globe
 };
 
-export default function SessionSection() {
-    const { t, i18n } = useTranslation('admin');
+export default function SessionSection({ ns = 'admin' }) {
+    const { t, i18n } = useTranslation(ns);
     const { logout, logoutAll, loading } = useLogout();
     
     const [showLogoutAllDialog, setShowLogoutAllDialog] = useState(false);
@@ -95,25 +95,31 @@ export default function SessionSection() {
                             return (
                                 <div
                                     key={session.id}
-                                    className="flex items-center justify-between p-3 border rounded-lg"
+                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-2xl bg-muted/20 gap-4"
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <IconComponent className="h-5 w-5 text-muted-foreground" />
-                                        <div>
-                                            <div className="flex items-center gap-2">
-                                                <p className="font-medium">
+                                    <div className="flex items-center gap-4 min-w-0">
+                                        <div className="h-10 w-10 rounded-xl bg-background flex items-center justify-center shrink-0 shadow-sm border border-border/40">
+                                            <IconComponent className="h-5 w-5 text-muted-foreground" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                <p className="font-bold text-sm text-foreground">
                                                     {session.device} - {session.browser}
                                                 </p>
                                                 {session.current && (
-                                                    <Badge variant="default" className="text-xs">
+                                                    <Badge variant="default" className="rounded-lg px-2 py-0.5 font-bold text-[10px] uppercase tracking-wider h-5 flex items-center">
                                                         {t('settings.session.current', 'Current')}
                                                     </Badge>
                                                 )}
                                             </div>
-                                            <div className="text-sm text-muted-foreground space-y-1">
-                                                <p>{session.location}</p>
-                                                <p>{session.ip}</p>
-                                                <p>{formatLastActive(session.lastActive)}</p>
+                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground font-medium">
+                                                <span className="flex items-center gap-1">
+                                                    {session.location}
+                                                </span>
+                                                <span className="hidden sm:inline text-border">•</span>
+                                                <span>{session.ip}</span>
+                                                <span className="hidden sm:inline text-border">•</span>
+                                                <span className="text-primary/70">{formatLastActive(session.lastActive)}</span>
                                             </div>
                                         </div>
                                     </div>
