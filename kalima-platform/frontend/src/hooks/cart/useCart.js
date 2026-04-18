@@ -15,35 +15,55 @@ export default function useCart() {
             });
             if (res.success) {
                 return res.data;
-            }
-            else {
-                throw new Error(res?.message || "Failed to fetch cart");
+            } else if (res?.message?.toLowerCase().includes("not found")) {
+                return null;
+            } else {
+                const msg = res?.message || "Failed to fetch cart";
+                toast.error(msg);
+                throw new Error(msg);
             }
         } catch (error) {
+            const isNotFound = error?.response?.status === 404 || error?.response?.data?.message?.toLowerCase().includes("not found") || error?.message?.toLowerCase().includes("not found");
+            if (isNotFound) {
+                return null;
+            }
             console.error("Failed to fetch cart:", error);
             throw error;
         }
-    }, []);
+    }, [mutate]);
 
-    const addToCart = useCallback(async (productId, quantity) => {
+    const addToCart = useCallback(async (productId) => {
         try {
+            // Fetch current cart to check for duplicates
+            const currentCart = await getCart();
+            const items = currentCart?.cart_items || [];
+
+            // Check if product is already in cart
+            const exists = items.some(item => (item.product_id === productId || item.products?.id === productId));
+
+            if (exists) {
+                toast.info(t("itemAlreadyInCart", "This item is already in your cart"));
+                return null;
+            }
+
             const res = await mutate({
                 method: "POST",
                 endpoint: "/cart/items",
-                data: { productId, quantity, required_fields: [] }
+                data: { productId, quantity: 1, required_fields: [] }
             });
             if (res.success) {
                 toast.success(t("itemAddedToCart", "Item added to cart"));
                 return res.data;
-            }
-            else {
-                throw new Error(res?.message || "Failed to add item to cart");
+            } else {
+                const msg = res?.message || "Failed to add item to cart";
+                toast.error(msg);
+                throw new Error(msg);
             }
         } catch (error) {
             console.error("Failed to add item to cart:", error);
             throw error;
         }
-    }, []);
+    }, [getCart, mutate, t]);
 
     const changeItemQuantity = useCallback(async (itemId, quantity) => {
         try {
@@ -54,9 +74,10 @@ export default function useCart() {
             });
             if (res.success) {
                 return res.data;
-            }
-            else {
-                throw new Error(res?.message || "Failed to change item quantity");
+            } else {
+                const msg = res?.message || "Failed to change item quantity";
+                toast.error(msg);
+                throw new Error(msg);
             }
         } catch (error) {
             console.error("Failed to change item quantity:", error);
@@ -73,9 +94,10 @@ export default function useCart() {
             if (res.success) {
                 toast.success(t("cartCleared", "Cart cleared successfully"));
                 return res.data;
-            }
-            else {
-                throw new Error(res?.message || "Failed to clear cart");
+            } else {
+                const msg = res?.message || "Failed to clear cart";
+                toast.error(msg);
+                throw new Error(msg);
             }
         } catch (error) {
             console.error("Failed to clear cart:", error);
@@ -99,8 +121,10 @@ export default function useCart() {
             });
             if (res.success) {
                 return res.data;
-            }else {                
-                throw new Error(res?.message || "Failed to apply coupon");
+            } else {
+                const msg = res?.message || "Failed to apply coupon";
+                toast.error(msg);
+                throw new Error(msg);
             }
         } catch (error) {
             console.error("Failed to apply coupon:", error);
@@ -117,7 +141,9 @@ export default function useCart() {
             if (res.success) {
                 return res.data;
             } else {
-                throw new Error(res?.message || "Failed to remove coupon");
+                const msg = res?.message || "Failed to remove coupon";
+                toast.error(msg);
+                throw new Error(msg);
             }
         } catch (error) {
             console.error("Failed to remove coupon:", error);
@@ -130,14 +156,15 @@ export default function useCart() {
             const res = await mutate({
                 method: "PATCH",
                 endpoint: `/cart/items/required-fields`,
-                data: {"cart_item_id": itemId, "required_fields": requiredFieldsData}
+                data: { "cart_item_id": itemId, "required_fields": requiredFieldsData }
             });
             if (res.success) {
                 toast.success(t("requiredFieldsUpdated", "Required fields updated"));
                 return res.data;
-            }
-            else {
-                throw new Error(res?.message || "Failed to update cart item required fields");
+            } else {
+                const msg = res?.message || "Failed to update cart item required fields";
+                toast.error(msg);
+                throw new Error(msg);
             }
         } catch (error) {
             console.error("Failed to update cart item required fields:", error);
@@ -163,9 +190,10 @@ export default function useCart() {
             if (res.success) {
                 toast.success(t("requiredFieldsImageUpdated", "Required fields image updated"));
                 return res.data;
-            }
-            else {
-                throw new Error(res?.message || "Failed to update cart item required fields image");
+            } else {
+                const msg = res?.message || "Failed to update cart item required fields image";
+                toast.error(msg);
+                throw new Error(msg);
             }
         } catch (error) {
             console.error("Failed to update cart item required fields image:", error);
@@ -184,7 +212,9 @@ export default function useCart() {
                 toast.success(t("checkoutSuccess", "Checkout successful"));
                 return res.data;
             } else {
-                throw new Error(res?.message || "Failed to checkout");
+                const msg = res?.message || "Failed to checkout";
+                toast.error(msg);
+                throw new Error(msg);
             }
         } catch (error) {
             console.error("Failed to checkout:", error);
@@ -206,7 +236,9 @@ export default function useCart() {
                 if (Array.isArray(payload?.methods)) return payload.methods;
                 return [];
             } else {
-                throw new Error(res?.message || "Failed to get payment methods");
+                const msg = res?.message || "Failed to get payment methods";
+                toast.error(msg);
+                throw new Error(msg);
             }
         } catch (error) {
             console.error("Failed to get payment methods:", error);

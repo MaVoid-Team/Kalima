@@ -30,6 +30,7 @@
   "payment": {
     "title": "Payment",
     "secureNotice": "Your payment information is secure.",
+    "freeOrderNotice": "No payment details are required for free orders.",
     "creditCard": "Credit Card",
     "paypal": "PayPal",
     "applePay": "Apple Pay",
@@ -76,6 +77,8 @@
     "complete_purchase": "Complete Purchase",
     "completePurchase": "Complete Purchase",
     "screenshot": "Payment Screenshot",
+    "completeOrder": "Complete Your Order",
+    "summaryDesc": "Fast Buy Checkout — Secure and Easy",
     "method": "Select Payment Method"
   },
   "orderSummary": {

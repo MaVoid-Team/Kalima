@@ -14,6 +14,7 @@ export default function FastBuyCheckoutForm({ form, onApplyCoupon, loading }) {
           updateField={form.updateField}
           needsTransferNumber={form.computed.needsTransferNumber}
           needsScreenshot={form.computed.needsScreenshot}
+          isFreeOrder={form.computed.isFreeOrder}
           screenshotName={form.computed.screenshotName}
           paymentMethods={paymentMethods}
         />

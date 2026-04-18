@@ -30,16 +30,18 @@ export function useCheckoutForm({ preview, cartItems, onSubmit }) {
     [items, preview],
   );
 
-  const needsScreenshot = commonFields.some((f) =>
+  const isFree = subtotal === 0;
+
+  const needsScreenshot = !isFree && commonFields.some((f) =>
     ["paymentScreenShot", "paymentScreenshot"].includes(f),
   );
-  const needsTransferNumber = commonFields.includes("numberTransferredFrom");
+  const needsTransferNumber = !isFree && commonFields.includes("numberTransferredFrom");
 
   const isSubmitDisabled =
-    !needsScreenshot &&
-    !formData.numberTransferredFrom &&
-    !hasBooks &&
-    !formData.notes;
+    (needsScreenshot && !formData.paymentScreenshot) ||
+    (needsTransferNumber && !formData.numberTransferredFrom) ||
+    (hasBooks &&
+      (!formData.nameOnBook || !formData.numberOnBook || !formData.seriesName));
 
   const handleSubmit = () => {
     const data = new FormData();

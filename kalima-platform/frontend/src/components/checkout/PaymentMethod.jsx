@@ -8,17 +8,18 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AlertDialog, AlertDialogContent, AlertDialogFooter, AlertDialogCancel } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
-import { ImageOff } from "lucide-react";
+import { ImageOff, Upload, X, Image as ImageIcon } from "lucide-react";
 import { getImageUrl } from "@/lib/storeUtils";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { PhoneInput, egyptPhoneSchema } from "@/components/ui/phone-input";
+import { motion } from "framer-motion";
 
 export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
     numberTransferredFrom, setNumberTransferredFrom,
     notes, setNotes,
-    screenshotFile, setScreenshotFile, setValidationErrors }) {
+    screenshotFile, setScreenshotFile, setValidationErrors, isFreeOrder = false }) {
     const { t, i18n } = useTranslation('checkout');
     const [methods, setMethods] = useState([]);
     const fileInputRef = useRef(null);
@@ -26,8 +27,10 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
     const [previewUrl, setPreviewUrl] = useState('');
 
     const schema = React.useMemo(() => z.object({
-        numberTransferredFrom: egyptPhoneSchema,
-    }), []);
+        numberTransferredFrom: isFreeOrder 
+            ? z.string().optional() 
+            : egyptPhoneSchema(t).refine(val => val && val !== "+20", { message: t('validation.required', 'Required') }),
+    }), [isFreeOrder]);
 
     const {
         control,
@@ -64,120 +67,133 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
     const safeMethods = Array.isArray(methods) ? methods : [];
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{t('payment.title')}</CardTitle>
-                <CardDescription>{t('payment.secureNotice')}</CardDescription>
+        <Card className="border border-border/40 bg-card/60 backdrop-blur-md shadow-xl rounded-3xl overflow-hidden">
+            <CardHeader className="gap-1 pb-6 bg-muted/20 border-b border-border/5">
+                <CardTitle className="text-2xl font-black uppercase tracking-tight">{t('payment.title')}</CardTitle>
+                <CardDescription className="font-medium">{isFreeOrder ? t('payment.freeOrderNotice') : t('payment.secureNotice')}</CardDescription>
             </CardHeader>
-            <CardContent>
-                <div className="grid gap-2">
-                    <Label htmlFor="transfer-screenshot" className="text-xs uppercase tracking-wide">
-                        {t('payment.chooseMethod')}
-                        <span className="text-destructive">*</span>
-                    </Label>
-                    <RadioGroup
-                        value={selectedId?.toString()}
-                        onValueChange={val => onSelect && onSelect(Number(val))}
-                        className="grid gap-4"
-                        dir={i18n.dir()}
-                    >
-                        {safeMethods.map(m => (
-                            <div key={m.id} className="border rounded-md overflow-hidden">
-                                <div className="flex justify-between items-center p-4">
-                                    <div className="flex items-center gap-3">
-                                        <RadioGroupItem
-                                            value={m.id.toString()}
-                                            id={`pm-${m.id}`}
-                                            data-testid={`checkout-payment-method-${m.id}`}
-                                        />
-                                        <Label htmlFor={`pm-${m.id}`} className="font-medium cursor-pointer">
-                                            {m.name}
-                                        </Label>
+            <CardContent className="p-8">
+                {!isFreeOrder && (
+                    <div className="grid gap-4">
+                        <Label htmlFor="transfer-screenshot" className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2 mb-2">
+                            {t('payment.chooseMethod')}
+                            <span className="text-destructive">*</span>
+                        </Label>
+                        <RadioGroup
+                            value={selectedId?.toString()}
+                            onValueChange={val => onSelect && onSelect(Number(val))}
+                            className="grid gap-3"
+                            dir={i18n.dir()}
+                            data-testid="checkout-payment-method-list"
+                        >
+                            {safeMethods.map(m => {
+                                const isSelected = selectedId?.toString() === m.id.toString();
+                                return (
+                                    <div 
+                                        key={m.id} 
+                                        className={`group relative border transition-all duration-300 rounded-2xl overflow-hidden ${isSelected ? 'border-primary ring-1 ring-primary/20 bg-primary/5' : 'border-border/40 hover:border-primary/20 hover:bg-muted/30'}`}
+                                    >
+                                        <div className="flex justify-between items-center p-5">
+                                            <div className="flex items-center gap-4">
+                                                <RadioGroupItem
+                                                    value={m.id.toString()}
+                                                    id={`pm-${m.id}`}
+                                                    className="border-primary/40 text-primary"
+                                                    data-testid={`checkout-payment-method-${m.id}`}
+                                                />
+                                                <Label htmlFor={`pm-${m.id}`} className="font-bold cursor-pointer text-base">
+                                                    {m.name}
+                                                </Label>
+                                            </div>
+                                            {m?.image_url && (
+                                                <div className="p-1 px-2 rounded-lg bg-white/10 shadow-sm border border-border/10">
+                                                    <img
+                                                        src={getImageUrl(m.image_url) || ''}
+                                                        alt={m.name}
+                                                        className="w-10 h-7 object-contain grayscale-[0.5] group-hover:grayscale-0 transition-all"
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                        {m.phone_number && isSelected && (
+                                            <motion.div 
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                className="px-5 pb-5 pt-0 text-xs font-black uppercase tracking-wider text-primary"
+                                            >
+                                                <div className="pt-4 border-t border-primary/20 flex items-center gap-2">
+                                                    <span className="opacity-60">{t('payment.phone')}:</span>
+                                                    <span className="select-all">{m.phone_number}</span>
+                                                </div>
+                                            </motion.div>
+                                        )}
                                     </div>
-                                    {m?.image_url && (
-                                        <img
-                                            src={getImageUrl(m.image_url) || ''}
-                                            alt={m.name}
-                                            className="w-8 h-8 object-contain"
-                                        />
-                                    )}
-                                </div>
-                                {m.phone_number && (
-                                    <div className="p-4 bg-muted/30 border-t border-border text-xs text-muted-foreground">
-                                        {t('payment.phone')}: {m.phone_number}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </RadioGroup>
-                </div>
+                                );
+                            })}
+                        </RadioGroup>
+                    </div>
+                )}
 
                 {/* bank transfer inputs */}
-                <div className="grid gap-4 mt-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="transfer-number" className="text-xs uppercase tracking-wide">
-                            {t('payment.transferNumber')}
-                            <span className="text-destructive">*</span>
-                        </Label>
-                        <Controller
-                            control={control}
-                            name="numberTransferredFrom"
-                            render={({ field }) => (
-                                <div>
-                                    <PhoneInput
-                                        id="transfer-number"
-                                        dir="ltr"
-                                        {...field}
-                                        onChange={(e) => {
-                                            field.onChange(e);
-                                            setNumberTransferredFrom(e.target.value);
-                                        }}
-                                        onBlur={() => trigger("numberTransferredFrom")}
-                                        className="w-full"
-                                        data-testid="checkout-payment-method-transfer-number"
-                                    />
-                                    {errors.numberTransferredFrom && (
-                                        <p className="text-destructive text-sm mt-1 font-medium">
-                                            {errors.numberTransferredFrom.message?.toString()}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
-                        />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="transfer-notes" className="text-xs uppercase tracking-wide">
-                            {t('payment.notes')}
-                        </Label>
-                        <Textarea
-                            id="transfer-notes"
-                            value={notes}
-                            onChange={e => setNotes(e.target.value)}
-                            className="input w-full h-20 resize-none"
-                            data-testid="checkout-payment-method-notes"
-                        />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label className="text-xs uppercase tracking-wide flex items-center justify-between">
-                            {t('payment.screenshot')}
-                            <span className="text-destructive">*</span>
-                        </Label>
-                        <div className="flex items-center gap-2">
+                <div className="grid gap-8 mt-10">
+                    {!isFreeOrder && (
+                        <div className="grid gap-3">
+                            <Label htmlFor="transfer-number" className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+                                {t('payment.transferNumber')}
+                                <span className="text-destructive ms-1">*</span>
+                            </Label>
+                            <Controller
+                                control={control}
+                                name="numberTransferredFrom"
+                                render={({ field }) => (
+                                    <div className="space-y-2">
+                                        <PhoneInput
+                                            id="transfer-number"
+                                            dir="ltr"
+                                            {...field}
+                                            onChange={(e) => {
+                                                field.onChange(e);
+                                                setNumberTransferredFrom(e.target.value);
+                                            }}
+                                            onBlur={() => trigger("numberTransferredFrom")}
+                                            className="h-14 bg-background/50 rounded-2xl border-border/40 focus:ring-primary/20 transition-all font-medium text-lg"
+                                            data-testid="checkout-payment-method-transfer-number"
+                                        />
+                                        {errors.numberTransferredFrom && (
+                                            <p className="text-destructive text-xs font-bold uppercase tracking-tighter">
+                                                {errors.numberTransferredFrom.message?.toString()}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            />
+                        </div>
+                    )}
+
+                    {!isFreeOrder && (
+                        <div className="grid gap-3" data-testid="checkout-payment-method-screenshot-section">
+                            <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center justify-between">
+                                {t('payment.screenshot')}
+                                <span className="text-destructive">*</span>
+                            </Label>
+                            
                             {screenshotFile ? (
-                                <>
-                                    <Button
+                                <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-2xl p-4 transition-all">
+                                    <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                                         <ImageIcon className="w-5 h-5" />
+                                    </div>
+                                    <button
                                         type="button"
-                                        variant="link"
-                                        className="text-sm underline text-primary"
+                                        className="text-sm font-bold truncate flex-1 text-start hover:text-primary transition-colors"
                                         onClick={() => setShowPreview(true)}
                                         data-testid="checkout-payment-method-preview-button"
                                     >
                                         {screenshotFile.name}
-                                    </Button>
+                                    </button>
                                     <Button
                                         type="button"
                                         variant="ghost"
-                                        className="text-destructive"
+                                        className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10"
                                         onClick={() => {
                                             setScreenshotFile(null);
                                             if (fileInputRef.current) fileInputRef.current.value = '';
@@ -185,33 +201,55 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                                         aria-label={t('payment.removeScreenshot', 'Remove screenshot')}
                                         data-testid="checkout-payment-method-remove-button"
                                     >
-                                        &times;
+                                        <X className="w-4 h-4" />
                                     </Button>
-                                </>
+                                </div>
                             ) : (
-                                <Label
+                                <motion.label
+                                    whileHover={{ scale: 1.01 }}
+                                    whileTap={{ scale: 0.99 }}
                                     htmlFor="transfer-screenshot"
-                                    className="cursor-pointer px-3 py-1 bg-accent text-accent-foreground rounded-sm text-sm"
+                                    className="cursor-pointer border-2 border-dashed border-primary/20 hover:border-primary/40 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 bg-primary/5 hover:bg-primary/10 transition-all group lg:min-h-[160px]"
                                     data-testid="checkout-payment-method-upload-button"
                                 >
-                                    {t('payment.uploadScreenshotButton', 'Upload image')}
-                                </Label>
+                                    <div className="h-12 w-12 rounded-full bg-primary/20 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all shadow-lg shadow-primary/10">
+                                        <Upload className="w-6 h-6" />
+                                    </div>
+                                    <div className="text-center">
+                                        <span className="font-bold text-base block text-foreground">{t('payment.uploadScreenshotButton', 'Select payment receipt')}</span>
+                                        <span className="text-xs font-medium text-muted-foreground opacity-70 mt-1 block">{t('payment.uploadHint', 'PNG, JPG up to 5MB')}</span>
+                                    </div>
+                                </motion.label>
                             )}
+
+                            <Input
+                                id="transfer-screenshot"
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                className="sr-only"
+                                onChange={e => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setScreenshotFile(file);
+                                    }
+                                }}
+                                data-testid="checkout-payment-method-file-input"
+                            />
                         </div>
-                        {/* hidden input used for selecting file */}
-                        <Input
-                            id="transfer-screenshot"
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            className="sr-only"
-                            onChange={e => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                    setScreenshotFile(file);
-                                }
-                            }}
-                            data-testid="checkout-payment-method-file-input"
+                    )}
+                    
+                    <div className="grid gap-3">
+                        <Label htmlFor="transfer-notes" className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+                            {t('payment.notes')}
+                        </Label>
+                        <Textarea
+                            id="transfer-notes"
+                            value={notes}
+                            onChange={e => setNotes(e.target.value)}
+                            placeholder={t('payment.notesPlaceholder', 'Any special requests?')}
+                            className="w-full min-h-[120px] bg-background/50 rounded-2xl border-border/40 focus:ring-primary/20 p-4 font-medium transition-all resize-none"
+                            data-testid="checkout-payment-method-notes"
                         />
                     </div>
                 </div>

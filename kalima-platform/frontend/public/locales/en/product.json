@@ -10,6 +10,10 @@
     "format": "Format",
     "kitAccentColor": "Kit Accent Color"
   },
+  "types": {
+    "Product": "Product",
+    "Book": "Book"
+  },
   "formats": {
     "physical": "Physical Kit",
     "digital": "Digital Only",
@@ -19,7 +23,13 @@
     "addToCart": "Add to Cart",
     "buyNow": "Buy Now",
     "viewSample": "View Sample",
-    "follow": "Follow"
+    "follow": "Follow",
+    "contactWhatsApp": "Message",
+    "contactWhatsAppLong": "Message Admin on WhatsApp",
+    "contactWhatsAppShort": "Message",
+    "whatsappTemplate": "Hello, I am interested in the following product:\nProduct Name: {{title}}\n{{serial}}\nPrice: {{price}} {{currency}}\nURL: {{url}}\n\nCan you please provide more information?",
+    "pendingReview": "Your account is pending admin review. You can browse freely but cannot make purchases until your account is approved.",
+    "viewOptions": "View Options"
   },
   "info": {
     "sku": "SKU",
@@ -32,6 +42,7 @@
     "reviews": "reviews",
     "createdBy": "Created by",
     "currency": "EGP",
+    "serial": "Serial",
     "requiredInfo": "Required Information for Purchase:",
     "perks": "Product Features:"
   },
@@ -112,7 +123,8 @@
   },
   "badges": {
     "bestSeller": "Best Seller",
-    "interactive": "Interactive"
+    "interactive": "Interactive",
+    "comingSoon": "Coming Soon"
   },
   "booklet": {
     "selectFormat": "SELECT FORMAT",
@@ -124,5 +136,11 @@
   },
   "common": {
     "cancel": "Cancel"
+  },
+  "countdown": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s"
   }
 }

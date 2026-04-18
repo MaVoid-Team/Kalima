@@ -9,6 +9,7 @@ import {
   UpdateGalleryEntryDto,
   AttachCategoriesDto,
   AttachRequiredFieldsDto,
+  AddExternalVideoDto,
   UpdateProductRequiredFieldDto,
 } from "../dtos/product.dto";
 import {
@@ -68,16 +69,13 @@ export const productController = {
 
       const dto = await validateDto(CreateProductDto, req.body);
       const files = req.files as
-        | { thumbnail?: Express.Multer.File[]; sample?: Express.Multer.File[] }
+        | { thumbnail?: Express.Multer.File[]; high_quality?: Express.Multer.File[]; low_quality?: Express.Multer.File[] }
         | undefined;
       const thumbnailFile = files?.thumbnail?.[0];
-      const sampleFile = files?.sample?.[0];
+      const highQualityFile = files?.high_quality?.[0];
+      const lowQualityFile = files?.low_quality?.[0];
 
-      const product = await productService.createProduct(
-        dto,
-        thumbnailFile,
-        sampleFile,
-      );
+      const product = await productService.createProduct(dto, thumbnailFile, highQualityFile, lowQualityFile);
 
       res.status(201).json({
         success: true,
@@ -216,10 +214,11 @@ export const productController = {
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
       const dto = await validateDto(UpdateProductDto, req.body);
-      const files = req.files as { sample?: Express.Multer.File[] } | undefined;
-      const sampleFile = files?.sample?.[0];
+      const files = req.files as { high_quality?: Express.Multer.File[]; low_quality?: Express.Multer.File[] } | undefined;
+      const highQualityFile = files?.high_quality?.[0];
+      const lowQualityFile = files?.low_quality?.[0];
 
-      const product = await productService.updateProduct(id, dto, sampleFile);
+      const product = await productService.updateProduct(id, dto, highQualityFile, lowQualityFile);
 
       res.status(200).json({
         success: true,
@@ -445,6 +444,114 @@ export const productController = {
       res.status(200).json({
         success: true,
         message: "Image removed from gallery",
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  // ──────────────────────────────────────────
+  // GALLERY VIDEOS
+  // ──────────────────────────────────────────
+
+  /**
+   * POST /products/:id/gallery/videos
+   * multipart/form-data — field "video"
+   */
+  async addVideoToGallery(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const id = parseInt(req.params.id as string, 10);
+      if (isNaN(id)) throw new BadRequestError("Invalid product ID");
+
+      const file = req.file as Express.Multer.File | undefined;
+      if (!file) throw new BadRequestError("No video file provided");
+
+      const video = await productService.addVideoToGallery(id, file);
+
+      res.status(201).json({
+        success: true,
+        message: "Video added to gallery",
+        data: video,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * POST /products/:id/gallery/videos/external
+   * Body: { url: string }
+   */
+  async addExternalVideoToGallery(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const id = parseInt(req.params.id as string, 10);
+      if (isNaN(id)) throw new BadRequestError("Invalid product ID");
+
+      const dto = await validateDto(AddExternalVideoDto, req.body);
+      const video = await productService.addExternalVideoToGallery(id, dto.url);
+
+      res.status(201).json({
+        success: true,
+        message: "External video added to gallery",
+        data: video,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * DELETE /products/:id/gallery/videos/:videoId
+   */
+  async removeVideoFromGallery(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const id = parseInt(req.params.id as string, 10);
+      const videoId = parseInt(req.params.videoId as string, 10);
+      if (isNaN(id) || isNaN(videoId)) {
+        throw new BadRequestError("Invalid product ID or video ID");
+      }
+
+      await productService.removeVideoFromGallery(id, videoId);
+
+      res.status(200).json({
+        success: true,
+        message: "Video removed from gallery",
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * GET /products/:id/gallery/full
+   * Combined images + videos
+   */
+  async getFullGallery(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const id = parseInt(req.params.id as string, 10);
+      if (isNaN(id)) throw new BadRequestError("Invalid product ID");
+
+      const gallery = await productService.getFullGallery(id);
+
+      res.status(200).json({
+        success: true,
+        data: gallery,
       });
     } catch (error) {
       _next(error);

@@ -261,6 +261,13 @@ export type Enumrole_enumNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel> | $Enums.role_enum | null
 }
 
+export type Enumuser_flag_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.user_flag_enum | Prisma.Enumuser_flag_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel> | $Enums.user_flag_enum
+}
+
 export type Enumgender_enumNullableWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.gender_enum | Prisma.Enumgender_enumFieldRefInput<$PrismaModel> | null
   in?: $Enums.gender_enum[] | Prisma.ListEnumgender_enumFieldRefInput<$PrismaModel> | null
@@ -287,6 +294,16 @@ export type Enumrole_enumNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel>
+}
+
+export type Enumuser_flag_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.user_flag_enum | Prisma.Enumuser_flag_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumuser_flag_enumWithAggregatesFilter<$PrismaModel> | $Enums.user_flag_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel>
 }
 
 export type DateTimeFilter<$PrismaModel = never> = {
@@ -392,6 +409,23 @@ export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDecimalFilter<$PrismaModel>
 }
 
+export type Enumsample_media_type_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.sample_media_type_enum | Prisma.Enumsample_media_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.sample_media_type_enum[] | Prisma.ListEnumsample_media_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.sample_media_type_enum[] | Prisma.ListEnumsample_media_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumsample_media_type_enumFilter<$PrismaModel> | $Enums.sample_media_type_enum
+}
+
+export type Enumsample_media_type_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.sample_media_type_enum | Prisma.Enumsample_media_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.sample_media_type_enum[] | Prisma.ListEnumsample_media_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.sample_media_type_enum[] | Prisma.ListEnumsample_media_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumsample_media_type_enumWithAggregatesFilter<$PrismaModel> | $Enums.sample_media_type_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumsample_media_type_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumsample_media_type_enumFilter<$PrismaModel>
+}
+
 export type Enumfield_type_enumFilter<$PrismaModel = never> = {
   equals?: $Enums.field_type_enum | Prisma.Enumfield_type_enumFieldRefInput<$PrismaModel>
   in?: $Enums.field_type_enum[] | Prisma.ListEnumfield_type_enumFieldRefInput<$PrismaModel>
@@ -437,6 +471,23 @@ export type Enumimage_mime_type_enumWithAggregatesFilter<$PrismaModel = never> =
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumimage_mime_type_enumFilter<$PrismaModel>
   _max?: Prisma.NestedEnumimage_mime_type_enumFilter<$PrismaModel>
+}
+
+export type Enumvideo_source_type_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.video_source_type_enum | Prisma.Enumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.video_source_type_enum[] | Prisma.ListEnumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.video_source_type_enum[] | Prisma.ListEnumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumvideo_source_type_enumFilter<$PrismaModel> | $Enums.video_source_type_enum
+}
+
+export type Enumvideo_source_type_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.video_source_type_enum | Prisma.Enumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.video_source_type_enum[] | Prisma.ListEnumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.video_source_type_enum[] | Prisma.ListEnumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumvideo_source_type_enumWithAggregatesFilter<$PrismaModel> | $Enums.video_source_type_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumvideo_source_type_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumvideo_source_type_enumFilter<$PrismaModel>
 }
 
 export type NestedIntFilter<$PrismaModel = never> = {
@@ -699,6 +750,13 @@ export type NestedEnumrole_enumNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel> | $Enums.role_enum | null
 }
 
+export type NestedEnumuser_flag_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.user_flag_enum | Prisma.Enumuser_flag_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel> | $Enums.user_flag_enum
+}
+
 export type NestedEnumgender_enumNullableWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.gender_enum | Prisma.Enumgender_enumFieldRefInput<$PrismaModel> | null
   in?: $Enums.gender_enum[] | Prisma.ListEnumgender_enumFieldRefInput<$PrismaModel> | null
@@ -725,6 +783,16 @@ export type NestedEnumrole_enumNullableWithAggregatesFilter<$PrismaModel = never
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumrole_enumNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumuser_flag_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.user_flag_enum | Prisma.Enumuser_flag_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.user_flag_enum[] | Prisma.ListEnumuser_flag_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumuser_flag_enumWithAggregatesFilter<$PrismaModel> | $Enums.user_flag_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumuser_flag_enumFilter<$PrismaModel>
 }
 
 export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -830,6 +898,23 @@ export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDecimalFilter<$PrismaModel>
 }
 
+export type NestedEnumsample_media_type_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.sample_media_type_enum | Prisma.Enumsample_media_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.sample_media_type_enum[] | Prisma.ListEnumsample_media_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.sample_media_type_enum[] | Prisma.ListEnumsample_media_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumsample_media_type_enumFilter<$PrismaModel> | $Enums.sample_media_type_enum
+}
+
+export type NestedEnumsample_media_type_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.sample_media_type_enum | Prisma.Enumsample_media_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.sample_media_type_enum[] | Prisma.ListEnumsample_media_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.sample_media_type_enum[] | Prisma.ListEnumsample_media_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumsample_media_type_enumWithAggregatesFilter<$PrismaModel> | $Enums.sample_media_type_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumsample_media_type_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumsample_media_type_enumFilter<$PrismaModel>
+}
+
 export type NestedEnumfield_type_enumFilter<$PrismaModel = never> = {
   equals?: $Enums.field_type_enum | Prisma.Enumfield_type_enumFieldRefInput<$PrismaModel>
   in?: $Enums.field_type_enum[] | Prisma.ListEnumfield_type_enumFieldRefInput<$PrismaModel>
@@ -875,6 +960,23 @@ export type NestedEnumimage_mime_type_enumWithAggregatesFilter<$PrismaModel = ne
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumimage_mime_type_enumFilter<$PrismaModel>
   _max?: Prisma.NestedEnumimage_mime_type_enumFilter<$PrismaModel>
+}
+
+export type NestedEnumvideo_source_type_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.video_source_type_enum | Prisma.Enumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.video_source_type_enum[] | Prisma.ListEnumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.video_source_type_enum[] | Prisma.ListEnumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumvideo_source_type_enumFilter<$PrismaModel> | $Enums.video_source_type_enum
+}
+
+export type NestedEnumvideo_source_type_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.video_source_type_enum | Prisma.Enumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.video_source_type_enum[] | Prisma.ListEnumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.video_source_type_enum[] | Prisma.ListEnumvideo_source_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumvideo_source_type_enumWithAggregatesFilter<$PrismaModel> | $Enums.video_source_type_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumvideo_source_type_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumvideo_source_type_enumFilter<$PrismaModel>
 }
 
 

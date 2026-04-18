@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
+import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
 import useExport from '@/hooks/useExport';
 import {
     Pagination,
@@ -23,6 +24,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 import ProductFilters from '@/components/admin/products/ProductFilters';
 import ProductsTable from '@/components/admin/products/ProductsTable';
@@ -45,6 +47,8 @@ export default function ProductsPage() {
         setArchivedFilter,
         setPage,
     } = useAdminProducts();
+
+    const { deleteSample } = useAdminSampleSections();
 
     const { exportData, loading: exportLoading, exportProgress } = useExport();
     const [selectedIds, setSelectedIds] = useState([]);
@@ -93,6 +97,20 @@ export default function ProductsPage() {
 
     const handleDeleteConfirm = async () => {
         if (!deleteTarget) return;
+
+        // Delete linked samples first if any
+        const samplesToDelete = Array.isArray(deleteTarget.samples) 
+            ? deleteTarget.samples 
+            : (deleteTarget.sample ? [deleteTarget.sample] : []);
+
+        if (samplesToDelete.length > 0) {
+            for (const sample of samplesToDelete) {
+                if (sample.section_id && sample.id) {
+                    await deleteSample(sample.section_id, sample.id);
+                }
+            }
+        }
+
         const res = await deleteProduct(deleteTarget.id);
         if (res?.success) {
             setDeleteOpen(false);
@@ -248,6 +266,7 @@ export default function ProductsPage() {
                 onConfirm={handleDeleteConfirm}
                 loading={actionLoading}
                 productTitle={deleteTarget?.title}
+                hasSample={(deleteTarget?.samples?.length > 0) || !!deleteTarget?.sample}
             />
         </div>
     );

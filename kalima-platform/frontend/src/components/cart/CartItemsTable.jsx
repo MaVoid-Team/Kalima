@@ -18,7 +18,6 @@ import CartItem from './CartItem';
 
 export default function CartItemsTable({
   cartItems,
-  updateQuantity,
   removeFromCart,
   applyCoupon,
   removeCoupon,
@@ -100,15 +99,14 @@ export default function CartItemsTable({
   };
 
   return (
-    <Card className="rounded-lg shadow-sm border overflow-x-hidden w-full">
-      <div className="divide-y divide-border overflow-x-hidden">
+    <Card className="rounded-3xl shadow-xl border border-border/40 bg-card/60 backdrop-blur-md overflow-hidden w-full">
+      <div className="divide-y divide-border/10 overflow-hidden">
         {cartItems.map((item, idx) => (
           <CartItem
             key={item.id}
             item={item}
             idx={idx}
             baseURL={baseURL}
-            updateQuantity={updateQuantity}
             onRemoveClick={(id) => { setItemToDelete(id); setDialogOpen(true); }}
             onApplyCouponClick={(id) => { setItemForCoupon(id); setCouponValue(''); setCouponDialogOpen(true); }}
             removeCoupon={handleRemoveCoupon}

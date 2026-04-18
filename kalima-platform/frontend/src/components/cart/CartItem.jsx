@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
-import { Minus, Plus, TicketCheck, TicketPlus, Trash } from 'lucide-react';
+import { useState } from 'react';
+import { TicketCheck, TicketPlus, Trash } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import CartItemRequiredFields from './CartItemRequiredFields';
 
 export default function CartItem({
     item,
     idx,
     baseURL,
-    updateQuantity,
     onRemoveClick,
     onApplyCouponClick,
     removeCoupon,
@@ -23,115 +21,119 @@ export default function CartItem({
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.04, duration: 0.35 }}
-            className="p-4 min-w-0 w-full max-w-full overflow-x-hidden"
+            transition={{ delay: idx * 0.05, duration: 0.4 }}
+            className="p-6 min-w-0 w-full max-w-full overflow-hidden hover:bg-muted/5 transition-colors group"
         >
-            <div className="flex gap-4">
-                <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-muted border border-border">
-                    <img src={item?.products?.thumbnail_image?.url
-                        ? new URL(item.products.thumbnail_image.url, baseURL).toString()
-                        : 'https://via.placeholder.com/150'} alt={item?.products?.title} className="w-full h-full object-cover" />
+            <div className="flex flex-col sm:flex-row gap-6">
+                {/* Product Thumbnail */}
+                <div className="w-24 h-24 shrink-0 rounded-2xl overflow-hidden bg-white border border-border/50 shadow-xs relative">
+                    <img
+                        src={item?.products?.thumbnail_image?.url
+                            ? new URL(item.products.thumbnail_image.url, baseURL).toString()
+                            : 'https://via.placeholder.com/150'}
+                        alt={item?.products?.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                 </div>
-                <div className="flex-1 min-w-0 flex flex-col justify-between">
+
+                {/* Content */}
+                <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
                     <div>
-                        <h3 className="text-sm font-bold text-foreground line-clamp-2 mb-1 leading-snug">{item?.products?.title}</h3>
-                        <p className="text-xs text-muted-foreground line-clamp-1 mb-2">{item?.products?.description}</p>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                        <div className="text-base font-bold">{item?.final_price} {t('L.E')}</div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="mt-4 flex items-center justify-between gap-4">
-                {/* <div className="flex items-center border rounded-lg h-9">
-                    <Button
-                        aria-label={t('decreaseQuantity')}
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 text-muted-foreground hover:text-foreground"
-                        data-testid={`cart-item-decrease-${item.id}`}
-                    >
-                        <Minus className="w-4 h-4" />
-                    </Button>
-                    <span className="text-sm font-semibold w-8 text-center">{item.quantity}</span>
-                    <Button
-                        aria-label={t('increaseQuantity')}
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        variant="ghost"
-                        size="icon"
-                        className="h-9 w-9 text-muted-foreground hover:text-foreground"
-                        data-testid={`cart-item-increase-${item.id}`}
-                    >
-                        <Plus className="w-4 h-4" />
-                    </Button>
-                </div> */}
-                <div className="text-xs text-muted-foreground font-medium">
-                    {t('each', { price: `${item?.price_at_add} ${t('L.E')}` })}
-                </div>
-            </div>
-
-            <div className="mt-2 flex items-center justify-between">
-                <div className='w-full'>
-                    {item.coupons ? (
-                        <div className="flex items-center justify-between flex-row gap-2">
-                            <div className="flex items-center gap-1">
-                                <span className="text-sm text-success" title={t('applied', 'Applied')}><TicketCheck className={`w-4 h-4 scale-x-[${i18n.language === 'ar' ? '-1' : '1'}]`} /></span>
-                                <Badge variant="success" className="h-5 px-1.5 text-xs bg-accent">{item?.coupons?.code}</Badge>
-                                {item?.coupons?.discount_percentage != 0 && <span className="text-sm text-muted-foreground">{i18n.language === 'en' && '-'}{item?.coupons?.discount_percentage}%{i18n.language === 'ar' && '-'}</span>}
-                                {item?.coupons?.discount_amount != 0 && <span className="text-sm text-muted-foreground">-{item?.coupons?.discount_amount} {t('L.E')}</span>}
-                                {item?.coupons?.discount_percentage != 0 && <span className="text-xs text-muted-foreground ms-1">({" - " + item?.discount} {t('L.E')})</span>}
+                        <div className="flex items-start justify-between gap-4">
+                            <h3 className="text-base font-bold text-foreground line-clamp-2 leading-tight flex-1">
+                                {item?.products?.title}
+                            </h3>
+                            <div className="text-lg font-black text-primary whitespace-nowrap">
+                                {item?.final_price} <span className="text-[10px] uppercase opacity-70">{t('L.E')}</span>
                             </div>
-                            <Button size="icon" variant="ghost" onClick={() => removeCoupon(item.id)} data-testid={`cart-item-remove-coupon-${item.id}`}>
-                                <Trash className="w-4 h-4 text-destructive" />
-                            </Button>
                         </div>
-                    ) : (
-                        <motion.div
-                            className="inline-block mb-2 min-w-0"
-                            onHoverStart={() => setHoveredCouponItem(true)}
-                            onHoverEnd={() => setHoveredCouponItem(false)}
-                        >
-                            <Button
-                                size="sm"
-                                className="bg-accent not-hover:text-accent-foreground flex items-center"
-                                onClick={() => onApplyCouponClick(item.id)}
-                                data-testid={`cart-item-apply-coupon-${item.id}`}
-                            >
-                                <TicketPlus className="w-4 h-4" />
-                                <motion.span
-                                    initial={{ maxWidth: 0, opacity: 0 }}
-                                    animate={
-                                        hoveredCouponItem
-                                            ? { maxWidth: 96, opacity: 1 }
-                                            : { maxWidth: 0, opacity: 0 }
-                                    }
-                                    transition={{ duration: 0.18 }}
-                                    className="overflow-hidden whitespace-nowrap block max-w-full"
+                        <p className="text-sm font-medium text-muted-foreground line-clamp-1 mt-1 opacity-80">
+                            {item?.products?.description}
+                        </p>
+                    </div>
+
+                    <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
+                        {/* Coupon Section */}
+                        <div className="flex-1 min-w-[120px]">
+                            {item.coupons ? (
+                                <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 bg-success/10 text-success px-3 py-1.5 rounded-full border border-success/20">
+                                        <TicketCheck className="w-4 h-4 shrink-0" />
+                                        <span className="text-xs font-bold uppercase tracking-wider">{item?.coupons?.code}</span>
+                                        <div className="w-px h-3 bg-success/20 mx-0.5" />
+                                        <span className="text-xs font-bold whitespace-nowrap">
+                                            {item?.coupons?.discount_percentage !== 0
+                                                ? `-${item?.coupons?.discount_percentage}%`
+                                                : `-${item?.coupons?.discount_amount} ${t('L.E')}`}
+                                        </span>
+                                    </div>
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive text-muted-foreground/60 shrink-0"
+                                        onClick={() => removeCoupon(item.id)}
+                                        data-testid={`cart-item-remove-coupon-${item.id}`}
+                                    >
+                                        <Trash className="w-3.5 h-3.5" />
+                                    </Button>
+                                </div>
+                            ) : (
+                                <motion.div
+                                    className="inline-block"
+                                    onHoverStart={() => setHoveredCouponItem(true)}
+                                    onHoverEnd={() => setHoveredCouponItem(false)}
                                 >
-                                    {t('applyCoupon', 'Apply Coupon')}
-                                </motion.span>
-                            </Button>
-                        </motion.div>
-                    )}
+                                    <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        className="bg-primary/5 hover:bg-primary/15 text-primary border border-primary/10 rounded-full h-10 px-5 font-bold flex items-center gap-2 group/btn transition-all"
+                                        onClick={() => onApplyCouponClick(item.id)}
+                                        data-testid={`cart-item-apply-coupon-${item.id}`}
+                                    >
+                                        <TicketPlus className="w-4 h-4 shrink-0" />
+                                        <span className="text-xs sm:hidden">
+                                            {t('applyCoupon', 'Apply Coupon')}
+                                        </span>
+                                        <motion.span
+                                            initial={{ maxWidth: 0, opacity: 0 }}
+                                            animate={hoveredCouponItem ? { maxWidth: 120, opacity: 1 } : { maxWidth: 0, opacity: 0 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="hidden sm:block overflow-hidden whitespace-nowrap text-xs"
+                                        >
+                                            {t('applyCoupon', 'Apply Coupon')}
+                                        </motion.span>
+                                    </Button>
+                                </motion.div>
+                            )}
+                        </div>
+
+                        {/* Remove Action */}
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:bg-destructive/10 font-bold gap-2 rounded-xl h-10 px-4 shrink-0"
+                            onClick={() => onRemoveClick(item.id)}
+                            data-testid={`cart-item-remove-${item.id}`}
+                        >
+                            <Trash className="w-4 h-4 shrink-0" />
+                            <span className="text-xs">{t('removeFromCart', 'Remove')}</span>
+                        </Button>
+                    </div>
                 </div>
             </div>
 
-            <CartItemRequiredFields
-                item={item}
-                baseURL={baseURL}
-                updateCartItemRequiredFields={updateCartItemRequiredFields}
-                updateCartItemRequiredFieldsImage={updateCartItemRequiredFieldsImage}
-                onOpenChange={onOpenChange}
-            />
-
-            <Button className="w-full" onClick={() => onRemoveClick(item.id)} data-testid={`cart-item-remove-${item.id}`}>
-                {t('removeFromCart', 'Remove From Cart')}
-            </Button>
+            {/* Required Fields Section */}
+            <div className="mt-6 pt-4 border-t border-border/5">
+                <CartItemRequiredFields
+                    item={item}
+                    baseURL={baseURL}
+                    updateCartItemRequiredFields={updateCartItemRequiredFields}
+                    updateCartItemRequiredFieldsImage={updateCartItemRequiredFieldsImage}
+                    onOpenChange={onOpenChange}
+                />
+            </div>
         </motion.div>
     );
 }

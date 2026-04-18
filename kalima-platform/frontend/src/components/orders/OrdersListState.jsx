@@ -15,7 +15,7 @@ export default function OrdersListState({ loading, orders, filters, t }) {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-20 text-center bg-card rounded-xl border border-border/40 shadow-sm">
+        <div className="flex flex-col items-center justify-center py-20 text-center rounded-xl border border-border/40 shadow-sm">
           <div className="bg-primary/10 p-4 rounded-full mb-4">
             <PackageOpen className="h-12 w-12 text-primary opacity-80" />
           </div>

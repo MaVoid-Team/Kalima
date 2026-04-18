@@ -8,6 +8,7 @@ import {
   IsNumber,
   Min,
   MaxLength,
+  ValidateIf,
 } from "class-validator";
 import { Type } from "class-transformer";
 
@@ -56,13 +57,15 @@ export class CreatePurchaseDto {
   @IsPositive()
   user_id: number;
 
+  @ValidateIf((o: CreatePurchaseDto) => Number(o.total) > 0)
   @IsInt()
   @IsPositive()
-  payment_method_id: number;
+  payment_method_id?: number | null;
 
+  @ValidateIf((o: CreatePurchaseDto) => Number(o.total) > 0)
   @IsInt()
   @IsPositive()
-  payment_screenshot_id: number;
+  payment_screenshot_id?: number | null;
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -79,6 +82,7 @@ export class CreatePurchaseDto {
   total: number;
 
   @IsOptional()
+  @ValidateIf((o: CreatePurchaseDto) => Number(o.total) > 0)
   @IsString()
   @MaxLength(50)
   number_transferred_from?: string;

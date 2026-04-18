@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput } from 'lucide-react';
+import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput, BarChart3, Activity } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 
 const ADMIN_THEME_STORAGE_KEY = 'adminTheme';
@@ -38,20 +38,25 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
 
   // Using userManagement namespace explicitly for the users translation
   const navigation = [
-    { name: t('nav.orders'), href: '/admin/orders', icon: ShoppingCart },
-    { name: t('nav.products'), href: '/admin/products', icon: Package },
-    { name: t('nav.samples'), href: '/admin/samples', icon: FileText },
-    { name: t('nav.coupons'), href: '/admin/coupons', icon: Ticket },
-    { name: t('nav.categories'), href: '/admin/categories', icon: LayoutGrid },
-    { name: t('nav.requiredFields'), href: '/admin/required-fields', icon: FormInput },
-    { name: t('nav.paymentMethods', 'Payment Methods'), href: '/admin/payment-methods', icon: CreditCard },
-    { name: i18n.t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users },
-    { name: t('nav.settings'), href: '/admin/settings', icon: Settings },
+    { name: t('nav.dashboard', 'Dashboard'), href: '/admin/dashboard', icon: Home, id: 'dashboard' },
+    { name: t('nav.analytics', 'Analytics'), href: '/admin/analytics', icon: BarChart3, id: 'analytics' },
+    { name: t('nav.employeePerformance', 'Employee Performance'), href: '/admin/employee-performance', icon: Activity, id: 'employee-performance' },
+    { name: t('nav.orders'), href: '/admin/orders', icon: ShoppingCart, id: 'orders' },
+    { name: t('nav.products'), href: '/admin/products', icon: Package, id: 'products' },
+    { name: t('nav.samples'), href: '/admin/samples', icon: FileText, id: 'samples' },
+    { name: t('nav.coupons'), href: '/admin/coupons', icon: Ticket, id: 'coupons' },
+    { name: t('nav.categories'), href: '/admin/categories', icon: LayoutGrid, id: 'categories' },
+    { name: t('nav.requiredFields'), href: '/admin/required-fields', icon: FormInput, id: 'required-fields' },
+    { name: t('nav.paymentMethods', 'Payment Methods'), href: '/admin/payment-methods', icon: CreditCard, id: 'payment-methods' },
+    { name: t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users, id: 'users' },
+    { name: t('nav.settings'), href: '/admin/settings', icon: Settings, id: 'settings' },
   ];
 
   const toggleLanguage = () => {
     const newLang = i18n.language === "ar" ? "en" : "ar";
     i18n.changeLanguage(newLang);
+    document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = newLang;
   };
 
   // Calculate width class
@@ -100,10 +105,10 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
           const isActive = location.pathname.startsWith(item.href);
           return (
             <Link
-              key={item.name}
+              key={item.href}
               to={item.href}
               title={isCollapsed ? item.name : undefined}
-              data-testid={`admin-sidebar-nav-${item.name.toLowerCase()}`}
+              data-testid={`admin-sidebar-nav-${item.id}`}
               className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive
                 ? "bg-sidebar-primary text-sidebar-primary-foreground"
                 : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"

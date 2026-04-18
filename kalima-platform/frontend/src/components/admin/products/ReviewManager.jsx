@@ -120,7 +120,7 @@ const ReviewManager = ({ productId, className }) => {
           disabled={isLoading}
           data-testid="admin-reviews-refresh"
         >
-          <RefreshCw className={cn('w-4 h-4 mr-2', isLoading && 'animate-spin')} />
+          <RefreshCw className={cn('w-4 h-4 mr-2 no-flip', isLoading && 'animate-spin')} />
           {t('common.refresh', 'Refresh')}
         </Button>
       </div>

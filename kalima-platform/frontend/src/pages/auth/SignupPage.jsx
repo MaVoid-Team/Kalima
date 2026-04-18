@@ -41,7 +41,7 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="container relative grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden lg:max-w-none lg:grid-cols-2 lg:px-0">
+        <div className="relative w-full grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden lg:max-w-none lg:grid-cols-2 lg:px-0">
             <AuthAnimatedBackground variant="register" />
 
             {/* Right Side - Image Loop / Artwork */}

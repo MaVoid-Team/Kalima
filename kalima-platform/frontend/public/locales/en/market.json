@@ -62,7 +62,14 @@
     "purchased": "PURCHASED",
     "new": "NEW",
     "off": "OFF",
-    "cart": "Cart"
+    "cart": "Cart",
+    "comingSoon": "Coming Soon"
+  },
+  "countdown": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s"
   },
   "products": {
     "trending": {
@@ -116,6 +123,11 @@
   "common": {
     "back": "Back"
   },
+  "breadcrumbs": {
+    "home": "Home",
+    "digitalProducts": "Digital Products",
+    "samples": "Samples"
+  },
   "errors": {
     "loadingError": "Error loading data",
     "fetchErrorLog": "Error fetching data:",
@@ -138,11 +150,28 @@
     "count": "Samples",
     "noSamples": "No samples found.",
     "view": "Preview",
-    "download": "Download"
+    "download": "Download",
+    "hq": "HQ",
+    "lq": "LQ",
+    "noNestedSamples": "No samples available in this section yet.",
+    "addFromProduct": "You can add samples to this section from the Product details page.",
+    "mediaTypes": {
+      "pdf": "PDF",
+      "image": "Image",
+      "video": "Video",
+      "word": "Word",
+      "powerpoint": "PowerPoint",
+      "audio": "Audio",
+      "Video": "Video",
+      "Audio": "Audio",
+      "Image": "Image",
+      "Document": "Document"
+    }
   },
   "samplePage": {
     "notFound": "Sample not found",
     "backToMarket": "Back to Market",
+    "backToSample": "Sample Details",
     "download": "Download",
     "downloadFile": "Download File",
     "previewUnavailable": "Preview unavailable for this file type",

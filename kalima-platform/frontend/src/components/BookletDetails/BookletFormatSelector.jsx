@@ -29,7 +29,7 @@ export default function BookletFormatSelector({
                 "relative flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all",
                 isSelected
                   ? "border-primary bg-primary/10"
-                  : "border-border hover:border-primary/50 bg-card",
+                  : "border-border hover:border-primary/50",
               )}
               data-testid={`booklet-format-selector-${format.id}-button`}
             >

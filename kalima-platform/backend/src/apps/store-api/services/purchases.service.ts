@@ -109,16 +109,32 @@ class PurchasesService {
     const user = await userManagementService.findUserById(input.user_id);
     if (!user) throw new NotFoundError("User not found");
 
-    const paymentMethod = await client.payment_methods.findUnique({
-      where: { id: input.payment_method_id },
-    });
-    if (!paymentMethod || paymentMethod.status !== true)
-      throw new BadRequestError("Invalid or inactive payment method");
+    const isFreeOrder = Number(input.total) <= 0;
 
-    const screenshot = await client.images.findUnique({
-      where: { id: input.payment_screenshot_id },
-    });
-    if (!screenshot) throw new BadRequestError("Payment screenshot not found");
+    let paymentMethod: { phone_number: string | null } | null = null;
+    if (!isFreeOrder) {
+      if (!input.payment_method_id) {
+        throw new BadRequestError("Payment method is required for paid orders");
+      }
+
+      if (!input.payment_screenshot_id) {
+        throw new BadRequestError(
+          "Payment screenshot is required for paid orders",
+        );
+      }
+
+      const screenshot = await client.images.findUnique({
+        where: { id: input.payment_screenshot_id },
+      });
+      if (!screenshot)
+        throw new BadRequestError("Payment screenshot not found");
+
+      paymentMethod = await validatePaymentForCheckout(client, {
+        total: Number(input.total),
+        numberTransferredFrom: input.number_transferred_from,
+        payment_method_id: input.payment_method_id,
+      });
+    }
 
     const userSerial = this.buildUserSerialFrom({
       mongo_id: user.mongo_id ?? undefined,
@@ -132,14 +148,22 @@ class PurchasesService {
     const created = await client.purchases.create({
       data: {
         user_id: input.user_id,
-        payment_method_id: input.payment_method_id,
-        payment_screenshot_id: input.payment_screenshot_id,
+        payment_method_id: isFreeOrder
+          ? null
+          : (input.payment_method_id ?? null),
+        payment_screenshot_id: isFreeOrder
+          ? null
+          : (input.payment_screenshot_id ?? null),
         subtotal: input.subtotal,
         discount: input.discount,
         total: input.total,
         notes: input.notes,
-        number_transferred_from: input.number_transferred_from,
-        payment_number: input.payment_number,
+        number_transferred_from: isFreeOrder
+          ? null
+          : (input.number_transferred_from ?? null),
+        payment_number: isFreeOrder
+          ? null
+          : (input.payment_number ?? paymentMethod?.phone_number ?? null),
         purchase_serial: purchaseSerial,
       },
     });
@@ -354,6 +378,8 @@ class PurchasesService {
       select: {
         id: true,
         name: true,
+        email: true,
+        phone: true,
         user_roles: {
           select: { role: true },
           where: { role: { in: eligibleRoles } },
@@ -390,6 +416,8 @@ class PurchasesService {
     const stats = admins.map((admin) => ({
       id: admin.id,
       name: admin.name,
+      email: admin.email,
+      phone: admin.phone,
       role: admin.user_roles[0]?.role || null,
       count: countsMap.get(admin.id) || 0,
     }));

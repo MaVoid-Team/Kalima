@@ -5,6 +5,7 @@ import requiredFieldRoutes from "./required-field.routes";
 import categoryRoutes from "./category.routes";
 import productRoutes from "./product.routes";
 import purchaseRoutes from "./purchase.routes";
+import sampleSectionRoutes from "./sample-section.routes";
 import sampleRoutes from "./sample.routes";
 import governmentRoutes from "./government.routes";
 import zonesRoutes from "./zones.routes";
@@ -24,6 +25,7 @@ router.use("/required-fields", requiredFieldRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/products", productRoutes);
 router.use("/purchases", purchaseRoutes);
+router.use("/sample-sections", sampleSectionRoutes);
 router.use("/samples", sampleRoutes);
 
 // Lookup / reference-data endpoints

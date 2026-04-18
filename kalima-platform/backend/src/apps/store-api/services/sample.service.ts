@@ -3,7 +3,11 @@ import { promises as fsPromises } from "fs";
 import crypto from "crypto";
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
-import { samples } from "../generated/prisma/client";
+import {
+  samples,
+  sample_sections,
+  sample_media_type_enum,
+} from "../generated/prisma/client";
 import { NotFoundError, BadRequestError } from "../../../libs/errors";
 
 // ============================================
@@ -14,20 +18,93 @@ const UPLOAD_DIR = path.resolve(__dirname, "../../../../uploads/samples");
 
 const SAMPLE_MIME_TYPES = new Set([
   "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 ]);
+
+const MIME_TO_MEDIA_TYPE: Record<string, sample_media_type_enum> = {
+  "application/pdf": sample_media_type_enum.pdf,
+  "image/jpeg": sample_media_type_enum.image,
+  "image/png": sample_media_type_enum.image,
+  "image/webp": sample_media_type_enum.image,
+  "image/gif": sample_media_type_enum.image,
+  "video/mp4": sample_media_type_enum.video,
+  "video/webm": sample_media_type_enum.video,
+  "video/quicktime": sample_media_type_enum.video,
+  "application/msword": sample_media_type_enum.word,
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    sample_media_type_enum.word,
+  "application/vnd.ms-powerpoint": sample_media_type_enum.powerpoint,
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+    sample_media_type_enum.powerpoint,
+};
 
 const MIME_TO_EXT: Record<string, string> = {
   "application/pdf": ".pdf",
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "image/gif": ".gif",
+  "video/mp4": ".mp4",
+  "video/webm": ".webm",
+  "video/quicktime": ".mov",
   "application/msword": ".doc",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
     ".docx",
+  "application/vnd.ms-powerpoint": ".ppt",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+    ".pptx",
 };
+
+const DISPLAYABLE_MEDIA_TYPES = new Set<sample_media_type_enum>([
+  sample_media_type_enum.pdf,
+  sample_media_type_enum.image,
+  sample_media_type_enum.video,
+]);
+
+// ============================================
+// TYPES
+// ============================================
+
+export interface CreateSampleSectionInput {
+  title: string;
+  description?: string;
+  sort_order?: number;
+  active?: boolean;
+}
+
+export interface UpdateSampleSectionInput {
+  title?: string;
+  description?: string;
+  sort_order?: number;
+  active?: boolean;
+}
+
+export interface CreateSampleInput {
+  product_id: number;
+  media_type: sample_media_type_enum;
+  original_name: string;
+  mime_type: string;
+  size: number;
+  high_quality_url?: string;
+  low_quality_url?: string;
+}
 
 const SAMPLE_LIST_SELECT = {
   id: true,
-  url: true,
+  media_type: true,
+  title: true,
+  high_quality_url: true,
+  low_quality_url: true,
   original_name: true,
   mime_type: true,
   size: true,
@@ -40,6 +117,16 @@ const SAMPLE_LIST_SELECT = {
   },
 };
 
+const SAMPLE_SECTION_SAFE_SELECT = {
+  id: true,
+  title: true,
+  description: true,
+  sort_order: true,
+  active: true,
+  created_at: true,
+  updated_at: true,
+} as const;
+
 interface SampleListFilters {
   search?: string;
   page?: number;
@@ -48,15 +135,20 @@ interface SampleListFilters {
 
 interface SampleResponse {
   id: number;
-  url: string;
+  media_type: sample_media_type_enum;
+  title: string | null;
+  high_quality_url: string | null;
+  low_quality_url: string | null;
   original_name: string;
   mime_type: string;
   size: number;
-  created_at: Date;
-  products: {
+  created_at: Date | null;
+  products?: {
     id: number;
     title: string;
-  };
+  } | null;
+  is_displayable?: boolean;
+  thumbnail?: string | null;
 }
 
 interface SampleListResponse {
@@ -82,42 +174,138 @@ class SampleService {
     await this.initPromise;
   }
 
-  async uploadSample(
-    file: Express.Multer.File,
-    productId: number,
-  ): Promise<samples> {
-    if (!file.buffer) {
-      throw new BadRequestError("Sample file buffer is required");
-    }
+  /** Derive is_displayable from media_type (not stored in DB) */
+  isDisplayable(mediaType: sample_media_type_enum): boolean {
+    return DISPLAYABLE_MEDIA_TYPES.has(mediaType);
+  }
 
-    if (!SAMPLE_MIME_TYPES.has(file.mimetype)) {
-      throw new BadRequestError(
-        `Invalid sample type: ${file.mimetype}. Allowed: PDF, Word docs`,
-      );
-    }
-
-    const ext =
-      MIME_TO_EXT[file.mimetype] || path.extname(file.originalname) || ".bin";
+  /** Save file buffer to disk and return the URL path */
+  async saveFileToDisk(
+    buffer: Buffer,
+    mimeType: string,
+    fieldName: string,
+  ): Promise<string> {
+    const ext = MIME_TO_EXT[mimeType] || path.extname(fieldName) || ".bin";
     const uniqueId = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
-    const filename = `${uniqueId}${ext}`;
+    const filename = `${uniqueId}-${fieldName}${ext}`;
     const filePath = path.join(UPLOAD_DIR, filename);
 
     await this.ensureUploadDir();
-    await fsPromises.writeFile(filePath, file.buffer);
+    await fsPromises.writeFile(filePath, buffer);
 
-    const url = `/uploads/samples/${filename}`;
+    return `/uploads/samples/${filename}`;
+  }
 
-    const sample = await this.db.samples.create({
-      data: {
-        product_id: productId,
-        url,
-        original_name: file.originalname,
-        mime_type: file.mimetype,
-        size: file.buffer.length,
+  /** Resolve URL to absolute filesystem path */
+  urlToAbsolutePath(url: string): string {
+    return path.resolve(
+      __dirname,
+      "../../../..",
+      url.startsWith("/") ? url.slice(1) : url,
+    );
+  }
+
+  // ============================================
+  // SAMPLE SECTIONS — CRUD
+  // ============================================
+
+  async getAllSections(activeOnly = false): Promise<sample_sections[]> {
+    const where = activeOnly ? { active: true } : {};
+    return this.db.sample_sections.findMany({
+      where,
+      include: {
+        samples: {
+          include: { products: { select: { id: true, title: true } } },
+        },
+      },
+      orderBy: [{ sort_order: "asc" }, { id: "asc" }],
+    });
+  }
+
+  async getSectionById(id: number): Promise<sample_sections> {
+    const section = await this.db.sample_sections.findUnique({
+      where: { id },
+      include: {
+        samples: {
+          include: { products: { select: { id: true, title: true } } },
+          orderBy: { id: "asc" },
+        },
       },
     });
 
-    return sample;
+    if (!section) {
+      throw new NotFoundError("Sample section not found");
+    }
+
+    return section;
+  }
+
+  async createSection(
+    data: CreateSampleSectionInput,
+  ): Promise<sample_sections> {
+    return this.db.sample_sections.create({
+      data: {
+        title: data.title,
+        description: data.description,
+        sort_order: data.sort_order ?? 0,
+        active: data.active ?? true,
+      },
+      select: SAMPLE_SECTION_SAFE_SELECT,
+    });
+  }
+
+  async updateSection(
+    id: number,
+    data: UpdateSampleSectionInput,
+  ): Promise<sample_sections> {
+    const section = await this.db.sample_sections.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+    if (!section) {
+      throw new NotFoundError("Sample section not found");
+    }
+
+    return this.db.sample_sections.update({
+      where: { id },
+      data: {
+        ...(data.title !== undefined && { title: data.title }),
+        ...(data.description !== undefined && {
+          description: data.description,
+        }),
+        ...(data.sort_order !== undefined && { sort_order: data.sort_order }),
+        ...(data.active !== undefined && { active: data.active }),
+        updated_at: new Date(),
+      },
+      select: SAMPLE_SECTION_SAFE_SELECT,
+    });
+  }
+
+  async deleteSection(id: number): Promise<void> {
+    const section = await this.db.sample_sections.findUnique({
+      where: { id },
+      include: { samples: true },
+    });
+
+    if (!section) {
+      throw new NotFoundError("Sample section not found");
+    }
+
+    // Delete file assets for all samples
+    for (const sample of section.samples) {
+      if (sample.high_quality_url) {
+        void fsPromises
+          .unlink(this.urlToAbsolutePath(sample.high_quality_url))
+          .catch(() => {});
+      }
+      if (sample.low_quality_url) {
+        void fsPromises
+          .unlink(this.urlToAbsolutePath(sample.low_quality_url))
+          .catch(() => {});
+      }
+    }
+
+    await this.db.sample_sections.delete({ where: { id } });
   }
 
   async getAllSamples(
@@ -131,8 +319,12 @@ class SampleService {
 
     if (filters?.search) {
       where.OR = [
-        { title: { contains: filters.search, mode: "insensitive" } },
-        { description: { contains: filters.search, mode: "insensitive" } },
+        { original_name: { contains: filters.search, mode: "insensitive" } },
+        {
+          products: {
+            title: { contains: filters.search, mode: "insensitive" },
+          },
+        },
       ];
     }
 
@@ -147,18 +339,49 @@ class SampleService {
       this.db.samples.count({ where }),
     ]);
 
+    const enrichedData = data.map((sample: any) => this.enrichSample(sample));
+
     return {
-      data: data,
+      data: enrichedData,
       total: total,
       page,
       limit,
     };
   }
 
-  async getSampleById(id: number): Promise<samples> {
-    const sample = await this.db.samples.findUnique({
-      where: { id },
-      include: { products: true },
+  // ============================================
+  // SAMPLES — CRUD
+  // ============================================
+
+  async getSamplesBySection(sectionId: number): Promise<samples[]> {
+    const section = await this.db.sample_sections.findUnique({
+      where: { id: sectionId },
+      select: { id: true },
+    });
+
+    if (!section) {
+      throw new NotFoundError("Sample section not found");
+    }
+
+    return this.db.samples.findMany({
+      where: { section_id: sectionId },
+      include: { products: { select: { id: true, title: true } } },
+      orderBy: { id: "asc" },
+    });
+  }
+
+  async getSampleById(sampleId: number, sectionId?: number): Promise<samples> {
+    const where: { id: number; section_id?: number } = { id: sampleId };
+    if (sectionId !== undefined) {
+      where.section_id = sectionId;
+    }
+
+    const sample = await this.db.samples.findFirst({
+      where,
+      include: {
+        products: { select: { id: true, title: true } },
+        sample_sections: { select: { id: true, title: true } },
+      },
     });
 
     if (!sample) {
@@ -168,21 +391,264 @@ class SampleService {
     return sample;
   }
 
-  async deleteSample(id: number): Promise<void> {
-    const sample = await this.db.samples.findUnique({ where: { id } });
+  async createSample(
+    sectionId: number,
+    productId: number | undefined,
+    highQualityFile?: Express.Multer.File,
+    lowQualityFile?: Express.Multer.File,
+    title?: string,
+  ): Promise<samples> {
+    if (!highQualityFile && !lowQualityFile) {
+      throw new BadRequestError(
+        "At least one of high_quality or low_quality file must be provided",
+      );
+    }
+
+    // Validate mime types eagerly before any I/O
+    if (
+      highQualityFile?.buffer &&
+      !SAMPLE_MIME_TYPES.has(highQualityFile.mimetype)
+    ) {
+      throw new BadRequestError(
+        `Invalid high_quality file type: ${highQualityFile.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
+      );
+    }
+    if (
+      lowQualityFile?.buffer &&
+      !SAMPLE_MIME_TYPES.has(lowQualityFile.mimetype)
+    ) {
+      throw new BadRequestError(
+        `Invalid low_quality file type: ${lowQualityFile.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
+      );
+    }
+
+    // Verify section + product exist in parallel
+    const [section, product] = await Promise.all([
+      this.db.sample_sections.findUnique({ where: { id: sectionId } }),
+      productId !== undefined
+        ? this.db.products.findFirst({
+            where: { id: productId, deleted_at: null },
+          })
+        : Promise.resolve(null),
+    ]);
+    if (!section) throw new NotFoundError("Sample section not found");
+    if (productId !== undefined && !product) throw new NotFoundError("Product not found");
+
+    // Determine metadata from primary file
+    const primaryFile = highQualityFile?.buffer
+      ? highQualityFile
+      : lowQualityFile!;
+    const mediaType =
+      MIME_TO_MEDIA_TYPE[primaryFile.mimetype] ?? sample_media_type_enum.pdf;
+    const originalName = primaryFile.originalname;
+    const mimeType = primaryFile.mimetype;
+    const size = primaryFile.buffer!.length;
+
+    // Write files to disk in parallel when both are provided
+    const fileWrites: Promise<string | null>[] = [
+      highQualityFile?.buffer
+        ? this.saveFileToDisk(
+            highQualityFile.buffer,
+            highQualityFile.mimetype,
+            "high_quality",
+          )
+        : Promise.resolve(null),
+      lowQualityFile?.buffer
+        ? this.saveFileToDisk(
+            lowQualityFile.buffer,
+            lowQualityFile.mimetype,
+            "low_quality",
+          )
+        : Promise.resolve(null),
+    ];
+    const [highQualityUrl, lowQualityUrl] = await Promise.all(fileWrites);
+
+    return this.db.samples.create({
+      data: {
+        section_id: sectionId,
+        product_id: productId,
+        title,
+        media_type: mediaType,
+        original_name: originalName,
+        mime_type: mimeType,
+        size,
+        high_quality_url: highQualityUrl,
+        low_quality_url: lowQualityUrl,
+      },
+      include: {
+        products: { select: { id: true, title: true } },
+        sample_sections: { select: { id: true, title: true } },
+      },
+    });
+  }
+
+  async updateSample(
+    sampleId: number,
+    sectionId: number,
+    highQualityFile?: Express.Multer.File,
+    lowQualityFile?: Express.Multer.File,
+    title?: string,
+  ): Promise<samples> {
+    const sample = await this.db.samples.findFirst({
+      where: { id: sampleId, section_id: sectionId },
+    });
+
     if (!sample) {
       throw new NotFoundError("Sample not found");
     }
 
-    const absolutePath = path.resolve(
-      __dirname,
-      "../../../..",
-      sample.url.startsWith("/") ? sample.url.slice(1) : sample.url,
-    );
+    let highQualityUrl = sample.high_quality_url;
+    let lowQualityUrl = sample.low_quality_url;
+    let originalName = sample.original_name;
+    let mimeType = sample.mime_type;
+    let size = sample.size;
 
-    await fsPromises.unlink(absolutePath).catch(() => {});
+    if (highQualityFile?.buffer) {
+      if (!SAMPLE_MIME_TYPES.has(highQualityFile.mimetype)) {
+        throw new BadRequestError(
+          `Invalid high_quality file type: ${highQualityFile.mimetype}`,
+        );
+      }
+      if (sample.high_quality_url) {
+        void fsPromises
+          .unlink(this.urlToAbsolutePath(sample.high_quality_url))
+          .catch(() => {});
+      }
+      highQualityUrl = await this.saveFileToDisk(
+        highQualityFile.buffer,
+        highQualityFile.mimetype,
+        "high_quality",
+      );
+      originalName = highQualityFile.originalname;
+      mimeType = highQualityFile.mimetype;
+      size = highQualityFile.buffer.length;
+    }
 
-    await this.db.samples.delete({ where: { id } });
+    if (lowQualityFile?.buffer) {
+      if (!SAMPLE_MIME_TYPES.has(lowQualityFile.mimetype)) {
+        throw new BadRequestError(
+          `Invalid low_quality file type: ${lowQualityFile.mimetype}`,
+        );
+      }
+      if (sample.low_quality_url) {
+        void fsPromises
+          .unlink(this.urlToAbsolutePath(sample.low_quality_url))
+          .catch(() => {});
+      }
+      lowQualityUrl = await this.saveFileToDisk(
+        lowQualityFile.buffer,
+        lowQualityFile.mimetype,
+        "low_quality",
+      );
+    }
+
+    return this.db.samples.update({
+      where: { id: sampleId },
+      data: {
+        ...(title !== undefined && { title }),
+        high_quality_url: highQualityUrl,
+        low_quality_url: lowQualityUrl,
+        original_name: originalName,
+        mime_type: mimeType,
+        size,
+        updated_at: new Date(),
+      },
+      include: {
+        products: { select: { id: true, title: true } },
+        sample_sections: { select: { id: true, title: true } },
+      },
+    });
+  }
+
+  async deleteSample(sampleId: number, sectionId?: number): Promise<void> {
+    const where: { id: number; section_id?: number } = { id: sampleId };
+    if (sectionId !== undefined) {
+      where.section_id = sectionId;
+    }
+
+    const sample = await this.db.samples.findFirst({ where });
+
+    if (!sample) {
+      throw new NotFoundError("Sample not found");
+    }
+
+    if (sample.high_quality_url) {
+      void fsPromises
+        .unlink(this.urlToAbsolutePath(sample.high_quality_url))
+        .catch(() => {});
+    }
+    if (sample.low_quality_url) {
+      void fsPromises
+        .unlink(this.urlToAbsolutePath(sample.low_quality_url))
+        .catch(() => {});
+    }
+
+    await this.db.samples.delete({ where: { id: sampleId } });
+  }
+
+  /** Get the file path for preview (high quality - protected, no download) */
+  async getPreviewPath(
+    sampleId: number,
+    sectionId?: number,
+  ): Promise<{
+    path: string;
+    mimeType: string;
+    originalName: string;
+  }> {
+    const sample = (await this.getSampleById(
+      sampleId,
+      sectionId,
+    )) as samples & { high_quality_url?: string | null };
+
+    if (!sample.high_quality_url) {
+      throw new NotFoundError("No preview available for this sample");
+    }
+
+    const absolutePath = this.urlToAbsolutePath(sample.high_quality_url);
+
+    return {
+      path: absolutePath,
+      mimeType: sample.mime_type,
+      originalName: sample.original_name,
+    };
+  }
+
+  /** Get the file path for download (low quality) */
+  async getDownloadPath(
+    sampleId: number,
+    sectionId?: number,
+  ): Promise<{
+    path: string;
+    mimeType: string;
+    originalName: string;
+  }> {
+    const sample = (await this.getSampleById(
+      sampleId,
+      sectionId,
+    )) as samples & { low_quality_url?: string | null };
+
+    if (!sample.low_quality_url) {
+      throw new NotFoundError("No download available for this sample");
+    }
+
+    const absolutePath = this.urlToAbsolutePath(sample.low_quality_url);
+
+    return {
+      path: absolutePath,
+      mimeType: sample.mime_type,
+      originalName: sample.original_name,
+    };
+  }
+
+  /** Enrich sample with computed is_displayable and thumbnail (for API responses) */
+  enrichSample<T extends { media_type: sample_media_type_enum; high_quality_url?: string | null; low_quality_url?: string | null }>(
+    sample: T,
+  ): T & { is_displayable: boolean; thumbnail: string | null } {
+    return {
+      ...sample,
+      is_displayable: this.isDisplayable(sample.media_type),
+      thumbnail: sample.high_quality_url || sample.low_quality_url || null,
+    };
   }
 }
 

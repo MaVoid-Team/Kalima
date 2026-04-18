@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatCurrency, formatOrderDate, getStatusColor } from '@/lib/storeUtils';
+import { formatCurrency, formatOrderDate, getStatusColor, formatPhone } from '@/lib/storeUtils';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Trash2 } from 'lucide-react';
@@ -79,7 +79,7 @@ export default function OrdersTable({
                                     <div className="font-medium">{order.users?.name || t('common.na', 'N/A')}</div>
                                     <div className="text-xs text-muted-foreground">{order.users?.email}</div>
                                     {order.users?.phone && (
-                                        <div className="text-xs text-muted-foreground mt-0.5">{order.users.phone}</div>
+                                        <div className="text-xs text-muted-foreground mt-0.5">{formatPhone(order.users.phone)}</div>
                                     )}
                                 </TableCell>
                                 <TableCell>
@@ -141,7 +141,7 @@ export default function OrdersTable({
                                 <div className="text-muted-foreground">{t('orders.table.customer')}</div>
                                 <div className="font-medium truncate" title={order.users?.name || t('common.na', 'N/A')}>{order.users?.name || t('common.na', 'N/A')}</div>
                                 {order.users?.phone && (
-                                    <div className="text-xs text-muted-foreground truncate mt-0.5" title={order.users.phone}>{order.users.phone}</div>
+                                    <div className="text-xs text-muted-foreground truncate mt-0.5" title={formatPhone(order.users.phone)}>{formatPhone(order.users.phone)}</div>
                                 )}
                             </div>
                             <div>

@@ -48,21 +48,24 @@ export default function CreateUserDialog({ onSuccess }) {
         createModeratorUser,
         createAssistantUser,
         createTeacherUser,
+        createStudentUser,
+        createParentUser,
+        createLecturerUser,
         actionLoading
     } = useAdminUsers();
 
     const [isOpen, setIsOpen] = useState(false);
 
-    const { governments, zones, getZonesByGovernment, subjects } = useLookups();
+    const { governments, zones, getZonesByGovernment, subjects, levels } = useLookups();
 
     const formSchema = z.object({
-        type: z.enum(['Admin', 'SubAdmin', 'Moderator', 'Assistant', 'Teacher']),
+        type: z.enum(['Admin', 'SubAdmin', 'Moderator', 'Assistant', 'Teacher', 'Student', 'Parent', 'Lecturer']),
         name: z.string().min(1, { message: t('common:validation.required', 'Required') }),
         email: z.string().email({ message: t('common:validation.email', 'Invalid email') }),
         password: z.string().min(6, { message: t('common:validation.minLength', { min: 6, defaultValue: 'Min 6 chars' }) }),
         confirm_password: z.string().min(6, { message: t('common:validation.minLength', { min: 6, defaultValue: 'Min 6 chars' }) }),
-        phone: egyptPhoneSchema,
-        secondary_phone: z.union([egyptPhoneSchema, z.literal(""), z.literal("+20"), z.undefined(), z.null()]),
+        phone: egyptPhoneSchema(t).refine(val => val && val !== "+20", { message: t('common:validation.required', 'Required') }),
+        secondary_phone: z.union([egyptPhoneSchema(t), z.literal(""), z.literal("+20"), z.undefined(), z.null()]),
         gender: z.enum(['male', 'female'], { message: t('common:validation.required', 'Required') }),
         // Teacher-specific fields (validated conditionally)
         government_id: z.string().optional(),
@@ -71,6 +74,11 @@ export default function CreateUserDialog({ onSuccess }) {
         is_primary: z.boolean().default(false),
         is_preparatory: z.boolean().default(false),
         is_secondary: z.boolean().default(false),
+        // Additional properties
+        lecturer_user_id: z.string().optional(),
+        level_id: z.string().optional(),
+        parent_phone_number: z.union([egyptPhoneSchema(t), z.literal(""), z.literal("+20"), z.undefined(), z.null()]).optional(),
+        faction: z.string().optional(),
     }).superRefine((data, ctx) => {
         if (data.password !== data.confirm_password) {
             ctx.addIssue({
@@ -89,6 +97,27 @@ export default function CreateUserDialog({ onSuccess }) {
             }
             if (!data.subject_id || data.subject_id.length === 0) {
                 ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['subject_id'] });
+            }
+        }
+
+        if (data.type === 'Assistant') {
+            if (!data.lecturer_user_id || data.lecturer_user_id.length === 0) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['lecturer_user_id'] });
+            }
+        }
+
+        if (data.type === 'Student') {
+            if (!data.level_id || data.level_id.length === 0) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['level_id'] });
+            }
+            if (!data.government_id || data.government_id.length === 0) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['government_id'] });
+            }
+            if (!data.zone_id || data.zone_id.length === 0) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['zone_id'] });
+            }
+            if (!data.parent_phone_number || data.parent_phone_number.length === 0) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['parent_phone_number'] });
             }
         }
     });
@@ -110,11 +139,19 @@ export default function CreateUserDialog({ onSuccess }) {
             is_primary: false,
             is_preparatory: false,
             is_secondary: false,
+            lecturer_user_id: '',
+            level_id: '',
+            parent_phone_number: '',
+            faction: '',
         },
     });
 
     const selectedType = form.watch('type');
     const isTeacher = selectedType === 'Teacher';
+    const isAssistant = selectedType === 'Assistant';
+    const isStudent = selectedType === 'Student';
+    const isLecturer = selectedType === 'Lecturer';
+    const needsGovZone = isTeacher || isStudent;
     const selectedGov = form.watch('government_id');
 
     const handleGovChange = (value) => {
@@ -135,14 +172,31 @@ export default function CreateUserDialog({ onSuccess }) {
             payload.government_id = parseInt(values.government_id);
             payload.zone_id = parseInt(values.zone_id);
             payload.subject_id = parseInt(values.subject_id);
-        } else {
-            // Remove teacher fields for non-teacher types
-            delete payload.government_id;
-            delete payload.zone_id;
+        } else if (values.type === 'Student') {
+            payload.government_id = parseInt(values.government_id);
+            payload.zone_id = parseInt(values.zone_id);
+            payload.level_id = parseInt(values.level_id);
+        } else if (values.type === 'Assistant') {
+            payload.lecturer_user_id = parseInt(values.lecturer_user_id);
+        }
+        
+        if (values.type !== 'Teacher') {
             delete payload.subject_id;
             delete payload.is_primary;
             delete payload.is_preparatory;
             delete payload.is_secondary;
+        }
+        if (values.type !== 'Teacher' && values.type !== 'Student') {
+            delete payload.government_id;
+            delete payload.zone_id;
+        }
+        if (values.type !== 'Student') {
+            delete payload.level_id;
+            delete payload.parent_phone_number;
+            delete payload.faction;
+        }
+        if (values.type !== 'Assistant') {
+            delete payload.lecturer_user_id;
         }
 
         switch (values.type) {
@@ -207,8 +261,11 @@ export default function CreateUserDialog({ onSuccess }) {
                                             {hasAdminAccess && <SelectItem value="Admin">{t('roles.Admin')}</SelectItem>}
                                             {hasAdminAccess && <SelectItem value="SubAdmin">{t('roles.SubAdmin')}</SelectItem>}
                                             <SelectItem value="Moderator">{t('roles.Moderator')}</SelectItem>
-                                            {/* <SelectItem value="Assistant">{t('roles.Assistant')}</SelectItem> */}
+                                            <SelectItem value="Assistant">{t('roles.Assistant', 'Assistant')}</SelectItem>
                                             <SelectItem value="Teacher">{t('roles.Teacher')}</SelectItem>
+                                            <SelectItem value="Student">{t('roles.Student', 'Student')}</SelectItem>
+                                            <SelectItem value="Parent">{t('roles.Parent', 'Parent')}</SelectItem>
+                                            <SelectItem value="Lecturer">{t('roles.Lecturer', 'Lecturer')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -323,11 +380,9 @@ export default function CreateUserDialog({ onSuccess }) {
                             )}
                         />
 
-                        {/* Teacher-specific fields */}
-                        {isTeacher && (
+                        {needsGovZone && (
                             <div className="space-y-4 border-t pt-4">
-                                <FormLabel className="text-base font-semibold">{t('createDialog.teacherFields')}</FormLabel>
-
+                                <FormLabel className="text-base font-semibold">{t('createDialog.locationFields', 'Location')}</FormLabel>
                                 <div className="grid grid-cols-2 gap-4">
                                     <FormField
                                         control={form.control}
@@ -384,7 +439,12 @@ export default function CreateUserDialog({ onSuccess }) {
                                         )}
                                     />
                                 </div>
+                            </div>
+                        )}
 
+                        {isTeacher && (
+                            <div className="space-y-4 border-t pt-4">
+                                <FormLabel className="text-base font-semibold">{t('createDialog.teacherFields')}</FormLabel>
                                 <FormField
                                     control={form.control}
                                     name="subject_id"
@@ -469,6 +529,81 @@ export default function CreateUserDialog({ onSuccess }) {
                                         />
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {isStudent && (
+                            <div className="space-y-4 border-t pt-4">
+                                <FormLabel className="text-base font-semibold">{t('createDialog.studentFields', 'Student Details')}</FormLabel>
+                                <FormField
+                                    control={form.control}
+                                    name="level_id"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t('createDialog.level', 'Level')}</FormLabel>
+                                            <Select dir={i18n.dir()} onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder={t('createDialog.selectLevel', 'Select level')} />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {levels.map((lvl) => (
+                                                        <SelectItem key={lvl.id} value={String(lvl.id)}>
+                                                            {lvl.title}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="parent_phone_number"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t('createDialog.parentPhone', 'Parent Phone')}</FormLabel>
+                                            <FormControl>
+                                                <PhoneInput dir="ltr" placeholder="010..." {...field} value={field.value || ''} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="faction"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t('createDialog.faction', 'Faction')}</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Alpha, Beta..." {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        )}
+
+                        {isAssistant && (
+                            <div className="space-y-4 border-t pt-4">
+                                <FormLabel className="text-base font-semibold">{t('createDialog.assistantFields', 'Assistant Details')}</FormLabel>
+                                <FormField
+                                    control={form.control}
+                                    name="lecturer_user_id"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{t('createDialog.lecturerId', 'Lecturer ID')}</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" placeholder="1" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
                         )}
 

@@ -58,6 +58,11 @@ export type user_roles = Prisma.user_rolesModel
  */
 export type users = Prisma.usersModel
 /**
+ * Model account_review_settings
+ * 
+ */
+export type account_review_settings = Prisma.account_review_settingsModel
+/**
  * Model refresh_tokens
  * 
  */
@@ -218,6 +223,11 @@ export type purchase_item_required_fields = Prisma.purchase_item_required_fields
  */
 export type payment_methods = Prisma.payment_methodsModel
 /**
+ * Model sample_sections
+ * 
+ */
+export type sample_sections = Prisma.sample_sectionsModel
+/**
  * Model images
  * 
  */
@@ -227,3 +237,8 @@ export type images = Prisma.imagesModel
  * 
  */
 export type product_gallery = Prisma.product_galleryModel
+/**
+ * Model product_gallery_videos
+ * 
+ */
+export type product_gallery_videos = Prisma.product_gallery_videosModel

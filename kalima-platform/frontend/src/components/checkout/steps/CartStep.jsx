@@ -7,7 +7,6 @@ import { useCart } from '@/contexts/CartContext';
 export default function CartStep({ onProceed }) {
     const {
         cart,
-        updateQuantity,
         removeFromCart,
         applyCoupon,
         removeCoupon,
@@ -29,7 +28,6 @@ export default function CartStep({ onProceed }) {
                 <div className="lg:col-span-2">
                     <CartItemsTable
                         cartItems={cart?.cart_items}
-                        updateQuantity={updateQuantity}
                         removeFromCart={removeFromCart}
                         applyCoupon={applyCoupon}
                         removeCoupon={removeCoupon}

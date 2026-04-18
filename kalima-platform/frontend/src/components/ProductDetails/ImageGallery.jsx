@@ -9,6 +9,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
+import { Video } from "lucide-react";
 
 export default function ImageGallery({ images, badge }) {
   const { t, i18n } = useTranslation("product");
@@ -16,7 +17,11 @@ export default function ImageGallery({ images, badge }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const imagesList = useMemo(
-    () => [images?.main, ...(images?.thumbnails ?? [])].filter(Boolean),
+    () => {
+      if (!images) return [];
+      const list = [images.main, ...(images.thumbnails ?? [])].filter(Boolean);
+      return list;
+    },
     [images],
   );
 
@@ -67,19 +72,118 @@ export default function ImageGallery({ images, badge }) {
     );
   }
 
-  return (
-    <div className="flex flex-col gap-4">
-      {/* Main Slider */}
-      <div className="relative w-full aspect-square md:aspect-4/3 rounded-2xl overflow-hidden bg-muted group">
+  const renderMedia = (mediaItem, isThumbnail = false) => {
+    // Legacy support for plain strings
+    if (typeof mediaItem === 'string') {
+      return (
         <img
-          src={imagesList[selectedIndex]}
-          alt={`${t("info.view")} ${selectedIndex + 1}`}
+          src={mediaItem}
+          alt={isThumbnail ? t("info.thumbnail") : t("info.view")}
           className="w-full h-full object-cover"
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = fallbackImage;
           }}
         />
+      );
+    }
+
+    const { type, url, thumbnail, source_type } = mediaItem;
+    const isVideo = type === 'video';
+    const isExternalVideoUrl = typeof url === "string" && (url.includes("youtube.com") || url.includes("youtu.be") || url.includes("vimeo.com"));
+    const isExternal = isVideo && (source_type === 'external' || isExternalVideoUrl);
+
+    // Thumbnail specific rendering
+    if (isThumbnail) {
+      if (isVideo) {
+        if (thumbnail) {
+          return (
+            <div className="relative w-full h-full">
+              <img src={thumbnail} alt="Video thumbnail" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                <Video className="h-6 w-6 text-white drop-shadow-md" />
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div className="w-full h-full bg-muted flex flex-col items-center justify-center text-muted-foreground border-border">
+            <Video className="h-6 w-6 opacity-60 mb-1" />
+            <span className="text-[10px] font-medium leading-tight px-1 text-center">Video</span>
+          </div>
+        );
+      }
+
+      return (
+        <img
+          src={url}
+          alt={t("info.thumbnail")}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = fallbackImage;
+          }}
+        />
+      );
+    }
+
+    // Main view rendering
+    if (isVideo) {
+      if (isExternal) {
+        // Embed Youtube / Vimeo
+        const isYoutube = url?.includes('youtube.com') || url?.includes('youtu.be');
+        let embedUrl = url;
+        if (isYoutube) {
+          let videoId = '';
+          try {
+            if (url.includes('youtube.com/watch')) {
+              videoId = new URL(url).searchParams.get('v');
+            } else if (url.includes('youtu.be/')) {
+              videoId = url.split('youtu.be/')[1].split(/[?#]/)[0];
+            }
+          } catch (_) {
+            videoId = '';
+          }
+          if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0`;
+        }
+        return (
+          <iframe
+            src={embedUrl}
+            className="w-full h-full border-0 absolute inset-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="External Video"
+          />
+        );
+      }
+      return (
+        <video
+          src={url}
+          className="w-full h-full object-contain bg-black"
+          controls
+          playsInline
+        />
+      );
+    }
+
+    return (
+      <img
+        src={url}
+        alt={t("info.view")}
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = fallbackImage;
+        }}
+      />
+    );
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Main Slider */}
+      <div className="relative w-full aspect-square md:aspect-4/3 rounded-2xl overflow-hidden bg-muted group">
+        {renderMedia(imagesList[selectedIndex], false)}
 
         {imagesList.length > 1 && (
           <>
@@ -161,15 +265,7 @@ export default function ImageGallery({ images, badge }) {
                     onClick={() => onThumbClick(index)}
                     data-testid={`product-gallery-thumb-${index}-button`}
                   >
-                    <img
-                      src={thumb}
-                      alt={`${t("info.thumbnail")} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = fallbackImage;
-                      }}
-                    />
+                    {renderMedia(thumb, true)}
                   </div>
                 </CarouselItem>
               ))}

@@ -11,12 +11,24 @@ const router = Router();
 // All admin routes require authentication + Admin or SubAdmin role
 const adminAuth = [
   authenticateToken,
-  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+  requireRole([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator]),
+];
+
+const adminModeratorAuth = [
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator]),
 ];
 
 // ============================================
 // USER MANAGEMENT
 // ============================================
+
+// ============================================
+// ACCOUNT REVIEW
+// ============================================
+
+router.get("/account-review-settings", ...adminAuth, adminController.getAccountReviewSettings);
+router.put("/account-review-settings", ...adminAuth, adminController.upsertAccountReviewSettings);
 
 // Create user (respects privilege matrix)
 router.post("/users", ...adminAuth, adminController.createUser);
@@ -31,7 +43,7 @@ router.post("/lecturers", ...adminAuth, adminController.createLecturer);
 router.get("/users/export", ...adminAuth, makeExportHandler("users"));
 
 // List / search users
-router.get("/users", ...adminAuth, adminController.listUsers);
+router.get("/users", ...adminModeratorAuth, adminController.listUsers);
 
 // Created Accounts Statistics
 router.get(
@@ -41,7 +53,16 @@ router.get(
 );
 
 // Get single user with all roles
-router.get("/users/:userId", ...adminAuth, adminController.getUser);
+router.get("/users/:userId", ...adminModeratorAuth, adminController.getUser);
+router.patch(
+  "/users/:userId/flag",
+  ...adminModeratorAuth,
+  adminController.updateUserFlag,
+);
+
+// Account review: approve / reject users (must be before :userId/roles to avoid conflict)
+router.post("/users/:userId/approve", ...adminAuth, adminController.approveUser);
+router.post("/users/:userId/reject", ...adminAuth, adminController.rejectUser);
 
 // ============================================
 // ROLE MANAGEMENT

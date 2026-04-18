@@ -4,12 +4,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Loader2, X, Package, PlusCircle, Calendar as CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
+import LoadingSpinner from '@/components/ui/loading-spinner';
+import { ChevronLeft, X, Package, PlusCircle, Calendar as CalendarIcon, CircleHelp } from 'lucide-react';
+import { format, startOfDay } from 'date-fns';
 import { arSA } from 'react-day-picker/locale';
 
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useAdminCoupons } from '@/hooks/admin/useAdminCoupons';
+import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
 import { useCategories } from '@/hooks/useCategories';
 
 import { Button } from '@/components/ui/button';
@@ -33,10 +35,17 @@ import {
 } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import FileUploadProgress from '@/components/admin/settings/FileUploadProgress';
 
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -52,20 +61,30 @@ export default function CreateProductPage() {
         title: z.string().min(1, t('products.form.titleIsRequired')).max(255, t('products.form.titleMaxLength')),
         price: z.coerce.number().min(0, t('products.form.priceMustBeGreaterThan0')),
         type: z.enum(['Product', 'Book']),
+        isFreePreview: z.boolean().optional(),
         description: z.string().optional(),
         price_after_discount: z.preprocess(
             (val) => (val === '' || val == null ? undefined : val),
-            z.coerce.number().positive(t('products.form.discountedPriceMustBeGreaterThan0')).optional()
+            z.coerce.number().min(0, t('products.form.discountedPriceMustBeGreaterThan0')).optional()
         ),
         serial: z.string().max(100, t('products.form.serialMaxLength')).optional().or(z.literal('')),
         coupon_id: z.preprocess(
             (val) => (val === '' || val == null ? undefined : val),
             z.coerce.number().int(t('products.form.couponIdMustBeInteger')).positive(t('products.form.couponIdMustBeGreaterThan0')).optional()
         ),
+        release_at: z.string().optional().or(z.literal('')),
         perks: z.string().optional().or(z.literal('')),
     }).refine(
-        (data) => !data.price_after_discount || data.price_after_discount < data.price,
+        (data) => {
+            if (data.isFreePreview) return data.price_after_discount === 0;
+            if (data.price_after_discount == null) return true;
+            if (data.price > 0) return data.price_after_discount < data.price;
+            return data.price_after_discount === 0;
+        },
         { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
+    ).refine(
+        (data) => !data.release_at || new Date(data.release_at) >= startOfDay(new Date()),
+        { message: t('products.form.releaseDateMustBeFuture', 'Release date must be today or in the future'), path: ['release_at'] }
     );
 
     const {
@@ -74,6 +93,9 @@ export default function CreateProductPage() {
         fetchFieldDefinitions,
         fieldDefinitions,
         actionLoading,
+        addGalleryImages,
+        addGalleryVideo,
+        addExternalGalleryVideo,
     } = useAdminProducts();
 
     const {
@@ -89,7 +111,11 @@ export default function CreateProductPage() {
     } = useCategories();
 
     const [thumbnail, setThumbnail] = useState(null);
-    const [sample, setSample] = useState(null);
+    const [hqSample, setHqSample] = useState(null);
+    const [lqSample, setLqSample] = useState(null);
+    const [sampleTitle, setSampleTitle] = useState('');
+    const [sampleSectionId, setSampleSectionId] = useState('');
+    const [mediaType, setMediaType] = useState('pdf');
 
     // Category picker state — single category only (up to 3 levels)
     const [selectedRootId, setSelectedRootId] = useState('');
@@ -105,19 +131,39 @@ export default function CreateProductPage() {
 
     // Upload progress state
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadFileName, setUploadFileName] = useState('');
+    const [uploadError, setUploadError] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
     // Quick coupon state
     const [quickCouponEnabled, setQuickCouponEnabled] = useState(false);
     const [quickCouponCode, setQuickCouponCode] = useState('');
     const [quickCouponType, setQuickCouponType] = useState('PERCENTAGE');
     const [quickCouponValue, setQuickCouponValue] = useState('');
     const [quickCouponExpiresAt, setQuickCouponExpiresAt] = useState('');
-    const thumbnailInputRef = useRef(null);
-    const sampleInputRef = useRef(null);
+    const uploadAbortControllerRef = useRef(null);
+    const createdProductIdRef = useRef(null);
 
-    // Fetch field definitions on mount
+    const thumbnailInputRef = useRef(null);
+    const galleryInputRef = useRef(null);
+    const galleryVideoInputRef = useRef(null);
+    const hqSampleInputRef = useRef(null);
+    const lqSampleInputRef = useRef(null);
+
+    const [pendingGalleryImages, setPendingGalleryImages] = useState([]);
+    const [pendingGalleryVideo, setPendingGalleryVideo] = useState(null);
+    const [externalVideoUrl, setExternalVideoUrl] = useState('');
+
+    const {
+        sections: sampleSections,
+        fetchSections: fetchSampleSections,
+        createSample,
+    } = useAdminSampleSections();
+
+    // Fetch definitions and sections on mount
     useEffect(() => {
         fetchFieldDefinitions();
-    }, [fetchFieldDefinitions]);
+        fetchSampleSections();
+    }, [fetchFieldDefinitions, fetchSampleSections]);
 
     const form = useForm({
         resolver: zodResolver(createProductSchema),
@@ -125,10 +171,12 @@ export default function CreateProductPage() {
             title: '',
             price: '',
             type: 'Product',
+            isFreePreview: false,
             description: '',
             price_after_discount: '',
             serial: '',
             coupon_id: '',
+            release_at: '',
             perks: '',
         },
     });
@@ -271,69 +319,171 @@ export default function CreateProductPage() {
 
     // ─── Submit ───────────────────────────────────────────────────────────────
 
+    const handleCancelUpload = () => {
+        if (uploadAbortControllerRef.current) {
+            uploadAbortControllerRef.current.abort();
+            uploadAbortControllerRef.current = null;
+        }
+        setIsUploading(false);
+        setUploadProgress(0);
+        setUploadError('');
+    };
+
     const onSubmit = async (values) => {
         const quickCouponDraft = quickCouponEnabled
             ? buildQuickCouponPayload('__PENDING_PRODUCT_ID__', Number(values.price))
             : null;
 
-        if (quickCouponEnabled && !quickCouponDraft) {
-            return;
+        if (quickCouponEnabled && !quickCouponDraft) return;
+
+        // ── Step 1: Create the product (guarded — skip if already created) ──
+        let newProductId = createdProductIdRef.current;
+
+        if (!newProductId) {
+            const formData = new FormData();
+            formData.append('title', values.title);
+            formData.append('price', values.price);
+            formData.append('type', values.type);
+            if (values.description) formData.append('description', values.description);
+            if (values.isFreePreview) {
+                formData.append('price_after_discount', 0);
+            } else if (values.price_after_discount != null && values.price_after_discount !== '') {
+                formData.append('price_after_discount', values.price_after_discount);
+            }
+            if (values.serial) formData.append('serial', values.serial);
+            if (values.coupon_id) formData.append('coupon_id', values.coupon_id);
+            if (values.release_at) formData.append('release_at', new Date(values.release_at).toISOString());
+            if (values.perks) formData.append('perks', values.perks);
+            if (pickedCategory) {
+                formData.append('category_id', String(pickedCategory.id));
+                formData.append('category_ids', JSON.stringify([pickedCategory.id]));
+            }
+            if (thumbnail) formData.append('thumbnail', thumbnail);
+
+            setUploadProgress(0);
+            setUploadFileName(thumbnail?.name || t('products.create.dialogTitle'));
+            setUploadError('');
+            setIsUploading(true);
+            const abortCtrl = new AbortController();
+            uploadAbortControllerRef.current = abortCtrl;
+
+            let res;
+            try {
+                res = await createProduct(formData, (progressEvent) => {
+                    if (progressEvent.total) {
+                        setUploadProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+                    }
+                });
+            } catch {
+                setIsUploading(false);
+                uploadAbortControllerRef.current = null;
+                return;
+            }
+
+            setIsUploading(false);
+            uploadAbortControllerRef.current = null;
+
+            if (!res?.success) return;
+            newProductId = res.data?.id;
+            createdProductIdRef.current = newProductId; // guard against double-creation on retry
         }
 
-        const formData = new FormData();
-        formData.append('title', values.title);
-        formData.append('price', values.price);
-        formData.append('type', values.type);
-        if (values.description) formData.append('description', values.description);
-        if (values.price_after_discount) formData.append('price_after_discount', values.price_after_discount);
-        if (values.serial) formData.append('serial', values.serial);
-        if (values.coupon_id) formData.append('coupon_id', values.coupon_id);
-        if (values.perks) formData.append('perks', values.perks);
-        if (pickedCategory) {
-            // Keep backward compatibility (category_ids) and support new API contract (category_id)
-            formData.append('category_id', String(pickedCategory.id));
-            formData.append('category_ids', JSON.stringify([pickedCategory.id]));
+        if (!newProductId) { navigate('/admin/products'); return; }
+
+        // ── Step 2: Attach required fields ──
+        if (pickedFields.length > 0) {
+            await attachRequiredFields(
+                newProductId,
+                pickedFields.map(f => ({ field_definition_id: f.id, is_required: f.is_required }))
+            );
         }
-        if (thumbnail) formData.append('thumbnail', thumbnail);
-        if (sample) formData.append('sample', sample);
 
-        setUploadProgress(0);
-        const res = await createProduct(formData, (progressEvent) => {
-            if (progressEvent.total) {
-                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                setUploadProgress(percentCompleted);
+        // ── Step 3: Quick coupon ──
+        if (quickCouponEnabled) {
+            try {
+                await createCoupon({ ...quickCouponDraft, product_id: String(newProductId) });
+            } catch {
+                toast.error(t('products.quickCoupon.createFailed'));
             }
-        });
+        }
 
-        if (res?.success) {
-            const newProductId = res.data?.id;
-            // Attach required fields after the product is created
-            if (pickedFields.length > 0 && newProductId) {
-                await attachRequiredFields(
-                    newProductId,
-                    pickedFields.map(f => ({ field_definition_id: f.id, is_required: f.is_required }))
-                );
+        // ── Step 4: Gallery images ──
+        if (pendingGalleryImages.length > 0) {
+            setUploadFileName(t('products.form.galleryImages', 'Gallery images'));
+            setUploadProgress(0); setUploadError(''); setIsUploading(true);
+            const abortCtrl = new AbortController();
+            uploadAbortControllerRef.current = abortCtrl;
+            const galleryFD = new FormData();
+            pendingGalleryImages.forEach(f => galleryFD.append('gallery', f));
+            try {
+                await addGalleryImages(newProductId, galleryFD, (ev) => {
+                    if (ev.total) setUploadProgress(Math.round((ev.loaded * 100) / ev.total));
+                }, abortCtrl.signal);
+            } catch { /* non-fatal */ }
+            setIsUploading(false); uploadAbortControllerRef.current = null;
+        }
+
+        // ── Step 5: Gallery video ──
+        if (pendingGalleryVideo) {
+            setUploadFileName(pendingGalleryVideo.name);
+            setUploadProgress(0); setUploadError(''); setIsUploading(true);
+            const abortCtrl = new AbortController();
+            uploadAbortControllerRef.current = abortCtrl;
+            const videoFD = new FormData();
+            videoFD.append('video', pendingGalleryVideo);
+            try {
+                await addGalleryVideo(newProductId, videoFD, (ev) => {
+                    if (ev.total) setUploadProgress(Math.round((ev.loaded * 100) / ev.total));
+                }, abortCtrl.signal);
+            } catch { /* non-fatal */ }
+            setIsUploading(false); uploadAbortControllerRef.current = null;
+        }
+
+        // ── Step 6: External video ──
+        if (externalVideoUrl.trim()) {
+            try { await addExternalGalleryVideo(newProductId, externalVideoUrl.trim()); } catch { /* non-fatal */ }
+        }
+
+        // ── Step 7: Sample ──
+        if ((hqSample || lqSample) && sampleSectionId) {
+            if (!sampleTitle.trim()) {
+                toast.error(t('products.form.sampleTitleRequired', 'Sample title is required when attaching a sample'));
+                setIsUploading(false);
+                return;
             }
-
-            if (quickCouponEnabled && newProductId) {
-                try {
-                    const couponPayload = {
-                        ...quickCouponDraft,
-                        product_id: String(newProductId),
-                    };
-                    await createCoupon(couponPayload);
-                } catch {
-                    toast.error(t('products.quickCoupon.createFailed'));
+            setUploadProgress(0);
+            setUploadFileName(hqSample?.name || lqSample?.name || 'Sample');
+            setUploadError(''); setIsUploading(true);
+            const abortCtrl = new AbortController();
+            uploadAbortControllerRef.current = abortCtrl;
+            const sampleFD = new FormData();
+            sampleFD.append('product_id', newProductId);
+            sampleFD.append('media_type', mediaType);
+            if (sampleTitle) sampleFD.append('title', sampleTitle);
+            if (hqSample) sampleFD.append('high_quality', hqSample);
+            if (lqSample) sampleFD.append('low_quality', lqSample);
+            toast.info(t('products.create.sampleUploading'));
+            try {
+                const sampleRes = await createSample(sampleSectionId, sampleFD, (ev) => {
+                    if (ev.total) setUploadProgress(Math.round((ev.loaded * 100) / ev.total));
+                });
+                if (sampleRes?.success) {
+                    toast.success(t('products.create.sampleSuccess'));
+                } else {
+                    setUploadError(sampleRes?.message || 'Sample upload failed');
                 }
-            }
-
-            // Navigate to the new product's detail page
-            if (newProductId) {
-                navigate(`/admin/products/${newProductId}`);
-            } else {
-                navigate('/admin/products');
+            } catch (err) {
+                if (err?.name !== 'AbortError' && err?.code !== 'ERR_CANCELED') {
+                    setUploadError('Sample upload failed');
+                }
+            } finally {
+                uploadAbortControllerRef.current = null;
+                setIsUploading(false);
             }
         }
+
+        createdProductIdRef.current = null;
+        navigate(`/admin/products/${newProductId}`);
     };
 
     // ─── Render ───────────────────────────────────────────────────────────────
@@ -442,6 +592,48 @@ export default function CreateProductPage() {
                             />
                         </div>
 
+                        <FormField
+                            control={form.control}
+                            name="isFreePreview"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                                    <div className="space-y-0.5">
+                                        <FormLabel className="flex items-center gap-1.5">
+                                            {t('products.form.freePreviewToggle')}
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <button
+                                                            type="button"
+                                                            className="text-muted-foreground hover:text-foreground transition-colors"
+                                                            aria-label={t('products.form.freePreviewHintAria', 'Free preview hint')}
+                                                        >
+                                                            <CircleHelp className="h-4 w-4" />
+                                                        </button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent side="top" className="max-w-[260px]">
+                                                        {t('products.form.freePreviewHint', 'Enabling this will set the product discount to 100% (free).')}
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        </FormLabel>
+                                    </div>
+                                    <FormControl>
+                                        <Switch
+                                            checked={!!field.value}
+                                            onCheckedChange={(checked) => {
+                                                field.onChange(checked);
+                                                if (checked) {
+                                                    form.setValue('price_after_discount', '0', { shouldValidate: true, shouldDirty: true });
+                                                }
+                                            }}
+                                            data-testid="create-product-free-preview-toggle"
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
                         {/* Price after discount + Serial */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormField
@@ -456,6 +648,7 @@ export default function CreateProductPage() {
                                                 min="0"
                                                 step="0.01"
                                                 data-testid="create-product-discount-input"
+                                                disabled={!!form.watch('isFreePreview')}
                                                 {...field}
                                             />
                                         </FormControl>
@@ -482,6 +675,76 @@ export default function CreateProductPage() {
                             />
                         </div>
 
+                        {/* Release At + Perks */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="release_at"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col">
+                                        <FormLabel className="flex items-center gap-2">
+                                            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                                            {t('products.form.releaseAt', 'Release Date')}
+                                        </FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        type="button"
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-full pl-3 text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                        data-testid="create-product-release-at-input"
+                                                    >
+                                                        {field.value ? (
+                                                            format(new Date(field.value), "PPP", { locale: isRtl ? arSA : undefined })
+                                                        ) : (
+                                                            <span>{t('products.form.pickDate', 'Pick a date')}</span>
+                                                        )}
+                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value ? new Date(field.value) : undefined}
+                                                    onSelect={(date) => field.onChange(date ? date.toISOString() : '')}
+                                                    disabled={(date) => date < startOfDay(new Date())}
+                                                    initialFocus
+                                                    locale={isRtl ? arSA : undefined}
+                                                    dir={isRtl ? 'rtl' : 'ltr'}
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="perks"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t('products.form.perks')}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder={t('products.form.perksPlaceholder')}
+                                                data-testid="create-product-perks-input"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <p className="text-[0.8rem] text-muted-foreground mt-1">
+                                            {t('products.form.perksTip')}
+                                        </p>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
                         {/* Description */}
                         <FormField
                             control={form.control}
@@ -497,28 +760,6 @@ export default function CreateProductPage() {
                                             {...field}
                                         />
                                     </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        {/* Perks */}
-                        <FormField
-                            control={form.control}
-                            name="perks"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t('products.form.perks')}</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder={t('products.form.perksPlaceholder')}
-                                            data-testid="create-product-perks-input"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <p className="text-[0.8rem] text-muted-foreground mt-1">
-                                        {t('products.form.perksTip')}
-                                    </p>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -574,7 +815,7 @@ export default function CreateProductPage() {
                             {selectedRootId && (
                                 childrenLoading ? (
                                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <LoadingSpinner className="h-4 w-4 text-primary-foreground" />
                                         <span>{t('common.loading')}</span>
                                     </div>
                                 ) : hasChildren ? (
@@ -601,7 +842,7 @@ export default function CreateProductPage() {
                             {selectedChildId && (
                                 grandchildrenLoading ? (
                                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <LoadingSpinner className="h-4 w-4 text-primary-foreground" />
                                         <span>{t('common.loading')}</span>
                                     </div>
                                 ) : hasGrandchildren ? (
@@ -708,10 +949,10 @@ export default function CreateProductPage() {
                         <h2 className="font-semibold text-foreground">{t('products.detail.media')}</h2>
                         <Separator />
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-6">
                             {/* Thumbnail */}
                             <div className="space-y-1.5">
-                                <span className="text-sm font-medium leading-none">{t('products.form.thumbnail')}</span>
+                                <FormLabel>{t('products.form.thumbnail')}</FormLabel>
                                 <input
                                     ref={thumbnailInputRef}
                                     type="file"
@@ -734,43 +975,196 @@ export default function CreateProductPage() {
                                 </p>
                             </div>
 
-                            {/* Sample */}
+                            <Separator />
+
+                            {/* Gallery Images */}
                             <div className="space-y-1.5">
-                                <span className="text-sm font-medium leading-none">{t('products.form.sample')}</span>
+                                <FormLabel>{t('products.form.galleryImages', 'Gallery Images')}</FormLabel>
                                 <input
-                                    ref={sampleInputRef}
+                                    ref={galleryInputRef}
                                     type="file"
-                                    accept=".pdf,.doc,.docx"
-                                    onChange={(e) => setSample(e.target.files?.[0] ?? null)}
+                                    accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*"
+                                    multiple
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files ?? []);
+                                        if (files.length) setPendingGalleryImages(prev => [...prev, ...files]);
+                                        e.target.value = '';
+                                    }}
                                     className="sr-only"
-                                    data-testid="create-product-sample-input"
+                                    data-testid="create-product-gallery-input"
                                 />
                                 <Button
                                     type="button"
                                     variant="outline"
                                     className="w-full justify-start"
-                                    onClick={() => sampleInputRef.current?.click()}
-                                    data-testid="create-product-sample-button"
+                                    onClick={() => galleryInputRef.current?.click()}
+                                    data-testid="create-product-gallery-button"
                                 >
-                                    {t('products.form.chooseSampleFile')}
+                                    {t('products.detail.addGalleryImages', 'Upload Images')}
                                 </Button>
-                                <p className="text-xs text-muted-foreground truncate">
-                                    {sample?.name || t('products.form.noFileSelected')}
-                                </p>
+                                {pendingGalleryImages.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {pendingGalleryImages.map((f, i) => (
+                                            <div key={i} className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-xs">
+                                                <span className="truncate max-w-[120px]">{f.name}</span>
+                                                <button type="button" onClick={() => setPendingGalleryImages(prev => prev.filter((_, j) => j !== i))} className="text-muted-foreground hover:text-destructive ml-1">&times;</button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
+
+                            {/* Gallery Video */}
+                            <div className="space-y-1.5">
+                                <FormLabel>{t('products.detail.addGalleryVideo', 'Gallery Video')}</FormLabel>
+                                <input
+                                    ref={galleryVideoInputRef}
+                                    type="file"
+                                    accept=".mp4,.webm,.mov,video/mp4,video/webm,video/quicktime"
+                                    onChange={(e) => { setPendingGalleryVideo(e.target.files?.[0] ?? null); e.target.value = ''; }}
+                                    className="sr-only"
+                                    data-testid="create-product-gallery-video-input"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                    onClick={() => galleryVideoInputRef.current?.click()}
+                                    data-testid="create-product-gallery-video-button"
+                                >
+                                    {t('products.detail.addGalleryVideo', 'Upload Video')}
+                                </Button>
+                                {pendingGalleryVideo && (
+                                    <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-xs mt-1">
+                                        <span className="truncate max-w-[200px]">{pendingGalleryVideo.name}</span>
+                                        <button type="button" onClick={() => setPendingGalleryVideo(null)} className="text-muted-foreground hover:text-destructive ml-1">&times;</button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* External Video URL */}
+                            <div className="space-y-1.5">
+                                <FormLabel>{t('products.detail.addExternalVideo', 'External Video URL')}</FormLabel>
+                                <Input
+                                    type="url"
+                                    placeholder="https://youtube.com/..."
+                                    value={externalVideoUrl}
+                                    onChange={(e) => setExternalVideoUrl(e.target.value)}
+                                    data-testid="create-product-external-video-input"
+                                />
+                                <p className="text-xs text-muted-foreground">{t('products.detail.videoUrlHelp', 'Supported link from Youtube, Vimeo, etc.')}</p>
+                            </div>
+
+                            <Separator />
+
+                            {/* Sample Section */}
+                            <div className="space-y-1.5">
+                                <FormLabel>{t('products.form.sampleTitle', 'Sample Title')}</FormLabel>
+                                <Input 
+                                    placeholder={t('products.form.sampleTitlePlaceholder', 'Enter a title for the sample')}
+                                    value={sampleTitle}
+                                    onChange={(e) => setSampleTitle(e.target.value)}
+                                    data-testid="create-product-sample-title-input"
+                                />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <FormLabel>{t('products.form.sampleSection')}</FormLabel>
+                                <Select value={sampleSectionId} onValueChange={setSampleSectionId}>
+                                    <SelectTrigger data-testid="create-product-sample-section-select">
+                                        <SelectValue placeholder={t('products.form.selectSampleSection')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {sampleSections.map(sec => (
+                                            <SelectItem key={sec.id} value={String(sec.id)}>{sec.title}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Media Type */}
+                            <div className="space-y-1.5">
+                                <FormLabel>{t('products.form.mediaType')}</FormLabel>
+                                <Select value={mediaType} onValueChange={setMediaType}>
+                                    <SelectTrigger data-testid="create-product-sample-media-type-select">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="pdf">{t('products.form.mediaTypePdf', 'PDF')}</SelectItem>
+                                        <SelectItem value="image">{t('products.form.mediaImage', 'Image')}</SelectItem>
+                                        <SelectItem value="video">{t('products.form.mediaVideo', 'Video')}</SelectItem>
+                                        <SelectItem value="word">{t('products.form.mediaWord', 'Word')}</SelectItem>
+                                        <SelectItem value="powerpoint">{t('products.form.mediaPowerpoint', 'PowerPoint')}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {/* HQ Sample */}
+                                <div className="space-y-1.5">
+                                    <FormLabel>{t('products.form.hqFile')}</FormLabel>
+                                    <input
+                                        ref={hqSampleInputRef}
+                                        type="file"
+                                        accept={mediaType === 'pdf' ? '.pdf,application/pdf' : mediaType === 'word' ? '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document' : mediaType === 'powerpoint' ? '.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation' : mediaType === 'video' ? '.mp4,.webm,.mov,video/mp4,video/webm,video/quicktime' : mediaType === 'image' ? '.jpg,.jpeg,.png,.webp,.gif,.svg,image/*' : '*/*'}
+                                        onChange={(e) => setHqSample(e.target.files?.[0] ?? null)}
+                                        className="sr-only"
+                                        data-testid="create-product-hq-sample-input"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="w-full justify-start"
+                                        onClick={() => hqSampleInputRef.current?.click()}
+                                        data-testid="create-product-hq-sample-button"
+                                    >
+                                        {t('products.form.chooseSampleFile')}
+                                    </Button>
+                                    <p className="text-xs text-muted-foreground truncate">
+                                        {hqSample?.name || t('products.form.noFileSelected')}
+                                    </p>
+                                </div>
+
+                                {/* LQ Sample */}
+                                <div className="space-y-1.5">
+                                    <FormLabel>{t('products.form.lqFile')}</FormLabel>
+                                    <input
+                                        ref={lqSampleInputRef}
+                                        type="file"
+                                        accept={mediaType === 'pdf' ? '.pdf,application/pdf' : mediaType === 'word' ? '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document' : mediaType === 'powerpoint' ? '.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation' : mediaType === 'video' ? '.mp4,.webm,.mov,video/mp4,video/webm,video/quicktime' : mediaType === 'image' ? '.jpg,.jpeg,.png,.webp,.gif,.svg,image/*' : '*/*'}
+                                        onChange={(e) => setLqSample(e.target.files?.[0] ?? null)}
+                                        className="sr-only"
+                                        data-testid="create-product-lq-sample-input"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="w-full justify-start"
+                                        onClick={() => lqSampleInputRef.current?.click()}
+                                        data-testid="create-product-lq-sample-button"
+                                    >
+                                        {t('products.form.chooseSampleFile')}
+                                    </Button>
+                                    <p className="text-xs text-muted-foreground truncate">
+                                        {lqSample?.name || t('products.form.noFileSelected')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p className="text-xs text-muted-foreground">
+                                {t('products.form.sampleFormats', 'Supported: images, videos, PDF, Word, PowerPoint')}
+                            </p>
                         </div>
                     </div>
 
                     {/* ── Upload Progress ── */}
-                    {actionLoading && uploadProgress > 0 && (
-                        <div className="mb-4">
-                            <div className="flex justify-between text-sm mb-1 text-muted-foreground">
-                                <span>{uploadProgress < 100 ? t('products.create.uploading', 'Uploading...') : t('products.create.processing', 'Processing...')}</span>
-                                <span>{uploadProgress}%</span>
-                            </div>
-                            <Progress value={uploadProgress} />
-                        </div>
-                    )}
+                    <FileUploadProgress
+                        progress={uploadProgress}
+                        isUploading={isUploading}
+                        fileName={uploadFileName}
+                        error={uploadError}
+                        onCancel={handleCancelUpload}
+                    />
                     {/* ── Section: Quick Coupon ── */}
                     <div className="rounded-xl border border-border p-5 space-y-4">
                         <h2 className="font-semibold text-foreground">{t('products.quickCoupon.title')}</h2>
@@ -907,7 +1301,7 @@ export default function CreateProductPage() {
                             data-testid="create-product-submit-button"
                         >
                             {actionLoading
-                                ? <><Loader2 className="me-2 h-4 w-4 animate-spin" />{t('products.create.creating')}</>
+                                ? <><LoadingSpinner className="h-4 w-4 text-primary-foreground" />{t('products.create.creating')}</>
                                 : t('products.create.submit')
                             }
                         </Button>

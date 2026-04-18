@@ -3,15 +3,17 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { arSA } from 'react-day-picker/locale';
-import { ChevronLeft, Package, Pencil, Trash2 } from 'lucide-react';
+import { ChevronLeft, Package, Pencil, Trash2, Clock } from 'lucide-react';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useAdminCoupons } from '@/hooks/admin/useAdminCoupons';
+import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
 import { formatCurrency } from '@/lib/storeUtils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 import EditCouponDialog from '@/components/admin/coupons/EditCouponDialog';
 import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
@@ -21,6 +23,7 @@ import CategoriesManager from '@/components/admin/products/CategoriesManager';
 import RequiredFieldsManager from '@/components/admin/products/RequiredFieldsManager';
 import SampleManager from '@/components/admin/products/SampleManager';
 import FileUploadProgress from '@/components/admin/settings/FileUploadProgress';
+import ReviewManager from '@/components/admin/products/ReviewManager';
 import { getDiscountType, getCouponId, isCouponActive } from '@/lib/couponUtils';
 
 export default function ProductDetailPage() {
@@ -42,6 +45,9 @@ export default function ProductDetailPage() {
         addGalleryImages,
         updateGalleryEntry,
         removeGalleryEntry,
+        addGalleryVideo,
+        addExternalGalleryVideo,
+        removeGalleryVideo,
         attachCategories,
         detachCategory,
         attachRequiredFields,
@@ -56,6 +62,8 @@ export default function ProductDetailPage() {
         generateCouponCode,
         apiLoading: couponLoading,
     } = useAdminCoupons();
+
+    const { deleteSample } = useAdminSampleSections();
 
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [productCoupons, setProductCoupons] = useState([]);
@@ -101,6 +109,19 @@ export default function ProductDetailPage() {
     };
 
     const handleDeleteConfirm = async () => {
+        // Delete linked samples first if any
+        const samplesToDelete = Array.isArray(selectedProduct?.samples) 
+            ? selectedProduct.samples 
+            : (selectedProduct?.sample ? [selectedProduct.sample] : []);
+
+        if (samplesToDelete.length > 0) {
+            for (const sample of samplesToDelete) {
+                if (sample.section_id && sample.id) {
+                    await deleteSample(sample.section_id, sample.id);
+                }
+            }
+        }
+
         const res = await deleteProduct(id);
         if (res?.success) navigate('/admin/products');
     };
@@ -189,16 +210,62 @@ export default function ProductDetailPage() {
         }
     };
 
-    const handleSampleUpload = async (formData) => {
-        const file = formData.get('sample');
-        if (!file) return;
+    const handleGalleryVideoUpload = async (formData) => {
+        const abortController = new AbortController();
+        setUploadAbortController(abortController);
 
+        setIsUploading(true);
+        setUploadFileName('Gallery video');
+        setUploadError('');
+        setUploadProgress(0);
+
+        try {
+            const res = await addGalleryVideo(id, formData, (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setUploadProgress(percentCompleted);
+                }
+            }, abortController.signal);
+            if (!res?.success) {
+                setUploadError(res?.message || 'Upload failed');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                setUploadError(error.message || 'Upload failed');
+            }
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+            setUploadFileName('');
+            setUploadAbortController(null);
+        }
+    };
+
+    const handleGalleryExternalVideo = async (url) => {
+        setIsUploading(true);
+        try {
+            const res = await addExternalGalleryVideo(id, url);
+            if (!res?.success) {
+                toast.error(res?.message || 'Failed to add external video');
+            }
+        } catch (error) {
+            toast.error(error.message || 'Failed to add external video');
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const handleSampleUpload = async (formData) => {
+        const hqFile = formData.get('high_quality');
+        const lqFile = formData.get('low_quality');
+        // We allow updates even without new files (for section/media type updates)
+        
         // Create new AbortController for this upload
         const abortController = new AbortController();
         setUploadAbortController(abortController);
 
         setIsUploading(true);
-        setUploadFileName(file.name);
+        setUploadFileName(hqFile ? hqFile.name : (lqFile ? lqFile.name : 'Metadata update'));
         setUploadError('');
         setUploadProgress(0);
 
@@ -209,15 +276,20 @@ export default function ProductDetailPage() {
                     setUploadProgress(percentCompleted);
                 }
             }, abortController.signal);
+            
             if (res?.success) {
-                // Product refresh is handled in hook
+                // Product refresh is handled in hook/refresh
+                refresh();
+                return true;
             } else {
                 setUploadError(res?.message || 'Upload failed');
+                return false;
             }
         } catch (error) {
             if (error.name !== 'AbortError') {
                 setUploadError(error.message || 'Upload failed');
             }
+            return false;
         } finally {
             setIsUploading(false);
             setUploadProgress(0);
@@ -259,6 +331,7 @@ export default function ProductDetailPage() {
     }
 
     const product = selectedProduct;
+    const isComingSoon = product.release_at && new Date(product.release_at) > new Date();
 
     return (
         <div className="space-y-6 no-scrollbar" data-testid="product-detail-page">
@@ -290,7 +363,21 @@ export default function ProductDetailPage() {
                             {product.serial && (
                                 <span className="text-sm text-muted-foreground">{product.serial}</span>
                             )}
+                            {isComingSoon && (
+                                <Badge
+                                    variant="outline"
+                                    className="bg-amber-500/10 text-amber-600 border-amber-500/30"
+                                >
+                                    <Clock className="h-3.5 w-3.5 me-1.5" />
+                                    {t('products.status.comingSoon', 'Coming Soon')}
+                                </Badge>
+                            )}
                         </div>
+                        {isComingSoon && product.release_at && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                                {t('products.detail.releaseDate', 'Release Date')}: {new Date(product.release_at).toLocaleDateString(i18n.language, { dateStyle: 'long' })}
+                            </p>
+                        )}
                     </div>
                 </div>
 
@@ -381,8 +468,11 @@ export default function ProductDetailPage() {
                     <GalleryManager
                         product={product}
                         onAddImages={handleGalleryUpload}
+                        onAddVideo={handleGalleryVideoUpload}
+                        onAddExternalVideo={handleGalleryExternalVideo}
                         onUpdateEntry={(galleryId, data) => updateGalleryEntry(id, galleryId, data)}
-                        onRemoveEntry={(galleryId) => removeGalleryEntry(id, galleryId)}
+                        onRemoveImage={(galleryId) => removeGalleryEntry(id, galleryId)}
+                        onRemoveVideo={(videoId) => removeGalleryVideo(id, videoId)}
                         loading={isUploading}
                     />
                 </div>
@@ -404,8 +494,9 @@ export default function ProductDetailPage() {
                 <SampleManager
                     product={product}
                     onUpdateSample={handleSampleUpload}
-                    onRemoveSample={removeProductSample}
+                    onRemoveSample={() => removeProductSample(id)}
                     loading={isUploading}
+                    onRefresh={refresh}
                 />
             </div>
 
@@ -489,6 +580,12 @@ export default function ProductDetailPage() {
                     </div>
                 )}
             </div>
+
+            <ReviewManager 
+                productId={product.id} 
+                className="mt-6 rounded-xl border border-border p-5" 
+            />
+
             <EditCouponDialog
                 open={editCouponOpen}
                 onOpenChange={(openState) => {
@@ -515,6 +612,7 @@ export default function ProductDetailPage() {
                 onConfirm={handleDeleteConfirm}
                 loading={actionLoading}
                 productTitle={product?.title}
+                hasSample={(product?.samples?.length > 0) || !!product?.sample}
             />
         </div>
     );

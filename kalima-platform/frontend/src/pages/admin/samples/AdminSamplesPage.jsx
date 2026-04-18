@@ -1,243 +1,190 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FileText, Download, ExternalLink, ChevronLeft, ChevronRight, Copy } from 'lucide-react';
+import { Folder, Plus, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { getImageUrl, formatFileSize } from '@/lib/storeUtils';
-import useApiMutation from '@/hooks/useApiMutation';
-import useExport from '@/hooks/useExport';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
+import SampleSectionDialog from '@/components/admin/samples/SampleSectionDialog';
+import SampleDialog from '@/components/admin/samples/SampleDialog';
 import { toast } from 'sonner';
 
 export default function AdminSamplesPage() {
     const { t, i18n } = useTranslation('admin');
-    const { mutate: fetchApi, loading } = useApiMutation();
-    const { exportData, loading: exportLoading, exportProgress } = useExport();
+    const { sections, loading, fetchSections, createSection, updateSection, deleteSection, createSample } = useAdminSampleSections();
 
-    const [samples, setSamples] = useState([]);
-    const [fetched, setFetched] = useState(false);
-    const [selectedIds, setSelectedIds] = useState([]);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [editingSection, setEditingSection] = useState(null);
 
-    const loadSamples = useCallback(async () => {
-        try {
-            const res = await fetchApi({ endpoint: '/samples', method: 'get' });
-            if (res?.success) setSamples(res.data ?? []);
-        } catch (e) {
-            console.error('Failed to fetch samples:', e);
-        } finally {
-            setFetched(true);
-        }
-    }, [fetchApi]);
+    const [isSampleDialogOpen, setIsSampleDialogOpen] = useState(false);
+
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [sectionToDelete, setSectionToDelete] = useState(null);
 
     useEffect(() => {
-        loadSamples();
-    }, [loadSamples]);
+        fetchSections();
+    }, [fetchSections]);
 
-    const handleSelect = (id, checked) => {
-        setSelectedIds(prev =>
-            checked ? [...prev, id] : prev.filter(selectedId => selectedId !== id)
-        );
+    const handleOpenAddDialog = () => {
+        setEditingSection(null);
+        setIsDialogOpen(true);
     };
 
-    const handleSelectAll = (checked) => {
-        if (checked) {
-            setSelectedIds(samples.map(s => s.id));
+    const handleOpenEditDialog = (section) => {
+        setEditingSection(section);
+        setIsDialogOpen(true);
+    };
+
+    const handleDialogSubmit = async (data) => {
+        if (editingSection) {
+            await updateSection(editingSection.id, data);
         } else {
-            setSelectedIds([]);
+            await createSection(data);
+        }
+        setIsDialogOpen(false);
+    };
+
+    const confirmDelete = (section) => {
+        setSectionToDelete(section);
+        setDeleteOpen(true);
+    };
+
+    const handleDelete = async () => {
+        if (!sectionToDelete) return;
+        const res = await deleteSection(sectionToDelete.id);
+        if (res?.success) {
+            setDeleteOpen(false);
+            setSectionToDelete(null);
         }
     };
-
-    const handleExport = (format) => {
-        exportData({
-            resource: 'samples',
-            format,
-            ids: selectedIds,
-        });
+    
+    // Create Sample from root 
+    const handleCreateSample = async (formData, onProgress, abortSignal) => {
+        const secId = formData.get('sample_section_id');
+        if (!secId) return false;
+        const res = await createSample(secId, formData, onProgress, abortSignal);
+        if (res?.success) {
+            toast.success(t('samples.sections.sampleAdded', 'Sample added successfully'));
+            fetchSections();
+            return true;
+        }
+        return false;
     };
 
-    const handleCopyLink = useCallback((sampleId) => {
-        const url = `${window.location.origin}/samples/${sampleId}`;
-        navigator.clipboard.writeText(url)
-            .then(() => toast.success(t('samples.linkCopied', 'Sample link copied!')))
-            .catch(() => toast.error(t('samples.linkCopyError', 'Failed to copy link')));
-    }, [t]);
-
     return (
-        <div className="space-y-6" data-testid="admin-samples-page">
-            {/* Header */}
+        <div className="space-y-6" data-testid="admin-sample-sections-page">
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">{t('samples.title')}</h1>
-                    <p className="text-muted-foreground text-sm mt-1">{t('samples.subtitle')}</p>
+                    <h1 className="text-2xl font-bold tracking-tight">{t('samples.sections.title', 'Sample Sections')}</h1>
+                    <p className="text-muted-foreground text-sm mt-1">{t('samples.sections.subtitle', 'Manage sample sections to organize your samples.')}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    {fetched && !loading && (
-                        <Badge variant="outline" className="shrink-0" data-testid="admin-samples-count">
-                            {samples.length} {t('samples.count', { count: samples.length })}
-                        </Badge>
-                    )}
-
-                    {/* Export dropdown */}
-                    <DropdownMenu dir={i18n.dir()}>
-                        <DropdownMenuTrigger asChild>
-                            <Button disabled={exportLoading} variant="outline" data-testid="samples-export-button">
-                                <Download className="me-2 h-4 w-4" />
-                                {t('orders.export', 'Export')}
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                onClick={() => handleExport('csv')}
-                                disabled={exportLoading}
-                                data-testid="samples-export-csv"
-                            >
-                                {t('orders.exportCsv', 'Export as CSV')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => handleExport('xlsx')}
-                                disabled={exportLoading}
-                                data-testid="samples-export-excel"
-                            >
-                                {t('orders.exportXlsx', 'Export as Excel')}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button variant="outline" onClick={() => setIsSampleDialogOpen(true)} data-testid="samples-add-button">
+                        <Plus className="me-2 h-4 w-4" />
+                        {t('samples.sections.addSample', 'Add Sample')}
+                    </Button>
+                    <Button onClick={handleOpenAddDialog} data-testid="sections-add-button">
+                        <Plus className="me-2 h-4 w-4" />
+                        {t('samples.sections.addTitle', 'Add Section')}
+                    </Button>
                 </div>
             </div>
 
-            {exportLoading && exportProgress > 0 && (
-                <div>
-                    <div className="flex justify-between text-sm mb-1 text-muted-foreground">
-                        <span>{exportProgress < 100 ? t('export.exporting', 'Exporting...') : t('export.processing', 'Processing...')}</span>
-                        <span>{exportProgress}%</span>
-                    </div>
-                    <Progress value={exportProgress} />
-                </div>
-            )}
-
-            {/* Table / List */}
-            {loading && !fetched ? (
-                <div className="space-y-3" data-testid="admin-samples-skeleton">
-                    {[...Array(5)].map((_, i) => (
+            {loading && sections.length === 0 ? (
+                <div className="space-y-3">
+                    {[...Array(3)].map((_, i) => (
                         <Skeleton key={i} className="h-16 w-full rounded-lg" />
                     ))}
                 </div>
-            ) : samples.length === 0 ? (
-                <div className="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground" data-testid="admin-samples-empty">
-                    <FileText className="h-10 w-10 opacity-40" />
-                    <p className="text-sm">{t('samples.noSamples')}</p>
+            ) : sections.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground" data-testid="admin-sections-empty">
+                    <Folder className="h-10 w-10 opacity-40" />
+                    <p className="text-sm">{t('samples.sections.noSections', 'No sample sections available yet.')}</p>
                 </div>
             ) : (
-                <div className="rounded-xl border border-border overflow-hidden" data-testid="admin-samples-list">
+                <div className="rounded-xl border border-border overflow-hidden" data-testid="admin-sections-list">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-muted-foreground">
                             <tr>
-                                <th className="ps-4 py-3 w-10">
-                                    <Checkbox
-                                        className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
-                                        checked={samples.length > 0 && selectedIds.length === samples.length}
-                                        onCheckedChange={handleSelectAll}
-                                        aria-label={t('samples.table.selectAll', 'Select all samples')}
-                                        data-testid="samples-table-select-all"
-                                    />
-                                </th>
-                                <th className="text-start py-3 font-medium">{t('samples.table.file')}</th>
-                                <th className="text-start py-3 font-medium hidden sm:table-cell">{t('samples.table.product')}</th>
-                                <th className="text-start py-3 font-medium hidden md:table-cell">{t('samples.table.size')}</th>
-                                <th className="text-start py-3 font-medium hidden md:table-cell">{t('samples.table.type')}</th>
-                                <th className="text-end pe-4 py-3 font-medium">{t('samples.table.actions')}</th>
+                                <th className="text-start ps-4 py-3 font-medium w-[40px]">#</th>
+                                <th className="text-start py-3 font-medium">{t('samples.sections.table.title', 'Title')}</th>
+                                <th className="text-start py-3 font-medium hidden md:table-cell">{t('samples.sections.table.description', 'Description')}</th>
+                                <th className="text-start py-3 font-medium hidden sm:table-cell">{t('samples.sections.table.order', 'Order')}</th>
+                                <th className="text-start py-3 font-medium">{t('samples.sections.table.status', 'Status')}</th>
+                                <th className="text-end pe-4 py-3 font-medium">{t('samples.sections.table.actions', 'Actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
-                            {samples.map((sample) => (
-                                <tr key={sample.id} className="hover:bg-muted/30 transition-colors" data-testid={`admin-samples-row-${sample.id}`}>
-                                    {/* Checkbox */}
-                                    <td className="ps-4 py-3">
-                                        <Checkbox
-                                            className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
-                                            checked={selectedIds.includes(sample.id)}
-                                            onCheckedChange={(checked) => handleSelect(sample.id, checked)}
-                                            aria-label={`Select sample ${sample.original_name}`}
-                                            data-testid={`samples-table-select-${sample.id}`}
-                                        />
-                                    </td>
-
-                                    {/* File name */}
+                            {sections.map((section) => (
+                                <tr key={section.id} className="hover:bg-muted/30 transition-colors">
+                                    <td className="ps-4 py-3 text-muted-foreground">{section.id}</td>
                                     <td className="py-3">
                                         <div className="flex items-center gap-2">
-                                            <FileText className="h-4 w-4 text-primary shrink-0" />
-                                            <span className="font-medium truncate max-w-[180px]">{sample.original_name}</span>
+                                            {section.thumbnail_url ? (
+                                                <img src={section.thumbnail_url} alt="" className="w-8 h-8 rounded shrink-0 object-cover" />
+                                            ) : (
+                                                <Folder className="h-5 w-5 text-primary shrink-0" />
+                                            )}
+                                            <Link
+                                                to={`/admin/samples/${section.id}`}
+                                                className="font-medium hover:underline max-w-[180px] block"
+                                            >
+                                                {section.title}
+                                            </Link>
                                         </div>
                                     </td>
-
-                                    {/* Product */}
+                                    <td className="py-3 text-muted-foreground hidden md:table-cell truncate max-w-[200px]">
+                                        {section.description || '—'}
+                                    </td>
                                     <td className="py-3 hidden sm:table-cell">
-                                        {sample.products?.id ? (
-                                            <Link
-                                                to={`/admin/products/${sample.products.id}`}
-                                                className="text-primary hover:underline truncate max-w-[160px] block"
-                                                data-testid={`admin-samples-product-link-${sample.id}`}
-                                            >
-                                                {sample.products.title ?? `#${sample.products.id}`}
-                                            </Link>
-                                        ) : (
-                                            <span className="text-muted-foreground">—</span>
-                                        )}
+                                        {section.sort_order}
                                     </td>
-
-                                    {/* Size */}
-                                    <td className="py-3 text-muted-foreground hidden md:table-cell">
-                                        {formatFileSize(sample.size)}
-                                    </td>
-
-                                    {/* Type */}
-                                    <td className="py-3 hidden md:table-cell">
-                                        <Badge variant="outline" className="text-xs">
-                                            {sample.mime_type === 'application/pdf' ? 'PDF' : 'Word'}
+                                    <td className="py-3">
+                                        <Badge variant={section.active ? 'default' : 'secondary'} className="text-xs">
+                                            {section.active ? (
+                                                <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {t('common.active', 'Active')}</span>
+                                            ) : (
+                                                <span className="flex items-center gap-1"><EyeOff className="h-3 w-3" /> {t('common.inactive', 'Inactive')}</span>
+                                            )}
                                         </Badge>
                                     </td>
-
-                                    {/* Actions */}
                                     <td className="pe-4 py-3">
                                         <div className="flex items-center justify-end gap-2">
                                             <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleCopyLink(sample.id)}
-                                                title={t('samples.copyLink', 'Copy link')}
-                                                data-testid={`admin-samples-copy-button-${sample.id}`}
-                                            >
-                                                <Copy className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
+                                                variant="outline"
                                                 size="sm"
                                                 asChild
-                                                data-testid={`admin-samples-view-button-${sample.id}`}
                                             >
-                                                <Link to={`/samples/${sample.id}`} state={{ cameFromAdmin: true }}>
-                                                    <ChevronRight className="h-4 w-4" />
-                                                    <ExternalLink className="h-4 w-4" />
+                                                <Link to={`/admin/samples/${section.id}`}>
+                                                    {t('samples.sections.manageSamples', 'Samples')}
                                                 </Link>
                                             </Button>
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
-                                                asChild
-                                                data-testid={`admin-samples-download-button-${sample.id}`}
+                                                size="icon"
+                                                onClick={() => handleOpenEditDialog(section)}
+                                                className="h-8 w-8 text-muted-foreground hover:text-primary"
                                             >
-                                                <a href={getImageUrl(sample.url)} download target="_blank" rel="noopener noreferrer">
-                                                    <Download className="h-4 w-4" />
-                                                </a>
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => confirmDelete(section)}
+                                                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     </td>
@@ -247,6 +194,52 @@ export default function AdminSamplesPage() {
                     </table>
                 </div>
             )}
+
+            <SampleSectionDialog
+                open={isDialogOpen}
+                onOpenChange={setIsDialogOpen}
+                section={editingSection}
+                onSubmit={handleDialogSubmit}
+                loading={loading}
+            />
+
+            <SampleDialog
+                open={isSampleDialogOpen}
+                onOpenChange={setIsSampleDialogOpen}
+                sectionId={null} 
+                sample={null}
+                onCreate={handleCreateSample}
+                showMediaTypeSelector
+            />
+
+            <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                            <Trash2 className="h-5 w-5 text-destructive" />
+                            {t('samples.sections.deleteConfirmTitle', 'Delete Section?')}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t('samples.sections.deleteConfirmDesc', 'Are you sure you want to delete this sample section? This will also remove any samples nested within it.')}
+                            {sectionToDelete?.title && (
+                                <span className="block mt-1 font-medium text-foreground">
+                                    &ldquo;{sectionToDelete.title}&rdquo;
+                                </span>
+                            )}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={loading}>{t('common.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDelete}
+                            disabled={loading}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            {loading ? '...' : t('common.delete')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

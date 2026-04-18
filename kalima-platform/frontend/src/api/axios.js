@@ -2,8 +2,9 @@ import axios from 'axios';
 import i18n from '../i18n';
 import { toast } from 'sonner';
 import { performLocalLogout } from '../lib/authUtils';
+import { translateBackendMessage } from '../lib/utils';
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v2';
+const baseURL = import.meta.env.VITE_API_URL || '/api/v2';
 
 const axiosInstance = axios.create({
     baseURL,
@@ -162,7 +163,9 @@ axiosInstance.interceptors.response.use(
 
         // in case of empy cart no need to show error toast, as this is a common scenario and we handle it gracefully in the UI
         if (errorMessage !== 'Active cart not found') {
-            toast.error(errorMessage, errorDetails ? { description: errorDetails } : undefined);
+            const translatedMessage = translateBackendMessage(errorMessage);
+            const translatedDetails = translateBackendMessage(errorDetails);
+            toast.error(translatedMessage, translatedDetails ? { description: translatedDetails } : undefined);
         }
         return Promise.reject(error);
     }

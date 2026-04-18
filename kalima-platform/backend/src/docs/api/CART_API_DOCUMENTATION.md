@@ -24,7 +24,7 @@
    - [Update Cart Item Required Field Image (Image Data)](#update-cart-item-required-field-image-image-data)
 4. [Checkout](#checkout)
    - [Get Checkout Preview](#get-checkout-preview)
-   - [Checkout](#checkout-1)
+   - [[UPDATED] Checkout](#updated-checkout)
 5. [Fast Buy Cart](#fast-buy-cart)
    - [Start Fast Buy](#start-fast-buy)
    - [Get Fast Buy Cart](#get-fast-buy-cart)
@@ -33,7 +33,7 @@
    - [Update Fast Buy Item Required Field Image (Image Data)](#update-fast-buy-item-required-field-image-image-data)
    - [Apply Coupon to Fast Buy](#apply-coupon-to-fast-buy)
    - [Get Fast Buy Checkout Preview](#get-fast-buy-checkout-preview)
-   - [Fast Buy Checkout](#fast-buy-checkout)
+   - [[UPDATED] Fast Buy Checkout](#updated-fast-buy-checkout)
 6. [Enums & Types](#enums--types)
 7. [Business Rules](#business-rules)
 8. [Error Codes](#error-codes)
@@ -464,7 +464,7 @@ Returns checkout requirements based on the cart contents. It checks all items ag
 
 ---
 
-### Checkout
+### [UPDATED] Checkout
 
 Processes the cart checkout: validates items & required fields, uploads payment screenshot, creates a purchase, records coupon usages, updates user analytics, clears the cart, and sends an admin notification.
 
@@ -637,7 +637,7 @@ Retrieves the checkout readiness preview for the Fast Buy cart.
 
 ---
 
-### Fast Buy Checkout
+### [UPDATED] Fast Buy Checkout
 
 Processes the final checkout for the Fast Buy cart.
 
