@@ -79,8 +79,8 @@ export default function AboutSection() {
 
           <motion.img
             src={ABOUT_IMAGE_DESKTOP}
-            srcSet={`${ABOUT_IMAGE_MOBILE} 480w, ${ABOUT_IMAGE_DESKTOP} 800w`}
-            sizes="(max-width: 640px) 480px, 800px"
+            srcSet={`${ABOUT_IMAGE_MOBILE} 300w, ${ABOUT_IMAGE_DESKTOP} 800w`}
+            sizes="(max-width: 640px) 300px, 800px"
             alt={t("landingPage.about.title")}
             width="800"
             height="460"
