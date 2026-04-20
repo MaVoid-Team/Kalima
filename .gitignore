@@ -82,3 +82,5 @@ coverage/
 .vscode-test
 .DS_Store
 *.tgz
+# Added by code-review-graph
+.code-review-graph/
