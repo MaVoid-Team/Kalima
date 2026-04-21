@@ -86,6 +86,13 @@ router.get(
   purchaseController.getPurchasesByUser,
 );
 
+// Get current user's purchases (alias for /history)
+router.get(
+  "/my",
+  authController.verifyRoles("Student", "Parent", "Teacher"),
+  purchaseController.getPurchasesByUser,
+);
+
 // Get, update, or delete a specific purchase by ID
 router
   .route("/:id")
