@@ -1,10 +1,12 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import Backend from "i18next-http-backend";
+import resourcesToBackend from "i18next-resources-to-backend";
 
 i18n
-    .use(Backend)
+    .use(resourcesToBackend((language, namespace) =>
+        import(`./locales/${language}/${namespace}.json`)
+    ))
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
@@ -14,10 +16,7 @@ i18n
         interpolation: {
             escapeValue: false, // not needed for react as it escapes by default
         },
-        backend: {
-            loadPath: '/locales/{{lng}}/{{ns}}.json',
-        },
-        ns: ['common', 'landing'],
+        ns: ['common', 'landing', 'admin', 'auth', 'cart', 'checkout', 'market', 'parent', 'PDFViewer', 'product', 'student', 'teacher', 'userManagement'],
         defaultNS: 'landing',
         detection: {
             order: ['queryString', 'cookie', 'localStorage', 'navigator'],
