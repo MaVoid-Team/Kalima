@@ -31,6 +31,8 @@ import {
   LecturerRegistrationDto,
 } from "../dtos/auth.dto";
 import { CreatorContext } from "../interfaces/auth.interface";
+import { userProfileService } from "../services/user-profile.service";
+import { UpdateProfileDto } from "../dtos/user-profile.dto";
 
 // ============================================
 // HELPER FUNCTIONS
@@ -63,9 +65,7 @@ function canViewOrEditUserFlag(user: any): boolean {
     role_enum.SubAdmin,
     role_enum.Moderator,
   ];
-  return roles.some((r) =>
-    allowedRoles.includes(r.role),
-  );
+  return roles.some((r) => allowedRoles.includes(r.role));
 }
 
 function validateEnums(
@@ -442,6 +442,43 @@ export const adminController = {
     }
   },
 
+  // ============================================
+  // UPDATE USER PROFILE
+  // ============================================
+
+  async updateUserProfile(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = parseInt(req.params.userId as string, 10);
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user ID");
+      }
+
+      const targetProfile = await userProfileService.getProfile(userId);
+      const roles = (targetProfile.user_roles || []).map((r) => r.role);
+
+      const dto = await validateDto(UpdateProfileDto, req.body);
+      const updated = await userProfileService.updateProfile(
+        userId,
+        dto,
+        roles,
+      );
+      res.status(200).json({
+        success: true,
+        message: "User profile updated successfully",
+        data: updated,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  // ============================================
+  // UPDATE USER FLAG
+  // ============================================
   /**
    * PATCH /admin/users/:userId/flag
    * Body: { flag: "NORMAL" | "PRO" | "ELITE" | ... }

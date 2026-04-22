@@ -18,6 +18,7 @@ import {
   role_enum,
   user_flag_enum,
 } from "../generated/prisma/client";
+import { UpdateProfileDto } from "./user-profile.dto";
 
 // ============================================
 // ADMIN USER CREATION DTOs

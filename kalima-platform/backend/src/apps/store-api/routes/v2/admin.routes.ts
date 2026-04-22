@@ -27,8 +27,16 @@ const adminModeratorAuth = [
 // ACCOUNT REVIEW
 // ============================================
 
-router.get("/account-review-settings", ...adminAuth, adminController.getAccountReviewSettings);
-router.put("/account-review-settings", ...adminAuth, adminController.upsertAccountReviewSettings);
+router.get(
+  "/account-review-settings",
+  ...adminAuth,
+  adminController.getAccountReviewSettings,
+);
+router.put(
+  "/account-review-settings",
+  ...adminAuth,
+  adminController.upsertAccountReviewSettings,
+);
 
 // Create user (respects privilege matrix)
 router.post("/users", ...adminAuth, adminController.createUser);
@@ -59,9 +67,18 @@ router.patch(
   ...adminModeratorAuth,
   adminController.updateUserFlag,
 );
+router.patch(
+  "/users/:userId/profile",
+  ...adminModeratorAuth,
+  adminController.updateUserProfile,
+);
 
 // Account review: approve / reject users (must be before :userId/roles to avoid conflict)
-router.post("/users/:userId/approve", ...adminAuth, adminController.approveUser);
+router.post(
+  "/users/:userId/approve",
+  ...adminAuth,
+  adminController.approveUser,
+);
 router.post("/users/:userId/reject", ...adminAuth, adminController.rejectUser);
 
 // ============================================
@@ -89,6 +106,10 @@ router.delete("/users/:userId", ...adminAuth, adminController.deleteUser);
 
 // Delete a product review
 import { reviewController } from "../../controllers/review.controller";
-router.delete("/reviews/:reviewId", ...adminModeratorAuth, reviewController.deleteReview);
+router.delete(
+  "/reviews/:reviewId",
+  ...adminModeratorAuth,
+  reviewController.deleteReview,
+);
 
 export default router;
