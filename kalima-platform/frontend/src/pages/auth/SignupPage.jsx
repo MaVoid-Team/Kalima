@@ -64,9 +64,9 @@ export default function SignupPage() {
                 />
             </motion.div>
 
-            {/* Left Side - Form */}
-            <div className="relative z-10 flex h-full flex-col items-center justify-center p-4 py-8 lg:p-8">
-                <div className="flex w-full flex-col justify-center space-y-6 max-w-md mx-auto">
+            {/* Form Section - Immersive on Mobile */}
+            <div className="relative z-10 pb-16 md:pb-0 flex h-full flex-col items-center justify-center p-0 md:p-8 pt-4 md:pt-8 lg:p-8">
+                <div className="flex w-full flex-col justify-center space-y-8 md:space-y-6 max-w-md mx-auto px-4 md:px-0">
                     <motion.div
                         initial={{ opacity: 0, y: 20, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}

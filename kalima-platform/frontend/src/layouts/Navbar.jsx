@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Globe, ShoppingCart, ShoppingBag, FileText } from "lucide-react";
+import { Menu, X, Globe, ShoppingCart, ShoppingBag, FileText, Home, User } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,6 +21,8 @@ import { useCart } from "../contexts/CartContext";
 import { useRole } from "@/hooks/useRole";
 
 export default function Navbar() {
+  const location = useLocation();
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
@@ -30,11 +32,11 @@ export default function Navbar() {
   // Cart is only relevant for regular store users
   const { cart, loading } = useCart();
   const navigate = useNavigate();
-  const location = useLocation();
   const { t, i18n } = useTranslation("landing");
   const [commandValue, setCommandValue] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isNavCollapsed, setIsNavCollapsed] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,7 +100,6 @@ export default function Navbar() {
   const toggleCartModal = () => {
     // provider keeps cart up to date automatically
     setIsCartModalOpen(!isCartModalOpen);
-    setIsMenuOpen(false);
   };
 
   const handleViewFullCart = () => {
@@ -280,8 +281,19 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Mobile Actions */}
-            <div className="flex items-center gap-2 md:hidden">
+            {/* Mobile Actions (Top) */}
+            <div className="flex items-center gap-1 md:hidden">
+              {/* Language Toggle Mobile */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleLanguage}
+                className="hover:bg-primary/10 hover:text-primary h-9 w-9"
+              >
+                <Globe className="h-4 w-4" />
+              </Button>
+
+              {/* Cart Button Mobile */}
               {isAuthenticated && !hasAdminAccess && !isStudentOrParent && (
                 <Button
                   variant="ghost"
@@ -295,20 +307,10 @@ export default function Navbar() {
                     "absolute -top-1 w-5 h-5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center z-10",
                     i18n.language === 'ar' ? 'left-0' : 'right-0'
                   )}>
-                    {cart.cart_items.length}
+                    {loading ? "..." : cart.cart_items.length}
                   </span>
                 </Button>
               )}
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground h-9 w-9"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                title={isMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
-              >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
             </div>
           </div>
 
@@ -321,217 +323,154 @@ export default function Navbar() {
         </motion.header>
       </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="md:hidden fixed inset-x-0 top-16 bottom-0 z-[60] bg-background/95 backdrop-blur-2xl border-t border-border overflow-hidden"
-          >
-            <nav className="flex flex-col h-full p-6 md:p-8 overflow-y-auto overscroll-contain">
-              <div className="flex flex-col gap-6">
-                {NAV_LINKS.length > 0 && (
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-2 px-2">
-                      {t("navbar.navigation", "Navigation")}
-                    </span>
-                    {NAV_LINKS.map((link, idx) => {
-                      const Icon = link.icon;
-                      return (
-                        <motion.div
-                          key={link.label}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.1 + idx * 0.05 }}
-                        >
-                          <Link
-                            to={link.href}
-                            className={cn(
-                              "group flex items-center gap-4 text-xl font-bold p-3 rounded-2xl transition-all duration-300",
-                              location.pathname === link.href
-                                ? "bg-primary/10 text-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)]"
-                                : "text-foreground hover:bg-muted/50"
-                            )}
-                            onClick={() => setIsMenuOpen(false)}
-                          >
-                            <div className={cn(
-                              "h-12 w-12 rounded-xl flex items-center justify-center transition-all duration-300",
-                              location.pathname === link.href
-                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                                : "bg-muted group-hover:bg-primary/10 group-hover:text-primary"
-                            )}>
-                              <Icon className="h-6 w-6" />
-                            </div>
-                            <span className="flex-1">{link.label}</span>
-                            <div className="h-1.5 w-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                          </Link>
-                        </motion.div>
-                      );
-                    })}
-
-                    {/* Add Cart Link for Mobile Menu
-                    {isAuthenticated && !hasAdminAccess && !isStudentOrParent && (
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 + NAV_LINKS.length * 0.05 }}
-                      >
-                        <button
-                          className="group flex items-center gap-4 w-full text-xl font-bold p-3 rounded-2xl text-foreground hover:bg-muted/50 transition-all duration-300"
-                          onClick={toggleCartModal}
-                        >
-                          <div className="h-12 w-12 rounded-xl bg-muted group-hover:bg-primary/10 group-hover:text-primary flex items-center justify-center transition-all duration-300 relative">
-                            <ShoppingCart className="h-6 w-6" />
-                            {cart.cart_items.length > 0 && (
-                              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-background shadow-sm">
-                                {cart.cart_items.length}
-                              </span>
-                            )}
-                          </div>
-                          <span className="flex-1 text-left rtl:text-right">
-                             {t("navbar.cartToggle", "Cart")}
-                          </span>
-                          <div className="h-1.5 w-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </button>
-                      </motion.div>
-                    )} */}
-                  </div>
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-6 inset-x-4 z-[70] flex justify-center pointer-events-none">
+        <AnimatePresence mode="wait">
+          {!isNavCollapsed ? (
+            <motion.div
+              key="expanded-nav"
+              initial={{ y: 100, opacity: 0, scale: 0.8 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 40, opacity: 0, scale: 0.5 }}
+              transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
+              className={cn(
+                "pointer-events-auto h-16 w-full max-w-[400px] overflow-hidden",
+                "bg-background/40 backdrop-blur-2xl px-4 flex items-center justify-around",
+                "rounded-full border border-primary/20 safe-area-pb"
+              )}
+              style={{
+                backgroundColor: "color-mix(in oklch, var(--background), transparent 30%)",
+                borderColor: "color-mix(in oklch, var(--primary), transparent 80%)",
+              }}
+            >
+              <Link to="/" className={cn(
+                "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+                location.pathname === "/" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}>
+                {location.pathname === "/" && (
+                  <motion.div
+                    layoutId="nav-active-pill"
+                    className="absolute inset-0 bg-foreground/[0.08] rounded-full"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
                 )}
-
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.25 }}
-                  className="h-px bg-linear-to-r from-border/0 via-border to-border/0"
+                <Home
+                  className={cn("h-6 w-6 transition-all relative z-10")}
+                  strokeWidth={location.pathname === "/" ? 2.5 : 2}
                 />
+              </Link>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex items-center justify-between bg-muted/30 p-4 rounded-2xl border border-border/40"
+              {!isStudentOrParent && (
+                <Link to="/market" className={cn(
+                  "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+                  location.pathname === "/market" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                )}>
+                  {location.pathname === "/market" && (
+                    <motion.div
+                      layoutId="nav-active-pill"
+                      className="absolute inset-0 bg-foreground/[0.08] rounded-full"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <ShoppingBag
+                    className={cn("h-6 w-6 transition-all relative z-10")}
+                    strokeWidth={location.pathname === "/market" ? 2.5 : 2}
+                  />
+                </Link>
+              )}
+
+              {!isStudentOrParent && (
+                <Link to="/samples" className={cn(
+                  "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+                  location.pathname === "/samples" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                )}>
+                  {location.pathname === "/samples" && (
+                    <motion.div
+                      layoutId="nav-active-pill"
+                      className="absolute inset-0 bg-foreground/[0.08] rounded-full"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <FileText
+                    className={cn("h-6 w-6 transition-all relative z-10")}
+                    strokeWidth={location.pathname === "/samples" ? 2.5 : 2}
+                  />
+                </Link>
+              )}
+
+              {isAuthenticated ? (
+                <Link
+                  to={
+                    hasAdminAccess ? "/admin" :
+                      isTeacher ? "/teacher/profile" :
+                        isStudent ? "/student/profile" :
+                          isParent ? "/parent/profile" : "/orders"
+                  }
+                  className={cn(
+                    "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+                    ["/admin", "/teacher", "/student", "/parent", "/orders"].some(p => location.pathname.startsWith(p)) ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  )}
                 >
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-foreground">
-                      {t("navbar.language", "Language")}
-                    </span>
-                    <span className="text-xs text-muted-foreground uppercase">
-                      {i18n.language === 'ar' ? 'العربية' : 'English'}
-                    </span>
-                  </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={toggleLanguage}
-                    className="gap-2 rounded-xl px-4 h-10 border border-border/40 shadow-xs"
-                  >
-                    <Globe className="h-4 w-4" />
-                    <span className="font-bold tracking-wider text-[10px]">
-                      {i18n.language === 'ar' ? 'English' : 'العربية'}
-                    </span>
-                  </Button>
-                </motion.div>
-              </div>
+                  {["/admin", "/teacher", "/student", "/parent", "/orders"].some(p => location.pathname.startsWith(p)) && (
+                    <motion.div
+                      layoutId="nav-active-pill"
+                      className="absolute inset-0 bg-foreground/[0.08] rounded-full"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <User
+                    className={cn("h-6 w-6 transition-all relative z-10")}
+                    strokeWidth={["/admin", "/teacher", "/student", "/parent", "/orders"].some(p => location.pathname.startsWith(p)) ? 2.5 : 2}
+                  />
+                </Link>
+              ) : (
+                <Link to="/login" className={cn(
+                  "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+                  location.pathname === "/login" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                )}>
+                  {location.pathname === "/login" && (
+                    <motion.div
+                      layoutId="nav-active-pill"
+                      className="absolute inset-0 bg-foreground/[0.08] rounded-full"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <User
+                    className={cn("h-6 w-6 transition-all relative z-10")}
+                    strokeWidth={location.pathname === "/login" ? 2.5 : 2}
+                  />
+                </Link>
+              )}
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="mt-auto flex flex-col gap-3 pb-8"
+              {/* Collapse Toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsNavCollapsed(true)}
+                className="min-w-[40px] h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-foreground/[0.05]"
               >
-                {isAuthenticated ? (
-                  <>
-                    <div className="grid grid-cols-1 gap-3">
-                      {hasAdminAccess && (
-                        <Button
-                          variant="default"
-                          className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
-                          onClick={() => setIsMenuOpen(false)}
-                          asChild
-                        >
-                          <Link to="/admin">{t("navbar.dashboard")}</Link>
-                        </Button>
-                      )}
-                      {!hasAdminAccess && isTeacher && (
-                        <Button
-                          variant="default"
-                          className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
-                          onClick={() => setIsMenuOpen(false)}
-                          asChild
-                        >
-                          <Link to="/teacher/profile">{t("navbar.teacherPortal")}</Link>
-                        </Button>
-                      )}
-                      {!hasAdminAccess && !isTeacher && isStudent && (
-                        <Button
-                          variant="default"
-                          className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
-                          onClick={() => setIsMenuOpen(false)}
-                          asChild
-                        >
-                          <Link to="/student/profile">{t("navbar.studentPortal")}</Link>
-                        </Button>
-                      )}
-                      {!hasAdminAccess && !isTeacher && !isStudent && isParent && (
-                        <Button
-                          variant="default"
-                          className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
-                          onClick={() => setIsMenuOpen(false)}
-                          asChild
-                        >
-                          <Link to="/parent/profile">{t("navbar.parentPortal")}</Link>
-                        </Button>
-                      )}
-                      {!hasAdminAccess && !isTeacher && !isStudent && !isParent && (
-                        <Button
-                          variant="default"
-                          className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
-                          onClick={() => setIsMenuOpen(false)}
-                          asChild
-                        >
-                          <Link to="/orders">{t("navbar.myOrders")}</Link>
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        className="w-full font-bold justify-center h-14 text-base text-destructive hover:text-destructive hover:bg-destructive/10 rounded-2xl transition-colors mt-2"
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          logout();
-                        }}
-                      >
-                        {t("navbar.logout", "Log out")}
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    <Button
-                      variant="outline"
-                      className="w-full font-bold justify-center h-14 text-base rounded-2xl border-border/60"
-                      onClick={() => setIsMenuOpen(false)}
-                      asChild
-                    >
-                      <Link to="/login" state={{ from: location }} replace>{t("navbar.login")}</Link>
-                    </Button>
-                    <Button
-                      variant="default"
-                      className="w-full font-bold justify-center h-14 text-base rounded-2xl shadow-lg shadow-primary/20"
-                      onClick={() => setIsMenuOpen(false)}
-                      asChild
-                    >
-                      <Link to="/signup" state={{ from: location }}>{t("navbar.signup")}</Link>
-                    </Button>
-                  </div>
-                )}
-              </motion.div>
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                <X className="h-5 w-5" />
+              </Button>
+            </motion.div>
+          ) : (
+            <motion.button
+              key="collapsed-nav"
+              initial={{ scale: 0.5, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.5, opacity: 0, y: 20 }}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsNavCollapsed(false)}
+              className={cn(
+                "pointer-events-auto h-14 w-14 rounded-full flex items-center justify-center",
+                "bg-primary text-primary-foreground shadow-2xl shadow-primary/40"
+              )}
+            >
+              <Menu className="h-7 w-7" />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
 
 
       <CommandDialog

@@ -1,7 +1,8 @@
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet } from "react-router-dom";
-import { useEffect, Suspense, lazy } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
+import { Toaster } from 'sonner';
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -207,7 +208,29 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return <RouterProvider router={router} />;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return (
+    <>
+      <RouterProvider router={router} />
+      <Toaster
+        richColors
+        position={isMobile ? "top-center" : "bottom-right"}
+        toastOptions={{
+          className: "border border-border/40 bg-card/60 backdrop-blur-md shadow-2xl rounded-2xl p-4",
+          titleClassName: "font-black uppercase tracking-tight text-sm",
+          descriptionClassName: "font-medium opacity-80 text-xs"
+        }}
+      />
+    </>
+  );
 }
 
 export default App;
