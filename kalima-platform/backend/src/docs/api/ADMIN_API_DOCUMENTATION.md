@@ -237,6 +237,76 @@ Retrieve a single user with all their roles and profile data.
 
 ---
 
+### Update User Profile
+
+**Endpoint:** `PATCH /users/:userId/profile`  
+**Auth Required:** Yes (Admin / SubAdmin)
+
+**Path Parameters:**
+
+| Parameter | Type   | Description   |
+| --------- | ------ | ------------- |
+| userId    | number | The user's ID |
+
+**Request Body:**
+
+```json
+{
+  "name": "string (max 255)",
+  "phone": "string (max 50)",
+  "secondary_phone": "string (max 50)",
+
+  "subject_id": "number (Teacher only)",
+  "government_id": "number (Teacher / Student / Parent)",
+  "zone_id": "number (Teacher / Student / Parent)",
+
+  "level_id": "number (Student only)",
+  "faction": "string (Student only, max 255)",
+  "parent_phone_number": "string (Student only, max 255)"
+
+  "is_primary": "boolean (Teacher only)",
+  "is_preparatory": "boolean (Teacher only)",
+  "is_secondary": "boolean (Teacher only)",
+}
+```
+
+**Success Response:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "User profile updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Ahmed Hassan",
+    "email": "ahmed@example.com",
+    "phone": "01012345678",
+    "secondary_phone": null,
+    "gender": "male",
+    "is_email_verified": true,
+    "profile_pic_url": null,
+    "created_at": "2026-01-15T10:30:00.000Z",
+    "role": "Teacher",
+    "confirmed": true,
+    "user_roles": [
+      { "id": 1, "portal": "store", "role": "Teacher" },
+      { "id": 2, "portal": "academy", "role": "Teacher" }
+    ]
+  }
+}
+```
+
+**Error Response:** `404 Not Found`
+
+```json
+{
+  "success": false,
+  "message": "User not found"
+}
+```
+
+---
+
 ### Delete User
 
 Permanently deletes a user account (performs a **soft-delete** and anonymization of personal details in the database to retain order history). Admin/SubAdmin cannot delete their own account via this endpoint.
@@ -285,6 +355,7 @@ Set a user's `confirmed` status to `true`.
 **Request Body:** None
 
 **Example Request:**
+
 ```bash
 curl -X POST http://localhost:5000/api/v2/admin/users/123/approve \
   -H "Authorization: Bearer <access_token>"
@@ -308,6 +379,7 @@ Set a user's `confirmed` status to `false`.
 **Request Body:** None
 
 **Example Request:**
+
 ```bash
 curl -X POST http://localhost:5000/api/v2/admin/users/123/reject \
   -H "Authorization: Bearer <access_token>"
@@ -811,7 +883,7 @@ Admin, SubAdmin, and Moderator can delete any product review using its ID.
 
 **Error Responses:**
 
-| Status | Message               |
-| ------ | --------------------- |
-| 400    | `Invalid review ID`   |
-| 404    | `Review not found`    |
+| Status | Message             |
+| ------ | ------------------- |
+| 400    | `Invalid review ID` |
+| 404    | `Review not found`  |

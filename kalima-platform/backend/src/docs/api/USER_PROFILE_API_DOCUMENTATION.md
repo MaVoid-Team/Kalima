@@ -114,7 +114,6 @@ Updates the authenticated user's profile. Supports basic fields (all roles) and 
   "name": "string (max 255)",
   "phone": "string (max 50)",
   "secondary_phone": "string (max 50)",
-  "gender": "male | female",
 
   "subject_id": "number (Teacher only)",
   "government_id": "number (Teacher / Student / Parent)",
@@ -123,6 +122,10 @@ Updates the authenticated user's profile. Supports basic fields (all roles) and 
   "level_id": "number (Student only)",
   "faction": "string (Student only, max 255)",
   "parent_phone_number": "string (Student only, max 255)"
+
+  "is_primary": "boolean (Teacher only)",
+  "is_preparatory": "boolean (Teacher only)",
+  "is_secondary": "boolean (Teacher only)",
 }
 ```
 
