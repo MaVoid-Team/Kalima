@@ -83,4 +83,12 @@ router.delete("/users/:userId/roles", ...adminAuth, adminController.revokeRole);
 // Delete a user
 router.delete("/users/:userId", ...adminAuth, adminController.deleteUser);
 
+// ============================================
+// REVIEWS MANAGEMENT
+// ============================================
+
+// Delete a product review
+import { reviewController } from "../../controllers/review.controller";
+router.delete("/reviews/:reviewId", ...adminModeratorAuth, reviewController.deleteReview);
+
 export default router;
