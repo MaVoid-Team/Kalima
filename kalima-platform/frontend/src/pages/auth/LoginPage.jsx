@@ -13,6 +13,7 @@ import { signInWithPopup } from 'firebase/auth';
 import { auth } from "@/lib/firebase";
 import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
 import AuthAnimatedBackground from "@/components/auth/AuthAnimatedBackground";
+import logo from "../../assets/Logo.webp";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -114,31 +115,54 @@ export default function LoginPage() {
             navigate(from, { replace: true });
         } catch (error) {
             console.error("Firebase Login failed:", error);
-            toast.error(error?.message || "Failed to login with Firebase");
+            // We don't toast here anymore because the global axios interceptor in src/api/axios.js 
+            // already handles error toasting with translated messages.
         }
     };
 
     return (
-        <div className="relative w-full grid min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden py-8 lg:max-w-none lg:grid-cols-1 lg:px-0 px-4">
+        <div className="relative w-full grid min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-5rem)] flex-col items-center justify-center overflow-hidden py-8 lg:max-w-none lg:grid-cols-1 lg:px-0 px-4">
             <AuthAnimatedBackground variant="login" />
 
             <div className="relative w-full lg:p-8">
                 <motion.div
-                    className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]"
+                    className="mx-auto flex w-full flex-col justify-center space-y-8 md:space-y-6"
                     variants={containerVariants}
                     initial="hidden"
                     animate="show"
                 >
+                    {/* Native App Style Header (Android Inspired) */}
+                    <motion.div variants={itemVariants} className="flex flex-col items-center space-y-4 mb-4 md:mb-6">
+                        <Link to="/" className="flex flex-col items-center gap-4">
+                            <div className="relative group">
+                                <div className="absolute  bg-primary/10 blur-3xl rounded-full opacity-60 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-700" />
+                                <img
+                                    src={logo}
+                                    alt="Kalima Logo"
+                                    className="h-20 md:h-16 w-auto relative z-10"
+                                />
+                            </div>
+                            <span className="text-3xl md:text-2xl font-bold tracking-tight text-foreground">
+                                {t("navbar.brand", "Kalima")}
+                            </span>
+                        </Link>
+                    </motion.div>
+
                     <motion.div
                         variants={itemVariants}
-                        className="relative group rounded-2xl p-[1.5px] bg-linear-to-b from-primary/60 via-primary/10 to-transparent shadow-2xl shadow-primary/20 transition-all duration-500 hover:shadow-primary/30"
+                        className="relative w-full pb-16 md:pb-0 md:max-w-[400px] md:mx-auto md:group md:rounded-[2.5rem] md:p-[1px] md:bg-linear-to-b md:from-primary/30 md:via-primary/5 md:to-transparent transition-all duration-700"
                     >
-                        {/* Ambient Glow effect around the frame */}
-                        <div className="pointer-events-none absolute -inset-1.5 -z-10 rounded-2xl bg-primary/20 blur-xl opacity-50 group-hover:opacity-90 transition-opacity duration-500" />
-                        <Card className="relative border-0 bg-background/80 shadow-none backdrop-blur-2xl rounded-[calc(1rem-1.5px)] sm:border-0">
-                            <CardHeader>
-                                <CardTitle className="text-2xl">{t("login.title")}</CardTitle>
-                                <CardDescription>{t("login.description")}</CardDescription>
+                        {/* Immersive Glow effect (Desktop only) */}
+                        <div className="pointer-events-none absolute -inset-2 -z-10 rounded-full bg-primary/10 blur-3xl opacity-0 md:opacity-60 md:group-hover:opacity-100 transition-opacity duration-700" />
+
+                        <Card className="relative border-0 bg-transparent md:bg-background/40 md:dark:bg-background/20 shadow-none md:backdrop-blur-3xl md:rounded-[2.5rem] overflow-hidden">
+                            <CardHeader className="text-center pb-6 md:pb-2 pt-4 md:pt-10">
+                                <CardTitle className="text-4xl md:text-3xl lg:text-4xl font-black md:font-extrabold tracking-tight bg-linear-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+                                    {t("login.title")}
+                                </CardTitle>
+                                <CardDescription className="text-lg md:text-base lg:text-lg text-muted-foreground/60 font-medium">
+                                    {t("login.description")}
+                                </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <Form {...form}>
@@ -151,7 +175,13 @@ export default function LoginPage() {
                                                     <FormItem>
                                                         <FormLabel>{t("login.emailLabel")}</FormLabel>
                                                         <FormControl>
-                                                            <Input placeholder="name@example.com" type="email" {...field} className="bg-background" data-testid="login-email-input" />
+                                                            <Input
+                                                                placeholder="name@example.com"
+                                                                type="email"
+                                                                {...field}
+                                                                className="bg-background/40 border-foreground/10 focus:bg-background/60 h-14 text-lg rounded-2xl transition-all"
+                                                                data-testid="login-email-input"
+                                                            />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
@@ -169,22 +199,23 @@ export default function LoginPage() {
                                                             <div className="relative">
                                                                 <Input
                                                                     type={showPassword ? "text" : "password"}
-                                                                    className="bg-background pr-10"
+                                                                    className="bg-background/40 md:bg-background/40 border-foreground/10 focus:bg-background/60 pr-14 h-16 md:h-14 text-xl md:text-lg rounded-2xl transition-all"
                                                                     {...field}
                                                                     data-testid="login-password-input"
+                                                                    placeholder="●●●●●●●●●●"
                                                                 />
                                                                 <Button
                                                                     type="button"
                                                                     variant="ghost"
                                                                     size="sm"
-                                                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                                                    className="absolute right-2 top-0 h-full px-3 py-2 hover:bg-transparent"
                                                                     onClick={() => setShowPassword(!showPassword)}
                                                                     data-testid="login-show-password-button"
                                                                 >
                                                                     {showPassword ? (
-                                                                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                                                        <EyeOff className="h-5 w-5 text-muted-foreground/50" />
                                                                     ) : (
-                                                                        <Eye className="h-4 w-4 text-muted-foreground" />
+                                                                        <Eye className="h-5 w-5 text-muted-foreground/50" />
                                                                     )}
                                                                 </Button>
                                                             </div>
@@ -203,10 +234,10 @@ export default function LoginPage() {
                                                 </motion.div>
                                             )}
                                         />
-                                        <motion.div variants={itemVariants}>
-                                            <Button type="submit" className="w-full" disabled={loading} data-testid="login-submit-button">
+                                        <motion.div variants={itemVariants} className="pt-8 md:pt-4">
+                                            <Button type="submit" className="w-full h-16 md:h-14 text-xl md:text-lg font-black md:font-bold transition-all duration-300 active:scale-[0.95] md:hover:scale-[1.02] rounded-3xl md:rounded-2xl" disabled={loading} data-testid="login-submit-button">
                                                 {loading && (
-                                                    <LoadingSpinner className="mr-2 h-4 w-4" />
+                                                    <LoadingSpinner className="mr-2 h-7 w-7 md:h-5 md:w-5" />
                                                 )}
                                                 {t("login.submit")}
                                             </Button>
