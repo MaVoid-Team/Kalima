@@ -144,7 +144,6 @@ class UserProfileService {
     if (dto.phone !== undefined) userData.phone = dto.phone;
     if (dto.secondary_phone !== undefined)
       userData.secondary_phone = dto.secondary_phone;
-    if (dto.gender !== undefined) userData.gender = dto.gender as gender_enum;
     userData.updated_at = new Date();
 
     await this.db.users.update({ where: { id: userId }, data: userData });
@@ -178,6 +177,30 @@ class UserProfileService {
       if (dto.zone_id !== undefined) {
         if (!zone) throw new NotFoundError("Zone not found");
         teacherData.zone_id = dto.zone_id;
+        hasTeacherUpdate = true;
+      }
+
+      if (
+        dto.is_primary !== undefined &&
+        dto.is_primary !== teacherData.is_primary
+      ) {
+        teacherData.is_primary = dto.is_primary;
+        hasTeacherUpdate = true;
+      }
+
+      if (
+        dto.is_preparatory !== undefined &&
+        dto.is_preparatory !== teacherData.is_preparatory
+      ) {
+        teacherData.is_preparatory = dto.is_preparatory;
+        hasTeacherUpdate = true;
+      }
+
+      if (
+        dto.is_secondary !== undefined &&
+        dto.is_secondary !== teacherData.is_secondary
+      ) {
+        teacherData.is_secondary = dto.is_secondary;
         hasTeacherUpdate = true;
       }
 
