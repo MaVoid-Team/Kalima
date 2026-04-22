@@ -68,6 +68,41 @@ function canViewOrEditUserFlag(user: any): boolean {
   return roles.some((r) => allowedRoles.includes(r.role));
 }
 
+function canViewOrEditUserProfile(
+  caller: any,
+  userRoles: role_enum[],
+): boolean {
+  const callerRoles: role_enum[] = (caller?.roles ?? []).map(
+    (r: any) => r.role,
+  );
+
+  const allowedRoles: role_enum[] = [
+    role_enum.Admin,
+    role_enum.SubAdmin,
+    role_enum.Moderator,
+  ];
+
+  if (callerRoles.includes(role_enum.Admin)) {
+    return true;
+  }
+
+  if (callerRoles.includes(role_enum.SubAdmin)) {
+    if (userRoles.includes(role_enum.Admin)) return false;
+    return true;
+  }
+
+  if (callerRoles.includes(role_enum.Moderator)) {
+    if (
+      userRoles.includes(role_enum.Admin) ||
+      userRoles.includes(role_enum.SubAdmin)
+    )
+      return false;
+    return true;
+  }
+
+  return false;
+}
+
 function validateEnums(
   portal: string,
   role: string,
@@ -459,6 +494,12 @@ export const adminController = {
 
       const targetProfile = await userProfileService.getProfile(userId);
       const roles = (targetProfile.user_roles || []).map((r) => r.role);
+
+      if (!canViewOrEditUserProfile((req as any).user, roles)) {
+        throw new ForbiddenError(
+          "You don't have permission to edit this profile",
+        );
+      }
 
       const dto = await validateDto(UpdateProfileDto, req.body);
       const updated = await userProfileService.updateProfile(
