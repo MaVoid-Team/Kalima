@@ -782,3 +782,36 @@ Update or insert multiple review settings at once.
   ]
 }
 ```
+
+---
+
+## Reviews Management
+
+### Delete a Product Review
+
+Admin, SubAdmin, and Moderator can delete any product review using its ID.
+
+**Endpoint:** `DELETE /reviews/:reviewId`  
+**Auth Required:** Yes (Admin / SubAdmin / Moderator)
+
+**Path Parameters:**
+
+| Parameter | Type   | Description     |
+| --------- | ------ | --------------- |
+| reviewId  | number | The review's ID |
+
+**Success Response:** `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Review deleted successfully"
+}
+```
+
+**Error Responses:**
+
+| Status | Message               |
+| ------ | --------------------- |
+| 400    | `Invalid review ID`   |
+| 404    | `Review not found`    |
