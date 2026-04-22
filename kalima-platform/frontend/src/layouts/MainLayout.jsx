@@ -8,7 +8,7 @@ export default function MainLayout() {
         <div className="flex min-h-screen flex-col relative z-10">
             <BackgroundAnimation />
             <Navbar />
-            <main className="flex-grow w-full mt-16">
+            <main className="flex-grow w-full mt-20">
                 <Outlet />
             </main>
             <Footer />
