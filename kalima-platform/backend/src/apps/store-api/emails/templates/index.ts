@@ -5,3 +5,8 @@ export * from './password-changed.template';
 export * from './account-created.template';
 export * from './welcome-oauth.template';
 export * from './order-received.template';
+export * from './order-pending.template';
+export * from './order-accepted.template';
+export * from './order-returned.template';
+export * from './order-deleted.template';
+export * from './order-item-deleted.template';

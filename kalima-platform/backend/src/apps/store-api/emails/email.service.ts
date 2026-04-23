@@ -31,6 +31,26 @@ import {
   getOrderReceivedEmailText,
   getOrderReceivedEmailSubject,
   OrderReceivedEmailData,
+  getOrderPendingEmailHtml,
+  getOrderPendingEmailText,
+  getOrderPendingEmailSubject,
+  OrderPendingEmailData,
+  getOrderAcceptedEmailHtml,
+  getOrderAcceptedEmailText,
+  getOrderAcceptedEmailSubject,
+  OrderAcceptedEmailData,
+  getOrderReturnedEmailHtml,
+  getOrderReturnedEmailText,
+  getOrderReturnedEmailSubject,
+  OrderReturnedEmailData,
+  getOrderDeletedEmailHtml,
+  getOrderDeletedEmailText,
+  getOrderDeletedEmailSubject,
+  OrderDeletedEmailData,
+  getOrderItemDeletedEmailHtml,
+  getOrderItemDeletedEmailText,
+  getOrderItemDeletedEmailSubject,
+  OrderItemDeletedEmailData,
 } from './templates';
 
 export interface EmailConfig {
@@ -243,6 +263,81 @@ export class EmailService {
       subject: getOrderReceivedEmailSubject(),
       html: getOrderReceivedEmailHtml(data),
       text: getOrderReceivedEmailText(data),
+    });
+  }
+
+  /**
+   * Send order pending confirmation
+   */
+  async sendOrderPendingEmail(
+    to: string,
+    data: OrderPendingEmailData
+  ): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: getOrderPendingEmailSubject(),
+      html: getOrderPendingEmailHtml(data),
+      text: getOrderPendingEmailText(data),
+    });
+  }
+
+  /**
+   * Send order accepted confirmation
+   */
+  async sendOrderAcceptedEmail(
+    to: string,
+    data: OrderAcceptedEmailData
+  ): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: getOrderAcceptedEmailSubject(),
+      html: getOrderAcceptedEmailHtml(data),
+      text: getOrderAcceptedEmailText(data),
+    });
+  }
+
+  /**
+   * Send order returned confirmation
+   */
+  async sendOrderReturnedEmail(
+    to: string,
+    data: OrderReturnedEmailData
+  ): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: getOrderReturnedEmailSubject(),
+      html: getOrderReturnedEmailHtml(data),
+      text: getOrderReturnedEmailText(data),
+    });
+  }
+
+  /**
+   * Send order deleted confirmation
+   */
+  async sendOrderDeletedEmail(
+    to: string,
+    data: OrderDeletedEmailData
+  ): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: getOrderDeletedEmailSubject(),
+      html: getOrderDeletedEmailHtml(data),
+      text: getOrderDeletedEmailText(data),
+    });
+  }
+
+  /**
+   * Send order item deleted confirmation
+   */
+  async sendOrderItemDeletedEmail(
+    to: string,
+    data: OrderItemDeletedEmailData
+  ): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: getOrderItemDeletedEmailSubject(),
+      html: getOrderItemDeletedEmailHtml(data),
+      text: getOrderItemDeletedEmailText(data),
     });
   }
 

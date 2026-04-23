@@ -1,4 +1,4 @@
-export interface OrderReceivedEmailData {
+export interface OrderAcceptedEmailData {
   name: string;
   purchaseSerial: string;
   totalItems: number;
@@ -6,12 +6,12 @@ export interface OrderReceivedEmailData {
   ordersUrl?: string;
 }
 
-export function getOrderReceivedEmailSubject(): string {
-  return "تم استلام طلبك";
+export function getOrderAcceptedEmailSubject(): string {
+  return "تم قبول طلبك";
 }
 
-export function getOrderReceivedEmailHtml(
-  data: OrderReceivedEmailData,
+export function getOrderAcceptedEmailHtml(
+  data: OrderAcceptedEmailData,
 ): string {
   return `
 <!DOCTYPE html>
@@ -19,7 +19,7 @@ export function getOrderReceivedEmailHtml(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تم استلام طلبك</title>
+  <title>تم قبول طلبك</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: 'IBM Plex Sans Arabic', 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f8f8;" dir="rtl">
   <table role="presentation" style="width: 100%; border-collapse: collapse;">
@@ -27,17 +27,16 @@ export function getOrderReceivedEmailHtml(
       <td align="center" style="padding: 20px 10px;">
         <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; box-shadow: 0 12px 30px rgba(175,13,14,0.08);">
           <tr>
-            <td style="padding: 32px 40px 20px; text-align: center; background-color: #af0d0e; border-radius: 12px 12px 0 0;">
+            <td style="padding: 32px 40px 20px; text-align: center; background-color: #059669; border-radius: 12px 12px 0 0;">
               <img src="cid:kalima-logo" alt="Kalima" width="72" style="display: block; margin: 0 auto 12px; height: auto;" />
-              <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: 700;">تم استلام طلبك</h1>
+              <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: 700;">تم قبول طلبك</h1>
             </td>
           </tr>
           <tr>
             <td style="padding: 32px 40px;">
-              <h2 style="margin: 0 0 16px; color: #1a1a1a; font-size: 22px; font-weight: 700;">شكرًا على شرائك!</h2>
-              <p style="margin: 0 0 12px; color: #4b5563; font-size: 16px; line-height: 1.8;">عميلنا ${data.name}،</p>
-              <p style="margin: 0 0 12px; color: #4b5563; font-size: 16px; line-height: 1.8;">يسرنا إعلامك أن طلبك (<strong>${data.purchaseSerial}</strong>) تم استلامه.</p>
-              <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.8;">لقد طلبت <strong>${data.totalItems}</strong> منتجًا.</p>
+              <h2 style="margin: 0 0 16px; color: #1a1a1a; font-size: 22px; font-weight: 700;">أخبار سارة، ${data.name}!</h2>
+              <p style="margin: 0 0 12px; color: #4b5563; font-size: 16px; line-height: 1.8;">يسعدنا إعلامك أنه تم قبول طلبك رقم (<strong>${data.purchaseSerial}</strong>) بنجاح.</p>
+              <p style="margin: 0 0 20px; color: #4b5563; font-size: 16px; line-height: 1.8;">الطلب يضم <strong>${data.totalItems}</strong> منتجًا.</p>
               <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
                 <thead>
                   <tr>
@@ -49,17 +48,17 @@ export function getOrderReceivedEmailHtml(
                   ${data.productListHTML}
                 </tbody>
               </table>
-              <p style="margin: 20px 0 0; color: #4b5563; font-size: 15px; line-height: 1.8;">سيتم معالجة طلبك بعد مراجعة الدفع من فريقنا خلال ساعات العمل من <strong>9:00 صباحًا إلى 9:00 مساءً</strong>.</p>
+              <p style="margin: 20px 0 0; color: #4b5563; font-size: 15px; line-height: 1.8;">فريقنا يعمل الآن على تجهيز طلبك وسيتم إرساله إليك في أقرب وقت ممكن.</p>
               ${
                 data.ordersUrl
                   ? `
               <div style="text-align: center; margin: 24px 0;">
-                <a href="${data.ordersUrl}" style="display: inline-block; padding: 12px 24px; background-color: #af0d0e; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 700;">عرض طلباتي</a>
+                <a href="${data.ordersUrl}" style="display: inline-block; padding: 12px 24px; background-color: #af0d0e; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 700;">عرض الطلب</a>
               </div>
               `
                   : ""
               }
-              <p style="margin: 0; color: #4b5563; font-size: 15px; line-height: 1.8;">إذا كان لديك أي استفسارات، يرجى التواصل مع فريق الدعم.</p>
+              <p style="margin: 0; color: #4b5563; font-size: 15px; line-height: 1.8;">شكرًا لاختيارك منصتنا!</p>
               <p style="margin: 16px 0 0; color: #1a1a1a; font-size: 15px; line-height: 1.8;">مع أطيب التحيات،<br><strong>فريق كلمة</strong></p>
             </td>
           </tr>
@@ -77,26 +76,26 @@ export function getOrderReceivedEmailHtml(
   `.trim();
 }
 
-export function getOrderReceivedEmailText(
-  data: OrderReceivedEmailData,
+export function getOrderAcceptedEmailText(
+  data: OrderAcceptedEmailData,
 ): string {
   return `
-شكرًا على شرائك!
+أخبار سارة! تم قبول طلبك
 
-عميلنا ${data.name}،
+مرحبًا ${data.name}،
 
-يسرنا إعلامك أن طلبك (${data.purchaseSerial}) تم استلامه.
-لقد طلبت ${data.totalItems} منتجًا.
+يسعدنا إعلامك أنه تم قبول طلبك رقم (${data.purchaseSerial}) بنجاح.
+الطلب يضم ${data.totalItems} منتجًا.
 
-سيتم معالجة طلبك بعد مراجعة الدفع من فريقنا خلال ساعات العمل من 9:00 صباحًا إلى 9:00 مساءً.
+فريقنا يعمل الآن على تجهيز طلبك وسيتم إرساله إليك في أقرب وقت ممكن.
 ${
   data.ordersUrl
     ? `
-عرض طلباتي: ${data.ordersUrl}
+عرض الطلب: ${data.ordersUrl}
 `
     : ""
 }
-إذا كان لديك أي استفسارات، يرجى التواصل مع فريق الدعم.
+شكرًا لاختيارك منصتنا!
 
 مع أطيب التحيات،
 فريق كلمة
