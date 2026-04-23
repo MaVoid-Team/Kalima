@@ -33,7 +33,8 @@
     "deleted": "محذوف",
     "approved": "معتمد",
     "rejected": "مرفوض",
-    "notVerified": "غير موثق"
+    "notVerified": "غير موثق",
+    "unconfirmed": "غير مؤكد"
   },
   "actions": {
     "create": "إنشاء مستخدم",
@@ -99,7 +100,9 @@
     "parents": "أولياء الأمور",
     "assists": "يساعد",
     "confirmDeleteTitle": "هل أنت متأكد؟",
-    "confirmDeleteDesc": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف حساب المستخدم نهائياً."
+    "confirmDeleteDesc": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف حساب المستخدم نهائياً.",
+    "userNotFound": "المستخدم غير موجود.",
+    "idLabel": "المعرف"
   },
   "createDialog": {
     "title": "إنشاء مستخدم جديد",

@@ -33,7 +33,8 @@
     "deleted": "Deleted",
     "approved": "Approved",
     "rejected": "Rejected",
-    "notVerified": "Not Verified"
+    "notVerified": "Not Verified",
+    "unconfirmed": "Unconfirmed"
   },
   "actions": {
     "create": "Create User",
@@ -99,7 +100,9 @@
     "parents": "Parents",
     "assists": "Assists",
     "confirmDeleteTitle": "Are you sure?",
-    "confirmDeleteDesc": "This action cannot be undone. This will permanently delete the user account."
+    "confirmDeleteDesc": "This action cannot be undone. This will permanently delete the user account.",
+    "userNotFound": "User not found.",
+    "idLabel": "ID"
   },
   "createDialog": {
     "title": "Create New User",

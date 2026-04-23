@@ -7,7 +7,7 @@ import {
     ArrowLeft, User, Mail, Phone, Calendar,
     ShieldCheck, Eye, ShoppingBag, UserPlus, BookOpen,
     MapPin, Hash, GraduationCap, BarChart3, Users,
-    Trash2
+    Trash2, CheckCircle2, XCircle
 } from 'lucide-react';
 
 import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
@@ -30,6 +30,12 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 /* ─── helpers ────────────────────────────────────────────────────────────── */
 function StatCard({ icon: Icon, label, value, color = 'text-primary' }) {
@@ -76,7 +82,9 @@ export default function UserDetailPage() {
         fetchUserById,
         assignRole,
         revokeRole,
-        deleteUser
+        deleteUser,
+        approveUser,
+        rejectUser
     } = useAdminUsers();
 
     useEffect(() => {
@@ -103,6 +111,20 @@ export default function UserDetailPage() {
         }
     };
 
+    const handleApprove = async () => {
+        const res = await approveUser(id);
+        if (res?.success) {
+            fetchUserById(id);
+        }
+    };
+
+    const handleReject = async () => {
+        const res = await rejectUser(id);
+        if (res?.success) {
+            fetchUserById(id);
+        }
+    };
+
     /* ── loading / not-found states ── */
     if (loading && !selectedUser) {
         return (
@@ -115,7 +137,7 @@ export default function UserDetailPage() {
     if (!selectedUser) {
         return (
             <div className="flex h-[50vh] flex-col items-center justify-center space-y-4">
-                <p className="text-xl text-muted-foreground">User not found.</p>
+                <p className="text-xl text-muted-foreground">{t('details.userNotFound', 'User not found.')}</p>
                 <Button variant="outline" asChild data-testid="user-detail-back-button">
                     <Link to="/admin/users">{t('details.back')}</Link>
                 </Button>
@@ -166,7 +188,8 @@ export default function UserDetailPage() {
         <div className="space-y-6 max-w-6xl mx-auto" data-testid="user-detail-page">
 
             {/* ── Top Bar ── */}
-            <div className="flex items-center justify-between">
+            {/* ── Top Bar ── */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <Button
                         variant="ghost"
@@ -176,72 +199,96 @@ export default function UserDetailPage() {
                         data-testid="user-detail-top-back-button"
                     >
                         <Link to="/admin/users">
-                            <ArrowLeft className="h-5 w-5" />
+                            <ArrowLeft className={`h-5 w-5`} />
                         </Link>
                     </Button>
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight">{t('details.title')}</h1>
-                        <p className="text-muted-foreground text-sm mt-0.5">
-                            <span className="font-mono text-xs bg-muted px-2 py-0.5 rounded me-2">
-                                ID: {selectedUser.id}
+                    <div className="min-w-0">
+                        <h1 className="text-xl sm:text-2xl font-bold tracking-tight truncate">{t('details.title')}</h1>
+                        <div className="flex items-center gap-2 text-muted-foreground text-sm mt-0.5">
+                            <span className="font-mono text-[10px] bg-muted px-1.5 py-0.5 rounded shrink-0">
+                                {t('details.idLabel', 'ID')}: {selectedUser.id}
                             </span>
-                            {selectedUser.name}
-                        </p>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    {selectedUser.is_deleted ? (
-                        <Badge variant="destructive" className="gap-1" data-testid="user-detail-deleted-badge">
-                            <Trash2 className="w-4 h-4" />
-                            {t('status.deleted', 'Deleted')}
-                        </Badge>
-                    ) : selectedUser.is_email_verified ? (
-                        <Badge variant="default" className="gap-1" data-testid="user-detail-verified-badge">
-                            <ShieldCheck className="w-4 h-4" />
-                            {t('status.verified')}
-                        </Badge>
-                    ) : (
-                        <Badge variant="outline" className="gap-1" data-testid="user-detail-pending-badge">
-                            {t('status.pending', 'Pending')}
-                        </Badge>
-                    )}
+                <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                        {selectedUser.is_deleted && (
+                            <Badge variant="destructive" className="gap-1" data-testid="user-detail-deleted-badge">
+                                <Trash2 className="w-4 h-4" />
+                                {t('status.deleted', 'Deleted')}
+                            </Badge>
+                        )}
+                    </div>
 
-                    {!selectedUser.is_deleted && hasAdminAccess && (
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    disabled={actionLoading}
-                                    data-testid="user-detail-delete-button"
-                                    className="ms-2"
-                                >
-                                    <Trash2 className="h-4 w-4 me-1" />
-                                    {t('actions.delete', 'Delete')}
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent dir={i18n.dir()}>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>{t('details.confirmDeleteTitle', 'Are you sure?')}</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        {t('details.confirmDeleteDesc', 'This action cannot be undone. This will permanently delete the user account.')}
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel disabled={actionLoading}>{t('actions.cancel', 'Cancel')}</AlertDialogCancel>
-                                    <AlertDialogAction
-                                        onClick={handleDeleteUser}
+                    <div className="flex flex-wrap items-center gap-2">
+                        {!selectedUser.is_deleted && hasAdminAccess && (
+                            <div className="flex items-center gap-2">
+                                {!selectedUser.confirmed ? (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-emerald-600 hover:text-emerald-700 border-emerald-200 hover:bg-emerald-50 h-8 px-2 sm:px-3"
+                                        onClick={handleApprove}
                                         disabled={actionLoading}
-                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        data-testid="user-detail-approve-button"
                                     >
-                                        {actionLoading && <LoadingSpinner className="h-4 w-4 mr-2" />}
-                                        {t('actions.delete', 'Delete')}
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    )}
+                                        <CheckCircle2 className={`h-4 w-4 ${i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''} sm:me-1`} />
+                                        <span className="hidden sm:inline">{t('actions.approve', 'Approve')}</span>
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-destructive hover:text-destructive border-destructive/20 hover:bg-destructive/5 h-8 px-2 sm:px-3"
+                                        onClick={handleReject}
+                                        disabled={actionLoading}
+                                        data-testid="user-detail-reject-button"
+                                    >
+                                        <XCircle className="h-4 w-4 sm:me-1" />
+                                        <span className="hidden sm:inline">{t('actions.reject', 'Reject')}</span>
+                                    </Button>
+                                )}
+                            </div>
+                        )}
+
+                        {!selectedUser.is_deleted && hasAdminAccess && (
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        disabled={actionLoading}
+                                        data-testid="user-detail-delete-button"
+                                        className="h-8 px-2 sm:px-3"
+                                    >
+                                        <Trash2 className="h-4 w-4 sm:me-1" />
+                                        <span className="hidden sm:inline">{t('actions.delete', 'Delete')}</span>
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent dir={i18n.dir()}>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>{t('details.confirmDeleteTitle', 'Are you sure?')}</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            {t('details.confirmDeleteDesc', 'This action cannot be undone. This will permanently delete the user account.')}
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel disabled={actionLoading}>{t('actions.cancel', 'Cancel')}</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={handleDeleteUser}
+                                            disabled={actionLoading}
+                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        >
+                                            {actionLoading && <LoadingSpinner className="h-4 w-4 mr-2" />}
+                                            {t('actions.delete', 'Delete')}
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -261,8 +308,30 @@ export default function UserDetailPage() {
 
                         {/* Info */}
                         <div className="flex-1 min-w-0 pt-3 sm:pt-0">
-                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-1">
                                 <h2 className="text-xl font-bold truncate">{selectedUser.name}</h2>
+                                <TooltipProvider>
+                                    {selectedUser.is_email_verified && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <ShieldCheck className={`h-5 w-5 text-blue-500 shrink-0 ${i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}`} />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                {t('status.verified')}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    )}
+                                    {selectedUser.confirmed && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <CheckCircle2 className={`h-5 w-5 text-emerald-500 shrink-0 ${i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}`} />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                {t('table.confirmed')}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    )}
+                                </TooltipProvider>
                                 {!selectedUser.is_email_verified && (
                                     <Badge variant="outline" className="text-muted-foreground text-xs shrink-0">
                                         {t('status.pending')}
@@ -307,7 +376,7 @@ export default function UserDetailPage() {
                     <BarChart3 className="h-4 w-4" />
                     {t('details.analytics')}
                 </h3>
-                <div className="grid grid-cols-2 gap-4" data-testid="user-detail-analytics">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" data-testid="user-detail-analytics">
                     {analyticsStats.map((s) => (
                         <StatCard key={s.label} {...s} />
                     ))}
