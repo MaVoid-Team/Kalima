@@ -15,7 +15,7 @@ export default function ProductInfo({ product }) {
     discountedPrice > 0 &&
     discountedPrice < originalPrice;
 
-  const currentPrice = hasValidDiscount ? discountedPrice : originalPrice;
+  const currentPrice = Number.parseFloat(product?.price_after_discount);
   const discount = hasValidDiscount
     ? calculateDiscountPercentage(originalPrice, currentPrice, 0)
     : 0;
