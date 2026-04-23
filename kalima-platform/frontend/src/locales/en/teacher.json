@@ -4,6 +4,7 @@
   },
   "portalTitle": "Teacher Portal",
   "nav": {
+    "home": "Home",
     "expandSidebar": "Expand sidebar",
     "collapseSidebar": "Collapse sidebar",
     "closeSidebar": "Close sidebar",

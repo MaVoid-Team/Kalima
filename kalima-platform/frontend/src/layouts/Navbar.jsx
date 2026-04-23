@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X, Globe, ShoppingCart, ShoppingBag, FileText, Home, User } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -36,12 +36,31 @@ export default function Navbar() {
   const [commandValue, setCommandValue] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [isNavCollapsed, setIsNavCollapsed] = useState(false);
+  const [showMobileNav, setShowMobileNav] = useState(true);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      const currentScrollY = window.scrollY;
+      
+      // Update header transparency/style
+      setScrolled(currentScrollY > 50);
+
+      if (window.innerWidth < 768) {
+        // Only hide if we've scrolled down a bit (threshold of 80px)
+        // And if we are actually scrolling down
+        if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
+          setShowMobileNav(false);
+        } 
+        // Show if we are scrolling up
+        else if (currentScrollY < lastScrollY.current) {
+          setShowMobileNav(true);
+        }
+      }
+      
+      lastScrollY.current = currentScrollY;
     };
+
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
@@ -325,32 +344,40 @@ export default function Navbar() {
 
       {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-6 inset-x-4 z-[70] flex justify-center pointer-events-none">
-        <AnimatePresence mode="wait">
-          {!isNavCollapsed ? (
+        <AnimatePresence>
+          {showMobileNav && (
             <motion.div
-              key="expanded-nav"
+              key="mobile-nav"
               initial={{ y: 100, opacity: 0, scale: 0.8 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 40, opacity: 0, scale: 0.5 }}
-              transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
+              exit={{ y: 100, opacity: 0, scale: 0.8 }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 260, 
+                damping: 20,
+                duration: 0.3 
+              }}
               className={cn(
-                "pointer-events-auto h-16 w-full max-w-[400px] overflow-hidden",
-                "bg-background/40 backdrop-blur-2xl px-4 flex items-center justify-around",
-                "rounded-full border border-primary/20 safe-area-pb"
+                "pointer-events-auto h-16 w-[calc(100%-2rem)] max-w-[420px] overflow-hidden",
+                "flex items-center justify-around px-2",
+                "rounded-full safe-area-pb transition-all duration-500",
+                "border border-white/20 dark:border-white/10",
+                "shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]"
               )}
               style={{
-                backgroundColor: "color-mix(in oklch, var(--background), transparent 30%)",
-                borderColor: "color-mix(in oklch, var(--primary), transparent 80%)",
+                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))",
+                backdropFilter: "blur(20px) saturate(180%)",
+                WebkitBackdropFilter: "blur(20px) saturate(180%)",
               }}
             >
               <Link to="/" className={cn(
                 "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
-                location.pathname === "/" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                location.pathname === "/" ? "text-primary" : "text-muted-foreground hover:text-foreground"
               )}>
                 {location.pathname === "/" && (
                   <motion.div
                     layoutId="nav-active-pill"
-                    className="absolute inset-0 bg-foreground/[0.08] rounded-full"
+                    className="absolute inset-0 bg-primary/10 rounded-full"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
@@ -363,12 +390,12 @@ export default function Navbar() {
               {!isStudentOrParent && (
                 <Link to="/market" className={cn(
                   "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
-                  location.pathname === "/market" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  location.pathname === "/market" ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}>
                   {location.pathname === "/market" && (
                     <motion.div
                       layoutId="nav-active-pill"
-                      className="absolute inset-0 bg-foreground/[0.08] rounded-full"
+                      className="absolute inset-0 bg-primary/10 rounded-full"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
@@ -382,12 +409,12 @@ export default function Navbar() {
               {!isStudentOrParent && (
                 <Link to="/samples" className={cn(
                   "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
-                  location.pathname === "/samples" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  location.pathname === "/samples" ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}>
                   {location.pathname === "/samples" && (
                     <motion.div
                       layoutId="nav-active-pill"
-                      className="absolute inset-0 bg-foreground/[0.08] rounded-full"
+                      className="absolute inset-0 bg-primary/10 rounded-full"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
@@ -408,13 +435,13 @@ export default function Navbar() {
                   }
                   className={cn(
                     "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
-                    ["/admin", "/teacher", "/student", "/parent", "/orders"].some(p => location.pathname.startsWith(p)) ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                    ["/admin", "/teacher", "/student", "/parent", "/orders"].some(p => location.pathname.startsWith(p)) ? "text-primary" : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   {["/admin", "/teacher", "/student", "/parent", "/orders"].some(p => location.pathname.startsWith(p)) && (
                     <motion.div
                       layoutId="nav-active-pill"
-                      className="absolute inset-0 bg-foreground/[0.08] rounded-full"
+                      className="absolute inset-0 bg-primary/10 rounded-full"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
@@ -426,12 +453,12 @@ export default function Navbar() {
               ) : (
                 <Link to="/login" className={cn(
                   "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
-                  location.pathname === "/login" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  location.pathname === "/login" ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}>
                   {location.pathname === "/login" && (
                     <motion.div
                       layoutId="nav-active-pill"
-                      className="absolute inset-0 bg-foreground/[0.08] rounded-full"
+                      className="absolute inset-0 bg-primary/10 rounded-full"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
@@ -441,33 +468,7 @@ export default function Navbar() {
                   />
                 </Link>
               )}
-
-              {/* Collapse Toggle */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsNavCollapsed(true)}
-                className="min-w-[40px] h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-foreground/[0.05]"
-              >
-                <X className="h-5 w-5" />
-              </Button>
             </motion.div>
-          ) : (
-            <motion.button
-              key="collapsed-nav"
-              initial={{ scale: 0.5, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.5, opacity: 0, y: 20 }}
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsNavCollapsed(false)}
-              className={cn(
-                "pointer-events-auto h-14 w-14 rounded-full flex items-center justify-center",
-                "bg-primary text-primary-foreground shadow-2xl shadow-primary/40"
-              )}
-            >
-              <Menu className="h-7 w-7" />
-            </motion.button>
           )}
         </AnimatePresence>
       </div>

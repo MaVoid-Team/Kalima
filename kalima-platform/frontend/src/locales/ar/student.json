@@ -11,6 +11,7 @@
   },
   "portalTitle": "بوابة الطالب",
   "nav": {
+    "home": "الرئيسية",
     "expandSidebar": "توسيع القائمة الجانبية",
     "collapseSidebar": "طي القائمة الجانبية",
     "closeSidebar": "إغلاق القائمة الجانبية",
