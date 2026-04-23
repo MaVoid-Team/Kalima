@@ -121,7 +121,7 @@ export default function ProductDetailsPage() {
               <ProductInfo product={productProps} />
 
               <ProductActions
-                price={productProps.price_after_discount == 0 ? productProps.price : productProps.price_after_discount}
+                price={productProps.price_after_discount}
                 productId={productProps.id}
                 sampleUrl={productProps.sample_url}
                 sampleId={primarySampleId}
