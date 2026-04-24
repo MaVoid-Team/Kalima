@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
+import { useWhatsAppContact } from '@/lib/whatsappUtils';
+
 export default function CartOrderSummary({
   subtotal,
   discount = '0',
@@ -15,7 +17,16 @@ export default function CartOrderSummary({
 }) {
   const { t } = useTranslation('cart');
   const navigate = useNavigate();
-  const whatsappUrl = 'https://wa.me/201000000000';
+
+  const { handleWhatsAppContact } = useWhatsAppContact();
+
+  const handleWhatsApp = () => {
+    handleWhatsAppContact('cart', {
+      total,
+      // We don't have the explicit items count here, 
+      // but we can pass whatever data we have
+    });
+  };
 
   const [clientStates, setClientStates] = useState({});
   const [highlightSaveAll, setHighlightSaveAll] = useState(false);
@@ -167,15 +178,13 @@ export default function CartOrderSummary({
               <h3 className="text-sm font-black uppercase tracking-tight mb-1">{t("needHelp")}</h3>
               <p className="text-xs font-medium text-muted-foreground leading-relaxed mb-4">{t("needHelpText")}</p>
               <Button
-                asChild
                 variant="outline"
                 className="h-9 px-4 rounded-xl font-bold text-xs border-primary/20 text-primary hover:bg-primary/5 hover:border-primary/40"
+                onClick={handleWhatsApp}
                 data-testid="cart-summary-chat-button"
               >
-                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  {t("chatWithUs")}
-                </a>
+                <MessageCircle className="w-3.5 h-3.5 me-2" />
+                {t("chatWithUs")}
               </Button>
             </div>
           </div>

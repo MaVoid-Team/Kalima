@@ -918,6 +918,16 @@
       "allAccountsDesc": "Enable or disable review requirement for all account types at once.",
       "partial": "partial"
     },
+    "general": {
+      "title": "General Administration Settings",
+      "description": "Global settings for store contact and messaging.",
+      "whatsappSendingNumber": "WhatsApp Sending Number",
+      "whatsappSendingNumberHint": "This is the number that the admin will be using when sending messages to clients via WhatsApp.",
+      "whatsappReceivingNumber": "WhatsApp Receiving Number",
+      "whatsappReceivingNumberHint": "This is the number that clients will send messages to when they have questions.",
+      "updateSuccess": "General settings updated successfully",
+      "editSettings": "Edit Settings"
+    },
     "expandSidebar": "Expand Sidebar"
   },
   "paymentMethods": {
