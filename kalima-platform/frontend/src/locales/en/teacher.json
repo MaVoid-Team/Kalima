@@ -31,6 +31,7 @@
       "avatarHint": "JPG, PNG or GIF. Max size 2MB.",
       "editProfile": "Edit Profile",
       "updateSuccess": "Profile updated successfully",
+      "avatarTitle": "Profile Picture",
       "validation": {
         "nameRequired": "Name is required",
         "emailInvalid": "Invalid email address",

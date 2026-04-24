@@ -147,7 +147,7 @@ export default function ProfileSection({ ns = 'admin' }) {
                         </Label>
                     </div>
 
-                    <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-3 flex-1">
+                    <div className="flex flex-col items-center sm:items-start text-center sm:text-start space-y-3 flex-1">
                         <div>
                             <h3 className="text-sm font-bold text-foreground">
                                 {t('settings.profile.avatarTitle', 'Profile Picture')}
