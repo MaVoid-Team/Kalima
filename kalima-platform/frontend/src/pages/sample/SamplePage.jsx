@@ -436,7 +436,7 @@ export default function SamplePage() {
                                     {sample?.title || sample?.original_name || `${t('samples.count', 'Sample')} #${sample?.id}`}
                                 </h1>
 
-                                {/* Quality badges */}
+                                {/* Quality badges
                                 <div className="flex flex-wrap gap-2">
                                     {hasHighQuality && (
                                         <Badge variant="secondary" className="gap-1 text-xs" data-testid="sample-page-hq-badge">
@@ -452,7 +452,7 @@ export default function SamplePage() {
                                             {sample?.low_quality_size > 0 && ` · ${formatFileSize(sample.low_quality_size)}`}
                                         </Badge>
                                     )}
-                                </div>
+                                </div> */}
                             </div>
 
                             {/* Sample Details */}
