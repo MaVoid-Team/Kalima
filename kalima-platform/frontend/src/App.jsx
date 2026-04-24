@@ -125,8 +125,8 @@ const router = createBrowserRouter(
           <Route path="/samples/:id/preview" element={<SamplePreview />} />
         </Route>
 
-        {/* Protected Store Routes (Auth Required) - Also Restricted for Students and Parents */}
-        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+        {/* Protected Store Routes (Auth Required) - Also Restricted for Students, Parents, and Admins */}
+        <Route element={<RoleRoute excludedRole={["Student", "Parent", "Admin", "SubAdmin"]} />}>
           <Route element={<ProtectedRoute requireAuth={true} />}>
             <Route path="/cart" element={<WizardCheckoutPage />} />
             <Route path="/checkout" element={<WizardCheckoutPage />} />
