@@ -84,7 +84,7 @@ export default function OrderDetailPage() {
         const title = item.products?.title || item.product?.title || item.title || `#${item.id}`;
         return `- منتج ${index + 1}: ${title} (${item.quantity}x ${item.price} جم)`;
     });
-    
+
     const whatsappMessage = [
         `هلاً بك أ/ ${order?.users?.name || '-'}`,
         'تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.',
@@ -389,7 +389,7 @@ export default function OrderDetailPage() {
 
 
 
-                    {/* Customer Notes */}
+                    {/* Customer Notes
                     {order.notes && (
                         <div className="bg-destructive/5 border-destructive/20 border rounded-md p-4 space-y-3">
                             <h3 className="font-medium text-destructive">{t('orders.details.customerNotes', 'Customer Notes')}</h3>
@@ -397,7 +397,7 @@ export default function OrderDetailPage() {
                                 {order.notes}
                             </div>
                         </div>
-                    )}
+                    )} */}
 
                     {/* Payment Info */}
                     <div className="border rounded-md p-4 space-y-3">
