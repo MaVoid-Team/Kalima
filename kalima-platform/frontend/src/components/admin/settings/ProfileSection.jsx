@@ -25,6 +25,7 @@ import { PhoneInput, egyptPhoneSchema } from '@/components/ui/phone-input';
 import FileUploadProgress from './FileUploadProgress';
 import { useProfile } from '@/hooks/useProfile';
 import { getImageUrl } from '@/lib/storeUtils';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 
 const getProfileSchema = (t) => z.object({
     name: z.string().min(1, t('settings.profile.validation.nameRequired', 'Name is required')).max(255),

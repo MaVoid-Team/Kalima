@@ -7,6 +7,7 @@ import AccountSection from '@/components/admin/settings/AccountSection';
 import SecuritySection from '@/components/admin/settings/SecuritySection';
 import SessionSection from '@/components/admin/settings/SessionSection';
 import AccountReviewSection from '@/components/admin/settings/AccountReviewSection';
+import GeneralSettingsSection from '@/components/admin/settings/GeneralSettingsSection';
 
 export default function SettingsPage() {
     const { t, i18n } = useTranslation('admin');
@@ -36,6 +37,7 @@ export default function SettingsPage() {
                 <AccountSection />
                 <SecuritySection />
                 <SessionSection />
+                <GeneralSettingsSection />
                 <AccountReviewSection />
             </div>
         </div>

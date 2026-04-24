@@ -21,5 +21,12 @@
     },
     "save": "Save",
     "cancel": "Cancel",
-    "enterNumber": "Enter number"
+    "enterNumber": "Enter number",
+    "whatsapp": {
+        "fetchError": "Failed to get WhatsApp number of the administration",
+        "productQueryHeader": "Hello, I'd like to inquire about this product:",
+        "cartCheckoutHeader": "Hello, I'd like to complete my order.",
+        "generalQuery": "Hello, I have a query regarding the platform.",
+        "link": "Link"
+    }
 }

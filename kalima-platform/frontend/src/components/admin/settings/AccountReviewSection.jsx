@@ -10,7 +10,7 @@ import { ROLES } from '@/lib/adminConstants';
 import useRole from '@/hooks/useRole';
 
 export default function AccountReviewSection() {
-    const { t } = useTranslation('admin');
+    const { t, i18n } = useTranslation('admin');
     const { settings, loading, updateLoading, updateSettings } = useAccountReviewSettings();
     const { isAdmin } = useRole();
 
@@ -72,7 +72,7 @@ export default function AccountReviewSection() {
         <Card data-testid="admin-settings-account-review-section">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <ShieldCheck className="h-5 w-5 text-primary" />
+                    <ShieldCheck className={`h-5 w-5 text-primary ${i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}`} />
                     {t('settings.accountReview.title', 'Account Review')}
                 </CardTitle>
                 <CardDescription>

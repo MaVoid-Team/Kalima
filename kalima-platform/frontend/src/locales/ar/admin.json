@@ -929,6 +929,16 @@
       "allAccountsDesc": "تفعيل أو تعطيل متطلب المراجعة لجميع أنواع الحسابات دفعة واحدة.",
       "partial": "جزئي"
     },
+    "general": {
+      "title": "إعدادات الإدارة العامة",
+      "description": "الإعدادات العامة للتواصل والمراسلة للمتجر.",
+      "whatsappSendingNumber": "رقم واتساب للإرسال",
+      "whatsappSendingNumberHint": "هذا هو الرقم الذي سيستخدمه المسؤول عند الإرسال إلى أي عميل عبر واتساب.",
+      "whatsappReceivingNumber": "رقم واتساب للاستقبال",
+      "whatsappReceivingNumberHint": "هذا هو الرقم الذي سيرسل إليه العميل في حالة وجود أي استفسارات.",
+      "updateSuccess": "تم تحديث الإعدادات العامة بنجاح",
+      "editSettings": "تعديل الإعدادات"
+    },
     "expandSidebar": "توسيع الشريط الجانبي"
   },
   "paymentMethods": {

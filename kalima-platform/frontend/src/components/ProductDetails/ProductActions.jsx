@@ -10,7 +10,7 @@ import { useFastBuy } from "@/hooks/useFastBuy";
 import useAuth from "@/hooks/auth/useAuth";
 import useRole from "@/hooks/useRole";
 
-import { buildWhatsAppLink } from "@/lib/whatsappUtils";
+import { useWhatsAppContact } from "@/lib/whatsappUtils";
 import { FaWhatsapp } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -72,15 +72,16 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
     startFastBuy(productId, 1);
   };
 
-  const whatsappMessage = t('actions.whatsappTemplate', {
-    title,
-    serial: serial ? `${t('info.sku', 'Serial')}: ${serial}` : '',
-    price: formatPrice(price),
-    currency: t('info.currency', 'EGP'),
-    url: window.location.href
-  });
+  const { handleWhatsAppContact } = useWhatsAppContact();
 
-  const whatsappHref = buildWhatsAppLink('201000000000', whatsappMessage); // Generic admin phone
+  const handleWhatsApp = () => {
+    handleWhatsAppContact('product', {
+      title,
+      serial,
+      price: formatPrice(price),
+      url: window.location.href
+    });
+  };
 
   return (
     <div className="flex flex-col gap-4 mt-2">
@@ -248,19 +249,17 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
                   !(sampleId || sampleUrl) && "col-span-2"
                 )}
                 size="sm"
-                asChild
+                onClick={handleWhatsApp}
               >
-                <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-                  <FaWhatsapp className="h-4 w-4 shrink-0" />
-                  <span className="text-[10px] font-black uppercase tracking-wider truncate">
-                    <span className="hidden min-[420px]:inline">
-                      {t("actions.contactWhatsAppLong", "Message Admin on WhatsApp")}
-                    </span>
-                    <span className="min-[420px]:hidden">
-                      {t("actions.contactWhatsAppShort", "Message")}
-                    </span>
+                <FaWhatsapp className="h-4 w-4 shrink-0" />
+                <span className="text-[10px] font-black uppercase tracking-wider truncate">
+                  <span className="hidden min-[420px]:inline">
+                    {t("actions.contactWhatsAppLong", "Message Admin on WhatsApp")}
                   </span>
-                </a>
+                  <span className="min-[420px]:hidden">
+                    {t("actions.contactWhatsAppShort", "Message")}
+                  </span>
+                </span>
               </Button>
             </div>
           </div>
@@ -357,12 +356,10 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
           variant="outline"
           className="text-sm border-success/30 text-success hover:bg-success/5 gap-2 h-11"
           size="lg"
-          asChild
+          onClick={handleWhatsApp}
         >
-          <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-            <FaWhatsapp className="h-4 w-4" />
-            {t("actions.contactWhatsAppLong", "Message Admin on WhatsApp")}
-          </a>
+          <FaWhatsapp className="h-4 w-4" />
+          {t("actions.contactWhatsAppLong", "Message Admin on WhatsApp")}
         </Button>
       </div >
     </div >
