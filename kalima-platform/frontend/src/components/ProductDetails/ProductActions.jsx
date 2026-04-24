@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 export default function ProductActions({ price, productId, sampleUrl, sampleId, title, serial, isReleased = true }) {
   const { t } = useTranslation("product");
   const { isAuthenticated } = useAuth();
-  const { isConfirmed } = useRole();
+  const { isConfirmed, hasAdminAccess } = useRole();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -186,7 +186,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
               <Button
                 size="lg"
                 className="h-14 rounded-2xl gap-1.5 font-bold shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 transition-all active:scale-95 px-2"
-                disabled={loading || !isReleased || isPurchaseBlocked}
+                disabled={loading || !isReleased || isPurchaseBlocked || hasAdminAccess}
                 onClick={handleAddToCart}
                 data-testid="product-actions-mobile-add-cart-button"
               >
@@ -205,7 +205,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
                 size="lg"
                 className="h-14 rounded-2xl gap-1.5 font-bold bg-secondary/80 backdrop-blur-md border border-border/40 transition-all active:scale-95 shadow-lg shadow-black/5 px-2"
                 onClick={handleBuyNow}
-                disabled={fastBuyLoading || !isReleased || isPurchaseBlocked}
+                disabled={fastBuyLoading || !isReleased || isPurchaseBlocked || hasAdminAccess}
                 data-testid="product-actions-mobile-buy-now-button"
               >
                 {fastBuyLoading ? (
@@ -294,7 +294,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
           </div> */}
 
           {/* Add to Cart */}
-          <Button className="gap-2 flex-1" size="lg" onClick={handleAddToCart} disabled={loading || !isReleased || isPurchaseBlocked} data-testid="product-actions-desktop-add-cart-button">
+          <Button className="gap-2 flex-1" size="lg" onClick={handleAddToCart} disabled={loading || !isReleased || isPurchaseBlocked || hasAdminAccess} data-testid="product-actions-desktop-add-cart-button">
             {loading ? (
               <LoadingSpinner className="h-5 w-5 border-white" />
             ) : !isReleased ? (
@@ -318,7 +318,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
             className="text-sm flex-1"
             size="lg"
             onClick={handleBuyNow}
-            disabled={fastBuyLoading || !isReleased || isPurchaseBlocked}
+            disabled={fastBuyLoading || !isReleased || isPurchaseBlocked || hasAdminAccess}
             data-testid="product-actions-desktop-buy-now-button"
           >
             {fastBuyLoading ? (

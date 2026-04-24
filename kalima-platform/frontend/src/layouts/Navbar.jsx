@@ -221,7 +221,7 @@ export default function Navbar() {
                 </Button>
 
                 {/* Cart Button Desktop */}
-                {isAuthenticated && !isStudentOrParent && (
+                {isAuthenticated && !isStudentOrParent && !hasAdminAccess && (
                   <Button
                     variant="ghost"
                     size="icon"
