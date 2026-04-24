@@ -31,6 +31,7 @@
       "avatarHint": "JPG، PNG أو GIF. الحد الأقصى للحجم 2MB.",
       "editProfile": "تعديل الملف",
       "updateSuccess": "تم تحديث الملف بنجاح",
+      "avatarTitle": "الصورة الشخصية",
       "validation": {
         "nameRequired": "الاسم مطلوب",
         "emailInvalid": "البريد الإلكتروني غير صالح",
