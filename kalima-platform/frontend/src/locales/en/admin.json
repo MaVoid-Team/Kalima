@@ -512,6 +512,11 @@
     "noAssociatedProduct": "No Associated Product",
     "productHint": "Optional. Connect this sample to a specific product.",
     "detectedType": "Detected Media Type",
+    "uploadProcess": {
+      "fileTooLarge": "File size exceeds the limit of 150MB.",
+      "success": "Sample uploaded successfully",
+      "updateSuccess": "Sample updated successfully"
+    },
     "errors": {
       "titleRequired": "Sample title is required.",
       "noHqFile": "High quality file is required.",
@@ -533,7 +538,11 @@
       "type": "Type",
       "mediaType": "Media Type",
       "actions": "Actions",
-      "selectAll": "Select all samples"
+      "selectAll": "Select all samples",
+      "section": "Section",
+      "searchSection": "Search sections...",
+      "noSectionsFound": "No sections found.",
+      "loading": "Loading..."
     },
     "mediaTypes": {
       "pdf": "PDF Document",

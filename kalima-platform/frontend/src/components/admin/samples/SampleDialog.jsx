@@ -288,7 +288,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                                 </PopoverTrigger>
                                 <PopoverContent className="w-[400px] p-0" align="start">
                                     <Command>
-                                        <CommandInput placeholder={t('samples.searchSection', 'Search sections...')} />
+                                        <CommandInput placeholder={t('samples.table.searchSection', 'Search sections...')} />
                                         <CommandList>
                                             <CommandEmpty>{sectionsLoading ? t('common.loading') : t('samples.noSectionsFound', 'No sections found.')}</CommandEmpty>
                                             <CommandGroup>
@@ -386,7 +386,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                     {showMediaTypeSelector && (
                         <div className="grid gap-2">
                             <Label>{t('samples.mediaTypeLabel', 'Media Type')}</Label>
-                            <Select value={mediaType} onValueChange={(val) => {
+                            <Select dir={i18n.dir()} value={mediaType} onValueChange={(val) => {
                                 setMediaType(val);
                                 if (val === 'word' || val === 'powerpoint') {
                                     if (hqFileRef.current) hqFileRef.current.value = '';
@@ -473,10 +473,10 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                                 variant="outline"
                                 onClick={() => lqFileRef.current?.click()}
                                 disabled={uploading}
-                                    className={cn(
-                                        "justify-start font-normal text-muted-foreground h-10 px-3",
-                                        uploading && "!bg-neutral-800 !text-neutral-500 !opacity-30 !cursor-not-allowed grayscale"
-                                    )}
+                                className={cn(
+                                    "justify-start font-normal text-muted-foreground h-10 px-3",
+                                    uploading && "!bg-neutral-800 !text-neutral-500 !opacity-30 !cursor-not-allowed grayscale"
+                                )}
                             >
                                 <Upload className="h-4 w-4 me-2 shrink-0" />
                                 <span className="truncate">
@@ -554,8 +554,8 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                         >
                             {uploading ? <><X className="h-4 w-4 me-2" /> {t('common.cancel')}</> : t('common.cancel')}
                         </Button>
-                        <Button 
-                            type="submit" 
+                        <Button
+                            type="submit"
                             disabled={isSubmitDisabled}
                             className={cn(
                                 isSubmitDisabled && "!bg-neutral-800 !text-neutral-500 !opacity-30 !cursor-not-allowed grayscale !border-transparent"
