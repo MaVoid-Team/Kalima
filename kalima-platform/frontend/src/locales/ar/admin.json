@@ -523,6 +523,11 @@
     "noAssociatedProduct": "بدون منتج مرتبط",
     "productHint": "اختياري. اربط هذه العينة بمنتج معين.",
     "detectedType": "نوع الملف المكتشف",
+    "uploadProcess": {
+      "fileTooLarge": "حجم الملف يتجاوز الحد المسموح به وهو 150 ميجابايت.",
+      "success": "تم رفع العينة بنجاح",
+      "updateSuccess": "تم تحديث العينة بنجاح"
+    },
     "errors": {
       "titleRequired": "عنوان العينة مطلوب.",
       "noHqFile": "الملف عالي الجودة مطلوب.",
@@ -544,7 +549,11 @@
       "name": "الاسم",
       "price": "السعر",
       "actions": "الإجراءات",
-      "selectAll": "تحديد جميع العينات"
+      "selectAll": "تحديد جميع العينات",
+      "section": "القسم",
+      "searchSection": "بحث...",
+      "loading": "جاري التحميل...",
+      "noSectionsFound": "لا توجد أقسام"
     },
     "mediaTypes": {
       "pdf": "ملف PDF",

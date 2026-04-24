@@ -1,7 +1,10 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import useApiMutation from '@/hooks/useApiMutation';
 
 export function useAdminSampleSections() {
+    const { t } = useTranslation('admin');
     const { mutate: apiMutate, loading, error } = useApiMutation();
     const [sections, setSections] = useState([]);
 
@@ -73,28 +76,54 @@ export function useAdminSampleSections() {
     }, [apiMutate, fetchSections]);
 
     const createSample = useCallback(async (sectionId, formData, onProgress, abortSignal) => {
+        // Limit: 150MB
+        const MAX_SIZE = 150 * 1024 * 1024;
+        let totalSize = 0;
+        for (let value of formData.values()) {
+            if (value instanceof Blob) {
+                totalSize += value.size;
+            }
+        }
+
+        if (totalSize > MAX_SIZE) {
+            toast.error(t('samples.uploadProcess.fileTooLarge', 'File size exceeds the limit of 150MB.'));
+            return null;
+        }
+
         const res = await apiMutate({
             endpoint: `/sample-sections/${sectionId}/samples`,
             method: 'post',
             data: formData, // FormData instance
             onUploadProgress: onProgress,
-            defaultSuccessMessage: 'Sample uploaded successfully',
-            // Signal unsupported out of the box by useApiMutation unless we pass it but useApiMutation doesn't explicitly pass it right now
-            // We should ensure useApiMutation supports config overrides or pass it directly.
+            defaultSuccessMessage: t('samples.uploadProcess.success', 'Sample uploaded successfully'),
         });
         return res;
-    }, [apiMutate]);
+    }, [apiMutate, t]);
 
     const updateSample = useCallback(async (sectionId, sampleId, formData, onProgress, abortSignal) => {
+        // Limit: 150MB
+        const MAX_SIZE = 150 * 1024 * 1024;
+        let totalSize = 0;
+        for (let value of formData.values()) {
+            if (value instanceof Blob) {
+                totalSize += value.size;
+            }
+        }
+
+        if (totalSize > MAX_SIZE) {
+            toast.error(t('samples.upload.fileTooLarge', 'File size exceeds the limit of 150MB.'));
+            return null;
+        }
+
         const res = await apiMutate({
             endpoint: `/sample-sections/${sectionId}/samples/${sampleId}`,
             method: 'patch',
             data: formData,
             onUploadProgress: onProgress,
-            defaultSuccessMessage: 'Sample updated successfully',
+            defaultSuccessMessage: t('samples.uploadProcess.updateSuccess', 'Sample updated successfully'),
         });
         return res;
-    }, [apiMutate]);
+    }, [apiMutate, t]);
 
     const deleteSample = useCallback(async (sectionId, sampleId) => {
         const res = await apiMutate({
