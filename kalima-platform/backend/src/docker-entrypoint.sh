@@ -3,19 +3,18 @@ set -e
 
 echo "🔄 Waiting for database to be ready..."
 
-# 1. Wait for the database to accept connections (retry up to 30 times)
 attempt=0
-until npx prisma migrate deploy 2>/dev/null; do
-  attempt=$((attempt + 1))
+while true; do
+  # Try to run migrations
+  output=$(npx prisma migrate deploy 2>&1) && break
 
-  # Check if it's a P3009 (failed migration) error — resolve it automatically
-  output=$(npx prisma migrate deploy 2>&1 || true)
+  # Check if it's a P3009 (failed migration) error
   if echo "$output" | grep -q "P3009"; then
     echo "⚠️  Detected failed migration(s). Auto-resolving..."
 
-    # Extract the failed migration name from the error output
-    # The error message contains: The `<migration_name>` migration started at ...
-    failed_migration=$(echo "$output" | grep -oP 'The `\K[^`]+' | head -1)
+    # Extract migration name: "The `<name>` migration started at ..."
+    # Uses sed (POSIX-compatible, works in Alpine/BusyBox)
+    failed_migration=$(echo "$output" | sed -n 's/.*The `\([^`]*\)` migration.*/\1/p' | head -1)
 
     if [ -n "$failed_migration" ]; then
       echo "📌 Marking migration as applied: $failed_migration"
@@ -30,8 +29,10 @@ until npx prisma migrate deploy 2>/dev/null; do
     fi
   fi
 
+  attempt=$((attempt + 1))
   if [ $attempt -ge 30 ]; then
     echo "❌ Prisma migrate failed after 30 attempts"
+    echo "$output"
     exit 1
   fi
 
