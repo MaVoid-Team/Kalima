@@ -91,7 +91,8 @@ export const ModelName = {
   sample_sections: 'sample_sections',
   images: 'images',
   product_gallery: 'product_gallery',
-  product_gallery_videos: 'product_gallery_videos'
+  product_gallery_videos: 'product_gallery_videos',
+  general_settings: 'general_settings'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -667,6 +668,16 @@ export const Product_gallery_videosScalarFieldEnum = {
 } as const
 
 export type Product_gallery_videosScalarFieldEnum = (typeof Product_gallery_videosScalarFieldEnum)[keyof typeof Product_gallery_videosScalarFieldEnum]
+
+
+export const General_settingsScalarFieldEnum = {
+  id: 'id',
+  whatsapp_receiving_number: 'whatsapp_receiving_number',
+  whatsapp_sending_number: 'whatsapp_sending_number',
+  updated_at: 'updated_at'
+} as const
+
+export type General_settingsScalarFieldEnum = (typeof General_settingsScalarFieldEnum)[keyof typeof General_settingsScalarFieldEnum]
 
 
 export const SortOrder = {
