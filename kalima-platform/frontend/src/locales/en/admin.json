@@ -1015,6 +1015,16 @@
       "invalidType": "Invalid file type. Please upload JPEG, PNG, or WebP images.",
       "tooLarge": "File too large. Maximum size is 5MB.",
       "uploading": "Uploading..."
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "nameMaxLength": "Name must be less than 100 characters",
+      "nameFormat": "Name can only contain letters, numbers, spaces, and hyphens",
+      "phoneRequired": "Phone number is required",
+      "phoneMaxLength": "Phone number must be less than 20 characters",
+      "phoneFormat": "Please enter a valid phone number",
+      "imageSize": "Image size must be less than 5MB",
+      "imageFormat": "Image must be JPEG, PNG, or WebP format"
     }
   },
   "requiredFields": {

@@ -15,19 +15,9 @@ import {
     generatePaginationLinks,
 } from '@/components/ui/pagination';
 
-import { useNavigate } from 'react-router-dom';
-import useRole from '@/hooks/useRole';
 
 const MyOrdersPage = () => {
     const { t } = useTranslation('admin');
-    const { isStudent } = useRole();
-    const navigate = useNavigate();
-
-    React.useEffect(() => {
-        if (isStudent) {
-            navigate('/', { replace: true });
-        }
-    }, [isStudent, navigate]);
 
     const {
         orders,

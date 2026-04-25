@@ -23,38 +23,40 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
 import PaymentMethodImageUpload from './PaymentMethodImageUpload';
 import { useAdminPaymentMethods } from '@/hooks/admin/useAdminPaymentMethods';
 
-const paymentMethodSchema = z.object({
-    name: z
-        .string()
-        .min(1, 'Name is required')
-        .max(100, 'Name must be less than 100 characters')
-        .regex(/^[a-zA-Z0-9\s\-]+$/, 'Name can only contain letters, numbers, spaces, and hyphens'),
-    phone_number: z
-        .string()
-        .min(1, 'Phone number is required')
-        .max(20, 'Phone number must be less than 20 characters')
-        .regex(/^[+]?[0-9\s\-()]+$/, 'Please enter a valid phone number'),
-    status: z.boolean().default(true),
-    image: z
-        .instanceof(File)
-        .optional()
-        .refine(
-            (file) => !file || file.size <= 5 * 1024 * 1024,
-            'Image size must be less than 5MB'
-        )
-        .refine(
-            (file) => !file || ['image/jpeg', 'image/png', 'image/webp'].includes(file.type),
-            'Image must be JPEG, PNG, or WebP format'
-        ),
-});
-
 export default function CreatePaymentMethodDialog({ open, onOpenChange, onSuccess }) {
     const { t } = useTranslation('admin');
+
+    const paymentMethodSchema = z.object({
+        name: z
+            .string()
+            .min(1, t('paymentMethods.validation.nameRequired', 'Name is required'))
+            .max(100, t('paymentMethods.validation.nameMaxLength', 'Name must be less than 100 characters'))
+            .regex(/^[a-zA-Z0-9\s\-\u0600-\u06FF]+$/, t('paymentMethods.validation.nameFormat', 'Name can only contain letters, numbers, spaces, and hyphens')),
+        phone_number: z
+            .string()
+            .min(1, t('paymentMethods.validation.phoneRequired', 'Phone number is required'))
+            .max(20, t('paymentMethods.validation.phoneMaxLength', 'Phone number must be less than 20 characters'))
+            .regex(/^[+]?[0-9\s\-()]+$/, t('paymentMethods.validation.phoneFormat', 'Please enter a valid phone number')),
+        status: z.boolean().default(true),
+        image: z
+            .instanceof(File)
+            .optional()
+            .refine(
+                (file) => !file || file.size <= 5 * 1024 * 1024,
+                t('paymentMethods.validation.imageSize', 'Image size must be less than 5MB')
+            )
+            .refine(
+                (file) => !file || ['image/jpeg', 'image/png', 'image/webp'].includes(file.type),
+                t('paymentMethods.validation.imageFormat', 'Image must be JPEG, PNG, or WebP format')
+            ),
+    });
+
     const { createPaymentMethod } = useAdminPaymentMethods();
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -162,12 +164,11 @@ export default function CreatePaymentMethodDialog({ open, onOpenChange, onSucces
                                             {t('paymentMethods.fields.phoneNumber', 'Phone Number')} *
                                         </FormLabel>
                                         <FormControl>
-                                            <Input
+                                            <PhoneInput
+                                                {...field}
                                                 id="phone_number"
                                                 placeholder={t('paymentMethods.fields.phoneNumberPlaceholder', 'e.g., 01012345678')}
-                                                {...field}
                                                 data-testid="payment-method-phone-input"
-                                                className="transition-colors focus:ring-2 focus:ring-primary/20"
                                             />
                                         </FormControl>
                                         <FormDescription>

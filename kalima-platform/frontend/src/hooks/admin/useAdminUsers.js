@@ -54,6 +54,21 @@ export const useAdminUsers = () => {
         }
     }, []);
 
+    // ─── Update Single User ─────────────────────────────────────────────────────────
+    const updateUser = useCallback(async (userId, data) => {
+        setLoading(true);
+        try {
+            const response = await axiosInstance.patch(`/admin/users/${userId}/profile`, data);
+            setSelectedUser(response.data?.data || null);
+            return response.data?.data;
+        } catch (error) {
+            console.error('Failed to update user:', error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     // ─── Delete User ─────────────────────────────────────────────────────────
     const deleteUser = async (userId) => {
         try {
@@ -152,6 +167,7 @@ export const useAdminUsers = () => {
         // actions
         fetchUsers,
         fetchUserById,
+        updateUser,
         deleteUser,
         approveUser,
         rejectUser,

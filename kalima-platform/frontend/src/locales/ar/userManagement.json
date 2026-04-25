@@ -36,6 +36,9 @@
     "notVerified": "غير موثق",
     "unconfirmed": "غير مؤكد"
   },
+  "profile": {
+    "secondaryPhone": "ثانوي"
+  },
   "actions": {
     "create": "إنشاء مستخدم",
     "view": "عرض التفاصيل",
@@ -48,7 +51,9 @@
     "addRoleDescription": "اختر البوابة والدور لتعيينهما لهذا المستخدم.",
     "revoke": "إلغاء",
     "revokeRole": "إلغاء الدور",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "edit": "تعديل",
+    "save": "حفظ"
   },
   "messages": {
     "approveSuccess": "تم اعتماد المستخدم بنجاح",
@@ -95,6 +100,7 @@
     "purchases": "المشتريات",
     "currency": "ج.م",
     "students": "الطلاب",
+    "teachers": "المعلمون",
     "lecturers": "المحاضرون",
     "assistants": "المساعدون",
     "parents": "أولياء الأمور",
@@ -102,7 +108,44 @@
     "confirmDeleteTitle": "هل أنت متأكد؟",
     "confirmDeleteDesc": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف حساب المستخدم نهائياً.",
     "userNotFound": "المستخدم غير موجود.",
-    "idLabel": "المعرف"
+    "idLabel": "المعرف",
+    "parentPhone": "ولي الأمر",
+    "faction": "الفئة",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "bio": "السيرة الذاتية",
+    "lecturerId": "معرف المحاضر",
+    "level": "المستوى/المرحلة",
+    "government": "المحافظة",
+    "zone": "المنطقة",
+    "subject": "المادة",
+    "selectSubject": "اختر المادة...",
+    "selectGovernment": "اختر المحافظة...",
+    "selectZone": "اختر المنطقة...",
+    "selectLevel": "اختر المرحلة...",
+    "teachingLevels": "المراحل الدراسية",
+    "personalInfo": "المعلومات الشخصية",
+    "gender": "الجنس",
+    "male": "ذكر",
+    "female": "أنثى",
+    "flag": "العلامة",
+    "joined": "تاريخ الانضمام",
+    "lastLogin": "آخر تسجيل دخول",
+    "selectPortal": "اختر البوابة",
+    "selectRole": "اختر الدور",
+    "assignRole": "تعيين دور",
+    "roles": "الأدوار",
+    "noRoles": "لا توجد أدوار معيّنة",
+    "secondaryPhone": "هاتف ثانوي",
+    "phone": "الهاتف",
+    "assignRolePrompt": "قم بتعيين دور للبدء",
+    "flags": {
+      "ELITE": "نخبة",
+      "PRO": "احترافي",
+      "NORMAL": "عادي",
+      "OBSERVER": "مراقب",
+      "Warned": "منذر"
+    }
   },
   "createDialog": {
     "title": "إنشاء مستخدم جديد",

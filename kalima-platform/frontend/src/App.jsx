@@ -111,30 +111,33 @@ const router = createBrowserRouter(
       {/* Public Routes with MainLayout (Navbar & Footer) */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<LandingPage />} />
-        
-        {/* Market and Product Routes - Restricted for Students and Parents */}
-        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+
+        {/* Market and Product Routes - Restricted by store access */}
+        <Route element={<RoleRoute requireStoreAccess={true} />}>
           <Route path="/market" element={<MarketPage />} />
           <Route path="/product/:id" element={<ProductDetailsPage />} />
           <Route path="/booklet/:id" element={<BookletDetailsPage />} />
         </Route>
-        {/* Samples Routes - Restricted for Students and Parents */}
-        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+        {/* Samples Routes - Restricted by store access */}
+        <Route element={<RoleRoute requireStoreAccess={true} />}>
           <Route path="/samples" element={<SamplesDirectoryPage />} />
           <Route path="/samples/:id" element={<SamplePage />} />
           <Route path="/samples/:id/preview" element={<SamplePreview />} />
         </Route>
 
-        {/* Protected Store Routes (Auth Required) - Also Restricted for Students, Parents, and Admins */}
-        <Route element={<RoleRoute excludedRole={["Student", "Parent", "Admin", "SubAdmin"]} />}>
+        {/* Protected Store Routes (Auth Required) - Restricted by store access */}
+        <Route element={<RoleRoute requireStoreAccess={true} />}>
           <Route element={<ProtectedRoute requireAuth={true} />}>
-            <Route path="/cart" element={<WizardCheckoutPage />} />
-            <Route path="/checkout" element={<WizardCheckoutPage />} />
+            {/* Purchase flow blocked for Admins */}
+            <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin"]} />}>
+              <Route path="/cart" element={<WizardCheckoutPage />} />
+              <Route path="/checkout" element={<WizardCheckoutPage />} />
+              <Route
+                path="/fast-buy/checkout"
+                element={<FastBuyCheckoutPage />}
+              />
+            </Route>
             <Route path="/orders" element={<MyOrdersPage />} />
-            <Route
-              path="/fast-buy/checkout"
-              element={<FastBuyCheckoutPage />}
-            />
           </Route>
         </Route>
 
