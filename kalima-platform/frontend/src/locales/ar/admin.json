@@ -1026,6 +1026,16 @@
       "invalidType": "نوع الملف غير صالح. يرجى رفع صور JPEG, PNG, أو WebP.",
       "tooLarge": "الملف كبير جداً. الحد الأقصى هو 5 ميجابايت.",
       "uploading": "جاري الرفع..."
+    },
+    "validation": {
+      "nameRequired": "الاسم مطلوب",
+      "nameMaxLength": "يجب أن يكون الاسم أقل من 100 حرف",
+      "nameFormat": "يمكن أن يحتوي الاسم فقط على أحرف وأرقام ومسافات وواصلات",
+      "phoneRequired": "رقم الهاتف مطلوب",
+      "phoneMaxLength": "يجب أن يكون رقم الهاتف أقل من 20 حرفاً",
+      "phoneFormat": "يرجى إدخال رقم هاتف صالح",
+      "imageSize": "يجب أن يكون حجم الصورة أقل من 5 ميجابايت",
+      "imageFormat": "يجب أن تكون الصورة بتنسيق JPEG أو PNG أو WebP"
     }
   },
   "requiredFields": {

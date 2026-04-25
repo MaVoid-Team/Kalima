@@ -27,8 +27,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
-  const { hasAdminAccess, isTeacher, isStudent, isParent } = useRole();
-  const isStudentOrParent = isStudent || isParent;
+  const { hasAdminAccess, isTeacher, isStudent, isParent, hasStoreAccess, isConfirmed } = useRole();
   // Cart is only relevant for regular store users
   const { cart, loading } = useCart();
   const navigate = useNavigate();
@@ -135,7 +134,7 @@ export default function Navbar() {
     { label: t("navbar.market"), href: "/market", icon: ShoppingCart },
     { label: t("navbar.samples"), href: "/samples", icon: FileText }
   ].filter(() => {
-    if (isStudentOrParent) return false;
+    if (!hasStoreAccess) return false;
     return true;
   });
 
@@ -188,17 +187,17 @@ export default function Navbar() {
             {/* Desktop Navigation & Actions */}
             <div className="hidden md:flex items-center gap-4 lg:gap-8">
               <div className="flex items-center gap-2 lg:gap-3">
-                {!isStudentOrParent && (
+                {hasStoreAccess && (
                   <Button
-                    variant="default"
+                    variant="ghost"
                     onClick={() => navigate("/market")}
                     className="h-9 px-4"
                   >
-                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    <ShoppingCart className="mr-2 h-4 w-4"></ShoppingCart>
                     {t("navbar.market")}
                   </Button>
                 )}
-                {!isStudentOrParent && (
+                {hasStoreAccess && (
                   <Button
                     variant='secondary'
                     onClick={() => navigate("/samples")}
@@ -221,13 +220,14 @@ export default function Navbar() {
                 </Button>
 
                 {/* Cart Button Desktop */}
-                {isAuthenticated && !isStudentOrParent && !hasAdminAccess && (
+                {isAuthenticated && hasStoreAccess && !hasAdminAccess && (
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={toggleCartModal}
                     className="relative hover:bg-primary/10 hover:text-primary h-9 w-9"
                     title={t("navbar.cartToggle")}
+                    disabled={!isConfirmed}
                   >
                     <ShoppingBag className="h-5 w-5" />
                     <span className={cn(
@@ -313,13 +313,14 @@ export default function Navbar() {
               </Button>
 
               {/* Cart Button Mobile */}
-              {isAuthenticated && !hasAdminAccess && !isStudentOrParent && (
+              {isAuthenticated && hasStoreAccess && !hasAdminAccess && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={toggleCartModal}
                   className="relative hover:bg-primary/10 hover:text-primary h-9 w-9"
                   title={t("navbar.cartToggle")}
+                  disabled={!isConfirmed}
                 >
                   <ShoppingBag className="h-5 w-5" />
                   <span className={cn(
@@ -387,7 +388,7 @@ export default function Navbar() {
                 />
               </Link>
 
-              {!isStudentOrParent && (
+              {hasStoreAccess && (
                 <Link to="/market" className={cn(
                   "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
                   location.pathname === "/market" ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -406,7 +407,7 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {!isStudentOrParent && (
+              {hasStoreAccess && (
                 <Link to="/samples" className={cn(
                   "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
                   location.pathname === "/samples" ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -483,7 +484,7 @@ export default function Navbar() {
         <CommandList>
           <CommandEmpty>{t("navbar.noResults")}</CommandEmpty>
           <CommandGroup heading={t("navbar.pages")}>
-            {!isStudentOrParent && (
+            {hasStoreAccess && (
               <CommandItem value="/market" onSelect={() => runCommand(() => navigate("/market"))}>
                 {t("navbar.market")}
               </CommandItem>

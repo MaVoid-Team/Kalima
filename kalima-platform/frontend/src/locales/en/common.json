@@ -1,4 +1,6 @@
 {
+    "na": "N/A",
+    "loading": "Loading...",
     "validation": {
         "required": "This field is required",
         "email": "Please enter a valid email address",

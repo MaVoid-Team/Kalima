@@ -36,6 +36,9 @@
     "notVerified": "Not Verified",
     "unconfirmed": "Unconfirmed"
   },
+  "profile": {
+    "secondaryPhone": "Secondary"
+  },
   "actions": {
     "create": "Create User",
     "view": "View Details",
@@ -48,7 +51,9 @@
     "addRoleDescription": "Select a portal and role to assign to this user.",
     "revoke": "Revoke",
     "revokeRole": "Revoke Role",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "save": "Save"
   },
   "messages": {
     "approveSuccess": "User approved successfully",
@@ -94,7 +99,9 @@
     "totalSpent": "Total Spent",
     "purchases": "Purchases",
     "currency": "EGP",
+    "phone": "Phone",
     "students": "Students",
+    "teachers": "Teachers",
     "lecturers": "Lecturers",
     "assistants": "Assistants",
     "parents": "Parents",
@@ -102,7 +109,44 @@
     "confirmDeleteTitle": "Are you sure?",
     "confirmDeleteDesc": "This action cannot be undone. This will permanently delete the user account.",
     "userNotFound": "User not found.",
-    "idLabel": "ID"
+    "idLabel": "ID",
+    "parentPhone": "Parent",
+    "faction": "Faction",
+    "name": "Name",
+    "email": "Email",
+    "bio": "Bio",
+    "lecturerId": "Lecturer ID",
+    "level": "Level",
+    "government": "Government",
+    "zone": "Zone",
+    "subject": "Subject",
+    "selectSubject": "Select subject...",
+    "selectGovernment": "Select government...",
+    "selectZone": "Select zone...",
+    "selectLevel": "Select level...",
+    "teachingLevels": "Teaching Levels",
+    "personalInfo": "Personal Information",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "flag": "Flag",
+    "joined": "Joined",
+    "lastLogin": "Last Login",
+    "selectPortal": "Select Portal",
+    "selectRole": "Select Role",
+    "assignRole": "Assign Role",
+    "roles": "Roles",
+    "noRoles": "No roles assigned",
+    "secondaryPhone": "Secondary Phone",
+    "phone": "Phone",
+    "assignRolePrompt": "Assign a role to get started",
+    "flags": {
+      "ELITE": "Elite",
+      "PRO": "Pro",
+      "NORMAL": "Normal",
+      "OBSERVER": "Observer",
+      "Warned": "Warned"
+    }
   },
   "createDialog": {
     "title": "Create New User",

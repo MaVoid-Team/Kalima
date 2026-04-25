@@ -1,4 +1,9 @@
 {
+  "User already has role Student on portal academy": "المستخدم لديه دور الطالب بالفعل على بوابة الأكاديمية",
+  "User already has role Lecturer on portal academy": "المستخدم لديه دور المحاضر بالفعل على بوابة الأكاديمية",
+  "User already has role Admin on portal store": "المستخدم لديه دور المدير بالفعل على بوابة المتجر",
+  "User already has role Seller on portal store": "المستخدم لديه دور البائع بالفعل على بوابة المتجر",
+  "Please enter the number you used to pay, not the payment method's phone number": "يرجى إدخال الرقم الذي استخدمته للدفع، وليس رقم هاتف طريقة الدفع",
   "No account found with this provider. Please register first.": "لا يوجد حساب بهذا البريد الإلكتروني. يرجى التسجيل أولاً.",
   "1 category(ies) attached, 0 skipped (already attached)": "تم إرفاق فئة واحدة، تم تخطي 0 (مرفقة بالفعل)",
   "1 field(s) attached, 0 skipped": "تم إرفاق حقل واحد، تم تخطي 0",
