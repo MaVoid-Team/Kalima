@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import "dotenv/config";
 import { closeRedis } from "./libs/redis/client";
+import { baileysClient } from "./libs/whatsapp/client";
 import path from "path";
 import express from "express";
 import { createServer } from "http";
@@ -68,6 +69,7 @@ async function start() {
 
 function gracefulShutdown() {
   console.log("\n🛑 Shutting down gracefully...");
+  baileysClient.destroy();
   httpServer.close(() => {
     closeRedis().finally(() => process.exit(0));
   });
