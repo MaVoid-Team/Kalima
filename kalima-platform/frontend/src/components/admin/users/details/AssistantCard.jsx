@@ -12,16 +12,17 @@ import {
 import InfoRow from './InfoRow';
 import { useTranslation } from 'react-i18next';
 
-export default function AssistantCard({ 
-    assistants = [], 
-    isEditing, 
-    formData, 
-    setFormData, 
-    t, 
-    levels = [], 
-    governments = [], 
+export default function AssistantCard({
+    assistants = [],
+    isEditing,
+    formData,
+    setFormData,
+    t,
+    levels = [],
+    governments = [],
     zones = [],
-    zonesLoading = false
+    zonesLoading = false,
+    getZonesByGovernment
 }) {
     const { i18n } = useTranslation();
     const na = t('common:na', 'N/A');
@@ -41,10 +42,10 @@ export default function AssistantCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.level', 'Level')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.assistant?.level_id || '')}
+                                value={String(formData.assistants?.level_id || '')}
                                 onValueChange={(val) => setFormData({
                                     ...formData,
-                                    assistant: { ...formData.assistant, level_id: parseInt(val) }
+                                    assistants: { ...formData.assistants, level_id: parseInt(val) }
                                 })}
                             >
                                 <SelectTrigger className="h-8 text-sm">
@@ -59,11 +60,14 @@ export default function AssistantCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.government', 'Government')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.assistant?.government_id || '')}
-                                onValueChange={(val) => setFormData({
-                                    ...formData,
-                                    assistant: { ...formData.assistant, government_id: parseInt(val), zone_id: null }
-                                })}
+                                value={String(formData.assistants?.government_id || '')}
+                                onValueChange={(val) => {
+                                    setFormData({
+                                        ...formData,
+                                        assistants: { ...formData.assistants, government_id: parseInt(val), zone_id: null }
+                                    });
+                                    getZonesByGovernment(val);
+                                }}
                             >
                                 <SelectTrigger className="h-8 text-sm">
                                     <SelectValue placeholder={t('details.selectGovernment', 'Select Government')} />
@@ -77,18 +81,18 @@ export default function AssistantCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.zone', 'Zone')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.assistant?.zone_id || '')}
+                                value={formData.assistants?.zone_id !== null && formData.assistants?.zone_id !== undefined ? String(formData.assistants.zone_id) : ""}
                                 onValueChange={(val) => setFormData({
                                     ...formData,
-                                    assistant: { ...formData.assistant, zone_id: parseInt(val) }
+                                    assistants: { ...formData.assistants, zone_id: val ? parseInt(val) : null }
                                 })}
-                                disabled={zonesLoading || !formData.assistant?.government_id}
+                                disabled={zonesLoading || !formData.assistants?.government_id}
                             >
                                 <SelectTrigger className="h-8 text-sm">
                                     <SelectValue placeholder={zonesLoading ? t('common:loading', 'Loading...') : t('details.selectZone', 'Select Zone')} />
                                 </SelectTrigger>
                                 <SelectContent position="popper">
-                                    {!zonesLoading && zones.map(z => <SelectItem key={z.id} value={String(z.id)}>{z.title}</SelectItem>)}
+                                    {zones.map(z => <SelectItem key={z.id} value={String(z.id)}>{z.title}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -96,10 +100,10 @@ export default function AssistantCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.lecturerId', 'Lecturer ID')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.assistant?.lecturer_id || '')}
+                                value={String(formData.assistants?.lecturer_id || '')}
                                 onValueChange={(val) => setFormData({
                                     ...formData,
-                                    assistant: { ...formData.assistant, lecturer_id: parseInt(val) }
+                                    assistants: { ...formData.assistants, lecturer_id: parseInt(val) }
                                 })}
                             >
                                 <SelectTrigger className="h-8 text-sm">

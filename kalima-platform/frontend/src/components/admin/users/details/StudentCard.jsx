@@ -25,7 +25,8 @@ export default function StudentCard({
     levels = [],
     governments = [],
     zones = [],
-    zonesLoading = false
+    zonesLoading = false,
+    getZonesByGovernment
 }) {
     const { i18n } = useTranslation();
     const na = t('common:na', 'N/A');
@@ -45,10 +46,10 @@ export default function StudentCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.level', 'Level')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.student?.level_id || '')}
+                                value={String(formData.students?.level_id || '')}
                                 onValueChange={(val) => setFormData({
                                     ...formData,
-                                    student: { ...formData.student, level_id: parseInt(val) }
+                                    students: { ...formData.students, level_id: parseInt(val) }
                                 })}
                             >
                                 <SelectTrigger className="h-8 text-sm">
@@ -63,11 +64,14 @@ export default function StudentCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.government', 'Government')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.student?.government_id || '')}
-                                onValueChange={(val) => setFormData({
-                                    ...formData,
-                                    student: { ...formData.student, government_id: parseInt(val), zone_id: null }
-                                })}
+                                value={String(formData.students?.government_id || '')}
+                                onValueChange={(val) => {
+                                    setFormData({
+                                        ...formData,
+                                        students: { ...formData.students, government_id: parseInt(val), zone_id: null }
+                                    });
+                                    getZonesByGovernment(val);
+                                }}
                             >
                                 <SelectTrigger className="h-8 text-sm">
                                     <SelectValue placeholder={t('details.selectGovernment', 'Select Government')} />
@@ -81,28 +85,28 @@ export default function StudentCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.zone', 'Zone')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.student?.zone_id || '')}
+                                value={formData.students?.zone_id !== null && formData.students?.zone_id !== undefined ? String(formData.students.zone_id) : ""}
                                 onValueChange={(val) => setFormData({
                                     ...formData,
-                                    student: { ...formData.student, zone_id: parseInt(val) }
+                                    students: { ...formData.students, zone_id: val ? parseInt(val) : null }
                                 })}
-                                disabled={zonesLoading || !formData.student?.government_id}
+                                disabled={zonesLoading || !formData.students?.government_id}
                             >
                                 <SelectTrigger className="h-8 text-sm">
                                     <SelectValue placeholder={zonesLoading ? t('common:loading', 'Loading...') : t('details.selectZone', 'Select Zone')} />
                                 </SelectTrigger>
                                 <SelectContent position="popper">
-                                    {!zonesLoading && zones.map(z => <SelectItem key={z.id} value={String(z.id)}>{z.title}</SelectItem>)}
+                                    {zones.map(z => <SelectItem key={z.id} value={String(z.id)}>{z.title}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="flex flex-col gap-1">
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.faction', 'Faction')}</label>
                             <Input
-                                value={formData.student?.faction || ''}
+                                value={formData.students?.faction || ''}
                                 onChange={(e) => setFormData({
                                     ...formData,
-                                    student: { ...formData.student, faction: e.target.value }
+                                    students: { ...formData.students, faction: e.target.value }
                                 })}
                                 className="h-8 text-sm"
                             />
@@ -110,10 +114,10 @@ export default function StudentCard({
                         <div className="flex flex-col gap-1">
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.parentPhone', 'Parent Phone')}</label>
                             <PhoneInput
-                                value={formData.student?.parent_phone_number || ''}
+                                value={formData.students?.parent_phone_number || ''}
                                 onChange={(e) => setFormData({
                                     ...formData,
-                                    student: { ...formData.student, parent_phone_number: e.target.value }
+                                    students: { ...formData.students, parent_phone_number: e.target.value }
                                 })}
                                 className="h-8 shadow-none"
                             />
