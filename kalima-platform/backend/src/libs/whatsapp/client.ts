@@ -4,6 +4,8 @@ import makeWASocket, {
   makeCacheableSignalKeyStore,
   WASocket,
   proto,
+  fetchLatestBaileysVersion,
+  Browsers,
 } from "baileys";
 import { Boom } from "@hapi/boom";
 import P from "pino";
@@ -11,6 +13,13 @@ import path from "path";
 
 const AUTH_DIR = path.join(process.cwd(), "baileys_auth");
 const logger = P({ level: "silent" }); // suppress Baileys internal logs
+
+// Suppress libsignal "Closing session" noise which bypasses Pino logger
+const originalConsoleLog = console.log;
+console.log = function (...args: any[]) {
+  if (typeof args[0] === "string" && args[0].startsWith("Closing session:")) return;
+  originalConsoleLog.apply(console, args);
+};
 
 type BaileysCallbacks = {
   onQr: (qr: string) => void;
@@ -40,14 +49,18 @@ class BaileysClient {
 
   private async connect(): Promise<void> {
     const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
+    const { version } = await fetchLatestBaileysVersion();
 
     this.sock = makeWASocket({
+      version,
       auth: {
         creds: state.creds,
         keys: makeCacheableSignalKeyStore(state.keys, logger),
       },
       logger,
       markOnlineOnConnect: false,
+      browser: Browsers.macOS('Desktop'),
+      syncFullHistory: false,
       getMessage: async () => proto.Message.create({}),
     });
 
