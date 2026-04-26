@@ -1,82 +1,54 @@
+# Build stage
+FROM node:23-alpine as build
 
-# ---- Build Stage ----
-FROM node:current-alpine3.23 AS builder
-
+# Set working directory
 WORKDIR /app
+
+# Copy package files first
+COPY package*.json ./
 
 # Install dependencies
-COPY package*.json ./
 RUN npm install --force
 
-# Copy TypeScript config and source
-COPY tsconfig.json ./
-COPY prisma.config.ts ./
-COPY src/ ./src/
+# Copy all frontend files
+COPY . . 
 
-# Generate Prisma client
-RUN npx prisma generate
+# Build-time Vite variables (must be present during npm run build)
+ARG VITE_API_URL=/api/v2
+ARG VITE_FIREBASE_API_KEY
+ARG VITE_FIREBASE_PROJECT_ID
+ARG VITE_FIREBASE_AUTH_DOMAIN
+ARG VITE_FIREBASE_STORAGE_BUCKET
+ARG VITE_FIREBASE_APP_ID
+ARG VITE_FIREBASE_MESSAGING_SENDER_ID
 
-# Compile TypeScript
-RUN npm run build
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY
+ENV VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID
+ENV VITE_FIREBASE_AUTH_DOMAIN=$VITE_FIREBASE_AUTH_DOMAIN
+ENV VITE_FIREBASE_STORAGE_BUCKET=$VITE_FIREBASE_STORAGE_BUCKET
+ENV VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID
+ENV VITE_FIREBASE_MESSAGING_SENDER_ID=$VITE_FIREBASE_MESSAGING_SENDER_ID
 
-# ---- Production Stage ----
-FROM node:current-alpine3.23 AS production
+# Build the app
+RUN npm run build 
+ 
+# Production stage
+FROM nginx:alpine
 
-WORKDIR /app
+# Remove default nginx static assets
+RUN rm -rf /usr/share/nginx/html/*
 
-# Copy node_modules from builder to keep Prisma CLI available for migrations
-COPY --from=builder /app/node_modules ./node_modules
+# Copy static assets from builder stage
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy compiled output
-COPY --from=builder /app/dist ./dist
+# Verify the files are copied
+RUN ls -la /usr/share/nginx/html
 
-# Copy Prisma config and migrations for runtime migrate deploy
-COPY prisma.config.ts ./
-COPY src/apps/store-api/prisma/schema.prisma ./src/apps/store-api/prisma/schema.prisma
-COPY src/apps/store-api/prisma/migrations ./src/apps/store-api/prisma/migrations
+# Ensure proper permissions
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
 
-EXPOSE 5000
-
-# Run pending migrations, then start the server
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/server.js"][root@Kalima backend]# cat Dockerfile 
-
-# ---- Build Stage ----
-FROM node:current-alpine3.23 AS builder
-
-WORKDIR /app
-
-# Install dependencies
-COPY package*.json ./
-RUN npm install --force
-
-# Copy TypeScript config and source
-COPY tsconfig.json ./
-COPY prisma.config.ts ./
-COPY src/ ./src/
-
-# Generate Prisma client
-RUN npx prisma generate
-
-# Compile TypeScript
-RUN npm run build
-
-# ---- Production Stage ----
-FROM node:current-alpine3.23 AS production
-
-WORKDIR /app
-
-# Copy node_modules from builder to keep Prisma CLI available for migrations
-COPY --from=builder /app/node_modules ./node_modules
-
-# Copy compiled output
-COPY --from=builder /app/dist ./dist
-
-# Copy Prisma config and migrations for runtime migrate deploy
-COPY prisma.config.ts ./
-COPY src/apps/store-api/prisma/schema.prisma ./src/apps/store-api/prisma/schema.prisma
-COPY src/apps/store-api/prisma/migrations ./src/apps/store-api/prisma/migrations
-
-EXPOSE 5000
-
-# Run pending migrations, then start the server
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/server.js"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
