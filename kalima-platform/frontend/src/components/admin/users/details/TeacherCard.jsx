@@ -25,7 +25,8 @@ export default function TeacherCard({
     governments = [],
     zones = [],
     zonesLoading = false,
-    subjects = []
+    subjects = [],
+    getZonesByGovernment
 }) {
     const { i18n } = useTranslation();
     const na = t('common:na', 'N/A');
@@ -44,10 +45,10 @@ export default function TeacherCard({
                         <div className="flex flex-col gap-1">
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.serial', 'Serial')}</label>
                             <Input
-                                value={formData.teacher?.serial || ''}
+                                value={formData.teachers?.serial || ''}
                                 onChange={(e) => setFormData({
                                     ...formData,
-                                    teacher: { ...formData.teacher, serial: e.target.value }
+                                    teachers: { ...formData.teachers, serial: e.target.value }
                                 })}
                                 className="h-8 text-sm"
                             />
@@ -56,10 +57,10 @@ export default function TeacherCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.subject', 'Subject')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.teacher?.subject_id || '')}
+                                value={String(formData.teachers?.subject_id || '')}
                                 onValueChange={(val) => setFormData({
                                     ...formData,
-                                    teacher: { ...formData.teacher, subject_id: parseInt(val) }
+                                    teachers: { ...formData.teachers, subject_id: parseInt(val) }
                                 })}
                             >
                                 <SelectTrigger className="h-8 text-sm">
@@ -74,11 +75,14 @@ export default function TeacherCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.government', 'Government')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.teacher?.government_id || '')}
-                                onValueChange={(val) => setFormData({
-                                    ...formData,
-                                    teacher: { ...formData.teacher, government_id: parseInt(val), zone_id: null }
-                                })}
+                                value={String(formData.teachers?.government_id || '')}
+                                onValueChange={(val) => {
+                                    setFormData({
+                                        ...formData,
+                                        teachers: { ...formData.teachers, government_id: parseInt(val), zone_id: null }
+                                    });
+                                    getZonesByGovernment(val);
+                                }}
                             >
                                 <SelectTrigger className="h-8 text-sm">
                                     <SelectValue placeholder={t('details.selectGovernment', 'Select Government')} />
@@ -92,18 +96,18 @@ export default function TeacherCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.zone', 'Zone')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.teacher?.zone_id || '')}
+                                value={formData.teachers?.zone_id !== null && formData.teachers?.zone_id !== undefined ? String(formData.teachers.zone_id) : ""}
                                 onValueChange={(val) => setFormData({
                                     ...formData,
-                                    teacher: { ...formData.teacher, zone_id: parseInt(val) }
+                                    teachers: { ...formData.teachers, zone_id: val ? parseInt(val) : null }
                                 })}
-                                disabled={zonesLoading || !formData.teacher?.government_id}
+                                disabled={zonesLoading || !formData.teachers?.government_id}
                             >
                                 <SelectTrigger className="h-8 text-sm">
                                     <SelectValue placeholder={zonesLoading ? t('common:loading', 'Loading...') : t('details.selectZone', 'Select Zone')} />
                                 </SelectTrigger>
                                 <SelectContent position="popper">
-                                    {!zonesLoading && zones.map(z => <SelectItem key={z.id} value={String(z.id)}>{z.title}</SelectItem>)}
+                                    {zones.map(z => <SelectItem key={z.id} value={String(z.id)}>{z.title}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -113,10 +117,10 @@ export default function TeacherCard({
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="is_primary"
-                                        checked={!!formData.teacher?.is_primary}
+                                        checked={!!formData.teachers?.is_primary}
                                         onCheckedChange={(checked) => setFormData({
                                             ...formData,
-                                            teacher: { ...formData.teacher, is_primary: !!checked }
+                                            teachers: { ...formData.teachers, is_primary: !!checked }
                                         })}
                                         className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                     />
@@ -125,10 +129,10 @@ export default function TeacherCard({
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="is_preparatory"
-                                        checked={!!formData.teacher?.is_preparatory}
+                                        checked={!!formData.teachers?.is_preparatory}
                                         onCheckedChange={(checked) => setFormData({
                                             ...formData,
-                                            teacher: { ...formData.teacher, is_preparatory: !!checked }
+                                            teachers: { ...formData.teachers, is_preparatory: !!checked }
                                         })}
                                         className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                     />
@@ -137,10 +141,10 @@ export default function TeacherCard({
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="is_secondary"
-                                        checked={!!formData.teacher?.is_secondary}
+                                        checked={!!formData.teachers?.is_secondary}
                                         onCheckedChange={(checked) => setFormData({
                                             ...formData,
-                                            teacher: { ...formData.teacher, is_secondary: !!checked }
+                                            teachers: { ...formData.teachers, is_secondary: !!checked }
                                         })}
                                         className={i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}
                                     />

@@ -51,11 +51,11 @@ export default function UserDetailPage() {
         secondary_phone: '',
         gender: '',
         flag: '',
-        teacher: {},
-        student: {},
-        lecturer: {},
-        assistant: {},
-        parent: {},
+        teachers: {},
+        students: {},
+        lecturers: {},
+        assistants: {},
+        parents: {},
     });
 
     useEffect(() => {
@@ -75,31 +75,25 @@ export default function UserDetailPage() {
                 gender: selectedUser.gender?.toUpperCase() || '',
                 flag: selectedUser.flag || 'NORMAL',
                 // Roles data
-                teacher: (Array.isArray(selectedUser.teachers) ? selectedUser.teachers[0] : selectedUser.teachers) || { is_primary: false, is_preparatory: false, is_secondary: false },
-                student: (Array.isArray(selectedUser.students) ? selectedUser.students[0] : selectedUser.students) || {},
-                lecturer: (Array.isArray(selectedUser.lecturers) ? selectedUser.lecturers[0] : selectedUser.lecturers) || {},
-                assistant: (Array.isArray(selectedUser.assistants) ? selectedUser.assistants[0] : selectedUser.assistants) || {},
-                parent: (Array.isArray(selectedUser.parents) ? selectedUser.parents[0] : selectedUser.parents) || {},
+                teachers: (Array.isArray(selectedUser.teachers) ? selectedUser.teachers[0] : selectedUser.teachers) || { is_primary: false, is_preparatory: false, is_secondary: false },
+                students: (Array.isArray(selectedUser.students) ? selectedUser.students[0] : selectedUser.students) || {},
+                lecturers: (Array.isArray(selectedUser.lecturers) ? selectedUser.lecturers[0] : selectedUser.lecturers) || {},
+                assistants: (Array.isArray(selectedUser.assistants) ? selectedUser.assistants[0] : selectedUser.assistants) || {},
+                parents: (Array.isArray(selectedUser.parents) ? selectedUser.parents[0] : selectedUser.parents) || {},
             });
         }
     }, [selectedUser]);
 
+    // Fetch initial zones when entering edit mode or when user data is loaded
     useEffect(() => {
-        const rolesWithGov = ['teacher', 'student', 'lecturer', 'assistant', 'parent'];
-        rolesWithGov.forEach(roleKey => {
-            const govId = formData[roleKey]?.government_id;
-            if (govId) {
-                getZonesByGovernment(govId);
+        if (isEditing || selectedUser) {
+            const rolesWithGov = ['teachers', 'students', 'lecturers', 'assistants', 'parents'];
+            const roleWithGov = rolesWithGov.find(role => formData[role]?.government_id);
+            if (roleWithGov && formData[roleWithGov].government_id) {
+                getZonesByGovernment(formData[roleWithGov].government_id);
             }
-        });
-    }, [
-        formData.teacher?.government_id,
-        formData.student?.government_id,
-        formData.lecturer?.government_id,
-        formData.assistant?.government_id,
-        formData.parent?.government_id,
-        getZonesByGovernment
-    ]);
+        }
+    }, [isEditing, selectedUser?.id, getZonesByGovernment]);
 
     /* ── handlers ── */
     const handleSave = async () => {
@@ -163,7 +157,7 @@ export default function UserDetailPage() {
 
     /* ── derived values ── */
     const analytics = selectedUser.user_analytics || {};
-    const teacher = selectedUser.teachers ? (Array.isArray(selectedUser.teachers) ? selectedUser.teachers[0] : selectedUser.teachers) : null;
+    const teachers = selectedUser.teachers ? (Array.isArray(selectedUser.teachers) ? selectedUser.teachers : [selectedUser.teachers]) : [];
     const teachesAt = selectedUser.teaches_at || [];
     const students = selectedUser.students ? (Array.isArray(selectedUser.students) ? selectedUser.students : [selectedUser.students]) : [];
     const lecturers = selectedUser.lecturers ? (Array.isArray(selectedUser.lecturers) ? selectedUser.lecturers : [selectedUser.lecturers]) : [];
@@ -263,7 +257,7 @@ export default function UserDetailPage() {
                     {/* Teacher Details */}
                     {isTeacher && (
                         <TeacherCard
-                            teacher={teacher}
+                            teachers={teachers}
                             isEditing={isEditing}
                             formData={formData}
                             setFormData={setFormData}
@@ -272,6 +266,7 @@ export default function UserDetailPage() {
                             governments={governments}
                             zones={zones}
                             zonesLoading={zonesLoading}
+                            getZonesByGovernment={getZonesByGovernment}
                             teachesAt={teachesAt}
                         />
                     )}
@@ -288,6 +283,7 @@ export default function UserDetailPage() {
                             governments={governments}
                             zones={zones}
                             zonesLoading={zonesLoading}
+                            getZonesByGovernment={getZonesByGovernment}
                         />
                     )}
 
@@ -303,6 +299,7 @@ export default function UserDetailPage() {
                             governments={governments}
                             zones={zones}
                             zonesLoading={zonesLoading}
+                            getZonesByGovernment={getZonesByGovernment}
                         />
                     )}
 
@@ -318,6 +315,7 @@ export default function UserDetailPage() {
                             governments={governments}
                             zones={zones}
                             zonesLoading={zonesLoading}
+                            getZonesByGovernment={getZonesByGovernment}
                         />
                     )}
 
@@ -333,6 +331,7 @@ export default function UserDetailPage() {
                             governments={governments}
                             zones={zones}
                             zonesLoading={zonesLoading}
+                            getZonesByGovernment={getZonesByGovernment}
                         />
                     )}
 

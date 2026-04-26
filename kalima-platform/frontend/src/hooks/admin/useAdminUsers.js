@@ -58,9 +58,13 @@ export const useAdminUsers = () => {
     const updateUser = useCallback(async (userId, data) => {
         setLoading(true);
         try {
-            const response = await axiosInstance.patch(`/admin/users/${userId}/profile`, data);
-            setSelectedUser(response.data?.data || null);
-            return response.data?.data;
+            const response = await mutate({
+                endpoint: `/admin/users/${userId}/profile`,
+                method: 'patch',
+                data,
+            });
+            setSelectedUser(response || null);
+            return response;
         } catch (error) {
             console.error('Failed to update user:', error);
             return null;

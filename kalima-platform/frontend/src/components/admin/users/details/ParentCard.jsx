@@ -21,7 +21,8 @@ export default function ParentCard({
     levels = [],
     governments = [],
     zones = [],
-    zonesLoading = false
+    zonesLoading = false,
+    getZonesByGovernment
 }) {
     const { i18n } = useTranslation();
     const na = t('common:na', 'N/A');
@@ -41,10 +42,10 @@ export default function ParentCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.level', 'Level')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.parent?.level_id || '')}
+                                value={String(formData.parents?.level_id || '')}
                                 onValueChange={(val) => setFormData({
                                     ...formData,
-                                    parent: { ...formData.parent, level_id: parseInt(val) }
+                                    parents: { ...formData.parents, level_id: parseInt(val) }
                                 })}
                             >
                                 <SelectTrigger className="h-8 text-sm">
@@ -59,11 +60,14 @@ export default function ParentCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.government', 'Government')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.parent?.government_id || '')}
-                                onValueChange={(val) => setFormData({
-                                    ...formData,
-                                    parent: { ...formData.parent, government_id: parseInt(val), zone_id: null }
-                                })}
+                                value={String(formData.parents?.government_id || '')}
+                                onValueChange={(val) => {
+                                    setFormData({
+                                        ...formData,
+                                        parents: { ...formData.parents, government_id: parseInt(val), zone_id: null }
+                                    });
+                                    getZonesByGovernment(val);
+                                }}
                             >
                                 <SelectTrigger className="h-8 text-sm">
                                     <SelectValue placeholder={t('details.selectGovernment', 'Select Government')} />
@@ -77,18 +81,18 @@ export default function ParentCard({
                             <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.zone', 'Zone')}</label>
                             <Select
                                 dir={i18n.dir()}
-                                value={String(formData.parent?.zone_id || '')}
+                                value={formData.parents?.zone_id !== null && formData.parents?.zone_id !== undefined ? String(formData.parents.zone_id) : ""}
                                 onValueChange={(val) => setFormData({
                                     ...formData,
-                                    parent: { ...formData.parent, zone_id: parseInt(val) }
+                                    parents: { ...formData.parents, zone_id: val ? parseInt(val) : null }
                                 })}
-                                disabled={zonesLoading || !formData.parent?.government_id}
+                                disabled={zonesLoading || !formData.parents?.government_id}
                             >
                                 <SelectTrigger className="h-8 text-sm">
                                     <SelectValue placeholder={zonesLoading ? t('common:loading', 'Loading...') : t('details.selectZone', 'Select Zone')} />
                                 </SelectTrigger>
                                 <SelectContent position="popper">
-                                    {!zonesLoading && zones.map(z => <SelectItem key={z.id} value={String(z.id)}>{z.title}</SelectItem>)}
+                                    {zones.map(z => <SelectItem key={z.id} value={String(z.id)}>{z.title}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
