@@ -424,7 +424,8 @@ export const ModelName = {
   sample_sections: 'sample_sections',
   images: 'images',
   product_gallery: 'product_gallery',
-  product_gallery_videos: 'product_gallery_videos'
+  product_gallery_videos: 'product_gallery_videos',
+  general_settings: 'general_settings'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -440,7 +441,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos" | "general_settings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3478,6 +3479,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    general_settings: {
+      payload: Prisma.$general_settingsPayload<ExtArgs>
+      fields: Prisma.general_settingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.general_settingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.general_settingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        findFirst: {
+          args: Prisma.general_settingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.general_settingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        findMany: {
+          args: Prisma.general_settingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>[]
+        }
+        create: {
+          args: Prisma.general_settingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        createMany: {
+          args: Prisma.general_settingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.general_settingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>[]
+        }
+        delete: {
+          args: Prisma.general_settingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        update: {
+          args: Prisma.general_settingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.general_settingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.general_settingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.general_settingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.general_settingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        aggregate: {
+          args: Prisma.General_settingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGeneral_settings>
+        }
+        groupBy: {
+          args: Prisma.general_settingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.General_settingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.general_settingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.General_settingsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4076,6 +4151,16 @@ export const Product_gallery_videosScalarFieldEnum = {
 export type Product_gallery_videosScalarFieldEnum = (typeof Product_gallery_videosScalarFieldEnum)[keyof typeof Product_gallery_videosScalarFieldEnum]
 
 
+export const General_settingsScalarFieldEnum = {
+  id: 'id',
+  whatsapp_receiving_number: 'whatsapp_receiving_number',
+  whatsapp_sending_number: 'whatsapp_sending_number',
+  updated_at: 'updated_at'
+} as const
+
+export type General_settingsScalarFieldEnum = (typeof General_settingsScalarFieldEnum)[keyof typeof General_settingsScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -4486,6 +4571,7 @@ export type GlobalOmitConfig = {
   images?: Prisma.imagesOmit
   product_gallery?: Prisma.product_galleryOmit
   product_gallery_videos?: Prisma.product_gallery_videosOmit
+  general_settings?: Prisma.general_settingsOmit
 }
 
 /* Types for Logging */

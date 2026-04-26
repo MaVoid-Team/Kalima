@@ -34,7 +34,10 @@ COPY prisma.config.ts ./
 COPY src/apps/store-api/prisma/schema.prisma ./src/apps/store-api/prisma/schema.prisma
 COPY src/apps/store-api/prisma/migrations ./src/apps/store-api/prisma/migrations
 
+# Copy entrypoint script that handles failed migrations automatically
+COPY src/docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
+
 EXPOSE 5000
 
-# Retry migrations while database boots, then start server
-CMD ["sh", "-c", "attempt=0; until npx prisma migrate deploy; do attempt=$((attempt+1)); if [ $attempt -ge 30 ]; then echo 'Prisma migrate failed after 30 attempts'; exit 1; fi; echo 'Waiting for database...'; sleep 2; done; node dist/src/server.js"]
+CMD ["./docker-entrypoint.sh"]
