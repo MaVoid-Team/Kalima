@@ -10,6 +10,7 @@ export const useWhatsappStatus = () => {
     const [qrCodeStr, setQrCodeStr] = useState(null);
     const [sendingNumber, setSendingNumber] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isActionLoading, setIsActionLoading] = useState(false);
 
     const fetchStatus = useCallback(async () => {
         try {
@@ -30,17 +31,20 @@ export const useWhatsappStatus = () => {
         const onQr = ({ qr }) => {
             setQrCodeStr(qr);
             setStatus('qr_pending');
+            setIsActionLoading(false);
         };
 
-        const onAuth = ({ whatsapp_sending_number }) => {
+        const onAuth = (data) => {
             setStatus('ready');
-            setSendingNumber(whatsapp_sending_number);
+            setSendingNumber(data.whatsapp_sending_number);
             setQrCodeStr(null);
+            setIsActionLoading(false);
             toast.success(t('settings.general.whatsappAuthSuccess'));
         };
 
         const onAuthFailed = (data) => {
             setStatus('failed');
+            setIsActionLoading(false);
             toast.error(t('settings.general.whatsappAuthFailedReason', { reason: data?.reason || t('common.unknownError', 'Unknown error') }));
         };
 
@@ -48,6 +52,7 @@ export const useWhatsappStatus = () => {
             setStatus('disconnected');
             setSendingNumber(null);
             setQrCodeStr(null);
+            setIsActionLoading(false);
             // Only show warning if it wasn't a deliberate logout
             if (data?.reason && data.reason !== 'logout') {
                 toast.warning(t('settings.general.whatsappDisconnectedReason', { reason: data.reason }));
@@ -63,6 +68,7 @@ export const useWhatsappStatus = () => {
             console.error('Socket connection error:', err);
             toast.error(t('settings.general.whatsappConnectionError'));
             setStatus('failed');
+            setIsActionLoading(false);
             disconnectSocket();
         };
 
@@ -85,20 +91,23 @@ export const useWhatsappStatus = () => {
     }, [fetchStatus, t]);
 
     const requestQR = () => {
+        setIsActionLoading(true);
         connectSocket();
         console.log('Emitting requestWhatsappQr');
         socket.emit('requestWhatsappQr');
     };
 
     const logout = async () => {
+        setIsActionLoading(true);
         try {
             await axiosInstance.post('/admin/whatsapp/logout');
             setStatus('disconnected');
             setSendingNumber(null);
             setQrCodeStr(null);
+            setIsActionLoading(false);
             toast.success(t('settings.general.whatsappSessionCleared'));
         } catch (error) {
-            // Error is handled by axios interceptor
+            setIsActionLoading(false);
         }
     };
 
@@ -108,6 +117,8 @@ export const useWhatsappStatus = () => {
             toast.success(t('settings.general.whatsappMessageSent'));
         } catch (error) {
             toast.error(t('settings.general.whatsappMessageFailed'));
+        } finally {
+            setIsActionLoading(false);
         }
     };
 
@@ -116,6 +127,7 @@ export const useWhatsappStatus = () => {
         qrCodeStr,
         sendingNumber,
         loading,
+        isActionLoading,
         requestQR,
         logout,
         refreshStatus: fetchStatus,

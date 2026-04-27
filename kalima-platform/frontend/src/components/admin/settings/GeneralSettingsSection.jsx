@@ -34,10 +34,9 @@ export default function GeneralSettingsSection() {
     const { t, i18n } = useTranslation('admin');
     const isRtl = i18n.dir() === 'rtl';
     const [isEditing, setIsEditing] = useState(false);
-    const [isActionLoading, setIsActionLoading] = useState(false);
 
     const { settings, updateSettings, loading: settingsLoading, updateLoading } = useAdminGeneralSettings();
-    const { status, qrCodeStr, sendingNumber, loading: whatsappLoading, requestQR, logout } = useWhatsappStatus();
+    const { status, qrCodeStr, sendingNumber, loading: whatsappLoading, isActionLoading, requestQR, logout } = useWhatsappStatus();
 
     const form = useForm({
         resolver: zodResolver(getGeneralSettingsSchema(t)),
@@ -60,25 +59,6 @@ export default function GeneralSettingsSection() {
         const success = await updateSettings(values);
         if (success) {
             setIsEditing(false);
-        }
-    };
-
-    const handleLogout = async () => {
-        setIsActionLoading(true);
-        try {
-            await logout();
-        } finally {
-            setIsActionLoading(false);
-        }
-    };
-
-    const handleRequestQR = async () => {
-        setIsActionLoading(true);
-        try {
-            await requestQR();
-        } finally {
-            // Give it a tiny bit of time to transition states
-            setTimeout(() => setIsActionLoading(false), 500);
         }
     };
 
@@ -274,7 +254,7 @@ export default function GeneralSettingsSection() {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={handleLogout}
+                                    onClick={logout}
                                     disabled={isActionLoading}
                                     className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
                                 >
@@ -296,7 +276,7 @@ export default function GeneralSettingsSection() {
                                     </p>
                                 </div>
                                  <Button 
-                                    onClick={handleRequestQR} 
+                                    onClick={requestQR} 
                                     className="mt-2"
                                     disabled={isActionLoading}
                                 >
@@ -318,7 +298,7 @@ export default function GeneralSettingsSection() {
                                     </p>
                                 </div>
                                 <Button 
-                                    onClick={handleRequestQR} 
+                                    onClick={requestQR} 
                                     variant="outline" 
                                     className="mt-2"
                                     disabled={isActionLoading}
@@ -368,7 +348,7 @@ export default function GeneralSettingsSection() {
                                 </div>
                                 <Button 
                                     variant="outline" 
-                                    onClick={handleRequestQR} 
+                                    onClick={requestQR} 
                                     className="mt-2"
                                     disabled={isActionLoading}
                                 >

@@ -55,7 +55,7 @@ export default function OrderDetailPage() {
     const [isWhatsAppConnectionOpen, setIsWhatsAppConnectionOpen] = useState(false);
     const [editableWhatsAppMessage, setEditableWhatsAppMessage] = useState('');
 
-    const { status: whatsappStatus, qrCodeStr, sendingNumber, requestQR, logout, sendMessage } = useWhatsappStatus();
+    const { status: whatsappStatus, qrCodeStr, sendingNumber, isActionLoading, requestQR, logout, sendMessage } = useWhatsappStatus();
 
     if (loading) {
         return <div className="p-8 text-center text-muted-foreground">{t('orders.details.loading', 'Loading details...')}</div>;
@@ -198,8 +198,8 @@ export default function OrderDetailPage() {
                                     <MessageSquare className="h-8 w-8 text-primary" />
                                 </div>
                                 <p className="font-medium text-center">{t('settings.general.whatsappStatusDisconnected')}</p>
-                                <Button onClick={requestQR} className="w-full">
-                                    <RefreshCw className="h-4 w-4 me-2" />
+                                <Button onClick={requestQR} className="w-full" disabled={isActionLoading}>
+                                    {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
                                     {t('settings.general.whatsappConnect')}
                                 </Button>
                             </div>
@@ -216,8 +216,8 @@ export default function OrderDetailPage() {
                                         {t('settings.general.whatsappPreparing')}
                                     </p>
                                 </div>
-                                <Button onClick={requestQR} variant="outline" size="sm">
-                                    <RefreshCw className="h-4 w-4 me-2" />
+                                <Button onClick={requestQR} variant="outline" size="sm" disabled={isActionLoading}>
+                                    {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
                                     {t('settings.general.whatsappRefreshQr')}
                                 </Button>
                             </div>
@@ -237,8 +237,8 @@ export default function OrderDetailPage() {
                                         <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-ping" />
                                         <span>{t('settings.general.whatsappQrRefreshNotice')}</span>
                                     </div>
-                                    <Button variant="outline" size="sm" onClick={requestQR}>
-                                        <RefreshCw className="h-4 w-4 me-2" />
+                                    <Button variant="outline" size="sm" onClick={requestQR} disabled={isActionLoading}>
+                                        {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
                                         {t('settings.general.whatsappRefreshQr')}
                                     </Button>
                                 </div>
@@ -256,8 +256,8 @@ export default function OrderDetailPage() {
                                         {t('settings.general.whatsappConnectionError')}
                                     </p>
                                 </div>
-                                <Button variant="outline" size="sm" onClick={requestQR}>
-                                    <RefreshCw className="h-4 w-4 me-2" />
+                                <Button variant="outline" size="sm" onClick={requestQR} disabled={isActionLoading}>
+                                    {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
                                     {t('settings.general.whatsappTryAgain')}
                                 </Button>
                             </div>
