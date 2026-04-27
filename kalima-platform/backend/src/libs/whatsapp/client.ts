@@ -10,6 +10,7 @@ import makeWASocket, {
 import { Boom } from "@hapi/boom";
 import P from "pino";
 import path from "path";
+import fs from "fs/promises";
 
 const AUTH_DIR = path.join(process.cwd(), "baileys_auth");
 const logger = P({ level: "silent" }); // suppress Baileys internal logs
@@ -45,6 +46,14 @@ class BaileysClient {
 
     this.callbacks = callbacks;
     await this.connect();
+  }
+
+  private async clearAuthState(): Promise<void> {
+    try {
+      await fs.rm(AUTH_DIR, { recursive: true, force: true });
+    } catch {
+      // Best-effort cleanup; failures should not block logout.
+    }
   }
 
   private async connect(): Promise<void> {
@@ -92,6 +101,7 @@ class BaileysClient {
           this._status = "disconnected";
           this._phoneNumber = null;
           this.sock = null;
+          this.clearAuthState();
           this.callbacks?.onDisconnected("Logged out");
         } else if (statusCode === reason.restartRequired) {
           // Normal reconnect after QR scan — re-create socket
@@ -126,6 +136,7 @@ class BaileysClient {
       this.sock = null;
       this._status = "disconnected";
       this._phoneNumber = null;
+      await this.clearAuthState();
     }
   }
 
