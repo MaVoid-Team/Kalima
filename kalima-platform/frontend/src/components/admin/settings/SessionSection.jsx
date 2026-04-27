@@ -79,7 +79,10 @@ export default function SessionSection({ ns = 'admin' }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle 
+                    className="flex items-center gap-2"
+                    data-search-content={`${t('settings.session.title', { lng: 'en' })} ${t('settings.session.title', { lng: 'ar' })}`}
+                >
                     <LogOut className="h-5 w-5" />
                     {t('settings.session.title')}
                 </CardTitle>
@@ -87,7 +90,12 @@ export default function SessionSection({ ns = 'admin' }) {
             <CardContent className="space-y-6">
                 {/* Active Sessions */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-medium">{t('settings.session.activeSessions')}</h3>
+                    <h3 
+                        className="text-sm font-medium"
+                        data-search-content={`${t('settings.session.activeSessions', { lng: 'en' })} ${t('settings.session.activeSessions', { lng: 'ar' })}`}
+                    >
+                        {t('settings.session.activeSessions')}
+                    </h3>
                     
                     <div className="space-y-3">
                         {activeSessions.map((session) => {
@@ -133,12 +141,25 @@ export default function SessionSection({ ns = 'admin' }) {
 
                 {/* Session Actions */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-medium">{t('settings.session.sessionActions')}</h3>
+                    <h3 
+                        className="text-sm font-medium"
+                        data-search-content={`${t('settings.session.sessionActions', { lng: 'en' })} ${t('settings.session.sessionActions', { lng: 'ar' })}`}
+                    >
+                        {t('settings.session.sessionActions')}
+                    </h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <h4 className="text-sm font-medium">{t('settings.session.logoutCurrent')}</h4>
-                            <p className="text-sm text-muted-foreground">
+                            <h4 
+                                className="text-sm font-medium"
+                                data-search-content={`${t('settings.session.logoutCurrent', { lng: 'en' })} ${t('settings.session.logoutCurrent', { lng: 'ar' })}`}
+                            >
+                                {t('settings.session.logoutCurrent')}
+                            </h4>
+                            <p 
+                                className="text-sm text-muted-foreground"
+                                data-search-content={`${t('settings.session.logoutCurrentDescription', { lng: 'en' })} ${t('settings.session.logoutCurrentDescription', { lng: 'ar' })}`}
+                            >
                                 {t('settings.session.logoutCurrentDescription', 'Logout from this device')}
                             </p>
                             <Button 
@@ -153,8 +174,16 @@ export default function SessionSection({ ns = 'admin' }) {
                         </div>
                         
                         <div className="space-y-2">
-                            <h4 className="text-sm font-medium">{t('settings.session.logoutAll')}</h4>
-                            <p className="text-sm text-muted-foreground">
+                            <h4 
+                                className="text-sm font-medium"
+                                data-search-content={`${t('settings.session.logoutAll', { lng: 'en' })} ${t('settings.session.logoutAll', { lng: 'ar' })}`}
+                            >
+                                {t('settings.session.logoutAll')}
+                            </h4>
+                            <p 
+                                className="text-sm text-muted-foreground"
+                                data-search-content={`${t('settings.session.logoutAllDescription', { lng: 'en' })} ${t('settings.session.logoutAllDescription', { lng: 'ar' })}`}
+                            >
                                 {t('settings.session.logoutAllDescription', 'Logout from all devices')}
                             </p>
                             <Button 
@@ -170,7 +199,10 @@ export default function SessionSection({ ns = 'admin' }) {
                     </div>
                     
                     <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                        <p className="text-sm text-amber-800">
+                        <p 
+                            className="text-sm text-amber-800"
+                            data-search-content={`${t('settings.session.logoutWarning', { lng: 'en' })} ${t('settings.session.logoutWarning', { lng: 'ar' })}`}
+                        >
                             {t('settings.session.logoutWarning', 'Logging out from all devices will require you to sign in again on each device.')}
                         </p>
                     </div>

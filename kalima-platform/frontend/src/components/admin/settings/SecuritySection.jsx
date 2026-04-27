@@ -78,7 +78,10 @@ export default function SecuritySection({ ns = 'admin' }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle 
+                    className="flex items-center gap-2"
+                    data-search-content={`${t('settings.email.title', { lng: 'en' })} ${t('settings.email.title', { lng: 'ar' })}`}
+                >
                     <Mail className="h-5 w-5" />
                     {t('settings.email.title')}
                 </CardTitle>
@@ -86,7 +89,12 @@ export default function SecuritySection({ ns = 'admin' }) {
             <CardContent className="space-y-6">
                 {/* Email Verification Status */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-medium">{t('settings.email.verificationStatus')}</h3>
+                    <h3 
+                        className="text-sm font-medium"
+                        data-search-content={`${t('settings.email.verificationStatus', { lng: 'en' })} ${t('settings.email.verificationStatus', { lng: 'ar' })}`}
+                    >
+                        {t('settings.email.verificationStatus')}
+                    </h3>
                     
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-2xl bg-muted/20 gap-4">
                         <div className="flex items-center gap-4 min-w-0">
@@ -122,7 +130,10 @@ export default function SecuritySection({ ns = 'admin' }) {
 
                     {!isEmailVerified && (
                         <div className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
+                            <p 
+                                className="text-sm text-muted-foreground"
+                                data-search-content={`${t('settings.email.verificationDescription', { lng: 'en' })} ${t('settings.email.verificationDescription', { lng: 'ar' })}`}
+                            >
                                 {t('settings.email.verificationDescription', 'Verify your email to secure your account and receive important notifications.')}
                             </p>
                             
@@ -162,11 +173,19 @@ export default function SecuritySection({ ns = 'admin' }) {
 
                 {/* Security Information */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-medium">{t('settings.email.securityInfo')}</h3>
+                    <h3 
+                        className="text-sm font-medium"
+                        data-search-content={`${t('settings.email.securityInfo', { lng: 'en' })} ${t('settings.email.securityInfo', { lng: 'ar' })}`}
+                    >
+                        {t('settings.email.securityInfo')}
+                    </h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="p-3 border rounded-lg">
-                            <h4 className="font-medium mb-2">
+                             <h4 
+                                className="font-medium mb-2"
+                                data-search-content={`${t('settings.email.benefits.title', { lng: 'en' })} ${t('settings.email.benefits.title', { lng: 'ar' })}`}
+                            >
                                 {t('settings.email.benefits.title', 'Benefits of Verification')}
                             </h4>
                             <ul className="text-sm text-muted-foreground space-y-1">
@@ -177,7 +196,10 @@ export default function SecuritySection({ ns = 'admin' }) {
                         </div>
                         
                         <div className="p-3 border rounded-lg">
-                            <h4 className="font-medium mb-2">
+                            <h4 
+                                className="font-medium mb-2"
+                                data-search-content={`${t('settings.email.troubleshooting.title', { lng: 'en' })} ${t('settings.email.troubleshooting.title', { lng: 'ar' })}`}
+                            >
                                 {t('settings.email.troubleshooting.title', 'Troubleshooting')}
                             </h4>
                             <ul className="text-sm text-muted-foreground space-y-1">
@@ -193,17 +215,26 @@ export default function SecuritySection({ ns = 'admin' }) {
 
                 {/* Danger Zone */}
                 <div className="space-y-4 pt-2">
-                    <h3 className="text-sm font-medium text-destructive flex items-center gap-2">
+                    <h3 
+                        className="text-sm font-medium text-destructive flex items-center gap-2"
+                        data-search-content={`${t('settings.account.dangerZone', { lng: 'en' })} ${t('settings.account.dangerZone', { lng: 'ar' })}`}
+                    >
                         <AlertTriangle className="h-4 w-4" />
                         {t('settings.account.dangerZone', 'Danger Zone')}
                     </h3>
                     
                     <div className="p-4 border border-destructive/20 bg-destructive/5 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <h4 className="font-medium text-destructive">
-                                {t('settings.account.deleteAccount', 'Delete Account')}
+                            <h4 
+                                className="font-medium text-destructive"
+                                data-search-content={`${t('settings.account.deleteAccount', { lng: 'en' })} ${t('settings.account.deleteAccount', { lng: 'ar' })}`}
+                            >
+                                {t('settings.account.deleteAccount')}
                             </h4>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p 
+                                className="text-sm text-muted-foreground mt-1"
+                                data-search-content={`${t('settings.account.deleteAccountDesc', { lng: 'en' })} ${t('settings.account.deleteAccountDesc', { lng: 'ar' })}`}
+                            >
                                 {t('settings.account.deleteAccountDesc', 'Permanently remove your account and all associated data. This action is irreversible.')}
                             </p>
                         </div>
