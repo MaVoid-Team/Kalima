@@ -346,7 +346,7 @@ export default function ProfileSection({ ns = 'admin' }) {
                                 </Label>
                                 <div className="flex items-center gap-2 px-1">
                                     <Badge variant="secondary" className="rounded-lg px-2 py-0.5 font-bold text-[10px]">
-                                        {t(`profile.${profile?.gender}`) || t('common.notSpecified')}
+                                        {t(`gender.${profile?.gender}`) || t('common.notSpecified')}
                                     </Badge>
                                 </div>
                             </div>
