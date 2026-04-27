@@ -31,7 +31,7 @@ export const useAdminGeneralSettings = () => {
     const updateSettings = async (newSettings) => {
         try {
             await mutate({
-                endpoint: '/admin/general-settings',
+                endpoint: '/admin/general-settings/whatsapp_receiving_number',
                 method: 'PUT',
                 data: newSettings,
                 defaultSuccessMessage: t('settings.general.updateSuccess', 'General settings updated successfully')
