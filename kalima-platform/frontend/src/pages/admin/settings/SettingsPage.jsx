@@ -18,7 +18,7 @@ export default function SettingsPage() {
         { id: 'profile', dataKey: 'profile', translationKey: 'settings.profile.title', icon: User, component: ProfileSection },
         { id: 'password', dataKey: 'password', translationKey: 'settings.password.title', icon: Lock, component: PasswordSection },
         { id: 'account', dataKey: 'account', translationKey: 'settings.account.title', icon: Shield, component: AccountSection },
-        { id: 'security', dataKey: 'email', translationKey: 'settings.email.title', icon: Mail, component: SecuritySection },
+        { id: 'security', dataKey: 'email', subKeys: ['account.delete', 'account.dangerZone'], translationKey: 'settings.email.title', icon: Mail, component: SecuritySection },
         { id: 'session', dataKey: 'session', translationKey: 'settings.session.title', icon: History, component: SessionSection },
         { id: 'general', dataKey: 'general', translationKey: 'settings.general.title', icon: Settings2, component: GeneralSettingsSection },
         { id: 'review', dataKey: 'accountReview', translationKey: 'settings.accountReview.title', icon: Users, component: AccountReviewSection },

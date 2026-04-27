@@ -68,7 +68,10 @@ export default function AccountSection({ ns = 'admin' }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle 
+                    className="flex items-center gap-2"
+                    data-search-content={`${t('settings.account.title', { lng: 'en' })} ${t('settings.account.title', { lng: 'ar' })}`}
+                >
                     <Shield className="h-5 w-5" />
                     {t('settings.account.title')}
                 </CardTitle>
@@ -76,12 +79,20 @@ export default function AccountSection({ ns = 'admin' }) {
             <CardContent className="space-y-6">
                 {/* Linked Providers */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-medium">{t('settings.account.linkedProviders')}</h3>
+                    <h3 
+                        className="text-sm font-medium"
+                        data-search-content={`${t('settings.account.linkedProviders', { lng: 'en' })} ${t('settings.account.linkedProviders', { lng: 'ar' })}`}
+                    >
+                        {t('settings.account.linkedProviders')}
+                    </h3>
 
                     {linkedProviders.length === 0 ? (
                         <div className="text-center py-8 border-2 border-dashed border-muted rounded-lg">
                             <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                            <p className="text-muted-foreground">
+                            <p 
+                                className="text-muted-foreground"
+                                data-search-content={`${t('settings.account.noLinkedProviders', { lng: 'en' })} ${t('settings.account.noLinkedProviders', { lng: 'ar' })}`}
+                            >
                                 {t('settings.account.noLinkedProviders', 'No linked accounts')}
                             </p>
                         </div>
@@ -144,7 +155,12 @@ export default function AccountSection({ ns = 'admin' }) {
 
                 {/* Link New Accounts */}
                 <div className="space-y-4">
-                    <h3 className="text-sm font-medium">{t('settings.account.linkNewAccount')}</h3>
+                    <h3 
+                        className="text-sm font-medium"
+                        data-search-content={`${t('settings.account.linkNewAccount', { lng: 'en' })} ${t('settings.account.linkNewAccount', { lng: 'ar' })}`}
+                    >
+                        {t('settings.account.linkNewAccount')}
+                    </h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {!hasFirebaseProvider && (
@@ -174,7 +190,10 @@ export default function AccountSection({ ns = 'admin' }) {
                         )}
                     </div>
 
-                    <p className="text-sm text-muted-foreground">
+                    <p 
+                        className="text-sm text-muted-foreground"
+                        data-search-content={`${t('settings.account.linkDescription', { lng: 'en' })} ${t('settings.account.linkDescription', { lng: 'ar' })}`}
+                    >
                         {t('settings.account.linkDescription', 'Link additional accounts to enable multiple login methods.')}
                     </p>
                 </div>

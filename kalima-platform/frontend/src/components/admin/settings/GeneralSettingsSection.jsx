@@ -34,6 +34,7 @@ export default function GeneralSettingsSection() {
     const { t, i18n } = useTranslation('admin');
     const isRtl = i18n.dir() === 'rtl';
     const [isEditing, setIsEditing] = useState(false);
+    const [isActionLoading, setIsActionLoading] = useState(false);
 
     const { settings, updateSettings, loading: settingsLoading, updateLoading } = useAdminGeneralSettings();
     const { status, qrCodeStr, sendingNumber, loading: whatsappLoading, requestQR, logout } = useWhatsappStatus();
@@ -62,6 +63,25 @@ export default function GeneralSettingsSection() {
         }
     };
 
+    const handleLogout = async () => {
+        setIsActionLoading(true);
+        try {
+            await logout();
+        } finally {
+            setIsActionLoading(false);
+        }
+    };
+
+    const handleRequestQR = async () => {
+        setIsActionLoading(true);
+        try {
+            await requestQR();
+        } finally {
+            // Give it a tiny bit of time to transition states
+            setTimeout(() => setIsActionLoading(false), 500);
+        }
+    };
+
     const loading = settingsLoading || (whatsappLoading && status === 'disconnected');
 
     if (loading && !isEditing) {
@@ -77,11 +97,14 @@ export default function GeneralSettingsSection() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle 
+                    className="flex items-center gap-2"
+                    data-search-content={`${t('settings.general.title', { lng: 'en' })} ${t('settings.general.title', { lng: 'ar' })}`}
+                >
                     <Settings2 className={isRtl ? "h-5 w-5 scale-x-[-1]" : "h-5 w-5"} />
                     {t('settings.general.title', 'General Administration Settings')}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription data-search-content={`${t('settings.general.description', { lng: 'en' })} ${t('settings.general.description', { lng: 'ar' })}`}>
                     {t('settings.general.description', 'Global settings for store contact and messaging.')}
                 </CardDescription>
             </CardHeader>
@@ -95,7 +118,10 @@ export default function GeneralSettingsSection() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <div className="flex items-center gap-2 mb-2">
-                                            <FormLabel className="mb-0">
+                                            <FormLabel 
+                                                className="mb-0"
+                                                data-search-content={`${t('settings.general.whatsappSendingNumber', { lng: 'en' })} ${t('settings.general.whatsappSendingNumber', { lng: 'ar' })}`}
+                                            >
                                                 {t('settings.general.whatsappSendingNumber', 'WhatsApp Sending Number')}
                                             </FormLabel>
                                             <TooltipProvider>
@@ -115,7 +141,8 @@ export default function GeneralSettingsSection() {
                                             <Input
                                                 disabled={true}
                                                 className="bg-muted font-mono"
-                                                value={sendingNumber || field.value || t('common:na', 'N/A')}
+                                                dir="ltr"
+                                                value={(sendingNumber || field.value) ? `+${(sendingNumber || field.value).toString().replace(/^\+/, '')}` : t('common:na', 'N/A')}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -130,7 +157,10 @@ export default function GeneralSettingsSection() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <div className="flex items-center gap-2 mb-2">
-                                            <FormLabel className="mb-0">
+                                            <FormLabel 
+                                                className="mb-0"
+                                                data-search-content={`${t('settings.general.whatsappReceivingNumber', { lng: 'en' })} ${t('settings.general.whatsappReceivingNumber', { lng: 'ar' })}`}
+                                            >
                                                 {t('settings.general.whatsappReceivingNumber', 'WhatsApp Receiving Number')}
                                             </FormLabel>
                                             {!isEditing && (
@@ -201,11 +231,17 @@ export default function GeneralSettingsSection() {
                 <div className="space-y-6 pt-2">
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <h3 className="text-lg font-medium flex items-center gap-2">
+                            <h3 
+                                className="text-lg font-medium flex items-center gap-2"
+                                data-search-content={`${t('settings.general.whatsappStatus', { lng: 'en' })} ${t('settings.general.whatsappStatus', { lng: 'ar' })}`}
+                            >
                                 <MessageSquare className="h-5 w-5 text-primary" />
                                 {t('settings.general.whatsappStatus')}
                             </h3>
-                            <p className="text-sm text-muted-foreground">
+                            <p 
+                                className="text-sm text-muted-foreground"
+                                data-search-content={`${t('settings.general.whatsappLinkDescription', { lng: 'en' })} ${t('settings.general.whatsappLinkDescription', { lng: 'ar' })}`}
+                            >
                                 {t('settings.general.whatsappLinkDescription')}
                             </p>
                         </div>
@@ -230,16 +266,19 @@ export default function GeneralSettingsSection() {
                                     </div>
                                     <div className="space-y-1">
                                         <p className="text-sm font-medium">{t('settings.general.whatsappConnectedAs')}</p>
-                                        <p className="text-lg font-mono font-bold">{sendingNumber}</p>
+                                        <p className="text-lg font-mono font-bold" dir="ltr">
+                                            +{sendingNumber.toString().replace(/^\+/, '')}
+                                        </p>
                                     </div>
                                 </div>
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={logout}
+                                    onClick={handleLogout}
+                                    disabled={isActionLoading}
                                     className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
                                 >
-                                    <LogOut className="h-4 w-4 me-2" />
+                                    {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <LogOut className="h-4 w-4 me-2" />}
                                     {t('settings.general.whatsappLogout')}
                                 </Button>
                             </div>
@@ -256,8 +295,12 @@ export default function GeneralSettingsSection() {
                                         {t('settings.general.whatsappLinkDescription')}
                                     </p>
                                 </div>
-                                <Button onClick={requestQR} className="mt-2">
-                                    <RefreshCw className="h-4 w-4 me-2" />
+                                 <Button 
+                                    onClick={handleRequestQR} 
+                                    className="mt-2"
+                                    disabled={isActionLoading}
+                                >
+                                    {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
                                     {t('settings.general.whatsappConnect')}
                                 </Button>
                             </div>
@@ -274,8 +317,13 @@ export default function GeneralSettingsSection() {
                                         {t('settings.general.whatsappPreparing', 'The server is preparing the WhatsApp connection.')}
                                     </p>
                                 </div>
-                                <Button onClick={requestQR} variant="outline" className="mt-2">
-                                    <RefreshCw className="h-4 w-4 me-2" />
+                                <Button 
+                                    onClick={handleRequestQR} 
+                                    variant="outline" 
+                                    className="mt-2"
+                                    disabled={isActionLoading}
+                                >
+                                    {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
                                     {t('settings.general.whatsappRefreshQr')}
                                 </Button>
                             </div>
@@ -318,8 +366,13 @@ export default function GeneralSettingsSection() {
                                         {t('settings.general.whatsappConnectionError', 'Something went wrong during the connection process.')}
                                     </p>
                                 </div>
-                                <Button variant="outline" onClick={requestQR} className="mt-2">
-                                    <RefreshCw className="h-4 w-4 me-2" />
+                                <Button 
+                                    variant="outline" 
+                                    onClick={handleRequestQR} 
+                                    className="mt-2"
+                                    disabled={isActionLoading}
+                                >
+                                    {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
                                     {t('settings.general.whatsappTryAgain', 'Try Again')}
                                 </Button>
                             </div>

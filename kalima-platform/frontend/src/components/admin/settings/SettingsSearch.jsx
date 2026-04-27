@@ -20,13 +20,10 @@ export default function SettingsSearch({ sections }) {
 
     const isRtl = i18n.dir() === 'rtl';
 
-    // Build the search index by pulling all relevant translations
+    // Build a bilingual search index by pulling both English and Arabic translations
     const searchableItems = useMemo(() => {
-        const items = [];
-        const bundle = i18n.getResourceBundle(i18n.language, 'admin');
-        if (!bundle) return items;
-
-        // Parts of the translation bundle that are relevant to the settings page
+        const index = {}; // Map of translation key -> { sectionId, texts: string[] }
+        
         const relevantKeys = [
             { root: 'settings', sectionId: null },
             { root: 'roles', sectionId: 'review' },
@@ -34,54 +31,99 @@ export default function SettingsSearch({ sections }) {
             { root: 'common', sectionId: null }
         ];
 
-        const flatten = (obj, prefix = '', sectionId = null) => {
-            for (const key in obj) {
-                const value = obj[key];
-                const fullKey = prefix ? `${prefix}.${key}` : key;
-                
-                // Determine which section this key belongs to
-                let currentSectionId = sectionId;
-                if (prefix === 'settings') {
-                    const sectionMatch = sections.find(s => s.dataKey === key);
-                    if (sectionMatch) currentSectionId = sectionMatch.id;
-                }
+        const languages = ['en', 'ar'];
 
-                if (typeof value === 'string' && value.length > 0) {
-                    items.push({
-                        key: fullKey,
-                        value,
-                        sectionId: currentSectionId
-                    });
-                } else if (typeof value === 'object' && value !== null) {
-                    flatten(value, fullKey, currentSectionId);
-                }
-            }
-        };
+        languages.forEach(lng => {
+            const bundle = i18n.getResourceBundle(lng, 'admin');
+            if (!bundle) return;
 
-        relevantKeys.forEach(({ root, sectionId }) => {
-            if (bundle[root]) {
-                flatten(bundle[root], root, sectionId);
-            }
+            const flatten = (obj, prefix = '', sectionId = null) => {
+                for (const key in obj) {
+                    const value = obj[key];
+                    const fullKey = prefix ? `${prefix}.${key}` : key;
+                    let currentSectionId = sectionId;
+                    
+                    // Logic to determine section mapping based on the full key path
+                    const relativePath = fullKey.startsWith('settings.') ? fullKey.slice(9) : null;
+                    if (relativePath) {
+                        // Priority 1: Check for explicit subKey matches (e.g. 'account.delete' -> security section)
+                        const subKeyMatch = sections.find(s => s.subKeys?.some(sk => relativePath.startsWith(sk)));
+                        if (subKeyMatch) {
+                            currentSectionId = subKeyMatch.id;
+                        } else if (!currentSectionId) {
+                            // Priority 2: Fallback to root dataKey match (e.g. 'account' -> account section)
+                            const rootKey = relativePath.split('.')[0];
+                            const sectionMatch = sections.find(s => s.dataKey === rootKey);
+                            if (sectionMatch) currentSectionId = sectionMatch.id;
+                        }
+                    }
+
+                    if (typeof value === 'string' && value.length > 0) {
+                        if (!index[fullKey]) {
+                            index[fullKey] = { sectionId: currentSectionId, texts: [] };
+                        }
+                        if (!index[fullKey].texts.includes(value)) {
+                            index[fullKey].texts.push(value);
+                        }
+                    } else if (typeof value === 'object' && value !== null) {
+                        flatten(value, fullKey, currentSectionId);
+                    }
+                }
+            };
+
+            relevantKeys.forEach(({ root, sectionId }) => {
+                if (bundle[root]) {
+                    flatten(bundle[root], root, sectionId);
+                }
+            });
         });
 
-        return items;
-    }, [i18n.language, sections]);
+        // Convert the map to an array of searchable objects
+        return Object.entries(index).map(([key, data]) => {
+            // Find the display value for the current language
+            const displayValue = t(key);
+            
+            return {
+                key,
+                sectionId: data.sectionId,
+                displayValue,
+                // The search string combines all available translations for this key
+                searchContent: `${key} ${data.texts.join(' ')}`.toLowerCase()
+            };
+        });
+    }, [i18n.language, sections, t]);
 
     const filteredItems = useMemo(() => {
         if (!search) return [];
         const query = search.toLowerCase();
         
-        // Filter and remove duplicates (some strings might appear in multiple keys)
         const seen = new Set();
-        return searchableItems.filter(item => {
-            const match = item.value.toLowerCase().includes(query) || 
-                          item.key.toLowerCase().includes(query);
-            if (match && !seen.has(item.value)) {
-                seen.add(item.value);
-                return true;
-            }
-            return false;
-        }).slice(0, 10);
+        return searchableItems
+            .filter(item => {
+                const match = item.searchContent.includes(query);
+                if (match && !seen.has(item.displayValue)) {
+                    seen.add(item.displayValue);
+                    return true;
+                }
+                return false;
+            })
+            .sort((a, b) => {
+                const aVal = a.displayValue.toLowerCase();
+                const bVal = b.displayValue.toLowerCase();
+                
+                // Priority 1: Exact match
+                if (aVal === query) return -1;
+                if (bVal === query) return 1;
+                
+                // Priority 2: Starts with query
+                const aStarts = aVal.startsWith(query);
+                const bStarts = bVal.startsWith(query);
+                if (aStarts && !bStarts) return -1;
+                if (bStarts && !aStarts) return 1;
+                
+                return aVal.length - bVal.length; // Shorter matches first
+            })
+            .slice(0, 20);
     }, [search, searchableItems]);
 
     const handleSelectSection = (id) => {
@@ -140,7 +182,7 @@ export default function SettingsSearch({ sections }) {
                                         onSelect={() => item.sectionId && handleSelectSection(item.sectionId)}
                                         className="flex flex-col items-start gap-0.5"
                                     >
-                                        <span className="font-medium text-foreground">{item.value}</span>
+                                        <span className="font-medium text-foreground">{item.displayValue}</span>
                                         <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
                                             {item.sectionId 
                                                 ? t(sections.find(s => s.id === item.sectionId)?.translationKey) 

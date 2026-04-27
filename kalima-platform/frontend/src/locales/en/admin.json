@@ -959,7 +959,13 @@
       "whatsappPreparing": "The server is preparing the WhatsApp connection.",
       "whatsappQrRefreshNotice": "QR code refreshes every 30 seconds",
       "whatsappConnectionError": "Something went wrong during the connection process.",
-      "whatsappTryAgain": "Try Again"
+      "whatsappTryAgain": "Try Again",
+      "whatsappMessageSent": "Message sent successfully",
+      "whatsappMessageFailed": "Failed to send message",
+      "whatsappSessionCleared": "WhatsApp session cleared",
+      "whatsappAuthSuccess": "WhatsApp connected successfully",
+      "whatsappAuthFailedReason": "WhatsApp authentication failed: {{reason}}",
+      "whatsappDisconnectedReason": "WhatsApp disconnected: {{reason}}"
     },
     "expandSidebar": "Expand Sidebar"
   },

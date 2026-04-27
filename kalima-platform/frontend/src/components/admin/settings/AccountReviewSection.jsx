@@ -71,11 +71,14 @@ export default function AccountReviewSection() {
     return (
         <Card data-testid="admin-settings-account-review-section">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle 
+                    className="flex items-center gap-2"
+                    data-search-content={`${t('settings.accountReview.title', { lng: 'en' })} ${t('settings.accountReview.title', { lng: 'ar' })}`}
+                >
                     <ShieldCheck className={`h-5 w-5 text-primary ${i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}`} />
                     {t('settings.accountReview.title', 'Account Review')}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription data-search-content={`${t('settings.accountReview.description', { lng: 'en' })} ${t('settings.accountReview.description', { lng: 'ar' })}`}>
                     {t('settings.accountReview.description', 'Require admin approval before new users can make purchases.')}
                 </CardDescription>
             </CardHeader>
@@ -106,7 +109,10 @@ export default function AccountReviewSection() {
                             data-testid="admin-settings-account-review-all"
                         >
                             <div className="space-y-0.5">
-                                <p className="text-sm font-semibold flex items-center gap-2">
+                                <p 
+                                    className="text-sm font-semibold flex items-center gap-2"
+                                    data-search-content={`${t('settings.accountReview.allAccounts', { lng: 'en' })} ${t('settings.accountReview.allAccounts', { lng: 'ar' })}`}
+                                >
                                     {allEnabled
                                         ? <ToggleRight className="h-4 w-4 text-primary" />
                                         : <ToggleLeft className="h-4 w-4 text-muted-foreground" />
@@ -118,7 +124,10 @@ export default function AccountReviewSection() {
                                         </span>
                                     )}
                                 </p>
-                                <p className="text-xs text-muted-foreground">
+                                <p 
+                                    className="text-xs text-muted-foreground"
+                                    data-search-content={`${t('settings.accountReview.allAccountsDesc', { lng: 'en' })} ${t('settings.accountReview.allAccountsDesc', { lng: 'ar' })}`}
+                                >
                                     {t('settings.accountReview.allAccountsDesc', 'Enable or disable review for all account types at once.')}
                                 </p>
                             </div>
@@ -144,8 +153,16 @@ export default function AccountReviewSection() {
                                     data-testid={`admin-settings-account-review-${role}`}
                                 >
                                     <div className="space-y-0.5 ps-2">
-                                        <p className="text-sm font-medium">{t(`roles.${role}`, role)}</p>
-                                        <p className="text-xs text-muted-foreground">
+                                        <p 
+                                            className="text-sm font-medium"
+                                            data-search-content={`${t(`roles.${role}`, { lng: 'en' })} ${t(`roles.${role}`, { lng: 'ar' })}`}
+                                        >
+                                            {t(`roles.${role}`, role)}
+                                        </p>
+                                        <p 
+                                            className="text-xs text-muted-foreground"
+                                            data-search-content={`${t('settings.accountReview.requireReviewDesc', { role, lng: 'en' })} ${t('settings.accountReview.requireReviewDesc', { role, lng: 'ar' })}`}
+                                        >
                                             {t('settings.accountReview.requireReviewDesc', { role })}
                                         </p>
                                     </div>
