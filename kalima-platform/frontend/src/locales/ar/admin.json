@@ -65,7 +65,8 @@
       "success": "تم التصدير بنجاح"
     },
     "uploading": "جاري الرفع...",
-    "processing": "جاري المعالجة..."
+    "processing": "جاري المعالجة...",
+    "noResults": "لم يتم العثور على نتائج."
   },
   "gender": {
     "male": "ذكر",
@@ -808,6 +809,10 @@
   "settings": {
     "title": "الإعدادات",
     "description": "إدارة إعدادات حسابك وتفضيلاته",
+    "searchButton": "البحث في الإعدادات...",
+    "searchPlaceholder": "اكتب للبحث...",
+    "sections": "أقسام الإعدادات",
+    "searchResults": "نتائج البحث",
     "profile": {
       "title": "معلومات الملف الشخصي",
       "avatarTitle": "صورة الملف الشخصي",
