@@ -65,7 +65,8 @@
       "success": "Export successful"
     },
     "uploading": "Uploading...",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "noResults": "No results found."
   },
   "gender": {
     "male": "Male",
@@ -797,6 +798,10 @@
   "settings": {
     "title": "Settings",
     "description": "Manage your account settings and preferences",
+    "searchButton": "Search settings...",
+    "searchPlaceholder": "Type to search...",
+    "sections": "Settings Sections",
+    "searchResults": "Search Results",
     "profile": {
       "title": "Profile Information",
       "avatarTitle": "Profile Picture",
