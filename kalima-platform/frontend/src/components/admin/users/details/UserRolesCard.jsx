@@ -56,7 +56,12 @@ export default function UserRolesCard({
                 {hasAdminAccess && (
                     <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                         <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 gap-1.5 border-primary/20 hover:bg-primary/5 hover:text-primary transition-all">
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-8 gap-1.5 border-primary/20 hover:bg-primary/5 hover:text-primary transition-all"
+                                onClick={() => setNewRole({ portal: '', role: '' })}
+                            >
                                 <Plus className="h-4 w-4" />
                                 {t('details.assignRole')}
                             </Button>
@@ -69,56 +74,89 @@ export default function UserRolesCard({
                                 </DialogDescription>
                             </DialogHeader>
 
-                            <div className="grid gap-4 py-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase text-muted-foreground">{t('details.selectPortal')}</label>
-                                    <Select
-                                        dir={i18n.dir()}
-                                        value={newRole.portal}
-                                        onValueChange={(val) => {
-                                            const defaultRole = val === 'store' ? 'Lecturer' : 'Student';
-                                            setNewRole({ portal: val, role: defaultRole });
-                                        }}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={t('details.selectPortal')} />
-                                        </SelectTrigger>
-                                        <SelectContent position="popper">
-                                            <SelectItem value="academy">{t('portals.academy')}</SelectItem>
-                                            <SelectItem value="store">{t('portals.store')}</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase text-muted-foreground">{t('details.roles')}</label>
-                                    <Select
-                                        dir={i18n.dir()}
-                                        value={newRole.role}
-                                        onValueChange={(val) => setNewRole({ ...newRole, role: val })}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={t('details.selectRole')} />
-                                        </SelectTrigger>
-                                        <SelectContent position="popper">
-                                            {newRole.portal === 'academy' ? (
-                                                <>
-                                                    <SelectItem value="Teacher">{t('roles.Teacher')}</SelectItem>
-                                                    <SelectItem value="Student">{t('roles.Student')}</SelectItem>
-                                                    <SelectItem value="Assistant">{t('roles.Assistant')}</SelectItem>
-                                                    <SelectItem value="Parent">{t('roles.Parent')}</SelectItem>
-                                                </>
-                                            ) : (
-                                                <SelectItem value="Lecturer">{t('roles.Lecturer')}</SelectItem>
-                                            )}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
+                            {(() => {
+                                const assignedPortals = roles.map(r => r.portal?.toLowerCase() || '');
+                                const canAddAcademy = !assignedPortals.includes('academy');
+                                const canAddStore = !assignedPortals.includes('store');
+                                const hasAvailablePortals = canAddAcademy || canAddStore;
 
-                            <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsAddOpen(false)}>{t('actions.cancel')}</Button>
-                                <Button onClick={handleAssign}>{t('actions.confirm')}</Button>
-                            </DialogFooter>
+                                if (!hasAvailablePortals) {
+                                    return (
+                                        <>
+                                            <div className="py-6 text-center text-muted-foreground flex flex-col items-center">
+                                                <div className="h-12 w-12 rounded-full bg-amber-500/10 flex items-center justify-center mb-3">
+                                                    <ShieldAlert className="h-6 w-6 text-amber-500" />
+                                                </div>
+                                                <p className="text-sm font-medium">
+                                                    {t('details.noAvailablePortals', 'This user is already assigned to all available portals.')}
+                                                </p>
+                                                <p className="text-xs mt-1">
+                                                    {t('details.oneRolePerPortalMessage', 'A user can only have one active role per portal.')}
+                                                </p>
+                                            </div>
+                                            <DialogFooter>
+                                                <Button variant="outline" onClick={() => setIsAddOpen(false)}>{t('actions.close', 'Close')}</Button>
+                                            </DialogFooter>
+                                        </>
+                                    );
+                                }
+
+                                return (
+                                    <>
+                                        <div className="grid gap-4 py-4">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold uppercase text-muted-foreground">{t('details.selectPortal')}</label>
+                                                <Select
+                                                    dir={i18n.dir()}
+                                                    value={newRole.portal}
+                                                    onValueChange={(val) => {
+                                                        const defaultRole = val === 'store' ? 'Teacher' : 'Student';
+                                                        setNewRole({ portal: val, role: defaultRole });
+                                                    }}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder={t('details.selectPortal')} />
+                                                    </SelectTrigger>
+                                                    <SelectContent position="popper">
+                                                        {canAddAcademy && <SelectItem value="academy">{t('portals.academy')}</SelectItem>}
+                                                        {canAddStore && <SelectItem value="store">{t('portals.store')}</SelectItem>}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold uppercase text-muted-foreground">{t('details.roles')}</label>
+                                                <Select
+                                                    dir={i18n.dir()}
+                                                    value={newRole.role}
+                                                    onValueChange={(val) => setNewRole({ ...newRole, role: val })}
+                                                    disabled={!newRole.portal}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder={t('details.selectRole')} />
+                                                    </SelectTrigger>
+                                                    <SelectContent position="popper">
+                                                        {newRole.portal === 'academy' ? (
+                                                            <>
+                                                                <SelectItem value="Teacher">{t('roles.Teacher')}</SelectItem>
+                                                                <SelectItem value="Student">{t('roles.Student')}</SelectItem>
+                                                                <SelectItem value="Assistant">{t('roles.Assistant')}</SelectItem>
+                                                                <SelectItem value="Parent">{t('roles.Parent')}</SelectItem>
+                                                            </>
+                                                        ) : newRole.portal === 'store' ? (
+                                                            <SelectItem value="Teacher">{t('roles.Teacher')}</SelectItem>
+                                                        ) : null}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+
+                                        <DialogFooter>
+                                            <Button variant="outline" onClick={() => setIsAddOpen(false)}>{t('actions.cancel')}</Button>
+                                            <Button onClick={handleAssign} disabled={!newRole.portal || !newRole.role}>{t('actions.confirm')}</Button>
+                                        </DialogFooter>
+                                    </>
+                                );
+                            })()}
                         </DialogContent>
                     </Dialog>
                 )}

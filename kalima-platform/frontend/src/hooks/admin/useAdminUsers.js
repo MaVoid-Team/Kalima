@@ -73,6 +73,25 @@ export const useAdminUsers = () => {
         }
     }, []);
 
+    // ─── Update User Flag ─────────────────────────────────────────────────────────
+    const updateUserFlag = useCallback(async (userId, flag) => {
+        setLoading(true);
+        try {
+            const response = await mutate({
+                endpoint: `/admin/users/${userId}/flag`,
+                method: 'patch',
+                data: { flag },
+            });
+            setSelectedUser(response || null);
+            return response;
+        } catch (error) {
+            console.error('Failed to update user flag:', error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     // ─── Delete User ─────────────────────────────────────────────────────────
     const deleteUser = async (userId) => {
         try {
@@ -172,6 +191,7 @@ export const useAdminUsers = () => {
         fetchUsers,
         fetchUserById,
         updateUser,
+        updateUserFlag,
         deleteUser,
         approveUser,
         rejectUser,

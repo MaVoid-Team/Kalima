@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Edit3, Save, X, Trash2, CheckCircle2, XCircle, Mail, Phone, Crown, Zap, ShieldCheck, Eye, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit3, Save, X, Trash2, CheckCircle2, XCircle, Mail, Phone, Crown, Zap, ShieldCheck, Eye, AlertTriangle, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -15,6 +15,12 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { useTranslation } from 'react-i18next';
 
@@ -27,6 +33,7 @@ export default function DetailHeader({
     onApprove,
     onReject,
     onDelete,
+    onUpdateFlag,
     actionLoading,
     isRtl,
     t
@@ -99,10 +106,26 @@ export default function DetailHeader({
                                     </Badge>
                                 )}
 
-                                <Badge variant="outline" className={`h-5 gap-1 px-2 border-dashed uppercase text-[10px] tracking-widest font-black ${flagConfig.color}`}>
-                                    <FlagIcon className={`${i18n.language === 'ar' ? 'scale-x-[-1]' : ''} h-3 w-3`} />
-                                    {t(`details.flags.${user.flag || 'NORMAL'}`, user.flag || 'NORMAL')}
-                                </Badge>
+                                <DropdownMenu dir={i18n.dir()}>
+                                    <DropdownMenuTrigger className="focus:outline-none">
+                                        <Badge variant="outline" className={`h-5 gap-1 px-2 border-dashed uppercase text-[10px] tracking-widest font-black cursor-pointer hover:opacity-80 transition-opacity ${flagConfig.color}`}>
+                                            <FlagIcon className={`${i18n.language === 'ar' ? 'scale-x-[-1]' : ''} h-3 w-3`} />
+                                            {t(`details.flags.${user.flag || 'NORMAL'}`, user.flag || 'NORMAL')}
+                                            <ChevronDown className="h-3 w-3 opacity-50 ms-0.5" />
+                                        </Badge>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align={i18n.dir() === 'rtl' ? 'end' : 'start'}>
+                                        {['ELITE', 'PRO', 'NORMAL', 'OBSERVER', 'Warned'].map(flagOption => (
+                                            <DropdownMenuItem
+                                                key={flagOption}
+                                                onClick={() => onUpdateFlag && onUpdateFlag(flagOption)}
+                                                className={`cursor-pointer ${user.flag === flagOption ? 'bg-primary/10 font-bold' : ''}`}
+                                            >
+                                                {t(`details.flags.${flagOption}`, flagOption)}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                             <div className="flex items-center gap-3 text-sm text-muted-foreground font-medium">
                                 <div className="flex items-center gap-1.5">
@@ -141,7 +164,7 @@ export default function DetailHeader({
                                         onClick={onApprove}
                                         disabled={actionLoading}
                                     >
-                                        <CheckCircle2 className="h-4 w-4 me-2" />
+                                        <CheckCircle2 className={`h-4 w-4 me-2 ${i18n.dir() === 'rtl' ? 'scale-x-[-1]' : ''}`} />
                                         {t('actions.approve')}
                                     </Button>
                                 )}

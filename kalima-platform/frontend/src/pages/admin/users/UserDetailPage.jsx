@@ -36,6 +36,7 @@ export default function UserDetailPage() {
         actionLoading,
         fetchUserById,
         updateUser,
+        updateUserFlag,
         assignRole,
         revokeRole,
         deleteUser,
@@ -50,7 +51,6 @@ export default function UserDetailPage() {
         phone: '',
         secondary_phone: '',
         gender: '',
-        flag: '',
         teachers: {},
         students: {},
         lecturers: {},
@@ -73,7 +73,6 @@ export default function UserDetailPage() {
                 phone: displayPhone || '',
                 secondary_phone: selectedUser.secondary_phone || '',
                 gender: selectedUser.gender?.toUpperCase() || '',
-                flag: selectedUser.flag || 'NORMAL',
                 // Roles data
                 teachers: (Array.isArray(selectedUser.teachers) ? selectedUser.teachers[0] : selectedUser.teachers) || { is_primary: false, is_preparatory: false, is_secondary: false },
                 students: (Array.isArray(selectedUser.students) ? selectedUser.students[0] : selectedUser.students) || {},
@@ -97,7 +96,27 @@ export default function UserDetailPage() {
 
     /* ── handlers ── */
     const handleSave = async () => {
-        const success = await updateUser(id, formData);
+        const { teachers, students, lecturers, assistants, parents, ...restData } = formData;
+        
+        const relationsToOmit = ['government', 'zones', 'subjects', 'levels', 'user', 'academy', 'created_by_user'];
+        
+        const cleanData = (data) => {
+            if (!data) return {};
+            return Object.fromEntries(
+                Object.entries(data).filter(([key, value]) => !relationsToOmit.includes(key) && value !== null)
+            );
+        };
+
+        const payload = {
+            ...cleanData(restData),
+            ...cleanData(teachers),
+            ...cleanData(students),
+            ...cleanData(lecturers),
+            ...cleanData(assistants),
+            ...cleanData(parents),
+        };
+
+        const success = await updateUser(id, payload);
         if (success) {
             setIsEditing(false);
             fetchUserById(id);
@@ -133,6 +152,11 @@ export default function UserDetailPage() {
         if (res?.success) {
             fetchUserById(id);
         }
+    };
+
+    const handleUpdateFlag = async (flag) => {
+        await updateUserFlag(id, flag);
+        fetchUserById(id);
     };
 
     /* ── loading / not-found states ── */
@@ -206,6 +230,7 @@ export default function UserDetailPage() {
                 onApprove={handleApprove}
                 onReject={handleReject}
                 onDelete={handleDeleteUser}
+                onUpdateFlag={handleUpdateFlag}
                 actionLoading={actionLoading}
                 isRtl={isRtl}
                 t={t}
