@@ -34,6 +34,7 @@ export function emitNotificationToUser(
     message_key: string;
     entity_type: string | null;
     entity_id: number | null;
+    target_link: string | null;
     created_at: Date | null;
   }
 ): void {
@@ -52,6 +53,7 @@ export function emitNotificationToUsers(
     message_key: string;
     entity_type: string | null;
     entity_id: number | null;
+    target_link: string | null;
     created_at: Date | null;
   }
 ): void {

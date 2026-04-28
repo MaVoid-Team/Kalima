@@ -690,6 +690,7 @@ export const NotificationsScalarFieldEnum = {
   message_key: 'message_key',
   entity_type: 'entity_type',
   entity_id: 'entity_id',
+  target_link: 'target_link',
   is_read: 'is_read',
   created_by: 'created_by',
   created_at: 'created_at'

@@ -19,6 +19,9 @@ export const NOTIFICATION_CATEGORY = {
   SYSTEM_ANNOUNCEMENT: 8,
   ACCOUNT_UPDATE: 9,
   CUSTOM: 10,
+  // Admin-facing only
+  NEW_ORDER: 4,
+  NEW_ACCOUNT: 5,
 } as const;
 
 // Re-export enum so callers don't need a second import
@@ -33,6 +36,7 @@ export interface NotificationRow {
   message_key: notification_key_enum;
   entity_type: string | null;
   entity_id: number | null;
+  target_link: string | null;
   is_read: boolean;
   created_by: number | null;
   created_at: Date | null;
@@ -57,6 +61,7 @@ class NotificationService {
     options?: {
       entityType?: string;
       entityId?: number;
+      targetLink?: string;
       createdBy?: number;
     },
   ): Promise<NotificationRow> {
@@ -67,6 +72,7 @@ class NotificationService {
         message_key: messageKey,
         entity_type: options?.entityType ?? null,
         entity_id: options?.entityId ?? null,
+        target_link: options?.targetLink ?? null,
         created_by: options?.createdBy ?? null,
       },
       include: { creator: { select: { id: true, name: true } } },
@@ -79,6 +85,7 @@ class NotificationService {
         message_key: row.message_key,
         entity_type: row.entity_type,
         entity_id: row.entity_id,
+        target_link: row.target_link,
         created_at: row.created_at,
       });
     }
@@ -97,6 +104,7 @@ class NotificationService {
     options?: {
       entityType?: string;
       entityId?: number;
+      targetLink?: string;
       createdBy?: number;
     },
   ): Promise<number> {
@@ -109,6 +117,7 @@ class NotificationService {
         message_key: messageKey,
         entity_type: options?.entityType ?? null,
         entity_id: options?.entityId ?? null,
+        target_link: options?.targetLink ?? null,
         created_by: options?.createdBy ?? null,
       })),
     });
@@ -146,6 +155,7 @@ class NotificationService {
             message_key: messageKey,
             entity_type: options?.entityType ?? null,
             entity_id: options?.entityId ?? null,
+            target_link: options?.targetLink ?? null,
             created_at: r?.created_at ?? null,
           },
         };
@@ -160,6 +170,7 @@ class NotificationService {
           message_key: messageKey,
           entity_type: options?.entityType ?? null,
           entity_id: options?.entityId ?? null,
+          target_link: options?.targetLink ?? null,
           created_at: null,
         },
       );
@@ -180,6 +191,7 @@ class NotificationService {
     options?: {
       entityType?: string;
       entityId?: number;
+      targetLink?: string;
       createdBy?: number;
     },
   ): Promise<NotificationRow> {
@@ -190,6 +202,7 @@ class NotificationService {
         message_key: messageKey,
         entity_type: options?.entityType ?? null,
         entity_id: options?.entityId ?? null,
+        target_link: options?.targetLink ?? null,
         created_by: options?.createdBy ?? null,
       },
       include: { creator: { select: { id: true, name: true } } },
@@ -210,12 +223,64 @@ class NotificationService {
           message_key: row.message_key,
           entity_type: row.entity_type,
           entity_id: row.entity_id,
+          target_link: row.target_link,
           created_at: row.created_at,
         });
       }
     }
 
     return row as unknown as NotificationRow;
+  }
+
+  // ---------------------------------------------------------------
+  // High-level triggers for Admin Alerts
+  // ---------------------------------------------------------------
+
+  /**
+   * Notify all Admins and SubAdmins about a new order.
+   */
+  async notifyAdminsOfNewOrder(
+    io: SocketIOServer | null,
+    purchase: { id: number; purchase_serial: string },
+  ) {
+    const roles: role_enum[] = ["Admin", "SubAdmin"] as any;
+    for (const role of roles) {
+      this.sendToRole(
+        io,
+        role,
+        NOTIFICATION_CATEGORY.NEW_ORDER,
+        notification_key_enum.NEW_ORDER_CREATED,
+        {
+          entityType: "purchase",
+          entityId: purchase.id,
+          targetLink: `/orders/${purchase.id}`,
+        },
+      ).catch((err) =>
+        console.error(`[Notifications] Failed to notify ${role} of order:`, err),
+      );
+    }
+  }
+
+  /**
+   * Notify all Admins and SubAdmins about a new account registration/creation.
+   */
+  async notifyAdminsOfNewAccount(io: SocketIOServer | null, user: { id: number }) {
+    const roles: role_enum[] = ["Admin", "SubAdmin"] as any;
+    for (const role of roles) {
+      this.sendToRole(
+        io,
+        role,
+        NOTIFICATION_CATEGORY.NEW_ACCOUNT,
+        notification_key_enum.NEW_ACCOUNT_CREATED,
+        {
+          entityType: "user",
+          entityId: user.id,
+          targetLink: `/users/${user.id}`,
+        },
+      ).catch((err) =>
+        console.error(`[Notifications] Failed to notify ${role} of user:`, err),
+      );
+    }
   }
 
   // ---------------------------------------------------------------

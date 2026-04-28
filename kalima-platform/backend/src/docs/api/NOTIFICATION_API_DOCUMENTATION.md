@@ -53,7 +53,9 @@ Customers can be targeted:
 | 1 | `ORDER_STATUS_CHANGE` | Admin changes purchase status (receive / confirm / return) |
 | 2 | `ORDER_ITEM_DELETED` | Admin removes an item from a purchase |
 | 3 | `ORDER_DELETED` | Admin deletes an entire purchase |
-| 4–6 | *(Reserved)* | — |
+| 4 | `NEW_ORDER` | System receives a new checkout (Notifies Admin/SubAdmin) |
+| 5 | `NEW_ACCOUNT` | New user registers or is created (Notifies Admin/SubAdmin) |
+| 6 | *(Reserved)* | — |
 | 7 | `ORDER_GENERAL_EDIT` | Admin / SubAdmin adds a note to a purchase |
 | 8 | `SYSTEM_ANNOUNCEMENT` | Generic system-wide message |
 | 9 | `ACCOUNT_UPDATE` | Account-level change |
@@ -73,6 +75,8 @@ Customers can be targeted:
 | `ORDER_ITEM_DELETED` | An item has been removed from your order | تم إزالة منتج من طلبك |
 | `ORDER_DELETED` | Your order has been cancelled | تم إلغاء طلبك |
 | `ORDER_ADMIN_NOTE` | A note has been added to your order | تمت إضافة ملاحظة على طلبك |
+| `NEW_ORDER_CREATED` | A new order has been received (Admin Alert) | تم استلام طلب جديد |
+| `NEW_ACCOUNT_CREATED` | A new user account has been created (Admin Alert) | تم إنشاء حساب مستخدم جديد |
 | `SYSTEM_ANNOUNCEMENT` | System announcement | إعلان من النظام |
 | `ACCOUNT_UPDATE` | Your account has been updated | تم تحديث حسابك |
 | `CUSTOM` | Custom notification | إشعار مخصص |
@@ -363,6 +367,7 @@ Returns all notifications in the system (admin view), paginated.
   "message_key": "notification_key_enum",
   "entity_type": "string | null — 'purchase', 'purchase_item', 'user'",
   "entity_id": "number | null — ID of the related entity",
+  "target_link": "string | null — relative path for frontend navigation (e.g. /orders/7)",
   "is_read": "boolean",
   "created_by": "number | null — admin user ID",
   "created_at": "timestamp"
@@ -423,7 +428,9 @@ These notifications are created automatically when admins perform order operatio
 | Return (`PATCH /:id/return`) | 1 | `ORDER_STATUS_RETURNED` | `"purchase"` | ✅ `sendOrderReturnedEmail` |
 | Delete Purchase (`DELETE /:id`) | 3 | `ORDER_DELETED` | `"purchase"` | ✅ `sendOrderDeletedEmail` |
 | Delete Item (`DELETE /:id/items/:itemId`) | 2 | `ORDER_ITEM_DELETED` | `"purchase"` | ✅ `sendOrderItemDeletedEmail` |
-| Add Note (`PATCH /:id/admin-note`) — Admin/SubAdmin only | 7 | `ORDER_ADMIN_NOTE` | `"purchase"` | ❌ (Socket + DB only) |
+| Add Note (`PATCH /:id/admin-note`) | 7 | `ORDER_ADMIN_NOTE` | `"purchase"` | ❌ (Socket + DB only) |
+| New Order (Checkout) | 4 | `NEW_ORDER_CREATED` | `"purchase"` | ❌ (Admin in-app only) |
+| New Account (Register/Create) | 5 | `NEW_ACCOUNT_CREATED` | `"user"` | ❌ (Admin in-app only) |
 
 ### `has_admin_edits` Flag on Purchases
 

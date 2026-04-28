@@ -11,6 +11,7 @@ import adminRoutes from "./apps/store-api/routes/v2/admin.routes";
 import { errorHandler } from "./libs/errors";
 import { setupStoreSocket } from "./libs/socket/setupStoreSocket";
 import { startPurchaseNotificationConsumer } from "./apps/store-api/services/notificationStream.service";
+import { notificationService } from "./apps/store-api/services/notification.service";
 import { emitStorePurchaseToAdmins } from "./libs/redis/socketNotificationEmitter";
 import cors from "cors";
 import corsOptions from "./config/corsOptions";
@@ -55,6 +56,10 @@ async function start() {
     if (process.env.REDIS_URL) {
       startPurchaseNotificationConsumer((payload) => {
         emitStorePurchaseToAdmins(io, payload);
+        notificationService.notifyAdminsOfNewOrder(io, {
+          id: payload.purchase_id,
+          purchase_serial: payload.purchase_serial,
+        });
       });
     }
 

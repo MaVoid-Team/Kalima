@@ -7,8 +7,8 @@ import {
   IsOptional,
   IsString,
   Max,
+  MaxLength,
   Min,
-  ValidateIf,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { role_enum, notification_key_enum } from "../generated/prisma/client";
@@ -48,6 +48,11 @@ export class SendNotificationDto {
   @IsInt()
   @Type(() => Number)
   entity_id?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  target_link?: string;
 }
 
 /**
