@@ -99,25 +99,6 @@ export default function MainInfoCard({
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="flex flex-col gap-1">
-                                <label className="text-[10px] font-bold uppercase text-muted-foreground">{t('details.flag', 'Flag')}</label>
-                                <Select
-                                    dir={i18n.dir()}
-                                    value={formData.flag || ''}
-                                    onValueChange={(val) => setFormData({ ...formData, flag: val })}
-                                >
-                                    <SelectTrigger className="h-8 text-sm">
-                                        <SelectValue placeholder="Flag" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="ELITE">{t('details.flags.ELITE')}</SelectItem>
-                                        <SelectItem value="PRO">{t('details.flags.PRO')}</SelectItem>
-                                        <SelectItem value="NORMAL">{t('details.flags.NORMAL')}</SelectItem>
-                                        <SelectItem value="OBSERVER">{t('details.flags.OBSERVER')}</SelectItem>
-                                        <SelectItem value="Warned">{t('details.flags.Warned')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
                         </div>
                     </div>
                 ) : (
