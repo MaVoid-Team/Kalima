@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { useTranslation } from 'react-i18next';
-import { extractImageColors } from '@/utils/imageColors';
+import { extractImageColors } from '@/lib/imageColors';
 
 export default function DetailHeader({
     user,
