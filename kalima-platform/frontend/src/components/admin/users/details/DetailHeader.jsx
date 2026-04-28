@@ -65,15 +65,35 @@ export default function DetailHeader({
     return (
         <div className="sticky top-0 z-20 -mx-4 md:-mx-8 border-b bg-background/80 backdrop-blur-xl overflow-hidden transition-all duration-300">
             {/* Elegant Cover Photo Banner */}
-            <div 
-                className={`h-32 md:h-40 w-full relative overflow-hidden transition-all duration-700 ${!bannerColors ? 'bg-linear-to-br from-primary/20 via-primary/5 to-background' : ''}`}
-                style={bannerColors ? { 
-                    backgroundImage: `linear-gradient(to bottom right, ${bannerColors.start}, ${bannerColors.mid}, ${bannerColors.end})` 
-                } : {}}
-            >
-                {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 animate-pulse" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/5 rounded-full blur-2xl -ml-10 -mb-10" />
+            <div className={`h-32 md:h-40 w-full relative overflow-hidden transition-all duration-1000 ${!bannerColors ? 'bg-linear-to-br from-primary/20 via-primary/5 to-background' : 'bg-background/50'}`}>
+
+                {/* Dynamic YouTube-like Ambient Glow */}
+                {bannerColors && (
+                    <>
+                        <div
+                            className="absolute inset-0 opacity-80 mix-blend-screen dark:mix-blend-lighten"
+                            style={{
+                                backgroundImage: `radial-gradient(circle at 20% -20%, rgba(${bannerColors.vibrantRGB}, 0.85) 0%, rgba(${bannerColors.dominantRGB}, 0) 75%)`
+                            }}
+                        />
+                        <div
+                            className="absolute inset-0 opacity-60 mix-blend-multiply dark:mix-blend-screen"
+                            style={{
+                                backgroundImage: `radial-gradient(circle at 85% 120%, rgba(${bannerColors.dominantRGB}, 0.6) 0%, rgba(${bannerColors.vibrantRGB}, 0) 70%)`
+                            }}
+                        />
+                        <div className="absolute inset-0 bg-background/20 backdrop-blur-[60px]" />
+                        <div className="absolute inset-0 bg-linear-to-b from-transparent via-background/10 to-background" />
+                    </>
+                )}
+
+                {/* Decorative Elements Fallback */}
+                {!bannerColors && (
+                    <>
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 animate-pulse" />
+                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/5 rounded-full blur-2xl -ml-10 -mb-10" />
+                    </>
+                )}
 
                 {/* Back Button Over Banner */}
                 <div className="absolute top-4 start-4 z-10">
