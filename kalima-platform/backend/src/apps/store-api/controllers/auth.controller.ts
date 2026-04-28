@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 import { authService } from "../services/auth.service";
+import { notificationService } from "../services/notification.service";
 import {
   TeacherRegistrationDto,
   StudentRegistrationDto,
@@ -80,6 +81,8 @@ export const authController = {
     try {
       const dto = await validateDto(TeacherRegistrationDto, req.body);
       const result = await authService.registerTeacher(dto);
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result.user);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -94,6 +97,8 @@ export const authController = {
     try {
       const dto = await validateDto(StudentRegistrationDto, req.body);
       const result = await authService.registerStudent(dto);
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result.user);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -108,6 +113,8 @@ export const authController = {
     try {
       const dto = await validateDto(ParentRegistrationDto, req.body);
       const result = await authService.registerParent(dto);
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result.user);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -122,6 +129,8 @@ export const authController = {
     try {
       const dto = await validateDto(LecturerRegistrationDto, req.body);
       const result = await authService.registerLecturer(dto);
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result.user);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -140,6 +149,8 @@ export const authController = {
     try {
       const dto = await validateDto(TeacherFirebaseRegistrationDto, req.body);
       const result = await authService.registerTeacherFirebase(dto);
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result.user);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -154,6 +165,8 @@ export const authController = {
     try {
       const dto = await validateDto(StudentFirebaseRegistrationDto, req.body);
       const result = await authService.registerStudentFirebase(dto);
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result.user);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -168,6 +181,8 @@ export const authController = {
     try {
       const dto = await validateDto(ParentFirebaseRegistrationDto, req.body);
       const result = await authService.registerParentFirebase(dto);
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result.user);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -182,6 +197,8 @@ export const authController = {
     try {
       const dto = await validateDto(LecturerFirebaseRegistrationDto, req.body);
       const result = await authService.registerLecturerFirebase(dto);
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result.user);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);

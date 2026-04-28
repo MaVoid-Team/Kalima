@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 import { userManagementService } from "../services/user-management.service";
+import { notificationService } from "../services/notification.service";
 import { accountReviewService } from "../services/account-review.service";
 import {
   AssignRoleDto,
@@ -33,7 +34,6 @@ import {
 import { CreatorContext } from "../interfaces/auth.interface";
 import { userProfileService } from "../services/user-profile.service";
 import { UpdateProfileDto } from "../dtos/user-profile.dto";
-import { notificationService } from "../services/notification.service";
 import { SendNotificationDto, NotificationFilterDto } from "../dtos/notification.dto";
 
 // ============================================
@@ -262,6 +262,9 @@ export const adminController = {
           );
       }
 
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result);
+
       res.status(201).json({
         success: true,
         message: `User with role ${role} created successfully`,
@@ -296,6 +299,9 @@ export const adminController = {
         creator,
       );
 
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result);
+
       res.status(201).json({
         success: true,
         message: "Teacher created successfully",
@@ -325,6 +331,9 @@ export const adminController = {
         dto,
         creator,
       );
+
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result);
 
       res.status(201).json({
         success: true,
@@ -356,6 +365,9 @@ export const adminController = {
         creator,
       );
 
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result);
+
       res.status(201).json({
         success: true,
         message: "Parent created successfully",
@@ -385,6 +397,9 @@ export const adminController = {
         dto,
         creator,
       );
+
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result);
 
       res.status(201).json({
         success: true,

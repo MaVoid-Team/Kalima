@@ -717,6 +717,8 @@ enum notification_key_enum {
   ORDER_ITEM_DELETED
   ORDER_DELETED
   ORDER_ADMIN_NOTE
+  NEW_ORDER_CREATED
+  NEW_ACCOUNT_CREATED
   SYSTEM_ANNOUNCEMENT
   ACCOUNT_UPDATE
   CUSTOM
@@ -738,6 +740,9 @@ model notifications {
   /// Link to the related entity (e.g. the purchase that was edited)
   entity_type String?                @db.VarChar(50)
   entity_id   Int?
+
+  /// Deep-link for the frontend to navigate to (e.g. /orders/7, /users/42)
+  target_link String?                @db.VarChar(255)
 
   /// Read tracking
   is_read     Boolean                @default(false)
