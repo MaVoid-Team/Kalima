@@ -10,5 +10,6 @@ export default defineConfig({
   },
   datasource: {
     url: process.env["DATABASE_URL"],
+    shadowDatabaseUrl: "postgresql://postgres:Ismk7%40wscxSpjdbI@82.29.175.176:5467/postgres?schema=shadow",
   },
 });
