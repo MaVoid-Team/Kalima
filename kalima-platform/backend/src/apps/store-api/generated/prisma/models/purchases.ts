@@ -72,6 +72,7 @@ export type PurchasesMinAggregateOutputType = {
   notes: string | null
   admin_notes: string | null
   admin_note_by: number | null
+  has_admin_edits: boolean | null
   received_at: Date | null
   received_by: number | null
   confirmed_at: Date | null
@@ -100,6 +101,7 @@ export type PurchasesMaxAggregateOutputType = {
   notes: string | null
   admin_notes: string | null
   admin_note_by: number | null
+  has_admin_edits: boolean | null
   received_at: Date | null
   received_by: number | null
   confirmed_at: Date | null
@@ -128,6 +130,7 @@ export type PurchasesCountAggregateOutputType = {
   notes: number
   admin_notes: number
   admin_note_by: number
+  has_admin_edits: number
   received_at: number
   received_by: number
   confirmed_at: number
@@ -188,6 +191,7 @@ export type PurchasesMinAggregateInputType = {
   notes?: true
   admin_notes?: true
   admin_note_by?: true
+  has_admin_edits?: true
   received_at?: true
   received_by?: true
   confirmed_at?: true
@@ -216,6 +220,7 @@ export type PurchasesMaxAggregateInputType = {
   notes?: true
   admin_notes?: true
   admin_note_by?: true
+  has_admin_edits?: true
   received_at?: true
   received_by?: true
   confirmed_at?: true
@@ -244,6 +249,7 @@ export type PurchasesCountAggregateInputType = {
   notes?: true
   admin_notes?: true
   admin_note_by?: true
+  has_admin_edits?: true
   received_at?: true
   received_by?: true
   confirmed_at?: true
@@ -359,6 +365,7 @@ export type PurchasesGroupByOutputType = {
   notes: string | null
   admin_notes: string | null
   admin_note_by: number | null
+  has_admin_edits: boolean | null
   received_at: Date | null
   received_by: number | null
   confirmed_at: Date | null
@@ -410,6 +417,7 @@ export type purchasesWhereInput = {
   notes?: Prisma.StringNullableFilter<"purchases"> | string | null
   admin_notes?: Prisma.StringNullableFilter<"purchases"> | string | null
   admin_note_by?: Prisma.IntNullableFilter<"purchases"> | number | null
+  has_admin_edits?: Prisma.BoolNullableFilter<"purchases"> | boolean | null
   received_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
   received_by?: Prisma.IntNullableFilter<"purchases"> | number | null
   confirmed_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
@@ -447,6 +455,7 @@ export type purchasesOrderByWithRelationInput = {
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   admin_notes?: Prisma.SortOrderInput | Prisma.SortOrder
   admin_note_by?: Prisma.SortOrderInput | Prisma.SortOrder
+  has_admin_edits?: Prisma.SortOrderInput | Prisma.SortOrder
   received_at?: Prisma.SortOrderInput | Prisma.SortOrder
   received_by?: Prisma.SortOrderInput | Prisma.SortOrder
   confirmed_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -487,6 +496,7 @@ export type purchasesWhereUniqueInput = Prisma.AtLeast<{
   notes?: Prisma.StringNullableFilter<"purchases"> | string | null
   admin_notes?: Prisma.StringNullableFilter<"purchases"> | string | null
   admin_note_by?: Prisma.IntNullableFilter<"purchases"> | number | null
+  has_admin_edits?: Prisma.BoolNullableFilter<"purchases"> | boolean | null
   received_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
   received_by?: Prisma.IntNullableFilter<"purchases"> | number | null
   confirmed_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
@@ -524,6 +534,7 @@ export type purchasesOrderByWithAggregationInput = {
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   admin_notes?: Prisma.SortOrderInput | Prisma.SortOrder
   admin_note_by?: Prisma.SortOrderInput | Prisma.SortOrder
+  has_admin_edits?: Prisma.SortOrderInput | Prisma.SortOrder
   received_at?: Prisma.SortOrderInput | Prisma.SortOrder
   received_by?: Prisma.SortOrderInput | Prisma.SortOrder
   confirmed_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -560,6 +571,7 @@ export type purchasesScalarWhereWithAggregatesInput = {
   notes?: Prisma.StringNullableWithAggregatesFilter<"purchases"> | string | null
   admin_notes?: Prisma.StringNullableWithAggregatesFilter<"purchases"> | string | null
   admin_note_by?: Prisma.IntNullableWithAggregatesFilter<"purchases"> | number | null
+  has_admin_edits?: Prisma.BoolNullableWithAggregatesFilter<"purchases"> | boolean | null
   received_at?: Prisma.DateTimeNullableWithAggregatesFilter<"purchases"> | Date | string | null
   received_by?: Prisma.IntNullableWithAggregatesFilter<"purchases"> | number | null
   confirmed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"purchases"> | Date | string | null
@@ -583,6 +595,7 @@ export type purchasesCreateInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   returned_at?: Date | string | null
@@ -617,6 +630,7 @@ export type purchasesUncheckedCreateInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -642,6 +656,7 @@ export type purchasesUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -676,6 +691,7 @@ export type purchasesUncheckedUpdateInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -706,6 +722,7 @@ export type purchasesCreateManyInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -729,6 +746,7 @@ export type purchasesUpdateManyMutationInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -754,6 +772,7 @@ export type purchasesUncheckedUpdateManyInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -797,6 +816,7 @@ export type purchasesCountOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   admin_notes?: Prisma.SortOrder
   admin_note_by?: Prisma.SortOrder
+  has_admin_edits?: Prisma.SortOrder
   received_at?: Prisma.SortOrder
   received_by?: Prisma.SortOrder
   confirmed_at?: Prisma.SortOrder
@@ -840,6 +860,7 @@ export type purchasesMaxOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   admin_notes?: Prisma.SortOrder
   admin_note_by?: Prisma.SortOrder
+  has_admin_edits?: Prisma.SortOrder
   received_at?: Prisma.SortOrder
   received_by?: Prisma.SortOrder
   confirmed_at?: Prisma.SortOrder
@@ -868,6 +889,7 @@ export type purchasesMinOrderByAggregateInput = {
   notes?: Prisma.SortOrder
   admin_notes?: Prisma.SortOrder
   admin_note_by?: Prisma.SortOrder
+  has_admin_edits?: Prisma.SortOrder
   received_at?: Prisma.SortOrder
   received_by?: Prisma.SortOrder
   confirmed_at?: Prisma.SortOrder
@@ -1235,6 +1257,7 @@ export type purchasesCreateWithoutUsersInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   returned_at?: Date | string | null
@@ -1267,6 +1290,7 @@ export type purchasesUncheckedCreateWithoutUsersInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -1302,6 +1326,7 @@ export type purchasesCreateWithoutReceived_by_userInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   returned_at?: Date | string | null
@@ -1335,6 +1360,7 @@ export type purchasesUncheckedCreateWithoutReceived_by_userInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   confirmed_by?: number | null
@@ -1369,6 +1395,7 @@ export type purchasesCreateWithoutConfirmed_by_userInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   returned_at?: Date | string | null
@@ -1402,6 +1429,7 @@ export type purchasesUncheckedCreateWithoutConfirmed_by_userInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -1436,6 +1464,7 @@ export type purchasesCreateWithoutReturned_by_userInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   returned_at?: Date | string | null
@@ -1469,6 +1498,7 @@ export type purchasesUncheckedCreateWithoutReturned_by_userInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -1527,6 +1557,7 @@ export type purchasesScalarWhereInput = {
   notes?: Prisma.StringNullableFilter<"purchases"> | string | null
   admin_notes?: Prisma.StringNullableFilter<"purchases"> | string | null
   admin_note_by?: Prisma.IntNullableFilter<"purchases"> | number | null
+  has_admin_edits?: Prisma.BoolNullableFilter<"purchases"> | boolean | null
   received_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
   received_by?: Prisma.IntNullableFilter<"purchases"> | number | null
   confirmed_at?: Prisma.DateTimeNullableFilter<"purchases"> | Date | string | null
@@ -1598,6 +1629,7 @@ export type purchasesCreateWithoutCoupon_usagesInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   returned_at?: Date | string | null
@@ -1631,6 +1663,7 @@ export type purchasesUncheckedCreateWithoutCoupon_usagesInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -1671,6 +1704,7 @@ export type purchasesUpdateWithoutCoupon_usagesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1704,6 +1738,7 @@ export type purchasesUncheckedUpdateWithoutCoupon_usagesInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1728,6 +1763,7 @@ export type purchasesCreateWithoutPurchase_itemsInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   returned_at?: Date | string | null
@@ -1761,6 +1797,7 @@ export type purchasesUncheckedCreateWithoutPurchase_itemsInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -1801,6 +1838,7 @@ export type purchasesUpdateWithoutPurchase_itemsInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1834,6 +1872,7 @@ export type purchasesUncheckedUpdateWithoutPurchase_itemsInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1858,6 +1897,7 @@ export type purchasesCreateWithoutPayment_methodsInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   returned_at?: Date | string | null
@@ -1890,6 +1930,7 @@ export type purchasesUncheckedCreateWithoutPayment_methodsInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -1941,6 +1982,7 @@ export type purchasesCreateWithoutWatermarkInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   returned_at?: Date | string | null
@@ -1973,6 +2015,7 @@ export type purchasesUncheckedCreateWithoutWatermarkInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -2008,6 +2051,7 @@ export type purchasesCreateWithoutPayment_screenshotInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   returned_at?: Date | string | null
@@ -2040,6 +2084,7 @@ export type purchasesUncheckedCreateWithoutPayment_screenshotInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -2111,6 +2156,7 @@ export type purchasesCreateManyUsersInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -2139,6 +2185,7 @@ export type purchasesCreateManyReceived_by_userInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   confirmed_at?: Date | string | null
   confirmed_by?: number | null
@@ -2166,6 +2213,7 @@ export type purchasesCreateManyConfirmed_by_userInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -2193,6 +2241,7 @@ export type purchasesCreateManyReturned_by_userInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -2215,6 +2264,7 @@ export type purchasesUpdateWithoutUsersInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2247,6 +2297,7 @@ export type purchasesUncheckedUpdateWithoutUsersInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2276,6 +2327,7 @@ export type purchasesUncheckedUpdateManyWithoutUsersInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2299,6 +2351,7 @@ export type purchasesUpdateWithoutReceived_by_userInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2332,6 +2385,7 @@ export type purchasesUncheckedUpdateWithoutReceived_by_userInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2361,6 +2415,7 @@ export type purchasesUncheckedUpdateManyWithoutReceived_by_userInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2383,6 +2438,7 @@ export type purchasesUpdateWithoutConfirmed_by_userInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2416,6 +2472,7 @@ export type purchasesUncheckedUpdateWithoutConfirmed_by_userInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2445,6 +2502,7 @@ export type purchasesUncheckedUpdateManyWithoutConfirmed_by_userInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2467,6 +2525,7 @@ export type purchasesUpdateWithoutReturned_by_userInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2500,6 +2559,7 @@ export type purchasesUncheckedUpdateWithoutReturned_by_userInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2529,6 +2589,7 @@ export type purchasesUncheckedUpdateManyWithoutReturned_by_userInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2555,6 +2616,7 @@ export type purchasesCreateManyPayment_methodsInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -2578,6 +2640,7 @@ export type purchasesUpdateWithoutPayment_methodsInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2610,6 +2673,7 @@ export type purchasesUncheckedUpdateWithoutPayment_methodsInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2639,6 +2703,7 @@ export type purchasesUncheckedUpdateManyWithoutPayment_methodsInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2666,6 +2731,7 @@ export type purchasesCreateManyWatermarkInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -2693,6 +2759,7 @@ export type purchasesCreateManyPayment_screenshotInput = {
   notes?: string | null
   admin_notes?: string | null
   admin_note_by?: number | null
+  has_admin_edits?: boolean | null
   received_at?: Date | string | null
   received_by?: number | null
   confirmed_at?: Date | string | null
@@ -2716,6 +2783,7 @@ export type purchasesUpdateWithoutWatermarkInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2748,6 +2816,7 @@ export type purchasesUncheckedUpdateWithoutWatermarkInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2777,6 +2846,7 @@ export type purchasesUncheckedUpdateManyWithoutWatermarkInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2800,6 +2870,7 @@ export type purchasesUpdateWithoutPayment_screenshotInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2832,6 +2903,7 @@ export type purchasesUncheckedUpdateWithoutPayment_screenshotInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2861,6 +2933,7 @@ export type purchasesUncheckedUpdateManyWithoutPayment_screenshotInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2929,6 +3002,7 @@ export type purchasesSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   notes?: boolean
   admin_notes?: boolean
   admin_note_by?: boolean
+  has_admin_edits?: boolean
   received_at?: boolean
   received_by?: boolean
   confirmed_at?: boolean
@@ -2967,6 +3041,7 @@ export type purchasesSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   notes?: boolean
   admin_notes?: boolean
   admin_note_by?: boolean
+  has_admin_edits?: boolean
   received_at?: boolean
   received_by?: boolean
   confirmed_at?: boolean
@@ -3002,6 +3077,7 @@ export type purchasesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   notes?: boolean
   admin_notes?: boolean
   admin_note_by?: boolean
+  has_admin_edits?: boolean
   received_at?: boolean
   received_by?: boolean
   confirmed_at?: boolean
@@ -3037,6 +3113,7 @@ export type purchasesSelectScalar = {
   notes?: boolean
   admin_notes?: boolean
   admin_note_by?: boolean
+  has_admin_edits?: boolean
   received_at?: boolean
   received_by?: boolean
   confirmed_at?: boolean
@@ -3049,7 +3126,7 @@ export type purchasesSelectScalar = {
   is_deleted?: boolean
 }
 
-export type purchasesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "status" | "subtotal" | "discount" | "total" | "payment_method_id" | "payment_screenshot_id" | "watermark_id" | "purchase_serial" | "number_transferred_from" | "payment_number" | "notes" | "admin_notes" | "admin_note_by" | "received_at" | "received_by" | "confirmed_at" | "confirmed_by" | "returned_at" | "returned_by" | "created_at" | "updated_at" | "deleted_at" | "is_deleted", ExtArgs["result"]["purchases"]>
+export type purchasesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "status" | "subtotal" | "discount" | "total" | "payment_method_id" | "payment_screenshot_id" | "watermark_id" | "purchase_serial" | "number_transferred_from" | "payment_number" | "notes" | "admin_notes" | "admin_note_by" | "has_admin_edits" | "received_at" | "received_by" | "confirmed_at" | "confirmed_by" | "returned_at" | "returned_by" | "created_at" | "updated_at" | "deleted_at" | "is_deleted", ExtArgs["result"]["purchases"]>
 export type purchasesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchase_items?: boolean | Prisma.purchases$purchase_itemsArgs<ExtArgs>
   coupon_usages?: boolean | Prisma.purchases$coupon_usagesArgs<ExtArgs>
@@ -3110,6 +3187,7 @@ export type $purchasesPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     notes: string | null
     admin_notes: string | null
     admin_note_by: number | null
+    has_admin_edits: boolean | null
     received_at: Date | null
     received_by: number | null
     confirmed_at: Date | null
@@ -3567,6 +3645,7 @@ export interface purchasesFieldRefs {
   readonly notes: Prisma.FieldRef<"purchases", 'String'>
   readonly admin_notes: Prisma.FieldRef<"purchases", 'String'>
   readonly admin_note_by: Prisma.FieldRef<"purchases", 'Int'>
+  readonly has_admin_edits: Prisma.FieldRef<"purchases", 'Boolean'>
   readonly received_at: Prisma.FieldRef<"purchases", 'DateTime'>
   readonly received_by: Prisma.FieldRef<"purchases", 'Int'>
   readonly confirmed_at: Prisma.FieldRef<"purchases", 'DateTime'>

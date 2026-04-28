@@ -150,7 +150,8 @@ export const purchaseController = {
     try {
       const id = parseIntParam(req.params.id, "purchase ID");
       const adminId = (req.user as any).userId;
-      const purchase = await purchasesService.receive(id, adminId);
+      const io = req.app.get("io");
+      const purchase = await purchasesService.receive(id, adminId, io);
       res.status(200).json({
         success: true,
         message: "Purchase marked as received",
@@ -166,7 +167,8 @@ export const purchaseController = {
     try {
       const id = parseIntParam(req.params.id, "purchase ID");
       const adminId = (req.user as any).userId;
-      const purchase = await purchasesService.confirm(id, adminId);
+      const io = req.app.get("io");
+      const purchase = await purchasesService.confirm(id, adminId, io);
       res.status(200).json({
         success: true,
         message: "Purchase confirmed successfully",
@@ -182,7 +184,8 @@ export const purchaseController = {
     try {
       const id = parseIntParam(req.params.id, "purchase ID");
       const adminId = (req.user as any).userId;
-      const purchase = await purchasesService.returnPurchase(id, adminId);
+      const io = req.app.get("io");
+      const purchase = await purchasesService.returnPurchase(id, adminId, io);
       res.status(200).json({
         success: true,
         message: "Purchase returned successfully",
@@ -201,10 +204,21 @@ export const purchaseController = {
       const id = parseIntParam(req.params.id, "purchase ID");
       const dto = await validateDto(AdminNoteDto, req.body);
       const adminId = (req.user as any).userId;
+      const io = req.app.get("io");
+
+      // Only Admin and SubAdmin trigger customer notifications for notes
+      const callerRoles: string[] = ((req.user as any).roles ?? []).map(
+        (r: any) => r.role,
+      );
+      const triggerNotification =
+        callerRoles.includes("Admin") || callerRoles.includes("SubAdmin");
+
       const purchase = await purchasesService.addAdminNote(
         id,
         dto.admin_notes || dto.adminNote || "",
         adminId,
+        io,
+        triggerNotification,
       );
       res.status(200).json({
         success: true,
@@ -219,7 +233,9 @@ export const purchaseController = {
   async deletePurchase(req: Request, res: Response, next: NextFunction) {
     try {
       const id = parseIntParam(req.params.id, "purchase ID");
-      await purchasesService.deletePurchase(id);
+      const adminId = (req.user as any).userId;
+      const io = req.app.get("io");
+      await purchasesService.deletePurchase(id, adminId, io);
       res.status(200).json({
         success: true,
         message: "Purchase deleted successfully",
@@ -234,7 +250,9 @@ export const purchaseController = {
     try {
       const purchaseId = parseIntParam(req.params.id, "purchase ID");
       const itemId = parseIntParam(req.params.itemId, "item ID");
-      const purchase = await purchasesService.deleteItem(purchaseId, itemId);
+      const adminId = (req.user as any).userId;
+      const io = req.app.get("io");
+      const purchase = await purchasesService.deleteItem(purchaseId, itemId, adminId, io);
       res.status(200).json({
         success: true,
         message: "Item removed from purchase",

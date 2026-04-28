@@ -9,6 +9,13 @@ import { role_enum } from "../generated/prisma/client";
 import type { CheckoutDto } from "../dtos/cart.dto";
 import { couponService } from "./coupon.service";
 import { validatePaymentForCheckout } from "./checkout-validation.service";
+import {
+  notificationService,
+  notification_key_enum,
+  NOTIFICATION_CATEGORY,
+} from "./notification.service";
+import { getEmailService } from "../emails/email.service";
+import type { Server as SocketIOServer } from "socket.io";
 
 /** Standard include shape for purchase queries */
 const PURCHASE_INCLUDE = {
@@ -435,116 +442,208 @@ class PurchasesService {
   // Status transitions
   // =============================================================
 
+  /** Build product list HTML for use in status notification emails */
+  #buildProductListHTML(
+    items: Array<{ quantity: number; products?: { title?: string | null } | null }>,
+  ): string {
+    return items
+      .map(
+        (item, index) =>
+          `<tr><td style='text-align:center; padding: 8px; border-bottom: 1px solid #ddd;'>${index + 1}</td>` +
+          `<td style='text-align:start; padding: 8px; border-bottom: 1px solid #ddd;'>` +
+          `${item.products?.title ?? "Product"} x${item.quantity}</td></tr>`,
+      )
+      .join("");
+  }
+
   /** pending → received */
-  async receive(purchaseId: number, adminId: number) {
+  async receive(purchaseId: number, adminId: number, io?: SocketIOServer | null) {
     const purchase = await this.db.purchases.findUnique({
       where: { id: purchaseId },
+      include: {
+        users: { select: { id: true, name: true, email: true } },
+        purchase_items: { where: { is_deleted: false }, include: { products: { select: { title: true } } } },
+      },
     });
     if (!purchase) throw new NotFoundError("Purchase not found");
     if (purchase.status !== "pending") {
       throw new BadRequestError(`Purchase is already ${purchase.status}`);
     }
 
-    return this.db.purchases.update({
+    const updated = await this.db.purchases.update({
       where: { id: purchaseId },
-      data: {
-        status: "received",
-        received_by: adminId,
-        received_at: new Date(),
-        updated_at: new Date(),
-      },
+      data: { status: "received", received_by: adminId, received_at: new Date(), updated_at: new Date() },
       include: PURCHASE_INCLUDE,
     });
+
+    // Notify customer
+    const customer = purchase.users;
+    notificationService
+      .sendToUser(io ?? null, customer.id, NOTIFICATION_CATEGORY.ORDER_STATUS_CHANGE,
+        notification_key_enum.ORDER_STATUS_RECEIVED,
+        { entityType: "purchase", entityId: purchaseId, createdBy: adminId })
+      .catch((err) => console.error("[Purchases] Failed to send receive notification:", err));
+
+    if (customer.email) {
+      getEmailService()
+        .sendOrderReceivedEmail(customer.email, {
+          name: customer.name,
+          purchaseSerial: purchase.purchase_serial ?? "N/A",
+          totalItems: purchase.purchase_items.reduce((s, i) => s + i.quantity, 0),
+          productListHTML: this.#buildProductListHTML(purchase.purchase_items),
+        })
+        .catch((err) => console.error("[Purchases] Failed to send receive email:", err));
+    }
+
+    return updated;
   }
 
   /** received | returned → confirmed */
-  async confirm(purchaseId: number, adminId: number) {
+  async confirm(purchaseId: number, adminId: number, io?: SocketIOServer | null) {
     const purchase = await this.db.purchases.findUnique({
       where: { id: purchaseId },
+      include: {
+        users: { select: { id: true, name: true, email: true } },
+        purchase_items: { where: { is_deleted: false }, include: { products: { select: { title: true } } } },
+      },
     });
     if (!purchase) throw new NotFoundError("Purchase not found");
-    if (purchase.status === "confirmed") {
-      throw new BadRequestError("Purchase is already confirmed");
-    }
+    if (purchase.status === "confirmed") throw new BadRequestError("Purchase is already confirmed");
     if (!["received", "returned"].includes(purchase.status)) {
-      throw new BadRequestError(
-        "Purchase must be received or in returned status before it can be confirmed",
-      );
+      throw new BadRequestError("Purchase must be received or in returned status before it can be confirmed");
     }
 
-    return this.db.purchases.update({
+    const updated = await this.db.purchases.update({
       where: { id: purchaseId },
-      data: {
-        status: "confirmed",
-        confirmed_by: adminId,
-        confirmed_at: new Date(),
-        updated_at: new Date(),
-      },
+      data: { status: "confirmed", confirmed_by: adminId, confirmed_at: new Date(), updated_at: new Date() },
       include: PURCHASE_INCLUDE,
     });
+
+    const customer = purchase.users;
+    notificationService
+      .sendToUser(io ?? null, customer.id, NOTIFICATION_CATEGORY.ORDER_STATUS_CHANGE,
+        notification_key_enum.ORDER_STATUS_CONFIRMED,
+        { entityType: "purchase", entityId: purchaseId, createdBy: adminId })
+      .catch((err) => console.error("[Purchases] Failed to send confirm notification:", err));
+
+    if (customer.email) {
+      getEmailService()
+        .sendOrderAcceptedEmail(customer.email, {
+          name: customer.name,
+          purchaseSerial: purchase.purchase_serial ?? "N/A",
+          totalItems: purchase.purchase_items.reduce((s, i) => s + i.quantity, 0),
+          productListHTML: this.#buildProductListHTML(purchase.purchase_items),
+        })
+        .catch((err) => console.error("[Purchases] Failed to send confirm email:", err));
+    }
+
+    return updated;
   }
 
   /** received | confirmed → returned */
-  async returnPurchase(purchaseId: number, adminId: number) {
+  async returnPurchase(purchaseId: number, adminId: number, io?: SocketIOServer | null) {
     const purchase = await this.db.purchases.findUnique({
       where: { id: purchaseId },
+      include: {
+        users: { select: { id: true, name: true, email: true } },
+        purchase_items: { where: { is_deleted: false }, include: { products: { select: { title: true } } } },
+      },
     });
     if (!purchase) throw new NotFoundError("Purchase not found");
-
     if (!["confirmed", "received"].includes(purchase.status)) {
       throw new BadRequestError(
-        purchase.status === "returned"
-          ? "Purchase is already returned"
-          : "Only confirmed or received purchases can be returned",
+        purchase.status === "returned" ? "Purchase is already returned" : "Only confirmed or received purchases can be returned",
       );
     }
 
-    return this.db.purchases.update({
+    const updated = await this.db.purchases.update({
       where: { id: purchaseId },
-      data: {
-        status: "returned",
-        returned_by: adminId,
-        returned_at: new Date(),
-        updated_at: new Date(),
-      },
+      data: { status: "returned", returned_by: adminId, returned_at: new Date(), updated_at: new Date() },
       include: PURCHASE_INCLUDE,
     });
+
+    const customer = purchase.users;
+    notificationService
+      .sendToUser(io ?? null, customer.id, NOTIFICATION_CATEGORY.ORDER_STATUS_CHANGE,
+        notification_key_enum.ORDER_STATUS_RETURNED,
+        { entityType: "purchase", entityId: purchaseId, createdBy: adminId })
+      .catch((err) => console.error("[Purchases] Failed to send return notification:", err));
+
+    if (customer.email) {
+      getEmailService()
+        .sendOrderReturnedEmail(customer.email, {
+          name: customer.name,
+          purchaseSerial: purchase.purchase_serial ?? "N/A",
+          totalItems: purchase.purchase_items.reduce((s, i) => s + i.quantity, 0),
+          productListHTML: this.#buildProductListHTML(purchase.purchase_items),
+        })
+        .catch((err) => console.error("[Purchases] Failed to send return email:", err));
+    }
+
+    return updated;
   }
 
   // =============================================================
   // Admin operations
   // =============================================================
 
-  /** Update admin notes */
-  async addAdminNote(purchaseId: number, adminNotes: string, adminId: number) {
-    const exists = await this.db.purchases.findUnique({
+  /** Update admin notes — only Admin and SubAdmin should trigger notifications */
+  async addAdminNote(
+    purchaseId: number,
+    adminNotes: string,
+    adminId: number,
+    io?: SocketIOServer | null,
+    triggerNotification = false,
+  ) {
+    const purchase = await this.db.purchases.findUnique({
       where: { id: purchaseId },
+      include: { users: { select: { id: true } } },
     });
-    if (!exists) throw new NotFoundError("Purchase not found");
+    if (!purchase) throw new NotFoundError("Purchase not found");
 
-    return this.db.purchases.update({
+    const updated = await this.db.purchases.update({
       where: { id: purchaseId },
       data: {
         admin_notes: adminNotes,
         admin_note_by: adminId,
+        has_admin_edits: true,
         updated_at: new Date(),
       },
       include: PURCHASE_INCLUDE,
     });
+
+    // Only notify customer if caller is Admin or SubAdmin
+    if (triggerNotification) {
+      notificationService
+        .sendToUser(
+          io ?? null,
+          purchase.users.id,
+          NOTIFICATION_CATEGORY.ORDER_GENERAL_EDIT,
+          notification_key_enum.ORDER_ADMIN_NOTE,
+          { entityType: "purchase", entityId: purchaseId, createdBy: adminId },
+        )
+        .catch((err) =>
+          console.error("[Purchases] Failed to send admin note notification:", err),
+        );
+    }
+
+    return updated;
   }
 
   /** Hard-delete a purchase. Restores used coupons if confirmed. */
-  async deletePurchase(purchaseId: number) {
+  async deletePurchase(purchaseId: number, adminId?: number, io?: SocketIOServer | null) {
     const purchase = await this.db.purchases.findUnique({
       where: { id: purchaseId },
+      include: {
+        users: { select: { id: true, name: true, email: true } },
+        purchase_items: { where: { is_deleted: false }, include: { products: { select: { title: true } } } },
+      },
     });
     if (!purchase) throw new NotFoundError("Purchase not found");
 
     await this.db.$transaction(async (tx) => {
       if (purchase.status === "confirmed") {
-        await tx.coupon_usages.deleteMany({
-          where: { purchase_id: purchaseId },
-        });
+        await tx.coupon_usages.deleteMany({ where: { purchase_id: purchaseId } });
       }
       await tx.purchases.update({
         where: { id: purchaseId },
@@ -552,30 +651,51 @@ class PurchasesService {
       });
       await tx.user_analytics.update({
         where: { user_id: purchase.user_id },
-        data: {
-          number_of_purchases: {
-            decrement: 1,
-          },
-        },
+        data: { number_of_purchases: { decrement: 1 } },
       });
     });
+
+    const customer = purchase.users;
+    notificationService
+      .sendToUser(io ?? null, customer.id, NOTIFICATION_CATEGORY.ORDER_DELETED,
+        notification_key_enum.ORDER_DELETED,
+        { entityType: "purchase", entityId: purchaseId, createdBy: adminId })
+      .catch((err) => console.error("[Purchases] Failed to send delete notification:", err));
+
+    if (customer.email) {
+      getEmailService()
+        .sendOrderDeletedEmail(customer.email, {
+          name: customer.name,
+          purchaseSerial: purchase.purchase_serial ?? "N/A",
+          totalItems: purchase.purchase_items.reduce((s, i) => s + i.quantity, 0),
+          productListHTML: this.#buildProductListHTML(purchase.purchase_items),
+        })
+        .catch((err) => console.error("[Purchases] Failed to send delete email:", err));
+    }
   }
 
   /** Remove a single item; recalculate totals. Cannot remove last item. */
-  async deleteItem(purchaseId: number, itemId: number) {
+  async deleteItem(
+    purchaseId: number,
+    itemId: number,
+    adminId?: number,
+    io?: SocketIOServer | null,
+  ) {
     const purchase = await this.db.purchases.findUnique({
       where: { id: purchaseId },
-      include: { purchase_items: true },
+      include: {
+        purchase_items: { include: { products: { select: { title: true } } } },
+        users: { select: { id: true, name: true, email: true } },
+      },
     });
     if (!purchase) throw new NotFoundError("Purchase not found");
 
-    const item = purchase.purchase_items.find((i) => i.id === itemId);
+    const activeItems = purchase.purchase_items.filter((i) => !i.is_deleted);
+    const item = activeItems.find((i) => i.id === itemId);
     if (!item) throw new NotFoundError("Item not found in this purchase");
 
-    if (purchase.purchase_items.length === 1) {
-      throw new BadRequestError(
-        "Cannot remove the last item. Delete the entire purchase instead.",
-      );
+    if (activeItems.length === 1) {
+      throw new BadRequestError("Cannot remove the last item. Delete the entire purchase instead.");
     }
 
     await this.db.purchase_items.update({
@@ -583,22 +703,37 @@ class PurchasesService {
       data: { deleted_at: new Date(), is_deleted: true },
     });
 
-    const remaining = purchase.purchase_items.filter((i) => i.id !== itemId);
+    const remaining = activeItems.filter((i) => i.id !== itemId);
     const newSubtotal = remaining.reduce(
       (sum, i) => sum + Number(i.price_at_purchase) * i.quantity,
       0,
     );
     const newTotal = Math.max(0, newSubtotal - Number(purchase.discount));
 
-    return this.db.purchases.update({
+    const updated = await this.db.purchases.update({
       where: { id: purchaseId },
-      data: {
-        subtotal: newSubtotal,
-        total: newTotal,
-        updated_at: new Date(),
-      },
+      data: { subtotal: newSubtotal, total: newTotal, has_admin_edits: true, updated_at: new Date() },
       include: PURCHASE_INCLUDE,
     });
+
+    const customer = purchase.users;
+    notificationService
+      .sendToUser(io ?? null, customer.id, NOTIFICATION_CATEGORY.ORDER_ITEM_DELETED,
+        notification_key_enum.ORDER_ITEM_DELETED,
+        { entityType: "purchase", entityId: purchaseId, createdBy: adminId })
+      .catch((err) => console.error("[Purchases] Failed to send item delete notification:", err));
+
+    if (customer.email) {
+      getEmailService()
+        .sendOrderItemDeletedEmail(customer.email, {
+          name: customer.name,
+          purchaseSerial: purchase.purchase_serial ?? "N/A",
+          itemName: item.products?.title ?? "Product",
+        })
+        .catch((err) => console.error("[Purchases] Failed to send item delete email:", err));
+    }
+
+    return updated;
   }
 }
 

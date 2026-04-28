@@ -86,6 +86,8 @@ model users {
   creator_user              users?                     @relation("UserCreator", fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
   created_users             users[]                    @relation("UserCreator")
   account_review_settings_updated account_review_settings[] @relation("AccountReviewUpdatedBy")
+  notifications_received    notifications[]            @relation("NotificationRecipient")
+  notifications_created     notifications[]            @relation("NotificationCreator")
 
   @@index([mongo_id], map: "ix_users_mongo_id")
 }
@@ -486,6 +488,7 @@ model purchases {
   notes                   String?
   admin_notes             String?
   admin_note_by           Int?
+  has_admin_edits         Boolean?         @default(false)
   received_at             DateTime?        @db.Timestamp(6)
   received_by             Int?
   confirmed_at            DateTime?        @db.Timestamp(6)
@@ -701,4 +704,55 @@ model general_settings {
   whatsapp_receiving_number  String?   @db.VarChar(50)
   whatsapp_sending_number    String?   @db.VarChar(50)
   updated_at                 DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+// ---------------------------------------------------------------
+// Notifications
+// ---------------------------------------------------------------
+
+enum notification_key_enum {
+  ORDER_STATUS_RECEIVED
+  ORDER_STATUS_CONFIRMED
+  ORDER_STATUS_RETURNED
+  ORDER_ITEM_DELETED
+  ORDER_DELETED
+  ORDER_ADMIN_NOTE
+  SYSTEM_ANNOUNCEMENT
+  ACCOUNT_UPDATE
+  CUSTOM
+}
+
+model notifications {
+  id          Int                    @id @default(autoincrement())
+
+  /// Targeting — only one of user_id or role will be set
+  user_id     Int?
+  role        role_enum?
+
+  /// Category label (1-10, see notification category scheme)
+  category    Int
+
+  /// Message key (enum) — resolved to human-readable text by the frontend
+  message_key notification_key_enum
+
+  /// Link to the related entity (e.g. the purchase that was edited)
+  entity_type String?                @db.VarChar(50)
+  entity_id   Int?
+
+  /// Read tracking
+  is_read     Boolean                @default(false)
+
+  /// The admin who triggered this notification (null = system-generated)
+  created_by  Int?
+
+  created_at  DateTime?              @default(now()) @db.Timestamptz(6)
+
+  user        users?                 @relation("NotificationRecipient", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  creator     users?                 @relation("NotificationCreator", fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([user_id, is_read],         map: "ix_notifications_user_read")
+  @@index([user_id, category],        map: "ix_notifications_user_category")
+  @@index([role],                     map: "ix_notifications_role")
+  @@index([entity_type, entity_id],   map: "ix_notifications_entity")
+  @@index([created_at],               map: "ix_notifications_created_at")
 }

@@ -131,4 +131,23 @@ router.get("/whatsapp/status", ...adminAuth, whatsappController.getStatus);
 router.post("/whatsapp/send", ...adminAuth, whatsappController.sendMessage);
 router.post("/whatsapp/logout", ...adminAuth, whatsappController.logout);
 
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+// Send notification to user(s) or role (Admin, SubAdmin only)
+router.post(
+  "/notifications",
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+  adminController.sendNotification,
+);
+
+// List all notifications (Admin, SubAdmin, Moderator)
+router.get(
+  "/notifications",
+  ...adminAuth,
+  adminController.listNotifications,
+);
+
 export default router;

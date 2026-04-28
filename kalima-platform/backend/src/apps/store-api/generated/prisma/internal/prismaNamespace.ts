@@ -425,7 +425,8 @@ export const ModelName = {
   images: 'images',
   product_gallery: 'product_gallery',
   product_gallery_videos: 'product_gallery_videos',
-  general_settings: 'general_settings'
+  general_settings: 'general_settings',
+  notifications: 'notifications'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -441,7 +442,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos" | "general_settings"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos" | "general_settings" | "notifications"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3553,6 +3554,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    notifications: {
+      payload: Prisma.$notificationsPayload<ExtArgs>
+      fields: Prisma.notificationsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.notificationsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.notificationsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        findFirst: {
+          args: Prisma.notificationsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.notificationsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        findMany: {
+          args: Prisma.notificationsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>[]
+        }
+        create: {
+          args: Prisma.notificationsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        createMany: {
+          args: Prisma.notificationsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.notificationsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>[]
+        }
+        delete: {
+          args: Prisma.notificationsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        update: {
+          args: Prisma.notificationsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        deleteMany: {
+          args: Prisma.notificationsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.notificationsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.notificationsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>[]
+        }
+        upsert: {
+          args: Prisma.notificationsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        aggregate: {
+          args: Prisma.NotificationsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotifications>
+        }
+        groupBy: {
+          args: Prisma.notificationsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.notificationsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4037,6 +4112,7 @@ export const PurchasesScalarFieldEnum = {
   notes: 'notes',
   admin_notes: 'admin_notes',
   admin_note_by: 'admin_note_by',
+  has_admin_edits: 'has_admin_edits',
   received_at: 'received_at',
   received_by: 'received_by',
   confirmed_at: 'confirmed_at',
@@ -4159,6 +4235,22 @@ export const General_settingsScalarFieldEnum = {
 } as const
 
 export type General_settingsScalarFieldEnum = (typeof General_settingsScalarFieldEnum)[keyof typeof General_settingsScalarFieldEnum]
+
+
+export const NotificationsScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  role: 'role',
+  category: 'category',
+  message_key: 'message_key',
+  entity_type: 'entity_type',
+  entity_id: 'entity_id',
+  is_read: 'is_read',
+  created_by: 'created_by',
+  created_at: 'created_at'
+} as const
+
+export type NotificationsScalarFieldEnum = (typeof NotificationsScalarFieldEnum)[keyof typeof NotificationsScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -4423,6 +4515,20 @@ export type ListEnumvideo_source_type_enumFieldRefInput<$PrismaModel> = FieldRef
 
 
 /**
+ * Reference to a field of type 'notification_key_enum'
+ */
+export type Enumnotification_key_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'notification_key_enum'>
+    
+
+
+/**
+ * Reference to a field of type 'notification_key_enum[]'
+ */
+export type ListEnumnotification_key_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'notification_key_enum[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -4572,6 +4678,7 @@ export type GlobalOmitConfig = {
   product_gallery?: Prisma.product_galleryOmit
   product_gallery_videos?: Prisma.product_gallery_videosOmit
   general_settings?: Prisma.general_settingsOmit
+  notifications?: Prisma.notificationsOmit
 }
 
 /* Types for Logging */
