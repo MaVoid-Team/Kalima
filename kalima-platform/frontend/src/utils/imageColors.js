@@ -7,30 +7,46 @@ export function extractImageColors(imageUrl) {
 
         const img = new Image();
         img.crossOrigin = 'Anonymous';
+        img.referrerPolicy = 'no-referrer';
+
+        let attempt = 0;
 
         img.onload = () => {
             try {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 
-                // Scale down to 10x10 to average out noise and improve performance
-                canvas.width = 10;
-                canvas.height = 10;
+                // Scale down to 32x32 to get a good sampling of colors
+                canvas.width = 32;
+                canvas.height = 32;
                 
-                ctx.drawImage(img, 0, 0, 10, 10);
-                const imageData = ctx.getImageData(0, 0, 10, 10).data;
+                ctx.drawImage(img, 0, 0, 32, 32);
+                const data = ctx.getImageData(0, 0, 32, 32).data;
                 
-                let r = 0, g = 0, b = 0;
-                let count = 0;
+                let maxScore = -1;
+                let bestColor = [0, 0, 0];
+                let rSum = 0, gSum = 0, bSum = 0, count = 0;
                 
-                for (let i = 0; i < imageData.length; i += 4) {
-                    // Ignore highly transparent pixels
-                    if (imageData[i + 3] < 128) continue;
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+                    if (a < 128) continue;
                     
-                    r += imageData[i];
-                    g += imageData[i + 1];
-                    b += imageData[i + 2];
-                    count++;
+                    rSum += r; gSum += g; bSum += b; count++;
+
+                    const max = Math.max(r, g, b);
+                    const min = Math.min(r, g, b);
+                    const saturation = max === 0 ? 0 : (max - min) / max;
+                    const lightness = (max + min) / 2;
+                    
+                    // Filter out greys, pure whites, and pure blacks
+                    if (lightness > 30 && lightness < 225) {
+                        // Score based on how colorful and bright it is
+                        const score = saturation * (max / 255);
+                        if (score > maxScore) {
+                            maxScore = score;
+                            bestColor = [r, g, b];
+                        }
+                    }
                 }
 
                 if (count === 0) {
@@ -38,28 +54,35 @@ export function extractImageColors(imageUrl) {
                     return;
                 }
                 
-                r = Math.floor(r / count);
-                g = Math.floor(g / count);
-                b = Math.floor(b / count);
+                // If the image is entirely greyscale or muted, fallback to the average color
+                if (maxScore < 0.1 && count > 0) {
+                    bestColor = [Math.floor(rSum/count), Math.floor(gSum/count), Math.floor(bSum/count)];
+                }
                 
-                // Enhance vibrancy for the gradient
-                const r2 = Math.min(255, Math.floor(r * 1.2));
-                const g2 = Math.min(255, Math.floor(g * 1.2));
-                const b2 = Math.min(255, Math.floor(b * 1.2));
+                const [r, g, b] = bestColor;
 
                 resolve({
-                    start: `rgba(${r2}, ${g2}, ${b2}, 0.25)`,
-                    mid: `rgba(${r}, ${g}, ${b}, 0.1)`,
-                    end: 'var(--background)' // Fades into the background cleanly
+                    dominantRGB: `${r}, ${g}, ${b}`,
+                    vibrantRGB: `${Math.min(255, Math.floor(r*1.3))}, ${Math.min(255, Math.floor(g*1.3))}, ${Math.min(255, Math.floor(b*1.3))}`
                 });
             } catch (e) {
-                console.warn('Could not extract image colors (CORS or other issue):', e);
-                resolve(null);
+                if (attempt === 0) {
+                    attempt++;
+                    img.src = `https://corsproxy.io/?${encodeURIComponent(imageUrl)}`;
+                } else {
+                    console.warn('Could not extract image colors:', e);
+                    resolve(null);
+                }
             }
         };
 
         img.onerror = () => {
-            resolve(null);
+            if (attempt === 0) {
+                attempt++;
+                img.src = `https://corsproxy.io/?${encodeURIComponent(imageUrl)}`;
+            } else {
+                resolve(null);
+            }
         };
 
         img.src = imageUrl;
