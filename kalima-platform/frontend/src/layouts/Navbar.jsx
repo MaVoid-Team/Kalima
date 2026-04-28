@@ -346,7 +346,7 @@ export default function Navbar() {
       {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-6 inset-x-4 z-[70] flex justify-center pointer-events-none">
         <AnimatePresence>
-          {showMobileNav && (
+          {showMobileNav && !location.pathname.startsWith('/product/') && (
             <motion.div
               key="mobile-nav"
               initial={{ y: 100, opacity: 0, scale: 0.8 }}
