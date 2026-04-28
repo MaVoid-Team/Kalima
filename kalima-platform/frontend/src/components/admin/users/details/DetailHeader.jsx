@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Edit3, Save, X, Trash2, CheckCircle2, XCircle, Mail, Phone, Crown, Zap, ShieldCheck, Eye, AlertTriangle, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { useTranslation } from 'react-i18next';
+import { extractImageColors } from '@/utils/imageColors';
 
 export default function DetailHeader({
     user,
@@ -39,6 +40,15 @@ export default function DetailHeader({
     t
 }) {
     const { i18n } = useTranslation();
+    const [bannerColors, setBannerColors] = useState(null);
+
+    useEffect(() => {
+        if (user?.profile_pic_url) {
+            extractImageColors(user.profile_pic_url).then(colors => {
+                if (colors) setBannerColors(colors);
+            });
+        }
+    }, [user?.profile_pic_url]);
 
     const getFlagConfig = (flag) => {
         const f = flag || 'NORMAL';
@@ -55,7 +65,12 @@ export default function DetailHeader({
     return (
         <div className="sticky top-0 z-20 -mx-4 md:-mx-8 border-b bg-background/80 backdrop-blur-xl overflow-hidden transition-all duration-300">
             {/* Elegant Cover Photo Banner */}
-            <div className="h-32 md:h-40 w-full bg-linear-to-br from-primary/20 via-primary/5 to-background relative overflow-hidden">
+            <div 
+                className={`h-32 md:h-40 w-full relative overflow-hidden transition-all duration-700 ${!bannerColors ? 'bg-linear-to-br from-primary/20 via-primary/5 to-background' : ''}`}
+                style={bannerColors ? { 
+                    backgroundImage: `linear-gradient(to bottom right, ${bannerColors.start}, ${bannerColors.mid}, ${bannerColors.end})` 
+                } : {}}
+            >
                 {/* Decorative Elements */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20 animate-pulse" />
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/5 rounded-full blur-2xl -ml-10 -mb-10" />
