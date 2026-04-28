@@ -247,3 +247,8 @@ export type product_gallery_videos = Prisma.product_gallery_videosModel
  * 
  */
 export type general_settings = Prisma.general_settingsModel
+/**
+ * Model notifications
+ * 
+ */
+export type notifications = Prisma.notificationsModel

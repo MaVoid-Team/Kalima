@@ -92,7 +92,8 @@ export const ModelName = {
   images: 'images',
   product_gallery: 'product_gallery',
   product_gallery_videos: 'product_gallery_videos',
-  general_settings: 'general_settings'
+  general_settings: 'general_settings',
+  notifications: 'notifications'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -556,6 +557,7 @@ export const PurchasesScalarFieldEnum = {
   notes: 'notes',
   admin_notes: 'admin_notes',
   admin_note_by: 'admin_note_by',
+  has_admin_edits: 'has_admin_edits',
   received_at: 'received_at',
   received_by: 'received_by',
   confirmed_at: 'confirmed_at',
@@ -678,6 +680,22 @@ export const General_settingsScalarFieldEnum = {
 } as const
 
 export type General_settingsScalarFieldEnum = (typeof General_settingsScalarFieldEnum)[keyof typeof General_settingsScalarFieldEnum]
+
+
+export const NotificationsScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  role: 'role',
+  category: 'category',
+  message_key: 'message_key',
+  entity_type: 'entity_type',
+  entity_id: 'entity_id',
+  is_read: 'is_read',
+  created_by: 'created_by',
+  created_at: 'created_at'
+} as const
+
+export type NotificationsScalarFieldEnum = (typeof NotificationsScalarFieldEnum)[keyof typeof NotificationsScalarFieldEnum]
 
 
 export const SortOrder = {

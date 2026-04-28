@@ -16,6 +16,7 @@ import userProfileRoutes from "./user-profile.routes";
 import paymentMethodRoutes from "./payment-method.routes";
 import adminRoutes from "./admin.routes";
 import adminDashboardRoutes from "./admin-dashboard.routes";
+import notificationRoutes from "./notification.routes";
 
 const router = Router();
 
@@ -46,6 +47,9 @@ router.use("/admin", adminRoutes);
 
 // Admin Dashboard Analytics Routes
 router.use("/admin/dashboard", adminDashboardRoutes);
+
+// Notifications
+router.use("/notifications", notificationRoutes);
 
 export default router;
 

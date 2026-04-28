@@ -490,6 +490,23 @@ export type Enumvideo_source_type_enumWithAggregatesFilter<$PrismaModel = never>
   _max?: Prisma.NestedEnumvideo_source_type_enumFilter<$PrismaModel>
 }
 
+export type Enumnotification_key_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.notification_key_enum | Prisma.Enumnotification_key_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.notification_key_enum[] | Prisma.ListEnumnotification_key_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.notification_key_enum[] | Prisma.ListEnumnotification_key_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumnotification_key_enumFilter<$PrismaModel> | $Enums.notification_key_enum
+}
+
+export type Enumnotification_key_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.notification_key_enum | Prisma.Enumnotification_key_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.notification_key_enum[] | Prisma.ListEnumnotification_key_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.notification_key_enum[] | Prisma.ListEnumnotification_key_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumnotification_key_enumWithAggregatesFilter<$PrismaModel> | $Enums.notification_key_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumnotification_key_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumnotification_key_enumFilter<$PrismaModel>
+}
+
 export type NestedIntFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel>
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
@@ -977,6 +994,23 @@ export type NestedEnumvideo_source_type_enumWithAggregatesFilter<$PrismaModel = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumvideo_source_type_enumFilter<$PrismaModel>
   _max?: Prisma.NestedEnumvideo_source_type_enumFilter<$PrismaModel>
+}
+
+export type NestedEnumnotification_key_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.notification_key_enum | Prisma.Enumnotification_key_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.notification_key_enum[] | Prisma.ListEnumnotification_key_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.notification_key_enum[] | Prisma.ListEnumnotification_key_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumnotification_key_enumFilter<$PrismaModel> | $Enums.notification_key_enum
+}
+
+export type NestedEnumnotification_key_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.notification_key_enum | Prisma.Enumnotification_key_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.notification_key_enum[] | Prisma.ListEnumnotification_key_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.notification_key_enum[] | Prisma.ListEnumnotification_key_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumnotification_key_enumWithAggregatesFilter<$PrismaModel> | $Enums.notification_key_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumnotification_key_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumnotification_key_enumFilter<$PrismaModel>
 }
 
 

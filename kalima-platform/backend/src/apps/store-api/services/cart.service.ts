@@ -999,7 +999,7 @@ class CartService {
         });
 
         getEmailService()
-          .sendOrderReceivedEmail(user.email, {
+          .sendOrderPendingEmail(user.email, {
             name: user.name,
             purchaseSerial: createdPurchase.purchase_serial ?? "N/A",
             totalItems: itemCount,
@@ -1007,7 +1007,7 @@ class CartService {
             ordersUrl: `${process.env.APP_URL || ""}/orders`,
           })
           .catch((err) =>
-            console.error("[Cart] Failed to send order received email:", err),
+            console.error("[Cart] Failed to send order pending email:", err),
           );
       }
     }

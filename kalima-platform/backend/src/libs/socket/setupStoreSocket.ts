@@ -31,6 +31,10 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
       const userId = payload.userId;
       console.log(`[Socket] Token verified for userId: ${userId}`);
 
+      // ALL authenticated users join their personal room for targeted notifications
+      socket.join(`user:${userId}`);
+      console.log(`[Socket] User ${userId} joined personal room user:${userId}`);
+
       const role = await prisma.user_roles.findFirst({
         where: {
           user_id: userId,
@@ -40,13 +44,13 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
       });
 
       if (role) {
-        console.log(`[Socket] User ${userId} authorized. Joining 'store_admins' room.`);
+        // Admins additionally join the shared admin room
+        console.log(`[Socket] User ${userId} is admin. Joining 'store_admins' room.`);
         socket.join("store_admins");
-        socket.join(`user:${userId}`);
-        
+
         socket.on("requestWhatsappQr", async () => {
           console.log(`[Socket] Received 'requestWhatsappQr' from user ${userId}`);
-          
+
           // If already connected, notify immediately
           if (baileysClient.status === "ready") {
             console.log(`[Socket] WhatsApp is already ready. Emitting 'whatsappAuthenticated' immediately.`);
@@ -85,12 +89,10 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
             },
           });
         });
-      } else {
-        console.log(`[Socket] User ${userId} lacks Admin/SubAdmin roles. Discarding socket.`);
       }
     } catch (err: any) {
       console.log(`[Socket] Token validation failed:`, err?.message);
-      // Invalid token – do not join admin room
+      // Invalid token – do not join any room
     }
   });
 

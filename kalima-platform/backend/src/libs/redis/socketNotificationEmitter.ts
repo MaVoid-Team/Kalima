@@ -20,3 +20,42 @@ export function emitStorePurchaseToAdmins(
   };
   io.to("store_admins").emit("storePurchase", eventPayload);
 }
+
+/**
+ * Emit a notification to a single user by their user ID.
+ * All authenticated users join "user:{userId}" on socket connection.
+ */
+export function emitNotificationToUser(
+  io: SocketIOServer,
+  userId: number,
+  notification: {
+    id: number;
+    category: number;
+    message_key: string;
+    entity_type: string | null;
+    entity_id: number | null;
+    created_at: Date | null;
+  }
+): void {
+  io.to(`user:${userId}`).emit("notification", notification);
+}
+
+/**
+ * Emit a notification to a list of user IDs (role-based broadcast).
+ */
+export function emitNotificationToUsers(
+  io: SocketIOServer,
+  userIds: number[],
+  notification: {
+    id: number;
+    category: number;
+    message_key: string;
+    entity_type: string | null;
+    entity_id: number | null;
+    created_at: Date | null;
+  }
+): void {
+  for (const uid of userIds) {
+    io.to(`user:${uid}`).emit("notification", notification);
+  }
+}
