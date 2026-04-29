@@ -11,6 +11,9 @@ import AdminNotesSection from '@/components/admin/orders/AdminNotesSection';
 import { useWhatsappStatus } from '@/hooks/admin/useWhatsappStatus';
 import { QRCodeSVG } from 'qrcode.react';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import SendNotificationModal from '@/components/admin/notifications/SendNotificationModal';
+import { Bell } from 'lucide-react';
+
 import {
     AlertDialog,
     AlertDialogAction,
@@ -53,6 +56,7 @@ export default function OrderDetailPage() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
     const [isWhatsAppConnectionOpen, setIsWhatsAppConnectionOpen] = useState(false);
+    const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
     const [editableWhatsAppMessage, setEditableWhatsAppMessage] = useState('');
 
     const { status: whatsappStatus, qrCodeStr, sendingNumber, isActionLoading, requestQR, logout, sendMessage } = useWhatsappStatus();
@@ -364,7 +368,17 @@ export default function OrderDetailPage() {
                         <Trash2 className="me-2 h-4 w-4" />
                         {t('orders.actions.delete')}
                     </Button>
+
+                    <Button
+                        variant="secondary"
+                        onClick={() => setIsNotifModalOpen(true)}
+                        className="bg-primary/5 text-primary border-primary/20 hover:bg-primary/10"
+                    >
+                        <Bell className="me-2 h-4 w-4" />
+                        {t('notifications:admin.send_notification', 'Send Notification')}
+                    </Button>
                 </div>
+
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -567,6 +581,15 @@ export default function OrderDetailPage() {
                     )}
                 </div>
             </div>
+
+            <SendNotificationModal 
+                open={isNotifModalOpen} 
+                onOpenChange={setIsNotifModalOpen}
+                userId={order.user_id}
+                entityType="purchase"
+                entityId={order.id}
+            />
         </div>
+
     );
 }

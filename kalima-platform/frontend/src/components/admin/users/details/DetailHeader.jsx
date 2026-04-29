@@ -24,6 +24,9 @@ import {
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { useTranslation } from 'react-i18next';
 import { extractImageColors } from '@/lib/imageColors';
+import SendNotificationModal from '@/components/admin/notifications/SendNotificationModal';
+import { Bell } from 'lucide-react';
+
 
 export default function DetailHeader({
     user,
@@ -41,6 +44,8 @@ export default function DetailHeader({
 }) {
     const { i18n } = useTranslation();
     const [bannerColors, setBannerColors] = useState(null);
+    const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
+
 
     useEffect(() => {
         if (user?.profile_pic_url) {
@@ -241,11 +246,27 @@ export default function DetailHeader({
                                         </AlertDialogContent>
                                     </AlertDialog>
                                 )}
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="bg-primary/5 text-primary border-primary/20 hover:bg-primary/10"
+                                    onClick={() => setIsNotifModalOpen(true)}
+                                >
+                                    <Bell className="h-4 w-4 me-2" />
+                                    {t('notifications:admin.send_notification', 'Send Notification')}
+                                </Button>
                             </>
                         )}
                     </div>
                 </div>
             </div>
+
+            <SendNotificationModal 
+                open={isNotifModalOpen} 
+                onOpenChange={setIsNotifModalOpen}
+                userId={user.id}
+            />
         </div>
+
     );
 }

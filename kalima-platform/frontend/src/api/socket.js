@@ -4,17 +4,14 @@ const socketURL = import.meta.env.VITE_API_URL?.replace('/api/v2', '').replace('
 console.log('Socket URL initialized:', socketURL);
 
 const socket = io(socketURL, {
+    autoConnect: false, // Don't connect until requested
     auth: {
         token: localStorage.getItem('accessToken')
     }
-    // autoConnect: false,
-    // transports: ['websocket'],
-    // withCredentials: true,
 });
 
-// Update auth token before each connect attempt
 socket.on('connect', () => {
-    console.log('Socket connected to /store_admins');
+    console.log('Socket connected successfully');
 });
 
 socket.on('connect_error', (err) => {
@@ -28,9 +25,11 @@ socket.on('disconnect', (reason) => {
 export const connectSocket = () => {
     const token = localStorage.getItem('accessToken');
     if (token) {
-        // socket.auth = { token };
-        // Fallback: some backends check query parameters
-        socket.io.opts.headers = { Authorization: `Bearer ${token}` };
+        socket.auth = { token: `Bearer ${token}` };
+        // Also set in extraHeaders for some server configurations
+        socket.io.opts.extraHeaders = {
+            Authorization: `Bearer ${token}`
+        };
     } else {
         console.warn('No access token found for socket connection');
     }
@@ -42,7 +41,10 @@ export const connectSocket = () => {
 };
 
 export const disconnectSocket = () => {
-    socket.disconnect();
+    if (socket.connected) {
+        socket.disconnect();
+    }
 };
 
 export default socket;
+
