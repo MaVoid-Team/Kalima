@@ -60,17 +60,20 @@ export const useWhatsappStatus = () => {
         };
 
         const onConnect = () => {
-            console.log('Socket connected, joining store_admins');
+            console.log('Socket already connected or just connected, joining store_admins');
             socket.emit('join', 'store_admins');
         };
 
-        const onConnectError = (err) => {
-            console.error('Socket connection error:', err);
-            toast.error(t('settings.general.whatsappConnectionError'));
+        // If already connected, join immediately
+        if (socket.connected) {
+            onConnect();
+        }
+
+        const onConnectError = () => {
             setStatus('failed');
             setIsActionLoading(false);
-            disconnectSocket();
         };
+
 
         socket.on('connect', onConnect);
         socket.on('whatsappQr', onQr);
@@ -86,14 +89,14 @@ export const useWhatsappStatus = () => {
             socket.off('whatsappAuthFailed', onAuthFailed);
             socket.off('whatsappDisconnected', onDisconnected);
             socket.off('connect_error', onConnectError);
-            disconnectSocket();
         };
     }, [fetchStatus, t]);
 
+
     const requestQR = () => {
         setIsActionLoading(true);
-        connectSocket();
         console.log('Emitting requestWhatsappQr');
+
         socket.emit('requestWhatsappQr');
     };
 

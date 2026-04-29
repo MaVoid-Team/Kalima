@@ -19,6 +19,8 @@ import CartPreview from "../components/cart/CartPreview";
 import useAuth from "../hooks/auth/useAuth";
 import { useCart } from "../contexts/CartContext";
 import { useRole } from "@/hooks/useRole";
+import NotificationBell from "../components/notifications/NotificationBell";
+
 
 export default function Navbar() {
   const location = useLocation();
@@ -142,7 +144,7 @@ export default function Navbar() {
   return (
     <>
       <div className={cn(
-        "fixed inset-x-0 z-[70] flex justify-center pointer-events-none transition-all duration-700",
+        "fixed inset-x-0 z-[100] flex justify-center pointer-events-none transition-all duration-700",
         (scrolled && !isMobile) ? "top-4 px-4" : "top-0"
       )}>
         <motion.header
@@ -164,7 +166,7 @@ export default function Navbar() {
           }}
           transition={{ duration: 0.8, ease: [0.215, 0.61, 0.355, 1] }}
           className={cn(
-            "pointer-events-auto relative flex items-center transition-all overflow-hidden",
+            "pointer-events-auto relative flex items-center transition-all",
             (scrolled && !isMobile) ? "shadow-[0_20px_50px_rgba(0,0,0,0.1)]" : "w-full"
           )}
         >
@@ -238,6 +240,12 @@ export default function Navbar() {
                     </span>
                   </Button>
                 )}
+
+                {/* Notifications Button Desktop */}
+                {isAuthenticated && (
+                  <NotificationBell />
+                )}
+
 
                 <div className="h-6 w-[1px] bg-border mx-2" />
 
@@ -331,6 +339,12 @@ export default function Navbar() {
                   </span>
                 </Button>
               )}
+
+              {/* Notifications Button Mobile */}
+              {isAuthenticated && (
+                <NotificationBell />
+              )}
+
             </div>
           </div>
 

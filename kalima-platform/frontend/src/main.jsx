@@ -5,13 +5,17 @@ import './index.css'
 import './i18n';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { CartProvider } from './contexts/CartContext.jsx';
+import { NotificationsProvider } from './contexts/NotificationsContext.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
-      <CartProvider>
-        <App />
-      </CartProvider>
+      <NotificationsProvider>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </NotificationsProvider>
     </AuthProvider>
   </React.StrictMode>
 )
+

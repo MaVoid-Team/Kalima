@@ -1,0 +1,46 @@
+{
+  "title": "Notifications",
+  "unread_count": "You have {{count}} unread notifications",
+  "no_notifications": "No new notifications",
+  "mark_all_read": "Mark all as read",
+  "view_all": "View all",
+  "new_notification": "New notification received",
+  "marked_all_read": "All notifications marked as read",
+  "view": "View",
+  "keys": {
+    "ORDER_STATUS_RECEIVED": "Your order has been received by our team",
+    "ORDER_STATUS_CONFIRMED": "Your order has been confirmed",
+    "ORDER_STATUS_RETURNED": "Your order has been returned",
+    "ORDER_ITEM_DELETED": "An item has been removed from your order",
+    "ORDER_DELETED": "Your order has been cancelled",
+    "ORDER_ADMIN_NOTE": "A note has been added to your order",
+    "NEW_ORDER_CREATED": "A new order has been received",
+    "NEW_ACCOUNT_CREATED": "A new user account has been created",
+    "SYSTEM_ANNOUNCEMENT": "System announcement",
+    "ACCOUNT_UPDATE": "Your account has been updated",
+    "CUSTOM": "Custom notification"
+  },
+  "categories": {
+    "1": "Order Status",
+    "2": "Order Edit",
+    "3": "Order Deleted",
+    "4": "New Order",
+    "5": "New Account",
+    "7": "Admin Note",
+    "8": "Announcement",
+    "9": "Account",
+    "10": "Custom"
+  },
+  "admin": {
+    "send_notification": "Send Notification",
+    "target_user": "Target User",
+    "target_role": "Target Role",
+    "message_key": "Message Type",
+    "category": "Category",
+    "send_success": "Notification sent successfully",
+    "mass_notifications": "Mass Notifications",
+    "select_users": "Select Users",
+    "all_users": "All Users",
+    "role_based": "By Role"
+  }
+}

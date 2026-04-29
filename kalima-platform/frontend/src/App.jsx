@@ -66,6 +66,9 @@ const SamplesDirectoryPage = lazy(() => import("./pages/sample/SamplesDirectoryP
 const SamplePreview = lazy(() => import("./pages/sample/SamplePreviewPage"))
 // User lazy-loaded pages
 const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
+const NotificationsPage = lazy(() => import("./pages/notifications/NotificationsPage"));
+const AdminNotificationsPage = lazy(() => import("./pages/admin/notifications/AdminNotificationsPage"));
+
 
 // Teacher lazy-loaded pages
 const TeacherLayout = lazy(() => import("./layouts/TeacherLayout"));
@@ -138,7 +141,9 @@ const router = createBrowserRouter(
               />
             </Route>
             <Route path="/orders" element={<MyOrdersPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
           </Route>
+
         </Route>
 
         {/* 404 Fallback */}
@@ -166,7 +171,9 @@ const router = createBrowserRouter(
           <Route path="/admin/settings" element={<SettingsPage />} />
           <Route path="/admin/analytics" element={<AnalyticsPage />} />
           <Route path="/admin/employee-performance" element={<EmployeePerformancePage />} />
+          <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
         </Route>
+
       </Route>
 
       {/* Teacher Routes */}
