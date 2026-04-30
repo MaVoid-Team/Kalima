@@ -111,7 +111,9 @@ export const user_flag_enum = {
   PRO: 'PRO',
   NORMAL: 'NORMAL',
   OBSERVER: 'OBSERVER',
-  Warned: 'Warned'
+  Warned: 'Warned',
+  SUSPICIOUS: 'SUSPICIOUS',
+  BANNED: 'BANNED'
 } as const
 
 export type user_flag_enum = (typeof user_flag_enum)[keyof typeof user_flag_enum]

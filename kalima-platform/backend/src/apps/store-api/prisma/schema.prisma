@@ -633,6 +633,8 @@ enum user_flag_enum {
   NORMAL
   OBSERVER
   Warned
+  SUSPICIOUS
+  BANNED
 }
 
 model sample_sections {
