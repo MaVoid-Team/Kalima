@@ -38,6 +38,16 @@ export type user_roles = Prisma.user_rolesModel
  */
 export type users = Prisma.usersModel
 /**
+ * Model user_appreciation_pages
+ * 
+ */
+export type user_appreciation_pages = Prisma.user_appreciation_pagesModel
+/**
+ * Model user_appreciation_comments
+ * 
+ */
+export type user_appreciation_comments = Prisma.user_appreciation_commentsModel
+/**
  * Model account_review_settings
  * 
  */

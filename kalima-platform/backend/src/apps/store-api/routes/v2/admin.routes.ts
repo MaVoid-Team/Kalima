@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { adminController } from "../../controllers/admin.controller";
 import { adminUserStatsController } from "../../controllers/admin-user-stats.controller";
+import { appreciationController } from "../../controllers/appreciation.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/client";
@@ -54,6 +55,16 @@ router.get(
 
 // Get single user with all roles
 router.get("/users/:userId", ...adminModeratorAuth, adminController.getUser);
+router.get(
+  "/users/:userId/appreciation-page",
+  ...adminModeratorAuth,
+  appreciationController.getAdminPage,
+);
+router.post(
+  "/users/:userId/appreciation-page",
+  ...adminModeratorAuth,
+  appreciationController.createAdminPage,
+);
 router.patch(
   "/users/:userId/flag",
   ...adminModeratorAuth,

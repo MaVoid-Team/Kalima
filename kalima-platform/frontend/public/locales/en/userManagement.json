@@ -38,6 +38,7 @@
   "actions": {
     "create": "Create User",
     "view": "View Details",
+    "appreciation": "Open appreciation page",
     "approve": "Approve",
     "reject": "Reject",
     "delete": "Delete",

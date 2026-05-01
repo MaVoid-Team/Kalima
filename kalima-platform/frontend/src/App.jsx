@@ -51,6 +51,7 @@ const CategoriesPage = lazy(
 );
 const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
 const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
+const UserAppreciationPage = lazy(() => import("./pages/admin/users/UserAppreciationPage"));
 const AdminSamplesPage = lazy(() => import("./pages/admin/samples/AdminSamplesPage"));
 const AdminSampleSectionDetailPage = lazy(() => import("./pages/admin/samples/AdminSampleSectionDetailPage"));
 const SettingsPage = lazy(() => import("./pages/admin/settings/SettingsPage"))
@@ -63,6 +64,7 @@ const EmployeePerformancePage = lazy(() => import("./pages/admin/employee-perfor
 const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
 const SamplesDirectoryPage = lazy(() => import("./pages/sample/SamplesDirectoryPage"));
 const SamplePreview = lazy(() => import("./pages/sample/SamplePreviewPage"))
+const AppreciationPublicPage = lazy(() => import("./pages/appreciation/AppreciationPublicPage"));
 // User lazy-loaded pages
 const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
 
@@ -106,7 +108,8 @@ function Root() {
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<Root />}>
+      <Route element={<Root />}>
+      <Route path="/appreciation/:token" element={<AppreciationPublicPage />} />
       {/* Public Routes with MainLayout (Navbar & Footer) */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<LandingPage />} />
@@ -156,6 +159,7 @@ const router = createBrowserRouter(
           <Route path="/admin/required-fields" element={<RequiredFieldsPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/admin/users/:id" element={<UserDetailPage />} />
+          <Route path="/admin/users/:id/appreciation" element={<UserAppreciationPage />} />
           <Route path="/admin/samples" element={<AdminSamplesPage />} />
           <Route path="/admin/samples/:id" element={<AdminSampleSectionDetailPage />} />
           <Route path="/admin/coupons" element={<CouponsPage />} />
