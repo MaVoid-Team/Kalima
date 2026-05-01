@@ -77,7 +77,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=postgres
     volumes:
-      - dev-postgres-data:/var/lib/postgresql/data
+      - dev-postgres-data:/var/lib/postgresql
     networks:
       - dev-network
     healthcheck:
@@ -108,5 +108,8 @@ networks:
 
 volumes:
   dev-uploads:
+    name: kalima-dev-uploads
   dev-postgres-data:
+    name: kalima-dev-postgres-data
   dev-redis-data:
+    name: kalima-dev-redis-data
