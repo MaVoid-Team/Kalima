@@ -55,6 +55,8 @@ export const ModelName = {
   user_analytics: 'user_analytics',
   user_roles: 'user_roles',
   users: 'users',
+  user_appreciation_pages: 'user_appreciation_pages',
+  user_appreciation_comments: 'user_appreciation_comments',
   account_review_settings: 'account_review_settings',
   refresh_tokens: 'refresh_tokens',
   assistants: 'assistants',
@@ -178,6 +180,28 @@ export const UsersScalarFieldEnum = {
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
+
+
+export const User_appreciation_pagesScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  token: 'token',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type User_appreciation_pagesScalarFieldEnum = (typeof User_appreciation_pagesScalarFieldEnum)[keyof typeof User_appreciation_pagesScalarFieldEnum]
+
+
+export const User_appreciation_commentsScalarFieldEnum = {
+  id: 'id',
+  page_id: 'page_id',
+  author_name: 'author_name',
+  comment: 'comment',
+  created_at: 'created_at'
+} as const
+
+export type User_appreciation_commentsScalarFieldEnum = (typeof User_appreciation_commentsScalarFieldEnum)[keyof typeof User_appreciation_commentsScalarFieldEnum]
 
 
 export const Account_review_settingsScalarFieldEnum = {

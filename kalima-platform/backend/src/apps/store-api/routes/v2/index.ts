@@ -16,6 +16,7 @@ import userProfileRoutes from "./user-profile.routes";
 import paymentMethodRoutes from "./payment-method.routes";
 import adminRoutes from "./admin.routes";
 import adminDashboardRoutes from "./admin-dashboard.routes";
+import appreciationRoutes from "./appreciation.routes";
 
 const router = Router();
 
@@ -40,6 +41,7 @@ router.use("/profile", userProfileRoutes);
 
 // Payment Methods
 router.use("/payment-methods", paymentMethodRoutes);
+router.use("/appreciation", appreciationRoutes);
 
 // Admin Routes
 router.use("/admin", adminRoutes);
