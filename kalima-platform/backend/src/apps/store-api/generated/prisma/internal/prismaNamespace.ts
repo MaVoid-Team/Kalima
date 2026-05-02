@@ -426,7 +426,9 @@ export const ModelName = {
   sample_sections: 'sample_sections',
   images: 'images',
   product_gallery: 'product_gallery',
-  product_gallery_videos: 'product_gallery_videos'
+  product_gallery_videos: 'product_gallery_videos',
+  general_settings: 'general_settings',
+  notifications: 'notifications'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -442,7 +444,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "user_appreciation_pages" | "user_appreciation_comments" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "user_appreciation_pages" | "user_appreciation_comments" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos" | "general_settings" | "notifications"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3628,6 +3630,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    general_settings: {
+      payload: Prisma.$general_settingsPayload<ExtArgs>
+      fields: Prisma.general_settingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.general_settingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.general_settingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        findFirst: {
+          args: Prisma.general_settingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.general_settingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        findMany: {
+          args: Prisma.general_settingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>[]
+        }
+        create: {
+          args: Prisma.general_settingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        createMany: {
+          args: Prisma.general_settingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.general_settingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>[]
+        }
+        delete: {
+          args: Prisma.general_settingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        update: {
+          args: Prisma.general_settingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.general_settingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.general_settingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.general_settingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.general_settingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$general_settingsPayload>
+        }
+        aggregate: {
+          args: Prisma.General_settingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGeneral_settings>
+        }
+        groupBy: {
+          args: Prisma.general_settingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.General_settingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.general_settingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.General_settingsCountAggregateOutputType> | number
+        }
+      }
+    }
+    notifications: {
+      payload: Prisma.$notificationsPayload<ExtArgs>
+      fields: Prisma.notificationsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.notificationsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.notificationsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        findFirst: {
+          args: Prisma.notificationsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.notificationsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        findMany: {
+          args: Prisma.notificationsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>[]
+        }
+        create: {
+          args: Prisma.notificationsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        createMany: {
+          args: Prisma.notificationsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.notificationsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>[]
+        }
+        delete: {
+          args: Prisma.notificationsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        update: {
+          args: Prisma.notificationsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        deleteMany: {
+          args: Prisma.notificationsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.notificationsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.notificationsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>[]
+        }
+        upsert: {
+          args: Prisma.notificationsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$notificationsPayload>
+        }
+        aggregate: {
+          args: Prisma.NotificationsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotifications>
+        }
+        groupBy: {
+          args: Prisma.notificationsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.notificationsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -4134,6 +4284,7 @@ export const PurchasesScalarFieldEnum = {
   notes: 'notes',
   admin_notes: 'admin_notes',
   admin_note_by: 'admin_note_by',
+  has_admin_edits: 'has_admin_edits',
   received_at: 'received_at',
   received_by: 'received_by',
   confirmed_at: 'confirmed_at',
@@ -4246,6 +4397,33 @@ export const Product_gallery_videosScalarFieldEnum = {
 } as const
 
 export type Product_gallery_videosScalarFieldEnum = (typeof Product_gallery_videosScalarFieldEnum)[keyof typeof Product_gallery_videosScalarFieldEnum]
+
+
+export const General_settingsScalarFieldEnum = {
+  id: 'id',
+  whatsapp_receiving_number: 'whatsapp_receiving_number',
+  whatsapp_sending_number: 'whatsapp_sending_number',
+  updated_at: 'updated_at'
+} as const
+
+export type General_settingsScalarFieldEnum = (typeof General_settingsScalarFieldEnum)[keyof typeof General_settingsScalarFieldEnum]
+
+
+export const NotificationsScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  role: 'role',
+  category: 'category',
+  message_key: 'message_key',
+  entity_type: 'entity_type',
+  entity_id: 'entity_id',
+  target_link: 'target_link',
+  is_read: 'is_read',
+  created_by: 'created_by',
+  created_at: 'created_at'
+} as const
+
+export type NotificationsScalarFieldEnum = (typeof NotificationsScalarFieldEnum)[keyof typeof NotificationsScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -4510,6 +4688,20 @@ export type ListEnumvideo_source_type_enumFieldRefInput<$PrismaModel> = FieldRef
 
 
 /**
+ * Reference to a field of type 'notification_key_enum'
+ */
+export type Enumnotification_key_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'notification_key_enum'>
+    
+
+
+/**
+ * Reference to a field of type 'notification_key_enum[]'
+ */
+export type ListEnumnotification_key_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'notification_key_enum[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -4660,6 +4852,8 @@ export type GlobalOmitConfig = {
   images?: Prisma.imagesOmit
   product_gallery?: Prisma.product_galleryOmit
   product_gallery_videos?: Prisma.product_gallery_videosOmit
+  general_settings?: Prisma.general_settingsOmit
+  notifications?: Prisma.notificationsOmit
 }
 
 /* Types for Logging */

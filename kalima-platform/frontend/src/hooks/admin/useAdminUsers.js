@@ -54,6 +54,44 @@ export const useAdminUsers = () => {
         }
     }, []);
 
+    // ─── Update Single User ─────────────────────────────────────────────────────────
+    const updateUser = useCallback(async (userId, data) => {
+        setLoading(true);
+        try {
+            const response = await mutate({
+                endpoint: `/admin/users/${userId}/profile`,
+                method: 'patch',
+                data,
+            });
+            setSelectedUser(response || null);
+            return response;
+        } catch (error) {
+            console.error('Failed to update user:', error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // ─── Update User Flag ─────────────────────────────────────────────────────────
+    const updateUserFlag = useCallback(async (userId, flag) => {
+        setLoading(true);
+        try {
+            const response = await mutate({
+                endpoint: `/admin/users/${userId}/flag`,
+                method: 'patch',
+                data: { flag },
+            });
+            setSelectedUser(response || null);
+            return response;
+        } catch (error) {
+            console.error('Failed to update user flag:', error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     // ─── Delete User ─────────────────────────────────────────────────────────
     const deleteUser = async (userId) => {
         try {
@@ -152,6 +190,8 @@ export const useAdminUsers = () => {
         // actions
         fetchUsers,
         fetchUserById,
+        updateUser,
+        updateUserFlag,
         deleteUser,
         approveUser,
         rejectUser,

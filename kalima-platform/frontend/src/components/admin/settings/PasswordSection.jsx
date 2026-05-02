@@ -38,7 +38,10 @@ export default function PasswordSection({ ns = 'admin' }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle 
+                    className="flex items-center gap-2"
+                    data-search-content={`${t('settings.password.title', { lng: 'en' })} ${t('settings.password.title', { lng: 'ar' })}`}
+                >
                     <Lock className="h-5 w-5" />
                     {t('settings.password.title')}
                 </CardTitle>
@@ -46,8 +49,16 @@ export default function PasswordSection({ ns = 'admin' }) {
             <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <h3 className="text-sm font-medium">{t('settings.password.changePassword')}</h3>
-                        <p className="text-sm text-muted-foreground">
+                        <h3 
+                            className="text-sm font-medium"
+                            data-search-content={`${t('settings.password.changePassword', { lng: 'en' })} ${t('settings.password.changePassword', { lng: 'ar' })}`}
+                        >
+                            {t('settings.password.changePassword')}
+                        </h3>
+                        <p 
+                            className="text-sm text-muted-foreground"
+                            data-search-content={`${t('settings.password.changeDescription', { lng: 'en' })} ${t('settings.password.changeDescription', { lng: 'ar' })}`}
+                        >
                             {t('settings.password.changeDescription', 'Change your existing password')}
                         </p>
                         <Button 
@@ -63,8 +74,16 @@ export default function PasswordSection({ ns = 'admin' }) {
                     {/* Only show set password option for OAuth users */}
                     {hasOAuthProviders && (
                         <div className="space-y-2">
-                            <h3 className="text-sm font-medium">{t('settings.password.setPassword')}</h3>
-                            <p className="text-sm text-muted-foreground">
+                            <h3 
+                                className="text-sm font-medium"
+                                data-search-content={`${t('settings.password.setPassword', { lng: 'en' })} ${t('settings.password.setPassword', { lng: 'ar' })}`}
+                            >
+                                {t('settings.password.setPassword')}
+                            </h3>
+                            <p 
+                                className="text-sm text-muted-foreground"
+                                data-search-content={`${t('settings.password.setDescription', { lng: 'en' })} ${t('settings.password.setDescription', { lng: 'ar' })}`}
+                            >
                                 {t('settings.password.setDescription', 'Set a password for local login')}
                             </p>
                             <Button 

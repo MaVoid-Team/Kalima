@@ -380,6 +380,8 @@ export type usersWhereInput = {
   creator_user?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   created_users?: Prisma.UsersListRelationFilter
   account_review_settings_updated?: Prisma.Account_review_settingsListRelationFilter
+  notifications_received?: Prisma.NotificationsListRelationFilter
+  notifications_created?: Prisma.NotificationsListRelationFilter
 }
 
 export type usersOrderByWithRelationInput = {
@@ -429,6 +431,8 @@ export type usersOrderByWithRelationInput = {
   creator_user?: Prisma.usersOrderByWithRelationInput
   created_users?: Prisma.usersOrderByRelationAggregateInput
   account_review_settings_updated?: Prisma.account_review_settingsOrderByRelationAggregateInput
+  notifications_received?: Prisma.notificationsOrderByRelationAggregateInput
+  notifications_created?: Prisma.notificationsOrderByRelationAggregateInput
 }
 
 export type usersWhereUniqueInput = Prisma.AtLeast<{
@@ -481,6 +485,8 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   creator_user?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   created_users?: Prisma.UsersListRelationFilter
   account_review_settings_updated?: Prisma.Account_review_settingsListRelationFilter
+  notifications_received?: Prisma.NotificationsListRelationFilter
+  notifications_created?: Prisma.NotificationsListRelationFilter
 }, "id" | "mongo_id" | "email">
 
 export type usersOrderByWithAggregationInput = {
@@ -586,6 +592,8 @@ export type usersCreateInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateInput = {
@@ -634,6 +642,8 @@ export type usersUncheckedCreateInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUpdateInput = {
@@ -681,6 +691,8 @@ export type usersUpdateInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateInput = {
@@ -729,6 +741,8 @@ export type usersUncheckedUpdateInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateManyInput = {
@@ -1299,6 +1313,38 @@ export type usersUpdateOneWithoutPurchases_returnedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutPurchases_returnedInput, Prisma.usersUpdateWithoutPurchases_returnedInput>, Prisma.usersUncheckedUpdateWithoutPurchases_returnedInput>
 }
 
+export type usersCreateNestedOneWithoutNotifications_receivedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutNotifications_receivedInput, Prisma.usersUncheckedCreateWithoutNotifications_receivedInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutNotifications_receivedInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersCreateNestedOneWithoutNotifications_createdInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutNotifications_createdInput, Prisma.usersUncheckedCreateWithoutNotifications_createdInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutNotifications_createdInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneWithoutNotifications_receivedNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutNotifications_receivedInput, Prisma.usersUncheckedCreateWithoutNotifications_receivedInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutNotifications_receivedInput
+  upsert?: Prisma.usersUpsertWithoutNotifications_receivedInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutNotifications_receivedInput, Prisma.usersUpdateWithoutNotifications_receivedInput>, Prisma.usersUncheckedUpdateWithoutNotifications_receivedInput>
+}
+
+export type usersUpdateOneWithoutNotifications_createdNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutNotifications_createdInput, Prisma.usersUncheckedCreateWithoutNotifications_createdInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutNotifications_createdInput
+  upsert?: Prisma.usersUpsertWithoutNotifications_createdInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutNotifications_createdInput, Prisma.usersUpdateWithoutNotifications_createdInput>, Prisma.usersUncheckedUpdateWithoutNotifications_createdInput>
+}
+
 export type usersCreateWithoutAuth_identitiesInput = {
   mongo_id?: string | null
   name: string
@@ -1343,6 +1389,8 @@ export type usersCreateWithoutAuth_identitiesInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutAuth_identitiesInput = {
@@ -1390,6 +1438,8 @@ export type usersUncheckedCreateWithoutAuth_identitiesInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutAuth_identitiesInput = {
@@ -1452,6 +1502,8 @@ export type usersUpdateWithoutAuth_identitiesInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
@@ -1499,6 +1551,8 @@ export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutUser_analyticsInput = {
@@ -1545,6 +1599,8 @@ export type usersCreateWithoutUser_analyticsInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutUser_analyticsInput = {
@@ -1592,6 +1648,8 @@ export type usersUncheckedCreateWithoutUser_analyticsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutUser_analyticsInput = {
@@ -1654,6 +1712,8 @@ export type usersUpdateWithoutUser_analyticsInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutUser_analyticsInput = {
@@ -1701,6 +1761,8 @@ export type usersUncheckedUpdateWithoutUser_analyticsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutUser_rolesInput = {
@@ -1747,6 +1809,8 @@ export type usersCreateWithoutUser_rolesInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutUser_rolesInput = {
@@ -1794,6 +1858,8 @@ export type usersUncheckedCreateWithoutUser_rolesInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutUser_rolesInput = {
@@ -1856,6 +1922,8 @@ export type usersUpdateWithoutUser_rolesInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutUser_rolesInput = {
@@ -1903,6 +1971,8 @@ export type usersUncheckedUpdateWithoutUser_rolesInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutCreated_usersInput = {
@@ -1949,6 +2019,8 @@ export type usersCreateWithoutCreated_usersInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesCreateNestedOneWithoutUsersInput
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutCreated_usersInput = {
@@ -1996,6 +2068,8 @@ export type usersUncheckedCreateWithoutCreated_usersInput = {
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutCreated_usersInput = {
@@ -2047,6 +2121,8 @@ export type usersCreateWithoutCreator_userInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutCreator_userInput = {
@@ -2094,6 +2170,8 @@ export type usersUncheckedCreateWithoutCreator_userInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutCreator_userInput = {
@@ -2161,6 +2239,8 @@ export type usersUpdateWithoutCreated_usersInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUpdateOneWithoutUsersNestedInput
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCreated_usersInput = {
@@ -2208,6 +2288,8 @@ export type usersUncheckedUpdateWithoutCreated_usersInput = {
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUpsertWithWhereUniqueWithoutCreator_userInput = {
@@ -2298,6 +2380,8 @@ export type usersCreateWithoutUser_appreciation_pageInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutUser_appreciation_pageInput = {
@@ -2345,6 +2429,8 @@ export type usersUncheckedCreateWithoutUser_appreciation_pageInput = {
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutUser_appreciation_pageInput = {
@@ -2407,6 +2493,8 @@ export type usersUpdateWithoutUser_appreciation_pageInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutUser_appreciation_pageInput = {
@@ -2454,6 +2542,8 @@ export type usersUncheckedUpdateWithoutUser_appreciation_pageInput = {
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutAccount_review_settings_updatedInput = {
@@ -2500,6 +2590,8 @@ export type usersCreateWithoutAccount_review_settings_updatedInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesCreateNestedOneWithoutUsersInput
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutAccount_review_settings_updatedInput = {
@@ -2547,6 +2639,8 @@ export type usersUncheckedCreateWithoutAccount_review_settings_updatedInput = {
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutAccount_review_settings_updatedInput = {
@@ -2609,6 +2703,8 @@ export type usersUpdateWithoutAccount_review_settings_updatedInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUpdateOneWithoutUsersNestedInput
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAccount_review_settings_updatedInput = {
@@ -2656,6 +2752,8 @@ export type usersUncheckedUpdateWithoutAccount_review_settings_updatedInput = {
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutRefresh_tokensInput = {
@@ -2702,6 +2800,8 @@ export type usersCreateWithoutRefresh_tokensInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutRefresh_tokensInput = {
@@ -2749,6 +2849,8 @@ export type usersUncheckedCreateWithoutRefresh_tokensInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutRefresh_tokensInput = {
@@ -2811,6 +2913,8 @@ export type usersUpdateWithoutRefresh_tokensInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
@@ -2858,6 +2962,8 @@ export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutAssistantsInput = {
@@ -2904,6 +3010,8 @@ export type usersCreateWithoutAssistantsInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutAssistantsInput = {
@@ -2951,6 +3059,8 @@ export type usersUncheckedCreateWithoutAssistantsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutAssistantsInput = {
@@ -3013,6 +3123,8 @@ export type usersUpdateWithoutAssistantsInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAssistantsInput = {
@@ -3060,6 +3172,8 @@ export type usersUncheckedUpdateWithoutAssistantsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutLecturersInput = {
@@ -3106,6 +3220,8 @@ export type usersCreateWithoutLecturersInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutLecturersInput = {
@@ -3153,6 +3269,8 @@ export type usersUncheckedCreateWithoutLecturersInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutLecturersInput = {
@@ -3215,6 +3333,8 @@ export type usersUpdateWithoutLecturersInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutLecturersInput = {
@@ -3262,6 +3382,8 @@ export type usersUncheckedUpdateWithoutLecturersInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutParentsInput = {
@@ -3308,6 +3430,8 @@ export type usersCreateWithoutParentsInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutParentsInput = {
@@ -3355,6 +3479,8 @@ export type usersUncheckedCreateWithoutParentsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutParentsInput = {
@@ -3417,6 +3543,8 @@ export type usersUpdateWithoutParentsInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutParentsInput = {
@@ -3464,6 +3592,8 @@ export type usersUncheckedUpdateWithoutParentsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutSocial_mediaInput = {
@@ -3510,6 +3640,8 @@ export type usersCreateWithoutSocial_mediaInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutSocial_mediaInput = {
@@ -3557,6 +3689,8 @@ export type usersUncheckedCreateWithoutSocial_mediaInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutSocial_mediaInput = {
@@ -3619,6 +3753,8 @@ export type usersUpdateWithoutSocial_mediaInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutSocial_mediaInput = {
@@ -3666,6 +3802,8 @@ export type usersUncheckedUpdateWithoutSocial_mediaInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutStudentsInput = {
@@ -3712,6 +3850,8 @@ export type usersCreateWithoutStudentsInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutStudentsInput = {
@@ -3759,6 +3899,8 @@ export type usersUncheckedCreateWithoutStudentsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutStudentsInput = {
@@ -3821,6 +3963,8 @@ export type usersUpdateWithoutStudentsInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutStudentsInput = {
@@ -3868,6 +4012,8 @@ export type usersUncheckedUpdateWithoutStudentsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutTeachersInput = {
@@ -3914,6 +4060,8 @@ export type usersCreateWithoutTeachersInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutTeachersInput = {
@@ -3961,6 +4109,8 @@ export type usersUncheckedCreateWithoutTeachersInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutTeachersInput = {
@@ -4023,6 +4173,8 @@ export type usersUpdateWithoutTeachersInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutTeachersInput = {
@@ -4070,6 +4222,8 @@ export type usersUncheckedUpdateWithoutTeachersInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutTeaches_atInput = {
@@ -4116,6 +4270,8 @@ export type usersCreateWithoutTeaches_atInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutTeaches_atInput = {
@@ -4163,6 +4319,8 @@ export type usersUncheckedCreateWithoutTeaches_atInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutTeaches_atInput = {
@@ -4225,6 +4383,8 @@ export type usersUpdateWithoutTeaches_atInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutTeaches_atInput = {
@@ -4272,6 +4432,8 @@ export type usersUncheckedUpdateWithoutTeaches_atInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutEmail_verification_tokensInput = {
@@ -4318,6 +4480,8 @@ export type usersCreateWithoutEmail_verification_tokensInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
@@ -4365,6 +4529,8 @@ export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutEmail_verification_tokensInput = {
@@ -4427,6 +4593,8 @@ export type usersUpdateWithoutEmail_verification_tokensInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
@@ -4474,6 +4642,8 @@ export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutPassword_reset_tokensInput = {
@@ -4520,6 +4690,8 @@ export type usersCreateWithoutPassword_reset_tokensInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
@@ -4567,6 +4739,8 @@ export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutPassword_reset_tokensInput = {
@@ -4629,6 +4803,8 @@ export type usersUpdateWithoutPassword_reset_tokensInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
@@ -4676,6 +4852,8 @@ export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutCoupon_usagesInput = {
@@ -4722,6 +4900,8 @@ export type usersCreateWithoutCoupon_usagesInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutCoupon_usagesInput = {
@@ -4769,6 +4949,8 @@ export type usersUncheckedCreateWithoutCoupon_usagesInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutCoupon_usagesInput = {
@@ -4831,6 +5013,8 @@ export type usersUpdateWithoutCoupon_usagesInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCoupon_usagesInput = {
@@ -4878,6 +5062,8 @@ export type usersUncheckedUpdateWithoutCoupon_usagesInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutProduct_reviewsInput = {
@@ -4924,6 +5110,8 @@ export type usersCreateWithoutProduct_reviewsInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutProduct_reviewsInput = {
@@ -4971,6 +5159,8 @@ export type usersUncheckedCreateWithoutProduct_reviewsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutProduct_reviewsInput = {
@@ -5033,6 +5223,8 @@ export type usersUpdateWithoutProduct_reviewsInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutProduct_reviewsInput = {
@@ -5080,6 +5272,8 @@ export type usersUncheckedUpdateWithoutProduct_reviewsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutCartsInput = {
@@ -5126,6 +5320,8 @@ export type usersCreateWithoutCartsInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutCartsInput = {
@@ -5173,6 +5369,8 @@ export type usersUncheckedCreateWithoutCartsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutCartsInput = {
@@ -5235,6 +5433,8 @@ export type usersUpdateWithoutCartsInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCartsInput = {
@@ -5282,6 +5482,8 @@ export type usersUncheckedUpdateWithoutCartsInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersCreateWithoutPurchasesInput = {
@@ -5328,6 +5530,8 @@ export type usersCreateWithoutPurchasesInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutPurchasesInput = {
@@ -5375,6 +5579,8 @@ export type usersUncheckedCreateWithoutPurchasesInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutPurchasesInput = {
@@ -5426,6 +5632,8 @@ export type usersCreateWithoutPurchases_receivedInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutPurchases_receivedInput = {
@@ -5473,6 +5681,8 @@ export type usersUncheckedCreateWithoutPurchases_receivedInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutPurchases_receivedInput = {
@@ -5524,6 +5734,8 @@ export type usersCreateWithoutPurchases_confirmedInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutPurchases_confirmedInput = {
@@ -5571,6 +5783,8 @@ export type usersUncheckedCreateWithoutPurchases_confirmedInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutPurchases_confirmedInput = {
@@ -5622,6 +5836,8 @@ export type usersCreateWithoutPurchases_returnedInput = {
   creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
   created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
 }
 
 export type usersUncheckedCreateWithoutPurchases_returnedInput = {
@@ -5669,6 +5885,8 @@ export type usersUncheckedCreateWithoutPurchases_returnedInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
   created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type usersCreateOrConnectWithoutPurchases_returnedInput = {
@@ -5731,6 +5949,8 @@ export type usersUpdateWithoutPurchasesInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchasesInput = {
@@ -5778,6 +5998,8 @@ export type usersUncheckedUpdateWithoutPurchasesInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUpsertWithoutPurchases_receivedInput = {
@@ -5835,6 +6057,8 @@ export type usersUpdateWithoutPurchases_receivedInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchases_receivedInput = {
@@ -5882,6 +6106,8 @@ export type usersUncheckedUpdateWithoutPurchases_receivedInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUpsertWithoutPurchases_confirmedInput = {
@@ -5939,6 +6165,8 @@ export type usersUpdateWithoutPurchases_confirmedInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchases_confirmedInput = {
@@ -5986,6 +6214,8 @@ export type usersUncheckedUpdateWithoutPurchases_confirmedInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUpsertWithoutPurchases_returnedInput = {
@@ -6043,6 +6273,8 @@ export type usersUpdateWithoutPurchases_returnedInput = {
   creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchases_returnedInput = {
@@ -6090,6 +6322,428 @@ export type usersUncheckedUpdateWithoutPurchases_returnedInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
+}
+
+export type usersCreateWithoutNotifications_receivedInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  flag?: $Enums.user_flag_enum
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
+  product_reviews?: Prisma.product_reviewsCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesCreateNestedOneWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
+  account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
+}
+
+export type usersUncheckedCreateWithoutNotifications_receivedInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  created_by?: number | null
+  flag?: $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
+  product_reviews?: Prisma.product_reviewsUncheckedCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesUncheckedCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
+  account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
+}
+
+export type usersCreateOrConnectWithoutNotifications_receivedInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutNotifications_receivedInput, Prisma.usersUncheckedCreateWithoutNotifications_receivedInput>
+}
+
+export type usersCreateWithoutNotifications_createdInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  flag?: $Enums.user_flag_enum
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
+  product_reviews?: Prisma.product_reviewsCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesCreateNestedOneWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
+  account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+}
+
+export type usersUncheckedCreateWithoutNotifications_createdInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  created_by?: number | null
+  flag?: $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
+  product_reviews?: Prisma.product_reviewsUncheckedCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesUncheckedCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
+  account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type usersCreateOrConnectWithoutNotifications_createdInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutNotifications_createdInput, Prisma.usersUncheckedCreateWithoutNotifications_createdInput>
+}
+
+export type usersUpsertWithoutNotifications_receivedInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutNotifications_receivedInput, Prisma.usersUncheckedUpdateWithoutNotifications_receivedInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutNotifications_receivedInput, Prisma.usersUncheckedCreateWithoutNotifications_receivedInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutNotifications_receivedInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutNotifications_receivedInput, Prisma.usersUncheckedUpdateWithoutNotifications_receivedInput>
+}
+
+export type usersUpdateWithoutNotifications_receivedInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  flag?: Prisma.Enumuser_flag_enumFieldUpdateOperationsInput | $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
+  product_reviews?: Prisma.product_reviewsUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUpdateOneWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
+  account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
+}
+
+export type usersUncheckedUpdateWithoutNotifications_receivedInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  flag?: Prisma.Enumuser_flag_enumFieldUpdateOperationsInput | $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
+  product_reviews?: Prisma.product_reviewsUncheckedUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUncheckedUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
+  account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
+}
+
+export type usersUpsertWithoutNotifications_createdInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutNotifications_createdInput, Prisma.usersUncheckedUpdateWithoutNotifications_createdInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutNotifications_createdInput, Prisma.usersUncheckedCreateWithoutNotifications_createdInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutNotifications_createdInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutNotifications_createdInput, Prisma.usersUncheckedUpdateWithoutNotifications_createdInput>
+}
+
+export type usersUpdateWithoutNotifications_createdInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  flag?: Prisma.Enumuser_flag_enumFieldUpdateOperationsInput | $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
+  product_reviews?: Prisma.product_reviewsUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUpdateOneWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
+  account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+}
+
+export type usersUncheckedUpdateWithoutNotifications_createdInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  flag?: Prisma.Enumuser_flag_enumFieldUpdateOperationsInput | $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
+  product_reviews?: Prisma.product_reviewsUncheckedUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUncheckedUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
+  account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type usersCreateManyCreator_userInput = {
@@ -6160,6 +6814,8 @@ export type usersUpdateWithoutCreator_userInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCreator_userInput = {
@@ -6207,6 +6863,8 @@ export type usersUncheckedUpdateWithoutCreator_userInput = {
   user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
   created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
   account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type usersUncheckedUpdateManyWithoutCreator_userInput = {
@@ -6254,6 +6912,8 @@ export type UsersCountOutputType = {
   coupon_usages: number
   created_users: number
   account_review_settings_updated: number
+  notifications_received: number
+  notifications_created: number
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -6272,6 +6932,8 @@ export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   coupon_usages?: boolean | UsersCountOutputTypeCountCoupon_usagesArgs
   created_users?: boolean | UsersCountOutputTypeCountCreated_usersArgs
   account_review_settings_updated?: boolean | UsersCountOutputTypeCountAccount_review_settings_updatedArgs
+  notifications_received?: boolean | UsersCountOutputTypeCountNotifications_receivedArgs
+  notifications_created?: boolean | UsersCountOutputTypeCountNotifications_createdArgs
 }
 
 /**
@@ -6389,6 +7051,20 @@ export type UsersCountOutputTypeCountAccount_review_settings_updatedArgs<ExtArgs
   where?: Prisma.account_review_settingsWhereInput
 }
 
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountNotifications_receivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.notificationsWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountNotifications_createdArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.notificationsWhereInput
+}
+
 
 export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -6437,6 +7113,8 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   creator_user?: boolean | Prisma.users$creator_userArgs<ExtArgs>
   created_users?: boolean | Prisma.users$created_usersArgs<ExtArgs>
   account_review_settings_updated?: boolean | Prisma.users$account_review_settings_updatedArgs<ExtArgs>
+  notifications_received?: boolean | Prisma.users$notifications_receivedArgs<ExtArgs>
+  notifications_created?: boolean | Prisma.users$notifications_createdArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
@@ -6543,6 +7221,8 @@ export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   creator_user?: boolean | Prisma.users$creator_userArgs<ExtArgs>
   created_users?: boolean | Prisma.users$created_usersArgs<ExtArgs>
   account_review_settings_updated?: boolean | Prisma.users$account_review_settings_updatedArgs<ExtArgs>
+  notifications_received?: boolean | Prisma.users$notifications_receivedArgs<ExtArgs>
+  notifications_created?: boolean | Prisma.users$notifications_createdArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type usersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -6579,6 +7259,8 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     creator_user: Prisma.$usersPayload<ExtArgs> | null
     created_users: Prisma.$usersPayload<ExtArgs>[]
     account_review_settings_updated: Prisma.$account_review_settingsPayload<ExtArgs>[]
+    notifications_received: Prisma.$notificationsPayload<ExtArgs>[]
+    notifications_created: Prisma.$notificationsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -7021,6 +7703,8 @@ export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Ty
   creator_user<T extends Prisma.users$creator_userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$creator_userArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   created_users<T extends Prisma.users$created_usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$created_usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   account_review_settings_updated<T extends Prisma.users$account_review_settings_updatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$account_review_settings_updatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$account_review_settingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications_received<T extends Prisma.users$notifications_receivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$notifications_receivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$notificationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications_created<T extends Prisma.users$notifications_createdArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$notifications_createdArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$notificationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8005,6 +8689,54 @@ export type users$account_review_settings_updatedArgs<ExtArgs extends runtime.Ty
   take?: number
   skip?: number
   distinct?: Prisma.Account_review_settingsScalarFieldEnum | Prisma.Account_review_settingsScalarFieldEnum[]
+}
+
+/**
+ * users.notifications_received
+ */
+export type users$notifications_receivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the notifications
+   */
+  select?: Prisma.notificationsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the notifications
+   */
+  omit?: Prisma.notificationsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.notificationsInclude<ExtArgs> | null
+  where?: Prisma.notificationsWhereInput
+  orderBy?: Prisma.notificationsOrderByWithRelationInput | Prisma.notificationsOrderByWithRelationInput[]
+  cursor?: Prisma.notificationsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationsScalarFieldEnum | Prisma.NotificationsScalarFieldEnum[]
+}
+
+/**
+ * users.notifications_created
+ */
+export type users$notifications_createdArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the notifications
+   */
+  select?: Prisma.notificationsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the notifications
+   */
+  omit?: Prisma.notificationsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.notificationsInclude<ExtArgs> | null
+  where?: Prisma.notificationsWhereInput
+  orderBy?: Prisma.notificationsOrderByWithRelationInput | Prisma.notificationsOrderByWithRelationInput[]
+  cursor?: Prisma.notificationsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationsScalarFieldEnum | Prisma.NotificationsScalarFieldEnum[]
 }
 
 /**

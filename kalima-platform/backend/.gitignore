@@ -3,3 +3,5 @@ trnode_modules
 .env
 migration_lock.toml
 /generated/prisma
+
+baileys_auth/

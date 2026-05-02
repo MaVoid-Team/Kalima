@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 import { userManagementService } from "../services/user-management.service";
+import { notificationService } from "../services/notification.service";
 import { accountReviewService } from "../services/account-review.service";
 import {
   AssignRoleDto,
@@ -31,6 +32,9 @@ import {
   LecturerRegistrationDto,
 } from "../dtos/auth.dto";
 import { CreatorContext } from "../interfaces/auth.interface";
+import { userProfileService } from "../services/user-profile.service";
+import { UpdateProfileDto } from "../dtos/user-profile.dto";
+import { SendNotificationDto, NotificationFilterDto } from "../dtos/notification.dto";
 
 // ============================================
 // HELPER FUNCTIONS
@@ -63,9 +67,42 @@ function canViewOrEditUserFlag(user: any): boolean {
     role_enum.SubAdmin,
     role_enum.Moderator,
   ];
-  return roles.some((r) =>
-    allowedRoles.includes(r.role),
+  return roles.some((r) => allowedRoles.includes(r.role));
+}
+
+function canViewOrEditUserProfile(
+  caller: any,
+  userRoles: role_enum[],
+): boolean {
+  const callerRoles: role_enum[] = (caller?.roles ?? []).map(
+    (r: any) => r.role,
   );
+
+  const allowedRoles: role_enum[] = [
+    role_enum.Admin,
+    role_enum.SubAdmin,
+    role_enum.Moderator,
+  ];
+
+  if (callerRoles.includes(role_enum.Admin)) {
+    return true;
+  }
+
+  if (callerRoles.includes(role_enum.SubAdmin)) {
+    if (userRoles.includes(role_enum.Admin)) return false;
+    return true;
+  }
+
+  if (callerRoles.includes(role_enum.Moderator)) {
+    if (
+      userRoles.includes(role_enum.Admin) ||
+      userRoles.includes(role_enum.SubAdmin)
+    )
+      return false;
+    return true;
+  }
+
+  return false;
 }
 
 function validateEnums(
@@ -225,6 +262,9 @@ export const adminController = {
           );
       }
 
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result);
+
       res.status(201).json({
         success: true,
         message: `User with role ${role} created successfully`,
@@ -259,6 +299,9 @@ export const adminController = {
         creator,
       );
 
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result);
+
       res.status(201).json({
         success: true,
         message: "Teacher created successfully",
@@ -288,6 +331,9 @@ export const adminController = {
         dto,
         creator,
       );
+
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result);
 
       res.status(201).json({
         success: true,
@@ -319,6 +365,9 @@ export const adminController = {
         creator,
       );
 
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result);
+
       res.status(201).json({
         success: true,
         message: "Parent created successfully",
@@ -348,6 +397,9 @@ export const adminController = {
         dto,
         creator,
       );
+
+      const io = req.app.get("io");
+      notificationService.notifyAdminsOfNewAccount(io, result);
 
       res.status(201).json({
         success: true,
@@ -442,6 +494,49 @@ export const adminController = {
     }
   },
 
+  // ============================================
+  // UPDATE USER PROFILE
+  // ============================================
+
+  async updateUserProfile(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = parseInt(req.params.userId as string, 10);
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user ID");
+      }
+
+      const targetProfile = await userProfileService.getProfile(userId);
+      const roles = (targetProfile.user_roles || []).map((r) => r.role);
+
+      if (!canViewOrEditUserProfile((req as any).user, roles)) {
+        throw new ForbiddenError(
+          "You don't have permission to edit this profile",
+        );
+      }
+
+      const dto = await validateDto(UpdateProfileDto, req.body);
+      const updated = await userProfileService.updateProfile(
+        userId,
+        dto,
+        roles,
+      );
+      res.status(200).json({
+        success: true,
+        message: "User profile updated successfully",
+        data: updated,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  // ============================================
+  // UPDATE USER FLAG
+  // ============================================
   /**
    * PATCH /admin/users/:userId/flag
    * Body: { flag: "NORMAL" | "PRO" | "ELITE" | ... }
@@ -765,6 +860,117 @@ export const adminController = {
       res
         .status(200)
         .json({ success: true, message: "User deleted successfully" });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  // ============================================
+  // NOTIFICATIONS
+  // ============================================
+
+  /**
+   * POST /admin/notifications
+   * Send a notification to specific user(s) or all users with a given role.
+   * Body: { user_ids?: number[], role?: role_enum, category, message_key, entity_type?, entity_id? }
+   * Must provide EITHER user_ids OR role.
+   */
+  async sendNotification(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const dto = await validateDto(SendNotificationDto, req.body);
+      const adminId: number = (req as any).user?.userId;
+      const io = req.app.get("io");
+
+      const hasUserIds = dto.user_ids && dto.user_ids.length > 0;
+      const hasRole = !!dto.role;
+
+      if (!hasUserIds && !hasRole) {
+        throw new BadRequestError(
+          "Must specify either user_ids (array of user IDs) or role as the notification target",
+        );
+      }
+      if (hasUserIds && hasRole) {
+        throw new BadRequestError(
+          "Provide either user_ids or role — not both",
+        );
+      }
+
+      const opts = {
+        entityType: dto.entity_type,
+        entityId: dto.entity_id,
+        createdBy: adminId,
+      };
+
+      let targetCount: number;
+      let notificationIds: number[];
+
+      if (hasRole && dto.role) {
+        const row = await notificationService.sendToRole(
+          io,
+          dto.role,
+          dto.category,
+          dto.message_key,
+          opts,
+        );
+        targetCount = 1;
+        notificationIds = [row.id];
+      } else {
+        const userIds = dto.user_ids!;
+        await notificationService.sendToUsers(
+          io,
+          userIds,
+          dto.category,
+          dto.message_key,
+          opts,
+        );
+        targetCount = userIds.length;
+        notificationIds = [];
+      }
+
+      res.status(201).json({
+        success: true,
+        message: hasRole
+          ? `Notification sent to all users with role '${dto.role}'`
+          : `Notification sent to ${targetCount} user(s)`,
+        data: { target_count: targetCount, notification_ids: notificationIds },
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * GET /admin/notifications
+   * List all notifications (admin view), paginated.
+   */
+  async listNotifications(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const dto = await validateDto(NotificationFilterDto, req.query);
+      const result = await notificationService.getAll({
+        category: dto.category,
+        page: dto.page,
+        limit: dto.limit,
+      });
+
+      res.status(200).json({
+        success: true,
+        results: result.notifications.length,
+        pagination: {
+          total: result.total,
+          page: result.page,
+          pages: result.pages,
+          limit: result.limit,
+        },
+        data: { notifications: result.notifications },
+      });
     } catch (error) {
       _next(error);
     }

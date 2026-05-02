@@ -40,7 +40,8 @@ export function useRole() {
     const isStudent = storeRoles.includes("Student") || academyRoles.includes("Student");
     const isParent = storeRoles.includes("Parent") || academyRoles.includes("Parent");
     const hasAdminAccess = isAdmin || isSubAdmin;
-    const hasStoreAccess = storeRoles.includes("User") || storeRoles.length > 0;
+    const hasStoreAccess = portalAccess ? storeAccess.hasAccess : true;
+    const hasAcademyAccess = portalAccess ? academyAccess.hasAccess : true;
 
     /**
      * Whether the current user's account has been approved by an admin.
@@ -57,6 +58,7 @@ export function useRole() {
         isParent,
         hasAdminAccess,
         hasStoreAccess,
+        hasAcademyAccess,
         isConfirmed,
         portalAccess,
         storeRoles,

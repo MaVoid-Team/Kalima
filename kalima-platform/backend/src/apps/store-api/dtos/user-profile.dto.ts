@@ -5,6 +5,7 @@ import {
   IsIn,
   IsInt,
   IsPositive,
+  IsBoolean,
 } from "class-validator";
 
 /** PATCH /profile/me — basic + role-specific profile fields */
@@ -26,16 +27,6 @@ export class UpdateProfileDto {
   secondary_phone?: string;
 
   @IsOptional()
-  @IsIn(["male", "female"])
-  gender?: string;
-
-  // ── Teacher-specific ──
-  @IsOptional()
-  @IsInt()
-  @IsPositive()
-  subject_id?: number;
-
-  @IsOptional()
   @IsInt()
   @IsPositive()
   government_id?: number;
@@ -44,6 +35,24 @@ export class UpdateProfileDto {
   @IsInt()
   @IsPositive()
   zone_id?: number;
+
+  // ── Teacher-specific ──
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  subject_id?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  is_primary?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  is_preparatory?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  is_secondary?: boolean;
 
   // ── Student-specific ──
   @IsOptional()

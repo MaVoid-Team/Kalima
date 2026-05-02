@@ -44,15 +44,9 @@ export default function FastBuyCheckoutPage() {
     blocker.proceed?.();
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <LoadingSpinner className="h-8 w-8" />
-      </div>
-    );
-  }
+  const isLoadingAny = isLoading || isSubmitting;
 
-  if (error) {
+  if (error && !isLoading) {
     const msg = error?.response?.data?.message || t("payment.error_loading");
     return (
       <div className="flex min-h-[60vh] items-center justify-center flex-col gap-4">
@@ -86,7 +80,7 @@ export default function FastBuyCheckoutPage() {
             </p>
           </motion.div>
 
-          <FastBuyCheckoutForm form={checkout} onApplyCoupon={applyCoupon} loading={isSubmitting} />
+          <FastBuyCheckoutForm form={checkout} onApplyCoupon={applyCoupon} loading={isLoadingAny} />
         </div>
       </div>
 

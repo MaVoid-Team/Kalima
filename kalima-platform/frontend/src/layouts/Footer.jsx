@@ -4,15 +4,17 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logo from "../assets/Logo.webp";
-
-const SOCIAL_LINKS = [
-  { Icon: FacebookIcon, href: "https://www.facebook.com/kalima010", label: "Facebook" },
-  { Icon: YoutubeIcon, href: "https://www.youtube.com/@kalima1", label: "Youtube" },
-  { Icon: FaWhatsapp, href: "https://wa.me/201000000000", label: "WhatsApp" },
-];
+import { useWhatsAppContact } from "@/lib/whatsappUtils";
 
 export default function Footer() {
   const { t } = useTranslation("landing");
+  const { handleWhatsAppContact } = useWhatsAppContact();
+
+  const SOCIAL_LINKS = [
+    { Icon: FacebookIcon, href: "https://www.facebook.com/kalima010", label: "Facebook" },
+    { Icon: YoutubeIcon, href: "https://www.youtube.com/@kalima1", label: "Youtube" },
+    { Icon: FaWhatsapp, label: "WhatsApp", onClick: () => handleWhatsAppContact('footer') },
+  ];
 
   const FOOTER_SECTIONS = [
     {
@@ -70,17 +72,22 @@ export default function Footer() {
             {t("footer.rights")}.
           </p>
           <div className="flex gap-4">
-            {SOCIAL_LINKS.map(({ Icon, href, label }) => (
+            {SOCIAL_LINKS.map(({ Icon, href, label, onClick }) => (
               <Button
                 key={label}
                 variant="ghost"
                 size="icon"
-                asChild
+                asChild={!onClick}
                 className="h-9 w-9 hover:text-primary hover:bg-transparent text-muted-foreground"
+                onClick={onClick}
               >
-                <a href={href} aria-label={label} target="_blank" rel="noopener noreferrer">
+                {onClick ? (
                   <Icon className="h-5 w-5 no-flip" />
-                </a>
+                ) : (
+                  <a href={href} aria-label={label} target="_blank" rel="noopener noreferrer">
+                    <Icon className="h-5 w-5 no-flip" />
+                  </a>
+                )}
               </Button>
             ))}
           </div>

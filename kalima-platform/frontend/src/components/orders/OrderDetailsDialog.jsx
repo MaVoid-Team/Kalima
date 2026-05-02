@@ -79,10 +79,10 @@ export default function OrderDetailsDialog({ order }) {
             ) : null}
           </section>
 
-          <section className="rounded-md border p-4 space-y-2">
+          {/* <section className="rounded-md border p-4 space-y-2">
             <h4 className="font-semibold text-sm">{t('orders.sections.notes', 'Notes')}</h4>
             <DetailRow label={t('orders.notes.customer', 'Customer notes')} value={order?.notes || '-'} />
-          </section>
+          </section> */}
 
           <section className="rounded-md border p-4 space-y-3">
             <h4 className="font-semibold text-sm">{t('orders.items.items', 'Items')}</h4>

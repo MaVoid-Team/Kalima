@@ -1,0 +1,298 @@
+{
+  "nav": {
+    "openMenu": "Open Menu",
+    "closeMenu": "Close Menu"
+  },
+  "navbar": {
+    "brand": "Kalima",
+    "courses": "Courses",
+    "teachers": "Teachers",
+    "services": "Services",
+    "market": "Market",
+    "samples": "Samples",
+    "pricing": "Pricing",
+    "home": "Home",
+    "account": "Me",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "languageToggle": "العربية",
+    "cartToggle": "Cart",
+    "searchPlaceholder": "Type a command or search...",
+    "searchButtonLong": "Search website...",
+    "searchButtonShort": "Search...",
+    "noResults": "No results found.",
+    "pages": "Pages",
+    "settings": "Settings",
+    "toggleLanguageAction": "Toggle Language",
+    "shortcuts": {
+      "open": "Ctrl+K"
+    },
+    "myOrders": "My Orders",
+    "dashboard": "Dashboard",
+    "teacherPortal": "Teacher Portal",
+    "studentPortal": "Student Portal",
+    "parentPortal": "Parent Portal",
+    "logout": "Log Out",
+    "navigation": "Navigation",
+    "language": "Language"
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Page Not Found",
+    "description": "Oops! The page you are looking for doesn't exist or has been moved.",
+    "backHome": "Back to Home"
+  },
+  "footer": {
+    "brand": "Kalima Platform",
+    "market": "Market",
+    "samples": "Samples",
+    "description": "A comprehensive educational platform providing the best resources and courses.",
+    "platform": "Platform",
+    "browseCourses": "Browse Courses",
+    "teachers": "Teachers",
+    "pricing": "Pricing",
+    "company": "Company",
+    "aboutUs": "About Us",
+    "contact": "Contact",
+    "careers": "Careers",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "rights": "All rights reserved"
+  },
+  "welcome": {
+    "badge": "Soar in the Sky of Creativity",
+    "sparkleBadge": "Fresh Content",
+    "title": "",
+    "titleHighlight": "Kalima",
+    "titleEnd": "Learning Platform",
+    "description": "A comprehensive educational platform providing the best teachers and courses from elementary to high school.",
+    "searchPlaceholder": "Search for courses, teachers...",
+    "searchButton": "Search",
+    "browseCourses": "Browse Courses",
+    "teachers": "Teachers",
+    "samples": "See Book Samples",
+    "market": "Browse Our Products",
+    "stats": {
+      "students": "Students",
+      "teachers": "Teachers",
+      "courses": "Courses"
+    },
+    "rating": "Rating",
+    "ratingNote": "Based on student reviews",
+    "trustedBy": "Trusted by 1,700+ Educators",
+    "noResults": "No results found.",
+    "recentSearches": "Recent Searches",
+    "categories": "Categories",
+    "examples": {
+      "react": "React Course",
+      "math": "Mathematics"
+    },
+    "categoriesItems": {
+      "science": "Science",
+      "arts": "Arts",
+      "tech": "Technology"
+    }
+  },
+  "subjects": {
+    "title": "Explore by Subject",
+    "description": "Find specialized materials tailored to each student's needs.",
+    "viewAll": "View All Subjects",
+    "categories": {
+      "languages": {
+        "title": "Languages",
+        "description": "Arabic, English, French, German and more."
+      },
+      "humanities": {
+        "title": "Humanities",
+        "description": "History, Philosophy, Psychology, Logic and Geography."
+      },
+      "sciences": {
+        "title": "Science & Math",
+        "description": "Geology, Chemistry, Physics, Statistics and Algebra."
+      }
+    }
+  },
+  "featured": {
+    "title": "Featured Courses",
+    "description": "Top-rated educational courses getting the best reviews this month.",
+    "allLevels": "All Levels",
+    "primary": "Primary",
+    "middle": "Middle",
+    "secondary": "Secondary",
+    "free": "Free",
+    "currency": "EGP",
+    "courses": {
+      "arabic": "Arabic Language",
+      "physics": "Physics",
+      "math": "Mathematics",
+      "chemistry": "Chemistry"
+    }
+  },
+  "about": {
+    "badge": "The Legacy",
+    "sparkleBadge": "Top Rated",
+    "title": "Beyond",
+    "titleHighlight": "Boundaries",
+    "titleEnd": "of Traditional Learning",
+    "description": "We provide an unforgettable educational experience, blending innovation, professionalism, and AI.",
+    "features": {
+      "interactive": {
+        "title": "Interactive Lectures",
+        "description": "Modern educational content with latest curricula."
+      },
+      "quality": {
+        "title": "Educational Quality",
+        "description": "Ensuring the highest pedagogical standards."
+      }
+    }
+  },
+  "appDownload": {
+    "badge": "Kalima App",
+    "sparkleBadge": "Download Ready",
+    "title": "Learn Without",
+    "titleHighlight": "Boundaries",
+    "titleEnd": "In Your Hands",
+    "description": "With Kalima app, we take you on an integrated educational journey that transcends limits.",
+    "features": {
+      "anywhere": {
+        "title": "Learn Anywhere",
+        "description": "Access your lessons from your phone anytime."
+      },
+      "offline": {
+        "title": "Offline Content",
+        "description": "Download lessons and watch offline."
+      }
+    },
+    "downloadButton": "Download App"
+  },
+  "landingPage": {
+    "hero": {
+      "badge": "A complete school success ecosystem",
+      "title": "Education-first platform for",
+      "titleHighlight": "students, teachers, and families",
+      "description": "Kalima now leads with a full learning experience: structured lessons, guided practice, and measurable progress, while still offering marketplace resources for classroom readiness.",
+      "startLearning": "Start Learning",
+      "openMarket": "Visit Marketplace",
+      "metrics": {
+        "programs": "Active learning resources",
+        "tracks": "Learning tracks",
+        "ratio": "80/20",
+        "learningFocus": "Learning to commerce focus"
+      },
+      "highlights": {
+        "liveClasses": {
+          "title": "Live + recorded",
+          "description": "Flexible lessons for every schedule."
+        },
+        "curriculum": {
+          "title": "Curriculum aligned",
+          "description": "Built around real semester outcomes."
+        },
+        "teacherTools": {
+          "title": "Teacher support",
+          "description": "Ready-to-use plans, sheets, and samples."
+        }
+      }
+    },
+    "learningJourney": {
+      "title": "A learning journey, not only a storefront",
+      "description": "From discovery to mastery, every step is designed to increase student outcomes and make teaching easier.",
+      "steps": {
+        "discover": {
+          "title": "Discover",
+          "description": "Find lessons by grade, subject, and objective."
+        },
+        "plan": {
+          "title": "Plan",
+          "description": "Build a weekly learning plan with clear milestones."
+        },
+        "practice": {
+          "title": "Practice",
+          "description": "Use exercises, samples, and quizzes to reinforce understanding."
+        },
+        "progress": {
+          "title": "Track progress",
+          "description": "Measure completion and confidence with actionable insights."
+        }
+      }
+    },
+    "about": {
+      "title": "About Kalima",
+      "titleStart": "What makes ",
+      "titleHighlight": "Kalima",
+      "titleEnd": " your best choice",
+      "description": "The platform now combines pedagogical quality, trusted educators, and practical tools into one consistent user journey.",
+      "pillars": {
+        "curriculum": {
+          "title": "Curriculum intelligence",
+          "description": "Content mapped to educational objectives and term pacing."
+        },
+        "teachers": {
+          "title": "Verified lecturers",
+          "description": "Experienced educators and practical classroom insights."
+        },
+        "assessment": {
+          "title": "Continuous assessment",
+          "description": "Frequent checkpoints to detect gaps early."
+        },
+        "engagement": {
+          "title": "Engaging experience",
+          "description": "Modern UX that keeps learners focused and active."
+        }
+      }
+    },
+    "marketplace": {
+      "title": "Marketplace that supports learning",
+      "description": "The market remains available for booklets and teaching assets, but now serves the educational flow first.",
+      "viewAll": "Explore all products",
+      "resourceTag": "Teacher Resource",
+      "openResource": "Open resource",
+      "placeholderDescription": "Classroom-ready material designed to save prep time and boost outcomes."
+    },
+    "stories": {
+      "badge": "Success stories",
+      "titleStart": "How ",
+      "titleHighlight": "Kalima",
+      "titleEnd": " creates real impact",
+      "storyOne": {
+        "quote": "My students engage more because lessons and worksheets are connected in one path.",
+        "name": "Mariam Adel",
+        "role": "Arabic Teacher"
+      },
+      "storyTwo": {
+        "quote": "I can finally track my son’s progress and know what to revise before exams.",
+        "name": "Ahmed Hassan",
+        "role": "Parent"
+      },
+      "storyThree": {
+        "quote": "We reduced preparation time while improving average class performance.",
+        "name": "Salma Nabil",
+        "role": "School Coordinator"
+      },
+      "form": {
+        "title": "Share your success story",
+        "description": "Add your own story and send a comment to inspire others.",
+        "namePlaceholder": "Your name",
+        "rolePlaceholder": "Your role (optional)",
+        "storyPlaceholder": "Write your success story...",
+        "commentPlaceholder": "Add your comment...",
+        "commentLabel": "Comment",
+        "submit": "Share Story",
+        "validation": "Please add your name, story, and comment.",
+        "success": "Your success story has been shared.",
+        "defaultRole": "Community Member"
+      }
+    },
+    "download": {
+      "badge": "Mobile learning experience",
+      "title": "Keep learning momentum everywhere",
+      "description": "Students and teachers can continue classes, assignments, and reviews on the go.",
+      "downloadButton": "Download app",
+      "exploreMarket": "Explore marketplace",
+      "mixTitle": "Platform product mix",
+      "learningLabel": "Learning & education",
+      "marketLabel": "Marketplace"
+    }
+  }
+}

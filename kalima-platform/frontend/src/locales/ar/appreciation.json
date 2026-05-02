@@ -1,0 +1,72 @@
+{
+  "admin": {
+    "title": "صفحة التقدير",
+    "subtitle": "عاين وشارك صفحة تقدير عامة لهذا المستخدم.",
+    "copyLink": "نسخ الرابط",
+    "openPublicPage": "فتح الصفحة العامة",
+    "copySuccess": "تم نسخ رابط صفحة التقدير.",
+    "previewBadge": "معاينة عامة",
+    "previewName": "صاحب الصفحة",
+    "previewRole": "الدور",
+    "roleFallback": "أحد أفراد المجتمع",
+    "shareTitle": "المشاركة",
+    "shareDescription": "استخدم هذا الرابط العام لجمع رسائل التقدير.",
+    "publicLink": "الرابط العام",
+    "commentCount": "عدد الرسائل",
+    "pageStatus": "حالة الصفحة",
+    "activeStatus": "نشطة",
+    "notesTitle": "آلية العمل",
+    "notesBody": "يمكن لأي شخص يملك الرابط العام أن يترك رسالة تقدير لهذا المستخدم.",
+    "notesFooter": "الصفحة عامة، لكنها مهيأة بحيث لا تظهر في نتائج البحث."
+  },
+  "preview": {
+    "headline": "{{name}} يستحق التقدير",
+    "body": "شارك هذه الصفحة لجمع كلمات صادقة لـ {{name}} تقديرًا لما يقدمه من وقت واهتمام وجهد داخل هذا المجتمع.",
+    "someone": "هذا الشخص",
+    "communityMember": "أحد أفراد المجتمع"
+  },
+  "public": {
+    "badge": "تقدير مشترك",
+    "eyebrow": "صفحة تقدير",
+    "headline": "امتنانًا لـ {{name}}",
+    "body": "مجموعة من كلمات التقدير لـ {{name}}، اعترافًا بما يقدمه من اهتمام وجهد وحضور مستمر داخل هذا المجتمع.",
+    "recipientLabel": "صاحب الصفحة",
+    "roleLabel": "الدور",
+    "appreciationLabel": "امتنان هادئ",
+    "appreciationStatement": "مساحة نتوقف فيها لنشكر {{name}} على ما قدمه للآخرين.",
+    "appreciationNote": "كل رسالة هنا تضيف تعبيرًا جماعيًا عن التقدير للأثر الذي تركه {{name}}.",
+    "commentPresence_zero": "لم تُضف أي رسالة بعد.",
+    "commentPresence_one": "أضاف شخص واحد صوته إلى هذا التقدير.",
+    "commentPresence_two": "أضاف شخصان صوتيهما إلى هذا التقدير.",
+    "commentPresence_few": "أضاف {{count}} أشخاص أصواتهم إلى هذا التقدير.",
+    "commentPresence_many": "أضاف {{count}} شخصًا صوته إلى هذا التقدير.",
+    "commentPresence_other": "أضاف {{count}} شخص صوته إلى هذا التقدير.",
+    "commentsTitle": "أضف رسالة تقدير",
+    "commentsSubtitle": "شارك ذكرى لطيفة أو موقفًا مؤثرًا أو بضع كلمات شكر.",
+    "commentFeedTitle": "رسائل التقدير",
+    "commentFeedSubtitle": "كلمات شاركها الآخرون تقديرًا لـ {{name}}.",
+    "languageToggle": "تبديل اللغة",
+    "commentFeedCount_zero": "{{count}} رسالة",
+    "commentFeedCount_one": "{{count}} رسالة",
+    "commentFeedCount_two": "{{count}} رسالتان",
+    "commentFeedCount_few": "{{count}} رسائل",
+    "commentFeedCount_many": "{{count}} رسالة",
+    "commentFeedCount_other": "{{count}} رسالة",
+    "emptyTitle": "لا توجد رسائل بعد",
+    "emptyBody": "كن أول من يترك رسالة تقدير."
+  },
+  "form": {
+    "authorName": "اسمك",
+    "authorNamePlaceholder": "اكتب اسمك",
+    "comment": "رسالتك",
+    "commentPlaceholder": "اكتب رسالة صادقة",
+    "submit": "نشر الرسالة"
+  },
+  "messages": {
+    "commentSubmitted": "تم نشر رسالتك."
+  },
+  "seo": {
+    "title": "صفحة تقدير لـ {{name}}",
+    "fallbackTitle": "صفحة التقدير"
+  }
+}

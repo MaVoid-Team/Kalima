@@ -38,9 +38,10 @@ export default function TeacherSidebar({ isMobileOpen, setIsMobileOpen }) {
   };
 
   const navigation = [
-    { name: t('nav.profile', 'My Profile'), href: '/teacher/profile', icon: User },
-    { name: t('nav.orders', 'My Orders'), href: '/orders', icon: ShoppingBag },
-    { name: t('nav.settings', 'Settings'), href: '/teacher/settings', icon: Settings },
+    { name: t('nav.home', 'Home'), href: '/', icon: Home, id: 'home' },
+    { name: t('nav.profile', 'My Profile'), href: '/teacher/profile', icon: User, id: 'profile' },
+    { name: t('nav.orders', 'My Orders'), href: '/orders', icon: ShoppingBag, id: 'orders' },
+    { name: t('nav.settings', 'Settings'), href: '/teacher/settings', icon: Settings, id: 'settings' },
   ];
 
   const toggleLanguage = () => {
@@ -91,13 +92,15 @@ export default function TeacherSidebar({ isMobileOpen, setIsMobileOpen }) {
       {/* Navigation Links */}
       <nav className="flex-1 space-y-2 px-2 py-4 overflow-y-auto">
         {navigation.map((item) => {
-          const isActive = location.pathname.startsWith(item.href);
+          const isActive = item.href === '/' 
+            ? location.pathname === '/' 
+            : location.pathname.startsWith(item.href);
           return (
             <Link
-              key={item.name}
+              key={item.id}
               to={item.href}
               title={isCollapsed ? item.name : undefined}
-              data-testid={`teacher-sidebar-nav-${item.name.toLowerCase().replace(/\\s+/g, '-')}`}
+              data-testid={`teacher-sidebar-nav-${item.id}`}
               className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive
                 ? "bg-sidebar-primary text-sidebar-primary-foreground"
                 : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
@@ -143,19 +146,7 @@ export default function TeacherSidebar({ isMobileOpen, setIsMobileOpen }) {
           </span>
         </button>
 
-        <Link
-          to="/market"
-          title={isCollapsed ? t("nav.backToStore", "Store") : undefined}
-          className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? "lg:justify-center" : ""}`}
-          data-testid="teacher-sidebar-back-store-link"
-        >
-          <Home
-            className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}
-          />
-          <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
-            {t("nav.backToStore", "Back to Store")}
-          </span>
-        </Link>
+
 
         <button
           onClick={logout}

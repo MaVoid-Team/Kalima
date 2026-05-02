@@ -10,28 +10,51 @@ const sendToken = async (user, res) => {
 
   // Check if user already has a refresh token
   const existingToken = await RefreshToken.findOne({ user: userId });
-  
+
   // Generate a new access token regardless
   const accessToken = generateAccessToken(userId, userRole);
-  
-  // If user already has a refresh token, reuse it instead of creating a new one
-  if (existingToken) {
-    return res.status(200).json({
-      accessToken,
-      message: "Welcome back! Using your existing session.",
-    });
-  }
-  
+
+  // Prepare tokens object
+  const tokens = {
+    accessToken,
+    refreshToken: null,
+  };
+
   // If no existing token, generate a new refresh token
-  const refreshToken = generateRefreshToken(userId, userRole);
-  
-  await RefreshToken.create({
-    user: userId,
-    token: refreshToken,
-  });
+  if (!existingToken) {
+    const refreshToken = generateRefreshToken(userId, userRole);
+    await RefreshToken.create({
+      user: userId,
+      token: refreshToken,
+    });
+    tokens.refreshToken = refreshToken;
+  } else {
+    tokens.refreshToken = existingToken.token;
+  }
+
+  // Build user object for frontend
+  const userResponse = {
+    id: userId.toString(),
+    email: user.email,
+    name: user.name,
+    role: userRole,
+    phoneNumber: user.phoneNumber,
+    avatar: user.avatar,
+    status: user.status,
+    isEmailVerified: user.isEmailVerified,
+  };
+
+  // Determine portal access based on role
+  const portalAccess = [userRole];
 
   return res.status(200).json({
-    accessToken,
+    success: true,
+    data: {
+      user: userResponse,
+      tokens,
+      portalAccess,
+    },
+    message: existingToken ? "Welcome back! Using your existing session." : "Login successful",
   });
 };
 

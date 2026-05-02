@@ -80,12 +80,24 @@ export default function EditProductPage() {
         (data) => {
             if (data.isFreePreview) return data.price_after_discount === 0;
             if (data.price_after_discount == null) return true;
-            if (data.price > 0) return data.price_after_discount < data.price;
+            if (data.price > 0) return data.price_after_discount <= data.price;
             return data.price_after_discount === 0;
         },
-        { message: t('products.form.discountedPriceMustBeLessThanOriginalPrice'), path: ['price_after_discount'] }
+        { message: t('products.form.discountedPriceMustBeLessThanOrEqualToOriginalPrice', 'Price after discount cannot exceed original price'), path: ['price_after_discount'] }
     ).refine(
-        (data) => !data.release_at || new Date(data.release_at) >= startOfDay(new Date()),
+        (data) => {
+            if (!data.release_at) return true;
+
+            // If it's the same as the original value, skip validation
+            // This allows editing other fields of a product that was released in the past
+            const originalFormatted = selectedProduct?.release_at
+                ? new Date(new Date(selectedProduct.release_at).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)
+                : '';
+
+            if (data.release_at === originalFormatted) return true;
+
+            return new Date(data.release_at) >= startOfDay(new Date());
+        },
         { message: t('products.form.releaseDateMustBeFuture', 'Release date must be today or in the future'), path: ['release_at'] }
     );
 
@@ -466,6 +478,33 @@ export default function EditProductPage() {
         navigate(`/admin/products/${id}`);
     };
 
+    const onInvalid = (errors) => {
+        const firstErrorKey = Object.keys(errors)[0];
+        if (!firstErrorKey) return;
+
+        const element = document.getElementsByName(firstErrorKey)[0] || 
+                        document.querySelector(`[data-testid*="${firstErrorKey}"]`);
+        
+        if (element) {
+            const headerHeight = 80; // Approximate height of the sticky header
+            const rect = element.getBoundingClientRect();
+            const elementTop = rect.top + window.pageYOffset;
+            const scrollToPosition = elementTop - headerHeight - 40; // Add some padding
+
+            window.scrollTo({
+                top: scrollToPosition,
+                behavior: 'smooth'
+            });
+            
+            // If it's an input, focus it after the scroll animation is likely finished
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName)) {
+                setTimeout(() => {
+                    element.focus({ preventScroll: true });
+                }, 1000); // Wait for the smooth scroll to finish
+            }
+        }
+    };
+
     // ─── Loading / Not Found States ────────────────────────────────────────────
 
     if (loading && !selectedProduct) {
@@ -513,7 +552,7 @@ export default function EditProductPage() {
 
             <Form {...form}>
                 <form
-                    onSubmit={form.handleSubmit(onSubmit)}
+                    onSubmit={form.handleSubmit(onSubmit, onInvalid)}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
                             e.preventDefault();

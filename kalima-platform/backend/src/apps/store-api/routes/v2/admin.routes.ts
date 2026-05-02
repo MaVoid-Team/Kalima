@@ -70,6 +70,11 @@ router.patch(
   ...adminModeratorAuth,
   adminController.updateUserFlag,
 );
+router.patch(
+  "/users/:userId/profile",
+  ...adminModeratorAuth,
+  adminController.updateUserProfile,
+);
 
 // Account review: approve / reject users (must be before :userId/roles to avoid conflict)
 router.post("/users/:userId/approve", ...adminAuth, adminController.approveUser);
@@ -93,5 +98,55 @@ router.delete("/users/:userId/roles", ...adminAuth, adminController.revokeRole);
 
 // Delete a user
 router.delete("/users/:userId", ...adminAuth, adminController.deleteUser);
+
+// ============================================
+// REVIEWS MANAGEMENT
+// ============================================
+
+// Delete a product review
+import { reviewController } from "../../controllers/review.controller";
+router.delete(
+  "/reviews/:reviewId",
+  ...adminModeratorAuth,
+  reviewController.deleteReview,
+);
+
+import { whatsappController } from "../../controllers/whatsapp.controller";
+
+// ============================================
+// GENERAL SETTINGS
+// ============================================
+router.get("/general-settings", ...adminAuth, whatsappController.getGeneralSettings);
+router.put(
+  "/general-settings/whatsapp_receiving_number",
+  ...adminAuth,
+  whatsappController.updateReceivingNumber,
+);
+
+// ============================================
+// WHATSAPP
+// ============================================
+router.get("/whatsapp/status", ...adminAuth, whatsappController.getStatus);
+router.post("/whatsapp/send", ...adminAuth, whatsappController.sendMessage);
+router.post("/whatsapp/logout", ...adminAuth, whatsappController.logout);
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+// Send notification to user(s) or role (Admin, SubAdmin only)
+router.post(
+  "/notifications",
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+  adminController.sendNotification,
+);
+
+// List all notifications (Admin, SubAdmin, Moderator)
+router.get(
+  "/notifications",
+  ...adminAuth,
+  adminController.listNotifications,
+);
 
 export default router;

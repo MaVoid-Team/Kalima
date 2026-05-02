@@ -101,7 +101,7 @@ axiosInstance.interceptors.response.use(
     },
     (error) => {
         const { response } = error;
-        let errorMessage = i18n.t('auth:errors.default');
+        let errorMessage = i18n.t('auth:errors.default', "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.");
         let errorDetails = '';
 
         const extractErrorMessage = (obj) => {
@@ -128,25 +128,25 @@ axiosInstance.interceptors.response.use(
             switch (response.status) {
                 case 400:
                     // Handle validation errors or bad requests
-                    errorMessage = response.data.message || i18n.t('auth:validation.required'); // Fallback
+                    errorMessage = response.data.message || i18n.t('auth:validation.required', "هذا الحقل مطلوب"); // Fallback
                     break;
                 case 401:
                     if (error.config && error.config.url && error.config.url.includes('/auth/login')) {
-                        errorMessage = i18n.t('auth:errors.invalid_credentials', 'Invalid email or password');
+                        errorMessage = i18n.t('auth:errors.invalid_credentials', 'البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.');
                     } else {
-                        errorMessage = i18n.t('auth:errors.unauthorized');
+                        errorMessage = i18n.t('auth:errors.unauthorized', "لست مخولاً للقيام بهذا الإجراء.");
                         performLocalLogout();
                         // Final fallback logout if 401 occurs despite proactive refresh
                     }
                     break;
                 case 403:
-                    errorMessage = i18n.t('auth:errors.forbidden');
+                    errorMessage = i18n.t('auth:errors.forbidden', "ليس لديك صلاحية للوصول إلى هذا المورد.");
                     break;
                 case 404:
-                    errorMessage = response.data.message || i18n.t('auth:errors.default');
+                    errorMessage = response.data.message || i18n.t('auth:errors.default', "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.");
                     break;
                 case 500:
-                    errorMessage = i18n.t('auth:errors.server_error');
+                    errorMessage = i18n.t('auth:errors.server_error', "خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقًا.");
                     break;
                 default:
                     errorMessage = response.data.message || errorMessage;
@@ -158,7 +158,7 @@ axiosInstance.interceptors.response.use(
             );
         } else if (error.request) {
             // The request was made but no response was received
-            errorMessage = i18n.t('auth:errors.network_error');
+            errorMessage = i18n.t('auth:errors.network_error', "خطأ في الشبكة. يرجى التحقق من اتصالك.");
         }
 
         // in case of empy cart no need to show error toast, as this is a common scenario and we handle it gracefully in the UI

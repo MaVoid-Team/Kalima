@@ -1,7 +1,8 @@
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet } from "react-router-dom";
-import { useEffect, Suspense, lazy } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
+import { Toaster } from 'sonner';
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -67,6 +68,8 @@ const SamplePreview = lazy(() => import("./pages/sample/SamplePreviewPage"))
 const AppreciationPublicPage = lazy(() => import("./pages/appreciation/AppreciationPublicPage"));
 // User lazy-loaded pages
 const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
+const NotificationsPage = lazy(() => import("./pages/notifications/NotificationsPage"));
+const AdminNotificationsPage = lazy(() => import("./pages/admin/notifications/AdminNotificationsPage"));
 
 // Teacher lazy-loaded pages
 const TeacherLayout = lazy(() => import("./layouts/TeacherLayout"));
@@ -113,31 +116,36 @@ const router = createBrowserRouter(
       {/* Public Routes with MainLayout (Navbar & Footer) */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<LandingPage />} />
-        
-        {/* Market and Product Routes - Restricted for Students and Parents */}
-        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+
+        {/* Market and Product Routes - Restricted by store access */}
+        <Route element={<RoleRoute requireStoreAccess={true} />}>
           <Route path="/market" element={<MarketPage />} />
           <Route path="/product/:id" element={<ProductDetailsPage />} />
           <Route path="/booklet/:id" element={<BookletDetailsPage />} />
         </Route>
-        {/* Samples Routes - Restricted for Students and Parents */}
-        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+        {/* Samples Routes - Restricted by store access */}
+        <Route element={<RoleRoute requireStoreAccess={true} />}>
           <Route path="/samples" element={<SamplesDirectoryPage />} />
           <Route path="/samples/:id" element={<SamplePage />} />
           <Route path="/samples/:id/preview" element={<SamplePreview />} />
         </Route>
 
-        {/* Protected Store Routes (Auth Required) - Also Restricted for Students and Parents */}
-        <Route element={<RoleRoute excludedRole={["Student", "Parent"]} />}>
+        {/* Protected Store Routes (Auth Required) - Restricted by store access */}
+        <Route element={<RoleRoute requireStoreAccess={true} />}>
           <Route element={<ProtectedRoute requireAuth={true} />}>
-            <Route path="/cart" element={<WizardCheckoutPage />} />
-            <Route path="/checkout" element={<WizardCheckoutPage />} />
+            {/* Purchase flow blocked for Admins */}
+            <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin"]} />}>
+              <Route path="/cart" element={<WizardCheckoutPage />} />
+              <Route path="/checkout" element={<WizardCheckoutPage />} />
+              <Route
+                path="/fast-buy/checkout"
+                element={<FastBuyCheckoutPage />}
+              />
+            </Route>
             <Route path="/orders" element={<MyOrdersPage />} />
-            <Route
-              path="/fast-buy/checkout"
-              element={<FastBuyCheckoutPage />}
-            />
+            <Route path="/notifications" element={<NotificationsPage />} />
           </Route>
+
         </Route>
 
         {/* 404 Fallback */}
@@ -166,7 +174,9 @@ const router = createBrowserRouter(
           <Route path="/admin/settings" element={<SettingsPage />} />
           <Route path="/admin/analytics" element={<AnalyticsPage />} />
           <Route path="/admin/employee-performance" element={<EmployeePerformancePage />} />
+          <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
         </Route>
+
       </Route>
 
       {/* Teacher Routes */}
@@ -211,7 +221,29 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return <RouterProvider router={router} />;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return (
+    <>
+      <RouterProvider router={router} />
+      <Toaster
+        richColors
+        position={isMobile ? "top-center" : "bottom-right"}
+        toastOptions={{
+          className: "border border-border/40 bg-card/60 backdrop-blur-md shadow-2xl rounded-2xl p-4",
+          titleClassName: "font-black uppercase tracking-tight text-sm",
+          descriptionClassName: "font-medium opacity-80 text-xs"
+        }}
+      />
+    </>
+  );
 }
 
 export default App;

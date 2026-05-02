@@ -130,7 +130,7 @@ export default function TeacherProfileForm({
                     {/* Gender */}
                     <div>
                         <Label>{t('profile.gender', 'Gender')}</Label>
-                        <Select value={gender || ''} onValueChange={(v) => setValue('gender', v, { shouldDirty: true })}>
+                        <Select dir={i18n.dir()} value={gender || ''} onValueChange={(v) => setValue('gender', v, { shouldDirty: true })}>
                             <SelectTrigger className="mt-1">
                                 <SelectValue placeholder={t('profile.selectGender', 'Select gender')} />
                             </SelectTrigger>
@@ -150,6 +150,7 @@ export default function TeacherProfileForm({
                     <div>
                         <Label>{t('profile.subject', 'Subject')}</Label>
                         <Select
+                            dir={i18n.dir()}
                             value={watch('subject_id') ? String(watch('subject_id')) : ''}
                             onValueChange={(v) => setValue('subject_id', Number(v), { shouldDirty: true })}
                         >
@@ -168,6 +169,7 @@ export default function TeacherProfileForm({
                         <div>
                             <Label>{t('profile.government', 'Governorate')}</Label>
                             <Select
+                                dir={i18n.dir()}
                                 value={watch('government_id') ? String(watch('government_id')) : ''}
                                 onValueChange={(v) => setValue('government_id', Number(v), { shouldDirty: true })}
                             >
@@ -184,6 +186,7 @@ export default function TeacherProfileForm({
                         <div>
                             <Label>{t('profile.zone', 'Zone')}</Label>
                             <Select
+                                dir={i18n.dir()}
                                 value={watch('zone_id') ? String(watch('zone_id')) : ''}
                                 onValueChange={(v) => setValue('zone_id', Number(v), { shouldDirty: true })}
                                 disabled={!watch('government_id') || zonesLoading}
@@ -201,9 +204,9 @@ export default function TeacherProfileForm({
                     </div>
 
                     <div className="flex justify-end pt-2">
-                        <Button 
-                            type="submit" 
-                            disabled={loading || !isDirty} 
+                        <Button
+                            type="submit"
+                            disabled={loading || !isDirty}
                             data-testid="teacher-save-profile-button"
                         >
                             {loading && <LoadingSpinner className="h-4 w-4" />}
