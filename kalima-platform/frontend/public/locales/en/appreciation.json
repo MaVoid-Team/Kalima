@@ -1,0 +1,52 @@
+{
+  "seo": {
+    "title": "Appreciation for {{name}} | Kalima",
+    "fallbackTitle": "Appreciation | Kalima"
+  },
+  "preview": {
+    "headline": "Thank you, {{name}}.",
+    "body": "{{name}} has been an important part of Kalima's journey. This page is a simple way for partners, colleagues, and friends to leave a few words of appreciation for the care, trust, and energy they bring as {{role}}.",
+    "someone": "this amazing person",
+    "communityMember": "a valued member of the Kalima community"
+  },
+  "admin": {
+    "title": "Appreciation Page",
+    "subtitle": "Create a permanent public thank-you page for this user and share it with anyone who wants to leave a note.",
+    "previewBadge": "Live message preview",
+    "previewName": "Recipient",
+    "previewRole": "Supporting context",
+    "roleFallback": "Kalima community member",
+    "shareTitle": "Share link",
+    "shareDescription": "This link stays stable for this user. Anyone with it can open the page and leave a comment without logging in.",
+    "publicLink": "Public URL",
+    "commentCount": "Comments so far",
+    "pageStatus": "Page status",
+    "activeStatus": "Active",
+    "copyLink": "Copy link",
+    "copySuccess": "Appreciation link copied",
+    "openPublicPage": "Open public page",
+    "notesTitle": "How this works",
+    "notesBody": "The page is unlisted and intended for direct sharing. It always keeps the same token for the same user, so you can reuse the same link later.",
+    "notesFooter": "Comments are shown newest first and update immediately after visitors submit them."
+  },
+  "public": {
+    "badge": "A public note of appreciation",
+    "headline": "A few words for {{name}}.",
+    "body": "{{name}} has helped shape the Kalima experience with generosity, commitment, and care. If you've worked with {{name}}, leave a note to thank them for everything they bring as {{role}}.",
+    "recipientLabel": "For",
+    "roleLabel": "Role",
+    "commentsTitle": "Leave a comment",
+    "commentsSubtitle": "Share a short message of thanks. Your name and comment are both required.",
+    "commentFeedTitle": "Public comments",
+    "commentFeedCount": "{{count}} comments",
+    "emptyTitle": "No comments yet",
+    "emptyBody": "Be the first person to leave a note of appreciation."
+  },
+  "form": {
+    "authorName": "Your name",
+    "authorNamePlaceholder": "Enter your name",
+    "comment": "Your comment",
+    "commentPlaceholder": "Write a thoughtful message for this person...",
+    "submit": "Post comment"
+  }
+}
