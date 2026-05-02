@@ -69,7 +69,8 @@ services:
       - dev-uploads:/app/uploads
 
   dev-postgres:
-    image: postgres:18-alpine
+    # Keep Postgres 17 until the existing data volume is explicitly upgraded.
+    image: postgres:17-alpine
     ports:
       - "5467:5432"
     environment:
