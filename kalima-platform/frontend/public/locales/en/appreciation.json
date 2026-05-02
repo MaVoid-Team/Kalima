@@ -1,52 +1,64 @@
 {
-  "seo": {
-    "title": "Appreciation for {{name}} | Kalima",
-    "fallbackTitle": "Appreciation | Kalima"
-  },
-  "preview": {
-    "headline": "Thank you, {{name}}.",
-    "body": "{{name}} has been an important part of Kalima's journey. This page is a simple way for partners, colleagues, and friends to leave a few words of appreciation for the care, trust, and energy they bring as {{role}}.",
-    "someone": "this amazing person",
-    "communityMember": "a valued member of the Kalima community"
-  },
   "admin": {
-    "title": "Appreciation Page",
-    "subtitle": "Create a permanent public thank-you page for this user and share it with anyone who wants to leave a note.",
-    "previewBadge": "Live message preview",
-    "previewName": "Recipient",
-    "previewRole": "Supporting context",
-    "roleFallback": "Kalima community member",
-    "shareTitle": "Share link",
-    "shareDescription": "This link stays stable for this user. Anyone with it can open the page and leave a comment without logging in.",
-    "publicLink": "Public URL",
-    "commentCount": "Comments so far",
+    "title": "Page of Thanks and Appreciation",
+    "subtitle": "Create and share a public tribute that reflects dedicated effort and honors a lasting contribution.",
+    "copyLink": "Copy link",
+    "openPublicPage": "Open public page",
+    "copySuccess": "The page link has been copied.",
+    "previewBadge": "Preview message",
+    "previewName": "Honoree",
+    "previewRole": "Role",
+    "roleFallback": "A valued member of the Kalima community",
+    "shareTitle": "Share",
+    "shareDescription": "Use this public link to share the page and gather messages of sincere thanks and appreciation.",
+    "publicLink": "Public link",
+    "commentCount": "Appreciation messages",
     "pageStatus": "Page status",
     "activeStatus": "Active",
-    "copyLink": "Copy link",
-    "copySuccess": "Appreciation link copied",
-    "openPublicPage": "Open public page",
-    "notesTitle": "How this works",
-    "notesBody": "The page is unlisted and intended for direct sharing. It always keeps the same token for the same user, so you can reuse the same link later.",
-    "notesFooter": "Comments are shown newest first and update immediately after visitors submit them."
+    "notesTitle": "How it works",
+    "notesBody": "Anyone with the public link may leave a message of thanks and appreciation for this person.",
+    "notesFooter": "The page is public, while remaining excluded from search results."
+  },
+  "preview": {
+    "headline": "Kalima extends its sincere thanks and appreciation to {{name}}",
+    "body": "This page has been prepared in recognition of the dedication shown, and to gather words of thanks and appreciation from all who have shared part of the journey with {{name}} as {{role}}.",
+    "someone": "this distinguished person",
+    "communityMember": "a valued member of the Kalima community"
   },
   "public": {
-    "badge": "A public note of appreciation",
-    "headline": "A few words for {{name}}.",
-    "body": "{{name}} has helped shape the Kalima experience with generosity, commitment, and care. If you've worked with {{name}}, leave a note to thank them for everything they bring as {{role}}.",
-    "recipientLabel": "For",
+    "badge": "With sincere thanks and appreciation",
+    "eyebrow": "Kalima Platform",
+    "headline": "Kalima extends its sincere thanks and appreciation to {{name}}",
+    "body": "In gratitude for the effort devoted to developing the notes, and for the active contribution of creative ideas and thoughtful questions that keep pace with the evolving educational system. We look forward to even more creativity in the coming year, along with a major surprise to be announced at its beginning.",
+    "recipientLabel": "To",
     "roleLabel": "Role",
-    "commentsTitle": "Leave a comment",
-    "commentsSubtitle": "Share a short message of thanks. Your name and comment are both required.",
-    "commentFeedTitle": "Public comments",
-    "commentFeedCount": "{{count}} comments",
-    "emptyTitle": "No comments yet",
-    "emptyBody": "Be the first person to leave a note of appreciation."
+    "appreciationLabel": "Message of appreciation",
+    "appreciationStatement": "With deepest thanks and appreciation from the Kalima team to {{name}}.",
+    "appreciationNote": "This page offers a place to share sincere words of gratitude and to honor the lasting impact that {{name}} has made on the journey of work and learning.",
+    "commentPresence_one": "1 person has already added a message of thanks and appreciation.",
+    "commentPresence_other": "{{count}} people have already added messages of thanks and appreciation.",
+    "commentsTitle": "Add a message of appreciation",
+    "commentsSubtitle": "Share a sincere word of thanks, a meaningful moment, or a lasting impression.",
+    "commentFeedTitle": "Messages of thanks and appreciation",
+    "commentFeedSubtitle": "Words shared by others in gratitude for all that {{name}} has contributed.",
+    "languageToggle": "Switch language",
+    "commentFeedCount_one": "{{count}} message",
+    "commentFeedCount_other": "{{count}} messages",
+    "emptyTitle": "No messages yet",
+    "emptyBody": "Be the first to leave a message of thanks and appreciation."
   },
   "form": {
     "authorName": "Your name",
     "authorNamePlaceholder": "Enter your name",
-    "comment": "Your comment",
-    "commentPlaceholder": "Write a thoughtful message for this person...",
-    "submit": "Post comment"
+    "comment": "Your message",
+    "commentPlaceholder": "Write a sincere message befitting this occasion",
+    "submit": "Send message"
+  },
+  "messages": {
+    "commentSubmitted": "Your message has been shared successfully."
+  },
+  "seo": {
+    "title": "A Page of Thanks and Appreciation for {{name}}",
+    "fallbackTitle": "Page of Thanks and Appreciation"
   }
 }
