@@ -1,8 +1,10 @@
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import axiosInstance from '@/api/axios';
 import useApiMutation from '@/hooks/useApiMutation';
 
 export default function usePublicAppreciationPage() {
+    const { t } = useTranslation('appreciation');
     const [pageData, setPageData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -30,7 +32,7 @@ export default function usePublicAppreciationPage() {
             endpoint: `/appreciation/${token}/comments`,
             method: 'post',
             data: values,
-            defaultSuccessMessage: 'Comment submitted successfully',
+            defaultSuccessMessage: t('messages.commentSubmitted'),
         });
 
         const createdComment = response?.data;
@@ -42,7 +44,7 @@ export default function usePublicAppreciationPage() {
         }
 
         return createdComment;
-    }, [mutate]);
+    }, [mutate, t]);
 
     return {
         pageData,
