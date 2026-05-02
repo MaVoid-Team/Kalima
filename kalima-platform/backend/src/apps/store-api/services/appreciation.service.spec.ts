@@ -13,7 +13,7 @@ function getMockPrismaClient() {
       },
       user_appreciation_pages: {
         findUnique: jest.fn(),
-        create: jest.fn(),
+        upsert: jest.fn(),
       },
       user_appreciation_comments: {
         create: jest.fn(),
@@ -43,7 +43,10 @@ describe("AppreciationService", () => {
   let service: AppreciationService;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockPrismaClient.users.findUnique.mockReset();
+    mockPrismaClient.user_appreciation_pages.findUnique.mockReset();
+    mockPrismaClient.user_appreciation_pages.upsert.mockReset();
+    mockPrismaClient.user_appreciation_comments.create.mockReset();
     process.env.APP_URL = "https://kalima.test";
     service = new AppreciationService(mockPrismaClient as unknown as PrismaClient);
   });
@@ -55,16 +58,7 @@ describe("AppreciationService", () => {
         name: "Amina Hassan",
       });
 
-      mockPrismaClient.user_appreciation_pages.findUnique
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({
-          id: 10,
-          user_id: 42,
-          token: "stable-token",
-          _count: { user_appreciation_comments: 0 },
-        });
-
-      mockPrismaClient.user_appreciation_pages.create.mockResolvedValue({
+      mockPrismaClient.user_appreciation_pages.upsert.mockResolvedValue({
         id: 10,
         user_id: 42,
         token: "stable-token",
@@ -76,7 +70,7 @@ describe("AppreciationService", () => {
 
       expect(created.token).toBe("stable-token");
       expect(fetched.token).toBe("stable-token");
-      expect(mockPrismaClient.user_appreciation_pages.create).toHaveBeenCalledTimes(1);
+      expect(mockPrismaClient.user_appreciation_pages.upsert).toHaveBeenCalledTimes(2);
     });
 
     it("rejects invalid user ids", async () => {
