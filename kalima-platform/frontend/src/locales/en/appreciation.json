@@ -1,64 +1,64 @@
 {
   "admin": {
-    "title": "Appreciation Page",
-    "subtitle": "Preview and share a public appreciation page for this user.",
+    "title": "Page of Thanks and Appreciation",
+    "subtitle": "Create and share a public tribute that reflects dedicated effort and honors a lasting contribution.",
     "copyLink": "Copy link",
     "openPublicPage": "Open public page",
-    "copySuccess": "Public appreciation link copied.",
-    "previewBadge": "Public preview",
-    "previewName": "Recipient",
+    "copySuccess": "The page link has been copied.",
+    "previewBadge": "Preview message",
+    "previewName": "Honoree",
     "previewRole": "Role",
-    "roleFallback": "Community member",
+    "roleFallback": "A valued member of the Kalima community",
     "shareTitle": "Share",
-    "shareDescription": "Use this public link to collect appreciation messages.",
+    "shareDescription": "Use this public link to share the page and gather messages of sincere thanks and appreciation.",
     "publicLink": "Public link",
-    "commentCount": "Comments",
+    "commentCount": "Appreciation messages",
     "pageStatus": "Page status",
     "activeStatus": "Active",
     "notesTitle": "How it works",
-    "notesBody": "Anyone with the public link can leave a message of appreciation for this user.",
-    "notesFooter": "The page is public, but it is marked to stay out of search results."
+    "notesBody": "Anyone with the public link may leave a message of thanks and appreciation for this person.",
+    "notesFooter": "The page is public, while remaining excluded from search results."
   },
   "preview": {
-    "headline": "{{name}} deserves appreciation",
-    "body": "Share this page to gather thoughtful words for {{name}} and recognize the care and effort they bring to this community.",
-    "someone": "this person",
-    "communityMember": "community member"
+    "headline": "Kalima extends its sincere thanks and appreciation to {{name}}",
+    "body": "This page has been prepared in recognition of the dedication shown, and to gather words of thanks and appreciation from all who have shared part of the journey with {{name}} as {{role}}.",
+    "someone": "this distinguished person",
+    "communityMember": "a valued member of the Kalima community"
   },
   "public": {
-    "badge": "Shared appreciation",
-    "eyebrow": "A page of appreciation",
-    "headline": "With gratitude for {{name}}",
-    "body": "A collection of appreciative notes for {{name}}, recognizing the care, effort, and presence they continue to bring to this community.",
-    "recipientLabel": "Recipient",
+    "badge": "With sincere thanks and appreciation",
+    "eyebrow": "Kalima Platform",
+    "headline": "Kalima extends its sincere thanks and appreciation to {{name}}",
+    "body": "In gratitude for the effort devoted to developing the notes, and for the active contribution of creative ideas and thoughtful questions that keep pace with the evolving educational system. We look forward to even more creativity in the coming year, along with a major surprise to be announced at its beginning.",
+    "recipientLabel": "To",
     "roleLabel": "Role",
-    "appreciationLabel": "A quiet thank-you",
-    "appreciationStatement": "A space to pause and thank {{name}} for what they have given to others.",
-    "appreciationNote": "Each note adds to a shared expression of appreciation for the difference {{name}} has made.",
-    "commentPresence_one": "{{count}} person has already added their voice.",
-    "commentPresence_other": "{{count}} people have already added their voice.",
-    "commentsTitle": "Add a note of appreciation",
-    "commentsSubtitle": "Share a kind memory, a meaningful moment, or a few words of thanks.",
-    "commentFeedTitle": "Appreciation messages",
-    "commentFeedSubtitle": "Notes shared in recognition of {{name}}.",
+    "appreciationLabel": "Message of appreciation",
+    "appreciationStatement": "With deepest thanks and appreciation from the Kalima team to {{name}}.",
+    "appreciationNote": "This page offers a place to share sincere words of gratitude and to honor the lasting impact that {{name}} has made on the journey of work and learning.",
+    "commentPresence_one": "1 person has already added a message of thanks and appreciation.",
+    "commentPresence_other": "{{count}} people have already added messages of thanks and appreciation.",
+    "commentsTitle": "Add a message of appreciation",
+    "commentsSubtitle": "Share a sincere word of thanks, a meaningful moment, or a lasting impression.",
+    "commentFeedTitle": "Messages of thanks and appreciation",
+    "commentFeedSubtitle": "Words shared by others in gratitude for all that {{name}} has contributed.",
     "languageToggle": "Switch language",
     "commentFeedCount_one": "{{count}} message",
     "commentFeedCount_other": "{{count}} messages",
     "emptyTitle": "No messages yet",
-    "emptyBody": "Be the first to leave a message of appreciation."
+    "emptyBody": "Be the first to leave a message of thanks and appreciation."
   },
   "form": {
     "authorName": "Your name",
     "authorNamePlaceholder": "Enter your name",
     "comment": "Your message",
-    "commentPlaceholder": "Write a thoughtful note",
-    "submit": "Post message"
+    "commentPlaceholder": "Write a sincere message befitting this occasion",
+    "submit": "Send message"
   },
   "messages": {
-    "commentSubmitted": "Your message was posted."
+    "commentSubmitted": "Your message has been shared successfully."
   },
   "seo": {
-    "title": "Appreciation for {{name}}",
-    "fallbackTitle": "Appreciation Page"
+    "title": "A Page of Thanks and Appreciation for {{name}}",
+    "fallbackTitle": "Page of Thanks and Appreciation"
   }
 }
