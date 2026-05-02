@@ -43,30 +43,21 @@ class AppreciationService {
       throw new NotFoundError("User not found");
     }
 
-    const page =
-      (await this.db.user_appreciation_pages.findUnique({
-        where: { user_id: userId },
-        include: {
-          _count: {
-            select: {
-              user_appreciation_comments: true,
-            },
+    const page = await this.db.user_appreciation_pages.upsert({
+      where: { user_id: userId },
+      update: {},
+      create: {
+        user_id: userId,
+        token: this.generateToken(),
+      },
+      include: {
+        _count: {
+          select: {
+            user_appreciation_comments: true,
           },
         },
-      })) ??
-      (await this.db.user_appreciation_pages.create({
-        data: {
-          user_id: userId,
-          token: this.generateToken(),
-        },
-        include: {
-          _count: {
-            select: {
-              user_appreciation_comments: true,
-            },
-          },
-        },
-      }));
+      },
+    });
 
     return this.mapAdminPage(page);
   }

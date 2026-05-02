@@ -108,7 +108,7 @@ function Root() {
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-      <Route element={<Root />}>
+    <Route element={<Root />}>
       <Route path="/appreciation/:token" element={<AppreciationPublicPage />} />
       {/* Public Routes with MainLayout (Navbar & Footer) */}
       <Route element={<MainLayout />}>
