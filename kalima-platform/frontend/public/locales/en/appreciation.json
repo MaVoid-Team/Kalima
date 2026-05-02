@@ -1,52 +1,64 @@
 {
   "seo": {
-    "title": "Appreciation for {{name}} | Kalima",
-    "fallbackTitle": "Appreciation | Kalima"
+    "title": "Appreciation for {{name}}",
+    "fallbackTitle": "Appreciation Page"
+  },
+  "messages": {
+    "commentSubmitted": "Your message was posted."
   },
   "preview": {
-    "headline": "Thank you, {{name}}.",
-    "body": "{{name}} has been an important part of Kalima's journey. This page is a simple way for partners, colleagues, and friends to leave a few words of appreciation for the care, trust, and energy they bring as {{role}}.",
-    "someone": "this amazing person",
-    "communityMember": "a valued member of the Kalima community"
+    "headline": "{{name}} deserves appreciation",
+    "body": "Share this page to gather thoughtful words for {{name}} and recognize the care and effort they bring to this community.",
+    "someone": "this person",
+    "communityMember": "community member"
   },
   "admin": {
     "title": "Appreciation Page",
-    "subtitle": "Create a permanent public thank-you page for this user and share it with anyone who wants to leave a note.",
-    "previewBadge": "Live message preview",
+    "subtitle": "Preview and share a public appreciation page for this user.",
+    "copyLink": "Copy link",
+    "openPublicPage": "Open public page",
+    "copySuccess": "Public appreciation link copied.",
+    "previewBadge": "Public preview",
     "previewName": "Recipient",
-    "previewRole": "Supporting context",
-    "roleFallback": "Kalima community member",
-    "shareTitle": "Share link",
-    "shareDescription": "This link stays stable for this user. Anyone with it can open the page and leave a comment without logging in.",
-    "publicLink": "Public URL",
-    "commentCount": "Comments so far",
+    "previewRole": "Role",
+    "roleFallback": "Community member",
+    "shareTitle": "Share",
+    "shareDescription": "Use this public link to collect appreciation messages.",
+    "publicLink": "Public link",
+    "commentCount": "Comments",
     "pageStatus": "Page status",
     "activeStatus": "Active",
-    "copyLink": "Copy link",
-    "copySuccess": "Appreciation link copied",
-    "openPublicPage": "Open public page",
     "notesTitle": "How this works",
-    "notesBody": "The page is unlisted and intended for direct sharing. It always keeps the same token for the same user, so you can reuse the same link later.",
-    "notesFooter": "Comments are shown newest first and update immediately after visitors submit them."
+    "notesBody": "Anyone with the public link can leave a message of appreciation for this user.",
+    "notesFooter": "The page is public, but it is marked to stay out of search results."
   },
   "public": {
-    "badge": "A public note of appreciation",
-    "headline": "A few words for {{name}}.",
-    "body": "{{name}} has helped shape the Kalima experience with generosity, commitment, and care. If you've worked with {{name}}, leave a note to thank them for everything they bring as {{role}}.",
-    "recipientLabel": "For",
+    "badge": "Shared appreciation",
+    "eyebrow": "A page of appreciation",
+    "headline": "With gratitude for {{name}}",
+    "body": "A collection of appreciative notes for {{name}}, recognizing the care, effort, and presence they continue to bring to this community.",
+    "recipientLabel": "Recipient",
     "roleLabel": "Role",
-    "commentsTitle": "Leave a comment",
-    "commentsSubtitle": "Share a short message of thanks. Your name and comment are both required.",
-    "commentFeedTitle": "Public comments",
-    "commentFeedCount": "{{count}} comments",
+    "appreciationLabel": "A quiet thank-you",
+    "appreciationStatement": "A space to pause and thank {{name}} for what they have given to others.",
+    "appreciationNote": "Each note adds to a shared expression of appreciation for the difference {{name}} has made.",
+    "commentPresence_one": "{{count}} person has already added their voice.",
+    "commentPresence_other": "{{count}} people have already added their voice.",
+    "commentsTitle": "Add a note of appreciation",
+    "commentsSubtitle": "Share a kind memory, a meaningful moment, or a few words of thanks.",
+    "commentFeedTitle": "Appreciation messages",
+    "commentFeedSubtitle": "Notes shared in recognition of {{name}}.",
+    "languageToggle": "Switch language",
+    "commentFeedCount_one": "{{count}} message",
+    "commentFeedCount_other": "{{count}} messages",
     "emptyTitle": "No comments yet",
-    "emptyBody": "Be the first person to leave a note of appreciation."
+    "emptyBody": "Be the first to leave a message of appreciation."
   },
   "form": {
     "authorName": "Your name",
     "authorNamePlaceholder": "Enter your name",
-    "comment": "Your comment",
-    "commentPlaceholder": "Write a thoughtful message for this person...",
-    "submit": "Post comment"
+    "comment": "Your message",
+    "commentPlaceholder": "Write a thoughtful note",
+    "submit": "Post message"
   }
 }

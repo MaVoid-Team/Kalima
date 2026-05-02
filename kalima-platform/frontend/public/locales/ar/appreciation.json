@@ -1,52 +1,72 @@
 {
   "seo": {
-    "title": "صفحة تقدير لـ {{name}} | كليمة",
-    "fallbackTitle": "صفحة تقدير | كليمة"
+    "title": "صفحة تقدير لـ {{name}}",
+    "fallbackTitle": "صفحة التقدير"
+  },
+  "messages": {
+    "commentSubmitted": "تم نشر رسالتك."
   },
   "preview": {
-    "headline": "شكرًا لك يا {{name}}.",
-    "body": "كان {{name}} جزءًا مهمًا من رحلة كليمة. هذه الصفحة وسيلة بسيطة ليترك الشركاء والزملاء والأصدقاء كلمات تقدير تعكس الثقة والاهتمام والطاقة التي يقدمها {{role}}.",
-    "someone": "هذا الشخص الرائع",
-    "communityMember": "عضوًا محل تقدير في مجتمع كليمة"
+    "headline": "{{name}} يستحق التقدير",
+    "body": "شارك هذه الصفحة لجمع كلمات صادقة لـ {{name}} تقديرًا لما يقدمه من وقت واهتمام وجهد داخل هذا المجتمع.",
+    "someone": "هذا الشخص",
+    "communityMember": "أحد أفراد المجتمع"
   },
   "admin": {
     "title": "صفحة التقدير",
-    "subtitle": "أنشئ صفحة شكر عامة ودائمة لهذا المستخدم وشاركها مع أي شخص يريد ترك رسالة تقدير.",
-    "previewBadge": "معاينة الرسالة",
-    "previewName": "المُهدى إليه",
-    "previewRole": "سياق داعم",
-    "roleFallback": "عضو في مجتمع كليمة",
-    "shareTitle": "رابط المشاركة",
-    "shareDescription": "هذا الرابط ثابت لهذا المستخدم. يمكن لأي شخص يملكه فتح الصفحة وترك تعليق بدون تسجيل دخول.",
+    "subtitle": "عاين وشارك صفحة تقدير عامة لهذا المستخدم.",
+    "copyLink": "نسخ الرابط",
+    "openPublicPage": "فتح الصفحة العامة",
+    "copySuccess": "تم نسخ رابط صفحة التقدير.",
+    "previewBadge": "معاينة عامة",
+    "previewName": "صاحب الصفحة",
+    "previewRole": "الدور",
+    "roleFallback": "أحد أفراد المجتمع",
+    "shareTitle": "المشاركة",
+    "shareDescription": "استخدم هذا الرابط العام لجمع رسائل التقدير.",
     "publicLink": "الرابط العام",
-    "commentCount": "عدد التعليقات",
+    "commentCount": "عدد الرسائل",
     "pageStatus": "حالة الصفحة",
     "activeStatus": "نشطة",
-    "copyLink": "نسخ الرابط",
-    "copySuccess": "تم نسخ رابط التقدير",
-    "openPublicPage": "فتح الصفحة العامة",
     "notesTitle": "آلية العمل",
-    "notesBody": "الصفحة غير مفهرسة ومخصصة للمشاركة المباشرة. تحتفظ دائمًا بنفس الرابط لنفس المستخدم، لذلك يمكنك إعادة استخدامه لاحقًا.",
-    "notesFooter": "تظهر التعليقات من الأحدث إلى الأقدم، وتُحدَّث مباشرة بعد إرسالها."
+    "notesBody": "يمكن لأي شخص يملك الرابط العام أن يترك رسالة تقدير لهذا المستخدم.",
+    "notesFooter": "الصفحة عامة، لكنها مهيأة بحيث لا تظهر في نتائج البحث."
   },
   "public": {
-    "badge": "رسالة تقدير عامة",
-    "headline": "بضع كلمات من أجل {{name}}.",
-    "body": "ساهم {{name}} في تشكيل تجربة كليمة بروح من العطاء والالتزام والاهتمام. إذا سبق لك العمل مع {{name}}، فاترك رسالة شكر تعبّر عن أثره كـ {{role}}.",
-    "recipientLabel": "إلى",
+    "badge": "تقدير مشترك",
+    "eyebrow": "صفحة تقدير",
+    "headline": "امتنانًا لـ {{name}}",
+    "body": "مجموعة من كلمات التقدير لـ {{name}}، اعترافًا بما يقدمه من اهتمام وجهد وحضور مستمر داخل هذا المجتمع.",
+    "recipientLabel": "صاحب الصفحة",
     "roleLabel": "الدور",
-    "commentsTitle": "اترك تعليقًا",
-    "commentsSubtitle": "شارك رسالة شكر قصيرة. الاسم والتعليق مطلوبان.",
-    "commentFeedTitle": "التعليقات العامة",
-    "commentFeedCount": "{{count}} تعليق",
+    "appreciationLabel": "امتنان هادئ",
+    "appreciationStatement": "مساحة نتوقف فيها لنشكر {{name}} على ما قدمه للآخرين.",
+    "appreciationNote": "كل رسالة هنا تضيف تعبيرًا جماعيًا عن التقدير للأثر الذي تركه {{name}}.",
+    "commentPresence_zero": "لم تُضف أي رسالة بعد.",
+    "commentPresence_one": "أضاف شخص واحد صوته إلى هذا التقدير.",
+    "commentPresence_two": "أضاف شخصان صوتيهما إلى هذا التقدير.",
+    "commentPresence_few": "أضاف {{count}} أشخاص أصواتهم إلى هذا التقدير.",
+    "commentPresence_many": "أضاف {{count}} شخصًا صوته إلى هذا التقدير.",
+    "commentPresence_other": "أضاف {{count}} شخص صوته إلى هذا التقدير.",
+    "commentsTitle": "أضف رسالة تقدير",
+    "commentsSubtitle": "شارك ذكرى لطيفة أو موقفًا مؤثرًا أو بضع كلمات شكر.",
+    "commentFeedTitle": "رسائل التقدير",
+    "commentFeedSubtitle": "كلمات شاركها الآخرون تقديرًا لـ {{name}}.",
+    "languageToggle": "تبديل اللغة",
+    "commentFeedCount_zero": "{{count}} رسالة",
+    "commentFeedCount_one": "{{count}} رسالة",
+    "commentFeedCount_two": "{{count}} رسالتان",
+    "commentFeedCount_few": "{{count}} رسائل",
+    "commentFeedCount_many": "{{count}} رسالة",
+    "commentFeedCount_other": "{{count}} رسالة",
     "emptyTitle": "لا توجد تعليقات بعد",
     "emptyBody": "كن أول من يترك رسالة تقدير."
   },
   "form": {
     "authorName": "اسمك",
     "authorNamePlaceholder": "اكتب اسمك",
-    "comment": "تعليقك",
-    "commentPlaceholder": "اكتب رسالة تقدير لطيفة لهذا الشخص...",
-    "submit": "إرسال التعليق"
+    "comment": "رسالتك",
+    "commentPlaceholder": "اكتب رسالة صادقة",
+    "submit": "نشر الرسالة"
   }
 }
