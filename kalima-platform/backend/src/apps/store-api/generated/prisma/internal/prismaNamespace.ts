@@ -388,6 +388,8 @@ export const ModelName = {
   user_analytics: 'user_analytics',
   user_roles: 'user_roles',
   users: 'users',
+  user_appreciation_pages: 'user_appreciation_pages',
+  user_appreciation_comments: 'user_appreciation_comments',
   account_review_settings: 'account_review_settings',
   refresh_tokens: 'refresh_tokens',
   assistants: 'assistants',
@@ -442,7 +444,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos" | "general_settings" | "notifications"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "user_appreciation_pages" | "user_appreciation_comments" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos" | "general_settings" | "notifications"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -739,6 +741,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.usersCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UsersCountAggregateOutputType> | number
+        }
+      }
+    }
+    user_appreciation_pages: {
+      payload: Prisma.$user_appreciation_pagesPayload<ExtArgs>
+      fields: Prisma.user_appreciation_pagesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.user_appreciation_pagesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_pagesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.user_appreciation_pagesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_pagesPayload>
+        }
+        findFirst: {
+          args: Prisma.user_appreciation_pagesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_pagesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.user_appreciation_pagesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_pagesPayload>
+        }
+        findMany: {
+          args: Prisma.user_appreciation_pagesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_pagesPayload>[]
+        }
+        create: {
+          args: Prisma.user_appreciation_pagesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_pagesPayload>
+        }
+        createMany: {
+          args: Prisma.user_appreciation_pagesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.user_appreciation_pagesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_pagesPayload>[]
+        }
+        delete: {
+          args: Prisma.user_appreciation_pagesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_pagesPayload>
+        }
+        update: {
+          args: Prisma.user_appreciation_pagesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_pagesPayload>
+        }
+        deleteMany: {
+          args: Prisma.user_appreciation_pagesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.user_appreciation_pagesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.user_appreciation_pagesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_pagesPayload>[]
+        }
+        upsert: {
+          args: Prisma.user_appreciation_pagesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_pagesPayload>
+        }
+        aggregate: {
+          args: Prisma.User_appreciation_pagesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUser_appreciation_pages>
+        }
+        groupBy: {
+          args: Prisma.user_appreciation_pagesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.User_appreciation_pagesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.user_appreciation_pagesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.User_appreciation_pagesCountAggregateOutputType> | number
+        }
+      }
+    }
+    user_appreciation_comments: {
+      payload: Prisma.$user_appreciation_commentsPayload<ExtArgs>
+      fields: Prisma.user_appreciation_commentsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.user_appreciation_commentsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_commentsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.user_appreciation_commentsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_commentsPayload>
+        }
+        findFirst: {
+          args: Prisma.user_appreciation_commentsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_commentsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.user_appreciation_commentsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_commentsPayload>
+        }
+        findMany: {
+          args: Prisma.user_appreciation_commentsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_commentsPayload>[]
+        }
+        create: {
+          args: Prisma.user_appreciation_commentsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_commentsPayload>
+        }
+        createMany: {
+          args: Prisma.user_appreciation_commentsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.user_appreciation_commentsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_commentsPayload>[]
+        }
+        delete: {
+          args: Prisma.user_appreciation_commentsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_commentsPayload>
+        }
+        update: {
+          args: Prisma.user_appreciation_commentsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_commentsPayload>
+        }
+        deleteMany: {
+          args: Prisma.user_appreciation_commentsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.user_appreciation_commentsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.user_appreciation_commentsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_commentsPayload>[]
+        }
+        upsert: {
+          args: Prisma.user_appreciation_commentsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$user_appreciation_commentsPayload>
+        }
+        aggregate: {
+          args: Prisma.User_appreciation_commentsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUser_appreciation_comments>
+        }
+        groupBy: {
+          args: Prisma.user_appreciation_commentsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.User_appreciation_commentsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.user_appreciation_commentsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.User_appreciation_commentsCountAggregateOutputType> | number
         }
       }
     }
@@ -3737,6 +3887,28 @@ export const UsersScalarFieldEnum = {
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
 
 
+export const User_appreciation_pagesScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  token: 'token',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type User_appreciation_pagesScalarFieldEnum = (typeof User_appreciation_pagesScalarFieldEnum)[keyof typeof User_appreciation_pagesScalarFieldEnum]
+
+
+export const User_appreciation_commentsScalarFieldEnum = {
+  id: 'id',
+  page_id: 'page_id',
+  author_name: 'author_name',
+  comment: 'comment',
+  created_at: 'created_at'
+} as const
+
+export type User_appreciation_commentsScalarFieldEnum = (typeof User_appreciation_commentsScalarFieldEnum)[keyof typeof User_appreciation_commentsScalarFieldEnum]
+
+
 export const Account_review_settingsScalarFieldEnum = {
   id: 'id',
   role: 'role',
@@ -4641,6 +4813,8 @@ export type GlobalOmitConfig = {
   user_analytics?: Prisma.user_analyticsOmit
   user_roles?: Prisma.user_rolesOmit
   users?: Prisma.usersOmit
+  user_appreciation_pages?: Prisma.user_appreciation_pagesOmit
+  user_appreciation_comments?: Prisma.user_appreciation_commentsOmit
   account_review_settings?: Prisma.account_review_settingsOmit
   refresh_tokens?: Prisma.refresh_tokensOmit
   assistants?: Prisma.assistantsOmit

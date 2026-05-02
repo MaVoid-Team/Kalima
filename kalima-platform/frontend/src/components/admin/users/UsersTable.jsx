@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { arSA } from 'date-fns/locale';
-import { Eye, CheckCircle2, XCircle, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, CheckCircle2, XCircle, Trash2, ChevronLeft, ChevronRight, HeartHandshake } from 'lucide-react';
 
 import {
     Table,
@@ -176,6 +176,19 @@ export default function UsersTable({
                                             >
                                                 <Link to={`/admin/users/${user.id}`}>
                                                     <Eye className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
+
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10"
+                                                asChild
+                                                title={t('actions.appreciation')}
+                                                data-testid={`users-table-appreciation-${user.id}`}
+                                            >
+                                                <Link to={`/admin/users/${user.id}/appreciation`}>
+                                                    <HeartHandshake className="h-4 w-4" />
                                                 </Link>
                                             </Button>
 
