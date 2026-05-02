@@ -66,6 +66,7 @@ services:
       - uploads:/app/uploads
 
   postgres:
+    # Keep Postgres 17 until the existing data volume is explicitly upgraded.
     image: postgres:17-alpine
     ports:
       - "5468:5432"
