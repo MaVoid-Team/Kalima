@@ -11,8 +11,7 @@ EXCEPTION
 END $$;                                                       
                                                               
 ALTER TABLE "users"                                           
-ADD COLUMN IF NOT EXISTS "flag" "user_flag_enum" DEFAULT 'NORM
-AL';                                                          
+ADD COLUMN IF NOT EXISTS "flag" "user_flag_enum" DEFAULT 'NORMAL';
                                                               
 UPDATE "users"                                                
 SET "flag" = 'NORMAL'                                         
