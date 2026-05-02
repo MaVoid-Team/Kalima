@@ -27,7 +27,7 @@ export default function FastBuyOrderSummaryCard({
   );
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       className="w-full lg:w-[400px] sticky top-24 xl:w-[450px] space-y-4"
@@ -142,7 +142,7 @@ const ItemCouponInput = ({ itemId, onApplyCoupon }) => {
     setIsApplying(true);
     await onApplyCoupon(itemId, code);
     setIsApplying(false);
-    setCode(""); 
+    setCode("");
   };
 
   return (

@@ -49,8 +49,10 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
     { name: t('nav.requiredFields'), href: '/admin/required-fields', icon: FormInput, id: 'required-fields' },
     { name: t('nav.paymentMethods', 'Payment Methods'), href: '/admin/payment-methods', icon: CreditCard, id: 'payment-methods' },
     { name: t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users, id: 'users' },
+    { name: t('nav.notifications', 'Notifications'), href: '/admin/notifications', icon: Bell, id: 'notifications' },
     { name: t('nav.settings'), href: '/admin/settings', icon: Settings, id: 'settings' },
-  ];
+];
+
 
   const toggleLanguage = () => {
     const newLang = i18n.language === "ar" ? "en" : "ar";

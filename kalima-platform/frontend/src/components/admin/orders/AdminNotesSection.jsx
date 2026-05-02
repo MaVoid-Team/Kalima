@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Save } from 'lucide-react';
+import { Save, User, Clock } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 import { formatOrderDate } from '@/lib/storeUtils';
 
@@ -41,6 +41,31 @@ export default function AdminNotesSection({ orderId, initialNote, onSaveNote }) 
         });
     };
 
+    const parseNotes = (text) => {
+        if (!text) return [];
+        return text.split('---').map(part => {
+            const trimmed = part.trim();
+            if (!trimmed) return null;
+
+            // Match [timestamp - admin]\ncontent
+            const match = trimmed.match(/^\[(.*?) - (.*?)\]\s*([\s\S]*)$/);
+            if (match) {
+                return {
+                    timestamp: match[1],
+                    admin: match[2],
+                    content: match[3].trim()
+                };
+            }
+            return {
+                timestamp: null,
+                admin: null,
+                content: trimmed
+            };
+        }).filter(Boolean);
+    };
+
+    const notes = parseNotes(initialNote).reverse();
+
     const maxAllowedChars = 5000;
     const currentLength = initialNote?.length || 0;
     const remainingChars = Math.max(0, maxAllowedChars - currentLength - 50); // 50 buffer for dates/separators
@@ -49,9 +74,31 @@ export default function AdminNotesSection({ orderId, initialNote, onSaveNote }) 
         <div className="border rounded-md p-4 space-y-4">
             <h3 className="font-medium">{t('orders.details.adminNotes')}</h3>
 
-            {initialNote && (
-                <div className="bg-muted/50 p-3 rounded-md text-sm whitespace-pre-wrap max-h-[300px] overflow-y-auto">
-                    {renderTextWithLinks(initialNote)}
+            {notes.length > 0 && (
+                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    {notes.map((note, index) => (
+                        <div key={index} className="bg-muted/30 border border-border/50 rounded-lg p-4 transition-all hover:bg-muted/50">
+                            {(note.admin || note.timestamp) && (
+                                <div className="flex flex-wrap items-center gap-3 mb-3 text-xs text-muted-foreground border-b border-border/40 pb-2">
+                                    {note.admin && (
+                                        <div className="flex items-center gap-1.5 font-medium text-foreground">
+                                            <User className="h-3.5 w-3.5" />
+                                            {note.admin}
+                                        </div>
+                                    )}
+                                    {note.timestamp && (
+                                        <div className="flex items-center gap-1.5">
+                                            <Clock className="h-3.5 w-3.5" />
+                                            {note.timestamp}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            <div className="text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">
+                                {renderTextWithLinks(note.content)}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
 

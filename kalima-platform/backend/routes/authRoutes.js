@@ -8,6 +8,7 @@ const loginLimiter = require("../middleware/loginLimiter.js");
 const verifyJWT = require("../middleware/verifyJWT");
 
 router.route("/").post(loginLimiter, authController.login);
+router.route("/login").post(loginLimiter, authController.login);
 router.route("/refresh").post(authController.refresh);
 router.route("/logout").post(verifyJWT, authController.logout);
 

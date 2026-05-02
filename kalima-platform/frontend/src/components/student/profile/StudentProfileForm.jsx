@@ -137,7 +137,7 @@ export default function StudentProfileForm({
                     {/* Gender */}
                     <div>
                         <Label>{t('student:profile.gender')}</Label>
-                        <Select value={gender || ''} onValueChange={(v) => setValue('gender', v, { shouldDirty: true })}>
+                        <Select dir={i18n.dir()} value={gender || ''} onValueChange={(v) => setValue('gender', v, { shouldDirty: true })}>
                             <SelectTrigger className="mt-1" data-testid="student-profile-select-gender">
                                 <SelectValue placeholder={t('student:profile.selectGender')} />
                             </SelectTrigger>
@@ -157,6 +157,7 @@ export default function StudentProfileForm({
                     <div>
                         <Label>{t('student:profile.level')}</Label>
                         <Select
+                            dir={i18n.dir()}
                             value={watch('level_id') ? String(watch('level_id')) : ''}
                             onValueChange={(v) => setValue('level_id', Number(v), { shouldDirty: true })}
                         >
@@ -185,6 +186,7 @@ export default function StudentProfileForm({
                         <div>
                             <Label>{t('student:profile.government')}</Label>
                             <Select
+                                dir={i18n.dir()}
                                 value={watch('government_id') ? String(watch('government_id')) : ''}
                                 onValueChange={(v) => setValue('government_id', Number(v), { shouldDirty: true })}
                             >
@@ -201,6 +203,7 @@ export default function StudentProfileForm({
                         <div>
                             <Label>{t('student:profile.zone')}</Label>
                             <Select
+                                dir={i18n.dir()}
                                 value={watch('zone_id') ? String(watch('zone_id')) : ''}
                                 onValueChange={(v) => setValue('zone_id', Number(v), { shouldDirty: true })}
                                 disabled={!watch('government_id') || zonesLoading}
@@ -238,9 +241,9 @@ export default function StudentProfileForm({
                     </div>
 
                     <div className="flex justify-end pt-2">
-                        <Button 
-                            type="submit" 
-                            disabled={loading || !isDirty} 
+                        <Button
+                            type="submit"
+                            disabled={loading || !isDirty}
                             data-testid="student-profile-button-save"
                         >
                             {loading && <LoadingSpinner className="h-4 w-4" />}

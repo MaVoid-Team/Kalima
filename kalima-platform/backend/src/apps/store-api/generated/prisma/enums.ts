@@ -111,7 +111,9 @@ export const user_flag_enum = {
   PRO: 'PRO',
   NORMAL: 'NORMAL',
   OBSERVER: 'OBSERVER',
-  Warned: 'Warned'
+  Warned: 'Warned',
+  SUSPICIOUS: 'SUSPICIOUS',
+  BANNED: 'BANNED'
 } as const
 
 export type user_flag_enum = (typeof user_flag_enum)[keyof typeof user_flag_enum]
@@ -123,3 +125,20 @@ export const coupon_type = {
 } as const
 
 export type coupon_type = (typeof coupon_type)[keyof typeof coupon_type]
+
+
+export const notification_key_enum = {
+  ORDER_STATUS_RECEIVED: 'ORDER_STATUS_RECEIVED',
+  ORDER_STATUS_CONFIRMED: 'ORDER_STATUS_CONFIRMED',
+  ORDER_STATUS_RETURNED: 'ORDER_STATUS_RETURNED',
+  ORDER_ITEM_DELETED: 'ORDER_ITEM_DELETED',
+  ORDER_DELETED: 'ORDER_DELETED',
+  ORDER_ADMIN_NOTE: 'ORDER_ADMIN_NOTE',
+  NEW_ORDER_CREATED: 'NEW_ORDER_CREATED',
+  NEW_ACCOUNT_CREATED: 'NEW_ACCOUNT_CREATED',
+  SYSTEM_ANNOUNCEMENT: 'SYSTEM_ANNOUNCEMENT',
+  ACCOUNT_UPDATE: 'ACCOUNT_UPDATE',
+  CUSTOM: 'CUSTOM'
+} as const
+
+export type notification_key_enum = (typeof notification_key_enum)[keyof typeof notification_key_enum]

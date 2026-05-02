@@ -129,7 +129,7 @@ export const reviewController = {
       const isAdmin = roles.some(
         (r) =>
           r.portal === "store" &&
-          (r.role === "Admin" || r.role === "SubAdmin"),
+          (r.role === "Admin" || r.role === "SubAdmin" || r.role === "Moderator"),
       );
 
       await reviewService.deleteReview(reviewId, userId, {

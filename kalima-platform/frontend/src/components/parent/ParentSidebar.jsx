@@ -37,6 +37,7 @@ export default function ParentSidebar({ isMobileOpen, setIsMobileOpen }) {
   };
 
   const navigation = [
+    { name: t('nav.home'), href: '/', icon: Home, id: 'home' },
     { name: t('nav.profile'), href: '/parent/profile', icon: User, id: 'profile' },
     { name: t('nav.settings'), href: '/parent/settings', icon: Settings, id: 'settings' },
   ];
@@ -91,7 +92,9 @@ export default function ParentSidebar({ isMobileOpen, setIsMobileOpen }) {
       {/* Navigation Links */}
       <nav className="flex-1 space-y-2 px-2 py-4 overflow-y-auto">
         {navigation.map((item) => {
-          const isActive = location.pathname.startsWith(item.href);
+          const isActive = item.href === '/' 
+            ? location.pathname === '/' 
+            : location.pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}

@@ -63,7 +63,7 @@ export default function PaymentMethodsTable({
                     <TableRow>
                         <TableHead className="w-12">
                             <Checkbox
-                                className={`${i18n.language=='ar'? 'scale-x-[-1]': ''}`}
+                                className={`${i18n.language == 'ar' ? 'scale-x-[-1]' : ''}`}
                                 checked={isAllSelected}
                                 data-testid="payment-methods-select-all"
                                 onCheckedChange={(checked) => onSelectAll(checked)}
@@ -90,7 +90,7 @@ export default function PaymentMethodsTable({
                         <TableRow key={paymentMethod.id}>
                             <TableCell>
                                 <Checkbox
-                                    className={`${i18n.language=='ar'? 'scale-x-[-1]': ''}`}
+                                    className={`${i18n.language == 'ar' ? 'scale-x-[-1]' : ''}`}
                                     checked={selectedIds.includes(paymentMethod.id)}
                                     onCheckedChange={(checked) => onSelect(paymentMethod.id, checked)}
                                     data-testid={`payment-method-select-${paymentMethod.id}`}
@@ -120,8 +120,8 @@ export default function PaymentMethodsTable({
                             <TableCell>
                                 <div className="font-medium">{paymentMethod.name}</div>
                             </TableCell>
-                            <TableCell>
-                                <div className="text-sm text-muted-foreground">
+                            <TableCell className={`${i18n.language == "ar" ? "text-right" : "text-left"}`}>
+                                <div dir="ltr" className="text-sm text-muted-foreground">
                                     {paymentMethod.phone_number}
                                 </div>
                             </TableCell>
@@ -132,11 +132,11 @@ export default function PaymentMethodsTable({
                                         onCheckedChange={() => onStatusToggle(paymentMethod)}
                                         data-testid={`payment-method-status-${paymentMethod.id}`}
                                     />
-                                    <Badge 
+                                    <Badge
                                         variant={paymentMethod.status ? 'default' : 'secondary'}
                                         data-testid={`payment-method-status-badge-${paymentMethod.id}`}
                                     >
-                                        {paymentMethod.status 
+                                        {paymentMethod.status
                                             ? t('paymentMethods.status.active', 'Active')
                                             : t('paymentMethods.status.inactive', 'Inactive')
                                         }

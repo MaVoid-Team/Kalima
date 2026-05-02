@@ -24,8 +24,11 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { hasAdminAccess } = useRole();
+  const { hasStoreAccess, isConfirmed, hasAdminAccess } = useRole();
   const { startFastBuy, loading: fastBuyLoading } = useFastBuy();
+
+  // Blocking logic: must have store access AND be confirmed if authenticated
+  const isPurchaseBlocked = !hasStoreAccess || (isAuthenticated && !isConfirmed);
 
   let cartCtx = null;
   try {
@@ -51,7 +54,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
 
   const handleAddToCart = async (e) => {
     e.preventDefault(); e.stopPropagation();
-    if (!is_released) return;
+    if (!is_released || isPurchaseBlocked) return;
     if (!isAuthenticated) { navigate("/login", { state: { from: location }, replace: true }); return; }
     if (!cartCtx?.addToCart) return;
     try {
@@ -65,7 +68,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
 
   const handleBuyNow = async (e) => {
     e.preventDefault(); e.stopPropagation();
-    if (!is_released) return;
+    if (!is_released || isPurchaseBlocked) return;
     if (!isAuthenticated) { navigate("/login", { state: { from: location }, replace: true }); return; }
     try {
       setIsBuyingNow(true);
@@ -182,14 +185,14 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
       </Link>
 
       {/* Action Buttons */}
-      {!hasAdminAccess && isAuthenticated && (
+      {hasStoreAccess && !hasAdminAccess && (
         <div className="flex gap-2 w-full">
           <Button
             variant="outline"
             size="sm"
             className="flex-1 h-9 rounded-xl border-border/40 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300"
             onClick={handleAddToCart}
-            disabled={cartLoading || fastBuyLoading || isAddingToCart || !is_released}
+            disabled={cartLoading || fastBuyLoading || isAddingToCart || !is_released || isPurchaseBlocked}
           >
             {isAddingToCart ? (
               <LoadingSpinner className="h-4 w-4 border-primary" />
@@ -207,7 +210,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
             size="sm"
             className="flex-1 h-9 rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 bg-primary hover:bg-primary/90 transition-all duration-300"
             onClick={handleBuyNow}
-            disabled={cartLoading || fastBuyLoading || isBuyingNow || !is_released}
+            disabled={cartLoading || fastBuyLoading || isBuyingNow || !is_released || isPurchaseBlocked}
           >
             {isBuyingNow ? (
               <LoadingSpinner className="h-4 w-4 border-white" />

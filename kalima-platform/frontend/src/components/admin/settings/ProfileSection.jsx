@@ -25,6 +25,7 @@ import { PhoneInput, egyptPhoneSchema } from '@/components/ui/phone-input';
 import FileUploadProgress from './FileUploadProgress';
 import { useProfile } from '@/hooks/useProfile';
 import { getImageUrl } from '@/lib/storeUtils';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 
 const getProfileSchema = (t) => z.object({
     name: z.string().min(1, t('settings.profile.validation.nameRequired', 'Name is required')).max(255),
@@ -124,7 +125,10 @@ export default function ProfileSection({ ns = 'admin' }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle 
+                    className="flex items-center gap-2"
+                    data-search-content={`${t('settings.profile.title', { lng: 'en' })} ${t('settings.profile.title', { lng: 'ar' })}`}
+                >
                     <User className="h-5 w-5" />
                     {t('settings.profile.title')}
                 </CardTitle>
@@ -146,12 +150,18 @@ export default function ProfileSection({ ns = 'admin' }) {
                         </Label>
                     </div>
 
-                    <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-3 flex-1">
+                    <div className="flex flex-col items-center sm:items-start text-center sm:text-start space-y-3 flex-1">
                         <div>
-                            <h3 className="text-sm font-bold text-foreground">
+                            <h3 
+                                className="text-sm font-bold text-foreground"
+                                data-search-content={`${t('settings.profile.avatarTitle', { lng: 'en' })} ${t('settings.profile.avatarTitle', { lng: 'ar' })}`}
+                            >
                                 {t('settings.profile.avatarTitle', 'Profile Picture')}
                             </h3>
-                            <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
+                            <p 
+                                className="text-xs text-muted-foreground mt-1 max-w-[200px]"
+                                data-search-content={`${t('settings.profile.avatarHint', { lng: 'en' })} ${t('settings.profile.avatarHint', { lng: 'ar' })}`}
+                            >
                                 {t('settings.profile.avatarHint', 'JPG, PNG or GIF. Max size 2MB.')}
                             </p>
                         </div>
@@ -195,7 +205,9 @@ export default function ProfileSection({ ns = 'admin' }) {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t('settings.profile.name')}</FormLabel>
+                                            <FormLabel data-search-content={`${t('settings.profile.name', { lng: 'en' })} ${t('settings.profile.name', { lng: 'ar' })}`}>
+                                                {t('settings.profile.name')}
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input disabled={loading} {...field} />
                                             </FormControl>
@@ -209,7 +221,9 @@ export default function ProfileSection({ ns = 'admin' }) {
                                     name="email"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t('settings.profile.email')}</FormLabel>
+                                            <FormLabel data-search-content={`${t('settings.profile.email', { lng: 'en' })} ${t('settings.profile.email', { lng: 'ar' })}`}>
+                                                {t('settings.profile.email')}
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input type="email" disabled={loading} {...field} />
                                             </FormControl>
@@ -223,7 +237,10 @@ export default function ProfileSection({ ns = 'admin' }) {
                                     name="phone"
                                     render={({ field }) => (
                                         <FormItem dir="ltr">
-                                            <FormLabel className={isRtl ? "text-right block w-full" : ""}>
+                                            <FormLabel 
+                                                className={isRtl ? "text-right block w-full" : ""}
+                                                data-search-content={`${t('settings.profile.phone', { lng: 'en' })} ${t('settings.profile.phone', { lng: 'ar' })}`}
+                                            >
                                                 {t('settings.profile.phone')}
                                             </FormLabel>
                                             <FormControl>
@@ -242,7 +259,10 @@ export default function ProfileSection({ ns = 'admin' }) {
                                     name="secondary_phone"
                                     render={({ field }) => (
                                         <FormItem dir="ltr">
-                                            <FormLabel className={isRtl ? "text-right block w-full" : ""}>
+                                            <FormLabel 
+                                                className={isRtl ? "text-right block w-full" : ""}
+                                                data-search-content={`${t('settings.profile.secondaryPhone', { lng: 'en' })} ${t('settings.profile.secondaryPhone', { lng: 'ar' })}`}
+                                            >
                                                 {t('settings.profile.secondaryPhone')}
                                             </FormLabel>
                                             <FormControl>
@@ -261,7 +281,9 @@ export default function ProfileSection({ ns = 'admin' }) {
                                     name="gender"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{t('settings.profile.gender')}</FormLabel>
+                                            <FormLabel data-search-content={`${t('settings.profile.gender', { lng: 'en' })} ${t('settings.profile.gender', { lng: 'ar' })}`}>
+                                                {t('settings.profile.gender')}
+                                            </FormLabel>
                                             <Select
                                                 dir={i18n.dir()}
                                                 disabled={loading}
@@ -301,7 +323,10 @@ export default function ProfileSection({ ns = 'admin' }) {
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
                             <div className="space-y-1.5">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60">
+                                <Label 
+                                    className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60"
+                                    data-search-content={`${t('settings.profile.name', { lng: 'en' })} ${t('settings.profile.name', { lng: 'ar' })}`}
+                                >
                                     {t('settings.profile.name')}
                                 </Label>
                                 <div className="flex items-center gap-2 px-1">
@@ -314,7 +339,10 @@ export default function ProfileSection({ ns = 'admin' }) {
                                 </div>
                             </div>
                             <div className="space-y-1.5">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60">
+                                <Label 
+                                    className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60"
+                                    data-search-content={`${t('settings.profile.email', { lng: 'en' })} ${t('settings.profile.email', { lng: 'ar' })}`}
+                                >
                                     {t('settings.profile.email')}
                                 </Label>
                                 <div className="flex items-center gap-2 px-1">
@@ -327,7 +355,10 @@ export default function ProfileSection({ ns = 'admin' }) {
                                 </div>
                             </div>
                             <div className="space-y-1.5">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60">
+                                <Label 
+                                    className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60"
+                                    data-search-content={`${t('settings.profile.phone', { lng: 'en' })} ${t('settings.profile.phone', { lng: 'ar' })}`}
+                                >
                                     {t('settings.profile.phone')}
                                 </Label>
                                 <div className="flex items-center gap-2 px-1" dir="ltr">
@@ -340,12 +371,15 @@ export default function ProfileSection({ ns = 'admin' }) {
                                 </div>
                             </div>
                             <div className="space-y-1.5">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60">
+                                <Label 
+                                    className="text-[10px] font-black uppercase tracking-wider text-muted-foreground/60"
+                                    data-search-content={`${t('settings.profile.gender', { lng: 'en' })} ${t('settings.profile.gender', { lng: 'ar' })}`}
+                                >
                                     {t('settings.profile.gender')}
                                 </Label>
                                 <div className="flex items-center gap-2 px-1">
                                     <Badge variant="secondary" className="rounded-lg px-2 py-0.5 font-bold text-[10px]">
-                                        {t(`profile.${profile?.gender}`) || t('common.notSpecified')}
+                                        {t(`gender.${profile?.gender}`) || t('common.notSpecified')}
                                     </Badge>
                                 </div>
                             </div>

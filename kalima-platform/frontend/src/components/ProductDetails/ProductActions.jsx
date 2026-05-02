@@ -10,7 +10,7 @@ import { useFastBuy } from "@/hooks/useFastBuy";
 import useAuth from "@/hooks/auth/useAuth";
 import useRole from "@/hooks/useRole";
 
-import { buildWhatsAppLink } from "@/lib/whatsappUtils";
+import { useWhatsAppContact } from "@/lib/whatsappUtils";
 import { FaWhatsapp } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 export default function ProductActions({ price, productId, sampleUrl, sampleId, title, serial, isReleased = true }) {
   const { t } = useTranslation("product");
   const { isAuthenticated } = useAuth();
-  const { isConfirmed } = useRole();
+  const { isConfirmed, hasAdminAccess, hasStoreAccess } = useRole();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -51,8 +51,8 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const sheetRef = useRef(null);
 
-  // Unconfirmed authenticated users can browse but cannot purchase
-  const isPurchaseBlocked = isAuthenticated && !isConfirmed;
+  // Blocking logic: must have store access AND be confirmed if authenticated
+  const isPurchaseBlocked = !hasStoreAccess || (isAuthenticated && !isConfirmed);
 
   const handleAddToCart = () => {
     if (!isReleased || isPurchaseBlocked) return;
@@ -72,15 +72,16 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
     startFastBuy(productId, 1);
   };
 
-  const whatsappMessage = t('actions.whatsappTemplate', {
-    title,
-    serial: serial ? `${t('info.sku', 'Serial')}: ${serial}` : '',
-    price: formatPrice(price),
-    currency: t('info.currency', 'EGP'),
-    url: window.location.href
-  });
+  const { handleWhatsAppContact } = useWhatsAppContact();
 
-  const whatsappHref = buildWhatsAppLink('201000000000', whatsappMessage); // Generic admin phone
+  const handleWhatsApp = () => {
+    handleWhatsAppContact('product', {
+      title,
+      serial,
+      price: formatPrice(price),
+      url: window.location.href
+    });
+  };
 
   return (
     <div className="flex flex-col gap-4 mt-2">
@@ -181,42 +182,44 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                size="lg"
-                className="h-14 rounded-2xl gap-1.5 font-bold shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 transition-all active:scale-95 px-2"
-                disabled={loading || !isReleased || isPurchaseBlocked}
-                onClick={handleAddToCart}
-                data-testid="product-actions-mobile-add-cart-button"
-              >
-                {loading ? (
-                  <LoadingSpinner className="h-5 w-5 border-white" />
-                ) : (
-                  <>
-                    <ShoppingCart className="h-4 w-4 shrink-0" />
-                    <span className="text-[12px] leading-none tracking-tight">{t("actions.addToCart")}</span>
-                  </>
-                )}
-              </Button>
+            {!hasAdminAccess && (
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  size="lg"
+                  className="h-14 rounded-2xl gap-1.5 font-bold shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 transition-all active:scale-95 px-2"
+                  disabled={loading || !isReleased || isPurchaseBlocked}
+                  onClick={handleAddToCart}
+                  data-testid="product-actions-mobile-add-cart-button"
+                >
+                  {loading ? (
+                    <LoadingSpinner className="h-5 w-5 border-white" />
+                  ) : (
+                    <>
+                      <ShoppingCart className="h-4 w-4 shrink-0" />
+                      <span className="text-[12px] leading-none tracking-tight">{t("actions.addToCart")}</span>
+                    </>
+                  )}
+                </Button>
 
-              <Button
-                variant="secondary"
-                size="lg"
-                className="h-14 rounded-2xl gap-1.5 font-bold bg-secondary/80 backdrop-blur-md border border-border/40 transition-all active:scale-95 shadow-lg shadow-black/5 px-2"
-                onClick={handleBuyNow}
-                disabled={fastBuyLoading || !isReleased || isPurchaseBlocked}
-                data-testid="product-actions-mobile-buy-now-button"
-              >
-                {fastBuyLoading ? (
-                  <LoadingSpinner className="h-5 w-5" />
-                ) : (
-                  <>
-                    <Zap className="h-4 w-4 shrink-0 fill-current" />
-                    <span className="text-[12px] leading-none tracking-tight">{t("actions.buyNow")}</span>
-                  </>
-                )}
-              </Button>
-            </div>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  className="h-14 rounded-2xl gap-1.5 font-bold bg-secondary/80 backdrop-blur-md border border-border/40 transition-all active:scale-95 shadow-lg shadow-black/5 px-2"
+                  onClick={handleBuyNow}
+                  disabled={fastBuyLoading || !isReleased || isPurchaseBlocked}
+                  data-testid="product-actions-mobile-buy-now-button"
+                >
+                  {fastBuyLoading ? (
+                    <LoadingSpinner className="h-5 w-5" />
+                  ) : (
+                    <>
+                      <Zap className="h-4 w-4 shrink-0 fill-current" />
+                      <span className="text-[12px] leading-none tracking-tight">{t("actions.buyNow")}</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-2">
               {(sampleId || sampleUrl) && (
@@ -248,19 +251,17 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
                   !(sampleId || sampleUrl) && "col-span-2"
                 )}
                 size="sm"
-                asChild
+                onClick={handleWhatsApp}
               >
-                <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-                  <FaWhatsapp className="h-4 w-4 shrink-0" />
-                  <span className="text-[10px] font-black uppercase tracking-wider truncate">
-                    <span className="hidden min-[420px]:inline">
-                      {t("actions.contactWhatsAppLong", "Message Admin on WhatsApp")}
-                    </span>
-                    <span className="min-[420px]:hidden">
-                      {t("actions.contactWhatsAppShort", "Message")}
-                    </span>
+                <FaWhatsapp className="h-4 w-4 shrink-0" />
+                <span className="text-[10px] font-black uppercase tracking-wider truncate">
+                  <span className="hidden min-[420px]:inline">
+                    {t("actions.contactWhatsAppLong", "Message Admin on WhatsApp")}
                   </span>
-                </a>
+                  <span className="min-[420px]:hidden">
+                    {t("actions.contactWhatsAppShort", "Message")}
+                  </span>
+                </span>
               </Button>
             </div>
           </div>
@@ -269,71 +270,55 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
 
       {/* Desktop Layout */}
       <div className="hidden md:flex flex-col gap-4">
-        <div className="flex gap-4">
-          {/* Quantity Stepper */}
-          {/* <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleDecrement}
-              disabled={quantity <= 1}
-              data-testid="product-actions-desktop-decrement-button"
-            >
-              <Minus className="h-4 w-4" />
-            </Button>
-            <div className="relative">
-              <Input
-                type="text"
-                value={quantity}
-                readOnly
-                className="w-14 text-center font-bold shadow-none border-transparent px-0"
-              />
+        {!hasAdminAccess && (
+          <>
+            <div className="flex gap-4">
+              {/* Add to Cart */}
+              <Button className="gap-2 flex-1" size="lg" onClick={handleAddToCart} disabled={loading || !isReleased || isPurchaseBlocked || !hasStoreAccess} data-testid="product-actions-desktop-add-cart-button">
+                {loading ? (
+                  <LoadingSpinner className="h-5 w-5 border-white" />
+                ) : !isReleased ? (
+                  <>
+                    <Clock className="h-5 w-5" />
+                    {t("badges.comingSoon", "Coming Soon")}
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="h-5 w-5" />
+                    {t("actions.addToCart")}
+                  </>
+                )}
+              </Button>
             </div>
-            <Button variant="outline" size="icon" onClick={handleIncrement} data-testid="product-actions-desktop-increment-button">
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div> */}
 
-          {/* Add to Cart */}
-          <Button className="gap-2 flex-1" size="lg" onClick={handleAddToCart} disabled={loading || !isReleased || isPurchaseBlocked} data-testid="product-actions-desktop-add-cart-button">
-            {loading ? (
-              <LoadingSpinner className="h-5 w-5 border-white" />
-            ) : !isReleased ? (
-              <>
-                <Clock className="h-5 w-5" />
-                {t("badges.comingSoon", "Coming Soon")}
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="h-5 w-5" />
-                {t("actions.addToCart")}
-              </>
-            )}
-          </Button>
-        </div>
+            {/* Buy Now */}
+            <div className="flex gap-3">
+              <Button
+                variant="secondary"
+                className="text-sm flex-1"
+                size="lg"
+                onClick={handleBuyNow}
+                disabled={fastBuyLoading || !isReleased || isPurchaseBlocked || !hasStoreAccess}
+                data-testid="product-actions-desktop-buy-now-button"
+              >
+                {fastBuyLoading ? (
+                  <LoadingSpinner className="h-5 w-5" />
+                ) : !isReleased ? (
+                  <span className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    {t("badges.comingSoon", "Coming Soon")}
+                  </span>
+                ) : (
+                  t("actions.buyNow")
+                )}
+              </Button>
+            </div>
+          </>
+        )}
 
-        {/* Secondary Actions */}
-        <div className="flex gap-3">
-          <Button
-            variant="secondary"
-            className="text-sm flex-1"
-            size="lg"
-            onClick={handleBuyNow}
-            disabled={fastBuyLoading || !isReleased || isPurchaseBlocked}
-            data-testid="product-actions-desktop-buy-now-button"
-          >
-            {fastBuyLoading ? (
-              <LoadingSpinner className="h-5 w-5" />
-            ) : !isReleased ? (
-              <span className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                {t("badges.comingSoon", "Coming Soon")}
-              </span>
-            ) : (
-              t("actions.buyNow")
-            )}
-          </Button>
-          {(sampleId || sampleUrl) && (
+        {/* View Sample (Keep separate so it stays if buttons are hidden) */}
+        {(sampleId || sampleUrl) && hasAdminAccess && (
+          <div className="flex gap-3">
             <Button
               variant="outline"
               className="text-sm flex-1"
@@ -351,18 +336,38 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
                 </a>
               )}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* Desktop Sample Button (Inside flex if not admin) */}
+        {(sampleId || sampleUrl) && !hasAdminAccess && (
+          <div className="flex gap-3 -mt-1">
+             <Button
+              variant="outline"
+              className="text-sm flex-1"
+              size="lg"
+              asChild
+            >
+              {sampleId ? (
+                <Link to={`/samples/${sampleId}`} state={{ cameFromAdmin: false }}>
+                  {t("actions.viewSample")}
+                </Link>
+              ) : (
+                <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
+                  {t("actions.viewSample")}
+                </a>
+              )}
+            </Button>
+          </div>
+        )}
         <Button
           variant="outline"
           className="text-sm border-success/30 text-success hover:bg-success/5 gap-2 h-11"
           size="lg"
-          asChild
+          onClick={handleWhatsApp}
         >
-          <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-            <FaWhatsapp className="h-4 w-4" />
-            {t("actions.contactWhatsAppLong", "Message Admin on WhatsApp")}
-          </a>
+          <FaWhatsapp className="h-4 w-4" />
+          {t("actions.contactWhatsAppLong", "Message Admin on WhatsApp")}
         </Button>
       </div >
     </div >

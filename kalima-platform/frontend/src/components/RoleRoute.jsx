@@ -8,9 +8,9 @@ import LoadingSpinner from './ui/loading-spinner';
  * RoleRoute - A general purpose route guard for role-based access control.
  * It checks if the authenticated user has at least one of the required roles.
  */
-const RoleRoute = ({ requiredRole, excludedRole }) => {
+const RoleRoute = ({ requiredRole, excludedRole, requireStoreAccess, requireAcademyAccess }) => {
     const { isAuthenticated, loading: authLoading } = useAuth();
-    const { storeRoles, academyRoles } = useRole();
+    const { storeRoles, academyRoles, hasStoreAccess, hasAcademyAccess } = useRole();
     const location = useLocation();
 
     // Ensure props are arrays for easy checking
@@ -19,7 +19,7 @@ const RoleRoute = ({ requiredRole, excludedRole }) => {
 
     // Check both store portal roles AND academy portal roles
     const allRoles = [...storeRoles, ...academyRoles];
-    
+
     const hasRequiredRole = requiredRolesArray.length === 0 || requiredRolesArray.some(role => allRoles.includes(role));
     const isExcluded = excludedRolesArray.some(role => allRoles.includes(role));
     if (authLoading) {
@@ -42,6 +42,14 @@ const RoleRoute = ({ requiredRole, excludedRole }) => {
 
     // If authenticated, check for requirement
     if (isAuthenticated && !hasRequiredRole) {
+        return <Navigate to="/" replace />;
+    }
+
+    // Portal access checks
+    if (requireStoreAccess && !hasStoreAccess) {
+        return <Navigate to="/" replace />;
+    }
+    if (requireAcademyAccess && !hasAcademyAccess) {
         return <Navigate to="/" replace />;
     }
 

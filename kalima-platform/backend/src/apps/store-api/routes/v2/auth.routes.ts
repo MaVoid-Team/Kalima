@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { authController } from "../../controllers/auth.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
+import { role_enum } from "../../generated/prisma/enums";
+import { requireRole } from "../../middleware/requireRole.middleware";
 
 const router = Router();
 
@@ -91,24 +93,29 @@ router.delete(
 // ADMIN ROUTES - Admin authentication required
 // ============================================
 
-router.post(
-  "/admin/create-admin",
+// All admin routes require authentication + Admin or SubAdmin role
+const adminAuth = [authenticateToken, requireRole([role_enum.Admin])];
+
+const adminSubAdminAuth = [
   authenticateToken,
-  authController.createAdmin,
-);
-router.post(
-  "/admin/create-subadmin",
+  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+];
+
+const adminModeratorAuth = [
   authenticateToken,
-  authController.createSubAdmin,
-);
+  requireRole([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator]),
+];
+
+router.post("/admin/create-admin", adminAuth, authController.createAdmin);
+router.post("/admin/create-subadmin", adminAuth, authController.createSubAdmin);
 router.post(
   "/admin/create-moderator",
-  authenticateToken,
+  adminSubAdminAuth,
   authController.createModerator,
 );
 router.post(
   "/admin/create-assistant",
-  authenticateToken,
+  adminModeratorAuth,
   authController.createAssistant,
 );
 

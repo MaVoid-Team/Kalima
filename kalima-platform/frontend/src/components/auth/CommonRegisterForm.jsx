@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import LoadingSpinner from "@/components/ui/loading-spinner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -99,7 +99,12 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
             const result = await signInWithPopup(auth, provider);
             const idToken = await result.user.getIdToken();
             setFirebaseToken(idToken);
-            toast.success(t("signup.firebaseAuthenticated", "Successfully authenticated with Firebase. Please complete the remaining fields."));
+
+            // Populate form with user data from social provider
+            if (result.user.displayName) form.setValue("name", result.user.displayName);
+            if (result.user.email) form.setValue("email", result.user.email);
+
+            toast.success(t("signup.firebaseAuthenticated", "Social account connected. Please complete the remaining fields."));
         } catch (error) {
             console.error("Firebase Login failed:", error);
             toast.error(error?.message || "Failed to authenticate with Firebase");
@@ -139,7 +144,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
 
     return (
         <motion.div
-            className="w-full space-y-6"
+            className="w-full space-y-6 pb-16 md:pb-0"
             variants={containerVariants}
             initial="hidden"
             animate="show"
@@ -186,7 +191,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                         <FormItem>
                                             <FormLabel htmlFor="name">{t("signup.fields.name")}</FormLabel>
                                             <FormControl>
-                                                <Input id="name" {...field} data-testid="auth-register-name-input" />
+                                                <Input id="name" {...field} className="h-16 md:h-12 text-xl md:text-base rounded-2xl md:rounded-xl bg-background/40" data-testid="auth-register-name-input" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -202,7 +207,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                         <FormItem>
                                             <FormLabel htmlFor="email">{t("signup.fields.email")}</FormLabel>
                                             <FormControl>
-                                                <Input id="email" type="email" {...field} data-testid="auth-register-email-input" />
+                                                <Input id="email" type="email" {...field} className="h-16 md:h-12 text-xl md:text-base rounded-2xl md:rounded-xl bg-background/40" data-testid="auth-register-email-input" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -212,11 +217,24 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                         </>
                     )}
 
-                    {firebaseToken && (
-                        <motion.div className="bg-success p-4 rounded-md mb-4 text-sm text-success-foreground" variants={itemVariants}>
-                            ✓ {t("signup.firebaseAuthenticated", "Social account connected. Please complete the remaining fields.")}
-                        </motion.div>
-                    )}
+                    <AnimatePresence mode="wait">
+                        {firebaseToken && (
+                            <motion.div
+                                key="firebase-success"
+                                initial={{ opacity: 0, y: -10, height: 0 }}
+                                animate={{ opacity: 1, y: 0, height: "auto" }}
+                                exit={{ opacity: 0, y: -10, height: 0 }}
+                                className="bg-success/20 border border-success/30 p-4 rounded-lg mb-4 text-sm text-success flex items-center gap-3 overflow-hidden"
+                            >
+                                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-success text-success-foreground flex items-center justify-center text-[10px] font-bold italic">
+                                    ✓
+                                </span>
+                                <span className="font-medium">
+                                    {t("signup.firebaseAuthenticated", "Social account connected. Please complete the remaining fields.")}
+                                </span>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     <FormField
                         control={form.control}
@@ -259,7 +277,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                     />
 
                     {!firebaseToken && (
-                        <motion.div className="grid grid-cols-2 gap-4" variants={itemVariants}>
+                        <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-4" variants={itemVariants}>
                             <FormField
                                 control={form.control}
                                 name="password"
@@ -271,8 +289,9 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                                 <Input
                                                     id="password"
                                                     type={showPassword ? "text" : "password"}
-                                                    className={cn(isRTL ? "pl-10" : "pr-10", "bg-background")}
+                                                    className={cn(isRTL ? "pl-14" : "pr-14", "bg-background/40 h-16 md:h-12 text-xl md:text-base rounded-2xl md:rounded-xl transition-all")}
                                                     {...field}
+                                                    placeholder="●●●●●●●●●●"
                                                     data-testid="auth-register-password-input"
                                                 />
                                                 <Button
@@ -309,8 +328,9 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                                 <Input
                                                     id="confirmPassword"
                                                     type={showPassword ? "text" : "password"}
-                                                    className={cn(isRTL ? "pl-10" : "pr-10", "bg-background")}
+                                                    className={cn(isRTL ? "pl-14" : "pr-14", "bg-background/40 h-16 md:h-12 text-xl md:text-base rounded-2xl md:rounded-xl transition-all")}
                                                     {...field}
+                                                    placeholder="●●●●●●●●●●"
                                                     data-testid="auth-register-confirm-password-input"
                                                 />
                                                 <Button
@@ -342,8 +362,8 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                     <motion.div variants={itemVariants}>{children}</motion.div>
 
                     <motion.div variants={itemVariants}>
-                        <Button type="submit" className="w-full" disabled={isLoading} data-testid="auth-register-submit-button">
-                            {isLoading && <LoadingSpinner className="mr-2 h-4 w-4" />}
+                        <Button type="submit" className="w-full h-16 md:h-14 text-xl md:text-lg font-black md:font-bold transition-all duration-300 active:scale-[0.95] md:hover:scale-[1.02] rounded-3xl md:rounded-2xl" disabled={isLoading} data-testid="auth-register-submit-button">
+                            {isLoading && <LoadingSpinner className="mr-2 h-7 w-7 md:h-5 md:w-5" />}
                             {t("signup.submit")}
                         </Button>
                     </motion.div>

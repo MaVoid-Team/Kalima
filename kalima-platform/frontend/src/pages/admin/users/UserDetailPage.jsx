@@ -1,98 +1,135 @@
-import { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { arSA } from 'date-fns/locale';
-import {
-    ArrowLeft, User, Mail, Phone, Calendar,
-    ShieldCheck, Eye, ShoppingBag, UserPlus, BookOpen,
-    MapPin, Hash, GraduationCap, BarChart3, Users,
-    Trash2
-} from 'lucide-react';
+import { ShoppingBag, BookOpen } from 'lucide-react';
 
 import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
 import { useRole } from '@/hooks/useRole';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
+import useLookups from '@/hooks/useLookups';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import UserRolesSection from '@/components/admin/users/UserRolesSection';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 
-/* ─── helpers ────────────────────────────────────────────────────────────── */
-function StatCard({ icon: Icon, label, value, color = 'text-primary' }) {
-    const { i18n } = useTranslation('userManagement');
-    return (
-        <Card className="shadow-sm" data-testid={`user-detail-stat-${label}`}>
-            <CardContent className="p-4 flex items-center gap-4">
-                <div className={`p-3 rounded-xl bg-muted/60 ${color}`}>
-                    <Icon className={`h-5 w-5 ${i18n.language === 'ar' ? 'scale-x-[-1]' : ''}`} />
-                </div>
-                <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground leading-none mb-1 truncate">{label}</p>
-                    <p className="text-xl font-bold truncate">{value}</p>
-                </div>
-            </CardContent>
-        </Card>
-    );
-}
+// Details Components
+import DetailHeader from '@/components/admin/users/details/DetailHeader';
+import MainInfoCard from '@/components/admin/users/details/MainInfoCard';
+import UserAnalyticsCard from '@/components/admin/users/details/UserAnalyticsCard';
+import UserRolesCard from '@/components/admin/users/details/UserRolesCard';
+import TeacherCard from '@/components/admin/users/details/TeacherCard';
+import StudentCard from '@/components/admin/users/details/StudentCard';
+import LecturerCard from '@/components/admin/users/details/LecturerCard';
+import AssistantCard from '@/components/admin/users/details/AssistantCard';
+import ParentCard from '@/components/admin/users/details/ParentCard';
+import UsersCreatedCard from '@/components/admin/users/details/UsersCreatedCard';
 
-function InfoRow({ icon: Icon, label, value }) {
-    if (!value && value !== 0) return null;
-    return (
-        <div className="flex items-start gap-3 py-2">
-            <Icon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-            <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground leading-none mb-0.5">{label}</p>
-                <p className="text-sm font-medium truncate">{value}</p>
-            </div>
-        </div>
-    );
-}
-
-/* ─── main component ─────────────────────────────────────────────────────── */
 export default function UserDetailPage() {
     const { id } = useParams();
     const { t, i18n } = useTranslation('userManagement');
     const isRtl = i18n.dir() === 'rtl';
     const { hasAdminAccess } = useRole();
+    const { governments, zones, getZonesByGovernment, subjects, levels, zonesLoading } = useLookups();
 
     const {
         selectedUser,
         loading,
         actionLoading,
         fetchUserById,
+        updateUser,
+        updateUserFlag,
         assignRole,
         revokeRole,
-        deleteUser
+        deleteUser,
+        approveUser,
+        rejectUser
     } = useAdminUsers();
 
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        secondary_phone: '',
+        gender: '',
+        teachers: {},
+        students: {},
+        lecturers: {},
+        assistants: {},
+        parents: {},
+    });
+
     useEffect(() => {
-        if (id) {
-            fetchUserById(id);
-        }
+        fetchUserById(id);
     }, [id, fetchUserById]);
 
-    const handleAddRole = async (portal, role) => {
-        await assignRole(id, portal, role);
-        // Refresh user to get updated user_roles in selectedUser
-        fetchUserById(id);
+    useEffect(() => {
+        if (selectedUser) {
+            const displayEmail = selectedUser.email?.includes('_deleted_') ? selectedUser.email.split('_deleted_')[0] : selectedUser.email;
+            const displayPhone = selectedUser.phone?.includes('_deleted_') ? selectedUser.phone.split('_deleted_')[0] : selectedUser.phone;
+
+            setFormData({
+                name: selectedUser.name || '',
+                email: displayEmail || '',
+                phone: displayPhone || '',
+                secondary_phone: selectedUser.secondary_phone || '',
+                gender: selectedUser.gender?.toUpperCase() || '',
+                // Roles data
+                teachers: (Array.isArray(selectedUser.teachers) ? selectedUser.teachers[0] : selectedUser.teachers) || { is_primary: false, is_preparatory: false, is_secondary: false },
+                students: (Array.isArray(selectedUser.students) ? selectedUser.students[0] : selectedUser.students) || {},
+                lecturers: (Array.isArray(selectedUser.lecturers) ? selectedUser.lecturers[0] : selectedUser.lecturers) || {},
+                assistants: (Array.isArray(selectedUser.assistants) ? selectedUser.assistants[0] : selectedUser.assistants) || {},
+                parents: (Array.isArray(selectedUser.parents) ? selectedUser.parents[0] : selectedUser.parents) || {},
+            });
+        }
+    }, [selectedUser]);
+
+    // Fetch initial zones when entering edit mode or when user data is loaded
+    useEffect(() => {
+        if (isEditing || selectedUser) {
+            const rolesWithGov = ['teachers', 'students', 'lecturers', 'assistants', 'parents'];
+            const roleWithGov = rolesWithGov.find(role => formData[role]?.government_id);
+            if (roleWithGov && formData[roleWithGov].government_id) {
+                getZonesByGovernment(formData[roleWithGov].government_id);
+            }
+        }
+    }, [isEditing, selectedUser?.id, getZonesByGovernment]);
+
+    /* ── handlers ── */
+    const handleSave = async () => {
+        const { teachers, students, lecturers, assistants, parents, ...restData } = formData;
+        
+        const relationsToOmit = ['government', 'zones', 'subjects', 'levels', 'user', 'academy', 'created_by_user'];
+        
+        const cleanData = (data) => {
+            if (!data) return {};
+            return Object.fromEntries(
+                Object.entries(data).filter(([key, value]) => !relationsToOmit.includes(key) && value !== null)
+            );
+        };
+
+        const payload = {
+            ...cleanData(restData),
+            ...cleanData(teachers),
+            ...cleanData(students),
+            ...cleanData(lecturers),
+            ...cleanData(assistants),
+            ...cleanData(parents),
+        };
+
+        const success = await updateUser(id, payload);
+        if (success) {
+            setIsEditing(false);
+            fetchUserById(id);
+        }
     };
 
     const handleRevokeRole = async (portal, role) => {
         await revokeRole(id, portal, role);
+        fetchUserById(id);
+    };
+
+    const handleAssignRole = async (portal, role) => {
+        await assignRole(id, portal, role);
         fetchUserById(id);
     };
 
@@ -101,6 +138,25 @@ export default function UserDetailPage() {
         if (res?.success) {
             fetchUserById(id);
         }
+    };
+
+    const handleApprove = async () => {
+        const res = await approveUser(id);
+        if (res?.success) {
+            fetchUserById(id);
+        }
+    };
+
+    const handleReject = async () => {
+        const res = await rejectUser(id);
+        if (res?.success) {
+            fetchUserById(id);
+        }
+    };
+
+    const handleUpdateFlag = async (flag) => {
+        await updateUserFlag(id, flag);
+        fetchUserById(id);
     };
 
     /* ── loading / not-found states ── */
@@ -114,10 +170,10 @@ export default function UserDetailPage() {
 
     if (!selectedUser) {
         return (
-            <div className="flex h-[50vh] flex-col items-center justify-center space-y-4">
-                <p className="text-xl text-muted-foreground">User not found.</p>
-                <Button variant="outline" asChild data-testid="user-detail-back-button">
-                    <Link to="/admin/users">{t('details.back')}</Link>
+            <div className="flex h-[50vh] flex-col items-center justify-center space-y-4 text-center">
+                <p className="text-xl text-muted-foreground">{t('details.userNotFound', 'User not found.')}</p>
+                <Button variant="outline" onClick={() => window.history.back()}>
+                    {t('details.back')}
                 </Button>
             </div>
         );
@@ -125,22 +181,21 @@ export default function UserDetailPage() {
 
     /* ── derived values ── */
     const analytics = selectedUser.user_analytics || {};
-    const teacher = selectedUser.teachers;
+    const teachers = selectedUser.teachers ? (Array.isArray(selectedUser.teachers) ? selectedUser.teachers : [selectedUser.teachers]) : [];
     const teachesAt = selectedUser.teaches_at || [];
-    const students = selectedUser.students ? (Array.isArray(selectedUser.students) ? selectedUser.students : []) : [];
-    const lecturers = selectedUser.lecturers ? (Array.isArray(selectedUser.lecturers) ? selectedUser.lecturers : []) : [];
-    const assistants = selectedUser.assistants ? (Array.isArray(selectedUser.assistants) ? selectedUser.assistants : []) : [];
-    const parents = selectedUser.parents ? (Array.isArray(selectedUser.parents) ? selectedUser.parents : []) : [];
-    const userCreated = selectedUser.userCreated || {};
+    const students = selectedUser.students ? (Array.isArray(selectedUser.students) ? selectedUser.students : [selectedUser.students]) : [];
+    const lecturers = selectedUser.lecturers ? (Array.isArray(selectedUser.lecturers) ? selectedUser.lecturers : [selectedUser.lecturers]) : [];
+    const assistants = selectedUser.assistants ? (Array.isArray(selectedUser.assistants) ? selectedUser.assistants : [selectedUser.assistants]) : [];
+    const parents = selectedUser.parents ? (Array.isArray(selectedUser.parents) ? selectedUser.parents : [selectedUser.parents]) : [];
     const roles = selectedUser.user_roles || [];
+    const userCreated = selectedUser.userCreated || {};
 
-    const activeLevels = teacher
-        ? [
-            teacher.is_primary && t('details.primary'),
-            teacher.is_preparatory && t('details.preparatory'),
-            teacher.is_secondary && t('details.secondary'),
-        ].filter(Boolean)
-        : [];
+    const hasRole = (portal, roleName) => roles.some(r => r.portal.toLowerCase() === portal.toLowerCase() && r.role.toLowerCase() === roleName.toLowerCase());
+    const isTeacher = hasRole('academy', 'Teacher') || hasRole('store', 'Teacher');
+    const isStudent = hasRole('academy', 'Student') || hasRole('store', 'Student');
+    const isLecturer = hasRole('academy', 'Lecturer') || hasRole('store', 'Lecturer');
+    const isAssistant = hasRole('academy', 'Assistant') || hasRole('store', 'Assistant');
+    const isParent = hasRole('academy', 'Parent') || hasRole('store', 'Parent');
 
     const analyticsStats = [
         {
@@ -158,440 +213,154 @@ export default function UserDetailPage() {
     ];
 
     const createdEntries = Object.entries(userCreated).filter(([, v]) => v > 0);
-
     const displayEmail = selectedUser.email?.includes('_deleted_') ? selectedUser.email.split('_deleted_')[0] : selectedUser.email;
     const displayPhone = selectedUser.phone?.includes('_deleted_') ? selectedUser.phone.split('_deleted_')[0] : selectedUser.phone;
+    const displaySecondaryPhone = selectedUser.secondary_phone?.includes('_deleted_') ? selectedUser.secondary_phone.split('_deleted_')[0] : selectedUser.secondary_phone;
 
     return (
-        <div className="space-y-6 max-w-6xl mx-auto" data-testid="user-detail-page">
+        <div className="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500" dir={isRtl ? 'rtl' : 'ltr'}>
 
-            {/* ── Top Bar ── */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        asChild
-                        className="shrink-0"
-                        data-testid="user-detail-top-back-button"
-                    >
-                        <Link to="/admin/users">
-                            <ArrowLeft className="h-5 w-5" />
-                        </Link>
-                    </Button>
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight">{t('details.title')}</h1>
-                        <p className="text-muted-foreground text-sm mt-0.5">
-                            <span className="font-mono text-xs bg-muted px-2 py-0.5 rounded me-2">
-                                ID: {selectedUser.id}
+            {/* Header */}
+            <DetailHeader
+                user={selectedUser}
+                isEditing={isEditing}
+                onEdit={() => setIsEditing(true)}
+                onCancel={() => setIsEditing(false)}
+                onSave={handleSave}
+                onApprove={handleApprove}
+                onReject={handleReject}
+                onDelete={handleDeleteUser}
+                onUpdateFlag={handleUpdateFlag}
+                actionLoading={actionLoading}
+                isRtl={isRtl}
+                t={t}
+            />
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                {/* Left Column: Analytics & Roles */}
+                <div className="lg:col-span-1 space-y-6 order-2 lg:order-1">
+                    <UserAnalyticsCard stats={analyticsStats} t={t} />
+
+                    <UserRolesCard
+                        roles={roles}
+                        onRevoke={handleRevokeRole}
+                        onAssign={handleAssignRole}
+                        hasAdminAccess={hasAdminAccess}
+                        t={t}
+                    />
+
+                    <UsersCreatedCard createdEntries={createdEntries} t={t} />
+
+                    {/* Metadata Card */}
+                    <div className="p-4 rounded-lg bg-muted/30 border border-border/50 space-y-2">
+                        <div className="flex items-center justify-between text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
+                            <span>{t('details.joined')}</span>
+                            <span className="font-mono tabular-nums">
+                                {selectedUser.created_at && format(new Date(selectedUser.created_at), 'PP p', { locale: isRtl ? arSA : undefined })}
                             </span>
-                            {selectedUser.name}
-                        </p>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    {selectedUser.is_deleted ? (
-                        <Badge variant="destructive" className="gap-1" data-testid="user-detail-deleted-badge">
-                            <Trash2 className="w-4 h-4" />
-                            {t('status.deleted', 'Deleted')}
-                        </Badge>
-                    ) : selectedUser.is_email_verified ? (
-                        <Badge variant="default" className="gap-1" data-testid="user-detail-verified-badge">
-                            <ShieldCheck className="w-4 h-4" />
-                            {t('status.verified')}
-                        </Badge>
-                    ) : (
-                        <Badge variant="outline" className="gap-1" data-testid="user-detail-pending-badge">
-                            {t('status.pending', 'Pending')}
-                        </Badge>
-                    )}
-
-                    {!selectedUser.is_deleted && hasAdminAccess && (
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    disabled={actionLoading}
-                                    data-testid="user-detail-delete-button"
-                                    className="ms-2"
-                                >
-                                    <Trash2 className="h-4 w-4 me-1" />
-                                    {t('actions.delete', 'Delete')}
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent dir={i18n.dir()}>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>{t('details.confirmDeleteTitle', 'Are you sure?')}</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        {t('details.confirmDeleteDesc', 'This action cannot be undone. This will permanently delete the user account.')}
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel disabled={actionLoading}>{t('actions.cancel', 'Cancel')}</AlertDialogCancel>
-                                    <AlertDialogAction
-                                        onClick={handleDeleteUser}
-                                        disabled={actionLoading}
-                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                    >
-                                        {actionLoading && <LoadingSpinner className="h-4 w-4 mr-2" />}
-                                        {t('actions.delete', 'Delete')}
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    )}
-                </div>
-            </div>
-
-            {/* ── Profile Hero Card ── */}
-            <Card className="shadow-sm overflow-hidden" data-testid="user-detail-profile-card">
-                {/* decorative banner */}
-                <div className="h-20 bg-linear-to-r from-primary/30 via-primary/10 to-transparent" />
-                <CardContent className="px-6 pb-6 -mt-10">
-                    <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-                        {/* Avatar */}
-                        <Avatar className="h-20 w-20 border-4 border-background shadow-md shrink-0">
-                            <AvatarImage src={selectedUser.profile_pic_url} alt={selectedUser.name} className="object-cover" />
-                            <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold uppercase">
-                                {selectedUser.name?.trim().charAt(0) || 'U'}
-                            </AvatarFallback>
-                        </Avatar>
-
-                        {/* Info */}
-                        <div className="flex-1 min-w-0 pt-3 sm:pt-0">
-                            <div className="flex flex-wrap items-center gap-2 mb-1">
-                                <h2 className="text-xl font-bold truncate">{selectedUser.name}</h2>
-                                {!selectedUser.is_email_verified && (
-                                    <Badge variant="outline" className="text-muted-foreground text-xs shrink-0">
-                                        {t('status.pending')}
-                                    </Badge>
-                                )}
-                            </div>
-
-                            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-2">
-                                {displayEmail && (
-                                    <span className="flex items-center gap-1.5" dir="ltr">
-                                        <Mail className="h-3.5 w-3.5 shrink-0" />
-                                        {displayEmail}
-                                    </span>
-                                )}
-                                {displayPhone && (
-                                    <span className="flex items-center gap-1.5" dir="ltr">
-                                        <Phone className="h-3.5 w-3.5 shrink-0" />
-                                        {displayPhone}
-                                    </span>
-                                )}
-                                {selectedUser.gender && (
-                                    <span className="flex items-center gap-1.5">
-                                        <User className="h-3.5 w-3.5 shrink-0" />
-                                        {t(`createDialog.${selectedUser.gender}`)}
-                                    </span>
-                                )}
-                                {selectedUser.created_at && (
-                                    <span className="flex items-center gap-1.5">
-                                        <Calendar className="h-3.5 w-3.5 shrink-0" />
-                                        {format(new Date(selectedUser.created_at), 'PPP', { locale: isRtl ? arSA : undefined })}
-                                    </span>
-                                )}
-                            </div>
                         </div>
+
                     </div>
-                </CardContent>
-            </Card>
-
-            {/* ── Analytics Stats Row ── */}
-            <div>
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4" />
-                    {t('details.analytics')}
-                </h3>
-                <div className="grid grid-cols-2 gap-4" data-testid="user-detail-analytics">
-                    {analyticsStats.map((s) => (
-                        <StatCard key={s.label} {...s} />
-                    ))}
-                </div>
-            </div>
-
-            {/* ── Bottom Section ── */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                {/* Left column: Teacher + Users Created */}
-                <div className="md:col-span-1 space-y-6">
-
-                    {/* Teacher Details Card */}
-                    {teacher && (
-                        <Card className="shadow-sm" data-testid="user-detail-teacher-card">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex items-center gap-2">
-                                    <GraduationCap className="h-5 w-5 text-primary" />
-                                    {t('details.teacherDetails')}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="pt-0 space-y-0">
-                                <InfoRow
-                                    icon={Hash}
-                                    label={t('details.serial')}
-                                    value={teacher.serial}
-                                />
-                                <Separator className="my-1 opacity-50" />
-                                <InfoRow
-                                    icon={BookOpen}
-                                    label={t('details.subject')}
-                                    value={teacher.subjects?.title}
-                                />
-                                <Separator className="my-1 opacity-50" />
-                                <InfoRow
-                                    icon={MapPin}
-                                    label={t('details.government')}
-                                    value={teacher.government?.title || `ID: ${teacher.government_id}`}
-                                />
-                                <Separator className="my-1 opacity-50" />
-                                <InfoRow
-                                    icon={MapPin}
-                                    label={t('details.zone')}
-                                    value={teacher.zones?.title || `ID: ${teacher.zone_id}`}
-                                />
-
-                                {activeLevels.length > 0 && (
-                                    <>
-                                        <Separator className="my-1 opacity-50" />
-                                        <div className="flex items-start gap-3 py-2">
-                                            <GraduationCap className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-xs text-muted-foreground leading-none mb-1.5">
-                                                    {t('details.levels')}
-                                                </p>
-                                                <div className="flex flex-wrap gap-1.5">
-                                                    {activeLevels.map((lvl) => (
-                                                        <Badge key={lvl} variant="secondary" className="text-xs">
-                                                            {lvl}
-                                                        </Badge>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-
-                                {teachesAt.length > 0 && (
-                                    <>
-                                        <Separator className="my-1 opacity-50" />
-                                        <div className="flex items-start gap-3 py-2">
-                                            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-xs text-muted-foreground leading-none mb-1.5">
-                                                    {t('details.teachingLocations', 'Teaching Locations')}
-                                                </p>
-                                                <div className="space-y-1">
-                                                    {teachesAt.map((location) => (
-                                                        <div key={location.id} className="text-sm font-medium">
-                                                            {location.location_name}
-                                                            <Badge variant="outline" className="text-xs ms-2">
-                                                                {location.location_type}
-                                                            </Badge>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Users Created Card */}
-                    {createdEntries.length > 0 && (
-                        <Card className="shadow-sm" data-testid="user-detail-users-created-card">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex items-center gap-2">
-                                    <Users className="h-5 w-5 text-primary" />
-                                    {t('details.usersCreated')}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="pt-0">
-                                <div className="space-y-2">
-                                    {createdEntries.map(([role, count]) => (
-                                        <div key={role} className="flex items-center justify-between py-1">
-                                            <span className="text-sm text-muted-foreground">
-                                                {t(`roles.${role}`, role)}
-                                            </span>
-                                            <Badge variant="secondary" className="font-mono tabular-nums">
-                                                {count}
-                                            </Badge>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Students Card */}
-                    {students.length > 0 && (
-                        <Card className="shadow-sm" data-testid="user-detail-students-card">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex items-center gap-2">
-                                    <GraduationCap className="h-5 w-5 text-primary" />
-                                    {t('details.students', 'Students')}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="pt-0 space-y-0">
-                                {students.map((student) => (
-                                    <div key={student.id} className="py-2">
-                                        <div className="flex items-start gap-3">
-                                            <User className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-sm font-medium truncate">{student.name}</p>
-                                                <div className="flex flex-wrap gap-2 mt-1">
-                                                    {student.levels && (
-                                                        <Badge variant="outline" className="text-xs">
-                                                            {student.levels.title}
-                                                        </Badge>
-                                                    )}
-                                                    {student.government && (
-                                                        <Badge variant="secondary" className="text-xs">
-                                                            {student.government.title}
-                                                        </Badge>
-                                                    )}
-                                                    {student.zones && (
-                                                        <Badge variant="secondary" className="text-xs">
-                                                            {student.zones.title}
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {student !== students[students.length - 1] && (
-                                            <Separator className="my-2 opacity-50" />
-                                        )}
-                                    </div>
-                                ))}
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Lecturers Card */}
-                    {lecturers.length > 0 && (
-                        <Card className="shadow-sm" data-testid="user-detail-lecturers-card">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex items-center gap-2">
-                                    <BookOpen className="h-5 w-5 text-primary" />
-                                    {t('details.lecturers', 'Lecturers')}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="pt-0 space-y-0">
-                                {lecturers.map((lecturer) => (
-                                    <div key={lecturer.id} className="py-2">
-                                        <div className="flex items-start gap-3">
-                                            <BookOpen className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-sm font-medium truncate">{lecturer.name}</p>
-                                                {lecturer.bio && (
-                                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                                        {lecturer.bio}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                        {lecturer !== lecturers[lecturers.length - 1] && (
-                                            <Separator className="my-2 opacity-50" />
-                                        )}
-                                    </div>
-                                ))}
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Assistants Card */}
-                    {assistants.length > 0 && (
-                        <Card className="shadow-sm" data-testid="user-detail-assistants-card">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex items-center gap-2">
-                                    <UserPlus className="h-5 w-5 text-primary" />
-                                    {t('details.assistants', 'Assistants')}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="pt-0 space-y-0">
-                                {assistants.map((assistant) => (
-                                    <div key={assistant.id} className="py-2">
-                                        <div className="flex items-start gap-3">
-                                            <UserPlus className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-sm font-medium truncate">{assistant.name}</p>
-                                                {assistant.lecturers && assistant.lecturers.length > 0 && (
-                                                    <div className="flex flex-wrap gap-1 mt-1">
-                                                        <span className="text-xs text-muted-foreground">{t('details.assists', 'Assists')}:</span>
-                                                        {assistant.lecturers.map((lecturer) => (
-                                                            <Badge key={lecturer.id} variant="outline" className="text-xs">
-                                                                {lecturer.name}
-                                                            </Badge>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        {assistant !== assistants[assistants.length - 1] && (
-                                            <Separator className="my-2 opacity-50" />
-                                        )}
-                                    </div>
-                                ))}
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Parents Card */}
-                    {parents.length > 0 && (
-                        <Card className="shadow-sm" data-testid="user-detail-parents-card">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex items-center gap-2">
-                                    <Users className="h-5 w-5 text-primary" />
-                                    {t('details.parents', 'Parents')}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="pt-0 space-y-0">
-                                {parents.map((parent) => (
-                                    <div key={parent.id} className="py-2">
-                                        <div className="flex items-start gap-3">
-                                            <Users className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-sm font-medium truncate">{parent.name}</p>
-                                                <div className="flex flex-wrap gap-2 mt-1">
-                                                    {parent.government && (
-                                                        <Badge variant="secondary" className="text-xs">
-                                                            {parent.government.title}
-                                                        </Badge>
-                                                    )}
-                                                    {parent.zones && (
-                                                        <Badge variant="secondary" className="text-xs">
-                                                            {parent.zones.title}
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {parent !== parents[parents.length - 1] && (
-                                            <Separator className="my-2 opacity-50" />
-                                        )}
-                                    </div>
-                                ))}
-                            </CardContent>
-                        </Card>
-                    )}
                 </div>
 
-                {/* Right column: Roles */}
-                <Card className="md:col-span-2 shadow-sm">
-                    <CardContent className="p-6">
-                        <UserRolesSection
-                            roles={roles}
-                            onAddRole={handleAddRole}
-                            onRevokeRole={handleRevokeRole}
-                            actionLoading={actionLoading}
+                {/* Main Column: User Details */}
+                <div className="lg:col-span-2 space-y-6 order-1 lg:order-2">
+
+                    {/* Basic Info */}
+                    <MainInfoCard
+                        user={selectedUser}
+                        isEditing={isEditing}
+                        formData={formData}
+                        setFormData={setFormData}
+                        t={t}
+                        displayEmail={displayEmail}
+                        displayPhone={displayPhone}
+                        displaySecondaryPhone={displaySecondaryPhone}
+                    />
+
+                    {/* Teacher Details */}
+                    {isTeacher && (
+                        <TeacherCard
+                            teachers={teachers}
+                            isEditing={isEditing}
+                            formData={formData}
+                            setFormData={setFormData}
+                            t={t}
+                            subjects={subjects}
+                            governments={governments}
+                            zones={zones}
+                            zonesLoading={zonesLoading}
+                            getZonesByGovernment={getZonesByGovernment}
+                            teachesAt={teachesAt}
                         />
-                    </CardContent>
-                </Card>
+                    )}
+
+                    {/* Student Details */}
+                    {isStudent && (
+                        <StudentCard
+                            students={students}
+                            isEditing={isEditing}
+                            formData={formData}
+                            setFormData={setFormData}
+                            t={t}
+                            levels={levels}
+                            governments={governments}
+                            zones={zones}
+                            zonesLoading={zonesLoading}
+                            getZonesByGovernment={getZonesByGovernment}
+                        />
+                    )}
+
+                    {/* Lecturer Details */}
+                    {isLecturer && (
+                        <LecturerCard
+                            lecturers={lecturers}
+                            isEditing={isEditing}
+                            formData={formData}
+                            setFormData={setFormData}
+                            t={t}
+                            levels={levels}
+                            governments={governments}
+                            zones={zones}
+                            zonesLoading={zonesLoading}
+                            getZonesByGovernment={getZonesByGovernment}
+                        />
+                    )}
+
+                    {/* Assistant Details */}
+                    {isAssistant && (
+                        <AssistantCard
+                            assistants={assistants}
+                            isEditing={isEditing}
+                            formData={formData}
+                            setFormData={setFormData}
+                            t={t}
+                            levels={levels}
+                            governments={governments}
+                            zones={zones}
+                            zonesLoading={zonesLoading}
+                            getZonesByGovernment={getZonesByGovernment}
+                        />
+                    )}
+
+                    {/* Parent Details */}
+                    {isParent && (
+                        <ParentCard
+                            parents={parents}
+                            isEditing={isEditing}
+                            formData={formData}
+                            setFormData={setFormData}
+                            t={t}
+                            levels={levels}
+                            governments={governments}
+                            zones={zones}
+                            zonesLoading={zonesLoading}
+                            getZonesByGovernment={getZonesByGovernment}
+                        />
+                    )}
+
+                </div>
             </div>
         </div>
     );

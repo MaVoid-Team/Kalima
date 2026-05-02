@@ -5,20 +5,18 @@ import CategorySidebar from "@/components/MarketPage/CategorySidebar";
 import ProductGrid from "@/components/MarketPage/ProductGrid";
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
-import { useNavigate } from "react-router-dom";
+import { ShieldAlert } from "lucide-react";
+import useAuth from "@/hooks/auth/useAuth";
 import useRole from "@/hooks/useRole";
 import { cn } from "@/lib/utils";
 
 export default function MarketPage() {
-  const { t } = useTranslation("market");
-  const { isStudent } = useRole();
-  const navigate = useNavigate();
+  const { t } = useTranslation(["market", "product"]);
+  const { isAuthenticated } = useAuth();
+  const { hasStoreAccess, isConfirmed } = useRole();
 
-  React.useEffect(() => {
-    if (isStudent) {
-      navigate("/", { replace: true });
-    }
-  }, [isStudent, navigate]);
+  // Blocking logic: must have store access AND be confirmed if authenticated
+  const isPurchaseBlocked = !hasStoreAccess || (isAuthenticated && !isConfirmed);
 
   React.useEffect(() => {
     window.scrollTo(0, 0);
@@ -73,6 +71,19 @@ export default function MarketPage() {
       <HeroSection onSearch={setSearch} />
 
       <div className="container pb-16">
+        {/* Pending Review Banner */}
+        {isPurchaseBlocked && (
+          <div
+            className="flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-400 mb-8"
+            data-testid="product-actions-pending-review-banner"
+          >
+            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
+            <p className="leading-relaxed">
+              {t("actions.pendingReview", { ns: "product", defaultValue: "Your account is pending admin review. You can browse freely but cannot make purchases until your account is approved." })}
+            </p>
+          </div>
+        )}
+
         <div className="flex flex-col md:flex-row gap-8 md:gap-10">
           {/* Sidebar */}
           <CategorySidebar

@@ -9,18 +9,11 @@ import WizardStepper from '@/components/checkout/WizardStepper';
 import CartStep from '@/components/checkout/steps/CartStep';
 import PaymentStep from '@/components/checkout/steps/PaymentStep';
 
-import useRole from '@/hooks/useRole';
-
 export default function WizardCheckoutPage() {
     const { cart, loading } = useCart();
     const navigate = useNavigate();
-    const { isStudent } = useRole();
 
-    useEffect(() => {
-        if (isStudent) {
-            navigate('/', { replace: true });
-        }
-    }, [isStudent, navigate]);
+
     const [searchParams, setSearchParams] = useSearchParams();
 
     // Default to step 1 (Cart) unless step=2 is in URL query
