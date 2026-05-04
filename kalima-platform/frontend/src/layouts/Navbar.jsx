@@ -43,7 +43,7 @@ export default function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       // Update header transparency/style
       setScrolled(currentScrollY > 50);
 
@@ -52,13 +52,13 @@ export default function Navbar() {
         // And if we are actually scrolling down
         if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
           setShowMobileNav(false);
-        } 
+        }
         // Show if we are scrolling up
         else if (currentScrollY < lastScrollY.current) {
           setShowMobileNav(true);
         }
       }
-      
+
       lastScrollY.current = currentScrollY;
     };
 
@@ -366,11 +366,11 @@ export default function Navbar() {
               initial={{ y: 100, opacity: 0, scale: 0.8 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 100, opacity: 0, scale: 0.8 }}
-              transition={{ 
-                type: "spring", 
-                stiffness: 260, 
+              transition={{
+                type: "spring",
+                stiffness: 260,
                 damping: 20,
-                duration: 0.3 
+                duration: 0.3
               }}
               className={cn(
                 "pointer-events-auto h-16 w-[calc(100%-2rem)] max-w-[420px] overflow-hidden",

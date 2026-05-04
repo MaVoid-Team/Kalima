@@ -16,7 +16,7 @@ export default function NotificationsPage() {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+    const [hasMore, setHasMore] = useState(false);
     const navigate = useNavigate();
 
     const dateLocale = i18n.language === 'ar' ? ar : enUS;
@@ -56,7 +56,7 @@ export default function NotificationsPage() {
         if (!notification.is_read) {
             await handleMarkRead(notification.id);
         }
-        
+
         if (notification.entity_type === 'purchase') {
             navigate(`/orders/${notification.entity_id}`);
         }
@@ -75,14 +75,14 @@ export default function NotificationsPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button 
-                        variant="outline" 
-                        size="sm" 
+                    <Button
+                        variant="outline"
+                        size="sm"
                         onClick={handleMarkAllRead}
                         className="font-bold uppercase tracking-tighter"
                         disabled={!notifications.some(n => !n.is_read)}
                     >
-                        <Check className="h-4 w-4 mr-2" />
+                        <Check className={`h-4 w-4 mr-2 ${i18n.language === 'ar' ? 'scale-x-[-1]' : ''}`} />
                         {t('mark_all_read')}
                     </Button>
                 </div>
@@ -110,15 +110,15 @@ export default function NotificationsPage() {
                                 onClick={() => handleNotificationClick(notification)}
                             >
                                 <div className="flex gap-4">
-                                    <div 
-                                        className="w-1.5 h-1.5 rounded-full mt-2.5 shrink-0" 
+                                    <div
+                                        className="w-1.5 h-1.5 rounded-full mt-2.5 shrink-0"
                                         style={{ backgroundColor: CATEGORY_COLORS[notification.category] || CATEGORY_COLORS[10] }}
                                     />
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between gap-4">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span 
+                                                    <span
                                                         className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-muted/50"
                                                         style={{ color: CATEGORY_COLORS[notification.category] }}
                                                     >
@@ -148,26 +148,26 @@ export default function NotificationsPage() {
 
                                         {notification.entity_type && (
                                             <div className="mt-4 flex items-center justify-between">
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="sm" 
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
                                                     className="h-8 px-3 text-xs font-bold text-primary group-hover:bg-primary/10"
                                                 >
                                                     {t('view')}
                                                     <ExternalLink className="h-3 w-3 ml-2" />
                                                 </Button>
-                                                
+
                                                 {!notification.is_read && (
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="sm" 
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             handleMarkRead(notification.id);
                                                         }}
                                                         className="h-8 text-[10px] uppercase font-black text-muted-foreground hover:text-foreground"
                                                     >
-                                                        {t('mark_all_read')}
+                                                        {t('mark_read')}
                                                     </Button>
                                                 )}
                                             </div>
@@ -181,8 +181,8 @@ export default function NotificationsPage() {
 
                 {hasMore && (
                     <div className="p-6 border-t border-border flex justify-center">
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             onClick={() => {
                                 const nextPage = page + 1;
                                 setPage(nextPage);
@@ -190,7 +190,7 @@ export default function NotificationsPage() {
                             }}
                             loading={loading}
                         >
-                            Load More
+                            {t('load_more')}
                         </Button>
                     </div>
                 )}
