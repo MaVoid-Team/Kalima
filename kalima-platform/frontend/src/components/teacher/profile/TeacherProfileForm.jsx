@@ -40,7 +40,7 @@ export default function TeacherProfileForm({
     zonesLoading,
     onGovernmentChange
 }) {
-    const { t } = useTranslation('teacher');
+    const { t, i18n } = useTranslation('teacher');
 
     const {
         register,

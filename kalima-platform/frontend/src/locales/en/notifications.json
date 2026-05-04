@@ -2,8 +2,13 @@
   "title": "Notifications",
   "unread_count": "You have {{count}} unread notifications",
   "no_notifications": "No new notifications",
+  "empty_desc": "You are all caught up! Check back later for new updates.",
+  "error_title": "Fetch Failed",
+  "error_desc": "Something went wrong while fetching your notifications. Please try again.",
   "mark_all_read": "Mark all as read",
+  "mark_read": "Mark as read",
   "view_all": "View all",
+  "load_more": "Load more",
   "new_notification": "New notification received",
   "marked_all_read": "All notifications marked as read",
   "view": "View",
@@ -39,8 +44,15 @@
     "category": "Category",
     "send_success": "Notification sent successfully",
     "mass_notifications": "Mass Notifications",
+    "manage_desc": "Manage and send system-wide notifications",
     "select_users": "Select Users",
     "all_users": "All Users",
-    "role_based": "By Role"
+    "role_based": "By Role",
+    "target_type": "Target Type",
+    "recent_activity": "Recent Activity",
+    "no_history": "No notifications sent yet",
+    "read": "Read",
+    "unread": "Unread",
+    "load_more": "Load More Activity"
   }
 }
