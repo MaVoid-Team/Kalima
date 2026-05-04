@@ -1,0 +1,64 @@
+{
+  "admin": {
+    "title": "Page of Thanks and Appreciation",
+    "subtitle": "Create and share a public tribute that reflects dedicated effort and honors a lasting contribution.",
+    "copyLink": "Copy link",
+    "openPublicPage": "Open public page",
+    "copySuccess": "The page link has been copied.",
+    "previewBadge": "Preview message",
+    "previewName": "Honoree",
+    "previewRole": "Role",
+    "roleFallback": "A valued member of the Kalima community",
+    "shareTitle": "Share",
+    "shareDescription": "Use this public link to share the page and gather messages of sincere thanks and appreciation.",
+    "publicLink": "Public link",
+    "commentCount": "Appreciation messages",
+    "pageStatus": "Page status",
+    "activeStatus": "Active",
+    "notesTitle": "How it works",
+    "notesBody": "Anyone with the public link may leave a message of thanks and appreciation for this person.",
+    "notesFooter": "The page is public, while remaining excluded from search results."
+  },
+  "preview": {
+    "headline": "Kalima extends its sincere thanks and appreciation to {{name}}",
+    "body": "This page has been prepared in recognition of the dedication shown, and to gather words of thanks and appreciation from all who have shared part of the journey with {{name}} as {{role}}.",
+    "someone": "this distinguished person",
+    "communityMember": "a valued member of the Kalima community"
+  },
+  "public": {
+    "badge": "With sincere thanks and appreciation",
+    "eyebrow": "Kalima Platform",
+    "headline": "Kalima extends its sincere thanks and appreciation to {{name}}",
+    "body": "In gratitude for the effort devoted to developing the notes, and for the active contribution of creative ideas and thoughtful questions that keep pace with the evolving educational system. We look forward to even more creativity in the coming year, along with a major surprise to be announced at its beginning.",
+    "recipientLabel": "To",
+    "roleLabel": "Role",
+    "appreciationLabel": "Message of appreciation",
+    "appreciationStatement": "With deepest thanks and appreciation from the Kalima team to {{name}}.",
+    "appreciationNote": "This page offers a place to share sincere words of gratitude and to honor the lasting impact that {{name}} has made on the journey of work and learning.",
+    "commentPresence_one": "1 person has already added a message of thanks and appreciation.",
+    "commentPresence_other": "{{count}} people have already added messages of thanks and appreciation.",
+    "commentsTitle": "Add a message of appreciation",
+    "commentsSubtitle": "Share a sincere word of thanks, a meaningful moment, or a lasting impression.",
+    "commentFeedTitle": "Messages of thanks and appreciation",
+    "commentFeedSubtitle": "Words shared by others in gratitude for all that {{name}} has contributed.",
+    "languageToggle": "Switch language",
+    "commentFeedCount_one": "{{count}} message",
+    "commentFeedCount_other": "{{count}} messages",
+    "emptyTitle": "No messages yet",
+    "emptyBody": "Be the first to leave a message of thanks and appreciation."
+  },
+  "form": {
+    "authorName": "Your name",
+    "authorNamePlaceholder": "Enter your name",
+    "comment": "Your message",
+    "commentPlaceholder": "Write a sincere message befitting this occasion",
+    "submit": "Send message"
+  },
+  "messages": {
+    "commentSubmitted": "Your message has been shared successfully."
+  },
+  "seo": {
+    "title": "A Page of Thanks and Appreciation for {{name}}",
+    "fallbackTitle": "Page of Thanks and Appreciation"
+  }
+}

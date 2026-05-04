@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { adminController } from "../../controllers/admin.controller";
 import { adminUserStatsController } from "../../controllers/admin-user-stats.controller";
+import { appreciationController } from "../../controllers/appreciation.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/client";
@@ -27,16 +28,8 @@ const adminModeratorAuth = [
 // ACCOUNT REVIEW
 // ============================================
 
-router.get(
-  "/account-review-settings",
-  ...adminAuth,
-  adminController.getAccountReviewSettings,
-);
-router.put(
-  "/account-review-settings",
-  ...adminAuth,
-  adminController.upsertAccountReviewSettings,
-);
+router.get("/account-review-settings", ...adminAuth, adminController.getAccountReviewSettings);
+router.put("/account-review-settings", ...adminAuth, adminController.upsertAccountReviewSettings);
 
 // Create user (respects privilege matrix)
 router.post("/users", ...adminAuth, adminController.createUser);
@@ -62,6 +55,16 @@ router.get(
 
 // Get single user with all roles
 router.get("/users/:userId", ...adminModeratorAuth, adminController.getUser);
+router.get(
+  "/users/:userId/appreciation-page",
+  ...adminModeratorAuth,
+  appreciationController.getAdminPage,
+);
+router.post(
+  "/users/:userId/appreciation-page",
+  ...adminModeratorAuth,
+  appreciationController.createAdminPage,
+);
 router.patch(
   "/users/:userId/flag",
   ...adminModeratorAuth,
@@ -74,11 +77,7 @@ router.patch(
 );
 
 // Account review: approve / reject users (must be before :userId/roles to avoid conflict)
-router.post(
-  "/users/:userId/approve",
-  ...adminAuth,
-  adminController.approveUser,
-);
+router.post("/users/:userId/approve", ...adminAuth, adminController.approveUser);
 router.post("/users/:userId/reject", ...adminAuth, adminController.rejectUser);
 
 // ============================================

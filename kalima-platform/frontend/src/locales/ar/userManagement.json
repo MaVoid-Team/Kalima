@@ -42,6 +42,7 @@
   "actions": {
     "create": "إنشاء مستخدم",
     "view": "عرض التفاصيل",
+    "appreciation": "صفحة التقدير",
     "approve": "اعتماد",
     "reject": "رفض",
     "delete": "حذف",
