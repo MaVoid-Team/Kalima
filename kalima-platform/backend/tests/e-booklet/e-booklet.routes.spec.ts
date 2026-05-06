@@ -9,6 +9,8 @@ process.env.JWT_SECRET = process.env.JWT_SECRET || "test-secret";
 const mockService = {
   listPublishedTemplates: jest.fn(),
   createTemplate: jest.fn(),
+  listTemplateVersions: jest.fn(),
+  listVersionHotspots: jest.fn(),
   createInvite: jest.fn(),
   acceptInvite: jest.fn(),
 };
@@ -105,6 +107,42 @@ describe("e-booklet routes", () => {
       expect.objectContaining({ title: "Template", price: 150 }),
       1,
     );
+  });
+
+  test("allows admin users to list template versions for the editor", async () => {
+    mockService.listTemplateVersions.mockResolvedValue([
+      { id: 5, version_number: 2, status: "draft" },
+    ]);
+
+    await request(app)
+      .get("/api/v2/admin/e-booklet-templates/44/versions")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data).toEqual([
+          { id: 5, version_number: 2, status: "draft" },
+        ]);
+      });
+
+    expect(mockService.listTemplateVersions).toHaveBeenCalledWith(44);
+  });
+
+  test("allows admin users to reload saved hotspots by version and page", async () => {
+    mockService.listVersionHotspots.mockResolvedValue([
+      { id: 9, page_number: 3, type: "audio" },
+    ]);
+
+    await request(app)
+      .get("/api/v2/admin/e-booklet-template-versions/5/hotspots?page_number=3")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data).toEqual([
+          { id: 9, page_number: 3, type: "audio" },
+        ]);
+      });
+
+    expect(mockService.listVersionHotspots).toHaveBeenCalledWith(5, 3);
   });
 
   test("allows teachers to create invite links for their own e-booklet instances", async () => {
