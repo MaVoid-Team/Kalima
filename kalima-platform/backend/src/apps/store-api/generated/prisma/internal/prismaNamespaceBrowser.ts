@@ -92,6 +92,16 @@ export const ModelName = {
   payment_methods: 'payment_methods',
   sample_sections: 'sample_sections',
   images: 'images',
+  e_booklet_templates: 'e_booklet_templates',
+  e_booklet_template_versions: 'e_booklet_template_versions',
+  e_booklet_hotspots: 'e_booklet_hotspots',
+  e_booklet_purchases: 'e_booklet_purchases',
+  e_booklet_instances: 'e_booklet_instances',
+  e_booklet_access: 'e_booklet_access',
+  e_booklet_invites: 'e_booklet_invites',
+  e_booklet_invite_redemptions: 'e_booklet_invite_redemptions',
+  e_booklet_file_assets: 'e_booklet_file_assets',
+  e_booklet_audit_logs: 'e_booklet_audit_logs',
   product_gallery: 'product_gallery',
   product_gallery_videos: 'product_gallery_videos',
   general_settings: 'general_settings',
@@ -668,6 +678,176 @@ export const ImagesScalarFieldEnum = {
 export type ImagesScalarFieldEnum = (typeof ImagesScalarFieldEnum)[keyof typeof ImagesScalarFieldEnum]
 
 
+export const E_booklet_templatesScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  slug: 'slug',
+  description: 'description',
+  cover_file_id: 'cover_file_id',
+  price: 'price',
+  currency: 'currency',
+  status: 'status',
+  category_id: 'category_id',
+  created_by: 'created_by',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_templatesScalarFieldEnum = (typeof E_booklet_templatesScalarFieldEnum)[keyof typeof E_booklet_templatesScalarFieldEnum]
+
+
+export const E_booklet_template_versionsScalarFieldEnum = {
+  id: 'id',
+  template_id: 'template_id',
+  version_number: 'version_number',
+  base_document_file_id: 'base_document_file_id',
+  rendered_document_file_id: 'rendered_document_file_id',
+  page_count: 'page_count',
+  page_dimensions_json: 'page_dimensions_json',
+  status: 'status',
+  created_by: 'created_by',
+  created_at: 'created_at',
+  published_at: 'published_at'
+} as const
+
+export type E_booklet_template_versionsScalarFieldEnum = (typeof E_booklet_template_versionsScalarFieldEnum)[keyof typeof E_booklet_template_versionsScalarFieldEnum]
+
+
+export const E_booklet_hotspotsScalarFieldEnum = {
+  id: 'id',
+  template_version_id: 'template_version_id',
+  page_number: 'page_number',
+  x_percent: 'x_percent',
+  y_percent: 'y_percent',
+  radius_percent: 'radius_percent',
+  type: 'type',
+  title: 'title',
+  text_content: 'text_content',
+  asset_file_id: 'asset_file_id',
+  trigger_type: 'trigger_type',
+  display_behavior: 'display_behavior',
+  sort_order: 'sort_order',
+  is_active: 'is_active',
+  created_by: 'created_by',
+  updated_by: 'updated_by',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_hotspotsScalarFieldEnum = (typeof E_booklet_hotspotsScalarFieldEnum)[keyof typeof E_booklet_hotspotsScalarFieldEnum]
+
+
+export const E_booklet_purchasesScalarFieldEnum = {
+  id: 'id',
+  teacher_id: 'teacher_id',
+  template_id: 'template_id',
+  template_version_id: 'template_version_id',
+  status: 'status',
+  price: 'price',
+  currency: 'currency',
+  payment_method: 'payment_method',
+  payment_reference: 'payment_reference',
+  branding_json: 'branding_json',
+  admin_notes: 'admin_notes',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_purchasesScalarFieldEnum = (typeof E_booklet_purchasesScalarFieldEnum)[keyof typeof E_booklet_purchasesScalarFieldEnum]
+
+
+export const E_booklet_instancesScalarFieldEnum = {
+  id: 'id',
+  purchase_id: 'purchase_id',
+  teacher_id: 'teacher_id',
+  template_id: 'template_id',
+  template_version_id: 'template_version_id',
+  custom_document_file_id: 'custom_document_file_id',
+  display_title: 'display_title',
+  branding_json: 'branding_json',
+  invite_quota: 'invite_quota',
+  used_invites_count: 'used_invites_count',
+  status: 'status',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_instancesScalarFieldEnum = (typeof E_booklet_instancesScalarFieldEnum)[keyof typeof E_booklet_instancesScalarFieldEnum]
+
+
+export const E_booklet_accessScalarFieldEnum = {
+  id: 'id',
+  booklet_instance_id: 'booklet_instance_id',
+  user_id: 'user_id',
+  role: 'role',
+  source_invite_id: 'source_invite_id',
+  status: 'status',
+  granted_at: 'granted_at',
+  revoked_at: 'revoked_at'
+} as const
+
+export type E_booklet_accessScalarFieldEnum = (typeof E_booklet_accessScalarFieldEnum)[keyof typeof E_booklet_accessScalarFieldEnum]
+
+
+export const E_booklet_invitesScalarFieldEnum = {
+  id: 'id',
+  booklet_instance_id: 'booklet_instance_id',
+  teacher_id: 'teacher_id',
+  token_hash: 'token_hash',
+  max_uses: 'max_uses',
+  used_count: 'used_count',
+  expires_at: 'expires_at',
+  status: 'status',
+  created_at: 'created_at'
+} as const
+
+export type E_booklet_invitesScalarFieldEnum = (typeof E_booklet_invitesScalarFieldEnum)[keyof typeof E_booklet_invitesScalarFieldEnum]
+
+
+export const E_booklet_invite_redemptionsScalarFieldEnum = {
+  id: 'id',
+  invite_id: 'invite_id',
+  booklet_instance_id: 'booklet_instance_id',
+  student_id: 'student_id',
+  redeemed_at: 'redeemed_at',
+  ip_address: 'ip_address',
+  user_agent: 'user_agent'
+} as const
+
+export type E_booklet_invite_redemptionsScalarFieldEnum = (typeof E_booklet_invite_redemptionsScalarFieldEnum)[keyof typeof E_booklet_invite_redemptionsScalarFieldEnum]
+
+
+export const E_booklet_file_assetsScalarFieldEnum = {
+  id: 'id',
+  owner_type: 'owner_type',
+  owner_id: 'owner_id',
+  file_type: 'file_type',
+  storage_key: 'storage_key',
+  original_filename: 'original_filename',
+  mime_type: 'mime_type',
+  size_bytes: 'size_bytes',
+  visibility: 'visibility',
+  created_at: 'created_at'
+} as const
+
+export type E_booklet_file_assetsScalarFieldEnum = (typeof E_booklet_file_assetsScalarFieldEnum)[keyof typeof E_booklet_file_assetsScalarFieldEnum]
+
+
+export const E_booklet_audit_logsScalarFieldEnum = {
+  id: 'id',
+  actor_user_id: 'actor_user_id',
+  action: 'action',
+  entity_type: 'entity_type',
+  entity_id: 'entity_id',
+  metadata_json: 'metadata_json',
+  ip_address: 'ip_address',
+  user_agent: 'user_agent',
+  created_at: 'created_at'
+} as const
+
+export type E_booklet_audit_logsScalarFieldEnum = (typeof E_booklet_audit_logsScalarFieldEnum)[keyof typeof E_booklet_audit_logsScalarFieldEnum]
+
+
 export const Product_galleryScalarFieldEnum = {
   id: 'id',
   product_id: 'product_id',
@@ -731,6 +911,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -745,4 +933,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
