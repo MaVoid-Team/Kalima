@@ -33,6 +33,18 @@ const ProductDetailsPage = lazy(
 const BookletDetailsPage = lazy(
   () => import("./pages/booklet/BookletDetailsPage"),
 );
+const EBookletStorePage = lazy(
+  () => import("./pages/e-booklets/EBookletStorePage"),
+);
+const EBookletDetailsPage = lazy(
+  () => import("./pages/e-booklets/EBookletDetailsPage"),
+);
+const EBookletCartPage = lazy(
+  () => import("./pages/e-booklets/EBookletCartPage"),
+);
+const EBookletCheckoutPage = lazy(
+  () => import("./pages/e-booklets/EBookletCheckoutPage"),
+);
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const CartPage = lazy(() => import("./pages/cart/CartPage"));
 
@@ -122,6 +134,8 @@ const router = createBrowserRouter(
           <Route path="/market" element={<MarketPage />} />
           <Route path="/product/:id" element={<ProductDetailsPage />} />
           <Route path="/booklet/:id" element={<BookletDetailsPage />} />
+          <Route path="/e-booklets" element={<EBookletStorePage />} />
+          <Route path="/e-booklets/:slug" element={<EBookletDetailsPage />} />
         </Route>
         {/* Samples Routes - Restricted by store access */}
         <Route element={<RoleRoute requireStoreAccess={true} />}>
@@ -137,6 +151,8 @@ const router = createBrowserRouter(
             <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin"]} />}>
               <Route path="/cart" element={<WizardCheckoutPage />} />
               <Route path="/checkout" element={<WizardCheckoutPage />} />
+              <Route path="/e-booklet-cart" element={<EBookletCartPage />} />
+              <Route path="/e-booklet-checkout" element={<EBookletCheckoutPage />} />
               <Route
                 path="/fast-buy/checkout"
                 element={<FastBuyCheckoutPage />}

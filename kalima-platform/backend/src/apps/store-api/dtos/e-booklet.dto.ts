@@ -156,6 +156,14 @@ export class EBookletCheckoutDto {
   branding_json!: Record<string, unknown>;
 
   @IsOptional()
+  @IsNumber()
+  price?: number;
+
+  @IsOptional()
+  @IsString()
+  currency?: string;
+
+  @IsOptional()
   @IsString()
   notes?: string;
 

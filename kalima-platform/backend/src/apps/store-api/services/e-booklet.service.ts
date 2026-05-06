@@ -90,6 +90,7 @@ export class EBookletService {
             where: { status: "active" },
             orderBy: { version_number: "desc" },
             take: 1,
+            include: { _count: { select: { hotspots: true } } },
           },
         },
         orderBy: { created_at: "desc" },
@@ -112,6 +113,7 @@ export class EBookletService {
           where: { status: "active" },
           orderBy: { version_number: "desc" },
           take: 1,
+          include: { _count: { select: { hotspots: true } } },
         },
       },
     });
