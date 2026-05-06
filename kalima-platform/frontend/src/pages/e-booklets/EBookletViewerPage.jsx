@@ -6,12 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import useAuth from "@/hooks/auth/useAuth";
 import useRole from "@/hooks/useRole";
 import { useEBookletViewer } from "@/hooks/useEBookletAccess";
-
-const today = new Intl.DateTimeFormat("en", {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-}).format(new Date());
+import { useTranslation } from "react-i18next";
 
 const getDimensions = (metadata, pageNumber) => {
   const dimensions =
@@ -20,6 +15,7 @@ const getDimensions = (metadata, pageNumber) => {
 };
 
 export default function EBookletViewerPage() {
+  const { t, i18n } = useTranslation("eBooklets");
   const { instanceId } = useParams();
   const { user } = useAuth();
   const { isStudent } = useRole();
@@ -60,7 +56,16 @@ export default function EBookletViewerPage() {
   const templateVersion = instance?.template_version;
   const pageCount = Math.max(1, Number(templateVersion?.page_count || 1));
   const dimensions = getDimensions(metadata, pageNumber);
-  const watermark = `Kalima - ${instance?.teacher?.name || "Teacher"} - ${user?.name || "User"} - ${today}`;
+  const today = new Intl.DateTimeFormat(i18n.language?.startsWith("ar") ? "ar-EG" : "en", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(new Date());
+  const watermark = t("viewer.watermark", {
+    teacher: instance?.teacher?.name || t("common.teacher"),
+    user: user?.name || t("common.user"),
+    date: today,
+  });
   const backHref = isStudent ? "/student/e-booklets" : "/teacher/e-booklets";
 
   const pageStyle = useMemo(
@@ -86,18 +91,18 @@ export default function EBookletViewerPage() {
             <Button asChild variant="ghost" size="sm" className="-ms-2">
               <Link to={backHref}>
                 <ArrowLeft className="h-4 w-4" />
-                Back
+                {t("common.back")}
               </Link>
             </Button>
             <h1 className="truncate text-xl font-semibold">
-              {instance?.display_title || instance?.template?.title || "E-Booklet"}
+              {instance?.display_title || instance?.template?.title || t("viewer.titleFallback")}
             </h1>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <Badge variant="outline" className="gap-1">
                 <Lock className="h-3 w-3" />
-                No download
+                {t("common.noDownload")}
               </Badge>
-              <span>Page {pageNumber} of {pageCount}</span>
+              <span>{t("common.pageOf", { page: pageNumber, total: pageCount })}</span>
               <span>{watermark}</span>
             </div>
           </div>
@@ -109,7 +114,7 @@ export default function EBookletViewerPage() {
               disabled={pageNumber <= 1}
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              {t("common.previous")}
             </Button>
             <Button
               variant="outline"
@@ -117,7 +122,7 @@ export default function EBookletViewerPage() {
               onClick={() => setPageNumber((page) => Math.min(pageCount, page + 1))}
               disabled={pageNumber >= pageCount}
             >
-              Next
+              {t("common.next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="sm" onClick={() => setZoom((value) => Math.max(0.75, value - 0.1))}>
@@ -168,7 +173,14 @@ export default function EBookletViewerPage() {
                     height: Math.max(18, Number(hotspot.radius_percent || 1.8) * 12),
                     transform: "translate(-50%, -50%)",
                   }}
-                  aria-label={hotspot.title || `${hotspot.type} hotspot`}
+                  aria-label={
+                    hotspot.title ||
+                    t("admin.editor.hotspots.hotspotFallback", {
+                      type: t(`admin.editor.hotspots.types.${hotspot.type}`, {
+                        defaultValue: hotspot.type,
+                      }),
+                    })
+                  }
                 />
               ))}
             </div>
@@ -176,9 +188,9 @@ export default function EBookletViewerPage() {
         </section>
 
         <aside className="rounded-lg border bg-background p-4">
-          <h2 className="font-semibold">Hotspots</h2>
+          <h2 className="font-semibold">{t("viewer.hotspotsTitle")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Media loads only after a hotspot is opened.
+            {t("viewer.hotspotsDescription")}
           </p>
           <div className="mt-4 space-y-3">
             {viewer.hotspots.map((hotspot) => (
@@ -188,13 +200,24 @@ export default function EBookletViewerPage() {
                 onClick={() => openHotspot(hotspot)}
                 className="w-full rounded-md border p-3 text-start hover:bg-muted/50"
               >
-                <div className="font-medium">{hotspot.title || `${hotspot.type} hotspot`}</div>
-                <div className="text-xs text-muted-foreground">{hotspot.type}</div>
+                <div className="font-medium">
+                  {hotspot.title ||
+                    t("admin.editor.hotspots.hotspotFallback", {
+                      type: t(`admin.editor.hotspots.types.${hotspot.type}`, {
+                        defaultValue: hotspot.type,
+                      }),
+                    })}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {t(`admin.editor.hotspots.types.${hotspot.type}`, {
+                    defaultValue: hotspot.type,
+                  })}
+                </div>
               </button>
             ))}
             {viewer.hotspots.length === 0 && (
               <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">
-                No hotspots on this page.
+                {t("viewer.emptyHotspots")}
               </div>
             )}
           </div>
@@ -202,16 +225,24 @@ export default function EBookletViewerPage() {
           {activeHotspot && (
             <div className="mt-5 rounded-md border bg-muted/30 p-4">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <h3 className="font-semibold">{activeHotspot.title || "Hotspot"}</h3>
-                <Badge variant="outline">{activeHotspot.type}</Badge>
+                <h3 className="font-semibold">
+                  {activeHotspot.title || t("viewer.hotspotFallback")}
+                </h3>
+                <Badge variant="outline">
+                  {t(`admin.editor.hotspots.types.${activeHotspot.type}`, {
+                    defaultValue: activeHotspot.type,
+                  })}
+                </Badge>
               </div>
               {activeHotspot.type === "text" ? (
                 <p className="whitespace-pre-wrap text-sm">
-                  {hotspotContent?.text_content || activeHotspot.text_content || "No text content."}
+                  {hotspotContent?.text_content || activeHotspot.text_content || t("viewer.noText")}
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  Private media asset #{hotspotContent?.asset_file_id || activeHotspot.asset_file_id} is available through the controlled hotspot endpoint.
+                  {t("viewer.privateMedia", {
+                    id: hotspotContent?.asset_file_id || activeHotspot.asset_file_id,
+                  })}
                 </p>
               )}
             </div>

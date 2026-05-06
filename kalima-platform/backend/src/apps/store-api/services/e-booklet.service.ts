@@ -1,6 +1,7 @@
 import path from "path";
 import { promises as fsPromises } from "fs";
 import crypto from "crypto";
+import { PDFDocument } from "pdf-lib";
 import type { PrismaClient } from "../../../libs/db/prisma";
 import {
   BadRequestError,
@@ -65,6 +66,11 @@ export interface PageDimensions {
   height: number;
 }
 
+export interface PdfMetadata {
+  page_count: number;
+  page_dimensions: PageDimensions[];
+}
+
 export interface ValidateTeacherDocumentInput {
   templateVersionId: number;
   uploadedPageCount: number;
@@ -97,6 +103,34 @@ function dimensionsDiffer(
       Number(dimension.height) !== Number(uploadedDimension.height)
     );
   });
+}
+
+async function extractPdfMetadata(
+  file: Express.Multer.File,
+): Promise<PdfMetadata | null> {
+  if (file.mimetype !== "application/pdf") return null;
+
+  try {
+    const document = await PDFDocument.load(file.buffer, {
+      ignoreEncryption: true,
+      updateMetadata: false,
+    });
+    const pages = document.getPages();
+    return {
+      page_count: pages.length,
+      page_dimensions: pages.map((page) => {
+        const size = page.getSize();
+        return {
+          width: Number(size.width.toFixed(2)),
+          height: Number(size.height.toFixed(2)),
+        };
+      }),
+    };
+  } catch {
+    throw new BadRequestError(
+      "The uploaded PDF could not be read. Please upload a valid PDF file.",
+    );
+  }
 }
 
 const VIEWER_PAGE_TOKEN_TTL_MS = 5 * 60 * 1000;
@@ -194,9 +228,10 @@ export class EBookletService {
     const storageKey = `e-booklets/private/${filename}`;
 
     await this.ensureFileStorageDir();
+    const metadata = await extractPdfMetadata(file);
     await fsPromises.writeFile(path.join(E_BOOKLET_UPLOAD_DIR, filename), file.buffer);
 
-    return this.db.e_booklet_file_assets.create({
+    const asset = await this.db.e_booklet_file_assets.create({
       data: {
         owner_type: input.ownerType || "admin",
         owner_id: input.ownerId ?? null,
@@ -208,6 +243,21 @@ export class EBookletService {
         visibility: "private",
       },
     });
+    return metadata ? { ...asset, metadata } : asset;
+  }
+
+  async getPrivateFileAssetForAdmin(
+    assetId: number,
+  ): Promise<{ asset: any; absolutePath: string }> {
+    const asset = await this.db.e_booklet_file_assets.findUnique({
+      where: { id: assetId },
+    });
+    if (!asset) throw new NotFoundError("E-booklet file asset not found");
+
+    const filename = path.basename(asset.storage_key || "");
+    const absolutePath = path.join(E_BOOKLET_UPLOAD_DIR, filename);
+    await fsPromises.access(absolutePath);
+    return { asset, absolutePath };
   }
 
   async listPublishedTemplates(filters: {
@@ -353,6 +403,8 @@ export class EBookletService {
     return this.db.e_booklet_template_versions.findMany({
       where: { template_id: templateId },
       include: {
+        base_document_file: true,
+        rendered_document_file: true,
         _count: { select: { hotspots: true, instances: true, purchases: true } },
       },
       orderBy: { version_number: "desc" },
@@ -927,8 +979,8 @@ export class EBookletService {
     const warnings: string[] = [];
 
     if (dimensionsDiffer(expectedDimensions, input.uploadedPageDimensions)) {
-      warnings.push(
-        "This file has the same page count, but some page dimensions differ from the template. Hotspot positions may not align correctly.",
+      throw new BadRequestError(
+        "This file has the same page count, but its page size does not match the template. Please upload a file with matching page width and height so hotspots align correctly.",
       );
     }
 

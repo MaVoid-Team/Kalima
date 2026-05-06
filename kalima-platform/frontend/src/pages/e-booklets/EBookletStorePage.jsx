@@ -19,9 +19,10 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useEBookletCart, useEBookletStore } from "@/hooks/useEBooklets";
+import { useTranslation } from "react-i18next";
 
-const formatMoney = (amount, currency = "EGP") => {
-  return new Intl.NumberFormat("en-EG", {
+const formatMoney = (amount, currency = "EGP", language = "en") => {
+  return new Intl.NumberFormat(language?.startsWith("ar") ? "ar-EG" : "en-EG", {
     style: "currency",
     currency,
     maximumFractionDigits: 0,
@@ -49,7 +50,7 @@ function StoreSkeleton() {
   );
 }
 
-function EBookletCover({ template, featured = false }) {
+function EBookletCover({ template, featured = false, t }) {
   if (template.coverUrl) {
     return (
       <img
@@ -70,7 +71,7 @@ function EBookletCover({ template, featured = false }) {
       </div>
       <div>
         <div className={cn("font-bold leading-tight", featured ? "text-3xl" : "text-xl")}>
-          Interactive booklet
+          {t("store.coverFallback")}
         </div>
         <div className="mt-2 h-1 w-14 rounded-full bg-emerald-600" />
       </div>
@@ -78,7 +79,7 @@ function EBookletCover({ template, featured = false }) {
   );
 }
 
-function EBookletCard({ template, featured, onAdd }) {
+function EBookletCard({ template, featured, onAdd, t, language }) {
   return (
     <article
       className={cn(
@@ -93,13 +94,13 @@ function EBookletCard({ template, featured, onAdd }) {
           featured ? "min-h-[300px] md:min-h-full" : "aspect-[4/3]",
         )}
       >
-        <EBookletCover template={template} featured={featured} />
+        <EBookletCover template={template} featured={featured} t={t} />
       </Link>
 
       <div className="flex min-w-0 flex-col p-5">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary" className="rounded-md bg-emerald-50 text-emerald-800 hover:bg-emerald-50">
-            E-Booklet
+            {t("common.eBooklet")}
           </Badge>
           {template.categoryTitle && (
             <span className="text-xs font-medium text-muted-foreground">
@@ -119,31 +120,35 @@ function EBookletCard({ template, featured, onAdd }) {
         </Link>
 
         <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
-          {template.description || "Interactive PDF booklet delivered by admin with teacher branding and controlled student access."}
+          {template.description || t("store.cardDescription")}
         </p>
 
         <div className="mt-5 grid grid-cols-3 gap-2 text-xs text-muted-foreground">
           <div className="rounded-md border border-border/70 px-3 py-2">
             <FileText className="mb-1 h-4 w-4 text-foreground" />
-            <span>{template.pageCount || "Page"} pages</span>
+            <span>
+              {template.pageCount
+                ? t("common.pageCount", { count: template.pageCount })
+                : t("common.pages")}
+            </span>
           </div>
           <div className="rounded-md border border-border/70 px-3 py-2">
             <Video className="mb-1 h-4 w-4 text-foreground" />
-            <span>{template.hotspotCount || 0} hotspots</span>
+            <span>{t("common.hotspotCount", { count: template.hotspotCount || 0 })}</span>
           </div>
           <div className="rounded-md border border-border/70 px-3 py-2">
             <LockKeyhole className="mb-1 h-4 w-4 text-foreground" />
-            <span>No download</span>
+            <span>{t("common.noDownload")}</span>
           </div>
         </div>
 
         <div className="mt-auto flex items-center justify-between gap-4 pt-6">
           <div>
             <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              Price
+              {t("common.price")}
             </div>
             <div className="text-lg font-bold text-foreground">
-              {formatMoney(template.price, template.currency)}
+              {formatMoney(template.price, template.currency, language)}
             </div>
           </div>
           <Button
@@ -153,7 +158,7 @@ function EBookletCard({ template, featured, onAdd }) {
             className="active:scale-[0.98]"
           >
             <ShoppingBag className="h-4 w-4" />
-            Add
+            {t("store.add")}
           </Button>
         </div>
       </div>
@@ -161,27 +166,27 @@ function EBookletCard({ template, featured, onAdd }) {
   );
 }
 
-function EmptyState({ onClearSearch }) {
+function EmptyState({ onClearSearch, t }) {
   return (
     <div className="rounded-lg border border-dashed border-border bg-card px-6 py-16 text-center">
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
         <BookOpenCheck className="h-7 w-7" />
       </div>
       <h2 className="mt-5 text-2xl font-bold tracking-tight">
-        No e-booklets are published yet
+        {t("store.emptyTitle")}
       </h2>
       <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-        Published e-booklet templates will appear here after the admin prepares
-        the secure PDF version, cover, price, and hotspot content.
+        {t("store.emptyDescription")}
       </p>
       <Button type="button" variant="outline" onClick={onClearSearch} className="mt-6">
-        Clear search
+        {t("common.clearSearch")}
       </Button>
     </div>
   );
 }
 
 export default function EBookletStorePage() {
+  const { t, i18n } = useTranslation("eBooklets");
   const navigate = useNavigate();
   const { replaceWithTemplate } = useEBookletCart();
   const [searchValue, setSearchValue] = useState("");
@@ -216,15 +221,13 @@ export default function EBookletStorePage() {
         <div className="max-w-3xl">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-700/20 bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-900">
             <ShieldCheck className="h-4 w-4" />
-            Invite-only interactive booklets
+            {t("store.badge")}
           </div>
           <h1 className="text-4xl font-black leading-tight tracking-tight text-slate-950 md:text-6xl">
-            E-booklets built for branded classroom delivery.
+            {t("store.heroTitle")}
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600">
-            Browse reusable booklet templates, request admin customization, and
-            keep the final PDF private with watermarking, page-by-page access,
-            and invite-controlled student entry.
+            {t("store.heroDescription")}
           </p>
         </div>
 
@@ -233,22 +236,22 @@ export default function EBookletStorePage() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Access model
+                  {t("store.accessModel")}
                 </p>
                 <h2 className="mt-1 text-2xl font-bold tracking-tight">
-                  Template plus teacher PDF
+                  {t("store.templatePlusPdf")}
                 </h2>
               </div>
               <LockKeyhole className="h-8 w-8 text-emerald-800" />
             </div>
             <div className="mt-5 grid grid-cols-3 gap-3 text-sm">
               {[
-                { label: "Text", Icon: FileText },
-                { label: "Image", Icon: ImageIcon },
-                { label: "Video", Icon: Video },
-                { label: "Audio", Icon: Volume2 },
-                { label: "Private", Icon: LockKeyhole },
-                { label: "Quota", Icon: CircleDollarSign },
+                { label: t("store.features.text"), Icon: FileText },
+                { label: t("store.features.image"), Icon: ImageIcon },
+                { label: t("store.features.video"), Icon: Video },
+                { label: t("store.features.audio"), Icon: Volume2 },
+                { label: t("store.features.private"), Icon: LockKeyhole },
+                { label: t("store.features.quota"), Icon: CircleDollarSign },
               ].map(({ label, Icon }) => (
                 <div key={label} className="rounded-md border border-border/70 p-3">
                   <Icon className="mb-2 h-4 w-4 text-emerald-800" />
@@ -265,10 +268,9 @@ export default function EBookletStorePage() {
       <section className="mx-auto max-w-[1400px] px-4 pb-20 md:px-6">
         <div className="mb-7 flex flex-col gap-4 border-t border-border/80 pt-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">E-booklet store</h2>
+            <h2 className="text-2xl font-bold tracking-tight">{t("store.title")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Separate catalog for interactive booklets. Normal Market product
-              logic is not used here.
+              {t("store.description")}
             </p>
           </div>
           <form onSubmit={handleSearch} className="relative w-full md:w-[360px]">
@@ -276,7 +278,7 @@ export default function EBookletStorePage() {
             <Input
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
-              placeholder="Search e-booklet templates"
+              placeholder={t("store.searchPlaceholder")}
               className="h-11 pl-9"
             />
           </form>
@@ -285,7 +287,8 @@ export default function EBookletStorePage() {
         {filters.search && (
           <div className="mb-5 flex items-center justify-between rounded-md border border-border/70 bg-muted/30 px-4 py-3 text-sm">
             <span className="text-muted-foreground">
-              Search results for <strong className="text-foreground">{filters.search}</strong>
+              {t("common.searchResultsFor")}{" "}
+              <strong className="text-foreground">{filters.search}</strong>
             </span>
             <button
               type="button"
@@ -295,7 +298,7 @@ export default function EBookletStorePage() {
               }}
               className="font-semibold text-emerald-800 hover:text-emerald-950"
             >
-              Clear
+              {t("common.clear")}
             </button>
           </div>
         )}
@@ -304,6 +307,7 @@ export default function EBookletStorePage() {
           <StoreSkeleton />
         ) : templates.length === 0 ? (
           <EmptyState
+            t={t}
             onClearSearch={() => {
               setSearchValue("");
               setSearch("");
@@ -318,6 +322,8 @@ export default function EBookletStorePage() {
                   template={template}
                   featured={index === 0}
                   onAdd={handleAddToCart}
+                  t={t}
+                  language={i18n.language}
                 />
               ))}
             </div>
@@ -325,7 +331,7 @@ export default function EBookletStorePage() {
             {totalPages > 1 && (
               <div className="mt-8 flex items-center justify-between border-t border-border pt-5 text-sm">
                 <span className="text-muted-foreground">
-                  Page {pagination.page} of {totalPages}
+                  {t("common.pageOf", { page: pagination.page, total: totalPages })}
                 </span>
                 <div className="flex gap-2">
                   <Button
@@ -334,7 +340,7 @@ export default function EBookletStorePage() {
                     disabled={pagination.page <= 1}
                     onClick={() => setPage(pagination.page - 1)}
                   >
-                    Previous
+                    {t("common.previous")}
                   </Button>
                   <Button
                     type="button"
@@ -342,7 +348,7 @@ export default function EBookletStorePage() {
                     disabled={pagination.page >= totalPages}
                     onClick={() => setPage(pagination.page + 1)}
                   >
-                    Next
+                    {t("common.next")}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </div>

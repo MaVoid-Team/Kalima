@@ -94,6 +94,24 @@ export const eBookletController = {
     }
   },
 
+  async previewAdminFileAsset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { asset, absolutePath } =
+        await getEBookletService().getPrivateFileAssetForAdmin(
+          parseId(req.params.assetId, "file asset ID"),
+        );
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "application/octet-stream");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
+      );
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async listStoreTemplates(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await getEBookletService().listPublishedTemplates({

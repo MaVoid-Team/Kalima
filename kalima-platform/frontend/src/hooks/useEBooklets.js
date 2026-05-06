@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import i18n from "@/i18n";
 import useApiMutation from "./useApiMutation";
 
 const E_BOOKLET_CART_KEY = "kalima:e-booklet-cart:v1";
@@ -280,7 +281,7 @@ export function useEBookletCheckout() {
         endpoint: "/e-booklet-checkout",
         method: "post",
         data: payload,
-        defaultSuccessMessage: "E-booklet request submitted",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.requestSubmitted"),
       });
     },
     [mutate],

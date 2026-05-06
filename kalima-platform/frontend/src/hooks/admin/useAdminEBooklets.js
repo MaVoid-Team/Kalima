@@ -1,4 +1,6 @@
 import { useCallback, useState } from "react";
+import axiosInstance from "@/api/axios";
+import i18n from "@/i18n";
 import useApiMutation from "../useApiMutation";
 
 const normalizeListResponse = (response) => ({
@@ -99,7 +101,7 @@ export function useAdminEBookletTemplates() {
           endpoint: `/admin/e-booklet-templates/${templateId}`,
           method: "patch",
           data,
-          defaultSuccessMessage: "E-booklet template updated",
+          defaultSuccessMessage: i18n.t("eBooklets:toasts.templateUpdated"),
         }),
       ),
     [fetchApi, runAction],
@@ -111,7 +113,7 @@ export function useAdminEBookletTemplates() {
         fetchApi({
           endpoint: `/admin/e-booklet-template-versions/${versionId}/publish`,
           method: "post",
-          defaultSuccessMessage: "E-booklet version published",
+          defaultSuccessMessage: i18n.t("eBooklets:toasts.versionPublished"),
         }),
       ),
     [fetchApi, runAction],
@@ -165,7 +167,7 @@ export function useAdminEBookletEditor() {
         endpoint: "/admin/e-booklet-templates",
         method: "post",
         data,
-        defaultSuccessMessage: "E-booklet template saved",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.templateSaved"),
       }),
     [fetchApi],
   );
@@ -176,7 +178,7 @@ export function useAdminEBookletEditor() {
         endpoint: `/admin/e-booklet-templates/${templateId}`,
         method: "patch",
         data,
-        defaultSuccessMessage: "E-booklet template updated",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.templateUpdated"),
       }),
     [fetchApi],
   );
@@ -187,7 +189,7 @@ export function useAdminEBookletEditor() {
         endpoint: `/admin/e-booklet-templates/${templateId}/versions`,
         method: "post",
         data,
-        defaultSuccessMessage: "E-booklet version saved",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.versionSaved"),
       }),
     [fetchApi],
   );
@@ -198,7 +200,7 @@ export function useAdminEBookletEditor() {
         endpoint: `/admin/e-booklet-template-versions/${versionId}`,
         method: "patch",
         data,
-        defaultSuccessMessage: "E-booklet version updated",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.versionUpdated"),
       }),
     [fetchApi],
   );
@@ -208,7 +210,7 @@ export function useAdminEBookletEditor() {
       fetchApi({
         endpoint: `/admin/e-booklet-template-versions/${versionId}/publish`,
         method: "post",
-        defaultSuccessMessage: "E-booklet version published",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.versionPublished"),
       }),
     [fetchApi],
   );
@@ -233,7 +235,7 @@ export function useAdminEBookletEditor() {
         endpoint: `/admin/e-booklet-template-versions/${versionId}/hotspots`,
         method: "post",
         data: { ...data, template_version_id: versionId },
-        defaultSuccessMessage: "Hotspot saved",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.hotspotSaved"),
       }),
     [fetchApi],
   );
@@ -244,7 +246,7 @@ export function useAdminEBookletEditor() {
         endpoint: `/admin/e-booklet-hotspots/${hotspotId}`,
         method: "patch",
         data,
-        defaultSuccessMessage: "Hotspot updated",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.hotspotUpdated"),
       }),
     [fetchApi],
   );
@@ -254,7 +256,7 @@ export function useAdminEBookletEditor() {
       fetchApi({
         endpoint: `/admin/e-booklet-hotspots/${hotspotId}`,
         method: "delete",
-        defaultSuccessMessage: "Hotspot removed",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.hotspotRemoved"),
       }),
     [fetchApi],
   );
@@ -274,11 +276,20 @@ export function useAdminEBookletEditor() {
         endpoint: `/admin/e-booklet-files/${kind}`,
         method: "post",
         data: formData,
-        defaultSuccessMessage: "File stored privately",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.fileStored"),
       });
     },
     [fetchApi],
   );
+
+  const fetchAssetBlobUrl = useCallback(async (assetId) => {
+    if (!assetId) return "";
+    const response = await axiosInstance.get(
+      `/admin/e-booklet-files/${assetId}/preview`,
+      { responseType: "blob" },
+    );
+    return URL.createObjectURL(response.data);
+  }, []);
 
   return {
     loading,
@@ -294,6 +305,7 @@ export function useAdminEBookletEditor() {
     updateHotspot,
     deleteHotspot,
     uploadAsset,
+    fetchAssetBlobUrl,
   };
 }
 
@@ -346,7 +358,7 @@ export function useAdminEBookletPurchases() {
         endpoint: `/admin/e-booklet-purchases/${purchaseId}/status`,
         method: "patch",
         data: { status: nextStatus, admin_notes: adminNotes },
-        defaultSuccessMessage: "E-booklet purchase updated",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.purchaseUpdated"),
       }),
     [fetchApi],
   );
@@ -356,7 +368,7 @@ export function useAdminEBookletPurchases() {
       fetchApi({
         endpoint: `/admin/e-booklet-purchases/${purchaseId}/mark-paid`,
         method: "post",
-        defaultSuccessMessage: "E-booklet purchase marked paid",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.purchaseMarkedPaid"),
       }),
     [fetchApi],
   );
@@ -367,7 +379,7 @@ export function useAdminEBookletPurchases() {
         endpoint: `/admin/e-booklet-purchases/${purchaseId}/deliver`,
         method: "post",
         data,
-        defaultSuccessMessage: "E-booklet delivered to teacher",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.delivered"),
       }),
     [fetchApi],
   );
@@ -386,7 +398,7 @@ export function useAdminEBookletPurchases() {
         endpoint: "/admin/e-booklet-files/document",
         method: "post",
         data: formData,
-        defaultSuccessMessage: "Teacher document stored privately",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.teacherDocumentStored"),
       });
     },
     [fetchApi],

@@ -4,6 +4,7 @@ import { BookOpenCheck, Link2, Play, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useTeacherEBooklets } from "@/hooks/useEBookletAccess";
+import { useTranslation } from "react-i18next";
 
 const remainingInvites = (instance) => {
   const quota = Number(instance?.invite_quota || 0);
@@ -12,6 +13,7 @@ const remainingInvites = (instance) => {
 };
 
 export default function TeacherEBookletsPage() {
+  const { t } = useTranslation("eBooklets");
   const { items, loading, fetchTeacherEBooklets } = useTeacherEBooklets();
 
   useEffect(() => {
@@ -23,27 +25,27 @@ export default function TeacherEBookletsPage() {
       <div>
         <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
           <BookOpenCheck className="h-8 w-8 text-primary" />
-          My E-Booklets
+          {t("teacher.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Open delivered booklets, manage invite quota, and track student access.
+          {t("teacher.description")}
         </p>
       </div>
 
       {loading && (
         <div className="rounded-lg border bg-background p-8 text-center text-muted-foreground">
-          Loading e-booklets...
+          {t("teacher.loading")}
         </div>
       )}
 
       {!loading && items.length === 0 && (
         <div className="rounded-lg border bg-background p-8 text-center">
-          <div className="font-semibold">No delivered e-booklets yet</div>
+          <div className="font-semibold">{t("teacher.emptyTitle")}</div>
           <p className="mt-1 text-sm text-muted-foreground">
-            Ready purchases appear here after admin customization and delivery.
+            {t("teacher.emptyDescription")}
           </p>
           <Button asChild className="mt-4">
-            <Link to="/e-booklets">Browse E-Booklet Store</Link>
+            <Link to="/e-booklets">{t("common.browse")}</Link>
           </Button>
         </div>
       )}
@@ -56,32 +58,36 @@ export default function TeacherEBookletsPage() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <Badge variant="outline" className="mb-3">
-                    {instance?.status || "active"}
+                    {t(`statuses.${instance?.status || "active"}`, {
+                      defaultValue: instance?.status || t("common.active"),
+                    })}
                   </Badge>
                   <h2 className="text-xl font-semibold">
-                    {instance?.display_title || instance?.template?.title || "E-Booklet"}
+                    {instance?.display_title || instance?.template?.title || t("common.eBooklet")}
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Template: {instance?.template?.title || "Template"}
+                    {t("teacher.templateLabel", {
+                      value: instance?.template?.title || t("common.template"),
+                    })}
                   </p>
                 </div>
                 <div className="rounded-md border px-3 py-2 text-sm">
-                  <div className="text-xs text-muted-foreground">Invites left</div>
+                  <div className="text-xs text-muted-foreground">{t("teacher.invitesLeft")}</div>
                   <div className="text-lg font-semibold">{remainingInvites(instance)}</div>
                 </div>
               </div>
 
               <div className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
                 <div className="rounded-md border p-3">
-                  <div className="text-xs text-muted-foreground">Quota</div>
+                  <div className="text-xs text-muted-foreground">{t("teacher.quota")}</div>
                   <div className="font-semibold">{instance?.invite_quota || 0}</div>
                 </div>
                 <div className="rounded-md border p-3">
-                  <div className="text-xs text-muted-foreground">Used</div>
+                  <div className="text-xs text-muted-foreground">{t("teacher.used")}</div>
                   <div className="font-semibold">{instance?.used_invites_count || 0}</div>
                 </div>
                 <div className="rounded-md border p-3">
-                  <div className="text-xs text-muted-foreground">Pages</div>
+                  <div className="text-xs text-muted-foreground">{t("common.pages")}</div>
                   <div className="font-semibold">{instance?.template_version?.page_count || 0}</div>
                 </div>
               </div>
@@ -90,19 +96,19 @@ export default function TeacherEBookletsPage() {
                 <Button asChild>
                   <Link to={`/teacher/e-booklets/${instance.id}`}>
                     <Play className="h-4 w-4" />
-                    Open
+                    {t("common.open")}
                   </Link>
                 </Button>
                 <Button asChild variant="outline">
                   <Link to={`/teacher/e-booklets/${instance.id}/invites`}>
                     <Link2 className="h-4 w-4" />
-                    Manage Invites
+                    {t("teacher.manageInvites")}
                   </Link>
                 </Button>
                 <Button asChild variant="outline">
                   <Link to={`/teacher/e-booklets/${instance.id}/invites`}>
                     <Users className="h-4 w-4" />
-                    Students
+                    {t("teacher.students")}
                   </Link>
                 </Button>
               </div>
