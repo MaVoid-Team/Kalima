@@ -711,6 +711,7 @@ export class EBookletService {
         booklet_instance: {
           include: {
             template: true,
+            template_version: true,
             teacher: { select: { id: true, name: true } },
           },
         },

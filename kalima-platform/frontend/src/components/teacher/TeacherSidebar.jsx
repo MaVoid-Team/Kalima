@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, User, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Settings } from 'lucide-react';
+import { ShoppingBag, User, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Settings, BookOpenCheck } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 
 
@@ -40,6 +40,7 @@ export default function TeacherSidebar({ isMobileOpen, setIsMobileOpen }) {
   const navigation = [
     { name: t('nav.home', 'Home'), href: '/', icon: Home, id: 'home' },
     { name: t('nav.profile', 'My Profile'), href: '/teacher/profile', icon: User, id: 'profile' },
+    { name: t('nav.eBooklets', 'My E-Booklets'), href: '/teacher/e-booklets', icon: BookOpenCheck, id: 'e-booklets' },
     { name: t('nav.orders', 'My Orders'), href: '/orders', icon: ShoppingBag, id: 'orders' },
     { name: t('nav.settings', 'Settings'), href: '/teacher/settings', icon: Settings, id: 'settings' },
   ];

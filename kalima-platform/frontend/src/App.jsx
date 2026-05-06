@@ -74,6 +74,7 @@ const AnalyticsPage = lazy(() => import("./pages/admin/analytics/AnalyticsPage")
 const EmployeePerformancePage = lazy(() => import("./pages/admin/employee-performance/EmployeePerformancePage"));
 const AdminEBookletTemplatesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTemplatesPage"));
 const AdminEBookletEditorPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletEditorPage"));
+const AdminEBookletPurchasesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchasesPage"));
 
 // Public viewer (no layout)
 const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
@@ -89,6 +90,9 @@ const AdminNotificationsPage = lazy(() => import("./pages/admin/notifications/Ad
 const TeacherLayout = lazy(() => import("./layouts/TeacherLayout"));
 const TeacherProfilePage = lazy(() => import("./pages/teacher/profile/TeacherProfilePage"));
 const TeacherSettingsPage = lazy(() => import("./pages/teacher/settings/TeacherSettingsPage"));
+const TeacherEBookletsPage = lazy(() => import("./pages/teacher/e-booklets/TeacherEBookletsPage"));
+const TeacherInviteManagementPage = lazy(() => import("./pages/teacher/e-booklets/TeacherInviteManagementPage"));
+const EBookletViewerPage = lazy(() => import("./pages/e-booklets/EBookletViewerPage"));
 
 // Student lazy-loaded pages
 const StudentLayout = lazy(() => import("./layouts/StudentLayout"));
@@ -183,6 +187,7 @@ const router = createBrowserRouter(
           <Route path="/admin/e-booklets" element={<AdminEBookletTemplatesPage />} />
           <Route path="/admin/e-booklets/create" element={<AdminEBookletEditorPage />} />
           <Route path="/admin/e-booklets/:id/edit" element={<AdminEBookletEditorPage />} />
+          <Route path="/admin/e-booklet-purchases" element={<AdminEBookletPurchasesPage />} />
           <Route path="/admin/categories" element={<CategoriesPage />} />
           <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
           <Route path="/admin/required-fields" element={<RequiredFieldsPage />} />
@@ -205,6 +210,9 @@ const router = createBrowserRouter(
         <Route element={<TeacherLayout />}>
           <Route path="/teacher/profile" element={<TeacherProfilePage />} />
           <Route path="/teacher/settings" element={<TeacherSettingsPage />} />
+          <Route path="/teacher/e-booklets" element={<TeacherEBookletsPage />} />
+          <Route path="/teacher/e-booklets/:instanceId" element={<EBookletViewerPage />} />
+          <Route path="/teacher/e-booklets/:instanceId/invites" element={<TeacherInviteManagementPage />} />
         </Route>
       </Route>
 

@@ -296,3 +296,113 @@ export function useAdminEBookletEditor() {
     uploadAsset,
   };
 }
+
+export function useAdminEBookletPurchases() {
+  const { mutate: fetchApi, loading } = useApiMutation();
+  const [purchases, setPurchases] = useState([]);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 12 });
+  const [status, setStatus] = useState("all");
+
+  const fetchPurchases = useCallback(
+    async (overrides = {}) => {
+      const query = new URLSearchParams();
+      query.set("page", String(overrides.page ?? pagination.page));
+      query.set("limit", String(overrides.limit ?? pagination.limit));
+      const nextStatus = overrides.status ?? status;
+      if (nextStatus && nextStatus !== "all") query.set("status", nextStatus);
+
+      const response = await fetchApi(
+        {
+          endpoint: `/admin/e-booklet-purchases?${query.toString()}`,
+          method: "get",
+        },
+        false,
+      );
+      const normalized = normalizeListResponse(response);
+      setPurchases(normalized.data);
+      setPagination((current) => ({
+        ...current,
+        total: normalized.total,
+        page: normalized.page,
+        limit: normalized.limit,
+      }));
+      return response;
+    },
+    [fetchApi, pagination.limit, pagination.page, status],
+  );
+
+  const setPage = useCallback((page) => {
+    setPagination((current) => ({ ...current, page }));
+  }, []);
+
+  const changeStatusFilter = useCallback((value) => {
+    setStatus(value);
+    setPagination((current) => ({ ...current, page: 1 }));
+  }, []);
+
+  const updatePurchaseStatus = useCallback(
+    (purchaseId, nextStatus, adminNotes) =>
+      fetchApi({
+        endpoint: `/admin/e-booklet-purchases/${purchaseId}/status`,
+        method: "patch",
+        data: { status: nextStatus, admin_notes: adminNotes },
+        defaultSuccessMessage: "E-booklet purchase updated",
+      }),
+    [fetchApi],
+  );
+
+  const markPaid = useCallback(
+    (purchaseId) =>
+      fetchApi({
+        endpoint: `/admin/e-booklet-purchases/${purchaseId}/mark-paid`,
+        method: "post",
+        defaultSuccessMessage: "E-booklet purchase marked paid",
+      }),
+    [fetchApi],
+  );
+
+  const deliverPurchase = useCallback(
+    (purchaseId, data) =>
+      fetchApi({
+        endpoint: `/admin/e-booklet-purchases/${purchaseId}/deliver`,
+        method: "post",
+        data,
+        defaultSuccessMessage: "E-booklet delivered to teacher",
+      }),
+    [fetchApi],
+  );
+
+  const uploadTeacherDocument = useCallback(
+    (file, data = {}) => {
+      const formData = new FormData();
+      formData.append("document", file);
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          formData.append(key, value);
+        }
+      });
+
+      return fetchApi({
+        endpoint: "/admin/e-booklet-files/document",
+        method: "post",
+        data: formData,
+        defaultSuccessMessage: "Teacher document stored privately",
+      });
+    },
+    [fetchApi],
+  );
+
+  return {
+    purchases,
+    pagination,
+    status,
+    loading,
+    setPage,
+    setStatus: changeStatusFilter,
+    fetchPurchases,
+    updatePurchaseStatus,
+    markPaid,
+    deliverPurchase,
+    uploadTeacherDocument,
+  };
+}
