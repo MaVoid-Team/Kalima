@@ -20,8 +20,9 @@ export default function Footer() {
     {
       title: t("footer.platform"),
       links: [
-        { label: t("footer.market"), href: "/market" },
         { label: t("footer.samples"), href: "/samples" },
+        { label: t("footer.market"), href: "/market" },
+        { label: t("footer.eBooklets"), href: "/e-booklets" },
       ],
     },
   ];
