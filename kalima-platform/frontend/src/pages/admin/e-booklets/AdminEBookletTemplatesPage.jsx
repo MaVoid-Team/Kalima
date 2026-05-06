@@ -30,6 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAdminEBookletTemplates } from "@/hooks/admin/useAdminEBooklets";
+import { useTranslation } from "react-i18next";
 
 const statusStyles = {
   draft: "border-slate-200 bg-slate-50 text-slate-700",
@@ -37,9 +38,9 @@ const statusStyles = {
   archived: "border-zinc-200 bg-zinc-100 text-zinc-600",
 };
 
-const formatDate = (value) => {
-  if (!value) return "Not edited yet";
-  return new Intl.DateTimeFormat("en", {
+const formatDate = (value, language, fallback) => {
+  if (!value) return fallback;
+  return new Intl.DateTimeFormat(language?.startsWith("ar") ? "ar-EG" : "en", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -54,6 +55,7 @@ const getLatestVersion = (template) => {
 };
 
 export default function AdminEBookletTemplatesPage() {
+  const { t, i18n } = useTranslation("eBooklets");
   const {
     templates,
     pagination,
@@ -96,16 +98,16 @@ export default function AdminEBookletTemplatesPage() {
         <div>
           <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
             <BookOpenCheck className="h-8 w-8 text-primary" />
-            E-Booklet Templates
+            {t("admin.templates.title")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage reusable e-booklet templates, versions, purchases, and hotspot structure.
+            {t("admin.templates.description")}
           </p>
         </div>
         <Button asChild data-testid="admin-create-e-booklet-link">
           <Link to="/admin/e-booklets/create">
             <Plus className="me-2 h-4 w-4" />
-            Create E-Booklet
+            {t("admin.templates.create")}
           </Link>
         </Button>
       </div>
@@ -116,24 +118,24 @@ export default function AdminEBookletTemplatesPage() {
           <Input
             value={filters.search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search templates"
+            placeholder={t("admin.templates.searchPlaceholder")}
             className="ps-9"
             data-testid="admin-e-booklet-search"
           />
         </div>
         <Select value={filters.status} onValueChange={setStatus}>
           <SelectTrigger className="w-full" data-testid="admin-e-booklet-status-filter">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t("common.status")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="published">Published</SelectItem>
-            <SelectItem value="archived">Archived</SelectItem>
+            <SelectItem value="all">{t("common.allStatuses")}</SelectItem>
+            <SelectItem value="draft">{t("statuses.draft")}</SelectItem>
+            <SelectItem value="published">{t("statuses.published")}</SelectItem>
+            <SelectItem value="archived">{t("statuses.archived")}</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="outline" onClick={fetchTemplates} disabled={loading}>
-          Refresh
+          {t("common.refresh")}
         </Button>
       </div>
 
@@ -141,29 +143,29 @@ export default function AdminEBookletTemplatesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Template</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Version</TableHead>
-              <TableHead>Pages</TableHead>
-              <TableHead>Purchases</TableHead>
-              <TableHead>Last Edited</TableHead>
-              <TableHead className="text-end">Actions</TableHead>
+              <TableHead>{t("admin.templates.table.template")}</TableHead>
+              <TableHead>{t("common.status")}</TableHead>
+              <TableHead>{t("admin.templates.table.version")}</TableHead>
+              <TableHead>{t("common.pages")}</TableHead>
+              <TableHead>{t("admin.templates.table.purchases")}</TableHead>
+              <TableHead>{t("admin.templates.table.lastEdited")}</TableHead>
+              <TableHead className="text-end">{t("common.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading && (
-              <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                  Loading e-booklet templates...
-                </TableCell>
-              </TableRow>
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                    {t("admin.templates.loading")}
+                  </TableCell>
+                </TableRow>
             )}
             {!loading && templates.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                  No e-booklet templates match the current filters.
-                </TableCell>
-              </TableRow>
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                    {t("admin.templates.empty")}
+                  </TableCell>
+                </TableRow>
             )}
             {!loading &&
               templates.map((template) => {
@@ -174,7 +176,7 @@ export default function AdminEBookletTemplatesPage() {
                     <TableCell className="min-w-[260px]">
                       <div className="font-semibold text-foreground">{template.title}</div>
                       <div className="mt-1 line-clamp-2 max-w-[420px] whitespace-normal text-xs text-muted-foreground">
-                        {template.description || "No description yet"}
+                        {template.description || t("admin.templates.noDescription")}
                       </div>
                       <div className="mt-2 text-xs text-muted-foreground">
                         {Number(template.price || 0).toLocaleString()} {template.currency || "EGP"}
@@ -185,22 +187,34 @@ export default function AdminEBookletTemplatesPage() {
                         variant="outline"
                         className={statusStyles[status] || statusStyles.draft}
                       >
-                        {status}
+                        {t(`statuses.${status}`, { defaultValue: status })}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       {latestVersion ? (
                         <div className="text-sm">
                           v{latestVersion.version_number}
-                          <div className="text-xs text-muted-foreground">{latestVersion.status}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {t(`statuses.${latestVersion.status}`, {
+                              defaultValue: latestVersion.status,
+                            })}
+                          </div>
                         </div>
                       ) : (
-                        <span className="text-sm text-muted-foreground">No version</span>
+                        <span className="text-sm text-muted-foreground">
+                          {t("admin.templates.noVersion")}
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>{latestVersion?.page_count || 0}</TableCell>
                     <TableCell>{template._count?.purchases || 0}</TableCell>
-                    <TableCell>{formatDate(template.updated_at || template.created_at)}</TableCell>
+                    <TableCell>
+                      {formatDate(
+                        template.updated_at || template.created_at,
+                        i18n.language,
+                        t("common.notEditedYet"),
+                      )}
+                    </TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-2">
                         {latestVersion?.id && status !== "published" && (
@@ -247,7 +261,7 @@ export default function AdminEBookletTemplatesPage() {
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          {pagination.total} templates total
+          {t("admin.templates.totalTemplates", { count: pagination.total })}
         </p>
         <div className="flex items-center justify-end gap-2">
           <Button
@@ -257,10 +271,10 @@ export default function AdminEBookletTemplatesPage() {
             disabled={pagination.page <= 1}
           >
             <ChevronLeft className="h-4 w-4" />
-            Previous
+            {t("common.previous")}
           </Button>
           <span className="text-sm text-muted-foreground">
-            Page {pagination.page} of {pageCount}
+            {t("common.pageOf", { page: pagination.page, total: pageCount })}
           </span>
           <Button
             variant="outline"
@@ -268,7 +282,7 @@ export default function AdminEBookletTemplatesPage() {
             onClick={() => setPage(Math.min(pageCount, pagination.page + 1))}
             disabled={pagination.page >= pageCount}
           >
-            Next
+            {t("common.next")}
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

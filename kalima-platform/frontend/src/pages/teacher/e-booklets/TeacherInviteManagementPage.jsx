@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useTeacherEBooklets } from "@/hooks/useEBookletAccess";
+import { useTranslation } from "react-i18next";
 
 export default function TeacherInviteManagementPage() {
+  const { t } = useTranslation("eBooklets");
   const { instanceId } = useParams();
   const {
     items,
@@ -57,7 +59,7 @@ export default function TeacherInviteManagementPage() {
 
   const copyLink = async (link) => {
     await navigator.clipboard.writeText(link);
-    toast.success("Invite link copied");
+    toast.success(t("toasts.inviteCopied"));
   };
 
   const handleDisableInvite = async (inviteId) => {
@@ -74,28 +76,34 @@ export default function TeacherInviteManagementPage() {
     <div className="space-y-6" data-testid="teacher-invite-management-page">
       <div>
         <Button asChild variant="ghost" size="sm" className="-ms-2 mb-2">
-          <Link to="/teacher/e-booklets">Back to My E-Booklets</Link>
+          <Link to="/teacher/e-booklets">{t("common.backToMyEBooklets")}</Link>
         </Button>
         <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
           <Users className="h-8 w-8 text-primary" />
-          Invite Management
+          {t("teacher.invites.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Multi-use invite links stop working when quota is exhausted or disabled.
+          {t("teacher.invites.description")}
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-lg border bg-background p-4">
-          <div className="text-xs uppercase text-muted-foreground">Total quota</div>
+          <div className="text-xs uppercase text-muted-foreground">
+            {t("teacher.invites.totalQuota")}
+          </div>
           <div className="mt-2 text-2xl font-semibold">{instance?.invite_quota || 0}</div>
         </div>
         <div className="rounded-lg border bg-background p-4">
-          <div className="text-xs uppercase text-muted-foreground">Active students</div>
+          <div className="text-xs uppercase text-muted-foreground">
+            {t("teacher.invites.activeStudents")}
+          </div>
           <div className="mt-2 text-2xl font-semibold">{activeStudents.length}</div>
         </div>
         <div className="rounded-lg border bg-background p-4">
-          <div className="text-xs uppercase text-muted-foreground">Remaining</div>
+          <div className="text-xs uppercase text-muted-foreground">
+            {t("teacher.invites.remaining")}
+          </div>
           <div className="mt-2 text-2xl font-semibold">{remaining}</div>
         </div>
       </div>
@@ -103,13 +111,13 @@ export default function TeacherInviteManagementPage() {
       <div className="grid gap-5 xl:grid-cols-[420px_minmax(0,1fr)]">
         <section className="space-y-4 rounded-lg border bg-background p-4">
           <div>
-            <h2 className="font-semibold">Create Invite Link</h2>
+            <h2 className="font-semibold">{t("teacher.invites.createTitle")}</h2>
             <p className="text-sm text-muted-foreground">
-              Leave per-link uses empty to use only the booklet quota.
+              {t("teacher.invites.createDescription")}
             </p>
           </div>
           <div className="space-y-2">
-            <Label>Max uses, optional</Label>
+            <Label>{t("teacher.invites.maxUses")}</Label>
             <Input
               type="number"
               min="1"
@@ -117,11 +125,11 @@ export default function TeacherInviteManagementPage() {
               onChange={(event) =>
                 setForm((current) => ({ ...current, max_uses: event.target.value }))
               }
-              placeholder="Example: 50"
+              placeholder={t("teacher.invites.maxUsesPlaceholder")}
             />
           </div>
           <div className="space-y-2">
-            <Label>Expiry date, optional</Label>
+            <Label>{t("teacher.invites.expiry")}</Label>
             <Input
               type="datetime-local"
               value={form.expires_at}
@@ -132,11 +140,13 @@ export default function TeacherInviteManagementPage() {
           </div>
           <Button onClick={handleCreateInvite} disabled={loading || remaining <= 0} className="w-full">
             <Link2 className="h-4 w-4" />
-            Generate Invite Link
+            {t("teacher.invites.generate")}
           </Button>
           {lastInviteLink && (
             <div className="rounded-md border p-3">
-              <div className="mb-2 text-xs text-muted-foreground">Latest invite link</div>
+              <div className="mb-2 text-xs text-muted-foreground">
+                {t("teacher.invites.latest")}
+              </div>
               <div className="break-all text-sm">{lastInviteLink}</div>
               <Button
                 variant="outline"
@@ -145,7 +155,7 @@ export default function TeacherInviteManagementPage() {
                 onClick={() => copyLink(lastInviteLink)}
               >
                 <Copy className="h-4 w-4" />
-                Copy
+                {t("common.copy")}
               </Button>
             </div>
           )}
@@ -153,12 +163,14 @@ export default function TeacherInviteManagementPage() {
 
         <section className="grid gap-5 lg:grid-cols-2">
           <div className="rounded-lg border bg-background p-4">
-            <h2 className="font-semibold">Invite Links</h2>
+            <h2 className="font-semibold">{t("teacher.invites.linksTitle")}</h2>
             <div className="mt-4 space-y-3">
               {invites.map((invite) => (
                 <div key={invite.id} className="rounded-md border p-3">
                   <div className="flex items-center justify-between gap-2">
-                    <Badge variant="outline">{invite.status}</Badge>
+                    <Badge variant="outline">
+                      {t(`statuses.${invite.status}`, { defaultValue: invite.status })}
+                    </Badge>
                     <Button
                       variant="outline"
                       size="sm"
@@ -169,33 +181,41 @@ export default function TeacherInviteManagementPage() {
                     </Button>
                   </div>
                   <div className="mt-2 text-sm text-muted-foreground">
-                    Uses: {invite.used_count || 0}
-                    {invite.max_uses ? ` / ${invite.max_uses}` : ""}
+                    {invite.max_uses
+                      ? t("teacher.invites.usesWithMax", {
+                          used: invite.used_count || 0,
+                          max: invite.max_uses,
+                        })
+                      : t("teacher.invites.uses", {
+                          used: invite.used_count || 0,
+                        })}
                   </div>
                 </div>
               ))}
               {invites.length === 0 && (
                 <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">
-                  No invite links created yet.
+                  {t("teacher.invites.emptyLinks")}
                 </div>
               )}
             </div>
           </div>
 
           <div className="rounded-lg border bg-background p-4">
-            <h2 className="font-semibold">Students</h2>
+            <h2 className="font-semibold">{t("teacher.invites.studentsTitle")}</h2>
             <div className="mt-4 space-y-3">
               {students.map((studentAccess) => (
                 <div key={studentAccess.id} className="flex items-center justify-between gap-3 rounded-md border p-3">
                   <div className="min-w-0">
                     <div className="truncate font-medium">
-                      {studentAccess.user?.name || "Student"}
+                      {studentAccess.user?.name || t("common.student")}
                     </div>
                     <div className="truncate text-xs text-muted-foreground">
                       {studentAccess.user?.email}
                     </div>
                     <Badge variant="outline" className="mt-2">
-                      {studentAccess.status}
+                      {t(`statuses.${studentAccess.status}`, {
+                        defaultValue: studentAccess.status,
+                      })}
                     </Badge>
                   </div>
                   <Button
@@ -210,7 +230,7 @@ export default function TeacherInviteManagementPage() {
               ))}
               {students.length === 0 && (
                 <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">
-                  No students accepted this invite yet.
+                  {t("teacher.invites.emptyStudents")}
                 </div>
               )}
             </div>

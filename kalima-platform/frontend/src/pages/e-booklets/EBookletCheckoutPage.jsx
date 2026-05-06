@@ -14,9 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useEBookletCart, useEBookletCheckout } from "@/hooks/useEBooklets";
+import { useTranslation } from "react-i18next";
 
-const formatMoney = (amount, currency = "EGP") => {
-  return new Intl.NumberFormat("en-EG", {
+const formatMoney = (amount, currency = "EGP", language = "en") => {
+  return new Intl.NumberFormat(language?.startsWith("ar") ? "ar-EG" : "en-EG", {
     style: "currency",
     currency,
     maximumFractionDigits: 0,
@@ -45,27 +46,27 @@ function Field({ label, helper, error, children }) {
   );
 }
 
-function EmptyCheckout() {
+function EmptyCheckout({ t }) {
   return (
     <main className="mx-auto flex min-h-[70dvh] max-w-3xl flex-col items-center justify-center px-4 pt-24 text-center">
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
         <BookOpenCheck className="h-7 w-7" />
       </div>
       <h1 className="mt-5 text-3xl font-bold tracking-tight">
-        Choose an e-booklet before checkout
+        {t("checkout.emptyTitle")}
       </h1>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
-        E-booklet checkout is separate from the Market cart and requires one
-        selected template.
+        {t("checkout.emptyDescription")}
       </p>
       <Button asChild className="mt-7">
-        <Link to="/e-booklets">Browse E-Booklets</Link>
+        <Link to="/e-booklets">{t("common.browse")}</Link>
       </Button>
     </main>
   );
 }
 
 export default function EBookletCheckoutPage() {
+  const { t, i18n } = useTranslation("eBooklets");
   const { item, total, currency, clear } = useEBookletCart();
   const { submitCheckout, loading } = useEBookletCheckout();
   const [submittedPurchase, setSubmittedPurchase] = useState(null);
@@ -84,12 +85,12 @@ export default function EBookletCheckoutPage() {
   const summary = useMemo(() => {
     if (!item) return [];
     return [
-      { label: "Template", value: item.title, Icon: FileText },
-      { label: "Quantity", value: "1", Icon: ShoppingBag },
-      { label: "Access", value: "Invite quota set by admin", Icon: ShieldCheck },
-      { label: "Delivery", value: "Manual admin customization", Icon: LockKeyhole },
+      { label: t("checkout.summary.template"), value: item.title, Icon: FileText },
+      { label: t("common.quantity"), value: "1", Icon: ShoppingBag },
+      { label: t("common.access"), value: t("checkout.summary.accessValue"), Icon: ShieldCheck },
+      { label: t("common.delivery"), value: t("checkout.summary.deliveryValue"), Icon: LockKeyhole },
     ];
-  }, [item]);
+  }, [item, t]);
 
   const updateField = (field) => (event) => {
     setForm((current) => ({ ...current, [field]: event.target.value }));
@@ -101,12 +102,12 @@ export default function EBookletCheckoutPage() {
     const nextErrors = {};
     requiredFields.forEach((field) => {
       if (!form[field].trim()) {
-        nextErrors[field] = "This field is required.";
+        nextErrors[field] = t("checkout.fieldRequired");
       }
     });
 
     if (!item?.template_version_id) {
-      setFormError("This e-booklet does not have an active published version.");
+      setFormError(t("checkout.activeVersionMissing"));
       return false;
     }
 
@@ -143,12 +144,12 @@ export default function EBookletCheckoutPage() {
     } catch (error) {
       setFormError(
         error?.response?.data?.message ||
-        "Checkout could not be submitted. Please review the form and try again.",
+        t("checkout.submitError"),
       );
     }
   };
 
-  if (!item && !submittedPurchase) return <EmptyCheckout />;
+  if (!item && !submittedPurchase) return <EmptyCheckout t={t} />;
 
   if (submittedPurchase) {
     return (
@@ -158,22 +159,20 @@ export default function EBookletCheckoutPage() {
             <CheckCircle2 className="h-8 w-8" />
           </div>
           <Badge className="mt-6 rounded-md bg-emerald-800 text-white hover:bg-emerald-800">
-            Request created
+            {t("checkout.successBadge")}
           </Badge>
           <h1 className="mt-5 text-4xl font-black tracking-tight text-slate-950">
-            Your e-booklet request is pending admin delivery
+            {t("checkout.successTitle")}
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-6 text-muted-foreground">
-            Kalima admin will confirm payment, collect or prepare the
-            teacher-specific PDF, validate page count, set invite quota, and
-            deliver the ready booklet to your account.
+            {t("checkout.successDescription")}
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild>
-              <Link to="/e-booklets">Back to E-Booklets</Link>
+              <Link to="/e-booklets">{t("common.backToEBooklets")}</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/teacher/profile">Open teacher portal</Link>
+              <Link to="/teacher/profile">{t("checkout.openTeacherPortal")}</Link>
             </Button>
           </div>
         </section>
@@ -186,39 +185,38 @@ export default function EBookletCheckoutPage() {
       <section className="mx-auto grid max-w-[1200px] gap-8 px-4 pb-20 pt-10 md:grid-cols-[1fr_380px] md:px-6">
         <div>
           <Badge className="rounded-md bg-emerald-800 text-white hover:bg-emerald-800">
-            E-booklet checkout
+            {t("checkout.badge")}
           </Badge>
           <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-950">
-            Branding and delivery details
+            {t("checkout.title")}
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-            This creates an admin-handled request. The booklet becomes usable
-            only after admin payment confirmation and delivery.
+            {t("checkout.description")}
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 grid gap-5">
             <div className="grid gap-5 md:grid-cols-2">
               <Field
-                label="Teacher display name"
-                helper="Shown in viewer watermarking and invite context."
+                label={t("checkout.fields.teacherName")}
+                helper={t("checkout.fields.teacherNameHelper")}
                 error={fieldErrors.teacherName}
               >
                 <Input
                   value={form.teacherName}
                   onChange={updateField("teacherName")}
-                  placeholder="Mona Abdelrahman"
+                  placeholder={t("checkout.fields.teacherNamePlaceholder")}
                   className="h-11"
                 />
               </Field>
 
               <Field
-                label="School or center name"
-                helper="Optional context for admin delivery."
+                label={t("checkout.fields.schoolName")}
+                helper={t("checkout.fields.schoolNameHelper")}
               >
                 <Input
                   value={form.schoolName}
                   onChange={updateField("schoolName")}
-                  placeholder="Al Noor Learning Center"
+                  placeholder={t("checkout.fields.schoolNamePlaceholder")}
                   className="h-11"
                 />
               </Field>
@@ -226,27 +224,27 @@ export default function EBookletCheckoutPage() {
 
             <div className="grid gap-5 md:grid-cols-2">
               <Field
-                label="Branding name on booklet"
-                helper="The name that should appear on the customized PDF."
+                label={t("checkout.fields.brandingName")}
+                helper={t("checkout.fields.brandingNameHelper")}
                 error={fieldErrors.brandingName}
               >
                 <Input
                   value={form.brandingName}
                   onChange={updateField("brandingName")}
-                  placeholder="Ms. Mona Arabic"
+                  placeholder={t("checkout.fields.brandingNamePlaceholder")}
                   className="h-11"
                 />
               </Field>
 
               <Field
-                label="Teacher-specific booklet title"
-                helper="Used by admin when delivering the final instance."
+                label={t("checkout.fields.bookletTitle")}
+                helper={t("checkout.fields.bookletTitleHelper")}
                 error={fieldErrors.bookletTitle}
               >
                 <Input
                   value={form.bookletTitle}
                   onChange={updateField("bookletTitle")}
-                  placeholder="Grade 5 Arabic Reading Practice"
+                  placeholder={t("checkout.fields.bookletTitlePlaceholder")}
                   className="h-11"
                 />
               </Field>
@@ -254,39 +252,39 @@ export default function EBookletCheckoutPage() {
 
             <div className="grid gap-5 md:grid-cols-2">
               <Field
-                label="WhatsApp or contact number"
-                helper="Used for manual payment and delivery coordination."
+                label={t("checkout.fields.contactWhatsapp")}
+                helper={t("checkout.fields.contactWhatsappHelper")}
                 error={fieldErrors.contactWhatsapp}
               >
                 <Input
                   value={form.contactWhatsapp}
                   onChange={updateField("contactWhatsapp")}
-                  placeholder="+20 100 482 6194"
+                  placeholder={t("checkout.fields.contactWhatsappPlaceholder")}
                   className="h-11"
                 />
               </Field>
 
               <Field
-                label="Logo instructions"
-                helper="Paste a logo link or describe what admin should use."
+                label={t("checkout.fields.logoInstructions")}
+                helper={t("checkout.fields.logoInstructionsHelper")}
               >
                 <Input
                   value={form.logoInstructions}
                   onChange={updateField("logoInstructions")}
-                  placeholder="Use my center logo from WhatsApp"
+                  placeholder={t("checkout.fields.logoInstructionsPlaceholder")}
                   className="h-11"
                 />
               </Field>
             </div>
 
             <Field
-              label="Notes for admin"
-              helper="Include payment reference, preferred watermark name, or delivery details."
+              label={t("checkout.fields.notes")}
+              helper={t("checkout.fields.notesHelper")}
             >
               <Textarea
                 value={form.notes}
                 onChange={updateField("notes")}
-                placeholder="Payment will be sent manually. Please use the teacher name in the footer watermark."
+                placeholder={t("checkout.fields.notesPlaceholder")}
                 className="min-h-32 resize-y"
               />
             </Field>
@@ -299,7 +297,7 @@ export default function EBookletCheckoutPage() {
 
             <div className="flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
               <Button asChild variant="outline">
-                <Link to="/e-booklet-cart">Back to cart</Link>
+                <Link to="/e-booklet-cart">{t("checkout.backToCart")}</Link>
               </Button>
               <Button
                 type="submit"
@@ -308,22 +306,24 @@ export default function EBookletCheckoutPage() {
                 className="active:scale-[0.98]"
               >
                 <MessageCircle className="h-4 w-4" />
-                {loading ? "Submitting..." : "Submit request"}
+                {loading ? t("checkout.submitting") : t("checkout.submit")}
               </Button>
             </div>
           </form>
         </div>
 
         <aside className="h-fit rounded-lg border border-border bg-card p-5 shadow-[0_20px_70px_-45px_rgba(15,23,42,0.45)]">
-          <h2 className="text-xl font-bold tracking-tight">Selected template</h2>
+          <h2 className="text-xl font-bold tracking-tight">{t("checkout.selectedTemplate")}</h2>
           <div className="mt-4 rounded-md border border-border/70 bg-muted/30 p-4">
             <div className="text-sm font-semibold text-muted-foreground">
-              E-booklet template
+              {t("common.eBooklet")} {t("common.template")}
             </div>
             <div className="mt-1 text-lg font-bold leading-tight">{item.title}</div>
             <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-              <span className="text-sm text-muted-foreground">Total</span>
-              <span className="text-xl font-black">{formatMoney(total, currency)}</span>
+              <span className="text-sm text-muted-foreground">{t("common.total")}</span>
+              <span className="text-xl font-black">
+                {formatMoney(total, currency, i18n.language)}
+              </span>
             </div>
           </div>
 
@@ -342,8 +342,7 @@ export default function EBookletCheckoutPage() {
           </div>
 
           <div className="mt-5 rounded-md border border-amber-500/30 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-            The teacher-specific PDF is uploaded by admin after checkout. It
-            must match the template page count before delivery.
+            {t("checkout.teacherPdfNotice")}
           </div>
         </aside>
       </section>

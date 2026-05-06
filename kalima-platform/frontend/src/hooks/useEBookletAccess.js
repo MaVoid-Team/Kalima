@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import i18n from "@/i18n";
 import useApiMutation from "./useApiMutation";
 
 export function useTeacherEBooklets() {
@@ -37,7 +38,7 @@ export function useTeacherEBooklets() {
         endpoint: `/teacher/e-booklets/${instanceId}/invites`,
         method: "post",
         data,
-        defaultSuccessMessage: "Invite link created",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.inviteCreated"),
       }),
     [fetchApi],
   );
@@ -47,7 +48,7 @@ export function useTeacherEBooklets() {
       fetchApi({
         endpoint: `/teacher/e-booklet-invites/${inviteId}/disable`,
         method: "patch",
-        defaultSuccessMessage: "Invite link disabled",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.inviteDisabled"),
       }),
     [fetchApi],
   );
@@ -72,7 +73,7 @@ export function useTeacherEBooklets() {
       fetchApi({
         endpoint: `/teacher/e-booklets/${instanceId}/students/${studentId}/revoke`,
         method: "patch",
-        defaultSuccessMessage: "Student access revoked",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.studentRevoked"),
       }),
     [fetchApi],
   );
@@ -178,7 +179,7 @@ export function useStudentEBooklets() {
       fetchApi({
         endpoint: `/e-booklet-invites/${token}/accept`,
         method: "post",
-        defaultSuccessMessage: "E-booklet access granted",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.accessGranted"),
       }),
     [fetchApi],
   );

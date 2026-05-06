@@ -76,6 +76,11 @@ router.post(
   eBookletController.uploadFileAsset,
 );
 router.get(
+  "/admin/e-booklet-files/:assetId/preview",
+  ...adminAuth,
+  eBookletController.previewAdminFileAsset,
+);
+router.get(
   "/admin/e-booklet-templates",
   ...adminAuth,
   eBookletController.listAdminTemplates,

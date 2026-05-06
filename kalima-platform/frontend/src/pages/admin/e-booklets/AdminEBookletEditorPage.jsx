@@ -30,12 +30,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAdminEBookletEditor } from "@/hooks/admin/useAdminEBooklets";
+import { useTranslation } from "react-i18next";
 
 const steps = [
-  { id: "basic", label: "Basic Info" },
-  { id: "file", label: "Original File" },
-  { id: "hotspots", label: "Hotspots" },
-  { id: "review", label: "Review" },
+  { id: "basic", labelKey: "admin.editor.steps.basic" },
+  { id: "file", labelKey: "admin.editor.steps.file" },
+  { id: "hotspots", labelKey: "admin.editor.steps.hotspots" },
+  { id: "review", labelKey: "admin.editor.steps.review" },
 ];
 
 const hotspotIcons = {
@@ -56,12 +57,11 @@ const defaultTemplateForm = {
 
 const defaultVersionForm = {
   id: null,
-  page_count: "1",
-  page_width: "612",
-  page_height: "792",
-  page_dimensions_json: "",
+  page_count: "",
+  page_dimensions: [],
   base_document_file_id: "",
   rendered_document_file_id: "",
+  document_filename: "",
 };
 
 const defaultHotspotForm = {
@@ -82,23 +82,15 @@ const parseNumber = (value, fallback = 0) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
-const normalizeAssetId = (response) => response?.data?.id || response?.id || "";
+const normalizeAsset = (response) => response?.data || response || null;
+const normalizeAssetId = (response) => normalizeAsset(response)?.id || "";
+const normalizeMetadata = (response) => normalizeAsset(response)?.metadata || null;
 
 const buildPageDimensions = (form) => {
-  if (form.page_dimensions_json.trim()) {
-    try {
-      const parsed = JSON.parse(form.page_dimensions_json);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    } catch {
-      toast.error("Page dimensions JSON is invalid.");
-      return null;
-    }
+  if (Array.isArray(form.page_dimensions) && form.page_dimensions.length > 0) {
+    return form.page_dimensions;
   }
-
-  const pageCount = Math.max(1, parseNumber(form.page_count, 1));
-  const width = Math.max(1, parseNumber(form.page_width, 612));
-  const height = Math.max(1, parseNumber(form.page_height, 792));
-  return Array.from({ length: pageCount }, () => ({ width, height }));
+  return null;
 };
 
 const getVersionDimensions = (version, fallbackForm) => {
@@ -109,6 +101,7 @@ const getVersionDimensions = (version, fallbackForm) => {
 };
 
 export default function AdminEBookletEditorPage() {
+  const { t } = useTranslation("eBooklets");
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
@@ -127,6 +120,7 @@ export default function AdminEBookletEditorPage() {
   const [hotspots, setHotspots] = useState([]);
   const [hotspotForm, setHotspotForm] = useState(defaultHotspotForm);
   const [recording, setRecording] = useState(false);
+  const [documentPreviewUrl, setDocumentPreviewUrl] = useState("");
 
   const activeStepIndex = steps.findIndex((step) => step.id === activeStep);
   const pageCount = Math.max(
@@ -175,17 +169,16 @@ export default function AdminEBookletEditorPage() {
       setVersionForm({
         id: latest.id,
         page_count: String(latest.page_count || 1),
-        page_width: String(latest.page_dimensions_json?.[0]?.width || 612),
-        page_height: String(latest.page_dimensions_json?.[0]?.height || 792),
-        page_dimensions_json: latest.page_dimensions_json
-          ? JSON.stringify(latest.page_dimensions_json, null, 2)
-          : "",
+        page_dimensions: Array.isArray(latest.page_dimensions_json)
+          ? latest.page_dimensions_json
+          : [],
         base_document_file_id: latest.base_document_file_id
           ? String(latest.base_document_file_id)
           : "",
         rendered_document_file_id: latest.rendered_document_file_id
           ? String(latest.rendered_document_file_id)
           : "",
+        document_filename: latest.base_document_file?.original_filename || "",
       });
     }
   }, [editor.fetchTemplate, editor.fetchVersions, id]);
@@ -209,12 +202,37 @@ export default function AdminEBookletEditorPage() {
     }
   }, [loadHotspots, selectedPage, selectedVersion?.id]);
 
+  useEffect(() => {
+    let cancelled = false;
+    let objectUrl = "";
+    const assetId = versionForm.base_document_file_id;
+
+    if (!assetId) {
+      setDocumentPreviewUrl("");
+      return undefined;
+    }
+
+    setDocumentPreviewUrl("");
+    editor
+      .fetchAssetBlobUrl(assetId)
+      .then((url) => {
+        if (cancelled) {
+          URL.revokeObjectURL(url);
+          return;
+        }
+        objectUrl = url;
+        setDocumentPreviewUrl(url);
+      })
+      .catch(() => setDocumentPreviewUrl(""));
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [editor.fetchAssetBlobUrl, versionForm.base_document_file_id]);
+
   const updateTemplateField = (field, value) => {
     setTemplateForm((current) => ({ ...current, [field]: value }));
-  };
-
-  const updateVersionField = (field, value) => {
-    setVersionForm((current) => ({ ...current, [field]: value }));
   };
 
   const updateHotspotField = (field, value) => {
@@ -223,7 +241,7 @@ export default function AdminEBookletEditorPage() {
 
   const saveBasicInfo = async () => {
     if (!templateForm.title.trim()) {
-      toast.error("Template title is required.");
+      toast.error(t("admin.editor.validation.titleRequired"));
       return null;
     }
 
@@ -256,7 +274,10 @@ export default function AdminEBookletEditorPage() {
     if (!savedTemplate?.id) return null;
 
     const dimensions = buildPageDimensions(versionForm);
-    if (!dimensions) return null;
+    if (!versionForm.base_document_file_id || !dimensions?.length) {
+      toast.error(t("admin.editor.file.saveRequired"));
+      return null;
+    }
 
     const payload = {
       base_document_file_id: versionForm.base_document_file_id
@@ -265,7 +286,7 @@ export default function AdminEBookletEditorPage() {
       rendered_document_file_id: versionForm.rendered_document_file_id
         ? Number(versionForm.rendered_document_file_id)
         : undefined,
-      page_count: Math.max(1, parseNumber(versionForm.page_count, dimensions.length)),
+      page_count: dimensions.length,
       page_dimensions_json: dimensions,
     };
 
@@ -275,7 +296,14 @@ export default function AdminEBookletEditorPage() {
     const version = response?.data;
     if (version?.id) {
       setSelectedVersion(version);
-      setVersionForm((current) => ({ ...current, id: version.id }));
+      setVersionForm((current) => ({
+        ...current,
+        id: version.id,
+        page_count: String(version.page_count || current.page_count),
+        page_dimensions: Array.isArray(version.page_dimensions_json)
+          ? version.page_dimensions_json
+          : current.page_dimensions,
+      }));
       const versionResponse = await editor.fetchVersions(savedTemplate.id);
       setVersions(Array.isArray(versionResponse?.data) ? versionResponse.data : [version]);
     }
@@ -296,7 +324,7 @@ export default function AdminEBookletEditorPage() {
         ),
       );
     }
-    setActiveStep("review");
+    navigate("/admin/e-booklets");
   };
 
   const goNext = async () => {
@@ -326,7 +354,10 @@ export default function AdminEBookletEditorPage() {
       file_type: "image",
     });
     const assetId = normalizeAssetId(response);
-    if (assetId) updateTemplateField("cover_file_id", String(assetId));
+    if (assetId) {
+      updateTemplateField("cover_file_id", String(assetId));
+      toast.success(t("toasts.coverUploaded"));
+    }
   };
 
   const handleDocumentUpload = async (event) => {
@@ -337,7 +368,23 @@ export default function AdminEBookletEditorPage() {
       owner_id: templateId || "",
     });
     const assetId = normalizeAssetId(response);
-    if (assetId) updateVersionField("base_document_file_id", String(assetId));
+    const metadata = normalizeMetadata(response);
+    if (assetId) {
+      if (!metadata?.page_count || !metadata?.page_dimensions?.length) {
+        toast.error(t("admin.editor.file.uploadRequired"));
+        return;
+      }
+      setSelectedVersion(null);
+      setSelectedPage(1);
+      setVersionForm((current) => ({
+        ...current,
+        base_document_file_id: String(assetId),
+        page_count: String(metadata.page_count),
+        page_dimensions: metadata.page_dimensions,
+        document_filename: file.name,
+      }));
+      toast.success(t("toasts.pdfDetected", { count: metadata.page_count }));
+    }
   };
 
   const handleHotspotMediaUpload = async (file) => {
@@ -417,7 +464,7 @@ export default function AdminEBookletEditorPage() {
 
   const startAudioRecording = async () => {
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
-      toast.error("Audio recording is not available in this browser.");
+      toast.error(t("admin.editor.hotspots.recordingUnavailable"));
       return;
     }
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -457,12 +504,13 @@ export default function AdminEBookletEditorPage() {
       <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold">
         {index + 1}
       </span>
-      <span className="truncate">{step.label}</span>
+      <span className="truncate">{t(step.labelKey)}</span>
     </button>
   );
 
   const pageOptions = Array.from({ length: pageCount }, (_, index) => index + 1);
   const CurrentIcon = hotspotIcons[hotspotForm.type] || CircleDot;
+  const statusLabel = (value) => t(`statuses.${value}`, { defaultValue: value });
 
   return (
     <div className="space-y-6" data-testid="admin-e-booklet-editor-page">
@@ -471,26 +519,31 @@ export default function AdminEBookletEditorPage() {
           <Button asChild variant="ghost" size="sm" className="-ms-2 mb-2">
             <Link to="/admin/e-booklets">
               <ArrowLeft className="h-4 w-4" />
-              Back to E-Booklets
+              {t("common.backToEBooklets")}
             </Link>
           </Button>
           <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
             <BookOpenCheck className="h-8 w-8 text-primary" />
-            {isEditing ? "Edit E-Booklet Template" : "Create E-Booklet Template"}
+            {isEditing ? t("admin.editor.titleEdit") : t("admin.editor.titleCreate")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Hotspots are versioned on the template; teacher PDFs stay separate at delivery.
+            {t("admin.editor.subtitle")}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {selectedVersion?.status && (
-            <Badge variant="outline">Version {selectedVersion.version_number}: {selectedVersion.status}</Badge>
+            <Badge variant="outline">
+              {t("admin.editor.versionBadge", {
+                version: selectedVersion.version_number,
+                status: statusLabel(selectedVersion.status),
+              })}
+            </Badge>
           )}
           <Button
             variant="outline"
             onClick={() => navigate("/admin/e-booklets")}
           >
-            Close
+            {t("common.close")}
           </Button>
         </div>
       </div>
@@ -504,23 +557,23 @@ export default function AdminEBookletEditorPage() {
       {activeStep === "basic" && (
         <section className="space-y-5 rounded-lg border bg-background p-5">
           <div>
-            <h2 className="text-lg font-semibold">Store Listing</h2>
+            <h2 className="text-lg font-semibold">{t("admin.editor.basic.title")}</h2>
             <p className="text-sm text-muted-foreground">
-              This creates the reusable product template shown in the e-booklet store.
+              {t("admin.editor.basic.description")}
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="ebooklet-title">Template title</Label>
+              <Label htmlFor="ebooklet-title">{t("admin.editor.basic.templateTitle")}</Label>
               <Input
                 id="ebooklet-title"
                 value={templateForm.title}
                 onChange={(event) => updateTemplateField("title", event.target.value)}
-                placeholder="Grade 5 Arabic Reading Booklet Template"
+                placeholder={t("admin.editor.basic.templateTitlePlaceholder")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ebooklet-price">Price</Label>
+              <Label htmlFor="ebooklet-price">{t("admin.editor.basic.price")}</Label>
               <div className="grid grid-cols-[1fr_110px] gap-2">
                 <Input
                   id="ebooklet-price"
@@ -537,17 +590,19 @@ export default function AdminEBookletEditorPage() {
               </div>
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="ebooklet-description">Description</Label>
+              <Label htmlFor="ebooklet-description">
+                {t("admin.editor.basic.descriptionLabel")}
+              </Label>
               <Textarea
                 id="ebooklet-description"
                 value={templateForm.description}
                 onChange={(event) => updateTemplateField("description", event.target.value)}
-                placeholder="Describe the booklet, target grade, and included interactive content."
+                placeholder={t("admin.editor.basic.descriptionPlaceholder")}
                 className="min-h-28"
               />
             </div>
             <div className="space-y-2">
-              <Label>Status</Label>
+              <Label>{t("admin.editor.basic.status")}</Label>
               <Select
                 value={templateForm.status}
                 onValueChange={(value) => updateTemplateField("status", value)}
@@ -556,29 +611,34 @@ export default function AdminEBookletEditorPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                  <SelectItem value="archived">Archived</SelectItem>
+                  <SelectItem value="draft">{t("statuses.draft")}</SelectItem>
+                  <SelectItem value="published">{t("statuses.published")}</SelectItem>
+                  <SelectItem value="archived">{t("statuses.archived")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ebooklet-cover">Cover image</Label>
-              <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
-                <Input
+              <Label htmlFor="ebooklet-cover">{t("admin.editor.basic.coverImage")}</Label>
+              <div className="flex flex-wrap items-center gap-2">
+                <div
                   id="ebooklet-cover"
-                  value={templateForm.cover_file_id}
-                  onChange={(event) => updateTemplateField("cover_file_id", event.target.value)}
-                  placeholder="Private file asset ID"
-                />
+                  className="min-h-9 flex-1 rounded-md border bg-muted/30 px-3 py-2 text-sm text-muted-foreground"
+                >
+                  {templateForm.cover_file_id
+                    ? t("admin.editor.basic.coverUploaded", {
+                        id: templateForm.cover_file_id,
+                      })
+                    : t("admin.editor.basic.coverEmpty")}
+                </div>
                 <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-3 text-sm font-medium hover:bg-accent">
                   <Upload className="h-4 w-4" />
-                  Upload
+                  {templateForm.cover_file_id ? t("common.replace") : t("common.upload")}
                   <input
                     type="file"
                     accept="image/*"
                     className="hidden"
                     onChange={handleCoverUpload}
+                    data-testid="ebooklet-cover-upload-input"
                   />
                 </label>
               </div>
@@ -590,9 +650,9 @@ export default function AdminEBookletEditorPage() {
       {activeStep === "file" && (
         <section className="space-y-5 rounded-lg border bg-background p-5">
           <div>
-            <h2 className="text-lg font-semibold">Original Sample File</h2>
+            <h2 className="text-lg font-semibold">{t("admin.editor.file.title")}</h2>
             <p className="text-sm text-muted-foreground">
-              Upload the admin sample PDF, DOC, or DOCX. The viewer uses PDF page previews and normalized coordinates.
+              {t("admin.editor.file.description")}
             </p>
           </div>
 
@@ -609,21 +669,20 @@ export default function AdminEBookletEditorPage() {
                     setVersionForm({
                       id: version.id,
                       page_count: String(version.page_count || 1),
-                      page_width: String(version.page_dimensions_json?.[0]?.width || 612),
-                      page_height: String(version.page_dimensions_json?.[0]?.height || 792),
-                      page_dimensions_json: version.page_dimensions_json
-                        ? JSON.stringify(version.page_dimensions_json, null, 2)
-                        : "",
+                      page_dimensions: Array.isArray(version.page_dimensions_json)
+                        ? version.page_dimensions_json
+                        : [],
                       base_document_file_id: version.base_document_file_id
                         ? String(version.base_document_file_id)
                         : "",
                       rendered_document_file_id: version.rendered_document_file_id
                         ? String(version.rendered_document_file_id)
                         : "",
+                      document_filename: version.base_document_file?.original_filename || "",
                     });
                   }}
                 >
-                  v{version.version_number} {version.status}
+                  v{version.version_number} {statusLabel(version.status)}
                 </Button>
               ))}
               <Button
@@ -637,72 +696,56 @@ export default function AdminEBookletEditorPage() {
                 }}
               >
                 <Plus className="h-4 w-4" />
-                New version
+                {t("admin.editor.file.newVersion")}
               </Button>
             </div>
           )}
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_280px]">
             <div className="space-y-2">
-              <Label htmlFor="ebooklet-document">Original document</Label>
-              <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
-                <Input
+              <Label htmlFor="ebooklet-document">{t("admin.editor.file.originalDocument")}</Label>
+              <div className="flex flex-wrap items-center gap-2">
+                <div
                   id="ebooklet-document"
-                  value={versionForm.base_document_file_id}
-                  onChange={(event) => updateVersionField("base_document_file_id", event.target.value)}
-                  placeholder="Private file asset ID"
-                />
+                  className="min-h-9 flex-1 rounded-md border bg-muted/30 px-3 py-2 text-sm text-muted-foreground"
+                >
+                  {versionForm.base_document_file_id
+                    ? versionForm.document_filename ||
+                      t("admin.editor.file.uploaded", {
+                        id: versionForm.base_document_file_id,
+                      })
+                    : t("admin.editor.file.empty")}
+                </div>
                 <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-3 text-sm font-medium hover:bg-accent">
                   <Upload className="h-4 w-4" />
-                  Upload
+                  {versionForm.base_document_file_id ? t("common.replace") : t("common.upload")}
                   <input
                     type="file"
-                    accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    accept=".pdf,application/pdf"
                     className="hidden"
                     onChange={handleDocumentUpload}
+                    data-testid="ebooklet-document-upload-input"
                   />
                 </label>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="ebooklet-pages">Page count</Label>
-              <Input
-                id="ebooklet-pages"
-                type="number"
-                min="1"
-                value={versionForm.page_count}
-                onChange={(event) => updateVersionField("page_count", event.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ebooklet-width">Page width</Label>
-              <Input
-                id="ebooklet-width"
-                type="number"
-                min="1"
-                value={versionForm.page_width}
-                onChange={(event) => updateVersionField("page_width", event.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ebooklet-height">Page height</Label>
-              <Input
-                id="ebooklet-height"
-                type="number"
-                min="1"
-                value={versionForm.page_height}
-                onChange={(event) => updateVersionField("page_height", event.target.value)}
-              />
-            </div>
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="ebooklet-dimensions">Per-page dimensions JSON, optional</Label>
-              <Textarea
-                id="ebooklet-dimensions"
-                value={versionForm.page_dimensions_json}
-                onChange={(event) => updateVersionField("page_dimensions_json", event.target.value)}
-                placeholder='[{"width":612,"height":792}]'
-                className="min-h-28 font-mono text-xs"
-              />
+            <div className="rounded-md border bg-muted/20 p-3 text-sm">
+              <div className="text-xs font-semibold uppercase text-muted-foreground">
+                {t("admin.editor.file.detectedPdf")}
+              </div>
+              <div className="mt-2 font-medium">
+                {versionForm.page_count
+                  ? t("common.pageCount", { count: Number(versionForm.page_count) })
+                  : t("admin.editor.file.noPdf")}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {versionForm.page_dimensions?.[0]
+                  ? t("admin.editor.file.dimensions", {
+                      width: versionForm.page_dimensions[0].width,
+                      height: versionForm.page_dimensions[0].height,
+                    })
+                  : t("admin.editor.file.dimensionsPending")}
+              </div>
             </div>
           </div>
         </section>
@@ -713,9 +756,9 @@ export default function AdminEBookletEditorPage() {
           <div className="space-y-4 rounded-lg border bg-background p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-lg font-semibold">Hotspot Editor</h2>
+                <h2 className="text-lg font-semibold">{t("admin.editor.hotspots.title")}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Click a page position, then save the hotspot content in the panel.
+                  {t("admin.editor.hotspots.description")}
                 </p>
               </div>
               <Select
@@ -728,7 +771,7 @@ export default function AdminEBookletEditorPage() {
                 <SelectContent>
                   {pageOptions.map((pageNumber) => (
                     <SelectItem key={pageNumber} value={String(pageNumber)}>
-                      Page {pageNumber}
+                      {t("common.page")} {pageNumber}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -743,14 +786,20 @@ export default function AdminEBookletEditorPage() {
                 style={{ aspectRatio: pageAspectRatio }}
                 data-testid="admin-e-booklet-hotspot-page"
               >
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.06)_1px,transparent_1px),linear-gradient(0deg,rgba(15,23,42,0.06)_1px,transparent_1px)] bg-[size:10%_10%]" />
-                <div className="absolute inset-x-8 top-8 h-6 rounded bg-slate-100" />
-                <div className="absolute inset-x-8 top-20 space-y-3">
-                  <div className="h-3 rounded bg-slate-100" />
-                  <div className="h-3 w-5/6 rounded bg-slate-100" />
-                  <div className="h-3 w-2/3 rounded bg-slate-100" />
-                </div>
-                <div className="absolute inset-x-8 bottom-10 h-24 rounded border border-dashed border-slate-200 bg-slate-50" />
+                {documentPreviewUrl ? (
+                  <iframe
+                    key={`${documentPreviewUrl}-${selectedPage}`}
+                    src={`${documentPreviewUrl}#page=${selectedPage}&toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                    title={`${t("common.eBooklet")} ${t("common.page")} ${selectedPage}`}
+                    className="pointer-events-none absolute inset-0 h-full w-full border-0 bg-white"
+                    data-testid="admin-e-booklet-pdf-preview"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-muted/40 p-6 text-center text-sm text-muted-foreground">
+                    {t("admin.editor.hotspots.renderPending")}
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-transparent" />
                 {pageHotspots.map((hotspot) => {
                   const Icon = hotspotIcons[hotspot.type] || CircleDot;
                   const size = Math.max(16, Number(hotspot.radius_percent || 1.8) * 10);
@@ -770,7 +819,12 @@ export default function AdminEBookletEditorPage() {
                         height: size,
                         transform: "translate(-50%, -50%)",
                       }}
-                      title={hotspot.title || hotspot.type}
+                      title={
+                        hotspot.title ||
+                        t(`admin.editor.hotspots.types.${hotspot.type}`, {
+                          defaultValue: hotspot.type,
+                        })
+                      }
                     >
                       <Icon className="h-3.5 w-3.5" />
                     </button>
@@ -778,7 +832,7 @@ export default function AdminEBookletEditorPage() {
                 })}
                 {!activeVersionId && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/85 text-center text-sm text-muted-foreground">
-                    Save the original file step before placing hotspots.
+                    {t("admin.editor.hotspots.saveBeforePlacing")}
                   </div>
                 )}
               </div>
@@ -788,9 +842,12 @@ export default function AdminEBookletEditorPage() {
           <aside className="space-y-4 rounded-lg border bg-background p-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold">Hotspot Content</h3>
+                <h3 className="font-semibold">{t("admin.editor.hotspots.contentTitle")}</h3>
                 <p className="text-xs text-muted-foreground">
-                  Page {selectedPage} has {pageHotspots.length} hotspots.
+                  {t("admin.editor.hotspots.pageSummary", {
+                    page: selectedPage,
+                    count: pageHotspots.length,
+                  })}
                 </p>
               </div>
               <CurrentIcon className="h-5 w-5 text-primary" />
@@ -798,7 +855,7 @@ export default function AdminEBookletEditorPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label>X %</Label>
+                <Label>{t("admin.editor.hotspots.xPercent")}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -808,7 +865,7 @@ export default function AdminEBookletEditorPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Y %</Label>
+                <Label>{t("admin.editor.hotspots.yPercent")}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -818,7 +875,7 @@ export default function AdminEBookletEditorPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Radius %</Label>
+                <Label>{t("admin.editor.hotspots.radiusPercent")}</Label>
                 <Input
                   type="number"
                   min="0.1"
@@ -829,7 +886,7 @@ export default function AdminEBookletEditorPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Trigger</Label>
+                <Label>{t("admin.editor.hotspots.trigger")}</Label>
                 <Select
                   value={hotspotForm.trigger_type}
                   onValueChange={(value) => updateHotspotField("trigger_type", value)}
@@ -838,16 +895,16 @@ export default function AdminEBookletEditorPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="click">Click</SelectItem>
-                    <SelectItem value="hover">Hover</SelectItem>
-                    <SelectItem value="both">Both</SelectItem>
+                    <SelectItem value="click">{t("admin.editor.hotspots.triggerClick")}</SelectItem>
+                    <SelectItem value="hover">{t("admin.editor.hotspots.triggerHover")}</SelectItem>
+                    <SelectItem value="both">{t("admin.editor.hotspots.triggerBoth")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>Type</Label>
+              <Label>{t("admin.editor.hotspots.type")}</Label>
               <Select
                 value={hotspotForm.type}
                 onValueChange={(value) => updateHotspotField("type", value)}
@@ -856,45 +913,47 @@ export default function AdminEBookletEditorPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="text">Text note</SelectItem>
-                  <SelectItem value="image">Image</SelectItem>
-                  <SelectItem value="video">Video</SelectItem>
-                  <SelectItem value="audio">Audio</SelectItem>
+                  <SelectItem value="text">{t("admin.editor.hotspots.types.text")}</SelectItem>
+                  <SelectItem value="image">{t("admin.editor.hotspots.types.image")}</SelectItem>
+                  <SelectItem value="video">{t("admin.editor.hotspots.types.video")}</SelectItem>
+                  <SelectItem value="audio">{t("admin.editor.hotspots.types.audio")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Title</Label>
+              <Label>{t("admin.editor.hotspots.titleLabel")}</Label>
               <Input
                 value={hotspotForm.title}
                 onChange={(event) => updateHotspotField("title", event.target.value)}
-                placeholder="Optional label"
+                placeholder={t("admin.editor.hotspots.titlePlaceholder")}
               />
             </div>
 
             {hotspotForm.type === "text" ? (
               <div className="space-y-2">
-                <Label>Text body</Label>
+                <Label>{t("admin.editor.hotspots.textBody")}</Label>
                 <Textarea
                   value={hotspotForm.text_content}
                   onChange={(event) => updateHotspotField("text_content", event.target.value)}
                   className="min-h-32"
-                  placeholder="Student-facing text note"
+                  placeholder={t("admin.editor.hotspots.textPlaceholder")}
                 />
               </div>
             ) : (
               <div className="space-y-2">
-                <Label>Media asset</Label>
-                <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
-                  <Input
-                    value={hotspotForm.asset_file_id}
-                    onChange={(event) => updateHotspotField("asset_file_id", event.target.value)}
-                    placeholder="Private media asset ID"
-                  />
+                <Label>{t("admin.editor.hotspots.mediaAsset")}</Label>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="min-h-9 flex-1 rounded-md border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+                    {hotspotForm.asset_file_id
+                      ? t("admin.editor.hotspots.mediaUploaded", {
+                          id: hotspotForm.asset_file_id,
+                        })
+                      : t("admin.editor.hotspots.mediaEmpty")}
+                  </div>
                   <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-3 text-sm font-medium hover:bg-accent">
                     <Upload className="h-4 w-4" />
-                    Upload
+                    {hotspotForm.asset_file_id ? t("common.replace") : t("common.upload")}
                     <input
                       type="file"
                       accept={
@@ -906,6 +965,7 @@ export default function AdminEBookletEditorPage() {
                       }
                       className="hidden"
                       onChange={(event) => handleHotspotMediaUpload(event.target.files?.[0])}
+                      data-testid="ebooklet-hotspot-media-upload-input"
                     />
                   </label>
                 </div>
@@ -917,7 +977,9 @@ export default function AdminEBookletEditorPage() {
                     className="w-full"
                   >
                     {recording ? <Save className="h-4 w-4" /> : <MousePointerClick className="h-4 w-4" />}
-                    {recording ? "Stop recording" : "Record audio"}
+                    {recording
+                      ? t("admin.editor.hotspots.stopRecording")
+                      : t("admin.editor.hotspots.recordAudio")}
                   </Button>
                 )}
               </div>
@@ -926,7 +988,7 @@ export default function AdminEBookletEditorPage() {
             <div className="grid grid-cols-2 gap-2">
               <Button onClick={saveHotspot} disabled={editor.loading || !activeVersionId}>
                 <Save className="h-4 w-4" />
-                Save
+                {t("common.save")}
               </Button>
               <Button
                 variant="outline"
@@ -934,7 +996,7 @@ export default function AdminEBookletEditorPage() {
                 disabled={!hotspotForm.id || editor.loading}
               >
                 <Trash2 className="h-4 w-4" />
-                Delete
+                {t("common.delete")}
               </Button>
             </div>
 
@@ -946,7 +1008,14 @@ export default function AdminEBookletEditorPage() {
                   onClick={() => selectHotspot(hotspot)}
                   className="flex w-full items-center justify-between border-b px-3 py-2 text-start text-sm last:border-b-0 hover:bg-muted/50"
                 >
-                  <span className="truncate">{hotspot.title || `${hotspot.type} hotspot`}</span>
+                  <span className="truncate">
+                    {hotspot.title ||
+                      t("admin.editor.hotspots.hotspotFallback", {
+                        type: t(`admin.editor.hotspots.types.${hotspot.type}`, {
+                          defaultValue: hotspot.type,
+                        }),
+                      })}
+                  </span>
                   <span className="text-xs text-muted-foreground">
                     {Number(hotspot.x_percent).toFixed(1)}, {Number(hotspot.y_percent).toFixed(1)}
                   </span>
@@ -954,7 +1023,7 @@ export default function AdminEBookletEditorPage() {
               ))}
               {pageHotspots.length === 0 && (
                 <div className="px-3 py-5 text-center text-sm text-muted-foreground">
-                  No hotspots on this page.
+                  {t("admin.editor.hotspots.emptyPage")}
                 </div>
               )}
             </div>
@@ -966,32 +1035,38 @@ export default function AdminEBookletEditorPage() {
         <section className="space-y-5 rounded-lg border bg-background p-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-lg font-semibold">Review and Publish</h2>
+              <h2 className="text-lg font-semibold">{t("admin.editor.review.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Publishing locks this version for new teacher purchases. Existing delivered instances keep their original version.
+                {t("admin.editor.review.description")}
               </p>
             </div>
             <Button onClick={publishCurrentVersion} disabled={editor.loading || !selectedVersion?.id}>
               <ShieldCheck className="h-4 w-4" />
-              Publish Version
+              {t("common.publishVersion")}
             </Button>
           </div>
 
           <div className="grid gap-4 md:grid-cols-4">
             <div className="rounded-md border p-4">
-              <div className="text-xs uppercase text-muted-foreground">Template</div>
-              <div className="mt-2 font-semibold">{templateForm.title || "Untitled"}</div>
+              <div className="text-xs uppercase text-muted-foreground">
+                {t("admin.editor.review.template")}
+              </div>
+              <div className="mt-2 font-semibold">
+                {templateForm.title || t("common.untitled")}
+              </div>
             </div>
             <div className="rounded-md border p-4">
-              <div className="text-xs uppercase text-muted-foreground">Price</div>
+              <div className="text-xs uppercase text-muted-foreground">{t("common.price")}</div>
               <div className="mt-2 font-semibold">{templateForm.price} {templateForm.currency}</div>
             </div>
             <div className="rounded-md border p-4">
-              <div className="text-xs uppercase text-muted-foreground">Pages</div>
+              <div className="text-xs uppercase text-muted-foreground">{t("common.pages")}</div>
               <div className="mt-2 font-semibold">{pageCount}</div>
             </div>
             <div className="rounded-md border p-4">
-              <div className="text-xs uppercase text-muted-foreground">Current Page Hotspots</div>
+              <div className="text-xs uppercase text-muted-foreground">
+                {t("admin.editor.review.currentPageHotspots")}
+              </div>
               <div className="mt-2 font-semibold">{pageHotspots.length}</div>
             </div>
           </div>
@@ -999,13 +1074,31 @@ export default function AdminEBookletEditorPage() {
           <div className="rounded-md border p-4">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Play className="h-4 w-4 text-primary" />
-              Admin preview checks
+              {t("admin.editor.review.previewChecks")}
             </div>
             <div className="mt-3 grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
-              <div>Private original document asset: {versionForm.base_document_file_id || "Not uploaded"}</div>
-              <div>Cover asset: {templateForm.cover_file_id || "Not uploaded"}</div>
-              <div>Template version: {selectedVersion?.version_number || "Draft not saved"}</div>
-              <div>Status: {selectedVersion?.status || "draft"}</div>
+              <div>
+                {t("admin.editor.review.privateOriginal", {
+                  value: versionForm.base_document_file_id || t("common.notUploaded"),
+                })}
+              </div>
+              <div>
+                {t("admin.editor.review.coverAsset", {
+                  value: templateForm.cover_file_id || t("common.notUploaded"),
+                })}
+              </div>
+              <div>
+                {t("admin.editor.review.templateVersion", {
+                  value: selectedVersion?.version_number || t("common.notSaved"),
+                })}
+              </div>
+              <div>
+                {t("admin.editor.review.status", {
+                  value: selectedVersion?.status
+                    ? statusLabel(selectedVersion.status)
+                    : t("common.draft"),
+                })}
+              </div>
             </div>
           </div>
         </section>
@@ -1017,7 +1110,7 @@ export default function AdminEBookletEditorPage() {
           onClick={goBack}
           disabled={activeStepIndex === 0 || editor.loading}
         >
-          Previous
+          {t("common.previous")}
         </Button>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
@@ -1026,16 +1119,16 @@ export default function AdminEBookletEditorPage() {
             disabled={editor.loading}
           >
             <Save className="h-4 w-4" />
-            Save Draft
+            {t("common.saveDraft")}
           </Button>
           {activeStep === "review" ? (
             <Button onClick={publishCurrentVersion} disabled={editor.loading || !selectedVersion?.id}>
               <ShieldCheck className="h-4 w-4" />
-              Publish
+              {t("common.publish")}
             </Button>
           ) : (
             <Button onClick={goNext} disabled={editor.loading}>
-              Continue
+              {t("common.continue")}
             </Button>
           )}
         </div>
