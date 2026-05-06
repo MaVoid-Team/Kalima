@@ -119,6 +119,110 @@ export const user_flag_enum = {
 export type user_flag_enum = (typeof user_flag_enum)[keyof typeof user_flag_enum]
 
 
+export const e_booklet_template_status_enum = {
+  draft: 'draft',
+  published: 'published',
+  archived: 'archived'
+} as const
+
+export type e_booklet_template_status_enum = (typeof e_booklet_template_status_enum)[keyof typeof e_booklet_template_status_enum]
+
+
+export const e_booklet_template_version_status_enum = {
+  draft: 'draft',
+  active: 'active',
+  archived: 'archived'
+} as const
+
+export type e_booklet_template_version_status_enum = (typeof e_booklet_template_version_status_enum)[keyof typeof e_booklet_template_version_status_enum]
+
+
+export const e_booklet_hotspot_type_enum = {
+  text: 'text',
+  image: 'image',
+  video: 'video',
+  audio: 'audio'
+} as const
+
+export type e_booklet_hotspot_type_enum = (typeof e_booklet_hotspot_type_enum)[keyof typeof e_booklet_hotspot_type_enum]
+
+
+export const e_booklet_hotspot_trigger_type_enum = {
+  hover: 'hover',
+  click: 'click',
+  both: 'both'
+} as const
+
+export type e_booklet_hotspot_trigger_type_enum = (typeof e_booklet_hotspot_trigger_type_enum)[keyof typeof e_booklet_hotspot_trigger_type_enum]
+
+
+export const e_booklet_purchase_status_enum = {
+  pending: 'pending',
+  awaiting_payment: 'awaiting_payment',
+  paid: 'paid',
+  needs_branding_info: 'needs_branding_info',
+  customization_in_progress: 'customization_in_progress',
+  ready: 'ready',
+  cancelled: 'cancelled',
+  rejected: 'rejected'
+} as const
+
+export type e_booklet_purchase_status_enum = (typeof e_booklet_purchase_status_enum)[keyof typeof e_booklet_purchase_status_enum]
+
+
+export const e_booklet_instance_status_enum = {
+  active: 'active',
+  suspended: 'suspended',
+  archived: 'archived'
+} as const
+
+export type e_booklet_instance_status_enum = (typeof e_booklet_instance_status_enum)[keyof typeof e_booklet_instance_status_enum]
+
+
+export const e_booklet_access_role_enum = {
+  teacher: 'teacher',
+  student: 'student'
+} as const
+
+export type e_booklet_access_role_enum = (typeof e_booklet_access_role_enum)[keyof typeof e_booklet_access_role_enum]
+
+
+export const e_booklet_access_status_enum = {
+  active: 'active',
+  revoked: 'revoked'
+} as const
+
+export type e_booklet_access_status_enum = (typeof e_booklet_access_status_enum)[keyof typeof e_booklet_access_status_enum]
+
+
+export const e_booklet_invite_status_enum = {
+  active: 'active',
+  disabled: 'disabled',
+  expired: 'expired'
+} as const
+
+export type e_booklet_invite_status_enum = (typeof e_booklet_invite_status_enum)[keyof typeof e_booklet_invite_status_enum]
+
+
+export const e_booklet_file_type_enum = {
+  pdf: 'pdf',
+  image: 'image',
+  video: 'video',
+  audio: 'audio',
+  doc: 'doc',
+  docx: 'docx'
+} as const
+
+export type e_booklet_file_type_enum = (typeof e_booklet_file_type_enum)[keyof typeof e_booklet_file_type_enum]
+
+
+export const e_booklet_file_visibility_enum = {
+  private: 'private'
+} as const
+
+export type e_booklet_file_visibility_enum = (typeof e_booklet_file_visibility_enum)[keyof typeof e_booklet_file_visibility_enum]
+
+
 export const coupon_type = {
   percentage: 'percentage',
   fixed: 'fixed'

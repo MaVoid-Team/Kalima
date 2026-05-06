@@ -18,6 +18,7 @@ import adminRoutes from "./admin.routes";
 import adminDashboardRoutes from "./admin-dashboard.routes";
 import notificationRoutes from "./notification.routes";
 import appreciationRoutes from "./appreciation.routes";
+import eBookletRoutes from "./e-booklet.routes";
 
 const router = Router();
 
@@ -52,6 +53,9 @@ router.use("/admin/dashboard", adminDashboardRoutes);
 
 // Notifications
 router.use("/notifications", notificationRoutes);
+
+// E-Booklets: standalone store/admin/teacher/student/viewer API namespace.
+router.use("/", eBookletRoutes);
 
 export default router;
 
