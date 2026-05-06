@@ -159,3 +159,34 @@ export function useEBookletViewer() {
     fetchHotspotContent,
   };
 }
+
+export function useStudentEBooklets() {
+  const { mutate: fetchApi, loading } = useApiMutation();
+  const [items, setItems] = useState([]);
+
+  const fetchStudentEBooklets = useCallback(async () => {
+    const response = await fetchApi(
+      { endpoint: "/student/e-booklets", method: "get" },
+      false,
+    );
+    setItems(Array.isArray(response?.data) ? response.data : []);
+    return response;
+  }, [fetchApi]);
+
+  const acceptInvite = useCallback(
+    (token) =>
+      fetchApi({
+        endpoint: `/e-booklet-invites/${token}/accept`,
+        method: "post",
+        defaultSuccessMessage: "E-booklet access granted",
+      }),
+    [fetchApi],
+  );
+
+  return {
+    items,
+    loading,
+    fetchStudentEBooklets,
+    acceptInvite,
+  };
+}

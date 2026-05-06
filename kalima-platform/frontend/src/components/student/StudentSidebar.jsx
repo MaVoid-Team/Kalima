@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, User, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Settings } from 'lucide-react';
+import { ShoppingBag, User, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Settings, BookOpenCheck } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 
 const STUDENT_THEME_STORAGE_KEY = 'studentTheme';
@@ -39,6 +39,7 @@ export default function StudentSidebar({ isMobileOpen, setIsMobileOpen }) {
   const navigation = [
     { name: t('nav.home'), href: '/', icon: Home, id: 'home' },
     { name: t('nav.profile'), href: '/student/profile', icon: User, id: 'profile' },
+    { name: t('nav.eBooklets', 'My E-Booklets'), href: '/student/e-booklets', icon: BookOpenCheck, id: 'e-booklets' },
     // { name: t('nav.orders'), href: '/orders', icon: ShoppingBag, id: 'orders' },
     { name: t('nav.settings'), href: '/student/settings', icon: Settings, id: 'settings' },
   ];
