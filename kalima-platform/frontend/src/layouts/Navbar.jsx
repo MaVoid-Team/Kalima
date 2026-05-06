@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, Globe, ShoppingCart, ShoppingBag, FileText, Home, User } from "lucide-react";
+import { Menu, X, Globe, ShoppingCart, ShoppingBag, FileText, Home, User, BookOpenCheck } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
@@ -39,6 +39,11 @@ export default function Navbar() {
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(true);
   const lastScrollY = useRef(0);
+  const shouldShowBottomNav =
+    showMobileNav &&
+    !location.pathname.startsWith('/product/') &&
+    !location.pathname.startsWith('/e-booklet-cart') &&
+    !location.pathname.startsWith('/e-booklet-checkout');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -106,7 +111,7 @@ export default function Navbar() {
   useEffect(() => {
     if (!open) return;
 
-    const routeValues = ["/market"];
+    const routeValues = ["/samples", "/market", "/e-booklets"];
     const current = routeValues.find((route) => location.pathname.startsWith(route));
     setCommandValue(current || "");
   }, [open, location.pathname]);
@@ -133,8 +138,9 @@ export default function Navbar() {
   };
 
   const NAV_LINKS = [
+    { label: t("navbar.samples"), href: "/samples", icon: FileText },
     { label: t("navbar.market"), href: "/market", icon: ShoppingCart },
-    { label: t("navbar.samples"), href: "/samples", icon: FileText }
+    { label: t("navbar.eBooklets"), href: "/e-booklets", icon: BookOpenCheck }
   ].filter(() => {
     if (!hasStoreAccess) return false;
     return true;
@@ -192,6 +198,16 @@ export default function Navbar() {
                 {hasStoreAccess && (
                   <Button
                     variant="ghost"
+                    onClick={() => navigate("/samples")}
+                    className="h-9 px-4"
+                  >
+                    <FileText className="mr-2 h-4 w-4"></FileText>
+                    {t("navbar.samples")}
+                  </Button>
+                )}
+                {hasStoreAccess && (
+                  <Button
+                    variant="ghost"
                     onClick={() => navigate("/market")}
                     className="h-9 px-4"
                   >
@@ -201,12 +217,12 @@ export default function Navbar() {
                 )}
                 {hasStoreAccess && (
                   <Button
-                    variant='secondary'
-                    onClick={() => navigate("/samples")}
+                    variant="secondary"
+                    onClick={() => navigate("/e-booklets")}
                     className="h-9 px-4"
                   >
-                    <FileText className="mr-2 h-4 w-4"></FileText>
-                    {t("navbar.samples")}
+                    <BookOpenCheck className="mr-2 h-4 w-4"></BookOpenCheck>
+                    {t("navbar.eBooklets")}
                   </Button>
                 )}
 
@@ -360,7 +376,7 @@ export default function Navbar() {
       {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-6 inset-x-4 z-[70] flex justify-center pointer-events-none">
         <AnimatePresence>
-          {showMobileNav && !location.pathname.startsWith('/product/') && (
+          {shouldShowBottomNav && (
             <motion.div
               key="mobile-nav"
               initial={{ y: 100, opacity: 0, scale: 0.8 }}
@@ -403,6 +419,25 @@ export default function Navbar() {
               </Link>
 
               {hasStoreAccess && (
+                <Link to="/samples" className={cn(
+                  "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+                  location.pathname.startsWith("/samples") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}>
+                  {location.pathname.startsWith("/samples") && (
+                    <motion.div
+                      layoutId="nav-active-pill"
+                      className="absolute inset-0 bg-primary/10 rounded-full"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <FileText
+                    className={cn("h-6 w-6 transition-all relative z-10")}
+                    strokeWidth={location.pathname.startsWith("/samples") ? 2.5 : 2}
+                  />
+                </Link>
+              )}
+
+              {hasStoreAccess && (
                 <Link to="/market" className={cn(
                   "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
                   location.pathname === "/market" ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -422,20 +457,20 @@ export default function Navbar() {
               )}
 
               {hasStoreAccess && (
-                <Link to="/samples" className={cn(
+                <Link to="/e-booklets" className={cn(
                   "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
-                  location.pathname === "/samples" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-") ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}>
-                  {location.pathname === "/samples" && (
+                  {(location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-")) && (
                     <motion.div
                       layoutId="nav-active-pill"
                       className="absolute inset-0 bg-primary/10 rounded-full"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-                  <FileText
+                  <BookOpenCheck
                     className={cn("h-6 w-6 transition-all relative z-10")}
-                    strokeWidth={location.pathname === "/samples" ? 2.5 : 2}
+                    strokeWidth={location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-") ? 2.5 : 2}
                   />
                 </Link>
               )}
@@ -499,8 +534,18 @@ export default function Navbar() {
           <CommandEmpty>{t("navbar.noResults")}</CommandEmpty>
           <CommandGroup heading={t("navbar.pages")}>
             {hasStoreAccess && (
+              <CommandItem value="/samples" onSelect={() => runCommand(() => navigate("/samples"))}>
+                {t("navbar.samples")}
+              </CommandItem>
+            )}
+            {hasStoreAccess && (
               <CommandItem value="/market" onSelect={() => runCommand(() => navigate("/market"))}>
                 {t("navbar.market")}
+              </CommandItem>
+            )}
+            {hasStoreAccess && (
+              <CommandItem value="/e-booklets" onSelect={() => runCommand(() => navigate("/e-booklets"))}>
+                {t("navbar.eBooklets")}
               </CommandItem>
             )}
           </CommandGroup>
