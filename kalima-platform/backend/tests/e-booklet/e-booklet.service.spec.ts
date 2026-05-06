@@ -12,6 +12,7 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     },
     e_booklet_hotspots: {
       findMany: jest.fn(),
+      findUnique: jest.fn(),
     },
     e_booklet_invites: {
       findFirst: jest.fn(),
@@ -302,6 +303,115 @@ describe("EBookletService", () => {
       );
       expect(db.e_booklet_access.create).not.toHaveBeenCalled();
       expect(db.e_booklet_invite_redemptions.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("viewer hardening", () => {
+    test("returns a short-lived page token and rejects out-of-range page requests", async () => {
+      const db = createMockDb();
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 1,
+        booklet_instance_id: 10,
+        user_id: 55,
+        status: "active",
+        booklet_instance: {
+          id: 10,
+          status: "active",
+          template_version_id: 22,
+          teacher: { id: 99, name: "Ms. Sara" },
+          template: { id: 7, title: "Grade 5 Arabic" },
+          template_version: {
+            id: 22,
+            page_count: 3,
+          },
+        },
+      });
+
+      const service = new EBookletService(db);
+
+      const result = await service.getViewerPage(10, 2, 55);
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          pageNumber: 2,
+          renderMode: "server-page",
+          pageAccessToken: expect.stringMatching(
+            /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/,
+          ),
+          expiresAt: expect.any(Date),
+          cacheControl: "private, no-store",
+          watermark: {
+            teacherName: "Ms. Sara",
+            templateTitle: "Grade 5 Arabic",
+          },
+        }),
+      );
+      expect(db.e_booklet_audit_logs.create).toHaveBeenCalledWith({
+        data: {
+          actor_user_id: 55,
+          action: "page_viewed",
+          entity_type: "e_booklet_instance",
+          entity_id: 10,
+          metadata_json: { page_number: 2 },
+        },
+      });
+
+      await expect(service.getViewerPage(10, 4, 55)).rejects.toThrow(
+        "Invalid e-booklet page number.",
+      );
+    });
+
+    test("does not expose private storage keys from hotspot content", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspots.findUnique.mockResolvedValue({
+        id: 77,
+        template_version_id: 22,
+        page_number: 2,
+        x_percent: 42.5,
+        y_percent: 67.2,
+        radius_percent: 1.8,
+        type: "audio",
+        title: "Listen",
+        text_content: null,
+        asset_file_id: 123,
+        trigger_type: "click",
+        display_behavior: "popover",
+        asset_file: {
+          id: 123,
+          file_type: "audio",
+          storage_key: "e-booklets/private/audio.mp3",
+          original_filename: "audio.mp3",
+          mime_type: "audio/mpeg",
+          size_bytes: 1024,
+          visibility: "private",
+        },
+        template_version: {
+          instances: [{ id: 10 }],
+        },
+      });
+
+      const service = new EBookletService(db);
+
+      const result = await service.getHotspotContent(77, 55);
+      const serialized = JSON.stringify(result);
+
+      expect(serialized).not.toContain("storage_key");
+      expect(serialized).not.toContain("e-booklets/private/audio.mp3");
+      expect(serialized).not.toContain("instances");
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: 77,
+          asset_file_id: 123,
+          asset_file: {
+            id: 123,
+            file_type: "audio",
+            original_filename: "audio.mp3",
+            mime_type: "audio/mpeg",
+            size_bytes: 1024,
+            visibility: "private",
+          },
+        }),
+      );
     });
   });
 

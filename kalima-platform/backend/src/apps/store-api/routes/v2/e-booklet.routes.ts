@@ -1,4 +1,5 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import { eBookletController } from "../../controllers/e-booklet.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
@@ -27,6 +28,28 @@ const studentAuth = [
 ];
 
 const viewerAuth = [authenticateToken];
+
+const inviteAcceptanceLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many e-booklet invite attempts. Please try again later.",
+  },
+});
+
+const viewerLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 180,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many e-booklet viewer requests. Please slow down.",
+  },
+});
 
 // Store APIs - separate from normal Market products.
 router.get("/e-booklet-store", eBookletController.listStoreTemplates);
@@ -190,6 +213,7 @@ router.patch(
 router.get("/student/e-booklets", ...studentAuth, eBookletController.listStudentEBooklets);
 router.post(
   "/e-booklet-invites/:token/accept",
+  inviteAcceptanceLimiter,
   ...studentAuth,
   eBookletController.acceptInvite,
 );
@@ -197,21 +221,25 @@ router.post(
 // Viewer APIs.
 router.get(
   "/e-booklet-viewer/:instanceId/metadata",
+  viewerLimiter,
   ...viewerAuth,
   eBookletController.getViewerMetadata,
 );
 router.get(
   "/e-booklet-viewer/:instanceId/pages/:pageNumber",
+  viewerLimiter,
   ...viewerAuth,
   eBookletController.getViewerPage,
 );
 router.get(
   "/e-booklet-viewer/:instanceId/pages/:pageNumber/hotspots",
+  viewerLimiter,
   ...viewerAuth,
   eBookletController.getViewerPageHotspots,
 );
 router.get(
   "/e-booklet-viewer/hotspots/:hotspotId/content",
+  viewerLimiter,
   ...viewerAuth,
   eBookletController.getHotspotContent,
 );

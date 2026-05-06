@@ -39,6 +39,22 @@ export default function EBookletViewerPage() {
     setHotspotContent(null);
   }, [instanceId, pageNumber, viewer.fetchPage]);
 
+  useEffect(() => {
+    const preventContextMenu = (event) => event.preventDefault();
+    const preventPrintShortcut = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "p") {
+        event.preventDefault();
+      }
+    };
+
+    document.addEventListener("contextmenu", preventContextMenu);
+    document.addEventListener("keydown", preventPrintShortcut);
+    return () => {
+      document.removeEventListener("contextmenu", preventContextMenu);
+      document.removeEventListener("keydown", preventPrintShortcut);
+    };
+  }, []);
+
   const metadata = viewer.metadata;
   const instance = metadata?.booklet_instance;
   const templateVersion = instance?.template_version;
@@ -118,11 +134,15 @@ export default function EBookletViewerPage() {
       </header>
 
       <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <section className="overflow-auto rounded-lg border bg-slate-200 p-4">
+        <section
+          className="select-none overflow-auto rounded-lg border bg-slate-200 p-4"
+          onContextMenu={(event) => event.preventDefault()}
+        >
           <div className="mx-auto w-full max-w-[820px] pb-10">
             <div
               className="relative overflow-hidden rounded-md border bg-white shadow-sm"
               style={pageStyle}
+              draggable={false}
             >
               <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.05)_1px,transparent_1px),linear-gradient(0deg,rgba(15,23,42,0.05)_1px,transparent_1px)] bg-[size:10%_10%]" />
               <div className="absolute inset-x-10 top-10 h-7 rounded bg-slate-100" />

@@ -8,6 +8,8 @@
 
 **Tech Stack:** Backend: Express + TypeScript + Prisma/PostgreSQL + Jest. Frontend: React/Vite + React Router + existing auth/role guards + existing shadcn/Radix/lucide component patterns. Browser verification: use the requested browser harness when available; otherwise use Playwright against the local Vite/backend servers.
 
+**Final status, 2026-05-06:** MVP module slices 1-6 were implemented on branch `codex/e-booklet-module` and verified with backend Jest tests, backend/frontend builds, and browser QA passes for store checkout, admin template editing, teacher delivery/viewer, student invite access, and final viewer hardening. Production-readiness gaps are tracked in `reports/e-booklet-launch-scale-readiness.md`.
+
 ---
 
 ## Requirement Coverage Todo

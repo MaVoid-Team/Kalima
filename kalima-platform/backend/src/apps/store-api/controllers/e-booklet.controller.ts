@@ -67,6 +67,12 @@ function pagination(req: Request) {
   };
 }
 
+function setPrivateNoStore(res: Response) {
+  res.set("Cache-Control", "private, no-store");
+  res.set("Pragma", "no-cache");
+  res.set("Expires", "0");
+}
+
 export const eBookletController = {
   async uploadFileAsset(req: Request, res: Response, next: NextFunction) {
     try {
@@ -492,6 +498,7 @@ export const eBookletController = {
         parseId(req.params.instanceId, "instance ID"),
         currentUserId(req),
       );
+      setPrivateNoStore(res);
       res.status(200).json({ success: true, data });
     } catch (error) {
       next(error);
@@ -505,6 +512,7 @@ export const eBookletController = {
         parseId(req.params.pageNumber, "page number"),
         currentUserId(req),
       );
+      setPrivateNoStore(res);
       res.status(200).json({ success: true, data });
     } catch (error) {
       next(error);
@@ -518,6 +526,7 @@ export const eBookletController = {
         parseId(req.params.pageNumber, "page number"),
         currentUserId(req),
       );
+      setPrivateNoStore(res);
       res.status(200).json({ success: true, data });
     } catch (error) {
       next(error);
@@ -530,6 +539,7 @@ export const eBookletController = {
         parseId(req.params.hotspotId, "hotspot ID"),
         currentUserId(req),
       );
+      setPrivateNoStore(res);
       res.status(200).json({ success: true, data });
     } catch (error) {
       next(error);

@@ -13,6 +13,7 @@ const mockService = {
   listVersionHotspots: jest.fn(),
   createInvite: jest.fn(),
   acceptInvite: jest.fn(),
+  getViewerPage: jest.fn(),
 };
 
 jest.mock("../../src/apps/store-api/services/e-booklet.service", () => ({
@@ -186,5 +187,25 @@ describe("e-booklet routes", () => {
       ipAddress: expect.any(String),
       userAgent: expect.stringContaining("node-superagent"),
     });
+  });
+
+  test("marks viewer page responses as private no-store", async () => {
+    mockService.getViewerPage.mockResolvedValue({
+      pageNumber: 1,
+      pageAccessToken: "short-lived-token",
+    });
+
+    await request(app)
+      .get("/api/v2/e-booklet-viewer/10/pages/1")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .expect(200)
+      .expect("Cache-Control", "private, no-store")
+      .expect("Pragma", "no-cache")
+      .expect("Expires", "0")
+      .expect((res) => {
+        expect(res.body.data.pageAccessToken).toBe("short-lived-token");
+      });
+
+    expect(mockService.getViewerPage).toHaveBeenCalledWith(10, 1, 55);
   });
 });

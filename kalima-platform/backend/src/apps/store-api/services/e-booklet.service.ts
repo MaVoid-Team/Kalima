@@ -99,6 +99,48 @@ function dimensionsDiffer(
   });
 }
 
+const VIEWER_PAGE_TOKEN_TTL_MS = 5 * 60 * 1000;
+
+function base64UrlEncode(value: string): string {
+  return Buffer.from(value)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+function viewerTokenSecret(): string {
+  return (
+    process.env.E_BOOKLET_PAGE_TOKEN_SECRET ||
+    process.env.JWT_SECRET ||
+    "dev-e-booklet-page-token-secret"
+  );
+}
+
+function createViewerPageToken(input: {
+  instanceId: number;
+  pageNumber: number;
+  userId: number;
+  expiresAt: Date;
+}): string {
+  const body = base64UrlEncode(
+    JSON.stringify({
+      instanceId: input.instanceId,
+      pageNumber: input.pageNumber,
+      userId: input.userId,
+      expiresAt: input.expiresAt.toISOString(),
+    }),
+  );
+  const signature = crypto
+    .createHmac("sha256", viewerTokenSecret())
+    .update(body)
+    .digest("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+  return `${body}.${signature}`;
+}
+
 export class EBookletService {
   private fileStorageInitPromise: Promise<unknown> | null = null;
 
@@ -757,7 +799,15 @@ export class EBookletService {
   }
 
   async getViewerPage(instanceId: number, pageNumber: number, userId: number) {
-    await this.assertViewerAccess(instanceId, userId);
+    const access: any = await this.assertViewerAccess(instanceId, userId);
+    const pageCount = Number(
+      access.booklet_instance?.template_version?.page_count || 0,
+    );
+    if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pageCount) {
+      throw new BadRequestError("Invalid e-booklet page number.");
+    }
+
+    const expiresAt = new Date(Date.now() + VIEWER_PAGE_TOKEN_TTL_MS);
     await this.db.e_booklet_audit_logs.create({
       data: {
         actor_user_id: userId,
@@ -770,6 +820,18 @@ export class EBookletService {
     return {
       pageNumber,
       renderMode: "server-page",
+      pageAccessToken: createViewerPageToken({
+        instanceId,
+        pageNumber,
+        userId,
+        expiresAt,
+      }),
+      expiresAt,
+      cacheControl: "private, no-store",
+      watermark: {
+        teacherName: access.booklet_instance?.teacher?.name || null,
+        templateTitle: access.booklet_instance?.template?.title || null,
+      },
       message: "Page rendering pipeline is pending document renderer integration.",
     };
   }
@@ -812,7 +874,30 @@ export class EBookletService {
     if (!hotspot || !hotspot.template_version.instances.length) {
       throw new ForbiddenError("You do not have access to this hotspot.");
     }
-    return hotspot;
+    return {
+      id: hotspot.id,
+      template_version_id: hotspot.template_version_id,
+      page_number: hotspot.page_number,
+      x_percent: hotspot.x_percent,
+      y_percent: hotspot.y_percent,
+      radius_percent: hotspot.radius_percent,
+      type: hotspot.type,
+      title: hotspot.title,
+      text_content: hotspot.text_content,
+      asset_file_id: hotspot.asset_file_id,
+      trigger_type: hotspot.trigger_type,
+      display_behavior: hotspot.display_behavior,
+      asset_file: hotspot.asset_file
+        ? {
+            id: hotspot.asset_file.id,
+            file_type: hotspot.asset_file.file_type,
+            original_filename: hotspot.asset_file.original_filename,
+            mime_type: hotspot.asset_file.mime_type,
+            size_bytes: hotspot.asset_file.size_bytes,
+            visibility: hotspot.asset_file.visibility,
+          }
+        : null,
+    };
   }
 
   async validateTeacherDocumentForDelivery(
