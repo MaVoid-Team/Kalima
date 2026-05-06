@@ -64,6 +64,10 @@ export class CreateEBookletTemplateDto {
 
   @IsOptional()
   @IsInt()
+  cover_file_id?: number;
+
+  @IsOptional()
+  @IsInt()
   category_id?: number;
 
   @IsOptional()
@@ -88,6 +92,14 @@ export class UpdateEBookletTemplateDto {
   @IsNumber()
   @Min(0)
   price?: number;
+
+  @IsOptional()
+  @IsString()
+  currency?: string;
+
+  @IsOptional()
+  @IsInt()
+  cover_file_id?: number;
 
   @IsOptional()
   @IsInt()

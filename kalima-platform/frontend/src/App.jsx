@@ -72,6 +72,8 @@ const PaymentMethodsPage = lazy(() => import("./pages/admin/payment-methods/Paym
 const RequiredFieldsPage = lazy(() => import("./pages/admin/required-fields/RequiredFieldsPage"));
 const AnalyticsPage = lazy(() => import("./pages/admin/analytics/AnalyticsPage"));
 const EmployeePerformancePage = lazy(() => import("./pages/admin/employee-performance/EmployeePerformancePage"));
+const AdminEBookletTemplatesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTemplatesPage"));
+const AdminEBookletEditorPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletEditorPage"));
 
 // Public viewer (no layout)
 const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
@@ -178,6 +180,9 @@ const router = createBrowserRouter(
           <Route path="/admin/products/create" element={<CreateProductPage />} />
           <Route path="/admin/products/:id" element={<ProductDetailPage />} />
           <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
+          <Route path="/admin/e-booklets" element={<AdminEBookletTemplatesPage />} />
+          <Route path="/admin/e-booklets/create" element={<AdminEBookletEditorPage />} />
+          <Route path="/admin/e-booklets/:id/edit" element={<AdminEBookletEditorPage />} />
           <Route path="/admin/categories" element={<CategoriesPage />} />
           <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
           <Route path="/admin/required-fields" element={<RequiredFieldsPage />} />

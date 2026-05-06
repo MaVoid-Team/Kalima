@@ -1,3 +1,6 @@
+import path from "path";
+import { promises as fsPromises } from "fs";
+import crypto from "crypto";
 import type { PrismaClient } from "../../../libs/db/prisma";
 import {
   BadRequestError,
@@ -7,6 +10,55 @@ import {
 import { hashInviteToken } from "../utils/e-booklet-token";
 
 type EBookletDb = PrismaClient | any;
+
+const E_BOOKLET_UPLOAD_DIR = path.resolve(
+  __dirname,
+  "../../../../uploads/e-booklets/private",
+);
+
+const MIME_TO_FILE_TYPE: Record<string, string> = {
+  "application/pdf": "pdf",
+  "application/msword": "doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "docx",
+  "image/jpeg": "image",
+  "image/png": "image",
+  "image/webp": "image",
+  "image/gif": "image",
+  "image/svg+xml": "image",
+  "image/avif": "image",
+  "video/mp4": "video",
+  "video/webm": "video",
+  "video/quicktime": "video",
+  "audio/mpeg": "audio",
+  "audio/mp3": "audio",
+  "audio/wav": "audio",
+  "audio/webm": "audio",
+  "audio/ogg": "audio",
+  "audio/mp4": "audio",
+};
+
+const MIME_TO_EXT: Record<string, string> = {
+  "application/pdf": ".pdf",
+  "application/msword": ".doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    ".docx",
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "image/gif": ".gif",
+  "image/svg+xml": ".svg",
+  "image/avif": ".avif",
+  "video/mp4": ".mp4",
+  "video/webm": ".webm",
+  "video/quicktime": ".mov",
+  "audio/mpeg": ".mp3",
+  "audio/mp3": ".mp3",
+  "audio/wav": ".wav",
+  "audio/webm": ".webm",
+  "audio/ogg": ".ogg",
+  "audio/mp4": ".m4a",
+};
 
 export interface PageDimensions {
   width: number;
@@ -48,7 +100,18 @@ function dimensionsDiffer(
 }
 
 export class EBookletService {
+  private fileStorageInitPromise: Promise<unknown> | null = null;
+
   constructor(private readonly db: EBookletDb = resolveDefaultPrisma()) {}
+
+  private async ensureFileStorageDir(): Promise<void> {
+    if (!this.fileStorageInitPromise) {
+      this.fileStorageInitPromise = fsPromises.mkdir(E_BOOKLET_UPLOAD_DIR, {
+        recursive: true,
+      });
+    }
+    await this.fileStorageInitPromise;
+  }
 
   private buildSlug(title: string): string {
     const base = title
@@ -57,6 +120,52 @@ export class EBookletService {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
     return base || `e-booklet-${Date.now()}`;
+  }
+
+  async createFileAsset(
+    file: Express.Multer.File | undefined,
+    input: {
+      ownerType?: string;
+      ownerId?: number | null;
+      fileType?: string;
+    } = {},
+  ): Promise<unknown> {
+    if (!file) {
+      throw new BadRequestError("No e-booklet file was uploaded.");
+    }
+
+    const fileType = input.fileType || MIME_TO_FILE_TYPE[file.mimetype];
+    if (!fileType) {
+      throw new BadRequestError(`Unsupported e-booklet file type: ${file.mimetype}`);
+    }
+
+    const ext =
+      MIME_TO_EXT[file.mimetype] ||
+      path.extname(file.originalname).toLowerCase() ||
+      ".bin";
+    const safeBase = path
+      .basename(file.originalname, path.extname(file.originalname))
+      .replace(/[^a-zA-Z0-9._-]+/g, "-")
+      .slice(0, 80);
+    const uniqueId = `${Date.now()}-${crypto.randomBytes(8).toString("hex")}`;
+    const filename = `${uniqueId}-${safeBase || "ebooklet"}${ext}`;
+    const storageKey = `e-booklets/private/${filename}`;
+
+    await this.ensureFileStorageDir();
+    await fsPromises.writeFile(path.join(E_BOOKLET_UPLOAD_DIR, filename), file.buffer);
+
+    return this.db.e_booklet_file_assets.create({
+      data: {
+        owner_type: input.ownerType || "admin",
+        owner_id: input.ownerId ?? null,
+        file_type: fileType,
+        storage_key: storageKey,
+        original_filename: file.originalname,
+        mime_type: file.mimetype,
+        size_bytes: file.size,
+        visibility: "private",
+      },
+    });
   }
 
   async listPublishedTemplates(filters: {
@@ -166,6 +275,7 @@ export class EBookletService {
         title: dto.title,
         slug,
         description: dto.description,
+        cover_file_id: dto.cover_file_id,
         price: dto.price,
         currency: dto.currency || "EGP",
         category_id: dto.category_id,
@@ -191,12 +301,47 @@ export class EBookletService {
     return template;
   }
 
+  async listTemplateVersions(templateId: number): Promise<unknown[]> {
+    const template = await this.db.e_booklet_templates.findUnique({
+      where: { id: templateId },
+      select: { id: true },
+    });
+    if (!template) throw new NotFoundError("E-booklet template not found");
+
+    return this.db.e_booklet_template_versions.findMany({
+      where: { template_id: templateId },
+      include: {
+        _count: { select: { hotspots: true, instances: true, purchases: true } },
+      },
+      orderBy: { version_number: "desc" },
+    });
+  }
+
   async updateTemplate(id: number, dto: any): Promise<unknown> {
     return this.db.e_booklet_templates.update({
       where: { id },
       data: {
-        ...dto,
+        title: dto.title,
+        description: dto.description,
+        cover_file_id: dto.cover_file_id,
+        price: dto.price,
+        currency: dto.currency,
+        category_id: dto.category_id,
+        status: dto.status,
         updated_at: new Date(),
+      },
+    });
+  }
+
+  async updateTemplateVersion(versionId: number, dto: any): Promise<unknown> {
+    return this.db.e_booklet_template_versions.update({
+      where: { id: versionId },
+      data: {
+        base_document_file_id: dto.base_document_file_id,
+        rendered_document_file_id: dto.rendered_document_file_id,
+        page_count: dto.page_count,
+        page_dimensions_json: dto.page_dimensions_json,
+        status: dto.status,
       },
     });
   }
@@ -223,6 +368,26 @@ export class EBookletService {
         status: "draft",
         created_by: adminUserId,
       },
+    });
+  }
+
+  async listVersionHotspots(
+    templateVersionId: number,
+    pageNumber?: number,
+  ): Promise<unknown[]> {
+    const where: Record<string, unknown> = {
+      template_version_id: templateVersionId,
+      is_active: true,
+    };
+    if (pageNumber) where.page_number = pageNumber;
+
+    return this.db.e_booklet_hotspots.findMany({
+      where,
+      orderBy: [
+        { page_number: "asc" },
+        { sort_order: "asc" },
+        { created_at: "asc" },
+      ],
     });
   }
 

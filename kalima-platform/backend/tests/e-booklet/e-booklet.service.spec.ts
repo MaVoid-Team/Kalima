@@ -3,8 +3,15 @@ import { hashInviteToken } from "../../src/apps/store-api/utils/e-booklet-token"
 
 function createMockDb(overrides: Record<string, unknown> = {}) {
   const db = {
+    e_booklet_templates: {
+      findUnique: jest.fn(),
+    },
     e_booklet_template_versions: {
       findUnique: jest.fn(),
+      findMany: jest.fn(),
+    },
+    e_booklet_hotspots: {
+      findMany: jest.fn(),
     },
     e_booklet_invites: {
       findFirst: jest.fn(),
@@ -87,6 +94,62 @@ describe("EBookletService", () => {
       expect(result.warnings).toEqual([
         "This file has the same page count, but some page dimensions differ from the template. Hotspot positions may not align correctly.",
       ]);
+    });
+  });
+
+  describe("admin template editing reads", () => {
+    test("lists versions for an existing template with usage counts", async () => {
+      const db = createMockDb();
+      const versions = [
+        {
+          id: 12,
+          template_id: 4,
+          version_number: 2,
+          status: "draft",
+          _count: { hotspots: 3, instances: 0, purchases: 0 },
+        },
+      ];
+      db.e_booklet_templates.findUnique.mockResolvedValue({ id: 4 });
+      db.e_booklet_template_versions.findMany.mockResolvedValue(versions);
+
+      const service = new EBookletService(db);
+      const result = await service.listTemplateVersions(4);
+
+      expect(db.e_booklet_templates.findUnique).toHaveBeenCalledWith({
+        where: { id: 4 },
+        select: { id: true },
+      });
+      expect(db.e_booklet_template_versions.findMany).toHaveBeenCalledWith({
+        where: { template_id: 4 },
+        include: {
+          _count: { select: { hotspots: true, instances: true, purchases: true } },
+        },
+        orderBy: { version_number: "desc" },
+      });
+      expect(result).toBe(versions);
+    });
+
+    test("lists only active hotspots for a specific template version page", async () => {
+      const db = createMockDb();
+      const hotspots = [{ id: 7, page_number: 2, is_active: true }];
+      db.e_booklet_hotspots.findMany.mockResolvedValue(hotspots);
+
+      const service = new EBookletService(db);
+      const result = await service.listVersionHotspots(12, 2);
+
+      expect(db.e_booklet_hotspots.findMany).toHaveBeenCalledWith({
+        where: {
+          template_version_id: 12,
+          is_active: true,
+          page_number: 2,
+        },
+        orderBy: [
+          { page_number: "asc" },
+          { sort_order: "asc" },
+          { created_at: "asc" },
+        ],
+      });
+      expect(result).toBe(hotspots);
     });
   });
 

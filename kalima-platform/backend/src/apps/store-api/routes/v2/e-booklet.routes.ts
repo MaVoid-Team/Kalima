@@ -3,6 +3,11 @@ import { eBookletController } from "../../controllers/e-booklet.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum, portal_enum } from "../../generated/prisma/client";
+import {
+  uploadEBookletCover,
+  uploadEBookletDocument,
+  uploadEBookletHotspotMedia,
+} from "../../middleware/e-booklet-upload.middleware";
 
 const router = Router();
 
@@ -29,6 +34,24 @@ router.get("/e-booklet-store/:slug", eBookletController.getStoreTemplate);
 router.post("/e-booklet-checkout", ...teacherAuth, eBookletController.checkout);
 
 // Admin APIs.
+router.post(
+  "/admin/e-booklet-files/document",
+  ...adminAuth,
+  uploadEBookletDocument,
+  eBookletController.uploadFileAsset,
+);
+router.post(
+  "/admin/e-booklet-files/cover",
+  ...adminAuth,
+  uploadEBookletCover,
+  eBookletController.uploadFileAsset,
+);
+router.post(
+  "/admin/e-booklet-files/hotspot-media",
+  ...adminAuth,
+  uploadEBookletHotspotMedia,
+  eBookletController.uploadFileAsset,
+);
 router.get(
   "/admin/e-booklet-templates",
   ...adminAuth,
@@ -58,6 +81,21 @@ router.post(
   "/admin/e-booklet-templates/:id/versions",
   ...adminAuth,
   eBookletController.createVersion,
+);
+router.get(
+  "/admin/e-booklet-templates/:id/versions",
+  ...adminAuth,
+  eBookletController.listTemplateVersions,
+);
+router.patch(
+  "/admin/e-booklet-template-versions/:versionId",
+  ...adminAuth,
+  eBookletController.updateVersion,
+);
+router.get(
+  "/admin/e-booklet-template-versions/:versionId/hotspots",
+  ...adminAuth,
+  eBookletController.listVersionHotspots,
 );
 router.post(
   "/admin/e-booklet-template-versions/:versionId/publish",

@@ -37,6 +37,13 @@ function parseId(raw: string | string[] | undefined, label: string): number {
   return id;
 }
 
+function parseOptionalId(raw: unknown): number | undefined {
+  if (raw === undefined || raw === null || raw === "") return undefined;
+  const id = Number(Array.isArray(raw) ? raw[0] : raw);
+  if (!Number.isInteger(id) || id <= 0) return undefined;
+  return id;
+}
+
 function parseParam(raw: string | string[] | undefined, label: string): string {
   const value = Array.isArray(raw) ? raw[0] : raw;
   if (!value) {
@@ -61,6 +68,26 @@ function pagination(req: Request) {
 }
 
 export const eBookletController = {
+  async uploadFileAsset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().createFileAsset(
+        (req as any).file,
+        {
+          ownerType:
+            typeof req.body?.owner_type === "string"
+              ? req.body.owner_type
+              : "admin",
+          ownerId: parseOptionalId(req.body?.owner_id),
+          fileType:
+            typeof req.body?.file_type === "string" ? req.body.file_type : undefined,
+        },
+      );
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async listStoreTemplates(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await getEBookletService().listPublishedTemplates({
@@ -150,6 +177,17 @@ export const eBookletController = {
     }
   },
 
+  async listTemplateVersions(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().listTemplateVersions(
+        parseId(req.params.id, "template ID"),
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async createVersion(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await getEBookletService().createTemplateVersion(
@@ -163,10 +201,37 @@ export const eBookletController = {
     }
   },
 
+  async updateVersion(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().updateTemplateVersion(
+        parseId(req.params.versionId, "template version ID"),
+        req.body,
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async publishVersion(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await getEBookletService().publishTemplateVersion(
         parseId(req.params.versionId, "template version ID"),
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async listVersionHotspots(req: Request, res: Response, next: NextFunction) {
+    try {
+      const pageNumber = req.query.page_number
+        ? parseInt(req.query.page_number as string, 10)
+        : undefined;
+      const data = await getEBookletService().listVersionHotspots(
+        parseId(req.params.versionId, "template version ID"),
+        pageNumber,
       );
       res.status(200).json({ success: true, data });
     } catch (error) {
