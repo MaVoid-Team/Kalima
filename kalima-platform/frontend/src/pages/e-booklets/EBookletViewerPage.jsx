@@ -4,6 +4,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight, Lock, Maximize2, ZoomIn, ZoomOut 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import useAuth from "@/hooks/auth/useAuth";
+import useRole from "@/hooks/useRole";
 import { useEBookletViewer } from "@/hooks/useEBookletAccess";
 
 const today = new Intl.DateTimeFormat("en", {
@@ -21,6 +22,7 @@ const getDimensions = (metadata, pageNumber) => {
 export default function EBookletViewerPage() {
   const { instanceId } = useParams();
   const { user } = useAuth();
+  const { isStudent } = useRole();
   const viewer = useEBookletViewer();
   const [pageNumber, setPageNumber] = useState(1);
   const [zoom, setZoom] = useState(1);
@@ -43,6 +45,7 @@ export default function EBookletViewerPage() {
   const pageCount = Math.max(1, Number(templateVersion?.page_count || 1));
   const dimensions = getDimensions(metadata, pageNumber);
   const watermark = `Kalima - ${instance?.teacher?.name || "Teacher"} - ${user?.name || "User"} - ${today}`;
+  const backHref = isStudent ? "/student/e-booklets" : "/teacher/e-booklets";
 
   const pageStyle = useMemo(
     () => ({
@@ -65,7 +68,7 @@ export default function EBookletViewerPage() {
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <Button asChild variant="ghost" size="sm" className="-ms-2">
-              <Link to="/teacher/e-booklets">
+              <Link to={backHref}>
                 <ArrowLeft className="h-4 w-4" />
                 Back
               </Link>

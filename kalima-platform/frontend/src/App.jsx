@@ -45,6 +45,9 @@ const EBookletCartPage = lazy(
 const EBookletCheckoutPage = lazy(
   () => import("./pages/e-booklets/EBookletCheckoutPage"),
 );
+const AcceptEBookletInvitePage = lazy(
+  () => import("./pages/e-booklets/AcceptEBookletInvitePage"),
+);
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const CartPage = lazy(() => import("./pages/cart/CartPage"));
 
@@ -98,6 +101,7 @@ const EBookletViewerPage = lazy(() => import("./pages/e-booklets/EBookletViewerP
 const StudentLayout = lazy(() => import("./layouts/StudentLayout"));
 const StudentProfilePage = lazy(() => import("./pages/student/profile/StudentProfilePage"));
 const StudentSettingsPage = lazy(() => import("./pages/student/settings/StudentSettingsPage"));
+const StudentEBookletsPage = lazy(() => import("./pages/student/e-booklets/StudentEBookletsPage"));
 
 // Parent lazy-loaded pages
 const ParentLayout = lazy(() => import("./layouts/ParentLayout"));
@@ -169,6 +173,11 @@ const router = createBrowserRouter(
           </Route>
 
         </Route>
+        <Route element={<RoleRoute requiredRole={["Student"]} />}>
+          <Route element={<ProtectedRoute requireAuth={true} />}>
+            <Route path="/e-booklet-invite/:token" element={<AcceptEBookletInvitePage />} />
+          </Route>
+        </Route>
 
         {/* 404 Fallback */}
         <Route path="*" element={<NotFoundPage />} />
@@ -221,6 +230,8 @@ const router = createBrowserRouter(
         <Route element={<StudentLayout />}>
           <Route path="/student/profile" element={<StudentProfilePage />} />
           <Route path="/student/settings" element={<StudentSettingsPage />} />
+          <Route path="/student/e-booklets" element={<StudentEBookletsPage />} />
+          <Route path="/student/e-booklets/:instanceId" element={<EBookletViewerPage />} />
         </Route>
       </Route>
 
