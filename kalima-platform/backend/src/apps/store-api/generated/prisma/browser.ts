@@ -223,6 +223,56 @@ export type sample_sections = Prisma.sample_sectionsModel
  */
 export type images = Prisma.imagesModel
 /**
+ * Model e_booklet_templates
+ * 
+ */
+export type e_booklet_templates = Prisma.e_booklet_templatesModel
+/**
+ * Model e_booklet_template_versions
+ * 
+ */
+export type e_booklet_template_versions = Prisma.e_booklet_template_versionsModel
+/**
+ * Model e_booklet_hotspots
+ * 
+ */
+export type e_booklet_hotspots = Prisma.e_booklet_hotspotsModel
+/**
+ * Model e_booklet_purchases
+ * 
+ */
+export type e_booklet_purchases = Prisma.e_booklet_purchasesModel
+/**
+ * Model e_booklet_instances
+ * 
+ */
+export type e_booklet_instances = Prisma.e_booklet_instancesModel
+/**
+ * Model e_booklet_access
+ * 
+ */
+export type e_booklet_access = Prisma.e_booklet_accessModel
+/**
+ * Model e_booklet_invites
+ * 
+ */
+export type e_booklet_invites = Prisma.e_booklet_invitesModel
+/**
+ * Model e_booklet_invite_redemptions
+ * 
+ */
+export type e_booklet_invite_redemptions = Prisma.e_booklet_invite_redemptionsModel
+/**
+ * Model e_booklet_file_assets
+ * 
+ */
+export type e_booklet_file_assets = Prisma.e_booklet_file_assetsModel
+/**
+ * Model e_booklet_audit_logs
+ * 
+ */
+export type e_booklet_audit_logs = Prisma.e_booklet_audit_logsModel
+/**
  * Model product_gallery
  * 
  */
