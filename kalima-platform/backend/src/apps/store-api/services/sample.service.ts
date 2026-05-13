@@ -174,11 +174,21 @@ interface SampleListResponse {
   limit: number;
 }
 
+const SAMPLE_PRODUCT_SELECT = {
+  id: true,
+  title: true,
+  type: true,
+  price: true,
+  price_after_discount: true,
+  serial: true,
+  thumbnail_image: true,
+};
+
 // ============================================
 // SAMPLE SERVICE
 // ============================================
 
-class SampleService {
+export class SampleService {
   private initPromise: Promise<unknown> | null = null;
 
   constructor(private db: PrismaClient = prisma) {}
@@ -386,7 +396,7 @@ class SampleService {
 
     return this.db.samples.findMany({
       where: { section_id: sectionId },
-      include: { products: { select: { id: true, title: true } } },
+      include: { products: { select: SAMPLE_PRODUCT_SELECT } },
       orderBy: { id: "asc" },
     });
   }
@@ -400,7 +410,7 @@ class SampleService {
     const sample = await this.db.samples.findFirst({
       where,
       include: {
-        products: { select: { id: true, title: true } },
+        products: { select: SAMPLE_PRODUCT_SELECT },
         sample_sections: { select: { id: true, title: true } },
       },
     });
