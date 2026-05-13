@@ -560,7 +560,7 @@ export default function CreateProductPage() {
                                             <Input
                                                 type="number"
                                                 min="0"
-                                                step="0.01"
+                                                step="1"
                                                 data-testid="create-product-price-input"
                                                 {...field}
                                             />
@@ -646,7 +646,7 @@ export default function CreateProductPage() {
                                             <Input
                                                 type="number"
                                                 min="0"
-                                                step="0.01"
+                                                step="1"
                                                 data-testid="create-product-discount-input"
                                                 disabled={!!form.watch('isFreePreview')}
                                                 {...field}

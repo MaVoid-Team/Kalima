@@ -33,6 +33,8 @@ const SAMPLE_SECTION_MIME_TYPES = new Set([
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 ]);
 
+const SAMPLE_THUMBNAIL_MIME_TYPES = IMAGE_MIME_TYPES;
+
 // ============================================
 // FILE FILTER — images only
 // ============================================
@@ -185,10 +187,15 @@ function sampleFilesFilter(
     SAMPLE_SECTION_MIME_TYPES.has(file.mimetype)
   ) {
     cb(null, true);
+  } else if (
+    file.fieldname === "thumbnail" &&
+    SAMPLE_THUMBNAIL_MIME_TYPES.has(file.mimetype)
+  ) {
+    cb(null, true);
   } else {
     cb(
       new BadRequestError(
-        `Invalid file type for ${file.fieldname}: ${file.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
+        `Invalid file type for ${file.fieldname}: ${file.mimetype}. Allowed: PDF, images, video, Word, PowerPoint, or thumbnail image`,
       ) as any,
       false,
     );
@@ -201,6 +208,7 @@ export const uploadSampleFiles = multer({
   fileFilter: sampleFilesFilter,
   limits: { fileSize: 150 * 1024 * 1024 },
 }).fields([
+  { name: "thumbnail", maxCount: 1 },
   { name: "high_quality", maxCount: 1 },
   { name: "low_quality", maxCount: 1 },
 ]);

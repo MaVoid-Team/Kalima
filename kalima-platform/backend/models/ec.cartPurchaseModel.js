@@ -165,23 +165,7 @@ const cartPurchaseSchema = new mongoose.Schema(
             type: Number,
             required: true,
             min: [0, "Total cannot be negative"],
-        }
-    },
-    couponCode: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ECCoupon",
-      default: null,
-    },
-    discount: {
-      type: Number,
-      default: 0,
-      min: [0, "Discount cannot be negative"],
-    },
-    total: {
-      type: Number,
-      required: true,
-      min: [0, "Total cannot be negative"],
-    },
+        },
   },
   {
     timestamps: true,

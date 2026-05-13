@@ -165,6 +165,8 @@
     "statusReturned": "Returned",
     "statusCreated": "Created",
     "deleted": "Deleted",
+    "deletedNotice": "This order was deleted by the administration.",
+    "removedItemsNotice": "An item was removed from this order.",
     "clearFilters": "Clear",
     "filterByDate": "Filter by date",
     "table": {
@@ -185,7 +187,8 @@
       "price": "Price",
       "discount": "Discount",
       "actions": "Actions",
-      "unknownProduct": "Unknown Product"
+      "unknownProduct": "Unknown Product",
+      "removed": "Removed"
     },
     "actions": {
       "view": "View Details",
@@ -502,6 +505,9 @@
     "editTitle": "Edit Sample",
     "description": "Upload sample files for protected preview and download.",
     "mediaTypeLabel": "Media Type",
+    "thumbnailFileLabel": "Thumbnail Image",
+    "currentThumbnail": "Current thumbnail",
+    "thumbnailNote": "Shown on the samples page cards.",
     "hqFileLabel": "High Quality File (Protected)",
     "hqNote": "Used for in-app protected preview.",
     "lqFileLabel": "Low Quality File (Downloadable)",
@@ -520,6 +526,7 @@
     },
     "errors": {
       "titleRequired": "Sample title is required.",
+      "noThumbnail": "Thumbnail image is required.",
       "noHqFile": "High quality file is required.",
       "noLqFile": "Low quality file is required for this media type.",
       "noProduct": "Please enter a product ID.",

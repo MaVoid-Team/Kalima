@@ -308,8 +308,11 @@ class PurchasesService {
     const skip = (page - 1) * limit;
 
     const where: Prisma.purchasesWhereInput = { user_id: userId };
-    if (filters?.status) {
-      where.status = filters.status;
+    const status = filters?.status && filters.status !== "all" ? filters.status : null;
+    if (status) {
+      where.status = status;
+      where.deleted_at = null;
+      where.is_deleted = false;
     }
 
     const [purchases, total] = await Promise.all([

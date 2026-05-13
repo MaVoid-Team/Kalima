@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus } from 'lucide-react';
+import { Eye, EyeOff, Plus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -55,6 +55,8 @@ export default function CreateUserDialog({ onSuccess }) {
     } = useAdminUsers();
 
     const [isOpen, setIsOpen] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const { governments, zones, getZonesByGovernment, subjects, levels } = useLookups();
 
@@ -62,8 +64,8 @@ export default function CreateUserDialog({ onSuccess }) {
         type: z.enum(['Admin', 'SubAdmin', 'Moderator', 'Assistant', 'Teacher', 'Student', 'Parent', 'Lecturer']),
         name: z.string().min(1, { message: t('common:validation.required', 'Required') }),
         email: z.string().email({ message: t('common:validation.email', 'Invalid email') }),
-        password: z.string().min(6, { message: t('common:validation.minLength', { min: 6, defaultValue: 'Min 6 chars' }) }),
-        confirm_password: z.string().min(6, { message: t('common:validation.minLength', { min: 6, defaultValue: 'Min 6 chars' }) }),
+        password: z.string().min(8, { message: t('common:validation.minLength', { min: 8, defaultValue: 'Min 8 chars' }) }),
+        confirm_password: z.string().min(8, { message: t('common:validation.minLength', { min: 8, defaultValue: 'Min 8 chars' }) }),
         phone: egyptPhoneSchema(t).refine(val => val && val !== "+20", { message: t('common:validation.required', 'Required') }),
         secondary_phone: z.union([egyptPhoneSchema(t), z.literal(""), z.literal("+20"), z.undefined(), z.null()]),
         gender: z.enum(['male', 'female'], { message: t('common:validation.required', 'Required') }),
@@ -166,6 +168,7 @@ export default function CreateUserDialog({ onSuccess }) {
 
         // Client-side only field; should not be sent to the API.
         delete payload.confirm_password;
+        delete payload.type;
 
         // Parse teacher-specific fields to integers for the API
         if (values.type === 'Teacher') {
@@ -215,6 +218,15 @@ export default function CreateUserDialog({ onSuccess }) {
             case 'Teacher':
                 success = await createTeacherUser(payload);
                 break;
+            case 'Student':
+                success = await createStudentUser(payload);
+                break;
+            case 'Parent':
+                success = await createParentUser(payload);
+                break;
+            case 'Lecturer':
+                success = await createLecturerUser(payload);
+                break;
         }
 
         if (success) {
@@ -227,7 +239,11 @@ export default function CreateUserDialog({ onSuccess }) {
     return (
         <Dialog open={isOpen} onOpenChange={(open) => {
             setIsOpen(open);
-            if (!open) form.reset();
+            if (!open) {
+                form.reset();
+                setShowPassword(false);
+                setShowConfirmPassword(false);
+            }
         }}>
             <DialogTrigger asChild>
                 <Button className="gap-2">
@@ -308,7 +324,24 @@ export default function CreateUserDialog({ onSuccess }) {
                                 <FormItem>
                                     <FormLabel>{t('createDialog.password')}</FormLabel>
                                     <FormControl>
-                                        <Input type="password" autoComplete="new-password" {...field} />
+                                        <div className="relative">
+                                            <Input
+                                                type={showPassword ? 'text' : 'password'}
+                                                autoComplete="new-password"
+                                                className="pe-10"
+                                                {...field}
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                className="absolute end-1 top-1/2 h-8 w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                                onClick={() => setShowPassword((value) => !value)}
+                                                aria-label={showPassword ? t('createDialog.hidePassword', 'Hide password') : t('createDialog.showPassword', 'Show password')}
+                                            >
+                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </Button>
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -322,7 +355,24 @@ export default function CreateUserDialog({ onSuccess }) {
                                 <FormItem>
                                     <FormLabel>{t('createDialog.confirmPassword', 'Confirm Password')}</FormLabel>
                                     <FormControl>
-                                        <Input type="password" autoComplete="new-password" {...field} />
+                                        <div className="relative">
+                                            <Input
+                                                type={showConfirmPassword ? 'text' : 'password'}
+                                                autoComplete="new-password"
+                                                className="pe-10"
+                                                {...field}
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                className="absolute end-1 top-1/2 h-8 w-8 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                                onClick={() => setShowConfirmPassword((value) => !value)}
+                                                aria-label={showConfirmPassword ? t('createDialog.hidePassword', 'Hide password') : t('createDialog.showPassword', 'Show password')}
+                                            >
+                                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </Button>
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

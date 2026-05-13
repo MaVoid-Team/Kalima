@@ -31,6 +31,17 @@ const SAMPLE_MIME_TYPES = new Set([
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 ]);
 
+const THUMBNAIL_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/svg+xml",
+  "image/avif",
+]);
+
+const MAX_THUMBNAIL_SIZE_BYTES = 5 * 1024 * 1024;
+
 const MIME_TO_MEDIA_TYPE: Record<string, sample_media_type_enum> = {
   "application/pdf": sample_media_type_enum.pdf,
   "image/jpeg": sample_media_type_enum.image,
@@ -54,6 +65,8 @@ const MIME_TO_EXT: Record<string, string> = {
   "image/png": ".png",
   "image/webp": ".webp",
   "image/gif": ".gif",
+  "image/svg+xml": ".svg",
+  "image/avif": ".avif",
   "video/mp4": ".mp4",
   "video/webm": ".webm",
   "video/quicktime": ".mov",
@@ -95,6 +108,7 @@ export interface CreateSampleInput {
   original_name: string;
   mime_type: string;
   size: number;
+  thumbnail_url?: string;
   high_quality_url?: string;
   low_quality_url?: string;
 }
@@ -103,6 +117,7 @@ const SAMPLE_LIST_SELECT = {
   id: true,
   media_type: true,
   title: true,
+  thumbnail_url: true,
   high_quality_url: true,
   low_quality_url: true,
   original_name: true,
@@ -137,6 +152,7 @@ interface SampleResponse {
   id: number;
   media_type: sample_media_type_enum;
   title: string | null;
+  thumbnail_url: string | null;
   high_quality_url: string | null;
   low_quality_url: string | null;
   original_name: string;
@@ -303,6 +319,11 @@ class SampleService {
           .unlink(this.urlToAbsolutePath(sample.low_quality_url))
           .catch(() => {});
       }
+      if (sample.thumbnail_url) {
+        void fsPromises
+          .unlink(this.urlToAbsolutePath(sample.thumbnail_url))
+          .catch(() => {});
+      }
     }
 
     await this.db.sample_sections.delete({ where: { id } });
@@ -397,6 +418,7 @@ class SampleService {
     highQualityFile?: Express.Multer.File,
     lowQualityFile?: Express.Multer.File,
     title?: string,
+    thumbnailFile?: Express.Multer.File,
   ): Promise<samples> {
     if (!highQualityFile && !lowQualityFile) {
       throw new BadRequestError(
@@ -420,6 +442,16 @@ class SampleService {
       throw new BadRequestError(
         `Invalid low_quality file type: ${lowQualityFile.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
       );
+    }
+    if (thumbnailFile?.buffer) {
+      if (!THUMBNAIL_MIME_TYPES.has(thumbnailFile.mimetype)) {
+        throw new BadRequestError(
+          `Invalid thumbnail file type: ${thumbnailFile.mimetype}. Allowed: images only`,
+        );
+      }
+      if (thumbnailFile.buffer.length > MAX_THUMBNAIL_SIZE_BYTES) {
+        throw new BadRequestError("Thumbnail image must be 5MB or smaller");
+      }
     }
 
     // Verify section + product exist in parallel
@@ -446,6 +478,13 @@ class SampleService {
 
     // Write files to disk in parallel when both are provided
     const fileWrites: Promise<string | null>[] = [
+      thumbnailFile?.buffer
+        ? this.saveFileToDisk(
+            thumbnailFile.buffer,
+            thumbnailFile.mimetype,
+            "thumbnail",
+          )
+        : Promise.resolve(null),
       highQualityFile?.buffer
         ? this.saveFileToDisk(
             highQualityFile.buffer,
@@ -461,7 +500,8 @@ class SampleService {
           )
         : Promise.resolve(null),
     ];
-    const [highQualityUrl, lowQualityUrl] = await Promise.all(fileWrites);
+    const [thumbnailUrl, highQualityUrl, lowQualityUrl] =
+      await Promise.all(fileWrites);
 
     return this.db.samples.create({
       data: {
@@ -472,6 +512,7 @@ class SampleService {
         original_name: originalName,
         mime_type: mimeType,
         size,
+        thumbnail_url: thumbnailUrl,
         high_quality_url: highQualityUrl,
         low_quality_url: lowQualityUrl,
       },
@@ -488,6 +529,7 @@ class SampleService {
     highQualityFile?: Express.Multer.File,
     lowQualityFile?: Express.Multer.File,
     title?: string,
+    thumbnailFile?: Express.Multer.File,
   ): Promise<samples> {
     const sample = await this.db.samples.findFirst({
       where: { id: sampleId, section_id: sectionId },
@@ -499,6 +541,7 @@ class SampleService {
 
     let highQualityUrl = sample.high_quality_url;
     let lowQualityUrl = sample.low_quality_url;
+    let thumbnailUrl = sample.thumbnail_url;
     let originalName = sample.original_name;
     let mimeType = sample.mime_type;
     let size = sample.size;
@@ -542,10 +585,32 @@ class SampleService {
       );
     }
 
+    if (thumbnailFile?.buffer) {
+      if (!THUMBNAIL_MIME_TYPES.has(thumbnailFile.mimetype)) {
+        throw new BadRequestError(
+          `Invalid thumbnail file type: ${thumbnailFile.mimetype}. Allowed: images only`,
+        );
+      }
+      if (thumbnailFile.buffer.length > MAX_THUMBNAIL_SIZE_BYTES) {
+        throw new BadRequestError("Thumbnail image must be 5MB or smaller");
+      }
+      if (thumbnailUrl) {
+        void fsPromises
+          .unlink(this.urlToAbsolutePath(thumbnailUrl))
+          .catch(() => {});
+      }
+      thumbnailUrl = await this.saveFileToDisk(
+        thumbnailFile.buffer,
+        thumbnailFile.mimetype,
+        "thumbnail",
+      );
+    }
+
     return this.db.samples.update({
       where: { id: sampleId },
       data: {
         ...(title !== undefined && { title }),
+        thumbnail_url: thumbnailUrl,
         high_quality_url: highQualityUrl,
         low_quality_url: lowQualityUrl,
         original_name: originalName,
@@ -580,6 +645,11 @@ class SampleService {
     if (sample.low_quality_url) {
       void fsPromises
         .unlink(this.urlToAbsolutePath(sample.low_quality_url))
+        .catch(() => {});
+    }
+    if (sample.thumbnail_url) {
+      void fsPromises
+        .unlink(this.urlToAbsolutePath(sample.thumbnail_url))
         .catch(() => {});
     }
 
@@ -641,13 +711,13 @@ class SampleService {
   }
 
   /** Enrich sample with computed is_displayable and thumbnail (for API responses) */
-  enrichSample<T extends { media_type: sample_media_type_enum; high_quality_url?: string | null; low_quality_url?: string | null }>(
+  enrichSample<T extends { media_type: sample_media_type_enum; thumbnail_url?: string | null; high_quality_url?: string | null; low_quality_url?: string | null }>(
     sample: T,
   ): T & { is_displayable: boolean; thumbnail: string | null } {
     return {
       ...sample,
       is_displayable: this.isDisplayable(sample.media_type),
-      thumbnail: sample.high_quality_url || sample.low_quality_url || null,
+      thumbnail: sample.thumbnail_url || null,
     };
   }
 }

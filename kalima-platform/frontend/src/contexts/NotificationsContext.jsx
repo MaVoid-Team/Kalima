@@ -35,7 +35,7 @@ export const CATEGORY_COLORS = {
 export const NotificationsProvider = ({ children }) => {
     const { t } = useTranslation('notifications');
     const { isAuthenticated } = useAuth();
-    const { hasAdminAccess } = useRole();
+    const { hasAdminAccess, isTeacher } = useRole();
     
     const {
         getMyNotifications,
@@ -68,7 +68,11 @@ export const NotificationsProvider = ({ children }) => {
         setLoading(true);
         try {
             const { data } = await getMyNotifications({ is_read: false, limit: 20 });
-            setNotifications(data.notifications);
+            const nextNotifications = data.notifications || [];
+            setNotifications(nextNotifications);
+            if (nextNotifications.some((notification) => notification.entity_type === 'purchase')) {
+                window.dispatchEvent(new CustomEvent('kalima:orders-changed'));
+            }
             await fetchUnreadCount();
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
@@ -111,17 +115,25 @@ export const NotificationsProvider = ({ children }) => {
                 console.log('Received notification:', notification);
                 setNotifications(prev => [notification, ...prev]);
                 setUnreadCount(prev => prev + 1);
+                if (notification.entity_type === 'purchase') {
+                    window.dispatchEvent(new CustomEvent('kalima:orders-changed', { detail: notification }));
+                }
                 
                 // Show toast
                 const messageKey = notification.message_key;
                 const message = t(`keys.${messageKey}`, messageKey);
+                const purchaseTarget = hasAdminAccess
+                    ? `/admin/orders/${notification.entity_id}`
+                    : isTeacher
+                        ? '/teacher/orders'
+                        : '/orders';
                 
                 toast(message, {
                     description: t('new_notification', 'You have a new notification'),
                     icon: '🔔',
                     action: notification.entity_type === 'purchase' ? {
                         label: t('view', 'View'),
-                        onClick: () => window.location.href = `/orders/${notification.entity_id}`
+                        onClick: () => window.location.href = purchaseTarget
                     } : undefined
                 });
             };
@@ -130,6 +142,7 @@ export const NotificationsProvider = ({ children }) => {
                 if (hasAdminAccess) {
                     socket.emit('join', 'store_admins');
                 }
+                fetchInitialNotifications();
             };
 
             socket.on('notification', onNotification);
@@ -149,7 +162,7 @@ export const NotificationsProvider = ({ children }) => {
             setUnreadCount(0);
             isFirstLoad.current = true;
         }
-    }, [isAuthenticated, hasAdminAccess, t, fetchInitialNotifications]);
+    }, [isAuthenticated, hasAdminAccess, isTeacher, t, fetchInitialNotifications]);
 
     const value = {
         notifications,

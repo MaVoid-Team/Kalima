@@ -152,6 +152,10 @@
     "selectGender": "Select gender",
     "male": "Male",
     "female": "Female",
+    "validation": {
+      "locationNameRequired": "Location name is required",
+      "urlInvalid": "Must be a valid URL"
+    },
     "teacherInfo": "Teaching Information",
     "subject": "Subject",
     "selectSubject": "Select subject",

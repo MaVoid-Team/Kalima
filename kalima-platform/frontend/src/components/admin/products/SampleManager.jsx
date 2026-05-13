@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
 import { cn } from '@/lib/utils';
+import { getImageUrl } from '@/lib/storeUtils';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -70,6 +71,7 @@ const SampleUploadForm = ({
     uploadProgress,
     initialSectionId,
     initialMediaType,
+    initialThumbnailName,
     initialHqName,
     initialLqName,
     initialTitle
@@ -79,29 +81,35 @@ const SampleUploadForm = ({
     const [title, setTitle] = useState(initialTitle || '');
     const [sectionId, setSectionId] = useState(initialSectionId || '');
     const [mediaType, setMediaType] = useState(initialMediaType || 'pdf');
+    const [thumbnailFileName, setThumbnailFileName] = useState(initialThumbnailName || '');
     const [hqFileName, setHqFileName] = useState(initialHqName || '');
     const [lqFileName, setLqFileName] = useState(initialLqName || '');
     const [validationError, setValidationError] = useState('');
 
+    const thumbnailFileRef = useRef(null);
     const hqFileRef = useRef(null);
     const lqFileRef = useRef(null);
 
     const getTypes = (newHq = null, newLq = null) => {
         const hqFile = newHq || hqFileRef.current?.files?.[0];
         const lqFile = newLq || lqFileRef.current?.files?.[0];
+        const thumbnailFile = thumbnailFileRef.current?.files?.[0];
         const hqType = hqFile ? detectMediaType(hqFile) : (sample ? sample.media_type : null);
         const lqType = lqFile ? detectMediaType(lqFile) : (sample ? sample.media_type : null);
-        return { hqFile, lqFile, hqType, lqType };
+        return { hqFile, lqFile, thumbnailFile, hqType, lqType };
     };
 
     const validateFiles = (newHq = null, newLq = null, overrideTitle = null) => {
         const { hqFile, lqFile, hqType, lqType } = getTypes(newHq, newLq);
+        const thumbnailFile = thumbnailFileRef.current?.files?.[0];
         const hqExists = hqFile || (sample && sample.high_quality_url);
         const lqExists = lqFile || (sample && sample.low_quality_url);
+        const thumbnailExists = thumbnailFile || (sample && sample.thumbnail_url);
 
         const currentTitle = overrideTitle !== null ? overrideTitle : title;
         if (!currentTitle.trim()) return t('samples.errors.titleRequired');
         if (!sectionId) return t('samples.errors.noSection');
+        if (!thumbnailExists) return t('samples.errors.noThumbnail', 'Thumbnail image is required.');
         if (!hqExists) return t('samples.errors.noHqFile');
 
         if (hqExists && hqFile && !hqType) return t('samples.errors.unsupportedType');
@@ -119,10 +127,10 @@ const SampleUploadForm = ({
             setValidationError(error);
             return;
         }
-        const { hqFile, lqFile, hqType, lqType } = getTypes();
+        const { hqFile, lqFile, thumbnailFile, hqType, lqType } = getTypes();
         const finalMediaType = hqType || lqType || mediaType;
 
-        onSubmit({ sectionId, mediaType: finalMediaType, title, hqFile, lqFile });
+        onSubmit({ sectionId, mediaType: finalMediaType, title, hqFile, lqFile, thumbnailFile });
     };
 
     return (
@@ -175,6 +183,39 @@ const SampleUploadForm = ({
                         {t('samples.docFormats', 'Accepted: PDF, Word (.doc/.docx), PowerPoint (.ppt/.pptx) — download only')}
                     </p>
                 )}
+            </div>
+
+            <div className="space-y-2">
+                <Label>{t('samples.thumbnailFileLabel', 'Thumbnail Image')} *</Label>
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => thumbnailFileRef.current?.click()}
+                    disabled={uploading}
+                    className="w-full justify-start font-normal text-muted-foreground h-10 px-3"
+                >
+                    <Upload className="h-4 w-4 me-2 shrink-0" />
+                    <span className="truncate">
+                        {thumbnailFileName || (sample?.thumbnail_url ? t('samples.currentThumbnail', 'Current thumbnail') : t('common.chooseFile'))}
+                    </span>
+                </Button>
+                <input
+                    type="file"
+                    ref={thumbnailFileRef}
+                    className="hidden"
+                    accept=".jpg,.jpeg,.png,.webp,.gif,.svg,.avif,image/*"
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                            setThumbnailFileName(file.name);
+                            setValidationError(validateFiles());
+                        } else {
+                            setThumbnailFileName('');
+                            setValidationError(validateFiles());
+                        }
+                    }}
+                />
+                <p className="text-[10px] text-muted-foreground">{t('samples.thumbnailNote', 'Shown on the samples page cards.')}</p>
             </div>
 
             <div className="space-y-2">
@@ -299,15 +340,21 @@ const SampleUploadForm = ({
 const SamplePreviewDisplay = ({ sample, product, previewUrl, downloadUrl, onEdit, onDelete }) => {
     const { t } = useTranslation('admin');
     const mt = sample.media_type;
+    const thumbnailUrl = getImageUrl(sample.thumbnail_url);
 
     return (
         <div className="border border-border rounded-xl overflow-hidden">
-            {mt === 'image' && sample.high_quality_url && (
+            {thumbnailUrl && (
+                <div className="w-full max-h-64 overflow-hidden bg-muted flex items-center justify-center">
+                    <img src={thumbnailUrl} alt={sample.title || t('samples.previewAlt')} className="max-h-64 object-cover w-full" />
+                </div>
+            )}
+            {!thumbnailUrl && mt === 'image' && sample.high_quality_url && (
                 <div className="w-full max-h-64 overflow-hidden bg-muted flex items-center justify-center">
                     <img src={previewUrl} alt={t('samples.previewAlt')} className="max-h-64 object-contain w-full" />
                 </div>
             )}
-            {mt === 'video' && sample.high_quality_url && (
+            {!thumbnailUrl && mt === 'video' && sample.high_quality_url && (
                 <div className="w-full bg-black">
                     <video src={previewUrl} controls className="w-full max-h-64" />
                 </div>
@@ -388,13 +435,14 @@ export default function SampleManager({ product, loading, onUpdateSample, onRemo
         setUploadProgress(0);
     };
 
-    const handleUploadSubmit = async ({ sectionId, mediaType, title, hqFile, lqFile }) => {
+    const handleUploadSubmit = async ({ sectionId, mediaType, title, hqFile, lqFile, thumbnailFile }) => {
         const formData = new FormData();
         formData.append('product_id', product.id);
         formData.append('sample_section_id', sectionId);
         formData.append('media_type', mediaType);
         if (title) formData.append('title', title);
         
+        if (thumbnailFile) formData.append('thumbnail', thumbnailFile);
         if (hqFile) formData.append('high_quality', hqFile);
         if (lqFile) formData.append('low_quality', lqFile);
 
@@ -521,6 +569,7 @@ export default function SampleManager({ product, loading, onUpdateSample, onRemo
                         onSubmit={handleUploadSubmit}
                         initialSectionId={currentEditSample?.section_id ? String(currentEditSample.section_id) : ''}
                         initialMediaType={currentEditSample?.media_type || 'pdf'}
+                        initialThumbnailName=""
                         initialHqName={currentEditSample?.original_name || ''}
                         initialLqName={currentEditSample?.original_name || ''}
                         initialTitle={currentEditSample?.title || ''}

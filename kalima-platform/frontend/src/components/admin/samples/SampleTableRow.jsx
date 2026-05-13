@@ -4,6 +4,7 @@ import { FileText, Image, Video, Presentation, FilePieChart, ExternalLink, Downl
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import RemoteFileSize from './RemoteFileSize';
+import { getImageUrl } from '@/lib/storeUtils';
 
 const getIconForType = (mediaType) => {
     const mt = mediaType?.toLowerCase();
@@ -19,12 +20,22 @@ export default function SampleTableRow({ sample, sectionId, onEdit, onDelete, lo
     const { t } = useTranslation('admin');
     const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
     const downloadUrl = `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download`;
+    const thumbnailUrl = getImageUrl(sample.thumbnail_url);
 
     return (
         <tr className="hover:bg-muted/30 transition-colors">
             <td className="ps-4 py-3">
                 <div className="flex items-center gap-3">
-                    {getIconForType(sample.media_type)}
+                    {thumbnailUrl ? (
+                        <img
+                            src={thumbnailUrl}
+                            alt=""
+                            className="h-12 w-16 rounded-md object-cover bg-muted border border-border"
+                            data-testid={`admin-sample-thumb-${sample.id}`}
+                        />
+                    ) : (
+                        getIconForType(sample.media_type)
+                    )}
                     <div className="flex flex-col">
                         <div className="flex items-center gap-2">
                             <span className="font-medium">{sample.title || `${t('samples.count', 'Sample')} #${sample.id}`}</span>

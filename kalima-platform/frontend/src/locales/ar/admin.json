@@ -165,6 +165,8 @@
     "statusReturned": "مرتجع",
     "statusCreated": "تم الإنشاء",
     "deleted": "محذوف",
+    "deletedNotice": "تم حذف هذا الطلب من قِبل الإدارة.",
+    "removedItemsNotice": "تمت إزالة عنصر من هذا الطلب.",
     "clearFilters": "مسح",
     "filterByDate": "تصفية حسب التاريخ",
     "table": {
@@ -185,7 +187,8 @@
       "price": "السعر",
       "discount": "الخصم",
       "actions": "الإجراءات",
-      "unknownProduct": "منتج غير معروف"
+      "unknownProduct": "منتج غير معروف",
+      "removed": "تمت الإزالة"
     },
     "actions": {
       "view": "عرض التفاصيل",
@@ -513,6 +516,9 @@
     "editTitle": "تعديل العينة",
     "description": "ارفع ملفات العينات للمعاينة المحمية والتنزيل.",
     "mediaTypeLabel": "نوع الوسائط",
+    "thumbnailFileLabel": "صورة مصغرة",
+    "currentThumbnail": "الصورة المصغرة الحالية",
+    "thumbnailNote": "تظهر على بطاقات صفحة العينات.",
     "hqFileLabel": "ملف عالي الجودة (محمي)",
     "hqNote": "يستخدم للمعاينة المحمية داخل التطبيق.",
     "lqFileLabel": "ملف منخفض الجودة (قابل للتنزيل)",
@@ -531,6 +537,7 @@
     },
     "errors": {
       "titleRequired": "عنوان العينة مطلوب.",
+      "noThumbnail": "الصورة المصغرة مطلوبة.",
       "noHqFile": "الملف عالي الجودة مطلوب.",
       "noLqFile": "الملف منخفض الجودة مطلوب لهذا النوع.",
       "noProduct": "يرجى إدخال معرف المنتج.",

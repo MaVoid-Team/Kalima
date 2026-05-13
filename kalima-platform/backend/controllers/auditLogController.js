@@ -500,14 +500,16 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
   });
 
   // Apply date filtering if provided
-    if (req.query.startDate) {
-      dateFilter.$gte = new Date(req.query.startDate);
-    }
-    if (req.query.endDate) {
-      const endDate = new Date(req.query.endDate);
-      endDate.setHours(23, 59, 59, 999); // Set to end of day
-      dateFilter.$lte = endDate;
-    }
+  const dateFilter = {};
+  if (req.query.startDate) {
+    dateFilter.$gte = new Date(req.query.startDate);
+  }
+  if (req.query.endDate) {
+    const endDate = new Date(req.query.endDate);
+    endDate.setHours(23, 59, 59, 999); // Set to end of day
+    dateFilter.$lte = endDate;
+  }
+  if (Object.keys(dateFilter).length > 0) {
     query
       .where("timestamp")
       .gte(dateFilter.$gte || new Date("1970-01-01"))

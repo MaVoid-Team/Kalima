@@ -172,12 +172,12 @@ export const useAdminUsers = () => {
         }
     };
 
-    const createTeacherUser = (data) => _createUser('auth/admin/teachers', data);
+    const createTeacherUser = (data) => _createUser('/admin/teachers', data);
     const createAdminUser = (data) => _createUser('auth/admin/create-admin', data);
     const createSubAdminUser = (data) => _createUser('auth/admin/create-subadmin', data);
     const createModeratorUser = (data) => _createUser('auth/admin/create-moderator', data);
     const createAssistantUser = (data) => _createUser('auth/admin/create-assistant', data);
-    const createStudentUser = (data) => _createUser('auth/admin/students', data);
+    const createStudentUser = (data) => _createUser('/admin/students', data);
     const createParentUser = (data) => _createUser('/admin/parents', data);
     const createLecturerUser = (data) => _createUser('/admin/lecturers', data);
     return {

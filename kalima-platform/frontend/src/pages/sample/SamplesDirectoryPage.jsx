@@ -6,7 +6,7 @@ import HeroSection from "@/components/MarketPage/HeroSection";
 import useApiMutation from "@/hooks/useApiMutation";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatFileSize } from "@/lib/storeUtils";
+import { formatFileSize, getImageUrl } from "@/lib/storeUtils";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import DownloadWithProgress from '@/components/ui/DownloadWithProgress';
 
@@ -116,11 +116,13 @@ export default function SamplesDirectoryPage() {
                                                         const downloadUrl = sectionId && sample.low_quality_url
                                                             ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download`
                                                             : '';
-                                                        const thumbnailUrl = sectionId && sample.high_quality_url
+                                                        const previewThumbnailUrl = sectionId && sample.high_quality_url
                                                             ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/preview`
                                                             : '';
-                                                        // Only image/video media types have a displayable thumbnail
-                                                        const hasThumbnail = (sample.thumbnail || sample.high_quality_url) && (mt === 'image' || mt === 'video');
+                                                        const uploadedThumbnailUrl = getImageUrl(sample.thumbnail_url);
+                                                        const thumbnailUrl = uploadedThumbnailUrl || previewThumbnailUrl;
+                                                        const hasMediaPreview = !uploadedThumbnailUrl && sample.high_quality_url && (mt === 'image' || mt === 'video');
+                                                        const hasThumbnail = Boolean(uploadedThumbnailUrl || hasMediaPreview);
 
                                                         return (
                                                             <div
@@ -130,7 +132,7 @@ export default function SamplesDirectoryPage() {
                                                                 {/* Thumbnail / Media preview */}
                                                                 {hasThumbnail ? (
                                                                     <div className="w-full aspect-video overflow-hidden bg-muted relative">
-                                                                        {mt === 'video' ? (
+                                                                        {hasMediaPreview && mt === 'video' ? (
                                                                             <video
                                                                                 src={thumbnailUrl}
                                                                                 className="w-full h-full object-cover"

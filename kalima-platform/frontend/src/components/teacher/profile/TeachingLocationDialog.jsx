@@ -21,8 +21,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
-const locationSchema = z.object({
-    location_name: z.string().min(1, 'Location name is required').max(255),
+const getLocationSchema = (t) => z.object({
+    location_name: z.string().min(1, t('profile.validation.locationNameRequired', 'Location name is required')).max(255),
     location_type: z.enum(['School', 'Center']).optional(),
 });
 
@@ -30,7 +30,7 @@ export default function TeachingLocationDialog({ open, onOpenChange, location, o
     const { t } = useTranslation('teacher');
 
     const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm({
-        resolver: zodResolver(locationSchema),
+        resolver: zodResolver(getLocationSchema(t)),
         defaultValues: { location_type: 'School', location_name: '' }
     });
 

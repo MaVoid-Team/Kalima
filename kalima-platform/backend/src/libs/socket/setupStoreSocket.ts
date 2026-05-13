@@ -16,10 +16,13 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
   io.on("connection", async (socket) => {
     console.log(`[Socket] New connection attempt: ${socket.id}`);
     
-    const token =
+    const rawToken =
       socket.handshake.auth?.token ??
       socket.handshake.query?.token ??
       socket.handshake.headers?.authorization?.replace("Bearer ", "");
+    const token = typeof rawToken === "string"
+      ? rawToken.replace(/^Bearer\s+/i, "")
+      : rawToken;
 
     if (!token) {
       console.log(`[Socket] Connection dropped - No token provided for ${socket.id}`);

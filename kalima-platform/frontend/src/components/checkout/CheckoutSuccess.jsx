@@ -5,10 +5,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import useRole from "@/hooks/useRole";
 
 export default function CheckoutSuccess({ purchaseSerial }) {
   const { t } = useTranslation("checkout");
   const navigate = useNavigate();
+  const { isTeacher } = useRole();
+  const ordersPath = isTeacher ? "/teacher/orders" : "/orders";
 
   const handleCopySerial = () => {
     if (!purchaseSerial) return;
@@ -69,7 +72,7 @@ export default function CheckoutSuccess({ purchaseSerial }) {
           </Button>
 
           <Button
-            onClick={() => navigate("/orders")}
+            onClick={() => navigate(ordersPath)}
             variant="outline"
             className="w-full"
             size="lg"

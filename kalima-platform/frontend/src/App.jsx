@@ -183,6 +183,7 @@ const router = createBrowserRouter(
       <Route element={<RoleRoute requiredRole={["Teacher"]} />}>
         <Route element={<TeacherLayout />}>
           <Route path="/teacher/profile" element={<TeacherProfilePage />} />
+          <Route path="/teacher/orders" element={<MyOrdersPage />} />
           <Route path="/teacher/settings" element={<TeacherSettingsPage />} />
         </Route>
       </Route>

@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { formatCurrency, formatOrderDate, getImageUrl } from '@/lib/storeUtils';
+import { cn } from '@/lib/utils';
 
 function DetailRow({ label, value }) {
   return (
@@ -24,6 +25,10 @@ export default function OrderDetailsDialog({ order }) {
   const { t, i18n } = useTranslation('admin');
 
   const screenshotUrl = getImageUrl(order?.payment_screenshot?.url);
+  const isDeleted = Boolean(order?.is_deleted || order?.deleted_at);
+  const statusValue = isDeleted
+    ? t('orders.deleted', 'Deleted')
+    : t(`orders.status.${(order?.status || '').toLowerCase()}`, order?.status || '-');
 
   return (
     <Dialog>
@@ -46,7 +51,12 @@ export default function OrderDetailsDialog({ order }) {
         <div className="space-y-5">
           <section className="rounded-md border p-4 space-y-2">
             <h4 className="font-semibold text-sm">{t('orders.sections.summary', 'Summary')}</h4>
-            <DetailRow label={t('orders.status.label', 'Status')} value={t(`orders.status.${(order?.status || '').toLowerCase()}`)} />
+            <DetailRow label={t('orders.status.label', 'Status')} value={statusValue} />
+            {isDeleted && (
+              <p className="text-sm font-medium text-destructive">
+                {t('orders.deletedNotice', 'This order was deleted by the administration.')}
+              </p>
+            )}
             <DetailRow label={t('orders.subtotal', 'Subtotal')} value={formatCurrency(order?.subtotal, t)} />
             <DetailRow label={t('orders.discount', 'Discount')} value={formatCurrency(order?.discount, t)} />
             <DetailRow label={t('orders.total', 'Total')} value={formatCurrency(order?.total, t)} />
@@ -91,9 +101,10 @@ export default function OrderDetailsDialog({ order }) {
               order.purchase_items.map((item) => {
                 const product = item?.products || {};
                 const thumbnail = getImageUrl(product?.thumbnail_image?.url);
+                const isRemoved = Boolean(item?.is_deleted || item?.deleted_at);
 
                 return (
-                  <div key={item.id} className="rounded-md border p-3 space-y-2">
+                  <div key={item.id} className={cn("rounded-md border p-3 space-y-2", isRemoved && "opacity-60 bg-muted/30")}>
                     <div className="flex gap-3 items-start">
                       {thumbnail ? (
                         <img
@@ -103,7 +114,14 @@ export default function OrderDetailsDialog({ order }) {
                         />
                       ) : null}
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-sm truncate">{product?.title || t('orders.unknownProduct', 'Unknown Product')}</p>
+                        <div className="flex items-center gap-2">
+                          <p className={cn("font-medium text-sm truncate", isRemoved && "line-through")}>{product?.title || t('orders.unknownProduct', 'Unknown Product')}</p>
+                          {isRemoved && (
+                            <span className="text-xs font-semibold text-destructive bg-destructive/10 px-2 py-0.5 rounded-sm">
+                              {t('orders.items.removed', 'Removed')}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground">{product?.type || 'Product'}</p>
                         <p className="text-xs mt-1">{t('orders.itemPrice', 'Item price')}: {formatCurrency(item?.price_at_purchase, t)}</p>
                       </div>

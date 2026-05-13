@@ -37,6 +37,15 @@ const MyOrdersPage = () => {
         fetchMyOrders();
     }, [fetchMyOrders]);
 
+    useEffect(() => {
+        const handleOrdersChanged = () => {
+            fetchMyOrders();
+        };
+
+        window.addEventListener('kalima:orders-changed', handleOrdersChanged);
+        return () => window.removeEventListener('kalima:orders-changed', handleOrdersChanged);
+    }, [fetchMyOrders]);
+
     const handlePageChange = (newPage) => {
         if (newPage < 1 || newPage > pagination.pages) return;
         setPage(newPage);

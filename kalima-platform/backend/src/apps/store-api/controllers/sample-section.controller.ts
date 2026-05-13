@@ -252,8 +252,13 @@ export const sampleSectionController = {
       const dto = await validateDto(CreateSampleBodyDto, body);
 
       const files = req.files as
-        | { high_quality?: Express.Multer.File[]; low_quality?: Express.Multer.File[] }
+        | {
+            thumbnail?: Express.Multer.File[];
+            high_quality?: Express.Multer.File[];
+            low_quality?: Express.Multer.File[];
+          }
         | undefined;
+      const thumbnailFile = files?.thumbnail?.[0];
       const highQualityFile = files?.high_quality?.[0];
       const lowQualityFile = files?.low_quality?.[0];
 
@@ -263,6 +268,7 @@ export const sampleSectionController = {
         highQualityFile,
         lowQualityFile,
         dto.title,
+        thumbnailFile,
       );
 
       res.status(201).json({
@@ -287,8 +293,13 @@ export const sampleSectionController = {
       const dto = await validateDto(UpdateSampleBodyDto, req.body);
 
       const files = req.files as
-        | { high_quality?: Express.Multer.File[]; low_quality?: Express.Multer.File[] }
+        | {
+            thumbnail?: Express.Multer.File[];
+            high_quality?: Express.Multer.File[];
+            low_quality?: Express.Multer.File[];
+          }
         | undefined;
+      const thumbnailFile = files?.thumbnail?.[0];
       const highQualityFile = files?.high_quality?.[0];
       const lowQualityFile = files?.low_quality?.[0];
 
@@ -298,6 +309,7 @@ export const sampleSectionController = {
         highQualityFile,
         lowQualityFile,
         dto.title,
+        thumbnailFile,
       );
 
       res.status(200).json({
