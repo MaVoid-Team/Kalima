@@ -8,14 +8,20 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
+import { useRole } from '@/hooks/useRole';
 
 export default function NotificationBell() {
     const { t, i18n } = useTranslation('notifications');
     const { notifications, unreadCount, markAsRead, markAllAsRead, loading } = useNotifications();
+    const { hasAdminAccess, isTeacher } = useRole();
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
 
     const dateLocale = i18n.language === 'ar' ? ar : enUS;
+    const getPurchaseTarget = (notification) => {
+        if (hasAdminAccess) return `/admin/orders/${notification.entity_id}`;
+        return isTeacher ? '/teacher/orders' : '/orders';
+    };
 
     const handleNotificationClick = async (notification) => {
         if (!notification.is_read) {
@@ -25,7 +31,7 @@ export default function NotificationBell() {
         setIsOpen(false);
         
         if (notification.entity_type === 'purchase') {
-            navigate(`/orders/${notification.entity_id}`);
+            navigate(getPurchaseTarget(notification));
         } else if (notification.entity_type === 'user') {
             // navigate to user profile
         }

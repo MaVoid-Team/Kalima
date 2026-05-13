@@ -40,7 +40,7 @@ export default function TeacherSidebar({ isMobileOpen, setIsMobileOpen }) {
   const navigation = [
     { name: t('nav.home', 'Home'), href: '/', icon: Home, id: 'home' },
     { name: t('nav.profile', 'My Profile'), href: '/teacher/profile', icon: User, id: 'profile' },
-    { name: t('nav.orders', 'My Orders'), href: '/orders', icon: ShoppingBag, id: 'orders' },
+    { name: t('nav.orders', 'My Orders'), href: '/teacher/orders', icon: ShoppingBag, id: 'orders' },
     { name: t('nav.settings', 'Settings'), href: '/teacher/settings', icon: Settings, id: 'settings' },
   ];
 

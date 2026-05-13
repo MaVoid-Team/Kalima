@@ -6,6 +6,7 @@ import axios from "@/api/axios";
 import useApiMutation from "@/hooks/useApiMutation";
 import { getImageUrl } from "@/lib/storeUtils";
 import { egyptPhoneSchema } from "@/components/ui/phone-input";
+import useRole from "@/hooks/useRole";
 
 const separateRequiredFields = (itemFields) => {
   const imageUploads = [];
@@ -60,6 +61,8 @@ export function useFastBuy({ checkout = false } = {}) {
   const { mutate, loading } = useApiMutation();
   const navigate = useNavigate();
   const { t } = useTranslation("checkout");
+  const { isTeacher } = useRole();
+  const ordersPath = isTeacher ? "/teacher/orders" : "/orders";
 
   const [preview, setPreview] = useState(null);
   const [isLoading, setIsLoading] = useState(checkout);
@@ -258,7 +261,7 @@ export function useFastBuy({ checkout = false } = {}) {
       }
 
       toast.success(t("fastBuy.checkoutSuccess", "Checkout successful! Redirecting to market..."));
-      navigate("/orders", { replace: true, state: { skipFastBuyClear: true } });
+      navigate(ordersPath, { replace: true, state: { skipFastBuyClear: true } });
     } catch {
       // Global error handler will trigger toasts
     }

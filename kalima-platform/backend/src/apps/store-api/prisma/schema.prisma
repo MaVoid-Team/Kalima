@@ -415,6 +415,7 @@ model samples {
   title            String?               @db.VarChar(255)
   is_archived      Boolean?              @default(false)
   media_type       sample_media_type_enum
+  thumbnail_url    String?
   high_quality_url String?
   low_quality_url  String?
   original_name    String                @db.VarChar(255)

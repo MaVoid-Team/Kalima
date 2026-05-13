@@ -14,15 +14,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-const socialSchema = z.object({
-    url: z.string().url('Must be a valid URL').max(1024),
+const getSocialSchema = (t) => z.object({
+    url: z.string().url(t('profile.validation.urlInvalid', 'Must be a valid URL')).max(1024),
 });
 
 export default function SocialMediaDialog({ open, onOpenChange, link, onSave, loading }) {
     const { t } = useTranslation('teacher');
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm({
-        resolver: zodResolver(socialSchema),
+        resolver: zodResolver(getSocialSchema(t)),
         defaultValues: { url: '' }
     });
 

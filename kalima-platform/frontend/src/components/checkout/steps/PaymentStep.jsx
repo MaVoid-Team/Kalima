@@ -11,11 +11,14 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { getBaseUrl, getImageUrl } from '@/lib/storeUtils';
 import { motion } from 'framer-motion';
+import useRole from '@/hooks/useRole';
 
 export default function PaymentStep({ onBack }) {
-    const { cart, checkout, getPaymentMethods } = useCart();
+    const { cart, checkout, getPaymentMethods, loadCart } = useCart();
     const { t, i18n } = useTranslation('checkout');
     const navigate = useNavigate();
+    const { isTeacher } = useRole();
+    const ordersPath = isTeacher ? '/teacher/orders' : '/orders';
 
     const baseURL = React.useMemo(() => getBaseUrl(), []);
 
@@ -181,7 +184,11 @@ export default function PaymentStep({ onBack }) {
                 </aside>
             </div>
 
-            <AlertDialog open={showReceipt} onOpenChange={() => { setShowReceipt(!showReceipt); navigate('/cart'); }}>
+            <AlertDialog open={showReceipt} onOpenChange={() => {
+                setShowReceipt(!showReceipt);
+                loadCart();
+                navigate('/cart');
+            }}>
                 <AlertDialogContent className="max-w-xl p-6 print:hidden">
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-lg font-bold text-center">{t('receipt.title', 'Purchase Receipt')}</AlertDialogTitle>
@@ -215,9 +222,27 @@ export default function PaymentStep({ onBack }) {
                             </div>
                         )}
                     </div>
-                    <AlertDialogFooter>
-                        <Button onClick={handlePrintReceipt} data-testid="checkout-payment-step-receipt-print-button">{t('receipt.print', 'Print')}</Button>
-                        <AlertDialogCancel data-testid="checkout-payment-step-receipt-close-button">{t('cancel', 'Close')}</AlertDialogCancel>
+                    <AlertDialogFooter className="flex-col sm:flex-col gap-2">
+                        <Button
+                            onClick={handlePrintReceipt}
+                            className="w-full"
+                            data-testid="checkout-payment-step-receipt-print-button"
+                        >
+                            {t('receipt.print', 'Print')}
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => {
+                                setShowReceipt(false);
+                                loadCart();
+                                navigate(ordersPath);
+                            }}
+                            data-testid="checkout-payment-step-receipt-orders-button"
+                        >
+                            {t('success.view_orders', 'View My Orders')}
+                        </Button>
+                        <AlertDialogCancel className="w-full" data-testid="checkout-payment-step-receipt-close-button">{t('cancel', 'Close')}</AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

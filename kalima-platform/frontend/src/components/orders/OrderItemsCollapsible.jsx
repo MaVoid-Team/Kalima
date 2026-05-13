@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, getImageUrl } from '@/lib/storeUtils';
+import { cn } from '@/lib/utils';
 
 export default function OrderItemsCollapsible({ order }) {
   const { t } = useTranslation('admin');
@@ -31,9 +32,14 @@ export default function OrderItemsCollapsible({ order }) {
           {order.purchase_items?.map((item) => {
             const product = item.products || {};
             const imgUrl = getImageUrl(product?.thumbnail_image?.url);
+            const isRemoved = Boolean(item?.is_deleted || item?.deleted_at);
 
             return (
-              <div key={item.id} className="flex items-center gap-4">
+              <div
+                key={item.id}
+                className={cn("flex items-center gap-4", isRemoved && "opacity-60")}
+                data-testid={`order-item-${item.id}`}
+              >
                 <div className="h-14 w-14 rounded-md bg-muted/50 border border-border/50 overflow-hidden shrink-0 relative">
                   {imgUrl ? (
                     <img
@@ -49,18 +55,26 @@ export default function OrderItemsCollapsible({ order }) {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h5 className="font-medium text-foreground text-sm truncate">
+                  <h5 className={cn("font-medium text-foreground text-sm truncate", isRemoved && "line-through")}>
                     {product.title || t('orders.unknownProduct', 'Unknown Product')}
                   </h5>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-sm">
                       {product.type || 'Product'}
                     </span>
+                    {isRemoved && (
+                      <span
+                        className="text-xs font-semibold text-destructive bg-destructive/10 px-2 py-0.5 rounded-sm"
+                        data-testid={`order-item-${item.id}-removed-badge`}
+                      >
+                        {t('orders.items.removed', 'Removed')}
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="font-semibold text-sm text-foreground">
+                  <span className={cn("font-semibold text-sm text-foreground", isRemoved && "line-through text-muted-foreground")}>
                     {formatCurrency(item.price_at_purchase, t)}
                   </span>
                 </div>

@@ -592,7 +592,7 @@ export default function EditProductPage() {
                                             <Input
                                                 type="number"
                                                 min="0"
-                                                step="0.01"
+                                                step="1"
                                                 data-testid="edit-product-price-input"
                                                 {...field}
                                             />
@@ -677,7 +677,7 @@ export default function EditProductPage() {
                                             <Input
                                                 type="number"
                                                 min="0"
-                                                step="0.01"
+                                                step="1"
                                                 data-testid="edit-product-discount-input"
                                                 disabled={!!form.watch('isFreePreview')}
                                                 {...field}

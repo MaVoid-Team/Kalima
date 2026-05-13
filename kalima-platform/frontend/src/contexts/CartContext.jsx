@@ -128,9 +128,6 @@ export function CartProvider({ children }) {
         if (result && result.purchase) {
             trackPurchasePixel(result.purchase);
         }
-        // optimistic clear so UI updates immediately even if /cart response is delayed
-        setCart(EMPTY_CART);
-        await loadCart();
         return result;
     };
 

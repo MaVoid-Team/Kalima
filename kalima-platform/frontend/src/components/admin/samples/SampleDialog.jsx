@@ -80,6 +80,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
 
     const [hqFileName, setHqFileName] = useState('');
     const [lqFileName, setLqFileName] = useState('');
+    const [thumbnailFileName, setThumbnailFileName] = useState('');
 
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -87,6 +88,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
 
     const hqFileRef = useRef(null);
     const lqFileRef = useRef(null);
+    const thumbnailFileRef = useRef(null);
     const abortControllerRef = useRef(null);
 
     useEffect(() => {
@@ -98,6 +100,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
             const name = sample.original_name || '';
             setHqFileName(sample.high_quality_url ? name : '');
             setLqFileName(sample.low_quality_url ? name : '');
+            setThumbnailFileName('');
         } else {
             setProductId('');
             setTitle('');
@@ -105,6 +108,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
             setSelectedSectionId(sectionId || '');
             setHqFileName('');
             setLqFileName('');
+            setThumbnailFileName('');
         }
         setValidationError('');
     }, [sample, open, sectionId]);
@@ -148,6 +152,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
     const validateFiles = (newHq = null, newLq = null, overrideTitle = null) => {
         const hqFileToCheck = newHq || hqFileRef.current?.files?.[0];
         const lqFileToCheck = newLq || lqFileRef.current?.files?.[0];
+        const thumbnailFileToCheck = thumbnailFileRef.current?.files?.[0];
         const { hqType, lqType } = getTypes(newHq, newLq);
 
         if (!sectionId && !selectedSectionId) return t('samples.errors.sectionRequired', 'Sample section is required');
@@ -157,6 +162,9 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
 
         const hqExists = !!sample?.high_quality_url || !!hqFileToCheck;
         const lqExists = !!sample?.low_quality_url || !!lqFileToCheck;
+        const thumbnailExists = !!sample?.thumbnail_url || !!thumbnailFileToCheck;
+
+        if (!thumbnailExists) return t('samples.errors.noThumbnail', 'Thumbnail image is required.');
 
         if (showHQ && !hqExists) return t('samples.errors.noHqFile', 'High quality file is required.');
         if (!showHQ && !lqExists) return t('samples.errors.noLqFile', 'Low quality file is required for this media type.');
@@ -173,7 +181,11 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
         return '';
     };
 
-    const isInvalid = !title.trim() || (!sectionId && !selectedSectionId) || (showHQ && !hqFileName && !sample?.high_quality_url);
+    const isInvalid =
+        !title.trim() ||
+        (!sectionId && !selectedSectionId) ||
+        (!thumbnailFileName && !sample?.thumbnail_url) ||
+        (showHQ && !hqFileName && !sample?.high_quality_url);
     const isSubmitDisabled = uploading || isInvalid;
 
     const handleSubmit = async (e) => {
@@ -202,8 +214,10 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
         if (title) formData.append('title', title);
         if (!sectionId && selectedSectionId) formData.append('sample_section_id', selectedSectionId);
 
+        const thumbnailFile = thumbnailFileRef.current?.files?.[0];
         const hqFile = hqFileRef.current?.files?.[0];
         const lqFile = lqFileRef.current?.files?.[0];
+        if (thumbnailFile) formData.append('thumbnail', thumbnailFile);
         if (hqFile) formData.append('high_quality', hqFile);
         if (lqFile) formData.append('low_quality', lqFile);
 
@@ -230,6 +244,7 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
             if (success) {
                 onOpenChange(false);
                 setProductId('');
+                if (thumbnailFileRef.current) thumbnailFileRef.current.value = '';
                 if (hqFileRef.current) hqFileRef.current.value = '';
                 if (lqFileRef.current) lqFileRef.current.value = '';
             }
@@ -408,6 +423,46 @@ export default function SampleDialog({ open, onOpenChange, sectionId, sample, on
                             </Select>
                         </div>
                     )}
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="thumbnail-file">{t('samples.thumbnailFileLabel', 'Thumbnail Image')} *</Label>
+                        <div className="flex flex-col gap-2">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => thumbnailFileRef.current?.click()}
+                                disabled={uploading}
+                                className={cn(
+                                    "justify-start font-normal text-muted-foreground h-10 px-3",
+                                    uploading && "!bg-neutral-800 !text-neutral-500 !opacity-30 !cursor-not-allowed grayscale"
+                                )}
+                            >
+                                <Upload className="h-4 w-4 me-2 shrink-0" />
+                                <span className="truncate">
+                                    {thumbnailFileName || (sample?.thumbnail_url ? t('samples.currentThumbnail', 'Current thumbnail') : t('common.chooseFile', 'Choose File'))}
+                                </span>
+                            </Button>
+                            <input
+                                id="thumbnail-file"
+                                type="file"
+                                ref={thumbnailFileRef}
+                                className="hidden"
+                                accept=".jpg,.jpeg,.png,.webp,.gif,.svg,.avif,image/*"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setThumbnailFileName(file.name);
+                                        setValidationError(validateFiles());
+                                    } else {
+                                        setThumbnailFileName('');
+                                        setValidationError(validateFiles());
+                                    }
+                                }}
+                                disabled={uploading}
+                            />
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">{t('samples.thumbnailNote', 'Shown on the samples page cards.')}</p>
+                    </div>
 
                     {showHQ && (
                         <div className="grid gap-2">

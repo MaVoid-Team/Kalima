@@ -9,9 +9,11 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
+import { useRole } from '@/hooks/useRole';
 export default function NotificationsPage() {
     const { t, i18n } = useTranslation('notifications');
     const { markAsRead, markAllAsRead, getMyNotifications } = useNotifications();
+    const { hasAdminAccess, isTeacher } = useRole();
 
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -20,6 +22,10 @@ export default function NotificationsPage() {
     const navigate = useNavigate();
 
     const dateLocale = i18n.language === 'ar' ? ar : enUS;
+    const getPurchaseTarget = (notification) => {
+        if (hasAdminAccess) return `/admin/orders/${notification.entity_id}`;
+        return isTeacher ? '/teacher/orders' : '/orders';
+    };
 
     const fetchNotifications = async (pageNum = 1, append = false) => {
         setLoading(true);
@@ -58,7 +64,7 @@ export default function NotificationsPage() {
         }
         
         if (notification.entity_type === 'purchase') {
-            navigate(`/orders/${notification.entity_id}`);
+            navigate(getPurchaseTarget(notification));
         }
     };
 
