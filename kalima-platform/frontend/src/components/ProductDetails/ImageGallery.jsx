@@ -192,7 +192,7 @@ export default function ImageGallery({ images, badge }) {
                 type="button"
                 variant="outline"
                 size="icon"
-                onClick={showPrevious}
+                onClick={showNext}
                 className="absolute start-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/80 hover:bg-background"
                 data-testid="product-gallery-prev-button"
               >
@@ -203,7 +203,7 @@ export default function ImageGallery({ images, badge }) {
                 type="button"
                 variant="outline"
                 size="icon"
-                onClick={showNext}
+                onClick={showPrevious}
                 className="absolute end-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/80 hover:bg-background"
                 data-testid="product-gallery-next-button"
               >
