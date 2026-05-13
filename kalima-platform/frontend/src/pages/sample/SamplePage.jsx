@@ -37,6 +37,17 @@ import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
 
 // ── Media Viewer ──────────────────────────────────────────────────────────────
 
+const PROTECTED_PDF_DISABLED_CATEGORIES = [
+    'annotation',
+    'redaction',
+    'document-open',
+    'document-print',
+    'document-protect',
+    'document-export',
+    'document-capture',
+    'selection',
+];
+
 function MediaViewer({ sample, previewUrl, downloadUrl, viewerI18n, dir, t }) {
     const mediaType = String(sample?.media_type || '').toLowerCase();
     const isPdf = sample?.mime_type === 'application/pdf' || mediaType === 'pdf';
@@ -103,7 +114,7 @@ function MediaViewer({ sample, previewUrl, downloadUrl, viewerI18n, dir, t }) {
                     theme: { preference: 'system' },
                     i18n: viewerI18n,
                     dir,
-                    disabledCategories: ['annotation', 'redaction', 'file', 'local', 'download'],
+                    disabledCategories: PROTECTED_PDF_DISABLED_CATEGORIES,
                 }}
                 style={{ width: '100%', height: '100%' }}
             />
@@ -243,6 +254,14 @@ export default function SamplePage() {
 
     const getMediaMeta = (type) => mediaTypeMeta[type?.toLowerCase()] || mediaTypeMeta.pdf;
 
+    const preventProtectedPdfShortcuts = (event) => {
+        const key = event.key?.toLowerCase();
+        if ((event.ctrlKey || event.metaKey) && ['o', 'p', 's'].includes(key)) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    };
+
     useEffect(() => {
         window.scrollTo(0, 0);
         if (!id) return;
@@ -257,6 +276,24 @@ export default function SamplePage() {
             })
             .catch(() => setError(true));
     }, [id, fetchApi, sample]);
+
+    const sampleMediaType = String(sample?.media_type || '').toLowerCase();
+    const sampleIsProtectedPdf = sampleMediaType === 'pdf' || sample?.mime_type === 'application/pdf';
+
+    useEffect(() => {
+        if (!sampleIsProtectedPdf) return undefined;
+
+        const handleKeyDown = (event) => {
+            const key = event.key?.toLowerCase();
+            if ((event.ctrlKey || event.metaKey) && ['o', 'p', 's'].includes(key)) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown, true);
+        return () => window.removeEventListener('keydown', handleKeyDown, true);
+    }, [sampleIsProtectedPdf]);
 
     // ── Loading ───────────────────────────────────────────────────────────────
     if (loading && !sample) {
@@ -307,9 +344,10 @@ export default function SamplePage() {
     const meta = getMediaMeta(mediaType);
     const MetaIcon = meta.icon;
     const product = sample?.products;
+    const isProtectedPdf = sampleIsProtectedPdf;
 
     const hasHighQuality = Boolean(sample?.high_quality_url || highQualityUrl);
-    const hasLowQuality = Boolean(sample?.low_quality_url || downloadUrl);
+    const hasLowQuality = !isProtectedPdf && Boolean(sample?.low_quality_url || downloadUrl);
 
     const formattedDate = sample?.created_at
         ? new Date(sample.created_at).toLocaleDateString(i18n.language, { year: 'numeric', month: 'long', day: 'numeric' })
@@ -322,7 +360,13 @@ export default function SamplePage() {
             : '/samples';
 
     return (
-        <div className="min-h-screen" data-testid="sample-details-page">
+        <div
+            className="min-h-screen"
+            data-testid="sample-details-page"
+            onKeyDownCapture={isProtectedPdf ? preventProtectedPdfShortcuts : undefined}
+            onContextMenu={isProtectedPdf ? (event) => event.preventDefault() : undefined}
+            onDragStart={isProtectedPdf ? (event) => event.preventDefault() : undefined}
+        >
             <div className="container mx-auto px-4 md:px-8 py-8">
 
                 {/* Breadcrumbs */}
@@ -388,7 +432,7 @@ export default function SamplePage() {
 
                             {/* Action Buttons */}
                             <div className="flex flex-col sm:flex-row gap-3" data-testid="sample-page-action-buttons">
-                                {hasHighQuality && ['pdf', 'image'].includes(mediaType?.toLowerCase()) && (
+                                {hasHighQuality && !isProtectedPdf && ['image'].includes(mediaType?.toLowerCase()) && (
                                     <Button variant="default" className="flex-1 gap-2" asChild data-testid="sample-page-full-preview-button">
                                         <a href={previewUrl} target="_blank" rel="noopener noreferrer">
                                             <Eye className="h-4 w-4" />
