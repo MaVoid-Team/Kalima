@@ -8,7 +8,7 @@ import {
   CreateSampleBodyDto,
   UpdateSampleBodyDto,
 } from "../dtos/sample.dto";
-import { ValidationError, BadRequestError } from "../../../libs/errors";
+import { ValidationError, BadRequestError, ForbiddenError } from "../../../libs/errors";
 import fs from "fs";
 
 // ============================================
@@ -365,7 +365,9 @@ export const sampleSectionController = {
 
       res.setHeader("Content-Type", mimeType);
       res.setHeader("Content-Disposition", `inline; filename="${originalName}"`);
-      // Prevent embedding in iframe from other origins (optional protection)
+      res.setHeader("Cache-Control", "no-store, private");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("X-Download-Options", "noopen");
       res.setHeader("X-Content-Type-Options", "nosniff");
       res.sendFile(filePath);
     } catch (error) {
@@ -388,6 +390,10 @@ export const sampleSectionController = {
 
       const { path: filePath, mimeType, originalName } =
         await sampleService.getDownloadPath(sampleId, sectionId);
+
+      if (mimeType === "application/pdf") {
+        throw new ForbiddenError("Protected PDF samples cannot be downloaded");
+      }
 
       if (!fs.existsSync(filePath)) {
         res.status(404).json({ success: false, message: "File not found" });

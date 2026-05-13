@@ -18,13 +18,28 @@ import corsOptions from "./config/corsOptions";
 import { registerAllExportResources } from "./apps/store-api/export";
 
 const app = express();
+const uploadsRoot = path.join(__dirname, "../uploads");
 
 registerAllExportResources();
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use(
+  "/uploads/samples",
+  (req, res, next) => {
+    if (req.path.toLowerCase().endsWith(".pdf")) {
+      res.status(403).json({
+        success: false,
+        message: "Protected PDF samples cannot be downloaded directly",
+      });
+      return;
+    }
+    next();
+  },
+  express.static(path.join(uploadsRoot, "samples")),
+);
+app.use("/uploads", express.static(uploadsRoot));
 
 app.get("/health", (_, res) => {
   res.json({ status: "ok" });

@@ -1,11 +1,22 @@
 import { PDFViewer } from '@embedpdf/react-pdf-viewer';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Download, AlertCircle, FileText, Music } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
 import { getImageUrl } from '@/lib/storeUtils';
+
+const PROTECTED_PDF_DISABLED_CATEGORIES = [
+    'annotation',
+    'redaction',
+    'document-open',
+    'document-print',
+    'document-protect',
+    'document-export',
+    'document-capture',
+    'selection',
+];
 
 /**
  * SamplePreviewPage — full-screen media viewer for a single sample.
@@ -49,6 +60,34 @@ export default function SamplePreviewPage() {
         return s;
     }, [id, searchParams]);
 
+    const mediaType = String(sample?.media_type || '').toLowerCase();
+    const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
+    const sectionId = sample?.section_id;
+
+    // Prefer API-served endpoints (proper Content-Type headers, bypasses nginx static cache)
+    const highQualityUrl = sectionId && sample?.high_quality_url
+        ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/preview`
+        : (getImageUrl(sample?.high_quality_url) || '');
+    const downloadUrl = sectionId && sample?.low_quality_url
+        ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download`
+        : (getImageUrl(sample?.low_quality_url) || '');
+    const previewUrl = highQualityUrl || (['image', 'video', 'audio'].includes(mediaType) ? downloadUrl : '');
+    const isPdf = mediaType === 'pdf' || sample?.mime_type === 'application/pdf';
+
+    const preventProtectedPdfShortcuts = (event) => {
+        const key = event.key?.toLowerCase();
+        if ((event.ctrlKey || event.metaKey) && ['o', 'p', 's'].includes(key)) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    };
+
+    useEffect(() => {
+        if (!isPdf) return undefined;
+        window.addEventListener('keydown', preventProtectedPdfShortcuts, true);
+        return () => window.removeEventListener('keydown', preventProtectedPdfShortcuts, true);
+    }, [isPdf]);
+
     if (!sample) {
         return (
             <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background text-center px-4" data-testid="sample-preview-error">
@@ -64,22 +103,14 @@ export default function SamplePreviewPage() {
         );
     }
 
-    const mediaType = String(sample?.media_type || '').toLowerCase();
-    const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
-    const sectionId = sample?.section_id;
-
-    // Prefer API-served endpoints (proper Content-Type headers, bypasses nginx static cache)
-    const highQualityUrl = sectionId && sample?.high_quality_url
-        ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/preview`
-        : (getImageUrl(sample?.high_quality_url) || '');
-    const downloadUrl = sectionId && sample?.low_quality_url
-        ? `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download`
-        : (getImageUrl(sample?.low_quality_url) || '');
-    const previewUrl = highQualityUrl || (['image', 'video', 'audio'].includes(mediaType) ? downloadUrl : '');
-    const isPdf = mediaType === 'pdf' || sample?.mime_type === 'application/pdf';
-
     return (
-        <div className="flex flex-col h-screen" data-testid="sample-preview-page">
+        <div
+            className="flex flex-col h-screen"
+            data-testid="sample-preview-page"
+            onKeyDownCapture={isPdf ? preventProtectedPdfShortcuts : undefined}
+            onContextMenu={isPdf ? (event) => event.preventDefault() : undefined}
+            onDragStart={isPdf ? (event) => event.preventDefault() : undefined}
+        >
 
             {/* Slim top bar */}
             <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-background/80 backdrop-blur shrink-0">
@@ -92,7 +123,7 @@ export default function SamplePreviewPage() {
                 <span dir="auto" className="text-sm font-medium truncate text-muted-foreground flex-1">
                     {sample?.title || sample?.original_name}
                 </span>
-                {downloadUrl && (
+                {downloadUrl && !isPdf && (
                     <Button variant="outline" size="sm" asChild data-testid="sample-preview-download-button">
                         <a href={downloadUrl} download>
                             <Download className="h-4 w-4 me-1" />
@@ -136,7 +167,7 @@ export default function SamplePreviewPage() {
                                 theme: { preference: 'system' },
                                 i18n: viewerI18n,
                                 dir: i18n.dir(),
-                                disabledCategories: ['annotation', 'redaction', 'local', 'download', 'file'],
+                                disabledCategories: PROTECTED_PDF_DISABLED_CATEGORIES,
                             }}
                             style={{ width: '100%', height: '100%' }}
                         />
