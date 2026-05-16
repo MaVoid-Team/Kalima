@@ -558,9 +558,9 @@ export default function CreateProductPage() {
                                         <FormLabel>{t('products.form.price')} *</FormLabel>
                                         <FormControl>
                                             <Input
-                                                type="number"
-                                                min="0"
-                                                step="1"
+                                                type="text"
+                                                inputMode="numeric"
+                                                pattern="[0-9]*"
                                                 data-testid="create-product-price-input"
                                                 {...field}
                                             />
