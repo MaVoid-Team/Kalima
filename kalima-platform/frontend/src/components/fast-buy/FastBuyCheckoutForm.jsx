@@ -80,7 +80,7 @@ export default function FastBuyCheckoutForm({ form, onApplyCoupon, loading }) {
         />
 
         <FastBuyDynamicFields
-          itemsMissingFields={form.computed.itemsMissingFields}
+          requiredFieldItems={form.computed.requiredFieldItems}
           itemFields={form.itemFields}
           updateItemField={form.updateItemField}
         />

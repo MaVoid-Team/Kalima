@@ -41,9 +41,65 @@ const separateRequiredFields = (itemFields) => {
   return { imageUploads, textPayloads };
 };
 
-const isAllFieldsFilled = (missingItems, answers) =>
-  missingItems.every((item) =>
-    item.missing_fields.every((field) => !!(answers[item.cart_item_id] || {})[field.id]),
+const normalizeRequiredField = (field) => {
+  const definition = field.required_field_definitions || field;
+
+  return {
+    id: field.id ?? field.field_definition_id,
+    label: definition.label || field.label || "",
+    field_type: definition.field_type || field.field_type || "text",
+    is_required: field.is_required ?? true,
+    value: field.value ?? null,
+  };
+};
+
+const buildRequiredFieldItems = (cartItems = [], fallbackMissingItems = []) => {
+  const items = cartItems
+    .map((item) => ({
+      cart_item_id: item.id,
+      product_name: item.products?.title || "",
+      required_fields: (item.cart_item_required_fields || []).map(normalizeRequiredField),
+    }))
+    .filter((item) => item.required_fields.length > 0);
+
+  if (items.length > 0) return items;
+
+  return fallbackMissingItems.map((item) => ({
+    cart_item_id: item.cart_item_id,
+    product_name: item.product_name || "",
+    required_fields: (item.missing_fields || []).map(normalizeRequiredField),
+  }));
+};
+
+const getAnsweredValue = (answers, cartItemId, field) => {
+  const itemAnswers = answers[cartItemId] || {};
+  return Object.prototype.hasOwnProperty.call(itemAnswers, field.id)
+    ? itemAnswers[field.id]
+    : field.value;
+};
+
+const isRequiredFieldFilled = (field, value, t) => {
+  if (!field.is_required) return true;
+
+  if (field.field_type === "image") {
+    return value instanceof File || (typeof value === "string" && value.trim() !== "");
+  }
+
+  const normalized = typeof value === "string" ? value.trim() : value;
+  if (!normalized || normalized === "+20") return false;
+
+  if (field.field_type === "number") {
+    return egyptPhoneSchema(t).safeParse(normalized).success;
+  }
+
+  return true;
+};
+
+const areAllRequiredFieldsFilled = (requiredFieldItems, answers, t) =>
+  requiredFieldItems.every((item) =>
+    item.required_fields.every((field) =>
+      isRequiredFieldFilled(field, getAnsweredValue(answers, item.cart_item_id, field), t),
+    ),
   );
 
 const formatCartItems = (items = []) =>
@@ -120,6 +176,7 @@ export function useFastBuy({ checkout = false } = {}) {
   const computed = useMemo(() => {
     const commonFields = preview?.requiredFields?.common || [];
     const itemsMissingFields = preview?.requiredFields?.itemsMissingFields || [];
+    const requiredFieldItems = buildRequiredFieldItems(preview?.cart_items, itemsMissingFields);
     const total = parseFloat(preview?.total || 0);
     const isFreeOrder = total <= 0;
 
@@ -139,16 +196,16 @@ export function useFastBuy({ checkout = false } = {}) {
       isFreeOrder,
       needsScreenshot,
       needsTransferNumber,
-      itemsMissingFields,
+      requiredFieldItems,
       screenshotName: formData.paymentScreenshot?.name || "",
       isSubmitDisabled:
-        !isAllFieldsFilled(itemsMissingFields, itemFields) ||
+        !areAllRequiredFieldsFilled(requiredFieldItems, itemFields, t) ||
         missingTransNum ||
         missingScreenshot ||
         invalidTransferNumber,
       hasItems: (preview?.cart_items || []).length > 0,
     };
-  }, [preview, formData, itemFields]);
+  }, [preview, formData, itemFields, t]);
 
   const startFastBuy = async (productId) => {
     try {
