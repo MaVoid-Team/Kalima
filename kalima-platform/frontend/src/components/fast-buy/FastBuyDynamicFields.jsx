@@ -6,17 +6,17 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { motion } from "framer-motion";
 
 export default function FastBuyDynamicFields({
-  itemsMissingFields,
+  requiredFieldItems,
   itemFields,
   updateItemField,
 }) {
-  if (!itemsMissingFields?.length) return null;
+  if (!requiredFieldItems?.length) return null;
 
   return (
     <div className="space-y-6">
-      {itemsMissingFields.map((missingItem, index) => (
+      {requiredFieldItems.map((fieldItem, index) => (
         <motion.div
-          key={missingItem.cart_item_id}
+          key={fieldItem.cart_item_id}
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: index * 0.1 }}
@@ -27,17 +27,21 @@ export default function FastBuyDynamicFields({
                 <Package className="w-5 h-5" />
              </div>
              <h4 className="font-bold text-lg text-foreground tracking-tight">
-               {missingItem.product_name}
+               {fieldItem.product_name}
              </h4>
           </div>
 
           <div className="space-y-6 pt-2">
-            {missingItem.missing_fields.map((field) => (
+            {fieldItem.required_fields.map((field) => (
               <DynamicFieldInput
                 key={field.id}
                 field={field}
-                cartItemId={missingItem.cart_item_id}
-                value={itemFields[missingItem.cart_item_id]?.[field.id]}
+                cartItemId={fieldItem.cart_item_id}
+                value={
+                  Object.prototype.hasOwnProperty.call(itemFields[fieldItem.cart_item_id] || {}, field.id)
+                    ? itemFields[fieldItem.cart_item_id]?.[field.id]
+                    : field.value
+                }
                 onChange={updateItemField}
               />
             ))}
@@ -67,7 +71,7 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
     <div className="space-y-3">
       <Label className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
         {field?.label}
-        <span className="text-destructive ms-1">*</span>
+        {field?.is_required ? <span className="text-destructive ms-1">*</span> : null}
       </Label>
       {isImage ? (
         <>
@@ -85,7 +89,9 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
               <p className="font-bold text-foreground">
                 {value?.name
                   ? value.name
-                  : t("payment.upload", "Click to upload")}
+                  : typeof value === "string" && value.trim()
+                    ? t("payment.currentImage", "Image uploaded")
+                    : t("payment.upload", "Click to upload")}
               </p>
               <p className="text-xs font-medium text-muted-foreground mt-1 opacity-80">
                 {t("payment.uploadHint", "PNG, JPG up to 5MB")}
@@ -104,7 +110,7 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
       ) : field.field_type === "number" ? (
         <PhoneInput
           dir="ltr"
-          value={value || ""}
+          value={value || "+20"}
           onChange={handleChange}
           className="h-12 bg-background/50 backdrop-blur-xs rounded-xl focus-visible:ring-primary/20"
           data-testid="fastbuy-dynamic-fields-phone-input"
