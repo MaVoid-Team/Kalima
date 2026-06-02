@@ -33,6 +33,9 @@ export type E_booklet_hotspotsAvgAggregateOutputType = {
   x_percent: runtime.Decimal | null
   y_percent: runtime.Decimal | null
   radius_percent: runtime.Decimal | null
+  reference_number: number | null
+  width_percent: runtime.Decimal | null
+  height_percent: runtime.Decimal | null
   asset_file_id: number | null
   sort_order: number | null
   created_by: number | null
@@ -46,6 +49,9 @@ export type E_booklet_hotspotsSumAggregateOutputType = {
   x_percent: runtime.Decimal | null
   y_percent: runtime.Decimal | null
   radius_percent: runtime.Decimal | null
+  reference_number: number | null
+  width_percent: runtime.Decimal | null
+  height_percent: runtime.Decimal | null
   asset_file_id: number | null
   sort_order: number | null
   created_by: number | null
@@ -59,6 +65,10 @@ export type E_booklet_hotspotsMinAggregateOutputType = {
   x_percent: runtime.Decimal | null
   y_percent: runtime.Decimal | null
   radius_percent: runtime.Decimal | null
+  reference_number: number | null
+  shape: $Enums.e_booklet_hotspot_shape_enum | null
+  width_percent: runtime.Decimal | null
+  height_percent: runtime.Decimal | null
   type: $Enums.e_booklet_hotspot_type_enum | null
   title: string | null
   text_content: string | null
@@ -79,6 +89,10 @@ export type E_booklet_hotspotsMaxAggregateOutputType = {
   x_percent: runtime.Decimal | null
   y_percent: runtime.Decimal | null
   radius_percent: runtime.Decimal | null
+  reference_number: number | null
+  shape: $Enums.e_booklet_hotspot_shape_enum | null
+  width_percent: runtime.Decimal | null
+  height_percent: runtime.Decimal | null
   type: $Enums.e_booklet_hotspot_type_enum | null
   title: string | null
   text_content: string | null
@@ -99,12 +113,18 @@ export type E_booklet_hotspotsCountAggregateOutputType = {
   x_percent: number
   y_percent: number
   radius_percent: number
+  reference_number: number
+  shape: number
+  width_percent: number
+  height_percent: number
   type: number
   title: number
   text_content: number
   asset_file_id: number
   trigger_type: number
   display_behavior: number
+  content_json: number
+  interaction_json: number
   sort_order: number
   is_active: number
   created_by: number
@@ -122,6 +142,9 @@ export type E_booklet_hotspotsAvgAggregateInputType = {
   x_percent?: true
   y_percent?: true
   radius_percent?: true
+  reference_number?: true
+  width_percent?: true
+  height_percent?: true
   asset_file_id?: true
   sort_order?: true
   created_by?: true
@@ -135,6 +158,9 @@ export type E_booklet_hotspotsSumAggregateInputType = {
   x_percent?: true
   y_percent?: true
   radius_percent?: true
+  reference_number?: true
+  width_percent?: true
+  height_percent?: true
   asset_file_id?: true
   sort_order?: true
   created_by?: true
@@ -148,6 +174,10 @@ export type E_booklet_hotspotsMinAggregateInputType = {
   x_percent?: true
   y_percent?: true
   radius_percent?: true
+  reference_number?: true
+  shape?: true
+  width_percent?: true
+  height_percent?: true
   type?: true
   title?: true
   text_content?: true
@@ -168,6 +198,10 @@ export type E_booklet_hotspotsMaxAggregateInputType = {
   x_percent?: true
   y_percent?: true
   radius_percent?: true
+  reference_number?: true
+  shape?: true
+  width_percent?: true
+  height_percent?: true
   type?: true
   title?: true
   text_content?: true
@@ -188,12 +222,18 @@ export type E_booklet_hotspotsCountAggregateInputType = {
   x_percent?: true
   y_percent?: true
   radius_percent?: true
+  reference_number?: true
+  shape?: true
+  width_percent?: true
+  height_percent?: true
   type?: true
   title?: true
   text_content?: true
   asset_file_id?: true
   trigger_type?: true
   display_behavior?: true
+  content_json?: true
+  interaction_json?: true
   sort_order?: true
   is_active?: true
   created_by?: true
@@ -296,12 +336,18 @@ export type E_booklet_hotspotsGroupByOutputType = {
   x_percent: runtime.Decimal
   y_percent: runtime.Decimal
   radius_percent: runtime.Decimal
+  reference_number: number | null
+  shape: $Enums.e_booklet_hotspot_shape_enum
+  width_percent: runtime.Decimal | null
+  height_percent: runtime.Decimal | null
   type: $Enums.e_booklet_hotspot_type_enum
   title: string | null
   text_content: string | null
   asset_file_id: number | null
   trigger_type: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior: runtime.JsonValue | null
+  content_json: runtime.JsonValue | null
+  interaction_json: runtime.JsonValue | null
   sort_order: number | null
   is_active: boolean
   created_by: number
@@ -340,12 +386,18 @@ export type e_booklet_hotspotsWhereInput = {
   x_percent?: Prisma.DecimalFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.IntNullableFilter<"e_booklet_hotspots"> | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.DecimalNullableFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.DecimalNullableFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.StringNullableFilter<"e_booklet_hotspots"> | string | null
   text_content?: Prisma.StringNullableFilter<"e_booklet_hotspots"> | string | null
   asset_file_id?: Prisma.IntNullableFilter<"e_booklet_hotspots"> | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.JsonNullableFilter<"e_booklet_hotspots">
+  content_json?: Prisma.JsonNullableFilter<"e_booklet_hotspots">
+  interaction_json?: Prisma.JsonNullableFilter<"e_booklet_hotspots">
   sort_order?: Prisma.IntNullableFilter<"e_booklet_hotspots"> | number | null
   is_active?: Prisma.BoolFilter<"e_booklet_hotspots"> | boolean
   created_by?: Prisma.IntFilter<"e_booklet_hotspots"> | number
@@ -365,12 +417,18 @@ export type e_booklet_hotspotsOrderByWithRelationInput = {
   x_percent?: Prisma.SortOrder
   y_percent?: Prisma.SortOrder
   radius_percent?: Prisma.SortOrder
+  reference_number?: Prisma.SortOrderInput | Prisma.SortOrder
+  shape?: Prisma.SortOrder
+  width_percent?: Prisma.SortOrderInput | Prisma.SortOrder
+  height_percent?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   text_content?: Prisma.SortOrderInput | Prisma.SortOrder
   asset_file_id?: Prisma.SortOrderInput | Prisma.SortOrder
   trigger_type?: Prisma.SortOrder
   display_behavior?: Prisma.SortOrderInput | Prisma.SortOrder
+  content_json?: Prisma.SortOrderInput | Prisma.SortOrder
+  interaction_json?: Prisma.SortOrderInput | Prisma.SortOrder
   sort_order?: Prisma.SortOrderInput | Prisma.SortOrder
   is_active?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
@@ -385,6 +443,7 @@ export type e_booklet_hotspotsOrderByWithRelationInput = {
 
 export type e_booklet_hotspotsWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  template_version_id_reference_number?: Prisma.e_booklet_hotspotsTemplate_version_idReference_numberCompoundUniqueInput
   AND?: Prisma.e_booklet_hotspotsWhereInput | Prisma.e_booklet_hotspotsWhereInput[]
   OR?: Prisma.e_booklet_hotspotsWhereInput[]
   NOT?: Prisma.e_booklet_hotspotsWhereInput | Prisma.e_booklet_hotspotsWhereInput[]
@@ -393,12 +452,18 @@ export type e_booklet_hotspotsWhereUniqueInput = Prisma.AtLeast<{
   x_percent?: Prisma.DecimalFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.IntNullableFilter<"e_booklet_hotspots"> | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.DecimalNullableFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.DecimalNullableFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.StringNullableFilter<"e_booklet_hotspots"> | string | null
   text_content?: Prisma.StringNullableFilter<"e_booklet_hotspots"> | string | null
   asset_file_id?: Prisma.IntNullableFilter<"e_booklet_hotspots"> | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.JsonNullableFilter<"e_booklet_hotspots">
+  content_json?: Prisma.JsonNullableFilter<"e_booklet_hotspots">
+  interaction_json?: Prisma.JsonNullableFilter<"e_booklet_hotspots">
   sort_order?: Prisma.IntNullableFilter<"e_booklet_hotspots"> | number | null
   is_active?: Prisma.BoolFilter<"e_booklet_hotspots"> | boolean
   created_by?: Prisma.IntFilter<"e_booklet_hotspots"> | number
@@ -409,7 +474,7 @@ export type e_booklet_hotspotsWhereUniqueInput = Prisma.AtLeast<{
   asset_file?: Prisma.XOR<Prisma.E_booklet_file_assetsNullableScalarRelationFilter, Prisma.e_booklet_file_assetsWhereInput> | null
   creator?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   updater?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
-}, "id">
+}, "id" | "template_version_id_reference_number">
 
 export type e_booklet_hotspotsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -418,12 +483,18 @@ export type e_booklet_hotspotsOrderByWithAggregationInput = {
   x_percent?: Prisma.SortOrder
   y_percent?: Prisma.SortOrder
   radius_percent?: Prisma.SortOrder
+  reference_number?: Prisma.SortOrderInput | Prisma.SortOrder
+  shape?: Prisma.SortOrder
+  width_percent?: Prisma.SortOrderInput | Prisma.SortOrder
+  height_percent?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   text_content?: Prisma.SortOrderInput | Prisma.SortOrder
   asset_file_id?: Prisma.SortOrderInput | Prisma.SortOrder
   trigger_type?: Prisma.SortOrder
   display_behavior?: Prisma.SortOrderInput | Prisma.SortOrder
+  content_json?: Prisma.SortOrderInput | Prisma.SortOrder
+  interaction_json?: Prisma.SortOrderInput | Prisma.SortOrder
   sort_order?: Prisma.SortOrderInput | Prisma.SortOrder
   is_active?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
@@ -447,12 +518,18 @@ export type e_booklet_hotspotsScalarWhereWithAggregatesInput = {
   x_percent?: Prisma.DecimalWithAggregatesFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalWithAggregatesFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalWithAggregatesFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.IntNullableWithAggregatesFilter<"e_booklet_hotspots"> | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumWithAggregatesFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.DecimalNullableWithAggregatesFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.DecimalNullableWithAggregatesFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumWithAggregatesFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.StringNullableWithAggregatesFilter<"e_booklet_hotspots"> | string | null
   text_content?: Prisma.StringNullableWithAggregatesFilter<"e_booklet_hotspots"> | string | null
   asset_file_id?: Prisma.IntNullableWithAggregatesFilter<"e_booklet_hotspots"> | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumWithAggregatesFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.JsonNullableWithAggregatesFilter<"e_booklet_hotspots">
+  content_json?: Prisma.JsonNullableWithAggregatesFilter<"e_booklet_hotspots">
+  interaction_json?: Prisma.JsonNullableWithAggregatesFilter<"e_booklet_hotspots">
   sort_order?: Prisma.IntNullableWithAggregatesFilter<"e_booklet_hotspots"> | number | null
   is_active?: Prisma.BoolWithAggregatesFilter<"e_booklet_hotspots"> | boolean
   created_by?: Prisma.IntWithAggregatesFilter<"e_booklet_hotspots"> | number
@@ -466,11 +543,17 @@ export type e_booklet_hotspotsCreateInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_at?: Date | string | null
@@ -488,12 +571,18 @@ export type e_booklet_hotspotsUncheckedCreateInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   asset_file_id?: number | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_by: number
@@ -507,11 +596,17 @@ export type e_booklet_hotspotsUpdateInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -529,12 +624,18 @@ export type e_booklet_hotspotsUncheckedUpdateInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
@@ -550,12 +651,18 @@ export type e_booklet_hotspotsCreateManyInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   asset_file_id?: number | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_by: number
@@ -569,11 +676,17 @@ export type e_booklet_hotspotsUpdateManyMutationInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -587,12 +700,18 @@ export type e_booklet_hotspotsUncheckedUpdateManyInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
@@ -611,6 +730,11 @@ export type e_booklet_hotspotsOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type e_booklet_hotspotsTemplate_version_idReference_numberCompoundUniqueInput = {
+  template_version_id: number
+  reference_number: number
+}
+
 export type e_booklet_hotspotsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   template_version_id?: Prisma.SortOrder
@@ -618,12 +742,18 @@ export type e_booklet_hotspotsCountOrderByAggregateInput = {
   x_percent?: Prisma.SortOrder
   y_percent?: Prisma.SortOrder
   radius_percent?: Prisma.SortOrder
+  reference_number?: Prisma.SortOrder
+  shape?: Prisma.SortOrder
+  width_percent?: Prisma.SortOrder
+  height_percent?: Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrder
   text_content?: Prisma.SortOrder
   asset_file_id?: Prisma.SortOrder
   trigger_type?: Prisma.SortOrder
   display_behavior?: Prisma.SortOrder
+  content_json?: Prisma.SortOrder
+  interaction_json?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
@@ -639,6 +769,9 @@ export type e_booklet_hotspotsAvgOrderByAggregateInput = {
   x_percent?: Prisma.SortOrder
   y_percent?: Prisma.SortOrder
   radius_percent?: Prisma.SortOrder
+  reference_number?: Prisma.SortOrder
+  width_percent?: Prisma.SortOrder
+  height_percent?: Prisma.SortOrder
   asset_file_id?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
@@ -652,6 +785,10 @@ export type e_booklet_hotspotsMaxOrderByAggregateInput = {
   x_percent?: Prisma.SortOrder
   y_percent?: Prisma.SortOrder
   radius_percent?: Prisma.SortOrder
+  reference_number?: Prisma.SortOrder
+  shape?: Prisma.SortOrder
+  width_percent?: Prisma.SortOrder
+  height_percent?: Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrder
   text_content?: Prisma.SortOrder
@@ -672,6 +809,10 @@ export type e_booklet_hotspotsMinOrderByAggregateInput = {
   x_percent?: Prisma.SortOrder
   y_percent?: Prisma.SortOrder
   radius_percent?: Prisma.SortOrder
+  reference_number?: Prisma.SortOrder
+  shape?: Prisma.SortOrder
+  width_percent?: Prisma.SortOrder
+  height_percent?: Prisma.SortOrder
   type?: Prisma.SortOrder
   title?: Prisma.SortOrder
   text_content?: Prisma.SortOrder
@@ -692,6 +833,9 @@ export type e_booklet_hotspotsSumOrderByAggregateInput = {
   x_percent?: Prisma.SortOrder
   y_percent?: Prisma.SortOrder
   radius_percent?: Prisma.SortOrder
+  reference_number?: Prisma.SortOrder
+  width_percent?: Prisma.SortOrder
+  height_percent?: Prisma.SortOrder
   asset_file_id?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
@@ -824,6 +968,10 @@ export type e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionNestedIn
   deleteMany?: Prisma.e_booklet_hotspotsScalarWhereInput | Prisma.e_booklet_hotspotsScalarWhereInput[]
 }
 
+export type Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput = {
+  set?: $Enums.e_booklet_hotspot_shape_enum
+}
+
 export type Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput = {
   set?: $Enums.e_booklet_hotspot_type_enum
 }
@@ -879,11 +1027,17 @@ export type e_booklet_hotspotsCreateWithoutCreatorInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_at?: Date | string | null
@@ -900,12 +1054,18 @@ export type e_booklet_hotspotsUncheckedCreateWithoutCreatorInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   asset_file_id?: number | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   updated_by?: number | null
@@ -928,11 +1088,17 @@ export type e_booklet_hotspotsCreateWithoutUpdaterInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_at?: Date | string | null
@@ -949,12 +1115,18 @@ export type e_booklet_hotspotsUncheckedCreateWithoutUpdaterInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   asset_file_id?: number | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_by: number
@@ -998,12 +1170,18 @@ export type e_booklet_hotspotsScalarWhereInput = {
   x_percent?: Prisma.DecimalFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.IntNullableFilter<"e_booklet_hotspots"> | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.DecimalNullableFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.DecimalNullableFilter<"e_booklet_hotspots"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.StringNullableFilter<"e_booklet_hotspots"> | string | null
   text_content?: Prisma.StringNullableFilter<"e_booklet_hotspots"> | string | null
   asset_file_id?: Prisma.IntNullableFilter<"e_booklet_hotspots"> | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFilter<"e_booklet_hotspots"> | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.JsonNullableFilter<"e_booklet_hotspots">
+  content_json?: Prisma.JsonNullableFilter<"e_booklet_hotspots">
+  interaction_json?: Prisma.JsonNullableFilter<"e_booklet_hotspots">
   sort_order?: Prisma.IntNullableFilter<"e_booklet_hotspots"> | number | null
   is_active?: Prisma.BoolFilter<"e_booklet_hotspots"> | boolean
   created_by?: Prisma.IntFilter<"e_booklet_hotspots"> | number
@@ -1033,11 +1211,17 @@ export type e_booklet_hotspotsCreateWithoutTemplate_versionInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_at?: Date | string | null
@@ -1053,12 +1237,18 @@ export type e_booklet_hotspotsUncheckedCreateWithoutTemplate_versionInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   asset_file_id?: number | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_by: number
@@ -1098,11 +1288,17 @@ export type e_booklet_hotspotsCreateWithoutAsset_fileInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_at?: Date | string | null
@@ -1119,11 +1315,17 @@ export type e_booklet_hotspotsUncheckedCreateWithoutAsset_fileInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_by: number
@@ -1165,12 +1367,18 @@ export type e_booklet_hotspotsCreateManyCreatorInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   asset_file_id?: number | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   updated_by?: number | null
@@ -1185,12 +1393,18 @@ export type e_booklet_hotspotsCreateManyUpdaterInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   asset_file_id?: number | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_by: number
@@ -1203,11 +1417,17 @@ export type e_booklet_hotspotsUpdateWithoutCreatorInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1224,12 +1444,18 @@ export type e_booklet_hotspotsUncheckedUpdateWithoutCreatorInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updated_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1244,12 +1470,18 @@ export type e_booklet_hotspotsUncheckedUpdateManyWithoutCreatorInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updated_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1262,11 +1494,17 @@ export type e_booklet_hotspotsUpdateWithoutUpdaterInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1283,12 +1521,18 @@ export type e_booklet_hotspotsUncheckedUpdateWithoutUpdaterInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1303,12 +1547,18 @@ export type e_booklet_hotspotsUncheckedUpdateManyWithoutUpdaterInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1322,12 +1572,18 @@ export type e_booklet_hotspotsCreateManyTemplate_versionInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   asset_file_id?: number | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_by: number
@@ -1341,11 +1597,17 @@ export type e_booklet_hotspotsUpdateWithoutTemplate_versionInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1361,12 +1623,18 @@ export type e_booklet_hotspotsUncheckedUpdateWithoutTemplate_versionInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1381,12 +1649,18 @@ export type e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionInput = 
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   asset_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1402,11 +1676,17 @@ export type e_booklet_hotspotsCreateManyAsset_fileInput = {
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type: $Enums.e_booklet_hotspot_type_enum
   title?: string | null
   text_content?: string | null
   trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: number | null
   is_active?: boolean
   created_by: number
@@ -1420,11 +1700,17 @@ export type e_booklet_hotspotsUpdateWithoutAsset_fileInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1441,11 +1727,17 @@ export type e_booklet_hotspotsUncheckedUpdateWithoutAsset_fileInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1461,11 +1753,17 @@ export type e_booklet_hotspotsUncheckedUpdateManyWithoutAsset_fileInput = {
   x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
   display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1483,12 +1781,18 @@ export type e_booklet_hotspotsSelect<ExtArgs extends runtime.Types.Extensions.In
   x_percent?: boolean
   y_percent?: boolean
   radius_percent?: boolean
+  reference_number?: boolean
+  shape?: boolean
+  width_percent?: boolean
+  height_percent?: boolean
   type?: boolean
   title?: boolean
   text_content?: boolean
   asset_file_id?: boolean
   trigger_type?: boolean
   display_behavior?: boolean
+  content_json?: boolean
+  interaction_json?: boolean
   sort_order?: boolean
   is_active?: boolean
   created_by?: boolean
@@ -1508,12 +1812,18 @@ export type e_booklet_hotspotsSelectCreateManyAndReturn<ExtArgs extends runtime.
   x_percent?: boolean
   y_percent?: boolean
   radius_percent?: boolean
+  reference_number?: boolean
+  shape?: boolean
+  width_percent?: boolean
+  height_percent?: boolean
   type?: boolean
   title?: boolean
   text_content?: boolean
   asset_file_id?: boolean
   trigger_type?: boolean
   display_behavior?: boolean
+  content_json?: boolean
+  interaction_json?: boolean
   sort_order?: boolean
   is_active?: boolean
   created_by?: boolean
@@ -1533,12 +1843,18 @@ export type e_booklet_hotspotsSelectUpdateManyAndReturn<ExtArgs extends runtime.
   x_percent?: boolean
   y_percent?: boolean
   radius_percent?: boolean
+  reference_number?: boolean
+  shape?: boolean
+  width_percent?: boolean
+  height_percent?: boolean
   type?: boolean
   title?: boolean
   text_content?: boolean
   asset_file_id?: boolean
   trigger_type?: boolean
   display_behavior?: boolean
+  content_json?: boolean
+  interaction_json?: boolean
   sort_order?: boolean
   is_active?: boolean
   created_by?: boolean
@@ -1558,12 +1874,18 @@ export type e_booklet_hotspotsSelectScalar = {
   x_percent?: boolean
   y_percent?: boolean
   radius_percent?: boolean
+  reference_number?: boolean
+  shape?: boolean
+  width_percent?: boolean
+  height_percent?: boolean
   type?: boolean
   title?: boolean
   text_content?: boolean
   asset_file_id?: boolean
   trigger_type?: boolean
   display_behavior?: boolean
+  content_json?: boolean
+  interaction_json?: boolean
   sort_order?: boolean
   is_active?: boolean
   created_by?: boolean
@@ -1572,7 +1894,7 @@ export type e_booklet_hotspotsSelectScalar = {
   updated_at?: boolean
 }
 
-export type e_booklet_hotspotsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "template_version_id" | "page_number" | "x_percent" | "y_percent" | "radius_percent" | "type" | "title" | "text_content" | "asset_file_id" | "trigger_type" | "display_behavior" | "sort_order" | "is_active" | "created_by" | "updated_by" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_hotspots"]>
+export type e_booklet_hotspotsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "template_version_id" | "page_number" | "x_percent" | "y_percent" | "radius_percent" | "reference_number" | "shape" | "width_percent" | "height_percent" | "type" | "title" | "text_content" | "asset_file_id" | "trigger_type" | "display_behavior" | "content_json" | "interaction_json" | "sort_order" | "is_active" | "created_by" | "updated_by" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_hotspots"]>
 export type e_booklet_hotspotsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   template_version?: boolean | Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>
   asset_file?: boolean | Prisma.e_booklet_hotspots$asset_fileArgs<ExtArgs>
@@ -1607,12 +1929,18 @@ export type $e_booklet_hotspotsPayload<ExtArgs extends runtime.Types.Extensions.
     x_percent: runtime.Decimal
     y_percent: runtime.Decimal
     radius_percent: runtime.Decimal
+    reference_number: number | null
+    shape: $Enums.e_booklet_hotspot_shape_enum
+    width_percent: runtime.Decimal | null
+    height_percent: runtime.Decimal | null
     type: $Enums.e_booklet_hotspot_type_enum
     title: string | null
     text_content: string | null
     asset_file_id: number | null
     trigger_type: $Enums.e_booklet_hotspot_trigger_type_enum
     display_behavior: runtime.JsonValue | null
+    content_json: runtime.JsonValue | null
+    interaction_json: runtime.JsonValue | null
     sort_order: number | null
     is_active: boolean
     created_by: number
@@ -2052,12 +2380,18 @@ export interface e_booklet_hotspotsFieldRefs {
   readonly x_percent: Prisma.FieldRef<"e_booklet_hotspots", 'Decimal'>
   readonly y_percent: Prisma.FieldRef<"e_booklet_hotspots", 'Decimal'>
   readonly radius_percent: Prisma.FieldRef<"e_booklet_hotspots", 'Decimal'>
+  readonly reference_number: Prisma.FieldRef<"e_booklet_hotspots", 'Int'>
+  readonly shape: Prisma.FieldRef<"e_booklet_hotspots", 'e_booklet_hotspot_shape_enum'>
+  readonly width_percent: Prisma.FieldRef<"e_booklet_hotspots", 'Decimal'>
+  readonly height_percent: Prisma.FieldRef<"e_booklet_hotspots", 'Decimal'>
   readonly type: Prisma.FieldRef<"e_booklet_hotspots", 'e_booklet_hotspot_type_enum'>
   readonly title: Prisma.FieldRef<"e_booklet_hotspots", 'String'>
   readonly text_content: Prisma.FieldRef<"e_booklet_hotspots", 'String'>
   readonly asset_file_id: Prisma.FieldRef<"e_booklet_hotspots", 'Int'>
   readonly trigger_type: Prisma.FieldRef<"e_booklet_hotspots", 'e_booklet_hotspot_trigger_type_enum'>
   readonly display_behavior: Prisma.FieldRef<"e_booklet_hotspots", 'Json'>
+  readonly content_json: Prisma.FieldRef<"e_booklet_hotspots", 'Json'>
+  readonly interaction_json: Prisma.FieldRef<"e_booklet_hotspots", 'Json'>
   readonly sort_order: Prisma.FieldRef<"e_booklet_hotspots", 'Int'>
   readonly is_active: Prisma.FieldRef<"e_booklet_hotspots", 'Boolean'>
   readonly created_by: Prisma.FieldRef<"e_booklet_hotspots", 'Int'>

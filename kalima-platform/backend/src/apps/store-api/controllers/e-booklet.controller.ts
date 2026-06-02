@@ -8,6 +8,7 @@ import {
   CreateEBookletTemplateDto,
   DeliverEBookletDto,
   EBookletCheckoutDto,
+  EBookletInviteAccessPathDto,
   UpdateEBookletPurchaseStatusDto,
   UpdateEBookletQuotaDto,
   UpdateEBookletTemplateDto,
@@ -495,15 +496,22 @@ export const eBookletController = {
   async acceptInvite(req: Request, res: Response, next: NextFunction) {
     try {
       const inviteToken = parseParam(req.params.token, "invite token");
-      await validateDto(AcceptEBookletInviteDto, { token: inviteToken });
-      const data = await getEBookletService().acceptInvite(
-        inviteToken,
-        currentUserId(req),
-        {
-          ipAddress: req.ip,
-          userAgent: req.get("user-agent"),
-        },
-      );
+      const dto = await validateDto(AcceptEBookletInviteDto, {
+        ...(req.body || {}),
+        token: inviteToken,
+      });
+      const service = getEBookletService();
+      const userId = currentUserId(req);
+      let data;
+      if (dto.accessPath === EBookletInviteAccessPathDto.free) {
+        data = await service.acceptFreeInvite(inviteToken, userId, dto);
+      } else if (dto.accessPath === EBookletInviteAccessPathDto.offline_passcode) {
+        data = await service.acceptInvitePasscode(inviteToken, userId, dto);
+      } else if (dto.accessPath === EBookletInviteAccessPathDto.online_purchase) {
+        data = await service.createStudentPurchaseLink(inviteToken, userId, dto);
+      } else {
+        throw new BadRequestError("Invite accessPath is required.");
+      }
       res.status(200).json({ success: true, data });
     } catch (error) {
       next(error);

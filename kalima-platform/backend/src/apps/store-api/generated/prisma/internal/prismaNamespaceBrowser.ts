@@ -99,6 +99,9 @@ export const ModelName = {
   e_booklet_instances: 'e_booklet_instances',
   e_booklet_access: 'e_booklet_access',
   e_booklet_invites: 'e_booklet_invites',
+  e_booklet_devices: 'e_booklet_devices',
+  e_booklet_device_allowances: 'e_booklet_device_allowances',
+  e_booklet_student_purchase_links: 'e_booklet_student_purchase_links',
   e_booklet_invite_redemptions: 'e_booklet_invite_redemptions',
   e_booklet_file_assets: 'e_booklet_file_assets',
   e_booklet_audit_logs: 'e_booklet_audit_logs',
@@ -685,6 +688,7 @@ export const E_booklet_templatesScalarFieldEnum = {
   description: 'description',
   cover_file_id: 'cover_file_id',
   price: 'price',
+  marketing_price: 'marketing_price',
   currency: 'currency',
   status: 'status',
   category_id: 'category_id',
@@ -720,12 +724,18 @@ export const E_booklet_hotspotsScalarFieldEnum = {
   x_percent: 'x_percent',
   y_percent: 'y_percent',
   radius_percent: 'radius_percent',
+  reference_number: 'reference_number',
+  shape: 'shape',
+  width_percent: 'width_percent',
+  height_percent: 'height_percent',
   type: 'type',
   title: 'title',
   text_content: 'text_content',
   asset_file_id: 'asset_file_id',
   trigger_type: 'trigger_type',
   display_behavior: 'display_behavior',
+  content_json: 'content_json',
+  interaction_json: 'interaction_json',
   sort_order: 'sort_order',
   is_active: 'is_active',
   created_by: 'created_by',
@@ -744,6 +754,9 @@ export const E_booklet_purchasesScalarFieldEnum = {
   template_version_id: 'template_version_id',
   status: 'status',
   price: 'price',
+  marketing_price: 'marketing_price',
+  internal_price: 'internal_price',
+  access_expires_at: 'access_expires_at',
   currency: 'currency',
   payment_method: 'payment_method',
   payment_reference: 'payment_reference',
@@ -767,6 +780,11 @@ export const E_booklet_instancesScalarFieldEnum = {
   branding_json: 'branding_json',
   invite_quota: 'invite_quota',
   used_invites_count: 'used_invites_count',
+  access_expires_at: 'access_expires_at',
+  archived_at: 'archived_at',
+  archive_reason: 'archive_reason',
+  student_marketing_price: 'student_marketing_price',
+  internal_price: 'internal_price',
   status: 'status',
   created_at: 'created_at',
   updated_at: 'updated_at'
@@ -781,6 +799,9 @@ export const E_booklet_accessScalarFieldEnum = {
   user_id: 'user_id',
   role: 'role',
   source_invite_id: 'source_invite_id',
+  access_source: 'access_source',
+  terms_accepted_at: 'terms_accepted_at',
+  terms_version: 'terms_version',
   status: 'status',
   granted_at: 'granted_at',
   revoked_at: 'revoked_at'
@@ -794,6 +815,8 @@ export const E_booklet_invitesScalarFieldEnum = {
   booklet_instance_id: 'booklet_instance_id',
   teacher_id: 'teacher_id',
   token_hash: 'token_hash',
+  passcode_hash: 'passcode_hash',
+  passcode_hint: 'passcode_hint',
   max_uses: 'max_uses',
   used_count: 'used_count',
   expires_at: 'expires_at',
@@ -802,6 +825,54 @@ export const E_booklet_invitesScalarFieldEnum = {
 } as const
 
 export type E_booklet_invitesScalarFieldEnum = (typeof E_booklet_invitesScalarFieldEnum)[keyof typeof E_booklet_invitesScalarFieldEnum]
+
+
+export const E_booklet_devicesScalarFieldEnum = {
+  id: 'id',
+  booklet_instance_id: 'booklet_instance_id',
+  user_id: 'user_id',
+  device_fingerprint: 'device_fingerprint',
+  device_label: 'device_label',
+  user_agent: 'user_agent',
+  ip_address: 'ip_address',
+  first_seen_at: 'first_seen_at',
+  last_seen_at: 'last_seen_at',
+  status: 'status',
+  reset_by_admin_id: 'reset_by_admin_id',
+  reset_reason: 'reset_reason'
+} as const
+
+export type E_booklet_devicesScalarFieldEnum = (typeof E_booklet_devicesScalarFieldEnum)[keyof typeof E_booklet_devicesScalarFieldEnum]
+
+
+export const E_booklet_device_allowancesScalarFieldEnum = {
+  id: 'id',
+  booklet_instance_id: 'booklet_instance_id',
+  user_id: 'user_id',
+  allowed_devices: 'allowed_devices',
+  updated_by_admin_id: 'updated_by_admin_id',
+  reason: 'reason',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_device_allowancesScalarFieldEnum = (typeof E_booklet_device_allowancesScalarFieldEnum)[keyof typeof E_booklet_device_allowancesScalarFieldEnum]
+
+
+export const E_booklet_student_purchase_linksScalarFieldEnum = {
+  id: 'id',
+  purchase_id: 'purchase_id',
+  invite_id: 'invite_id',
+  booklet_instance_id: 'booklet_instance_id',
+  student_id: 'student_id',
+  access_id: 'access_id',
+  marketing_price_snapshot: 'marketing_price_snapshot',
+  terms_accepted_at: 'terms_accepted_at',
+  terms_version: 'terms_version',
+  created_at: 'created_at',
+  approved_at: 'approved_at'
+} as const
+
+export type E_booklet_student_purchase_linksScalarFieldEnum = (typeof E_booklet_student_purchase_linksScalarFieldEnum)[keyof typeof E_booklet_student_purchase_linksScalarFieldEnum]
 
 
 export const E_booklet_invite_redemptionsScalarFieldEnum = {

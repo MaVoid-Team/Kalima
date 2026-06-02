@@ -8,7 +8,10 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  Length,
+  Matches,
   Max,
+  MaxLength,
   Min,
 } from "class-validator";
 
@@ -23,12 +26,29 @@ export enum EBookletHotspotTypeDto {
   image = "image",
   video = "video",
   audio = "audio",
+  file = "file",
+  link = "link",
+  question_answer = "question_answer",
+}
+
+export enum EBookletHotspotShapeDto {
+  circle = "circle",
+  rectangle = "rectangle",
+  square = "square",
+  triangle = "triangle",
+  oval = "oval",
 }
 
 export enum EBookletHotspotTriggerDto {
   hover = "hover",
   click = "click",
   both = "both",
+}
+
+export enum EBookletInviteAccessPathDto {
+  free = "free",
+  offline_passcode = "offline_passcode",
+  online_purchase = "online_purchase",
 }
 
 export enum EBookletPurchaseStatusDto {
@@ -59,7 +79,13 @@ export class CreateEBookletTemplateDto {
   price!: number;
 
   @IsOptional()
+  @IsNumber()
+  @Min(0)
+  marketing_price?: number;
+
+  @IsOptional()
   @IsString()
+  @Length(3, 3)
   currency?: string;
 
   @IsOptional()
@@ -94,7 +120,13 @@ export class UpdateEBookletTemplateDto {
   price?: number;
 
   @IsOptional()
+  @IsNumber()
+  @Min(0)
+  marketing_price?: number;
+
+  @IsOptional()
   @IsString()
+  @Length(3, 3)
   currency?: string;
 
   @IsOptional()
@@ -133,6 +165,27 @@ export class UpsertEBookletHotspotDto {
   @Max(20)
   radius_percent!: number;
 
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  reference_number?: number;
+
+  @IsOptional()
+  @IsEnum(EBookletHotspotShapeDto)
+  shape?: EBookletHotspotShapeDto;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0.1)
+  @Max(100)
+  width_percent?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0.1)
+  @Max(100)
+  height_percent?: number;
+
   @IsEnum(EBookletHotspotTypeDto)
   type!: EBookletHotspotTypeDto;
 
@@ -155,6 +208,14 @@ export class UpsertEBookletHotspotDto {
   @IsOptional()
   @IsObject()
   display_behavior?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsObject()
+  content_json?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsObject()
+  interaction_json?: Record<string, unknown>;
 }
 
 export class EBookletCheckoutDto {
@@ -172,7 +233,18 @@ export class EBookletCheckoutDto {
   price?: number;
 
   @IsOptional()
+  @IsNumber()
+  @Min(0)
+  marketing_price?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  internal_price?: number;
+
+  @IsOptional()
   @IsString()
+  @Length(3, 3)
   currency?: string;
 
   @IsOptional()
@@ -210,6 +282,20 @@ export class DeliverEBookletDto {
   @IsOptional()
   @IsArray()
   page_dimensions?: Array<{ width: number; height: number }>;
+
+  @IsOptional()
+  @IsDateString()
+  access_expires_at?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  student_marketing_price?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  internal_price?: number;
 }
 
 export class CreateEBookletInviteDto {
@@ -221,6 +307,16 @@ export class CreateEBookletInviteDto {
   @IsOptional()
   @IsDateString()
   expires_at?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^\d{6}$/)
+  passcode?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  passcode_hint?: string;
 }
 
 export class UpdateEBookletQuotaDto {
@@ -232,6 +328,94 @@ export class UpdateEBookletQuotaDto {
 export class AcceptEBookletInviteDto {
   @IsString()
   token!: string;
+
+  @IsOptional()
+  @IsEnum(EBookletInviteAccessPathDto)
+  accessPath?: EBookletInviteAccessPathDto;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  purchaseId?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  termsAccepted?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  termsVersion?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^\d{6}$/)
+  passcode?: string;
+}
+
+export class EBookletStudentPurchaseLinkDto {
+  @IsString()
+  token!: string;
+
+  @IsInt()
+  @Min(1)
+  purchaseId!: number;
+
+  @IsBoolean()
+  termsAccepted!: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  termsVersion?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  paymentProofFileId?: number;
+}
+
+export class EBookletPaymentProofDto {
+  @IsInt()
+  @Min(1)
+  paymentProofFileId!: number;
+
+  @IsOptional()
+  @IsString()
+  paymentReference?: string;
+}
+
+export class EBookletDeviceBindDto {
+  @IsString()
+  @Length(1, 128)
+  @Matches(/^[A-Za-z0-9._:-]+$/)
+  deviceFingerprint!: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  deviceLabel?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  userAgent?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  ipAddress?: string;
+}
+
+export class EBookletDeviceAllowanceDto {
+  @IsInt()
+  @Min(1)
+  allowedDevices!: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  reason?: string;
 }
 
 export class ViewerPageRequestDto {

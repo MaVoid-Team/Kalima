@@ -1,11 +1,10 @@
 import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
+import path from "path";
 import { BadRequestError } from "../../../libs/errors";
 
 const DOCUMENT_MIME_TYPES = new Set([
   "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
 
 const IMAGE_MIME_TYPES = new Set([
@@ -13,7 +12,6 @@ const IMAGE_MIME_TYPES = new Set([
   "image/png",
   "image/webp",
   "image/gif",
-  "image/svg+xml",
   "image/avif",
 ]);
 
@@ -32,11 +30,56 @@ const AUDIO_MIME_TYPES = new Set([
   "audio/mp4",
 ]);
 
+const SAFE_ATTACHMENT_MIME_TYPES = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "text/plain",
+  "text/csv",
+]);
+
 const HOTSPOT_MEDIA_MIME_TYPES = new Set([
   ...IMAGE_MIME_TYPES,
   ...VIDEO_MIME_TYPES,
   ...AUDIO_MIME_TYPES,
+  ...SAFE_ATTACHMENT_MIME_TYPES,
 ]);
+
+const MIME_ALLOWED_EXTS: Record<string, string[]> = {
+  "application/pdf": [".pdf"],
+  "application/msword": [".doc"],
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+  "application/vnd.ms-excel": [".xls"],
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+  "application/vnd.ms-powerpoint": [".ppt"],
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": [".pptx"],
+  "text/plain": [".txt"],
+  "text/csv": [".csv"],
+  "image/jpeg": [".jpg", ".jpeg"],
+  "image/png": [".png"],
+  "image/webp": [".webp"],
+  "image/gif": [".gif"],
+  "image/avif": [".avif"],
+  "video/mp4": [".mp4"],
+  "video/webm": [".webm"],
+  "video/quicktime": [".mov", ".qt"],
+  "audio/mpeg": [".mp3"],
+  "audio/mp3": [".mp3"],
+  "audio/wav": [".wav"],
+  "audio/webm": [".webm"],
+  "audio/ogg": [".ogg"],
+  "audio/mp4": [".m4a", ".mp4"],
+};
+
+function hasAllowedExtension(file: Express.Multer.File): boolean {
+  const ext = path.extname(file.originalname).toLowerCase();
+  const allowed = MIME_ALLOWED_EXTS[file.mimetype];
+  return !allowed || !ext || allowed.includes(ext);
+}
 
 const storage = multer.memoryStorage();
 
@@ -45,14 +88,14 @@ function documentFilter(
   file: Express.Multer.File,
   cb: FileFilterCallback,
 ): void {
-  if (DOCUMENT_MIME_TYPES.has(file.mimetype)) {
+  if (DOCUMENT_MIME_TYPES.has(file.mimetype) && hasAllowedExtension(file)) {
     cb(null, true);
     return;
   }
 
   cb(
     new BadRequestError(
-      `Invalid document type: ${file.mimetype}. Allowed: PDF, DOC, DOCX`,
+      `Invalid document type: ${file.mimetype}. Allowed: PDF only`,
     ),
   );
 }
@@ -62,14 +105,14 @@ function coverFilter(
   file: Express.Multer.File,
   cb: FileFilterCallback,
 ): void {
-  if (IMAGE_MIME_TYPES.has(file.mimetype)) {
+  if (IMAGE_MIME_TYPES.has(file.mimetype) && hasAllowedExtension(file)) {
     cb(null, true);
     return;
   }
 
   cb(
     new BadRequestError(
-      `Invalid cover image type: ${file.mimetype}. Allowed: jpeg, png, webp, gif, svg, avif`,
+      `Invalid cover image type: ${file.mimetype}. Allowed: jpeg, png, webp, gif, avif`,
     ),
   );
 }
@@ -79,14 +122,14 @@ function hotspotMediaFilter(
   file: Express.Multer.File,
   cb: FileFilterCallback,
 ): void {
-  if (HOTSPOT_MEDIA_MIME_TYPES.has(file.mimetype)) {
+  if (HOTSPOT_MEDIA_MIME_TYPES.has(file.mimetype) && hasAllowedExtension(file)) {
     cb(null, true);
     return;
   }
 
   cb(
     new BadRequestError(
-      `Invalid hotspot media type: ${file.mimetype}. Allowed: image, video, or audio`,
+      `Invalid hotspot media type: ${file.mimetype}. Allowed: image, video, audio, PDF, or safe office attachment`,
     ),
   );
 }

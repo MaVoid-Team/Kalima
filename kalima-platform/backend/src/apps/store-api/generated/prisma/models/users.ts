@@ -392,6 +392,9 @@ export type usersWhereInput = {
   e_booklet_invites?: Prisma.E_booklet_invitesListRelationFilter
   e_booklet_invite_redemptions?: Prisma.E_booklet_invite_redemptionsListRelationFilter
   e_booklet_audit_logs?: Prisma.E_booklet_audit_logsListRelationFilter
+  e_booklet_devices?: Prisma.E_booklet_devicesListRelationFilter
+  e_booklet_device_allowances?: Prisma.E_booklet_device_allowancesListRelationFilter
+  e_booklet_student_purchase_links?: Prisma.E_booklet_student_purchase_linksListRelationFilter
 }
 
 export type usersOrderByWithRelationInput = {
@@ -453,6 +456,9 @@ export type usersOrderByWithRelationInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesOrderByRelationAggregateInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsOrderByRelationAggregateInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsOrderByRelationAggregateInput
+  e_booklet_devices?: Prisma.e_booklet_devicesOrderByRelationAggregateInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesOrderByRelationAggregateInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksOrderByRelationAggregateInput
 }
 
 export type usersWhereUniqueInput = Prisma.AtLeast<{
@@ -517,6 +523,9 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   e_booklet_invites?: Prisma.E_booklet_invitesListRelationFilter
   e_booklet_invite_redemptions?: Prisma.E_booklet_invite_redemptionsListRelationFilter
   e_booklet_audit_logs?: Prisma.E_booklet_audit_logsListRelationFilter
+  e_booklet_devices?: Prisma.E_booklet_devicesListRelationFilter
+  e_booklet_device_allowances?: Prisma.E_booklet_device_allowancesListRelationFilter
+  e_booklet_student_purchase_links?: Prisma.E_booklet_student_purchase_linksListRelationFilter
 }, "id" | "mongo_id" | "email">
 
 export type usersOrderByWithAggregationInput = {
@@ -634,6 +643,9 @@ export type usersCreateInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateInput = {
@@ -694,6 +706,9 @@ export type usersUncheckedCreateInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersUpdateInput = {
@@ -753,6 +768,9 @@ export type usersUpdateInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateInput = {
@@ -813,6 +831,9 @@ export type usersUncheckedUpdateInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateManyInput = {
@@ -1497,6 +1518,48 @@ export type usersUpdateOneRequiredWithoutE_booklet_invitesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutE_booklet_invitesInput, Prisma.usersUpdateWithoutE_booklet_invitesInput>, Prisma.usersUncheckedUpdateWithoutE_booklet_invitesInput>
 }
 
+export type usersCreateNestedOneWithoutE_booklet_devicesInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_devicesInput, Prisma.usersUncheckedCreateWithoutE_booklet_devicesInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutE_booklet_devicesInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutE_booklet_devicesNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_devicesInput, Prisma.usersUncheckedCreateWithoutE_booklet_devicesInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutE_booklet_devicesInput
+  upsert?: Prisma.usersUpsertWithoutE_booklet_devicesInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutE_booklet_devicesInput, Prisma.usersUpdateWithoutE_booklet_devicesInput>, Prisma.usersUncheckedUpdateWithoutE_booklet_devicesInput>
+}
+
+export type usersCreateNestedOneWithoutE_booklet_device_allowancesInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_device_allowancesInput, Prisma.usersUncheckedCreateWithoutE_booklet_device_allowancesInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutE_booklet_device_allowancesInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutE_booklet_device_allowancesNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_device_allowancesInput, Prisma.usersUncheckedCreateWithoutE_booklet_device_allowancesInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutE_booklet_device_allowancesInput
+  upsert?: Prisma.usersUpsertWithoutE_booklet_device_allowancesInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutE_booklet_device_allowancesInput, Prisma.usersUpdateWithoutE_booklet_device_allowancesInput>, Prisma.usersUncheckedUpdateWithoutE_booklet_device_allowancesInput>
+}
+
+export type usersCreateNestedOneWithoutE_booklet_student_purchase_linksInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_student_purchase_linksInput, Prisma.usersUncheckedCreateWithoutE_booklet_student_purchase_linksInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutE_booklet_student_purchase_linksInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutE_booklet_student_purchase_linksNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_student_purchase_linksInput, Prisma.usersUncheckedCreateWithoutE_booklet_student_purchase_linksInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutE_booklet_student_purchase_linksInput
+  upsert?: Prisma.usersUpsertWithoutE_booklet_student_purchase_linksInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutE_booklet_student_purchase_linksInput, Prisma.usersUpdateWithoutE_booklet_student_purchase_linksInput>, Prisma.usersUncheckedUpdateWithoutE_booklet_student_purchase_linksInput>
+}
+
 export type usersCreateNestedOneWithoutE_booklet_invite_redemptionsInput = {
   create?: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_invite_redemptionsInput, Prisma.usersUncheckedCreateWithoutE_booklet_invite_redemptionsInput>
   connectOrCreate?: Prisma.usersCreateOrConnectWithoutE_booklet_invite_redemptionsInput
@@ -1615,6 +1678,9 @@ export type usersCreateWithoutAuth_identitiesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutAuth_identitiesInput = {
@@ -1674,6 +1740,9 @@ export type usersUncheckedCreateWithoutAuth_identitiesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutAuth_identitiesInput = {
@@ -1748,6 +1817,9 @@ export type usersUpdateWithoutAuth_identitiesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
@@ -1807,6 +1879,9 @@ export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutUser_analyticsInput = {
@@ -1865,6 +1940,9 @@ export type usersCreateWithoutUser_analyticsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutUser_analyticsInput = {
@@ -1924,6 +2002,9 @@ export type usersUncheckedCreateWithoutUser_analyticsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutUser_analyticsInput = {
@@ -1998,6 +2079,9 @@ export type usersUpdateWithoutUser_analyticsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutUser_analyticsInput = {
@@ -2057,6 +2141,9 @@ export type usersUncheckedUpdateWithoutUser_analyticsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutUser_rolesInput = {
@@ -2115,6 +2202,9 @@ export type usersCreateWithoutUser_rolesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutUser_rolesInput = {
@@ -2174,6 +2264,9 @@ export type usersUncheckedCreateWithoutUser_rolesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutUser_rolesInput = {
@@ -2248,6 +2341,9 @@ export type usersUpdateWithoutUser_rolesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutUser_rolesInput = {
@@ -2307,6 +2403,9 @@ export type usersUncheckedUpdateWithoutUser_rolesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutCreated_usersInput = {
@@ -2365,6 +2464,9 @@ export type usersCreateWithoutCreated_usersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutCreated_usersInput = {
@@ -2424,6 +2526,9 @@ export type usersUncheckedCreateWithoutCreated_usersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutCreated_usersInput = {
@@ -2487,6 +2592,9 @@ export type usersCreateWithoutCreator_userInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutCreator_userInput = {
@@ -2546,6 +2654,9 @@ export type usersUncheckedCreateWithoutCreator_userInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutCreator_userInput = {
@@ -2625,6 +2736,9 @@ export type usersUpdateWithoutCreated_usersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCreated_usersInput = {
@@ -2684,6 +2798,9 @@ export type usersUncheckedUpdateWithoutCreated_usersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUpsertWithWhereUniqueWithoutCreator_userInput = {
@@ -2786,6 +2903,9 @@ export type usersCreateWithoutUser_appreciation_pageInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutUser_appreciation_pageInput = {
@@ -2845,6 +2965,9 @@ export type usersUncheckedCreateWithoutUser_appreciation_pageInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutUser_appreciation_pageInput = {
@@ -2919,6 +3042,9 @@ export type usersUpdateWithoutUser_appreciation_pageInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutUser_appreciation_pageInput = {
@@ -2978,6 +3104,9 @@ export type usersUncheckedUpdateWithoutUser_appreciation_pageInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutAccount_review_settings_updatedInput = {
@@ -3036,6 +3165,9 @@ export type usersCreateWithoutAccount_review_settings_updatedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutAccount_review_settings_updatedInput = {
@@ -3095,6 +3227,9 @@ export type usersUncheckedCreateWithoutAccount_review_settings_updatedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutAccount_review_settings_updatedInput = {
@@ -3169,6 +3304,9 @@ export type usersUpdateWithoutAccount_review_settings_updatedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAccount_review_settings_updatedInput = {
@@ -3228,6 +3366,9 @@ export type usersUncheckedUpdateWithoutAccount_review_settings_updatedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutRefresh_tokensInput = {
@@ -3286,6 +3427,9 @@ export type usersCreateWithoutRefresh_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutRefresh_tokensInput = {
@@ -3345,6 +3489,9 @@ export type usersUncheckedCreateWithoutRefresh_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutRefresh_tokensInput = {
@@ -3419,6 +3566,9 @@ export type usersUpdateWithoutRefresh_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
@@ -3478,6 +3628,9 @@ export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutAssistantsInput = {
@@ -3536,6 +3689,9 @@ export type usersCreateWithoutAssistantsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutAssistantsInput = {
@@ -3595,6 +3751,9 @@ export type usersUncheckedCreateWithoutAssistantsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutAssistantsInput = {
@@ -3669,6 +3828,9 @@ export type usersUpdateWithoutAssistantsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAssistantsInput = {
@@ -3728,6 +3890,9 @@ export type usersUncheckedUpdateWithoutAssistantsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutLecturersInput = {
@@ -3786,6 +3951,9 @@ export type usersCreateWithoutLecturersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutLecturersInput = {
@@ -3845,6 +4013,9 @@ export type usersUncheckedCreateWithoutLecturersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutLecturersInput = {
@@ -3919,6 +4090,9 @@ export type usersUpdateWithoutLecturersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutLecturersInput = {
@@ -3978,6 +4152,9 @@ export type usersUncheckedUpdateWithoutLecturersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutParentsInput = {
@@ -4036,6 +4213,9 @@ export type usersCreateWithoutParentsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutParentsInput = {
@@ -4095,6 +4275,9 @@ export type usersUncheckedCreateWithoutParentsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutParentsInput = {
@@ -4169,6 +4352,9 @@ export type usersUpdateWithoutParentsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutParentsInput = {
@@ -4228,6 +4414,9 @@ export type usersUncheckedUpdateWithoutParentsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutSocial_mediaInput = {
@@ -4286,6 +4475,9 @@ export type usersCreateWithoutSocial_mediaInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutSocial_mediaInput = {
@@ -4345,6 +4537,9 @@ export type usersUncheckedCreateWithoutSocial_mediaInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutSocial_mediaInput = {
@@ -4419,6 +4614,9 @@ export type usersUpdateWithoutSocial_mediaInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutSocial_mediaInput = {
@@ -4478,6 +4676,9 @@ export type usersUncheckedUpdateWithoutSocial_mediaInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutStudentsInput = {
@@ -4536,6 +4737,9 @@ export type usersCreateWithoutStudentsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutStudentsInput = {
@@ -4595,6 +4799,9 @@ export type usersUncheckedCreateWithoutStudentsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutStudentsInput = {
@@ -4669,6 +4876,9 @@ export type usersUpdateWithoutStudentsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutStudentsInput = {
@@ -4728,6 +4938,9 @@ export type usersUncheckedUpdateWithoutStudentsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutTeachersInput = {
@@ -4786,6 +4999,9 @@ export type usersCreateWithoutTeachersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutTeachersInput = {
@@ -4845,6 +5061,9 @@ export type usersUncheckedCreateWithoutTeachersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutTeachersInput = {
@@ -4919,6 +5138,9 @@ export type usersUpdateWithoutTeachersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutTeachersInput = {
@@ -4978,6 +5200,9 @@ export type usersUncheckedUpdateWithoutTeachersInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutTeaches_atInput = {
@@ -5036,6 +5261,9 @@ export type usersCreateWithoutTeaches_atInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutTeaches_atInput = {
@@ -5095,6 +5323,9 @@ export type usersUncheckedCreateWithoutTeaches_atInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutTeaches_atInput = {
@@ -5169,6 +5400,9 @@ export type usersUpdateWithoutTeaches_atInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutTeaches_atInput = {
@@ -5228,6 +5462,9 @@ export type usersUncheckedUpdateWithoutTeaches_atInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutEmail_verification_tokensInput = {
@@ -5286,6 +5523,9 @@ export type usersCreateWithoutEmail_verification_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
@@ -5345,6 +5585,9 @@ export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutEmail_verification_tokensInput = {
@@ -5419,6 +5662,9 @@ export type usersUpdateWithoutEmail_verification_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
@@ -5478,6 +5724,9 @@ export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutPassword_reset_tokensInput = {
@@ -5536,6 +5785,9 @@ export type usersCreateWithoutPassword_reset_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
@@ -5595,6 +5847,9 @@ export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutPassword_reset_tokensInput = {
@@ -5669,6 +5924,9 @@ export type usersUpdateWithoutPassword_reset_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
@@ -5728,6 +5986,9 @@ export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutCoupon_usagesInput = {
@@ -5786,6 +6047,9 @@ export type usersCreateWithoutCoupon_usagesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutCoupon_usagesInput = {
@@ -5845,6 +6109,9 @@ export type usersUncheckedCreateWithoutCoupon_usagesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutCoupon_usagesInput = {
@@ -5919,6 +6186,9 @@ export type usersUpdateWithoutCoupon_usagesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCoupon_usagesInput = {
@@ -5978,6 +6248,9 @@ export type usersUncheckedUpdateWithoutCoupon_usagesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutProduct_reviewsInput = {
@@ -6036,6 +6309,9 @@ export type usersCreateWithoutProduct_reviewsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutProduct_reviewsInput = {
@@ -6095,6 +6371,9 @@ export type usersUncheckedCreateWithoutProduct_reviewsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutProduct_reviewsInput = {
@@ -6169,6 +6448,9 @@ export type usersUpdateWithoutProduct_reviewsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutProduct_reviewsInput = {
@@ -6228,6 +6510,9 @@ export type usersUncheckedUpdateWithoutProduct_reviewsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutCartsInput = {
@@ -6286,6 +6571,9 @@ export type usersCreateWithoutCartsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutCartsInput = {
@@ -6345,6 +6633,9 @@ export type usersUncheckedCreateWithoutCartsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutCartsInput = {
@@ -6419,6 +6710,9 @@ export type usersUpdateWithoutCartsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCartsInput = {
@@ -6478,6 +6772,9 @@ export type usersUncheckedUpdateWithoutCartsInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutPurchasesInput = {
@@ -6536,6 +6833,9 @@ export type usersCreateWithoutPurchasesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutPurchasesInput = {
@@ -6595,6 +6895,9 @@ export type usersUncheckedCreateWithoutPurchasesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutPurchasesInput = {
@@ -6658,6 +6961,9 @@ export type usersCreateWithoutPurchases_receivedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutPurchases_receivedInput = {
@@ -6717,6 +7023,9 @@ export type usersUncheckedCreateWithoutPurchases_receivedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutPurchases_receivedInput = {
@@ -6780,6 +7089,9 @@ export type usersCreateWithoutPurchases_confirmedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutPurchases_confirmedInput = {
@@ -6839,6 +7151,9 @@ export type usersUncheckedCreateWithoutPurchases_confirmedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutPurchases_confirmedInput = {
@@ -6902,6 +7217,9 @@ export type usersCreateWithoutPurchases_returnedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutPurchases_returnedInput = {
@@ -6961,6 +7279,9 @@ export type usersUncheckedCreateWithoutPurchases_returnedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutPurchases_returnedInput = {
@@ -7035,6 +7356,9 @@ export type usersUpdateWithoutPurchasesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchasesInput = {
@@ -7094,6 +7418,9 @@ export type usersUncheckedUpdateWithoutPurchasesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUpsertWithoutPurchases_receivedInput = {
@@ -7163,6 +7490,9 @@ export type usersUpdateWithoutPurchases_receivedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchases_receivedInput = {
@@ -7222,6 +7552,9 @@ export type usersUncheckedUpdateWithoutPurchases_receivedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUpsertWithoutPurchases_confirmedInput = {
@@ -7291,6 +7624,9 @@ export type usersUpdateWithoutPurchases_confirmedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchases_confirmedInput = {
@@ -7350,6 +7686,9 @@ export type usersUncheckedUpdateWithoutPurchases_confirmedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUpsertWithoutPurchases_returnedInput = {
@@ -7419,6 +7758,9 @@ export type usersUpdateWithoutPurchases_returnedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchases_returnedInput = {
@@ -7478,6 +7820,9 @@ export type usersUncheckedUpdateWithoutPurchases_returnedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutE_booklet_templates_createdInput = {
@@ -7536,6 +7881,9 @@ export type usersCreateWithoutE_booklet_templates_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutE_booklet_templates_createdInput = {
@@ -7595,6 +7943,9 @@ export type usersUncheckedCreateWithoutE_booklet_templates_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutE_booklet_templates_createdInput = {
@@ -7669,6 +8020,9 @@ export type usersUpdateWithoutE_booklet_templates_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutE_booklet_templates_createdInput = {
@@ -7728,6 +8082,9 @@ export type usersUncheckedUpdateWithoutE_booklet_templates_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutE_booklet_template_versions_createdInput = {
@@ -7786,6 +8143,9 @@ export type usersCreateWithoutE_booklet_template_versions_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutE_booklet_template_versions_createdInput = {
@@ -7845,6 +8205,9 @@ export type usersUncheckedCreateWithoutE_booklet_template_versions_createdInput 
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutE_booklet_template_versions_createdInput = {
@@ -7919,6 +8282,9 @@ export type usersUpdateWithoutE_booklet_template_versions_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutE_booklet_template_versions_createdInput = {
@@ -7978,6 +8344,9 @@ export type usersUncheckedUpdateWithoutE_booklet_template_versions_createdInput 
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutE_booklet_hotspots_createdInput = {
@@ -8036,6 +8405,9 @@ export type usersCreateWithoutE_booklet_hotspots_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutE_booklet_hotspots_createdInput = {
@@ -8095,6 +8467,9 @@ export type usersUncheckedCreateWithoutE_booklet_hotspots_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutE_booklet_hotspots_createdInput = {
@@ -8158,6 +8533,9 @@ export type usersCreateWithoutE_booklet_hotspots_updatedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutE_booklet_hotspots_updatedInput = {
@@ -8217,6 +8595,9 @@ export type usersUncheckedCreateWithoutE_booklet_hotspots_updatedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutE_booklet_hotspots_updatedInput = {
@@ -8291,6 +8672,9 @@ export type usersUpdateWithoutE_booklet_hotspots_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutE_booklet_hotspots_createdInput = {
@@ -8350,6 +8734,9 @@ export type usersUncheckedUpdateWithoutE_booklet_hotspots_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUpsertWithoutE_booklet_hotspots_updatedInput = {
@@ -8419,6 +8806,9 @@ export type usersUpdateWithoutE_booklet_hotspots_updatedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutE_booklet_hotspots_updatedInput = {
@@ -8478,6 +8868,9 @@ export type usersUncheckedUpdateWithoutE_booklet_hotspots_updatedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutE_booklet_purchasesInput = {
@@ -8536,6 +8929,9 @@ export type usersCreateWithoutE_booklet_purchasesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutE_booklet_purchasesInput = {
@@ -8595,6 +8991,9 @@ export type usersUncheckedCreateWithoutE_booklet_purchasesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutE_booklet_purchasesInput = {
@@ -8669,6 +9068,9 @@ export type usersUpdateWithoutE_booklet_purchasesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutE_booklet_purchasesInput = {
@@ -8728,6 +9130,9 @@ export type usersUncheckedUpdateWithoutE_booklet_purchasesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutE_booklet_instancesInput = {
@@ -8786,6 +9191,9 @@ export type usersCreateWithoutE_booklet_instancesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutE_booklet_instancesInput = {
@@ -8845,6 +9253,9 @@ export type usersUncheckedCreateWithoutE_booklet_instancesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutE_booklet_instancesInput = {
@@ -8919,6 +9330,9 @@ export type usersUpdateWithoutE_booklet_instancesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutE_booklet_instancesInput = {
@@ -8978,6 +9392,9 @@ export type usersUncheckedUpdateWithoutE_booklet_instancesInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutE_booklet_accessInput = {
@@ -9036,6 +9453,9 @@ export type usersCreateWithoutE_booklet_accessInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutE_booklet_accessInput = {
@@ -9095,6 +9515,9 @@ export type usersUncheckedCreateWithoutE_booklet_accessInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutE_booklet_accessInput = {
@@ -9169,6 +9592,9 @@ export type usersUpdateWithoutE_booklet_accessInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutE_booklet_accessInput = {
@@ -9228,6 +9654,9 @@ export type usersUncheckedUpdateWithoutE_booklet_accessInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutE_booklet_invitesInput = {
@@ -9286,6 +9715,9 @@ export type usersCreateWithoutE_booklet_invitesInput = {
   e_booklet_access?: Prisma.e_booklet_accessCreateNestedManyWithoutUserInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutE_booklet_invitesInput = {
@@ -9345,6 +9777,9 @@ export type usersUncheckedCreateWithoutE_booklet_invitesInput = {
   e_booklet_access?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutUserInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutE_booklet_invitesInput = {
@@ -9419,6 +9854,9 @@ export type usersUpdateWithoutE_booklet_invitesInput = {
   e_booklet_access?: Prisma.e_booklet_accessUpdateManyWithoutUserNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutE_booklet_invitesInput = {
@@ -9478,6 +9916,795 @@ export type usersUncheckedUpdateWithoutE_booklet_invitesInput = {
   e_booklet_access?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutUserNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
+}
+
+export type usersCreateWithoutE_booklet_devicesInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  flag?: $Enums.user_flag_enum
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
+  product_reviews?: Prisma.product_reviewsCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesCreateNestedOneWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
+  account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesCreateNestedManyWithoutCreatorInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutUpdaterInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTeacherInput
+  e_booklet_instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTeacherInput
+  e_booklet_access?: Prisma.e_booklet_accessCreateNestedManyWithoutUserInput
+  e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
+}
+
+export type usersUncheckedCreateWithoutE_booklet_devicesInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  created_by?: number | null
+  flag?: $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
+  product_reviews?: Prisma.product_reviewsUncheckedCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesUncheckedCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
+  account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutUpdaterInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTeacherInput
+  e_booklet_instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTeacherInput
+  e_booklet_access?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
+}
+
+export type usersCreateOrConnectWithoutE_booklet_devicesInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_devicesInput, Prisma.usersUncheckedCreateWithoutE_booklet_devicesInput>
+}
+
+export type usersUpsertWithoutE_booklet_devicesInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutE_booklet_devicesInput, Prisma.usersUncheckedUpdateWithoutE_booklet_devicesInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_devicesInput, Prisma.usersUncheckedCreateWithoutE_booklet_devicesInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutE_booklet_devicesInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutE_booklet_devicesInput, Prisma.usersUncheckedUpdateWithoutE_booklet_devicesInput>
+}
+
+export type usersUpdateWithoutE_booklet_devicesInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  flag?: Prisma.Enumuser_flag_enumFieldUpdateOperationsInput | $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
+  product_reviews?: Prisma.product_reviewsUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUpdateOneWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
+  account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesUpdateManyWithoutCreatorNestedInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsUpdateManyWithoutUpdaterNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTeacherNestedInput
+  e_booklet_instances?: Prisma.e_booklet_instancesUpdateManyWithoutTeacherNestedInput
+  e_booklet_access?: Prisma.e_booklet_accessUpdateManyWithoutUserNestedInput
+  e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
+}
+
+export type usersUncheckedUpdateWithoutE_booklet_devicesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  flag?: Prisma.Enumuser_flag_enumFieldUpdateOperationsInput | $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
+  product_reviews?: Prisma.product_reviewsUncheckedUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUncheckedUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
+  account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutUpdaterNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTeacherNestedInput
+  e_booklet_instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTeacherNestedInput
+  e_booklet_access?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
+}
+
+export type usersCreateWithoutE_booklet_device_allowancesInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  flag?: $Enums.user_flag_enum
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
+  product_reviews?: Prisma.product_reviewsCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesCreateNestedOneWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
+  account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesCreateNestedManyWithoutCreatorInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutUpdaterInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTeacherInput
+  e_booklet_instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTeacherInput
+  e_booklet_access?: Prisma.e_booklet_accessCreateNestedManyWithoutUserInput
+  e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
+}
+
+export type usersUncheckedCreateWithoutE_booklet_device_allowancesInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  created_by?: number | null
+  flag?: $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
+  product_reviews?: Prisma.product_reviewsUncheckedCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesUncheckedCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
+  account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutUpdaterInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTeacherInput
+  e_booklet_instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTeacherInput
+  e_booklet_access?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
+}
+
+export type usersCreateOrConnectWithoutE_booklet_device_allowancesInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_device_allowancesInput, Prisma.usersUncheckedCreateWithoutE_booklet_device_allowancesInput>
+}
+
+export type usersUpsertWithoutE_booklet_device_allowancesInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutE_booklet_device_allowancesInput, Prisma.usersUncheckedUpdateWithoutE_booklet_device_allowancesInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_device_allowancesInput, Prisma.usersUncheckedCreateWithoutE_booklet_device_allowancesInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutE_booklet_device_allowancesInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutE_booklet_device_allowancesInput, Prisma.usersUncheckedUpdateWithoutE_booklet_device_allowancesInput>
+}
+
+export type usersUpdateWithoutE_booklet_device_allowancesInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  flag?: Prisma.Enumuser_flag_enumFieldUpdateOperationsInput | $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
+  product_reviews?: Prisma.product_reviewsUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUpdateOneWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
+  account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesUpdateManyWithoutCreatorNestedInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsUpdateManyWithoutUpdaterNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTeacherNestedInput
+  e_booklet_instances?: Prisma.e_booklet_instancesUpdateManyWithoutTeacherNestedInput
+  e_booklet_access?: Prisma.e_booklet_accessUpdateManyWithoutUserNestedInput
+  e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
+}
+
+export type usersUncheckedUpdateWithoutE_booklet_device_allowancesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  flag?: Prisma.Enumuser_flag_enumFieldUpdateOperationsInput | $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
+  product_reviews?: Prisma.product_reviewsUncheckedUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUncheckedUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
+  account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutUpdaterNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTeacherNestedInput
+  e_booklet_instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTeacherNestedInput
+  e_booklet_access?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
+}
+
+export type usersCreateWithoutE_booklet_student_purchase_linksInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  flag?: $Enums.user_flag_enum
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
+  product_reviews?: Prisma.product_reviewsCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesCreateNestedOneWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
+  account_review_settings_updated?: Prisma.account_review_settingsCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsCreateNestedManyWithoutCreatorInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesCreateNestedManyWithoutCreatorInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutUpdaterInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTeacherInput
+  e_booklet_instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTeacherInput
+  e_booklet_access?: Prisma.e_booklet_accessCreateNestedManyWithoutUserInput
+  e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+}
+
+export type usersUncheckedCreateWithoutE_booklet_student_purchase_linksInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  created_by?: number | null
+  flag?: $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
+  product_reviews?: Prisma.product_reviewsUncheckedCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesUncheckedCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedCreateNestedOneWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
+  account_review_settings_updated?: Prisma.account_review_settingsUncheckedCreateNestedManyWithoutUpdated_by_userInput
+  notifications_received?: Prisma.notificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications_created?: Prisma.notificationsUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutCreatorInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutUpdaterInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTeacherInput
+  e_booklet_instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTeacherInput
+  e_booklet_access?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type usersCreateOrConnectWithoutE_booklet_student_purchase_linksInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_student_purchase_linksInput, Prisma.usersUncheckedCreateWithoutE_booklet_student_purchase_linksInput>
+}
+
+export type usersUpsertWithoutE_booklet_student_purchase_linksInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutE_booklet_student_purchase_linksInput, Prisma.usersUncheckedUpdateWithoutE_booklet_student_purchase_linksInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutE_booklet_student_purchase_linksInput, Prisma.usersUncheckedCreateWithoutE_booklet_student_purchase_linksInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutE_booklet_student_purchase_linksInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutE_booklet_student_purchase_linksInput, Prisma.usersUncheckedUpdateWithoutE_booklet_student_purchase_linksInput>
+}
+
+export type usersUpdateWithoutE_booklet_student_purchase_linksInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  flag?: Prisma.Enumuser_flag_enumFieldUpdateOperationsInput | $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
+  product_reviews?: Prisma.product_reviewsUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUpdateOneWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
+  account_review_settings_updated?: Prisma.account_review_settingsUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUpdateManyWithoutCreatorNestedInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesUpdateManyWithoutCreatorNestedInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsUpdateManyWithoutUpdaterNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTeacherNestedInput
+  e_booklet_instances?: Prisma.e_booklet_instancesUpdateManyWithoutTeacherNestedInput
+  e_booklet_access?: Prisma.e_booklet_accessUpdateManyWithoutUserNestedInput
+  e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+}
+
+export type usersUncheckedUpdateWithoutE_booklet_student_purchase_linksInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  flag?: Prisma.Enumuser_flag_enumFieldUpdateOperationsInput | $Enums.user_flag_enum
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
+  product_reviews?: Prisma.product_reviewsUncheckedUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUncheckedUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  user_appreciation_page?: Prisma.user_appreciation_pagesUncheckedUpdateOneWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
+  account_review_settings_updated?: Prisma.account_review_settingsUncheckedUpdateManyWithoutUpdated_by_userNestedInput
+  notifications_received?: Prisma.notificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications_created?: Prisma.notificationsUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_templates_created?: Prisma.e_booklet_templatesUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_template_versions_created?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_created?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutCreatorNestedInput
+  e_booklet_hotspots_updated?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutUpdaterNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTeacherNestedInput
+  e_booklet_instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTeacherNestedInput
+  e_booklet_access?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
+  e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
+  e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type usersCreateWithoutE_booklet_invite_redemptionsInput = {
@@ -9536,6 +10763,9 @@ export type usersCreateWithoutE_booklet_invite_redemptionsInput = {
   e_booklet_access?: Prisma.e_booklet_accessCreateNestedManyWithoutUserInput
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutE_booklet_invite_redemptionsInput = {
@@ -9595,6 +10825,9 @@ export type usersUncheckedCreateWithoutE_booklet_invite_redemptionsInput = {
   e_booklet_access?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutUserInput
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutE_booklet_invite_redemptionsInput = {
@@ -9669,6 +10902,9 @@ export type usersUpdateWithoutE_booklet_invite_redemptionsInput = {
   e_booklet_access?: Prisma.e_booklet_accessUpdateManyWithoutUserNestedInput
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutE_booklet_invite_redemptionsInput = {
@@ -9728,6 +10964,9 @@ export type usersUncheckedUpdateWithoutE_booklet_invite_redemptionsInput = {
   e_booklet_access?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutUserNestedInput
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutE_booklet_audit_logsInput = {
@@ -9786,6 +11025,9 @@ export type usersCreateWithoutE_booklet_audit_logsInput = {
   e_booklet_access?: Prisma.e_booklet_accessCreateNestedManyWithoutUserInput
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutE_booklet_audit_logsInput = {
@@ -9845,6 +11087,9 @@ export type usersUncheckedCreateWithoutE_booklet_audit_logsInput = {
   e_booklet_access?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutUserInput
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutE_booklet_audit_logsInput = {
@@ -9919,6 +11164,9 @@ export type usersUpdateWithoutE_booklet_audit_logsInput = {
   e_booklet_access?: Prisma.e_booklet_accessUpdateManyWithoutUserNestedInput
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutE_booklet_audit_logsInput = {
@@ -9978,6 +11226,9 @@ export type usersUncheckedUpdateWithoutE_booklet_audit_logsInput = {
   e_booklet_access?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutUserNestedInput
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateWithoutNotifications_receivedInput = {
@@ -10036,6 +11287,9 @@ export type usersCreateWithoutNotifications_receivedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutNotifications_receivedInput = {
@@ -10095,6 +11349,9 @@ export type usersUncheckedCreateWithoutNotifications_receivedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutNotifications_receivedInput = {
@@ -10158,6 +11415,9 @@ export type usersCreateWithoutNotifications_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutStudentInput
 }
 
 export type usersUncheckedCreateWithoutNotifications_createdInput = {
@@ -10217,6 +11477,9 @@ export type usersUncheckedCreateWithoutNotifications_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutTeacherInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutStudentInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedCreateNestedManyWithoutActorInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutUserInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type usersCreateOrConnectWithoutNotifications_createdInput = {
@@ -10291,6 +11554,9 @@ export type usersUpdateWithoutNotifications_receivedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutNotifications_receivedInput = {
@@ -10350,6 +11616,9 @@ export type usersUncheckedUpdateWithoutNotifications_receivedInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUpsertWithoutNotifications_createdInput = {
@@ -10419,6 +11688,9 @@ export type usersUpdateWithoutNotifications_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutNotifications_createdInput = {
@@ -10478,6 +11750,9 @@ export type usersUncheckedUpdateWithoutNotifications_createdInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersCreateManyCreator_userInput = {
@@ -10560,6 +11835,9 @@ export type usersUpdateWithoutCreator_userInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCreator_userInput = {
@@ -10619,6 +11897,9 @@ export type usersUncheckedUpdateWithoutCreator_userInput = {
   e_booklet_invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutTeacherNestedInput
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutStudentNestedInput
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsUncheckedUpdateManyWithoutActorNestedInput
+  e_booklet_devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutUserNestedInput
+  e_booklet_student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type usersUncheckedUpdateManyWithoutCreator_userInput = {
@@ -10678,6 +11959,9 @@ export type UsersCountOutputType = {
   e_booklet_invites: number
   e_booklet_invite_redemptions: number
   e_booklet_audit_logs: number
+  e_booklet_devices: number
+  e_booklet_device_allowances: number
+  e_booklet_student_purchase_links: number
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -10708,6 +11992,9 @@ export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   e_booklet_invites?: boolean | UsersCountOutputTypeCountE_booklet_invitesArgs
   e_booklet_invite_redemptions?: boolean | UsersCountOutputTypeCountE_booklet_invite_redemptionsArgs
   e_booklet_audit_logs?: boolean | UsersCountOutputTypeCountE_booklet_audit_logsArgs
+  e_booklet_devices?: boolean | UsersCountOutputTypeCountE_booklet_devicesArgs
+  e_booklet_device_allowances?: boolean | UsersCountOutputTypeCountE_booklet_device_allowancesArgs
+  e_booklet_student_purchase_links?: boolean | UsersCountOutputTypeCountE_booklet_student_purchase_linksArgs
 }
 
 /**
@@ -10909,6 +12196,27 @@ export type UsersCountOutputTypeCountE_booklet_audit_logsArgs<ExtArgs extends ru
   where?: Prisma.e_booklet_audit_logsWhereInput
 }
 
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountE_booklet_devicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_devicesWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountE_booklet_device_allowancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_device_allowancesWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountE_booklet_student_purchase_linksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_student_purchase_linksWhereInput
+}
+
 
 export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -10969,6 +12277,9 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   e_booklet_invites?: boolean | Prisma.users$e_booklet_invitesArgs<ExtArgs>
   e_booklet_invite_redemptions?: boolean | Prisma.users$e_booklet_invite_redemptionsArgs<ExtArgs>
   e_booklet_audit_logs?: boolean | Prisma.users$e_booklet_audit_logsArgs<ExtArgs>
+  e_booklet_devices?: boolean | Prisma.users$e_booklet_devicesArgs<ExtArgs>
+  e_booklet_device_allowances?: boolean | Prisma.users$e_booklet_device_allowancesArgs<ExtArgs>
+  e_booklet_student_purchase_links?: boolean | Prisma.users$e_booklet_student_purchase_linksArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
@@ -11087,6 +12398,9 @@ export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   e_booklet_invites?: boolean | Prisma.users$e_booklet_invitesArgs<ExtArgs>
   e_booklet_invite_redemptions?: boolean | Prisma.users$e_booklet_invite_redemptionsArgs<ExtArgs>
   e_booklet_audit_logs?: boolean | Prisma.users$e_booklet_audit_logsArgs<ExtArgs>
+  e_booklet_devices?: boolean | Prisma.users$e_booklet_devicesArgs<ExtArgs>
+  e_booklet_device_allowances?: boolean | Prisma.users$e_booklet_device_allowancesArgs<ExtArgs>
+  e_booklet_student_purchase_links?: boolean | Prisma.users$e_booklet_student_purchase_linksArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type usersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -11135,6 +12449,9 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     e_booklet_invites: Prisma.$e_booklet_invitesPayload<ExtArgs>[]
     e_booklet_invite_redemptions: Prisma.$e_booklet_invite_redemptionsPayload<ExtArgs>[]
     e_booklet_audit_logs: Prisma.$e_booklet_audit_logsPayload<ExtArgs>[]
+    e_booklet_devices: Prisma.$e_booklet_devicesPayload<ExtArgs>[]
+    e_booklet_device_allowances: Prisma.$e_booklet_device_allowancesPayload<ExtArgs>[]
+    e_booklet_student_purchase_links: Prisma.$e_booklet_student_purchase_linksPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -11589,6 +12906,9 @@ export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Ty
   e_booklet_invites<T extends Prisma.users$e_booklet_invitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$e_booklet_invitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_invitesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   e_booklet_invite_redemptions<T extends Prisma.users$e_booklet_invite_redemptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$e_booklet_invite_redemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_invite_redemptionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   e_booklet_audit_logs<T extends Prisma.users$e_booklet_audit_logsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$e_booklet_audit_logsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_audit_logsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  e_booklet_devices<T extends Prisma.users$e_booklet_devicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$e_booklet_devicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_devicesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  e_booklet_device_allowances<T extends Prisma.users$e_booklet_device_allowancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$e_booklet_device_allowancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_device_allowancesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  e_booklet_student_purchase_links<T extends Prisma.users$e_booklet_student_purchase_linksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$e_booklet_student_purchase_linksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_student_purchase_linksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -12861,6 +14181,78 @@ export type users$e_booklet_audit_logsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.E_booklet_audit_logsScalarFieldEnum | Prisma.E_booklet_audit_logsScalarFieldEnum[]
+}
+
+/**
+ * users.e_booklet_devices
+ */
+export type users$e_booklet_devicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_devices
+   */
+  select?: Prisma.e_booklet_devicesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_devices
+   */
+  omit?: Prisma.e_booklet_devicesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_devicesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_devicesWhereInput
+  orderBy?: Prisma.e_booklet_devicesOrderByWithRelationInput | Prisma.e_booklet_devicesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_devicesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_devicesScalarFieldEnum | Prisma.E_booklet_devicesScalarFieldEnum[]
+}
+
+/**
+ * users.e_booklet_device_allowances
+ */
+export type users$e_booklet_device_allowancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_device_allowances
+   */
+  select?: Prisma.e_booklet_device_allowancesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_device_allowances
+   */
+  omit?: Prisma.e_booklet_device_allowancesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_device_allowancesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_device_allowancesWhereInput
+  orderBy?: Prisma.e_booklet_device_allowancesOrderByWithRelationInput | Prisma.e_booklet_device_allowancesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_device_allowancesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_device_allowancesScalarFieldEnum | Prisma.E_booklet_device_allowancesScalarFieldEnum[]
+}
+
+/**
+ * users.e_booklet_student_purchase_links
+ */
+export type users$e_booklet_student_purchase_linksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_student_purchase_links
+   */
+  select?: Prisma.e_booklet_student_purchase_linksSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_student_purchase_links
+   */
+  omit?: Prisma.e_booklet_student_purchase_linksOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_student_purchase_linksInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_student_purchase_linksWhereInput
+  orderBy?: Prisma.e_booklet_student_purchase_linksOrderByWithRelationInput | Prisma.e_booklet_student_purchase_linksOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_student_purchase_linksWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_student_purchase_linksScalarFieldEnum | Prisma.E_booklet_student_purchase_linksScalarFieldEnum[]
 }
 
 /**

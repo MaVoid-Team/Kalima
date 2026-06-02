@@ -141,10 +141,32 @@ export const e_booklet_hotspot_type_enum = {
   text: 'text',
   image: 'image',
   video: 'video',
-  audio: 'audio'
+  audio: 'audio',
+  file: 'file',
+  link: 'link',
+  question_answer: 'question_answer'
 } as const
 
 export type e_booklet_hotspot_type_enum = (typeof e_booklet_hotspot_type_enum)[keyof typeof e_booklet_hotspot_type_enum]
+
+
+export const e_booklet_hotspot_shape_enum = {
+  circle: 'circle',
+  rectangle: 'rectangle',
+  square: 'square',
+  triangle: 'triangle',
+  oval: 'oval'
+} as const
+
+export type e_booklet_hotspot_shape_enum = (typeof e_booklet_hotspot_shape_enum)[keyof typeof e_booklet_hotspot_shape_enum]
+
+
+export const e_booklet_video_source_enum = {
+  uploaded: 'uploaded',
+  youtube: 'youtube'
+} as const
+
+export type e_booklet_video_source_enum = (typeof e_booklet_video_source_enum)[keyof typeof e_booklet_video_source_enum]
 
 
 export const e_booklet_hotspot_trigger_type_enum = {

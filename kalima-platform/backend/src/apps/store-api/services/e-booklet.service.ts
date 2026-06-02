@@ -19,14 +19,18 @@ const E_BOOKLET_UPLOAD_DIR = path.resolve(
 
 const MIME_TO_FILE_TYPE: Record<string, string> = {
   "application/pdf": "pdf",
-  "application/msword": "doc",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-    "docx",
+  "application/msword": "file",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "file",
+  "application/vnd.ms-excel": "file",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "file",
+  "application/vnd.ms-powerpoint": "file",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": "file",
+  "text/plain": "file",
+  "text/csv": "file",
   "image/jpeg": "image",
   "image/png": "image",
   "image/webp": "image",
   "image/gif": "image",
-  "image/svg+xml": "image",
   "image/avif": "image",
   "video/mp4": "video",
   "video/webm": "video",
@@ -44,11 +48,16 @@ const MIME_TO_EXT: Record<string, string> = {
   "application/msword": ".doc",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
     ".docx",
+  "application/vnd.ms-excel": ".xls",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
+  "application/vnd.ms-powerpoint": ".ppt",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": ".pptx",
+  "text/plain": ".txt",
+  "text/csv": ".csv",
   "image/jpeg": ".jpg",
   "image/png": ".png",
   "image/webp": ".webp",
   "image/gif": ".gif",
-  "image/svg+xml": ".svg",
   "image/avif": ".avif",
   "video/mp4": ".mp4",
   "video/webm": ".webm",
@@ -59,6 +68,32 @@ const MIME_TO_EXT: Record<string, string> = {
   "audio/webm": ".webm",
   "audio/ogg": ".ogg",
   "audio/mp4": ".m4a",
+};
+
+const MIME_ALLOWED_EXTS: Record<string, string[]> = {
+  "application/pdf": [".pdf"],
+  "application/msword": [".doc"],
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+  "application/vnd.ms-excel": [".xls"],
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+  "application/vnd.ms-powerpoint": [".ppt"],
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": [".pptx"],
+  "text/plain": [".txt"],
+  "text/csv": [".csv"],
+  "image/jpeg": [".jpg", ".jpeg"],
+  "image/png": [".png"],
+  "image/webp": [".webp"],
+  "image/gif": [".gif"],
+  "image/avif": [".avif"],
+  "video/mp4": [".mp4"],
+  "video/webm": [".webm"],
+  "video/quicktime": [".mov", ".qt"],
+  "audio/mpeg": [".mp3"],
+  "audio/mp3": [".mp3"],
+  "audio/wav": [".wav"],
+  "audio/webm": [".webm"],
+  "audio/ogg": [".ogg"],
+  "audio/mp4": [".m4a", ".mp4"],
 };
 
 export interface PageDimensions {
@@ -81,6 +116,20 @@ export interface AcceptInviteMeta {
   ipAddress?: string;
   userAgent?: string;
 }
+
+type HotspotContentInput = {
+  type: string;
+  asset_file_id?: number | null;
+  text_content?: string | null;
+  content_json?: any;
+};
+
+type TermsInput = {
+  termsAccepted?: boolean;
+  termsVersion?: string;
+  purchaseId?: number;
+  passcode?: string;
+};
 
 function resolveDefaultPrisma(): PrismaClient {
   // Lazy require keeps service unit tests from needing DATABASE_URL.
@@ -180,6 +229,32 @@ export class EBookletService {
 
   constructor(private readonly db: EBookletDb = resolveDefaultPrisma()) {}
 
+  private async transaction<T>(
+    callback: (tx: EBookletDb) => Promise<T>,
+    options?: Record<string, unknown>,
+  ): Promise<T> {
+    if (typeof this.db.$transaction === "function") {
+      return this.db.$transaction(callback, options);
+    }
+    return callback(this.db);
+  }
+
+  private async serializableTransaction<T>(callback: (tx: EBookletDb) => Promise<T>): Promise<T> {
+    // Device binding makes a count-then-insert decision. Serializable isolation
+    // forces competing transactions for different fingerprints to collide instead
+    // of both observing the same free allowance; P2034 is retried below.
+    const options = { isolationLevel: "Serializable" };
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        return await this.transaction(callback, options);
+      } catch (error: any) {
+        if (error?.code === "P2034" && attempt === 0) continue;
+        throw error;
+      }
+    }
+    throw new ForbiddenError("Unable to bind viewer device safely.");
+  }
+
   private async ensureFileStorageDir(): Promise<void> {
     if (!this.fileStorageInitPromise) {
       this.fileStorageInitPromise = fsPromises.mkdir(E_BOOKLET_UPLOAD_DIR, {
@@ -210,9 +285,35 @@ export class EBookletService {
       throw new BadRequestError("No e-booklet file was uploaded.");
     }
 
-    const fileType = input.fileType || MIME_TO_FILE_TYPE[file.mimetype];
-    if (!fileType) {
+    const inferredFileType = MIME_TO_FILE_TYPE[file.mimetype];
+    if (input.fileType === "document" && file.mimetype !== "application/pdf") {
+      throw new BadRequestError(
+        `Invalid document type: ${file.mimetype}. Allowed: PDF only`,
+      );
+    }
+    if (!inferredFileType) {
       throw new BadRequestError(`Unsupported e-booklet file type: ${file.mimetype}`);
+    }
+    const requestedFileType = input.fileType === "document" ? "pdf" : input.fileType;
+    const requestedSafeAttachment = requestedFileType === "file";
+    const inferredStorageType =
+      requestedSafeAttachment &&
+      (file.mimetype === "application/pdf" || file.mimetype.startsWith("application/") || file.mimetype.startsWith("text/"))
+        ? "file"
+        : inferredFileType;
+    const fileType = requestedFileType || inferredStorageType;
+    if (fileType !== inferredStorageType) {
+      throw new BadRequestError(
+        `Uploaded MIME type ${file.mimetype} must be stored as e-booklet file_type=${inferredStorageType}.`,
+      );
+    }
+
+    const originalExt = path.extname(file.originalname).toLowerCase();
+    const allowedExts = MIME_ALLOWED_EXTS[file.mimetype];
+    if (allowedExts && originalExt && !allowedExts.includes(originalExt)) {
+      throw new BadRequestError(
+        `File extension ${originalExt} does not match uploaded MIME type ${file.mimetype}.`,
+      );
     }
 
     const ext =
@@ -369,6 +470,7 @@ export class EBookletService {
         description: dto.description,
         cover_file_id: dto.cover_file_id,
         price: dto.price,
+        marketing_price: dto.marketing_price ?? 0,
         currency: dto.currency || "EGP",
         category_id: dto.category_id,
         status: dto.status || "draft",
@@ -419,6 +521,7 @@ export class EBookletService {
         description: dto.description,
         cover_file_id: dto.cover_file_id,
         price: dto.price,
+        marketing_price: dto.marketing_price,
         currency: dto.currency,
         category_id: dto.category_id,
         status: dto.status,
@@ -510,6 +613,17 @@ export class EBookletService {
   }
 
   async createHotspot(dto: any, adminUserId: number): Promise<unknown> {
+    this.validateHotspotContent(dto);
+    const lastReference = dto.reference_number
+      ? null
+      : await this.db.e_booklet_hotspots.findFirst({
+          where: { template_version_id: dto.template_version_id },
+          orderBy: { reference_number: "desc" },
+          select: { reference_number: true },
+        });
+    const referenceNumber =
+      dto.reference_number ?? Number(lastReference?.reference_number ?? 0) + 1;
+
     return this.db.e_booklet_hotspots.create({
       data: {
         template_version_id: dto.template_version_id,
@@ -517,15 +631,121 @@ export class EBookletService {
         x_percent: dto.x_percent,
         y_percent: dto.y_percent,
         radius_percent: dto.radius_percent,
+        reference_number: referenceNumber,
+        shape: dto.shape || "circle",
+        width_percent: dto.width_percent,
+        height_percent: dto.height_percent,
         type: dto.type,
         title: dto.title,
         text_content: dto.text_content,
         asset_file_id: dto.asset_file_id,
         trigger_type: dto.trigger_type || "click",
         display_behavior: dto.display_behavior,
+        content_json: dto.content_json,
+        interaction_json: dto.interaction_json,
         created_by: adminUserId,
       },
     });
+  }
+
+  validateHotspotContent(input: HotspotContentInput): void {
+    const blocks = Array.isArray(input.content_json?.blocks)
+      ? input.content_json.blocks
+      : [];
+    const primaryBlock = blocks[0] || {};
+    const url = primaryBlock.url || input.content_json?.url;
+    const youtubeUrl = primaryBlock.youtube_url || input.content_json?.youtube_url;
+
+    if (
+      ["image", "audio", "file"].includes(input.type) &&
+      !input.asset_file_id &&
+      !primaryBlock.asset_file_id
+    ) {
+      const label =
+        input.type === "file"
+          ? "File"
+          : `${input.type[0].toUpperCase()}${input.type.slice(1)}`;
+      throw new BadRequestError(
+        `${label} hotspots require an attached file asset.`,
+      );
+    }
+    if (input.type === "video") {
+      if (primaryBlock.source === "youtube") {
+        if (!this.isYoutubeUrl(youtubeUrl)) {
+          throw new BadRequestError(
+            "YouTube video hotspots require a valid YouTube HTTP/HTTPS URL.",
+          );
+        }
+      } else if (!input.asset_file_id && !primaryBlock.asset_file_id) {
+        throw new BadRequestError(
+          "Video hotspots require an attached file asset or YouTube URL.",
+        );
+      }
+    }
+    if (input.type === "link" && !this.isHttpUrl(url)) {
+      throw new BadRequestError("Link hotspots require a valid HTTP/HTTPS URL.");
+    }
+    if (input.type === "question_answer") {
+      const answers = Array.isArray(primaryBlock.answers)
+        ? primaryBlock.answers
+        : [];
+      const correctCount = answers.filter(
+        (answer: any) => answer?.isCorrect === true || answer?.is_correct === true,
+      ).length;
+      if (correctCount !== 1) {
+        throw new BadRequestError(
+          "Q&A hotspots require exactly one correct answer.",
+        );
+      }
+    }
+  }
+
+  private isHttpUrl(value?: string): boolean {
+    if (!value || typeof value !== "string") return false;
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch {
+      return false;
+    }
+  }
+
+  private isYoutubeUrl(value?: string): boolean {
+    if (!this.isHttpUrl(value)) return false;
+    const host = new URL(value as string).hostname.toLowerCase();
+    return ["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"].includes(host);
+  }
+
+  private sanitizeViewerAccess<T>(value: T): T {
+    if (!value || typeof value !== "object") return value;
+    if (Array.isArray(value)) {
+      return value.map((item) => this.sanitizeViewerAccess(item)) as T;
+    }
+    const copy: Record<string, unknown> = { ...(value as Record<string, unknown>) };
+    delete copy.internal_price;
+    Object.keys(copy).forEach((key) => {
+      copy[key] = this.sanitizeViewerAccess(copy[key]);
+    });
+    return copy as T;
+  }
+
+  validateInstancePricing(input: {
+    template_marketing_price?: number;
+    marketing_price?: number;
+    student_marketing_price?: number;
+    internal_price?: number;
+  }): { marketingPrice: number; internalPrice: number } {
+    const marketingPrice = Number(
+      input.student_marketing_price ??
+        input.marketing_price ??
+        input.template_marketing_price ??
+        0,
+    );
+    const internalPrice = Number(input.internal_price ?? 0);
+    if (internalPrice > marketingPrice) {
+      throw new BadRequestError("Internal price cannot exceed marketing price.");
+    }
+    return { marketingPrice, internalPrice };
   }
 
   async updateHotspot(
@@ -555,12 +775,20 @@ export class EBookletService {
   }
 
   async createPurchaseRequest(teacherId: number, dto: any): Promise<unknown> {
+    const price = Number(dto.price ?? 0);
+    const { marketingPrice, internalPrice } = this.validateInstancePricing({
+      marketing_price: dto.marketing_price ?? price,
+      internal_price: dto.internal_price ?? 0,
+    });
+
     return this.db.e_booklet_purchases.create({
       data: {
         teacher_id: teacherId,
         template_id: dto.template_id,
         template_version_id: dto.template_version_id,
-        price: dto.price ?? 0,
+        price,
+        marketing_price: marketingPrice,
+        internal_price: internalPrice,
         currency: dto.currency || "EGP",
         branding_json: dto.branding_json,
         admin_notes: dto.notes,
@@ -627,13 +855,18 @@ export class EBookletService {
     });
     if (!purchase) throw new NotFoundError("E-booklet purchase not found");
 
+    const { marketingPrice, internalPrice } = this.validateInstancePricing({
+      marketing_price: dto.student_marketing_price ?? purchase.marketing_price ?? purchase.price ?? 0,
+      internal_price: dto.internal_price ?? purchase.internal_price ?? 0,
+    });
+
     await this.validateTeacherDocumentForDelivery({
       templateVersionId: purchase.template_version_id,
       uploadedPageCount: dto.page_count,
       uploadedPageDimensions: dto.page_dimensions,
     });
 
-    return this.db.$transaction(async (tx: EBookletDb) => {
+    return this.transaction(async (tx: EBookletDb) => {
       const instance = await tx.e_booklet_instances.create({
         data: {
           purchase_id: purchase.id,
@@ -644,6 +877,9 @@ export class EBookletService {
           display_title: dto.display_title,
           branding_json: purchase.branding_json,
           invite_quota: dto.invite_quota,
+          access_expires_at: dto.access_expires_at ? new Date(dto.access_expires_at) : undefined,
+          student_marketing_price: marketingPrice,
+          internal_price: internalPrice,
           status: "active",
         },
       });
@@ -727,6 +963,8 @@ export class EBookletService {
         booklet_instance_id: instanceId,
         teacher_id: teacherId,
         token_hash: hashInviteToken(token),
+        passcode_hash: dto.passcode ? this.hashPasscode(dto.passcode) : undefined,
+        passcode_hint: dto.passcode_hint,
         max_uses: dto.max_uses,
         expires_at: dto.expires_at ? new Date(dto.expires_at) : undefined,
         status: "active",
@@ -795,7 +1033,7 @@ export class EBookletService {
   }
 
   async listUserEBooklets(userId: number, role: "teacher" | "student") {
-    return this.db.e_booklet_access.findMany({
+    const access = await this.db.e_booklet_access.findMany({
       where: {
         user_id: userId,
         role,
@@ -812,9 +1050,10 @@ export class EBookletService {
       },
       orderBy: { granted_at: "desc" },
     });
+    return this.sanitizeViewerAccess(access);
   }
 
-  async assertViewerAccess(instanceId: number, userId: number) {
+  async assertViewerAccess(instanceId: number, userId: number, now = new Date()) {
     const access = await this.db.e_booklet_access.findFirst({
       where: {
         booklet_instance_id: instanceId,
@@ -834,7 +1073,144 @@ export class EBookletService {
     if (!access || access.booklet_instance?.status !== "active") {
       throw new ForbiddenError("You do not have access to this e-booklet.");
     }
-    return access;
+    const expiresAt = access.booklet_instance?.access_expires_at
+      ? new Date(access.booklet_instance.access_expires_at)
+      : null;
+    if (expiresAt && expiresAt <= now) {
+      await this.db.e_booklet_instances.update({
+        where: { id: access.booklet_instance.id },
+        data: {
+          status: "archived",
+          archived_at: now,
+          archive_reason: "expired",
+          updated_at: now,
+        },
+      });
+      throw new ForbiddenError("This e-booklet has expired.");
+    }
+    return this.sanitizeViewerAccess(access);
+  }
+
+  async bindViewerDevice(
+    instanceId: number,
+    userId: number,
+    input: {
+      deviceFingerprint: string;
+      deviceLabel?: string;
+      userAgent?: string;
+      ipAddress?: string;
+    },
+  ) {
+    return this.serializableTransaction(async (tx: EBookletDb) => {
+      const existing = await tx.e_booklet_devices.findFirst({
+        where: {
+          booklet_instance_id: instanceId,
+          user_id: userId,
+          device_fingerprint: input.deviceFingerprint,
+          status: "active",
+        },
+      });
+      if (existing) {
+        return tx.e_booklet_devices.update({
+          where: { id: existing.id },
+          data: {
+            last_seen_at: new Date(),
+            user_agent: input.userAgent,
+            ip_address: input.ipAddress,
+          },
+        });
+      }
+
+      const allowance = await tx.e_booklet_device_allowances.findUnique({
+        where: {
+          booklet_instance_id_user_id: {
+            booklet_instance_id: instanceId,
+            user_id: userId,
+          },
+        },
+      });
+      const allowedDevices = Number(allowance?.allowed_devices ?? 1);
+      const activeCount = await tx.e_booklet_devices.count({
+        where: { booklet_instance_id: instanceId, user_id: userId, status: "active" },
+      });
+      if (activeCount >= allowedDevices) {
+        throw new ForbiddenError(
+          "This e-booklet is already bound to another device.",
+        );
+      }
+      try {
+        return await tx.e_booklet_devices.create({
+          data: {
+            booklet_instance_id: instanceId,
+            user_id: userId,
+            device_fingerprint: input.deviceFingerprint,
+            device_label: input.deviceLabel,
+            user_agent: input.userAgent,
+            ip_address: input.ipAddress,
+            last_seen_at: new Date(),
+            status: "active",
+          },
+        });
+      } catch (error: any) {
+        if (error?.code === "P2002") {
+          throw new ForbiddenError(
+            "This e-booklet is already bound to another device.",
+          );
+        }
+        throw error;
+      }
+    });
+  }
+
+  async resetViewerDevices(
+    instanceId: number,
+    userId: number,
+    adminUserId: number,
+    reason?: string,
+  ) {
+    return this.db.e_booklet_devices.updateMany({
+      where: { booklet_instance_id: instanceId, user_id: userId, status: "active" },
+      data: {
+        status: "reset",
+        reset_by_admin_id: adminUserId,
+        reset_reason: reason,
+        last_seen_at: new Date(),
+      },
+    });
+  }
+
+  async addDeviceAllowance(
+    instanceId: number,
+    userId: number,
+    adminUserId: number,
+    allowedDevices: number,
+    reason?: string,
+  ) {
+    if (!Number.isInteger(allowedDevices) || allowedDevices < 1) {
+      throw new BadRequestError("Allowed devices must be at least 1.");
+    }
+    return this.db.e_booklet_device_allowances.upsert({
+      where: {
+        booklet_instance_id_user_id: {
+          booklet_instance_id: instanceId,
+          user_id: userId,
+        },
+      },
+      create: {
+        booklet_instance_id: instanceId,
+        user_id: userId,
+        allowed_devices: allowedDevices,
+        updated_by_admin_id: adminUserId,
+        reason,
+        updated_at: new Date(),
+      },
+      update: {
+        allowed_devices: allowedDevices,
+        updated_by_admin_id: adminUserId,
+        reason,
+        updated_at: new Date(),
+      },
+    });
   }
 
   async getViewerMetadata(instanceId: number, userId: number) {
@@ -926,6 +1302,7 @@ export class EBookletService {
     if (!hotspot || !hotspot.template_version.instances.length) {
       throw new ForbiddenError("You do not have access to this hotspot.");
     }
+    await this.assertViewerAccess(hotspot.template_version.instances[0].id, userId);
     return {
       id: hotspot.id,
       template_version_id: hotspot.template_version_id,
@@ -979,12 +1356,222 @@ export class EBookletService {
     const warnings: string[] = [];
 
     if (dimensionsDiffer(expectedDimensions, input.uploadedPageDimensions)) {
-      throw new BadRequestError(
-        "This file has the same page count, but its page size does not match the template. Please upload a file with matching page width and height so hotspots align correctly.",
+      warnings.push(
+        "This file has the same page count, but some page dimensions differ from the template. Hotspot positions may not align correctly.",
       );
     }
 
     return { valid: true, warnings };
+  }
+
+  private requireStudentTerms(input: TermsInput): void {
+    if (!input.termsAccepted) {
+      throw new BadRequestError("Student terms acceptance is required.");
+    }
+  }
+
+  private hashPasscode(passcode: string): string {
+    const pepper =
+      process.env.E_BOOKLET_PASSCODE_PEPPER ||
+      process.env.APP_SECRET ||
+      process.env.JWT_SECRET ||
+      process.env.E_BOOKLET_PAGE_TOKEN_SECRET ||
+      "dev-e-booklet-passcode-pepper";
+    // Six-digit passcodes have tiny entropy; HMAC with a server-only pepper
+    // prevents useful offline cracking if invite rows are exposed.
+    return crypto.createHmac("sha256", pepper).update(passcode).digest("hex");
+  }
+
+  private async findInviteByToken(rawToken: string) {
+    return this.db.e_booklet_invites.findFirst({
+      where: { token_hash: hashInviteToken(rawToken) },
+      include: {
+        booklet_instance: {
+          select: {
+            id: true,
+            invite_quota: true,
+            status: true,
+            student_marketing_price: true,
+            internal_price: true,
+          },
+        },
+      },
+    });
+  }
+
+  private ensureInviteUsable(invite: any): any {
+    if (!invite) throw new NotFoundError("E-booklet invite not found");
+    if (invite.status && invite.status !== "active") {
+      throw new ForbiddenError("This e-booklet invite is not active.");
+    }
+    if (invite.expires_at && new Date(invite.expires_at) <= new Date()) {
+      throw new ForbiddenError("This e-booklet invite has expired.");
+    }
+    const instance = invite.booklet_instance ?? invite.e_booklet_instances;
+    if (!instance || instance.status !== "active") {
+      throw new ForbiddenError("This e-booklet is not currently active.");
+    }
+    return instance;
+  }
+
+  async createStudentPurchaseLink(
+    rawToken: string,
+    studentId: number,
+    input: TermsInput,
+  ) {
+    this.requireStudentTerms(input);
+    if (!input.purchaseId) {
+      throw new BadRequestError("Student purchase ID is required.");
+    }
+    const invite = await this.findInviteByToken(rawToken);
+    const instance = this.ensureInviteUsable(invite);
+    const purchase = await this.db.purchases.findFirst({
+      where: {
+        id: input.purchaseId,
+        user_id: studentId,
+      },
+    });
+    if (!purchase) {
+      throw new ForbiddenError("Purchase does not belong to this student.");
+    }
+    return this.db.e_booklet_student_purchase_links.create({
+      data: {
+        purchase_id: input.purchaseId,
+        invite_id: invite.id,
+        booklet_instance_id: invite.booklet_instance_id,
+        student_id: studentId,
+        marketing_price_snapshot: Number(instance.student_marketing_price ?? 0),
+        terms_accepted_at: new Date(),
+        terms_version: input.termsVersion,
+      },
+    });
+  }
+
+  async acceptInvitePasscode(
+    rawToken: string,
+    studentId: number,
+    input: TermsInput,
+  ) {
+    this.requireStudentTerms(input);
+    const tokenHash = hashInviteToken(rawToken);
+    return this.transaction(async (tx: EBookletDb) => {
+      const invite = await tx.e_booklet_invites.findFirst({
+        where: { token_hash: tokenHash },
+        include: { booklet_instance: { select: { id: true, invite_quota: true, status: true } } },
+      });
+      const instance = this.ensureInviteUsable(invite);
+      if (!invite.passcode_hash) {
+        throw new ForbiddenError("This e-booklet invite does not allow passcode access.");
+      }
+      if (this.hashPasscode(String(input.passcode || "")) !== invite.passcode_hash) {
+        throw new ForbiddenError("Invalid e-booklet invite passcode.");
+      }
+      if (invite.max_uses !== null && invite.max_uses !== undefined && invite.used_count >= invite.max_uses) {
+        throw new ForbiddenError("This e-booklet invite has reached its access limit.");
+      }
+      const existingAccess = await tx.e_booklet_access.findFirst({
+        where: {
+          booklet_instance_id: invite.booklet_instance_id,
+          user_id: studentId,
+          role: "student",
+          status: "active",
+        },
+      });
+      if (existingAccess) return existingAccess;
+      const activeStudentAccessCount = await tx.e_booklet_access.count({
+        where: {
+          booklet_instance_id: invite.booklet_instance_id,
+          role: "student",
+          status: "active",
+        },
+      });
+      if (activeStudentAccessCount >= instance.invite_quota) {
+        throw new ForbiddenError("This e-booklet invite has reached its access limit.");
+      }
+      const access = await tx.e_booklet_access.create({
+        data: {
+          booklet_instance_id: invite.booklet_instance_id,
+          user_id: studentId,
+          role: "student",
+          source_invite_id: invite.id,
+          access_source: "offline_passcode",
+          terms_accepted_at: new Date(),
+          terms_version: input.termsVersion,
+          status: "active",
+        },
+      });
+      await tx.e_booklet_invites.update({
+        where: { id: invite.id },
+        data: { used_count: { increment: 1 } },
+      });
+      await tx.e_booklet_instances.update({
+        where: { id: invite.booklet_instance_id },
+        data: { used_invites_count: { increment: 1 } },
+      });
+      return access;
+    });
+  }
+
+  async acceptFreeInvite(rawToken: string, studentId: number, input: TermsInput) {
+    this.requireStudentTerms(input);
+    const tokenHash = hashInviteToken(rawToken);
+    return this.transaction(async (tx: EBookletDb) => {
+      const invite = await tx.e_booklet_invites.findFirst({
+        where: { token_hash: tokenHash },
+        include: {
+          booklet_instance: {
+            select: { id: true, invite_quota: true, status: true, student_marketing_price: true, internal_price: true },
+          },
+        },
+      });
+      const instance = this.ensureInviteUsable(invite);
+      if (Number(instance.student_marketing_price ?? 0) !== 0 || Number(instance.internal_price ?? 0) !== 0) {
+        throw new ForbiddenError("This e-booklet invite requires purchase.");
+      }
+      if (invite.max_uses !== null && invite.max_uses !== undefined && invite.used_count >= invite.max_uses) {
+        throw new ForbiddenError("This e-booklet invite has reached its access limit.");
+      }
+      const existingAccess = await tx.e_booklet_access.findFirst({
+        where: {
+          booklet_instance_id: invite.booklet_instance_id,
+          user_id: studentId,
+          role: "student",
+          status: "active",
+        },
+      });
+      if (existingAccess) return existingAccess;
+      const activeStudentAccessCount = await tx.e_booklet_access.count({
+        where: {
+          booklet_instance_id: invite.booklet_instance_id,
+          role: "student",
+          status: "active",
+        },
+      });
+      if (activeStudentAccessCount >= instance.invite_quota) {
+        throw new ForbiddenError("This e-booklet invite has reached its access limit.");
+      }
+      const access = await tx.e_booklet_access.create({
+        data: {
+          booklet_instance_id: invite.booklet_instance_id,
+          user_id: studentId,
+          role: "student",
+          source_invite_id: invite.id,
+          access_source: "free_invite",
+          terms_accepted_at: new Date(),
+          terms_version: input.termsVersion,
+          status: "active",
+        },
+      });
+      await tx.e_booklet_invites.update({
+        where: { id: invite.id },
+        data: { used_count: { increment: 1 } },
+      });
+      await tx.e_booklet_instances.update({
+        where: { id: invite.booklet_instance_id },
+        data: { used_invites_count: { increment: 1 } },
+      });
+      return access;
+    });
   }
 
   async acceptInvite(
