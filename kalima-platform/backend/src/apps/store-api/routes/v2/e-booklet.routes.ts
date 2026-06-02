@@ -54,7 +54,6 @@ const viewerLimiter = rateLimit({
 // Store APIs - separate from normal Market products.
 router.get("/e-booklet-store", eBookletController.listStoreTemplates);
 router.get("/e-booklet-store/:slug", eBookletController.getStoreTemplate);
-router.post("/e-booklet-checkout", ...teacherAuth, eBookletController.checkout);
 
 // Admin APIs.
 router.post(
@@ -150,6 +149,11 @@ router.get(
   ...adminAuth,
   eBookletController.listPurchases,
 );
+router.post(
+  "/admin/e-booklet-purchases",
+  ...adminAuth,
+  eBookletController.createPurchaseDeal,
+);
 router.get(
   "/admin/e-booklet-purchases/:id",
   ...adminAuth,
@@ -184,6 +188,26 @@ router.post(
   "/admin/e-booklet-instances/:id/revoke-access",
   ...adminAuth,
   eBookletController.revokeTeacherAccess,
+);
+router.get(
+  "/admin/e-booklet-instances/:instanceId/users/:userId/devices",
+  ...adminAuth,
+  eBookletController.listViewerDevices,
+);
+router.post(
+  "/admin/e-booklet-instances/:instanceId/users/:userId/devices/reset",
+  ...adminAuth,
+  eBookletController.resetViewerDevices,
+);
+router.post(
+  "/admin/e-booklet-instances/:instanceId/users/:userId/device-allowance",
+  ...adminAuth,
+  eBookletController.addDeviceAllowance,
+);
+router.post(
+  "/admin/e-booklet-student-purchases/:purchaseId/approve",
+  ...adminAuth,
+  eBookletController.approveStudentPurchaseLink,
 );
 
 // Teacher APIs.
@@ -229,6 +253,12 @@ router.get(
   viewerLimiter,
   ...viewerAuth,
   eBookletController.getViewerMetadata,
+);
+router.post(
+  "/e-booklet-viewer/:instanceId/devices/bind",
+  viewerLimiter,
+  ...viewerAuth,
+  eBookletController.bindViewerDevice,
 );
 router.get(
   "/e-booklet-viewer/:instanceId/pages/:pageNumber",

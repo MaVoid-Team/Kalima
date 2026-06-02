@@ -37,6 +37,8 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     },
     e_booklet_student_purchase_links: {
       create: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
     },
     purchases: {
       findFirst: jest.fn(),
@@ -54,6 +56,8 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     e_booklet_instances: {
       create: jest.fn(),
       update: jest.fn(),
+      updateMany: jest.fn(),
+      findMany: jest.fn(),
     },
     e_booklet_access: {
       findFirst: jest.fn(),
@@ -475,8 +479,31 @@ describe("EBookletService", () => {
   });
 
   describe("V2 device binding", () => {
+    test("allows the same active device again and can list active viewer devices", async () => {
+      const db = createMockDb();
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 9,
+        status: "active",
+        booklet_instance: { id: 10, status: "active", access_expires_at: new Date("2026-12-31T00:00:00.000Z") },
+      });
+      db.e_booklet_devices.findFirst.mockResolvedValue({ id: 1, device_fingerprint: "dev-1" });
+      db.e_booklet_devices.update.mockResolvedValue({ id: 1, device_fingerprint: "dev-1" });
+      db.e_booklet_devices.findMany = jest.fn().mockResolvedValue([{ id: 1, device_fingerprint: "dev-1", status: "active" }]);
+      const service = new EBookletService(db);
+
+      await expect(service.bindViewerDevice(10, 55, { deviceFingerprint: "dev-1", userAgent: "ua" })).resolves.toEqual({ id: 1, device_fingerprint: "dev-1" });
+      await expect(service.listViewerDevices(10, 55)).resolves.toEqual([{ id: 1, device_fingerprint: "dev-1", status: "active" }]);
+      expect(db.e_booklet_devices.update).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 1 }, data: expect.objectContaining({ user_agent: "ua" }) }));
+      expect(db.e_booklet_devices.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { booklet_instance_id: 10, user_id: 55, status: "active" } }));
+    });
+
     test("first-binds a viewer device and blocks a second device by default", async () => {
       const db = createMockDb();
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 9,
+        status: "active",
+        booklet_instance: { id: 10, status: "active", access_expires_at: new Date("2026-12-31T00:00:00.000Z") },
+      });
       db.e_booklet_devices.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
       db.e_booklet_devices.count.mockResolvedValueOnce(0).mockResolvedValueOnce(1);
       db.e_booklet_device_allowances.findUnique.mockResolvedValue(null);
@@ -508,6 +535,30 @@ describe("EBookletService", () => {
   });
 
   describe("V2 access paths, terms, pricing, and expiry", () => {
+    test("requires access expiry at delivery and archives expired active instances in bulk", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.findUnique.mockResolvedValue({
+        id: 2,
+        teacher_id: 9,
+        template_id: 3,
+        template_version_id: 4,
+        branding_json: {},
+        price: 120,
+        marketing_price: 150,
+        internal_price: 70,
+      });
+      db.e_booklet_instances.updateMany.mockResolvedValue({ count: 2 });
+      const service = new EBookletService(db);
+
+      await expect(service.deliverPurchase(2, { custom_document_file_id: 99, display_title: "No expiry", invite_quota: 5, page_count: 2 }, 1)).rejects.toThrow("Access expiry is required for delivered e-booklets.");
+      const now = new Date("2026-06-02T00:00:00.000Z");
+      await expect(service.archiveExpiredInstances(now)).resolves.toEqual({ count: 2 });
+      expect(db.e_booklet_instances.updateMany).toHaveBeenCalledWith({
+        where: { status: "active", access_expires_at: { lte: now } },
+        data: expect.objectContaining({ status: "archived", archive_reason: "expired", archived_at: now }),
+      });
+    });
+
     test("requires student terms before online, passcode-direct, or free access", async () => {
       const service = new EBookletService(createMockDb());
       await expect(service.createStudentPurchaseLink("token", 55, { termsAccepted: false })).rejects.toThrow("Student terms acceptance is required.");
@@ -525,7 +576,7 @@ describe("EBookletService", () => {
         used_count: 0,
         booklet_instance: { id: 10, invite_quota: 10, status: "active", student_marketing_price: 150, internal_price: 60 },
       });
-      db.purchases.findFirst.mockResolvedValue({ id: 500, user_id: 55 });
+      db.purchases.findFirst.mockResolvedValue({ id: 500, user_id: 55, payment_screenshot_id: 700 });
       db.e_booklet_student_purchase_links.create.mockResolvedValue({ id: 20, purchase_id: 500 });
       db.e_booklet_access.findFirst.mockResolvedValue(null);
       db.e_booklet_access.count.mockResolvedValue(0);
@@ -537,6 +588,29 @@ describe("EBookletService", () => {
         data: expect.objectContaining({ purchase_id: 500, marketing_price_snapshot: 150, terms_version: "v1" }),
       });
       expect(db.e_booklet_access.create).toHaveBeenCalledWith({ data: expect.objectContaining({ access_source: "offline_passcode" }) });
+    });
+
+    test("auto-grants student access when an online student purchase link is approved", async () => {
+      const db = createMockDb();
+      db.e_booklet_student_purchase_links.findUnique.mockResolvedValue({
+        purchase_id: 500,
+        invite_id: 2,
+        booklet_instance_id: 10,
+        student_id: 55,
+        access_id: null,
+        invite: { id: 2, max_uses: null, used_count: 0 },
+        booklet_instance: { id: 10, invite_quota: 10, status: "active" },
+      });
+      db.e_booklet_access.findFirst.mockResolvedValue(null);
+      db.e_booklet_access.count.mockResolvedValue(0);
+      db.e_booklet_access.create.mockResolvedValue({ id: 88, access_source: "online_purchase" });
+      db.e_booklet_student_purchase_links.update.mockResolvedValue({ purchase_id: 500, access_id: 88 });
+      const service = new EBookletService(db);
+
+      await expect(service.approveStudentPurchaseLink(500, 1)).resolves.toEqual({ purchase_id: 500, access_id: 88 });
+      expect(db.e_booklet_access.create).toHaveBeenCalledWith({ data: expect.objectContaining({ access_source: "online_purchase", source_invite_id: 2, user_id: 55 }) });
+      expect(db.e_booklet_student_purchase_links.update).toHaveBeenCalledWith(expect.objectContaining({ where: { purchase_id: 500 }, data: expect.objectContaining({ access_id: 88, approved_at: expect.any(Date) }) }));
+      expect(db.e_booklet_audit_logs.create).toHaveBeenCalledWith({ data: expect.objectContaining({ actor_user_id: 1, action: "student_purchase_approved", entity_id: 10 }) });
     });
 
     test("creates zero-price free invite access without a purchase link", async () => {

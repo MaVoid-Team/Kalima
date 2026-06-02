@@ -9,6 +9,7 @@ process.env.JWT_SECRET = process.env.JWT_SECRET || "test-secret";
 const mockService = {
   listPublishedTemplates: jest.fn(),
   createTemplate: jest.fn(),
+  createPurchaseRequest: jest.fn(),
   listTemplateVersions: jest.fn(),
   listVersionHotspots: jest.fn(),
   createInvite: jest.fn(),
@@ -17,6 +18,11 @@ const mockService = {
   acceptInvitePasscode: jest.fn(),
   createStudentPurchaseLink: jest.fn(),
   getViewerPage: jest.fn(),
+  bindViewerDevice: jest.fn(),
+  listViewerDevices: jest.fn(),
+  resetViewerDevices: jest.fn(),
+  addDeviceAllowance: jest.fn(),
+  approveStudentPurchaseLink: jest.fn(),
   getAuthorizedHotspotAsset: jest.fn(),
   createFileAsset: jest.fn(),
 };
@@ -111,6 +117,37 @@ describe("e-booklet routes", () => {
 
     expect(mockService.createTemplate).toHaveBeenCalledWith(
       expect.objectContaining({ title: "Template", price: 150 }),
+      1,
+    );
+  });
+
+  test("does not expose teacher checkout and uses admin deal creation for e_booklet_purchases", async () => {
+    mockService.createPurchaseRequest.mockResolvedValue({ id: 99, teacher_id: 2 });
+
+    await request(app)
+      .post("/api/v2/e-booklet-checkout")
+      .send({ template_id: 3, template_version_id: 4, branding_json: {} })
+      .expect(404);
+
+    await request(app)
+      .post("/api/v2/e-booklet-checkout")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 2)}`)
+      .send({ template_id: 3, template_version_id: 4, branding_json: {} })
+      .expect(404);
+
+    await request(app)
+      .post("/api/v2/admin/e-booklet-purchases")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .send({ teacher_id: 2, template_id: 3, template_version_id: 4, branding_json: {}, price: 120 })
+      .expect(201)
+      .expect((res) => {
+        expect(res.body.data).toEqual({ id: 99, teacher_id: 2 });
+      });
+
+    expect(mockService.createPurchaseRequest).toHaveBeenCalledTimes(1);
+    expect(mockService.createPurchaseRequest).toHaveBeenCalledWith(
+      2,
+      expect.objectContaining({ teacher_id: 2, template_id: 3, template_version_id: 4 }),
       1,
     );
   });
@@ -252,7 +289,7 @@ describe("e-booklet routes", () => {
     await request(app)
       .post("/api/v2/e-booklet-invites/raw-token/accept")
       .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
-      .send({ accessPath: "online_purchase", purchaseId: 500, termsAccepted: true })
+      .send({ accessPath: "online_purchase", purchaseId: 500, paymentProofFileId: 321, termsAccepted: true })
       .expect(200);
 
     expect(mockService.acceptInvite).not.toHaveBeenCalled();
@@ -279,6 +316,48 @@ describe("e-booklet routes", () => {
       });
 
     expect(mockService.getViewerPage).toHaveBeenCalledWith(10, 1, 55);
+  });
+
+  test("binds/lists viewer devices and exposes admin device reset/allowance/approval routes", async () => {
+    mockService.bindViewerDevice.mockResolvedValue({ id: 1, device_fingerprint: "dev-1" });
+    mockService.listViewerDevices.mockResolvedValue([{ id: 1, device_fingerprint: "dev-1" }]);
+    mockService.resetViewerDevices.mockResolvedValue({ count: 1 });
+    mockService.addDeviceAllowance.mockResolvedValue({ allowed_devices: 2 });
+    mockService.approveStudentPurchaseLink.mockResolvedValue({ purchase_id: 500, access_id: 88 });
+
+    await request(app)
+      .post("/api/v2/e-booklet-viewer/10/devices/bind")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .send({ deviceFingerprint: "dev-1", deviceLabel: "iPad" })
+      .expect(200);
+
+    await request(app)
+      .get("/api/v2/admin/e-booklet-instances/10/users/55/devices")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .expect(200);
+
+    await request(app)
+      .post("/api/v2/admin/e-booklet-instances/10/users/55/devices/reset")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .send({ reason: "replacement" })
+      .expect(200);
+
+    await request(app)
+      .post("/api/v2/admin/e-booklet-instances/10/users/55/device-allowance")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .send({ allowedDevices: 2, reason: "second tablet" })
+      .expect(200);
+
+    await request(app)
+      .post("/api/v2/admin/e-booklet-student-purchases/500/approve")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .expect(200);
+
+    expect(mockService.bindViewerDevice).toHaveBeenCalledWith(10, 55, expect.objectContaining({ deviceFingerprint: "dev-1", deviceLabel: "iPad" }));
+    expect(mockService.listViewerDevices).toHaveBeenCalledWith(10, 55);
+    expect(mockService.resetViewerDevices).toHaveBeenCalledWith(10, 55, 1, "replacement");
+    expect(mockService.addDeviceAllowance).toHaveBeenCalledWith(10, 55, 1, 2, "second tablet");
+    expect(mockService.approveStudentPurchaseLink).toHaveBeenCalledWith(500, 1);
   });
 
   test("serves authorized hotspot assets with private no-store headers", async () => {
