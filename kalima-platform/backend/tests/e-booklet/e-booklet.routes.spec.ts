@@ -13,7 +13,11 @@ const mockService = {
   listVersionHotspots: jest.fn(),
   createInvite: jest.fn(),
   acceptInvite: jest.fn(),
+  acceptFreeInvite: jest.fn(),
+  acceptInvitePasscode: jest.fn(),
+  createStudentPurchaseLink: jest.fn(),
   getViewerPage: jest.fn(),
+  createFileAsset: jest.fn(),
 };
 
 jest.mock("../../src/apps/store-api/services/e-booklet.service", () => ({
@@ -110,6 +114,48 @@ describe("e-booklet routes", () => {
     );
   });
 
+  test("rejects non-PDF main e-booklet document uploads while hotspot media still accepts safe attachments", async () => {
+    mockService.createFileAsset.mockResolvedValue({ id: 77 });
+
+    await request(app)
+      .post("/api/v2/admin/e-booklet-files/document")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .attach("document", Buffer.from("docx"), {
+        filename: "main.docx",
+        contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      })
+      .expect(400)
+      .expect((res) => {
+        expect(res.body.message).toContain("Allowed: PDF only");
+      });
+
+    await request(app)
+      .post("/api/v2/admin/e-booklet-files/hotspot-media")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .field("file_type", "image")
+      .attach("media", Buffer.from("png"), {
+        filename: "worksheet.png",
+        contentType: "image/png",
+      })
+      .expect(201);
+
+    await request(app)
+      .post("/api/v2/admin/e-booklet-files/hotspot-media")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .field("file_type", "file")
+      .attach("media", Buffer.from("docx"), {
+        filename: "worksheet.docx",
+        contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      })
+      .expect(201);
+
+    expect(mockService.createFileAsset).toHaveBeenCalledTimes(2);
+    expect(mockService.createFileAsset).toHaveBeenLastCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ fileType: "file" }),
+    );
+  });
+
   test("allows admin users to list template versions for the editor", async () => {
     mockService.listTemplateVersions.mockResolvedValue([
       { id: 5, version_number: 2, status: "draft" },
@@ -166,27 +212,52 @@ describe("e-booklet routes", () => {
     });
   });
 
-  test("accepts student invite tokens through the e-booklet invite namespace", async () => {
-    mockService.acceptInvite.mockResolvedValue({
-      alreadyHadAccess: false,
-      bookletInstanceId: 10,
-      access: { id: 12 },
-    });
+  test("rejects empty legacy invite acceptance bodies instead of bypassing access rules", async () => {
+    await request(app)
+      .post("/api/v2/e-booklet-invites/raw-token/accept")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .send({})
+      .expect(400)
+      .expect((res) => {
+        expect(res.body.message).toContain("Invite accessPath is required");
+      });
+
+    expect(mockService.acceptInvite).not.toHaveBeenCalled();
+    expect(mockService.acceptFreeInvite).not.toHaveBeenCalled();
+    expect(mockService.acceptInvitePasscode).not.toHaveBeenCalled();
+    expect(mockService.createStudentPurchaseLink).not.toHaveBeenCalled();
+  });
+
+  test("dispatches student invite acceptance to explicit Phase 1 access paths", async () => {
+    mockService.acceptFreeInvite.mockResolvedValue({ id: 12, access_source: "free_invite" });
+    mockService.acceptInvitePasscode.mockResolvedValue({ id: 13, access_source: "offline_passcode" });
+    mockService.createStudentPurchaseLink.mockResolvedValue({ id: 14, purchase_id: 500 });
 
     await request(app)
       .post("/api/v2/e-booklet-invites/raw-token/accept")
       .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
-      .set("User-Agent", "node-superagent-test")
-      .send()
+      .send({ accessPath: "free", termsAccepted: true, termsVersion: "v1" })
       .expect(200)
       .expect((res) => {
-        expect(res.body.data.bookletInstanceId).toBe(10);
+        expect(res.body.data.access_source).toBe("free_invite");
       });
 
-    expect(mockService.acceptInvite).toHaveBeenCalledWith("raw-token", 55, {
-      ipAddress: expect.any(String),
-      userAgent: expect.stringContaining("node-superagent"),
-    });
+    await request(app)
+      .post("/api/v2/e-booklet-invites/raw-token/accept")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .send({ accessPath: "offline_passcode", passcode: "123456", termsAccepted: true })
+      .expect(200);
+
+    await request(app)
+      .post("/api/v2/e-booklet-invites/raw-token/accept")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .send({ accessPath: "online_purchase", purchaseId: 500, termsAccepted: true })
+      .expect(200);
+
+    expect(mockService.acceptInvite).not.toHaveBeenCalled();
+    expect(mockService.acceptFreeInvite).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ termsAccepted: true, termsVersion: "v1" }));
+    expect(mockService.acceptInvitePasscode).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ passcode: "123456", termsAccepted: true }));
+    expect(mockService.createStudentPurchaseLink).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ purchaseId: 500, termsAccepted: true }));
   });
 
   test("marks viewer page responses as private no-store", async () => {

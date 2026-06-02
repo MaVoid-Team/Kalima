@@ -558,6 +558,13 @@ export type Enume_booklet_template_version_status_enumWithAggregatesFilter<$Pris
   _max?: Prisma.NestedEnume_booklet_template_version_status_enumFilter<$PrismaModel>
 }
 
+export type Enume_booklet_hotspot_shape_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_hotspot_shape_enum | Prisma.Enume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_hotspot_shape_enum[] | Prisma.ListEnume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_hotspot_shape_enum[] | Prisma.ListEnume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_hotspot_shape_enumFilter<$PrismaModel> | $Enums.e_booklet_hotspot_shape_enum
+}
+
 export type Enume_booklet_hotspot_type_enumFilter<$PrismaModel = never> = {
   equals?: $Enums.e_booklet_hotspot_type_enum | Prisma.Enume_booklet_hotspot_type_enumFieldRefInput<$PrismaModel>
   in?: $Enums.e_booklet_hotspot_type_enum[] | Prisma.ListEnume_booklet_hotspot_type_enumFieldRefInput<$PrismaModel>
@@ -570,6 +577,16 @@ export type Enume_booklet_hotspot_trigger_type_enumFilter<$PrismaModel = never> 
   in?: $Enums.e_booklet_hotspot_trigger_type_enum[] | Prisma.ListEnume_booklet_hotspot_trigger_type_enumFieldRefInput<$PrismaModel>
   notIn?: $Enums.e_booklet_hotspot_trigger_type_enum[] | Prisma.ListEnume_booklet_hotspot_trigger_type_enumFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnume_booklet_hotspot_trigger_type_enumFilter<$PrismaModel> | $Enums.e_booklet_hotspot_trigger_type_enum
+}
+
+export type Enume_booklet_hotspot_shape_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_hotspot_shape_enum | Prisma.Enume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_hotspot_shape_enum[] | Prisma.ListEnume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_hotspot_shape_enum[] | Prisma.ListEnume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_hotspot_shape_enumWithAggregatesFilter<$PrismaModel> | $Enums.e_booklet_hotspot_shape_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnume_booklet_hotspot_shape_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnume_booklet_hotspot_shape_enumFilter<$PrismaModel>
 }
 
 export type Enume_booklet_hotspot_type_enumWithAggregatesFilter<$PrismaModel = never> = {
@@ -1275,6 +1292,13 @@ export type NestedEnume_booklet_template_version_status_enumWithAggregatesFilter
   _max?: Prisma.NestedEnume_booklet_template_version_status_enumFilter<$PrismaModel>
 }
 
+export type NestedEnume_booklet_hotspot_shape_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_hotspot_shape_enum | Prisma.Enume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_hotspot_shape_enum[] | Prisma.ListEnume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_hotspot_shape_enum[] | Prisma.ListEnume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_hotspot_shape_enumFilter<$PrismaModel> | $Enums.e_booklet_hotspot_shape_enum
+}
+
 export type NestedEnume_booklet_hotspot_type_enumFilter<$PrismaModel = never> = {
   equals?: $Enums.e_booklet_hotspot_type_enum | Prisma.Enume_booklet_hotspot_type_enumFieldRefInput<$PrismaModel>
   in?: $Enums.e_booklet_hotspot_type_enum[] | Prisma.ListEnume_booklet_hotspot_type_enumFieldRefInput<$PrismaModel>
@@ -1287,6 +1311,16 @@ export type NestedEnume_booklet_hotspot_trigger_type_enumFilter<$PrismaModel = n
   in?: $Enums.e_booklet_hotspot_trigger_type_enum[] | Prisma.ListEnume_booklet_hotspot_trigger_type_enumFieldRefInput<$PrismaModel>
   notIn?: $Enums.e_booklet_hotspot_trigger_type_enum[] | Prisma.ListEnume_booklet_hotspot_trigger_type_enumFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnume_booklet_hotspot_trigger_type_enumFilter<$PrismaModel> | $Enums.e_booklet_hotspot_trigger_type_enum
+}
+
+export type NestedEnume_booklet_hotspot_shape_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_hotspot_shape_enum | Prisma.Enume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_hotspot_shape_enum[] | Prisma.ListEnume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_hotspot_shape_enum[] | Prisma.ListEnume_booklet_hotspot_shape_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_hotspot_shape_enumWithAggregatesFilter<$PrismaModel> | $Enums.e_booklet_hotspot_shape_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnume_booklet_hotspot_shape_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnume_booklet_hotspot_shape_enumFilter<$PrismaModel>
 }
 
 export type NestedEnume_booklet_hotspot_type_enumWithAggregatesFilter<$PrismaModel = never> = {

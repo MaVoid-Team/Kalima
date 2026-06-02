@@ -258,6 +258,21 @@ export type e_booklet_access = Prisma.e_booklet_accessModel
  */
 export type e_booklet_invites = Prisma.e_booklet_invitesModel
 /**
+ * Model e_booklet_devices
+ * 
+ */
+export type e_booklet_devices = Prisma.e_booklet_devicesModel
+/**
+ * Model e_booklet_device_allowances
+ * 
+ */
+export type e_booklet_device_allowances = Prisma.e_booklet_device_allowancesModel
+/**
+ * Model e_booklet_student_purchase_links
+ * 
+ */
+export type e_booklet_student_purchase_links = Prisma.e_booklet_student_purchase_linksModel
+/**
  * Model e_booklet_invite_redemptions
  * 
  */

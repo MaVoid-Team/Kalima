@@ -47,6 +47,8 @@ export type E_booklet_invitesMinAggregateOutputType = {
   booklet_instance_id: number | null
   teacher_id: number | null
   token_hash: string | null
+  passcode_hash: string | null
+  passcode_hint: string | null
   max_uses: number | null
   used_count: number | null
   expires_at: Date | null
@@ -59,6 +61,8 @@ export type E_booklet_invitesMaxAggregateOutputType = {
   booklet_instance_id: number | null
   teacher_id: number | null
   token_hash: string | null
+  passcode_hash: string | null
+  passcode_hint: string | null
   max_uses: number | null
   used_count: number | null
   expires_at: Date | null
@@ -71,6 +75,8 @@ export type E_booklet_invitesCountAggregateOutputType = {
   booklet_instance_id: number
   teacher_id: number
   token_hash: number
+  passcode_hash: number
+  passcode_hint: number
   max_uses: number
   used_count: number
   expires_at: number
@@ -101,6 +107,8 @@ export type E_booklet_invitesMinAggregateInputType = {
   booklet_instance_id?: true
   teacher_id?: true
   token_hash?: true
+  passcode_hash?: true
+  passcode_hint?: true
   max_uses?: true
   used_count?: true
   expires_at?: true
@@ -113,6 +121,8 @@ export type E_booklet_invitesMaxAggregateInputType = {
   booklet_instance_id?: true
   teacher_id?: true
   token_hash?: true
+  passcode_hash?: true
+  passcode_hint?: true
   max_uses?: true
   used_count?: true
   expires_at?: true
@@ -125,6 +135,8 @@ export type E_booklet_invitesCountAggregateInputType = {
   booklet_instance_id?: true
   teacher_id?: true
   token_hash?: true
+  passcode_hash?: true
+  passcode_hint?: true
   max_uses?: true
   used_count?: true
   expires_at?: true
@@ -224,6 +236,8 @@ export type E_booklet_invitesGroupByOutputType = {
   booklet_instance_id: number
   teacher_id: number
   token_hash: string
+  passcode_hash: string | null
+  passcode_hint: string | null
   max_uses: number | null
   used_count: number
   expires_at: Date | null
@@ -259,6 +273,8 @@ export type e_booklet_invitesWhereInput = {
   booklet_instance_id?: Prisma.IntFilter<"e_booklet_invites"> | number
   teacher_id?: Prisma.IntFilter<"e_booklet_invites"> | number
   token_hash?: Prisma.StringFilter<"e_booklet_invites"> | string
+  passcode_hash?: Prisma.StringNullableFilter<"e_booklet_invites"> | string | null
+  passcode_hint?: Prisma.StringNullableFilter<"e_booklet_invites"> | string | null
   max_uses?: Prisma.IntNullableFilter<"e_booklet_invites"> | number | null
   used_count?: Prisma.IntFilter<"e_booklet_invites"> | number
   expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_invites"> | Date | string | null
@@ -268,6 +284,7 @@ export type e_booklet_invitesWhereInput = {
   teacher?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   access_records?: Prisma.E_booklet_accessListRelationFilter
   redemptions?: Prisma.E_booklet_invite_redemptionsListRelationFilter
+  student_purchase_links?: Prisma.E_booklet_student_purchase_linksListRelationFilter
 }
 
 export type e_booklet_invitesOrderByWithRelationInput = {
@@ -275,6 +292,8 @@ export type e_booklet_invitesOrderByWithRelationInput = {
   booklet_instance_id?: Prisma.SortOrder
   teacher_id?: Prisma.SortOrder
   token_hash?: Prisma.SortOrder
+  passcode_hash?: Prisma.SortOrderInput | Prisma.SortOrder
+  passcode_hint?: Prisma.SortOrderInput | Prisma.SortOrder
   max_uses?: Prisma.SortOrderInput | Prisma.SortOrder
   used_count?: Prisma.SortOrder
   expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -284,6 +303,7 @@ export type e_booklet_invitesOrderByWithRelationInput = {
   teacher?: Prisma.usersOrderByWithRelationInput
   access_records?: Prisma.e_booklet_accessOrderByRelationAggregateInput
   redemptions?: Prisma.e_booklet_invite_redemptionsOrderByRelationAggregateInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksOrderByRelationAggregateInput
 }
 
 export type e_booklet_invitesWhereUniqueInput = Prisma.AtLeast<{
@@ -294,6 +314,8 @@ export type e_booklet_invitesWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.e_booklet_invitesWhereInput | Prisma.e_booklet_invitesWhereInput[]
   booklet_instance_id?: Prisma.IntFilter<"e_booklet_invites"> | number
   teacher_id?: Prisma.IntFilter<"e_booklet_invites"> | number
+  passcode_hash?: Prisma.StringNullableFilter<"e_booklet_invites"> | string | null
+  passcode_hint?: Prisma.StringNullableFilter<"e_booklet_invites"> | string | null
   max_uses?: Prisma.IntNullableFilter<"e_booklet_invites"> | number | null
   used_count?: Prisma.IntFilter<"e_booklet_invites"> | number
   expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_invites"> | Date | string | null
@@ -303,6 +325,7 @@ export type e_booklet_invitesWhereUniqueInput = Prisma.AtLeast<{
   teacher?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   access_records?: Prisma.E_booklet_accessListRelationFilter
   redemptions?: Prisma.E_booklet_invite_redemptionsListRelationFilter
+  student_purchase_links?: Prisma.E_booklet_student_purchase_linksListRelationFilter
 }, "id" | "token_hash">
 
 export type e_booklet_invitesOrderByWithAggregationInput = {
@@ -310,6 +333,8 @@ export type e_booklet_invitesOrderByWithAggregationInput = {
   booklet_instance_id?: Prisma.SortOrder
   teacher_id?: Prisma.SortOrder
   token_hash?: Prisma.SortOrder
+  passcode_hash?: Prisma.SortOrderInput | Prisma.SortOrder
+  passcode_hint?: Prisma.SortOrderInput | Prisma.SortOrder
   max_uses?: Prisma.SortOrderInput | Prisma.SortOrder
   used_count?: Prisma.SortOrder
   expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -330,6 +355,8 @@ export type e_booklet_invitesScalarWhereWithAggregatesInput = {
   booklet_instance_id?: Prisma.IntWithAggregatesFilter<"e_booklet_invites"> | number
   teacher_id?: Prisma.IntWithAggregatesFilter<"e_booklet_invites"> | number
   token_hash?: Prisma.StringWithAggregatesFilter<"e_booklet_invites"> | string
+  passcode_hash?: Prisma.StringNullableWithAggregatesFilter<"e_booklet_invites"> | string | null
+  passcode_hint?: Prisma.StringNullableWithAggregatesFilter<"e_booklet_invites"> | string | null
   max_uses?: Prisma.IntNullableWithAggregatesFilter<"e_booklet_invites"> | number | null
   used_count?: Prisma.IntWithAggregatesFilter<"e_booklet_invites"> | number
   expires_at?: Prisma.DateTimeNullableWithAggregatesFilter<"e_booklet_invites"> | Date | string | null
@@ -339,6 +366,8 @@ export type e_booklet_invitesScalarWhereWithAggregatesInput = {
 
 export type e_booklet_invitesCreateInput = {
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
@@ -348,6 +377,7 @@ export type e_booklet_invitesCreateInput = {
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_invitesInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutSource_inviteInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutInviteInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutInviteInput
 }
 
 export type e_booklet_invitesUncheckedCreateInput = {
@@ -355,6 +385,8 @@ export type e_booklet_invitesUncheckedCreateInput = {
   booklet_instance_id: number
   teacher_id: number
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
@@ -362,10 +394,13 @@ export type e_booklet_invitesUncheckedCreateInput = {
   created_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutSource_inviteInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutInviteInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutInviteInput
 }
 
 export type e_booklet_invitesUpdateInput = {
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -375,6 +410,7 @@ export type e_booklet_invitesUpdateInput = {
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_invitesNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutSource_inviteNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutInviteNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutInviteNestedInput
 }
 
 export type e_booklet_invitesUncheckedUpdateInput = {
@@ -382,6 +418,8 @@ export type e_booklet_invitesUncheckedUpdateInput = {
   booklet_instance_id?: Prisma.IntFieldUpdateOperationsInput | number
   teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -389,6 +427,7 @@ export type e_booklet_invitesUncheckedUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutSource_inviteNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutInviteNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutInviteNestedInput
 }
 
 export type e_booklet_invitesCreateManyInput = {
@@ -396,6 +435,8 @@ export type e_booklet_invitesCreateManyInput = {
   booklet_instance_id: number
   teacher_id: number
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
@@ -405,6 +446,8 @@ export type e_booklet_invitesCreateManyInput = {
 
 export type e_booklet_invitesUpdateManyMutationInput = {
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -417,6 +460,8 @@ export type e_booklet_invitesUncheckedUpdateManyInput = {
   booklet_instance_id?: Prisma.IntFieldUpdateOperationsInput | number
   teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -444,6 +489,8 @@ export type e_booklet_invitesCountOrderByAggregateInput = {
   booklet_instance_id?: Prisma.SortOrder
   teacher_id?: Prisma.SortOrder
   token_hash?: Prisma.SortOrder
+  passcode_hash?: Prisma.SortOrder
+  passcode_hint?: Prisma.SortOrder
   max_uses?: Prisma.SortOrder
   used_count?: Prisma.SortOrder
   expires_at?: Prisma.SortOrder
@@ -464,6 +511,8 @@ export type e_booklet_invitesMaxOrderByAggregateInput = {
   booklet_instance_id?: Prisma.SortOrder
   teacher_id?: Prisma.SortOrder
   token_hash?: Prisma.SortOrder
+  passcode_hash?: Prisma.SortOrder
+  passcode_hint?: Prisma.SortOrder
   max_uses?: Prisma.SortOrder
   used_count?: Prisma.SortOrder
   expires_at?: Prisma.SortOrder
@@ -476,6 +525,8 @@ export type e_booklet_invitesMinOrderByAggregateInput = {
   booklet_instance_id?: Prisma.SortOrder
   teacher_id?: Prisma.SortOrder
   token_hash?: Prisma.SortOrder
+  passcode_hash?: Prisma.SortOrder
+  passcode_hint?: Prisma.SortOrder
   max_uses?: Prisma.SortOrder
   used_count?: Prisma.SortOrder
   expires_at?: Prisma.SortOrder
@@ -600,6 +651,20 @@ export type Enume_booklet_invite_status_enumFieldUpdateOperationsInput = {
   set?: $Enums.e_booklet_invite_status_enum
 }
 
+export type e_booklet_invitesCreateNestedOneWithoutStudent_purchase_linksInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_invitesCreateWithoutStudent_purchase_linksInput, Prisma.e_booklet_invitesUncheckedCreateWithoutStudent_purchase_linksInput>
+  connectOrCreate?: Prisma.e_booklet_invitesCreateOrConnectWithoutStudent_purchase_linksInput
+  connect?: Prisma.e_booklet_invitesWhereUniqueInput
+}
+
+export type e_booklet_invitesUpdateOneRequiredWithoutStudent_purchase_linksNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_invitesCreateWithoutStudent_purchase_linksInput, Prisma.e_booklet_invitesUncheckedCreateWithoutStudent_purchase_linksInput>
+  connectOrCreate?: Prisma.e_booklet_invitesCreateOrConnectWithoutStudent_purchase_linksInput
+  upsert?: Prisma.e_booklet_invitesUpsertWithoutStudent_purchase_linksInput
+  connect?: Prisma.e_booklet_invitesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_invitesUpdateToOneWithWhereWithoutStudent_purchase_linksInput, Prisma.e_booklet_invitesUpdateWithoutStudent_purchase_linksInput>, Prisma.e_booklet_invitesUncheckedUpdateWithoutStudent_purchase_linksInput>
+}
+
 export type e_booklet_invitesCreateNestedOneWithoutRedemptionsInput = {
   create?: Prisma.XOR<Prisma.e_booklet_invitesCreateWithoutRedemptionsInput, Prisma.e_booklet_invitesUncheckedCreateWithoutRedemptionsInput>
   connectOrCreate?: Prisma.e_booklet_invitesCreateOrConnectWithoutRedemptionsInput
@@ -616,6 +681,8 @@ export type e_booklet_invitesUpdateOneRequiredWithoutRedemptionsNestedInput = {
 
 export type e_booklet_invitesCreateWithoutTeacherInput = {
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
@@ -624,12 +691,15 @@ export type e_booklet_invitesCreateWithoutTeacherInput = {
   booklet_instance: Prisma.e_booklet_instancesCreateNestedOneWithoutInvitesInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutSource_inviteInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutInviteInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutInviteInput
 }
 
 export type e_booklet_invitesUncheckedCreateWithoutTeacherInput = {
   id?: number
   booklet_instance_id: number
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
@@ -637,6 +707,7 @@ export type e_booklet_invitesUncheckedCreateWithoutTeacherInput = {
   created_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutSource_inviteInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutInviteInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutInviteInput
 }
 
 export type e_booklet_invitesCreateOrConnectWithoutTeacherInput = {
@@ -673,6 +744,8 @@ export type e_booklet_invitesScalarWhereInput = {
   booklet_instance_id?: Prisma.IntFilter<"e_booklet_invites"> | number
   teacher_id?: Prisma.IntFilter<"e_booklet_invites"> | number
   token_hash?: Prisma.StringFilter<"e_booklet_invites"> | string
+  passcode_hash?: Prisma.StringNullableFilter<"e_booklet_invites"> | string | null
+  passcode_hint?: Prisma.StringNullableFilter<"e_booklet_invites"> | string | null
   max_uses?: Prisma.IntNullableFilter<"e_booklet_invites"> | number | null
   used_count?: Prisma.IntFilter<"e_booklet_invites"> | number
   expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_invites"> | Date | string | null
@@ -682,6 +755,8 @@ export type e_booklet_invitesScalarWhereInput = {
 
 export type e_booklet_invitesCreateWithoutBooklet_instanceInput = {
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
@@ -690,12 +765,15 @@ export type e_booklet_invitesCreateWithoutBooklet_instanceInput = {
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_invitesInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutSource_inviteInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutInviteInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutInviteInput
 }
 
 export type e_booklet_invitesUncheckedCreateWithoutBooklet_instanceInput = {
   id?: number
   teacher_id: number
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
@@ -703,6 +781,7 @@ export type e_booklet_invitesUncheckedCreateWithoutBooklet_instanceInput = {
   created_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutSource_inviteInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutInviteInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutInviteInput
 }
 
 export type e_booklet_invitesCreateOrConnectWithoutBooklet_instanceInput = {
@@ -733,6 +812,8 @@ export type e_booklet_invitesUpdateManyWithWhereWithoutBooklet_instanceInput = {
 
 export type e_booklet_invitesCreateWithoutAccess_recordsInput = {
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
@@ -741,6 +822,7 @@ export type e_booklet_invitesCreateWithoutAccess_recordsInput = {
   booklet_instance: Prisma.e_booklet_instancesCreateNestedOneWithoutInvitesInput
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_invitesInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutInviteInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutInviteInput
 }
 
 export type e_booklet_invitesUncheckedCreateWithoutAccess_recordsInput = {
@@ -748,12 +830,15 @@ export type e_booklet_invitesUncheckedCreateWithoutAccess_recordsInput = {
   booklet_instance_id: number
   teacher_id: number
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
   status?: $Enums.e_booklet_invite_status_enum
   created_at?: Date | string | null
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutInviteInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutInviteInput
 }
 
 export type e_booklet_invitesCreateOrConnectWithoutAccess_recordsInput = {
@@ -774,6 +859,8 @@ export type e_booklet_invitesUpdateToOneWithWhereWithoutAccess_recordsInput = {
 
 export type e_booklet_invitesUpdateWithoutAccess_recordsInput = {
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -782,6 +869,7 @@ export type e_booklet_invitesUpdateWithoutAccess_recordsInput = {
   booklet_instance?: Prisma.e_booklet_instancesUpdateOneRequiredWithoutInvitesNestedInput
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_invitesNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutInviteNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutInviteNestedInput
 }
 
 export type e_booklet_invitesUncheckedUpdateWithoutAccess_recordsInput = {
@@ -789,16 +877,21 @@ export type e_booklet_invitesUncheckedUpdateWithoutAccess_recordsInput = {
   booklet_instance_id?: Prisma.IntFieldUpdateOperationsInput | number
   teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.Enume_booklet_invite_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_invite_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutInviteNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutInviteNestedInput
 }
 
-export type e_booklet_invitesCreateWithoutRedemptionsInput = {
+export type e_booklet_invitesCreateWithoutStudent_purchase_linksInput = {
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
@@ -807,6 +900,85 @@ export type e_booklet_invitesCreateWithoutRedemptionsInput = {
   booklet_instance: Prisma.e_booklet_instancesCreateNestedOneWithoutInvitesInput
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_invitesInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutSource_inviteInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutInviteInput
+}
+
+export type e_booklet_invitesUncheckedCreateWithoutStudent_purchase_linksInput = {
+  id?: number
+  booklet_instance_id: number
+  teacher_id: number
+  token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
+  max_uses?: number | null
+  used_count?: number
+  expires_at?: Date | string | null
+  status?: $Enums.e_booklet_invite_status_enum
+  created_at?: Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutSource_inviteInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutInviteInput
+}
+
+export type e_booklet_invitesCreateOrConnectWithoutStudent_purchase_linksInput = {
+  where: Prisma.e_booklet_invitesWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_invitesCreateWithoutStudent_purchase_linksInput, Prisma.e_booklet_invitesUncheckedCreateWithoutStudent_purchase_linksInput>
+}
+
+export type e_booklet_invitesUpsertWithoutStudent_purchase_linksInput = {
+  update: Prisma.XOR<Prisma.e_booklet_invitesUpdateWithoutStudent_purchase_linksInput, Prisma.e_booklet_invitesUncheckedUpdateWithoutStudent_purchase_linksInput>
+  create: Prisma.XOR<Prisma.e_booklet_invitesCreateWithoutStudent_purchase_linksInput, Prisma.e_booklet_invitesUncheckedCreateWithoutStudent_purchase_linksInput>
+  where?: Prisma.e_booklet_invitesWhereInput
+}
+
+export type e_booklet_invitesUpdateToOneWithWhereWithoutStudent_purchase_linksInput = {
+  where?: Prisma.e_booklet_invitesWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_invitesUpdateWithoutStudent_purchase_linksInput, Prisma.e_booklet_invitesUncheckedUpdateWithoutStudent_purchase_linksInput>
+}
+
+export type e_booklet_invitesUpdateWithoutStudent_purchase_linksInput = {
+  token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  used_count?: Prisma.IntFieldUpdateOperationsInput | number
+  expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.Enume_booklet_invite_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_invite_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  booklet_instance?: Prisma.e_booklet_instancesUpdateOneRequiredWithoutInvitesNestedInput
+  teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_invitesNestedInput
+  access_records?: Prisma.e_booklet_accessUpdateManyWithoutSource_inviteNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutInviteNestedInput
+}
+
+export type e_booklet_invitesUncheckedUpdateWithoutStudent_purchase_linksInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  booklet_instance_id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  used_count?: Prisma.IntFieldUpdateOperationsInput | number
+  expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.Enume_booklet_invite_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_invite_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutSource_inviteNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutInviteNestedInput
+}
+
+export type e_booklet_invitesCreateWithoutRedemptionsInput = {
+  token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
+  max_uses?: number | null
+  used_count?: number
+  expires_at?: Date | string | null
+  status?: $Enums.e_booklet_invite_status_enum
+  created_at?: Date | string | null
+  booklet_instance: Prisma.e_booklet_instancesCreateNestedOneWithoutInvitesInput
+  teacher: Prisma.usersCreateNestedOneWithoutE_booklet_invitesInput
+  access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutSource_inviteInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutInviteInput
 }
 
 export type e_booklet_invitesUncheckedCreateWithoutRedemptionsInput = {
@@ -814,12 +986,15 @@ export type e_booklet_invitesUncheckedCreateWithoutRedemptionsInput = {
   booklet_instance_id: number
   teacher_id: number
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
   status?: $Enums.e_booklet_invite_status_enum
   created_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutSource_inviteInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutInviteInput
 }
 
 export type e_booklet_invitesCreateOrConnectWithoutRedemptionsInput = {
@@ -840,6 +1015,8 @@ export type e_booklet_invitesUpdateToOneWithWhereWithoutRedemptionsInput = {
 
 export type e_booklet_invitesUpdateWithoutRedemptionsInput = {
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -848,6 +1025,7 @@ export type e_booklet_invitesUpdateWithoutRedemptionsInput = {
   booklet_instance?: Prisma.e_booklet_instancesUpdateOneRequiredWithoutInvitesNestedInput
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_invitesNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutSource_inviteNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutInviteNestedInput
 }
 
 export type e_booklet_invitesUncheckedUpdateWithoutRedemptionsInput = {
@@ -855,18 +1033,23 @@ export type e_booklet_invitesUncheckedUpdateWithoutRedemptionsInput = {
   booklet_instance_id?: Prisma.IntFieldUpdateOperationsInput | number
   teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.Enume_booklet_invite_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_invite_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutSource_inviteNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutInviteNestedInput
 }
 
 export type e_booklet_invitesCreateManyTeacherInput = {
   id?: number
   booklet_instance_id: number
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
@@ -876,6 +1059,8 @@ export type e_booklet_invitesCreateManyTeacherInput = {
 
 export type e_booklet_invitesUpdateWithoutTeacherInput = {
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -884,12 +1069,15 @@ export type e_booklet_invitesUpdateWithoutTeacherInput = {
   booklet_instance?: Prisma.e_booklet_instancesUpdateOneRequiredWithoutInvitesNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutSource_inviteNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutInviteNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutInviteNestedInput
 }
 
 export type e_booklet_invitesUncheckedUpdateWithoutTeacherInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   booklet_instance_id?: Prisma.IntFieldUpdateOperationsInput | number
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -897,12 +1085,15 @@ export type e_booklet_invitesUncheckedUpdateWithoutTeacherInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutSource_inviteNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutInviteNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutInviteNestedInput
 }
 
 export type e_booklet_invitesUncheckedUpdateManyWithoutTeacherInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   booklet_instance_id?: Prisma.IntFieldUpdateOperationsInput | number
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -914,6 +1105,8 @@ export type e_booklet_invitesCreateManyBooklet_instanceInput = {
   id?: number
   teacher_id: number
   token_hash: string
+  passcode_hash?: string | null
+  passcode_hint?: string | null
   max_uses?: number | null
   used_count?: number
   expires_at?: Date | string | null
@@ -923,6 +1116,8 @@ export type e_booklet_invitesCreateManyBooklet_instanceInput = {
 
 export type e_booklet_invitesUpdateWithoutBooklet_instanceInput = {
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -931,12 +1126,15 @@ export type e_booklet_invitesUpdateWithoutBooklet_instanceInput = {
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_invitesNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutSource_inviteNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutInviteNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutInviteNestedInput
 }
 
 export type e_booklet_invitesUncheckedUpdateWithoutBooklet_instanceInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -944,12 +1142,15 @@ export type e_booklet_invitesUncheckedUpdateWithoutBooklet_instanceInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutSource_inviteNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutInviteNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutInviteNestedInput
 }
 
 export type e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
   token_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  passcode_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passcode_hint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   max_uses?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   used_count?: Prisma.IntFieldUpdateOperationsInput | number
   expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -965,11 +1166,13 @@ export type e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceInput = {
 export type E_booklet_invitesCountOutputType = {
   access_records: number
   redemptions: number
+  student_purchase_links: number
 }
 
 export type E_booklet_invitesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   access_records?: boolean | E_booklet_invitesCountOutputTypeCountAccess_recordsArgs
   redemptions?: boolean | E_booklet_invitesCountOutputTypeCountRedemptionsArgs
+  student_purchase_links?: boolean | E_booklet_invitesCountOutputTypeCountStudent_purchase_linksArgs
 }
 
 /**
@@ -996,12 +1199,21 @@ export type E_booklet_invitesCountOutputTypeCountRedemptionsArgs<ExtArgs extends
   where?: Prisma.e_booklet_invite_redemptionsWhereInput
 }
 
+/**
+ * E_booklet_invitesCountOutputType without action
+ */
+export type E_booklet_invitesCountOutputTypeCountStudent_purchase_linksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_student_purchase_linksWhereInput
+}
+
 
 export type e_booklet_invitesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   booklet_instance_id?: boolean
   teacher_id?: boolean
   token_hash?: boolean
+  passcode_hash?: boolean
+  passcode_hint?: boolean
   max_uses?: boolean
   used_count?: boolean
   expires_at?: boolean
@@ -1011,6 +1223,7 @@ export type e_booklet_invitesSelect<ExtArgs extends runtime.Types.Extensions.Int
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   access_records?: boolean | Prisma.e_booklet_invites$access_recordsArgs<ExtArgs>
   redemptions?: boolean | Prisma.e_booklet_invites$redemptionsArgs<ExtArgs>
+  student_purchase_links?: boolean | Prisma.e_booklet_invites$student_purchase_linksArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_invitesCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["e_booklet_invites"]>
 
@@ -1019,6 +1232,8 @@ export type e_booklet_invitesSelectCreateManyAndReturn<ExtArgs extends runtime.T
   booklet_instance_id?: boolean
   teacher_id?: boolean
   token_hash?: boolean
+  passcode_hash?: boolean
+  passcode_hint?: boolean
   max_uses?: boolean
   used_count?: boolean
   expires_at?: boolean
@@ -1033,6 +1248,8 @@ export type e_booklet_invitesSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   booklet_instance_id?: boolean
   teacher_id?: boolean
   token_hash?: boolean
+  passcode_hash?: boolean
+  passcode_hint?: boolean
   max_uses?: boolean
   used_count?: boolean
   expires_at?: boolean
@@ -1047,6 +1264,8 @@ export type e_booklet_invitesSelectScalar = {
   booklet_instance_id?: boolean
   teacher_id?: boolean
   token_hash?: boolean
+  passcode_hash?: boolean
+  passcode_hint?: boolean
   max_uses?: boolean
   used_count?: boolean
   expires_at?: boolean
@@ -1054,12 +1273,13 @@ export type e_booklet_invitesSelectScalar = {
   created_at?: boolean
 }
 
-export type e_booklet_invitesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "booklet_instance_id" | "teacher_id" | "token_hash" | "max_uses" | "used_count" | "expires_at" | "status" | "created_at", ExtArgs["result"]["e_booklet_invites"]>
+export type e_booklet_invitesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "booklet_instance_id" | "teacher_id" | "token_hash" | "passcode_hash" | "passcode_hint" | "max_uses" | "used_count" | "expires_at" | "status" | "created_at", ExtArgs["result"]["e_booklet_invites"]>
 export type e_booklet_invitesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   booklet_instance?: boolean | Prisma.e_booklet_instancesDefaultArgs<ExtArgs>
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   access_records?: boolean | Prisma.e_booklet_invites$access_recordsArgs<ExtArgs>
   redemptions?: boolean | Prisma.e_booklet_invites$redemptionsArgs<ExtArgs>
+  student_purchase_links?: boolean | Prisma.e_booklet_invites$student_purchase_linksArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_invitesCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type e_booklet_invitesIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1078,12 +1298,15 @@ export type $e_booklet_invitesPayload<ExtArgs extends runtime.Types.Extensions.I
     teacher: Prisma.$usersPayload<ExtArgs>
     access_records: Prisma.$e_booklet_accessPayload<ExtArgs>[]
     redemptions: Prisma.$e_booklet_invite_redemptionsPayload<ExtArgs>[]
+    student_purchase_links: Prisma.$e_booklet_student_purchase_linksPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     booklet_instance_id: number
     teacher_id: number
     token_hash: string
+    passcode_hash: string | null
+    passcode_hint: string | null
     max_uses: number | null
     used_count: number
     expires_at: Date | null
@@ -1487,6 +1710,7 @@ export interface Prisma__e_booklet_invitesClient<T, Null = never, ExtArgs extend
   teacher<T extends Prisma.usersDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.usersDefaultArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   access_records<T extends Prisma.e_booklet_invites$access_recordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_invites$access_recordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_accessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   redemptions<T extends Prisma.e_booklet_invites$redemptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_invites$redemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_invite_redemptionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  student_purchase_links<T extends Prisma.e_booklet_invites$student_purchase_linksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_invites$student_purchase_linksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_student_purchase_linksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1520,6 +1744,8 @@ export interface e_booklet_invitesFieldRefs {
   readonly booklet_instance_id: Prisma.FieldRef<"e_booklet_invites", 'Int'>
   readonly teacher_id: Prisma.FieldRef<"e_booklet_invites", 'Int'>
   readonly token_hash: Prisma.FieldRef<"e_booklet_invites", 'String'>
+  readonly passcode_hash: Prisma.FieldRef<"e_booklet_invites", 'String'>
+  readonly passcode_hint: Prisma.FieldRef<"e_booklet_invites", 'String'>
   readonly max_uses: Prisma.FieldRef<"e_booklet_invites", 'Int'>
   readonly used_count: Prisma.FieldRef<"e_booklet_invites", 'Int'>
   readonly expires_at: Prisma.FieldRef<"e_booklet_invites", 'DateTime'>
@@ -1975,6 +2201,30 @@ export type e_booklet_invites$redemptionsArgs<ExtArgs extends runtime.Types.Exte
   take?: number
   skip?: number
   distinct?: Prisma.E_booklet_invite_redemptionsScalarFieldEnum | Prisma.E_booklet_invite_redemptionsScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_invites.student_purchase_links
+ */
+export type e_booklet_invites$student_purchase_linksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_student_purchase_links
+   */
+  select?: Prisma.e_booklet_student_purchase_linksSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_student_purchase_links
+   */
+  omit?: Prisma.e_booklet_student_purchase_linksOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_student_purchase_linksInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_student_purchase_linksWhereInput
+  orderBy?: Prisma.e_booklet_student_purchase_linksOrderByWithRelationInput | Prisma.e_booklet_student_purchase_linksOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_student_purchase_linksWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_student_purchase_linksScalarFieldEnum | Prisma.E_booklet_student_purchase_linksScalarFieldEnum[]
 }
 
 /**

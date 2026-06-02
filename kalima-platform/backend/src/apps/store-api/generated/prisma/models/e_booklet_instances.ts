@@ -35,6 +35,8 @@ export type E_booklet_instancesAvgAggregateOutputType = {
   custom_document_file_id: number | null
   invite_quota: number | null
   used_invites_count: number | null
+  student_marketing_price: runtime.Decimal | null
+  internal_price: runtime.Decimal | null
 }
 
 export type E_booklet_instancesSumAggregateOutputType = {
@@ -46,6 +48,8 @@ export type E_booklet_instancesSumAggregateOutputType = {
   custom_document_file_id: number | null
   invite_quota: number | null
   used_invites_count: number | null
+  student_marketing_price: runtime.Decimal | null
+  internal_price: runtime.Decimal | null
 }
 
 export type E_booklet_instancesMinAggregateOutputType = {
@@ -58,6 +62,11 @@ export type E_booklet_instancesMinAggregateOutputType = {
   display_title: string | null
   invite_quota: number | null
   used_invites_count: number | null
+  access_expires_at: Date | null
+  archived_at: Date | null
+  archive_reason: string | null
+  student_marketing_price: runtime.Decimal | null
+  internal_price: runtime.Decimal | null
   status: $Enums.e_booklet_instance_status_enum | null
   created_at: Date | null
   updated_at: Date | null
@@ -73,6 +82,11 @@ export type E_booklet_instancesMaxAggregateOutputType = {
   display_title: string | null
   invite_quota: number | null
   used_invites_count: number | null
+  access_expires_at: Date | null
+  archived_at: Date | null
+  archive_reason: string | null
+  student_marketing_price: runtime.Decimal | null
+  internal_price: runtime.Decimal | null
   status: $Enums.e_booklet_instance_status_enum | null
   created_at: Date | null
   updated_at: Date | null
@@ -89,6 +103,11 @@ export type E_booklet_instancesCountAggregateOutputType = {
   branding_json: number
   invite_quota: number
   used_invites_count: number
+  access_expires_at: number
+  archived_at: number
+  archive_reason: number
+  student_marketing_price: number
+  internal_price: number
   status: number
   created_at: number
   updated_at: number
@@ -105,6 +124,8 @@ export type E_booklet_instancesAvgAggregateInputType = {
   custom_document_file_id?: true
   invite_quota?: true
   used_invites_count?: true
+  student_marketing_price?: true
+  internal_price?: true
 }
 
 export type E_booklet_instancesSumAggregateInputType = {
@@ -116,6 +137,8 @@ export type E_booklet_instancesSumAggregateInputType = {
   custom_document_file_id?: true
   invite_quota?: true
   used_invites_count?: true
+  student_marketing_price?: true
+  internal_price?: true
 }
 
 export type E_booklet_instancesMinAggregateInputType = {
@@ -128,6 +151,11 @@ export type E_booklet_instancesMinAggregateInputType = {
   display_title?: true
   invite_quota?: true
   used_invites_count?: true
+  access_expires_at?: true
+  archived_at?: true
+  archive_reason?: true
+  student_marketing_price?: true
+  internal_price?: true
   status?: true
   created_at?: true
   updated_at?: true
@@ -143,6 +171,11 @@ export type E_booklet_instancesMaxAggregateInputType = {
   display_title?: true
   invite_quota?: true
   used_invites_count?: true
+  access_expires_at?: true
+  archived_at?: true
+  archive_reason?: true
+  student_marketing_price?: true
+  internal_price?: true
   status?: true
   created_at?: true
   updated_at?: true
@@ -159,6 +192,11 @@ export type E_booklet_instancesCountAggregateInputType = {
   branding_json?: true
   invite_quota?: true
   used_invites_count?: true
+  access_expires_at?: true
+  archived_at?: true
+  archive_reason?: true
+  student_marketing_price?: true
+  internal_price?: true
   status?: true
   created_at?: true
   updated_at?: true
@@ -262,6 +300,11 @@ export type E_booklet_instancesGroupByOutputType = {
   branding_json: runtime.JsonValue | null
   invite_quota: number
   used_invites_count: number
+  access_expires_at: Date | null
+  archived_at: Date | null
+  archive_reason: string | null
+  student_marketing_price: runtime.Decimal
+  internal_price: runtime.Decimal
   status: $Enums.e_booklet_instance_status_enum
   created_at: Date | null
   updated_at: Date | null
@@ -301,6 +344,11 @@ export type e_booklet_instancesWhereInput = {
   branding_json?: Prisma.JsonNullableFilter<"e_booklet_instances">
   invite_quota?: Prisma.IntFilter<"e_booklet_instances"> | number
   used_invites_count?: Prisma.IntFilter<"e_booklet_instances"> | number
+  access_expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
+  archived_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
+  archive_reason?: Prisma.StringNullableFilter<"e_booklet_instances"> | string | null
+  student_marketing_price?: Prisma.DecimalFilter<"e_booklet_instances"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFilter<"e_booklet_instances"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFilter<"e_booklet_instances"> | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
@@ -312,6 +360,9 @@ export type e_booklet_instancesWhereInput = {
   access_records?: Prisma.E_booklet_accessListRelationFilter
   invites?: Prisma.E_booklet_invitesListRelationFilter
   redemptions?: Prisma.E_booklet_invite_redemptionsListRelationFilter
+  devices?: Prisma.E_booklet_devicesListRelationFilter
+  device_allowances?: Prisma.E_booklet_device_allowancesListRelationFilter
+  student_purchase_links?: Prisma.E_booklet_student_purchase_linksListRelationFilter
 }
 
 export type e_booklet_instancesOrderByWithRelationInput = {
@@ -325,6 +376,11 @@ export type e_booklet_instancesOrderByWithRelationInput = {
   branding_json?: Prisma.SortOrderInput | Prisma.SortOrder
   invite_quota?: Prisma.SortOrder
   used_invites_count?: Prisma.SortOrder
+  access_expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  archived_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  archive_reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  student_marketing_price?: Prisma.SortOrder
+  internal_price?: Prisma.SortOrder
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -336,6 +392,9 @@ export type e_booklet_instancesOrderByWithRelationInput = {
   access_records?: Prisma.e_booklet_accessOrderByRelationAggregateInput
   invites?: Prisma.e_booklet_invitesOrderByRelationAggregateInput
   redemptions?: Prisma.e_booklet_invite_redemptionsOrderByRelationAggregateInput
+  devices?: Prisma.e_booklet_devicesOrderByRelationAggregateInput
+  device_allowances?: Prisma.e_booklet_device_allowancesOrderByRelationAggregateInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksOrderByRelationAggregateInput
 }
 
 export type e_booklet_instancesWhereUniqueInput = Prisma.AtLeast<{
@@ -352,6 +411,11 @@ export type e_booklet_instancesWhereUniqueInput = Prisma.AtLeast<{
   branding_json?: Prisma.JsonNullableFilter<"e_booklet_instances">
   invite_quota?: Prisma.IntFilter<"e_booklet_instances"> | number
   used_invites_count?: Prisma.IntFilter<"e_booklet_instances"> | number
+  access_expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
+  archived_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
+  archive_reason?: Prisma.StringNullableFilter<"e_booklet_instances"> | string | null
+  student_marketing_price?: Prisma.DecimalFilter<"e_booklet_instances"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFilter<"e_booklet_instances"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFilter<"e_booklet_instances"> | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
@@ -363,6 +427,9 @@ export type e_booklet_instancesWhereUniqueInput = Prisma.AtLeast<{
   access_records?: Prisma.E_booklet_accessListRelationFilter
   invites?: Prisma.E_booklet_invitesListRelationFilter
   redemptions?: Prisma.E_booklet_invite_redemptionsListRelationFilter
+  devices?: Prisma.E_booklet_devicesListRelationFilter
+  device_allowances?: Prisma.E_booklet_device_allowancesListRelationFilter
+  student_purchase_links?: Prisma.E_booklet_student_purchase_linksListRelationFilter
 }, "id" | "purchase_id">
 
 export type e_booklet_instancesOrderByWithAggregationInput = {
@@ -376,6 +443,11 @@ export type e_booklet_instancesOrderByWithAggregationInput = {
   branding_json?: Prisma.SortOrderInput | Prisma.SortOrder
   invite_quota?: Prisma.SortOrder
   used_invites_count?: Prisma.SortOrder
+  access_expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  archived_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  archive_reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  student_marketing_price?: Prisma.SortOrder
+  internal_price?: Prisma.SortOrder
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -400,6 +472,11 @@ export type e_booklet_instancesScalarWhereWithAggregatesInput = {
   branding_json?: Prisma.JsonNullableWithAggregatesFilter<"e_booklet_instances">
   invite_quota?: Prisma.IntWithAggregatesFilter<"e_booklet_instances"> | number
   used_invites_count?: Prisma.IntWithAggregatesFilter<"e_booklet_instances"> | number
+  access_expires_at?: Prisma.DateTimeNullableWithAggregatesFilter<"e_booklet_instances"> | Date | string | null
+  archived_at?: Prisma.DateTimeNullableWithAggregatesFilter<"e_booklet_instances"> | Date | string | null
+  archive_reason?: Prisma.StringNullableWithAggregatesFilter<"e_booklet_instances"> | string | null
+  student_marketing_price?: Prisma.DecimalWithAggregatesFilter<"e_booklet_instances"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalWithAggregatesFilter<"e_booklet_instances"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumWithAggregatesFilter<"e_booklet_instances"> | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"e_booklet_instances"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"e_booklet_instances"> | Date | string | null
@@ -410,6 +487,11 @@ export type e_booklet_instancesCreateInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -421,6 +503,9 @@ export type e_booklet_instancesCreateInput = {
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesUncheckedCreateInput = {
@@ -434,12 +519,20 @@ export type e_booklet_instancesUncheckedCreateInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesUpdateInput = {
@@ -447,6 +540,11 @@ export type e_booklet_instancesUpdateInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -458,6 +556,9 @@ export type e_booklet_instancesUpdateInput = {
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateInput = {
@@ -471,12 +572,20 @@ export type e_booklet_instancesUncheckedUpdateInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesCreateManyInput = {
@@ -490,6 +599,11 @@ export type e_booklet_instancesCreateManyInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -500,6 +614,11 @@ export type e_booklet_instancesUpdateManyMutationInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -516,6 +635,11 @@ export type e_booklet_instancesUncheckedUpdateManyInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -542,6 +666,11 @@ export type e_booklet_instancesCountOrderByAggregateInput = {
   branding_json?: Prisma.SortOrder
   invite_quota?: Prisma.SortOrder
   used_invites_count?: Prisma.SortOrder
+  access_expires_at?: Prisma.SortOrder
+  archived_at?: Prisma.SortOrder
+  archive_reason?: Prisma.SortOrder
+  student_marketing_price?: Prisma.SortOrder
+  internal_price?: Prisma.SortOrder
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -556,6 +685,8 @@ export type e_booklet_instancesAvgOrderByAggregateInput = {
   custom_document_file_id?: Prisma.SortOrder
   invite_quota?: Prisma.SortOrder
   used_invites_count?: Prisma.SortOrder
+  student_marketing_price?: Prisma.SortOrder
+  internal_price?: Prisma.SortOrder
 }
 
 export type e_booklet_instancesMaxOrderByAggregateInput = {
@@ -568,6 +699,11 @@ export type e_booklet_instancesMaxOrderByAggregateInput = {
   display_title?: Prisma.SortOrder
   invite_quota?: Prisma.SortOrder
   used_invites_count?: Prisma.SortOrder
+  access_expires_at?: Prisma.SortOrder
+  archived_at?: Prisma.SortOrder
+  archive_reason?: Prisma.SortOrder
+  student_marketing_price?: Prisma.SortOrder
+  internal_price?: Prisma.SortOrder
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -583,6 +719,11 @@ export type e_booklet_instancesMinOrderByAggregateInput = {
   display_title?: Prisma.SortOrder
   invite_quota?: Prisma.SortOrder
   used_invites_count?: Prisma.SortOrder
+  access_expires_at?: Prisma.SortOrder
+  archived_at?: Prisma.SortOrder
+  archive_reason?: Prisma.SortOrder
+  student_marketing_price?: Prisma.SortOrder
+  internal_price?: Prisma.SortOrder
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -597,6 +738,8 @@ export type e_booklet_instancesSumOrderByAggregateInput = {
   custom_document_file_id?: Prisma.SortOrder
   invite_quota?: Prisma.SortOrder
   used_invites_count?: Prisma.SortOrder
+  student_marketing_price?: Prisma.SortOrder
+  internal_price?: Prisma.SortOrder
 }
 
 export type E_booklet_instancesScalarRelationFilter = {
@@ -804,6 +947,48 @@ export type e_booklet_instancesUpdateOneRequiredWithoutInvitesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_instancesUpdateToOneWithWhereWithoutInvitesInput, Prisma.e_booklet_instancesUpdateWithoutInvitesInput>, Prisma.e_booklet_instancesUncheckedUpdateWithoutInvitesInput>
 }
 
+export type e_booklet_instancesCreateNestedOneWithoutDevicesInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutDevicesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutDevicesInput>
+  connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutDevicesInput
+  connect?: Prisma.e_booklet_instancesWhereUniqueInput
+}
+
+export type e_booklet_instancesUpdateOneRequiredWithoutDevicesNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutDevicesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutDevicesInput>
+  connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutDevicesInput
+  upsert?: Prisma.e_booklet_instancesUpsertWithoutDevicesInput
+  connect?: Prisma.e_booklet_instancesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_instancesUpdateToOneWithWhereWithoutDevicesInput, Prisma.e_booklet_instancesUpdateWithoutDevicesInput>, Prisma.e_booklet_instancesUncheckedUpdateWithoutDevicesInput>
+}
+
+export type e_booklet_instancesCreateNestedOneWithoutDevice_allowancesInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutDevice_allowancesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutDevice_allowancesInput>
+  connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutDevice_allowancesInput
+  connect?: Prisma.e_booklet_instancesWhereUniqueInput
+}
+
+export type e_booklet_instancesUpdateOneRequiredWithoutDevice_allowancesNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutDevice_allowancesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutDevice_allowancesInput>
+  connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutDevice_allowancesInput
+  upsert?: Prisma.e_booklet_instancesUpsertWithoutDevice_allowancesInput
+  connect?: Prisma.e_booklet_instancesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_instancesUpdateToOneWithWhereWithoutDevice_allowancesInput, Prisma.e_booklet_instancesUpdateWithoutDevice_allowancesInput>, Prisma.e_booklet_instancesUncheckedUpdateWithoutDevice_allowancesInput>
+}
+
+export type e_booklet_instancesCreateNestedOneWithoutStudent_purchase_linksInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutStudent_purchase_linksInput, Prisma.e_booklet_instancesUncheckedCreateWithoutStudent_purchase_linksInput>
+  connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutStudent_purchase_linksInput
+  connect?: Prisma.e_booklet_instancesWhereUniqueInput
+}
+
+export type e_booklet_instancesUpdateOneRequiredWithoutStudent_purchase_linksNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutStudent_purchase_linksInput, Prisma.e_booklet_instancesUncheckedCreateWithoutStudent_purchase_linksInput>
+  connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutStudent_purchase_linksInput
+  upsert?: Prisma.e_booklet_instancesUpsertWithoutStudent_purchase_linksInput
+  connect?: Prisma.e_booklet_instancesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_instancesUpdateToOneWithWhereWithoutStudent_purchase_linksInput, Prisma.e_booklet_instancesUpdateWithoutStudent_purchase_linksInput>, Prisma.e_booklet_instancesUncheckedUpdateWithoutStudent_purchase_linksInput>
+}
+
 export type e_booklet_instancesCreateNestedOneWithoutRedemptionsInput = {
   create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutRedemptionsInput, Prisma.e_booklet_instancesUncheckedCreateWithoutRedemptionsInput>
   connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutRedemptionsInput
@@ -865,6 +1050,11 @@ export type e_booklet_instancesCreateWithoutTeacherInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -875,6 +1065,9 @@ export type e_booklet_instancesCreateWithoutTeacherInput = {
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesUncheckedCreateWithoutTeacherInput = {
@@ -887,12 +1080,20 @@ export type e_booklet_instancesUncheckedCreateWithoutTeacherInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesCreateOrConnectWithoutTeacherInput = {
@@ -935,6 +1136,11 @@ export type e_booklet_instancesScalarWhereInput = {
   branding_json?: Prisma.JsonNullableFilter<"e_booklet_instances">
   invite_quota?: Prisma.IntFilter<"e_booklet_instances"> | number
   used_invites_count?: Prisma.IntFilter<"e_booklet_instances"> | number
+  access_expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
+  archived_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
+  archive_reason?: Prisma.StringNullableFilter<"e_booklet_instances"> | string | null
+  student_marketing_price?: Prisma.DecimalFilter<"e_booklet_instances"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFilter<"e_booklet_instances"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFilter<"e_booklet_instances"> | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"e_booklet_instances"> | Date | string | null
@@ -945,6 +1151,11 @@ export type e_booklet_instancesCreateWithoutTemplateInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -955,6 +1166,9 @@ export type e_booklet_instancesCreateWithoutTemplateInput = {
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesUncheckedCreateWithoutTemplateInput = {
@@ -967,12 +1181,20 @@ export type e_booklet_instancesUncheckedCreateWithoutTemplateInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesCreateOrConnectWithoutTemplateInput = {
@@ -1006,6 +1228,11 @@ export type e_booklet_instancesCreateWithoutTemplate_versionInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -1016,6 +1243,9 @@ export type e_booklet_instancesCreateWithoutTemplate_versionInput = {
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesUncheckedCreateWithoutTemplate_versionInput = {
@@ -1028,12 +1258,20 @@ export type e_booklet_instancesUncheckedCreateWithoutTemplate_versionInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesCreateOrConnectWithoutTemplate_versionInput = {
@@ -1067,6 +1305,11 @@ export type e_booklet_instancesCreateWithoutPurchaseInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -1077,6 +1320,9 @@ export type e_booklet_instancesCreateWithoutPurchaseInput = {
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesUncheckedCreateWithoutPurchaseInput = {
@@ -1089,12 +1335,20 @@ export type e_booklet_instancesUncheckedCreateWithoutPurchaseInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesCreateOrConnectWithoutPurchaseInput = {
@@ -1128,6 +1382,11 @@ export type e_booklet_instancesCreateWithoutAccess_recordsInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -1138,6 +1397,9 @@ export type e_booklet_instancesCreateWithoutAccess_recordsInput = {
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesUncheckedCreateWithoutAccess_recordsInput = {
@@ -1151,11 +1413,19 @@ export type e_booklet_instancesUncheckedCreateWithoutAccess_recordsInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesCreateOrConnectWithoutAccess_recordsInput = {
@@ -1179,6 +1449,11 @@ export type e_booklet_instancesUpdateWithoutAccess_recordsInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1189,6 +1464,9 @@ export type e_booklet_instancesUpdateWithoutAccess_recordsInput = {
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateWithoutAccess_recordsInput = {
@@ -1202,11 +1480,19 @@ export type e_booklet_instancesUncheckedUpdateWithoutAccess_recordsInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesCreateWithoutInvitesInput = {
@@ -1214,6 +1500,11 @@ export type e_booklet_instancesCreateWithoutInvitesInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -1224,6 +1515,9 @@ export type e_booklet_instancesCreateWithoutInvitesInput = {
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesUncheckedCreateWithoutInvitesInput = {
@@ -1237,11 +1531,19 @@ export type e_booklet_instancesUncheckedCreateWithoutInvitesInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesCreateOrConnectWithoutInvitesInput = {
@@ -1265,6 +1567,11 @@ export type e_booklet_instancesUpdateWithoutInvitesInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1275,6 +1582,9 @@ export type e_booklet_instancesUpdateWithoutInvitesInput = {
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateWithoutInvitesInput = {
@@ -1288,18 +1598,31 @@ export type e_booklet_instancesUncheckedUpdateWithoutInvitesInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
 }
 
-export type e_booklet_instancesCreateWithoutRedemptionsInput = {
+export type e_booklet_instancesCreateWithoutDevicesInput = {
   display_title: string
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -1310,6 +1633,363 @@ export type e_booklet_instancesCreateWithoutRedemptionsInput = {
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
+}
+
+export type e_booklet_instancesUncheckedCreateWithoutDevicesInput = {
+  id?: number
+  purchase_id: number
+  teacher_id: number
+  template_id: number
+  template_version_id: number
+  custom_document_file_id?: number | null
+  display_title: string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: number
+  used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.e_booklet_instance_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
+}
+
+export type e_booklet_instancesCreateOrConnectWithoutDevicesInput = {
+  where: Prisma.e_booklet_instancesWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutDevicesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutDevicesInput>
+}
+
+export type e_booklet_instancesUpsertWithoutDevicesInput = {
+  update: Prisma.XOR<Prisma.e_booklet_instancesUpdateWithoutDevicesInput, Prisma.e_booklet_instancesUncheckedUpdateWithoutDevicesInput>
+  create: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutDevicesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutDevicesInput>
+  where?: Prisma.e_booklet_instancesWhereInput
+}
+
+export type e_booklet_instancesUpdateToOneWithWhereWithoutDevicesInput = {
+  where?: Prisma.e_booklet_instancesWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_instancesUpdateWithoutDevicesInput, Prisma.e_booklet_instancesUncheckedUpdateWithoutDevicesInput>
+}
+
+export type e_booklet_instancesUpdateWithoutDevicesInput = {
+  display_title?: Prisma.StringFieldUpdateOperationsInput | string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
+  used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchase?: Prisma.e_booklet_purchasesUpdateOneRequiredWithoutInstancesNestedInput
+  teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_instancesNestedInput
+  template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutInstancesNestedInput
+  template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
+  custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
+  access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
+}
+
+export type e_booklet_instancesUncheckedUpdateWithoutDevicesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  purchase_id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  custom_document_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  display_title?: Prisma.StringFieldUpdateOperationsInput | string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
+  used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+}
+
+export type e_booklet_instancesCreateWithoutDevice_allowancesInput = {
+  display_title: string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: number
+  used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.e_booklet_instance_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  purchase: Prisma.e_booklet_purchasesCreateNestedOneWithoutInstancesInput
+  teacher: Prisma.usersCreateNestedOneWithoutE_booklet_instancesInput
+  template: Prisma.e_booklet_templatesCreateNestedOneWithoutInstancesInput
+  template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
+  custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
+  access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
+}
+
+export type e_booklet_instancesUncheckedCreateWithoutDevice_allowancesInput = {
+  id?: number
+  purchase_id: number
+  teacher_id: number
+  template_id: number
+  template_version_id: number
+  custom_document_file_id?: number | null
+  display_title: string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: number
+  used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.e_booklet_instance_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
+}
+
+export type e_booklet_instancesCreateOrConnectWithoutDevice_allowancesInput = {
+  where: Prisma.e_booklet_instancesWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutDevice_allowancesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutDevice_allowancesInput>
+}
+
+export type e_booklet_instancesUpsertWithoutDevice_allowancesInput = {
+  update: Prisma.XOR<Prisma.e_booklet_instancesUpdateWithoutDevice_allowancesInput, Prisma.e_booklet_instancesUncheckedUpdateWithoutDevice_allowancesInput>
+  create: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutDevice_allowancesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutDevice_allowancesInput>
+  where?: Prisma.e_booklet_instancesWhereInput
+}
+
+export type e_booklet_instancesUpdateToOneWithWhereWithoutDevice_allowancesInput = {
+  where?: Prisma.e_booklet_instancesWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_instancesUpdateWithoutDevice_allowancesInput, Prisma.e_booklet_instancesUncheckedUpdateWithoutDevice_allowancesInput>
+}
+
+export type e_booklet_instancesUpdateWithoutDevice_allowancesInput = {
+  display_title?: Prisma.StringFieldUpdateOperationsInput | string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
+  used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchase?: Prisma.e_booklet_purchasesUpdateOneRequiredWithoutInstancesNestedInput
+  teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_instancesNestedInput
+  template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutInstancesNestedInput
+  template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
+  custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
+  access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
+}
+
+export type e_booklet_instancesUncheckedUpdateWithoutDevice_allowancesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  purchase_id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  custom_document_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  display_title?: Prisma.StringFieldUpdateOperationsInput | string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
+  used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+}
+
+export type e_booklet_instancesCreateWithoutStudent_purchase_linksInput = {
+  display_title: string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: number
+  used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.e_booklet_instance_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  purchase: Prisma.e_booklet_purchasesCreateNestedOneWithoutInstancesInput
+  teacher: Prisma.usersCreateNestedOneWithoutE_booklet_instancesInput
+  template: Prisma.e_booklet_templatesCreateNestedOneWithoutInstancesInput
+  template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
+  custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
+  access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+}
+
+export type e_booklet_instancesUncheckedCreateWithoutStudent_purchase_linksInput = {
+  id?: number
+  purchase_id: number
+  teacher_id: number
+  template_id: number
+  template_version_id: number
+  custom_document_file_id?: number | null
+  display_title: string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: number
+  used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.e_booklet_instance_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+}
+
+export type e_booklet_instancesCreateOrConnectWithoutStudent_purchase_linksInput = {
+  where: Prisma.e_booklet_instancesWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutStudent_purchase_linksInput, Prisma.e_booklet_instancesUncheckedCreateWithoutStudent_purchase_linksInput>
+}
+
+export type e_booklet_instancesUpsertWithoutStudent_purchase_linksInput = {
+  update: Prisma.XOR<Prisma.e_booklet_instancesUpdateWithoutStudent_purchase_linksInput, Prisma.e_booklet_instancesUncheckedUpdateWithoutStudent_purchase_linksInput>
+  create: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutStudent_purchase_linksInput, Prisma.e_booklet_instancesUncheckedCreateWithoutStudent_purchase_linksInput>
+  where?: Prisma.e_booklet_instancesWhereInput
+}
+
+export type e_booklet_instancesUpdateToOneWithWhereWithoutStudent_purchase_linksInput = {
+  where?: Prisma.e_booklet_instancesWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_instancesUpdateWithoutStudent_purchase_linksInput, Prisma.e_booklet_instancesUncheckedUpdateWithoutStudent_purchase_linksInput>
+}
+
+export type e_booklet_instancesUpdateWithoutStudent_purchase_linksInput = {
+  display_title?: Prisma.StringFieldUpdateOperationsInput | string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
+  used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchase?: Prisma.e_booklet_purchasesUpdateOneRequiredWithoutInstancesNestedInput
+  teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_instancesNestedInput
+  template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutInstancesNestedInput
+  template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
+  custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
+  access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+}
+
+export type e_booklet_instancesUncheckedUpdateWithoutStudent_purchase_linksInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  purchase_id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  custom_document_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  display_title?: Prisma.StringFieldUpdateOperationsInput | string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
+  used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+}
+
+export type e_booklet_instancesCreateWithoutRedemptionsInput = {
+  display_title: string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: number
+  used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.e_booklet_instance_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  purchase: Prisma.e_booklet_purchasesCreateNestedOneWithoutInstancesInput
+  teacher: Prisma.usersCreateNestedOneWithoutE_booklet_instancesInput
+  template: Prisma.e_booklet_templatesCreateNestedOneWithoutInstancesInput
+  template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
+  custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
+  access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesUncheckedCreateWithoutRedemptionsInput = {
@@ -1323,11 +2003,19 @@ export type e_booklet_instancesUncheckedCreateWithoutRedemptionsInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesCreateOrConnectWithoutRedemptionsInput = {
@@ -1351,6 +2039,11 @@ export type e_booklet_instancesUpdateWithoutRedemptionsInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1361,6 +2054,9 @@ export type e_booklet_instancesUpdateWithoutRedemptionsInput = {
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateWithoutRedemptionsInput = {
@@ -1374,11 +2070,19 @@ export type e_booklet_instancesUncheckedUpdateWithoutRedemptionsInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesCreateWithoutCustom_document_fileInput = {
@@ -1386,6 +2090,11 @@ export type e_booklet_instancesCreateWithoutCustom_document_fileInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -1396,6 +2105,9 @@ export type e_booklet_instancesCreateWithoutCustom_document_fileInput = {
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesUncheckedCreateWithoutCustom_document_fileInput = {
@@ -1408,12 +2120,20 @@ export type e_booklet_instancesUncheckedCreateWithoutCustom_document_fileInput =
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
 }
 
 export type e_booklet_instancesCreateOrConnectWithoutCustom_document_fileInput = {
@@ -1452,6 +2172,11 @@ export type e_booklet_instancesCreateManyTeacherInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -1462,6 +2187,11 @@ export type e_booklet_instancesUpdateWithoutTeacherInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1472,6 +2202,9 @@ export type e_booklet_instancesUpdateWithoutTeacherInput = {
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateWithoutTeacherInput = {
@@ -1484,12 +2217,20 @@ export type e_booklet_instancesUncheckedUpdateWithoutTeacherInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateManyWithoutTeacherInput = {
@@ -1502,6 +2243,11 @@ export type e_booklet_instancesUncheckedUpdateManyWithoutTeacherInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1517,6 +2263,11 @@ export type e_booklet_instancesCreateManyTemplateInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -1527,6 +2278,11 @@ export type e_booklet_instancesUpdateWithoutTemplateInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1537,6 +2293,9 @@ export type e_booklet_instancesUpdateWithoutTemplateInput = {
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateWithoutTemplateInput = {
@@ -1549,12 +2308,20 @@ export type e_booklet_instancesUncheckedUpdateWithoutTemplateInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateManyWithoutTemplateInput = {
@@ -1567,6 +2334,11 @@ export type e_booklet_instancesUncheckedUpdateManyWithoutTemplateInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1582,6 +2354,11 @@ export type e_booklet_instancesCreateManyTemplate_versionInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -1592,6 +2369,11 @@ export type e_booklet_instancesUpdateWithoutTemplate_versionInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1602,6 +2384,9 @@ export type e_booklet_instancesUpdateWithoutTemplate_versionInput = {
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateWithoutTemplate_versionInput = {
@@ -1614,12 +2399,20 @@ export type e_booklet_instancesUncheckedUpdateWithoutTemplate_versionInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateManyWithoutTemplate_versionInput = {
@@ -1632,6 +2425,11 @@ export type e_booklet_instancesUncheckedUpdateManyWithoutTemplate_versionInput =
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1647,6 +2445,11 @@ export type e_booklet_instancesCreateManyPurchaseInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -1657,6 +2460,11 @@ export type e_booklet_instancesUpdateWithoutPurchaseInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1667,6 +2475,9 @@ export type e_booklet_instancesUpdateWithoutPurchaseInput = {
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateWithoutPurchaseInput = {
@@ -1679,12 +2490,20 @@ export type e_booklet_instancesUncheckedUpdateWithoutPurchaseInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateManyWithoutPurchaseInput = {
@@ -1697,6 +2516,11 @@ export type e_booklet_instancesUncheckedUpdateManyWithoutPurchaseInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1712,6 +2536,11 @@ export type e_booklet_instancesCreateManyCustom_document_fileInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: number
   used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
@@ -1722,6 +2551,11 @@ export type e_booklet_instancesUpdateWithoutCustom_document_fileInput = {
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1732,6 +2566,9 @@ export type e_booklet_instancesUpdateWithoutCustom_document_fileInput = {
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateWithoutCustom_document_fileInput = {
@@ -1744,12 +2581,20 @@ export type e_booklet_instancesUncheckedUpdateWithoutCustom_document_fileInput =
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
 }
 
 export type e_booklet_instancesUncheckedUpdateManyWithoutCustom_document_fileInput = {
@@ -1762,6 +2607,11 @@ export type e_booklet_instancesUncheckedUpdateManyWithoutCustom_document_fileInp
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
   used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1776,12 +2626,18 @@ export type E_booklet_instancesCountOutputType = {
   access_records: number
   invites: number
   redemptions: number
+  devices: number
+  device_allowances: number
+  student_purchase_links: number
 }
 
 export type E_booklet_instancesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   access_records?: boolean | E_booklet_instancesCountOutputTypeCountAccess_recordsArgs
   invites?: boolean | E_booklet_instancesCountOutputTypeCountInvitesArgs
   redemptions?: boolean | E_booklet_instancesCountOutputTypeCountRedemptionsArgs
+  devices?: boolean | E_booklet_instancesCountOutputTypeCountDevicesArgs
+  device_allowances?: boolean | E_booklet_instancesCountOutputTypeCountDevice_allowancesArgs
+  student_purchase_links?: boolean | E_booklet_instancesCountOutputTypeCountStudent_purchase_linksArgs
 }
 
 /**
@@ -1815,6 +2671,27 @@ export type E_booklet_instancesCountOutputTypeCountRedemptionsArgs<ExtArgs exten
   where?: Prisma.e_booklet_invite_redemptionsWhereInput
 }
 
+/**
+ * E_booklet_instancesCountOutputType without action
+ */
+export type E_booklet_instancesCountOutputTypeCountDevicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_devicesWhereInput
+}
+
+/**
+ * E_booklet_instancesCountOutputType without action
+ */
+export type E_booklet_instancesCountOutputTypeCountDevice_allowancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_device_allowancesWhereInput
+}
+
+/**
+ * E_booklet_instancesCountOutputType without action
+ */
+export type E_booklet_instancesCountOutputTypeCountStudent_purchase_linksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_student_purchase_linksWhereInput
+}
+
 
 export type e_booklet_instancesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1827,6 +2704,11 @@ export type e_booklet_instancesSelect<ExtArgs extends runtime.Types.Extensions.I
   branding_json?: boolean
   invite_quota?: boolean
   used_invites_count?: boolean
+  access_expires_at?: boolean
+  archived_at?: boolean
+  archive_reason?: boolean
+  student_marketing_price?: boolean
+  internal_price?: boolean
   status?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -1838,6 +2720,9 @@ export type e_booklet_instancesSelect<ExtArgs extends runtime.Types.Extensions.I
   access_records?: boolean | Prisma.e_booklet_instances$access_recordsArgs<ExtArgs>
   invites?: boolean | Prisma.e_booklet_instances$invitesArgs<ExtArgs>
   redemptions?: boolean | Prisma.e_booklet_instances$redemptionsArgs<ExtArgs>
+  devices?: boolean | Prisma.e_booklet_instances$devicesArgs<ExtArgs>
+  device_allowances?: boolean | Prisma.e_booklet_instances$device_allowancesArgs<ExtArgs>
+  student_purchase_links?: boolean | Prisma.e_booklet_instances$student_purchase_linksArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_instancesCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["e_booklet_instances"]>
 
@@ -1852,6 +2737,11 @@ export type e_booklet_instancesSelectCreateManyAndReturn<ExtArgs extends runtime
   branding_json?: boolean
   invite_quota?: boolean
   used_invites_count?: boolean
+  access_expires_at?: boolean
+  archived_at?: boolean
+  archive_reason?: boolean
+  student_marketing_price?: boolean
+  internal_price?: boolean
   status?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -1873,6 +2763,11 @@ export type e_booklet_instancesSelectUpdateManyAndReturn<ExtArgs extends runtime
   branding_json?: boolean
   invite_quota?: boolean
   used_invites_count?: boolean
+  access_expires_at?: boolean
+  archived_at?: boolean
+  archive_reason?: boolean
+  student_marketing_price?: boolean
+  internal_price?: boolean
   status?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -1894,12 +2789,17 @@ export type e_booklet_instancesSelectScalar = {
   branding_json?: boolean
   invite_quota?: boolean
   used_invites_count?: boolean
+  access_expires_at?: boolean
+  archived_at?: boolean
+  archive_reason?: boolean
+  student_marketing_price?: boolean
+  internal_price?: boolean
   status?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type e_booklet_instancesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "purchase_id" | "teacher_id" | "template_id" | "template_version_id" | "custom_document_file_id" | "display_title" | "branding_json" | "invite_quota" | "used_invites_count" | "status" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_instances"]>
+export type e_booklet_instancesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "purchase_id" | "teacher_id" | "template_id" | "template_version_id" | "custom_document_file_id" | "display_title" | "branding_json" | "invite_quota" | "used_invites_count" | "access_expires_at" | "archived_at" | "archive_reason" | "student_marketing_price" | "internal_price" | "status" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_instances"]>
 export type e_booklet_instancesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchase?: boolean | Prisma.e_booklet_purchasesDefaultArgs<ExtArgs>
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
@@ -1909,6 +2809,9 @@ export type e_booklet_instancesInclude<ExtArgs extends runtime.Types.Extensions.
   access_records?: boolean | Prisma.e_booklet_instances$access_recordsArgs<ExtArgs>
   invites?: boolean | Prisma.e_booklet_instances$invitesArgs<ExtArgs>
   redemptions?: boolean | Prisma.e_booklet_instances$redemptionsArgs<ExtArgs>
+  devices?: boolean | Prisma.e_booklet_instances$devicesArgs<ExtArgs>
+  device_allowances?: boolean | Prisma.e_booklet_instances$device_allowancesArgs<ExtArgs>
+  student_purchase_links?: boolean | Prisma.e_booklet_instances$student_purchase_linksArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_instancesCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type e_booklet_instancesIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1937,6 +2840,9 @@ export type $e_booklet_instancesPayload<ExtArgs extends runtime.Types.Extensions
     access_records: Prisma.$e_booklet_accessPayload<ExtArgs>[]
     invites: Prisma.$e_booklet_invitesPayload<ExtArgs>[]
     redemptions: Prisma.$e_booklet_invite_redemptionsPayload<ExtArgs>[]
+    devices: Prisma.$e_booklet_devicesPayload<ExtArgs>[]
+    device_allowances: Prisma.$e_booklet_device_allowancesPayload<ExtArgs>[]
+    student_purchase_links: Prisma.$e_booklet_student_purchase_linksPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1949,6 +2855,11 @@ export type $e_booklet_instancesPayload<ExtArgs extends runtime.Types.Extensions
     branding_json: runtime.JsonValue | null
     invite_quota: number
     used_invites_count: number
+    access_expires_at: Date | null
+    archived_at: Date | null
+    archive_reason: string | null
+    student_marketing_price: runtime.Decimal
+    internal_price: runtime.Decimal
     status: $Enums.e_booklet_instance_status_enum
     created_at: Date | null
     updated_at: Date | null
@@ -2354,6 +3265,9 @@ export interface Prisma__e_booklet_instancesClient<T, Null = never, ExtArgs exte
   access_records<T extends Prisma.e_booklet_instances$access_recordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$access_recordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_accessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   invites<T extends Prisma.e_booklet_instances$invitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$invitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_invitesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   redemptions<T extends Prisma.e_booklet_instances$redemptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$redemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_invite_redemptionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  devices<T extends Prisma.e_booklet_instances$devicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$devicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_devicesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  device_allowances<T extends Prisma.e_booklet_instances$device_allowancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$device_allowancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_device_allowancesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  student_purchase_links<T extends Prisma.e_booklet_instances$student_purchase_linksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$student_purchase_linksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_student_purchase_linksPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2393,6 +3307,11 @@ export interface e_booklet_instancesFieldRefs {
   readonly branding_json: Prisma.FieldRef<"e_booklet_instances", 'Json'>
   readonly invite_quota: Prisma.FieldRef<"e_booklet_instances", 'Int'>
   readonly used_invites_count: Prisma.FieldRef<"e_booklet_instances", 'Int'>
+  readonly access_expires_at: Prisma.FieldRef<"e_booklet_instances", 'DateTime'>
+  readonly archived_at: Prisma.FieldRef<"e_booklet_instances", 'DateTime'>
+  readonly archive_reason: Prisma.FieldRef<"e_booklet_instances", 'String'>
+  readonly student_marketing_price: Prisma.FieldRef<"e_booklet_instances", 'Decimal'>
+  readonly internal_price: Prisma.FieldRef<"e_booklet_instances", 'Decimal'>
   readonly status: Prisma.FieldRef<"e_booklet_instances", 'e_booklet_instance_status_enum'>
   readonly created_at: Prisma.FieldRef<"e_booklet_instances", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"e_booklet_instances", 'DateTime'>
@@ -2889,6 +3808,78 @@ export type e_booklet_instances$redemptionsArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.E_booklet_invite_redemptionsScalarFieldEnum | Prisma.E_booklet_invite_redemptionsScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_instances.devices
+ */
+export type e_booklet_instances$devicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_devices
+   */
+  select?: Prisma.e_booklet_devicesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_devices
+   */
+  omit?: Prisma.e_booklet_devicesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_devicesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_devicesWhereInput
+  orderBy?: Prisma.e_booklet_devicesOrderByWithRelationInput | Prisma.e_booklet_devicesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_devicesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_devicesScalarFieldEnum | Prisma.E_booklet_devicesScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_instances.device_allowances
+ */
+export type e_booklet_instances$device_allowancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_device_allowances
+   */
+  select?: Prisma.e_booklet_device_allowancesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_device_allowances
+   */
+  omit?: Prisma.e_booklet_device_allowancesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_device_allowancesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_device_allowancesWhereInput
+  orderBy?: Prisma.e_booklet_device_allowancesOrderByWithRelationInput | Prisma.e_booklet_device_allowancesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_device_allowancesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_device_allowancesScalarFieldEnum | Prisma.E_booklet_device_allowancesScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_instances.student_purchase_links
+ */
+export type e_booklet_instances$student_purchase_linksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_student_purchase_links
+   */
+  select?: Prisma.e_booklet_student_purchase_linksSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_student_purchase_links
+   */
+  omit?: Prisma.e_booklet_student_purchase_linksOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_student_purchase_linksInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_student_purchase_linksWhereInput
+  orderBy?: Prisma.e_booklet_student_purchase_linksOrderByWithRelationInput | Prisma.e_booklet_student_purchase_linksOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_student_purchase_linksWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_student_purchase_linksScalarFieldEnum | Prisma.E_booklet_student_purchase_linksScalarFieldEnum[]
 }
 
 /**

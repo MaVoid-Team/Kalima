@@ -30,6 +30,7 @@ export type E_booklet_templatesAvgAggregateOutputType = {
   id: number | null
   cover_file_id: number | null
   price: runtime.Decimal | null
+  marketing_price: runtime.Decimal | null
   category_id: number | null
   created_by: number | null
 }
@@ -38,6 +39,7 @@ export type E_booklet_templatesSumAggregateOutputType = {
   id: number | null
   cover_file_id: number | null
   price: runtime.Decimal | null
+  marketing_price: runtime.Decimal | null
   category_id: number | null
   created_by: number | null
 }
@@ -49,6 +51,7 @@ export type E_booklet_templatesMinAggregateOutputType = {
   description: string | null
   cover_file_id: number | null
   price: runtime.Decimal | null
+  marketing_price: runtime.Decimal | null
   currency: string | null
   status: $Enums.e_booklet_template_status_enum | null
   category_id: number | null
@@ -64,6 +67,7 @@ export type E_booklet_templatesMaxAggregateOutputType = {
   description: string | null
   cover_file_id: number | null
   price: runtime.Decimal | null
+  marketing_price: runtime.Decimal | null
   currency: string | null
   status: $Enums.e_booklet_template_status_enum | null
   category_id: number | null
@@ -79,6 +83,7 @@ export type E_booklet_templatesCountAggregateOutputType = {
   description: number
   cover_file_id: number
   price: number
+  marketing_price: number
   currency: number
   status: number
   category_id: number
@@ -93,6 +98,7 @@ export type E_booklet_templatesAvgAggregateInputType = {
   id?: true
   cover_file_id?: true
   price?: true
+  marketing_price?: true
   category_id?: true
   created_by?: true
 }
@@ -101,6 +107,7 @@ export type E_booklet_templatesSumAggregateInputType = {
   id?: true
   cover_file_id?: true
   price?: true
+  marketing_price?: true
   category_id?: true
   created_by?: true
 }
@@ -112,6 +119,7 @@ export type E_booklet_templatesMinAggregateInputType = {
   description?: true
   cover_file_id?: true
   price?: true
+  marketing_price?: true
   currency?: true
   status?: true
   category_id?: true
@@ -127,6 +135,7 @@ export type E_booklet_templatesMaxAggregateInputType = {
   description?: true
   cover_file_id?: true
   price?: true
+  marketing_price?: true
   currency?: true
   status?: true
   category_id?: true
@@ -142,6 +151,7 @@ export type E_booklet_templatesCountAggregateInputType = {
   description?: true
   cover_file_id?: true
   price?: true
+  marketing_price?: true
   currency?: true
   status?: true
   category_id?: true
@@ -244,6 +254,7 @@ export type E_booklet_templatesGroupByOutputType = {
   description: string | null
   cover_file_id: number | null
   price: runtime.Decimal
+  marketing_price: runtime.Decimal
   currency: string
   status: $Enums.e_booklet_template_status_enum
   category_id: number | null
@@ -282,6 +293,7 @@ export type e_booklet_templatesWhereInput = {
   description?: Prisma.StringNullableFilter<"e_booklet_templates"> | string | null
   cover_file_id?: Prisma.IntNullableFilter<"e_booklet_templates"> | number | null
   price?: Prisma.DecimalFilter<"e_booklet_templates"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFilter<"e_booklet_templates"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"e_booklet_templates"> | string
   status?: Prisma.Enume_booklet_template_status_enumFilter<"e_booklet_templates"> | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.IntNullableFilter<"e_booklet_templates"> | number | null
@@ -303,6 +315,7 @@ export type e_booklet_templatesOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   cover_file_id?: Prisma.SortOrderInput | Prisma.SortOrder
   price?: Prisma.SortOrder
+  marketing_price?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   category_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -327,6 +340,7 @@ export type e_booklet_templatesWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringNullableFilter<"e_booklet_templates"> | string | null
   cover_file_id?: Prisma.IntNullableFilter<"e_booklet_templates"> | number | null
   price?: Prisma.DecimalFilter<"e_booklet_templates"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFilter<"e_booklet_templates"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"e_booklet_templates"> | string
   status?: Prisma.Enume_booklet_template_status_enumFilter<"e_booklet_templates"> | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.IntNullableFilter<"e_booklet_templates"> | number | null
@@ -348,6 +362,7 @@ export type e_booklet_templatesOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   cover_file_id?: Prisma.SortOrderInput | Prisma.SortOrder
   price?: Prisma.SortOrder
+  marketing_price?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   category_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -371,6 +386,7 @@ export type e_booklet_templatesScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"e_booklet_templates"> | string | null
   cover_file_id?: Prisma.IntNullableWithAggregatesFilter<"e_booklet_templates"> | number | null
   price?: Prisma.DecimalWithAggregatesFilter<"e_booklet_templates"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalWithAggregatesFilter<"e_booklet_templates"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringWithAggregatesFilter<"e_booklet_templates"> | string
   status?: Prisma.Enume_booklet_template_status_enumWithAggregatesFilter<"e_booklet_templates"> | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.IntNullableWithAggregatesFilter<"e_booklet_templates"> | number | null
@@ -384,6 +400,7 @@ export type e_booklet_templatesCreateInput = {
   slug: string
   description?: string | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   created_at?: Date | string | null
@@ -403,6 +420,7 @@ export type e_booklet_templatesUncheckedCreateInput = {
   description?: string | null
   cover_file_id?: number | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   category_id?: number | null
@@ -419,6 +437,7 @@ export type e_booklet_templatesUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -438,6 +457,7 @@ export type e_booklet_templatesUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -456,6 +476,7 @@ export type e_booklet_templatesCreateManyInput = {
   description?: string | null
   cover_file_id?: number | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   category_id?: number | null
@@ -469,6 +490,7 @@ export type e_booklet_templatesUpdateManyMutationInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -482,6 +504,7 @@ export type e_booklet_templatesUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -507,6 +530,7 @@ export type e_booklet_templatesCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   cover_file_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  marketing_price?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
@@ -519,6 +543,7 @@ export type e_booklet_templatesAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   cover_file_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  marketing_price?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
 }
@@ -530,6 +555,7 @@ export type e_booklet_templatesMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   cover_file_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  marketing_price?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
@@ -545,6 +571,7 @@ export type e_booklet_templatesMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   cover_file_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  marketing_price?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
@@ -557,6 +584,7 @@ export type e_booklet_templatesSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   cover_file_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  marketing_price?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
 }
@@ -743,6 +771,7 @@ export type e_booklet_templatesCreateWithoutCreatorInput = {
   slug: string
   description?: string | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   created_at?: Date | string | null
@@ -761,6 +790,7 @@ export type e_booklet_templatesUncheckedCreateWithoutCreatorInput = {
   description?: string | null
   cover_file_id?: number | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   category_id?: number | null
@@ -807,6 +837,7 @@ export type e_booklet_templatesScalarWhereInput = {
   description?: Prisma.StringNullableFilter<"e_booklet_templates"> | string | null
   cover_file_id?: Prisma.IntNullableFilter<"e_booklet_templates"> | number | null
   price?: Prisma.DecimalFilter<"e_booklet_templates"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFilter<"e_booklet_templates"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFilter<"e_booklet_templates"> | string
   status?: Prisma.Enume_booklet_template_status_enumFilter<"e_booklet_templates"> | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.IntNullableFilter<"e_booklet_templates"> | number | null
@@ -820,6 +851,7 @@ export type e_booklet_templatesCreateWithoutCategoryInput = {
   slug: string
   description?: string | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   created_at?: Date | string | null
@@ -838,6 +870,7 @@ export type e_booklet_templatesUncheckedCreateWithoutCategoryInput = {
   description?: string | null
   cover_file_id?: number | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   created_by: number
@@ -879,6 +912,7 @@ export type e_booklet_templatesCreateWithoutVersionsInput = {
   slug: string
   description?: string | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   created_at?: Date | string | null
@@ -897,6 +931,7 @@ export type e_booklet_templatesUncheckedCreateWithoutVersionsInput = {
   description?: string | null
   cover_file_id?: number | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   category_id?: number | null
@@ -928,6 +963,7 @@ export type e_booklet_templatesUpdateWithoutVersionsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -946,6 +982,7 @@ export type e_booklet_templatesUncheckedUpdateWithoutVersionsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -961,6 +998,7 @@ export type e_booklet_templatesCreateWithoutPurchasesInput = {
   slug: string
   description?: string | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   created_at?: Date | string | null
@@ -979,6 +1017,7 @@ export type e_booklet_templatesUncheckedCreateWithoutPurchasesInput = {
   description?: string | null
   cover_file_id?: number | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   category_id?: number | null
@@ -1010,6 +1049,7 @@ export type e_booklet_templatesUpdateWithoutPurchasesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1028,6 +1068,7 @@ export type e_booklet_templatesUncheckedUpdateWithoutPurchasesInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1043,6 +1084,7 @@ export type e_booklet_templatesCreateWithoutInstancesInput = {
   slug: string
   description?: string | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   created_at?: Date | string | null
@@ -1061,6 +1103,7 @@ export type e_booklet_templatesUncheckedCreateWithoutInstancesInput = {
   description?: string | null
   cover_file_id?: number | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   category_id?: number | null
@@ -1092,6 +1135,7 @@ export type e_booklet_templatesUpdateWithoutInstancesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1110,6 +1154,7 @@ export type e_booklet_templatesUncheckedUpdateWithoutInstancesInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1125,6 +1170,7 @@ export type e_booklet_templatesCreateWithoutCover_fileInput = {
   slug: string
   description?: string | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   created_at?: Date | string | null
@@ -1142,6 +1188,7 @@ export type e_booklet_templatesUncheckedCreateWithoutCover_fileInput = {
   slug: string
   description?: string | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   category_id?: number | null
@@ -1186,6 +1233,7 @@ export type e_booklet_templatesCreateManyCreatorInput = {
   description?: string | null
   cover_file_id?: number | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   category_id?: number | null
@@ -1198,6 +1246,7 @@ export type e_booklet_templatesUpdateWithoutCreatorInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1216,6 +1265,7 @@ export type e_booklet_templatesUncheckedUpdateWithoutCreatorInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1233,6 +1283,7 @@ export type e_booklet_templatesUncheckedUpdateManyWithoutCreatorInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1247,6 +1298,7 @@ export type e_booklet_templatesCreateManyCategoryInput = {
   description?: string | null
   cover_file_id?: number | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   created_by: number
@@ -1259,6 +1311,7 @@ export type e_booklet_templatesUpdateWithoutCategoryInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1277,6 +1330,7 @@ export type e_booklet_templatesUncheckedUpdateWithoutCategoryInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1294,6 +1348,7 @@ export type e_booklet_templatesUncheckedUpdateManyWithoutCategoryInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cover_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1307,6 +1362,7 @@ export type e_booklet_templatesCreateManyCover_fileInput = {
   slug: string
   description?: string | null
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   status?: $Enums.e_booklet_template_status_enum
   category_id?: number | null
@@ -1320,6 +1376,7 @@ export type e_booklet_templatesUpdateWithoutCover_fileInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1337,6 +1394,7 @@ export type e_booklet_templatesUncheckedUpdateWithoutCover_fileInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1354,6 +1412,7 @@ export type e_booklet_templatesUncheckedUpdateManyWithoutCover_fileInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
   category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1418,6 +1477,7 @@ export type e_booklet_templatesSelect<ExtArgs extends runtime.Types.Extensions.I
   description?: boolean
   cover_file_id?: boolean
   price?: boolean
+  marketing_price?: boolean
   currency?: boolean
   status?: boolean
   category_id?: boolean
@@ -1440,6 +1500,7 @@ export type e_booklet_templatesSelectCreateManyAndReturn<ExtArgs extends runtime
   description?: boolean
   cover_file_id?: boolean
   price?: boolean
+  marketing_price?: boolean
   currency?: boolean
   status?: boolean
   category_id?: boolean
@@ -1458,6 +1519,7 @@ export type e_booklet_templatesSelectUpdateManyAndReturn<ExtArgs extends runtime
   description?: boolean
   cover_file_id?: boolean
   price?: boolean
+  marketing_price?: boolean
   currency?: boolean
   status?: boolean
   category_id?: boolean
@@ -1476,6 +1538,7 @@ export type e_booklet_templatesSelectScalar = {
   description?: boolean
   cover_file_id?: boolean
   price?: boolean
+  marketing_price?: boolean
   currency?: boolean
   status?: boolean
   category_id?: boolean
@@ -1484,7 +1547,7 @@ export type e_booklet_templatesSelectScalar = {
   updated_at?: boolean
 }
 
-export type e_booklet_templatesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "description" | "cover_file_id" | "price" | "currency" | "status" | "category_id" | "created_by" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_templates"]>
+export type e_booklet_templatesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "description" | "cover_file_id" | "price" | "marketing_price" | "currency" | "status" | "category_id" | "created_by" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_templates"]>
 export type e_booklet_templatesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cover_file?: boolean | Prisma.e_booklet_templates$cover_fileArgs<ExtArgs>
   category?: boolean | Prisma.e_booklet_templates$categoryArgs<ExtArgs>
@@ -1522,6 +1585,7 @@ export type $e_booklet_templatesPayload<ExtArgs extends runtime.Types.Extensions
     description: string | null
     cover_file_id: number | null
     price: runtime.Decimal
+    marketing_price: runtime.Decimal
     currency: string
     status: $Enums.e_booklet_template_status_enum
     category_id: number | null
@@ -1963,6 +2027,7 @@ export interface e_booklet_templatesFieldRefs {
   readonly description: Prisma.FieldRef<"e_booklet_templates", 'String'>
   readonly cover_file_id: Prisma.FieldRef<"e_booklet_templates", 'Int'>
   readonly price: Prisma.FieldRef<"e_booklet_templates", 'Decimal'>
+  readonly marketing_price: Prisma.FieldRef<"e_booklet_templates", 'Decimal'>
   readonly currency: Prisma.FieldRef<"e_booklet_templates", 'String'>
   readonly status: Prisma.FieldRef<"e_booklet_templates", 'e_booklet_template_status_enum'>
   readonly category_id: Prisma.FieldRef<"e_booklet_templates", 'Int'>
