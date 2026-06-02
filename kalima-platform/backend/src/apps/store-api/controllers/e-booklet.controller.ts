@@ -8,6 +8,8 @@ import {
   CreateEBookletTemplateDto,
   DeliverEBookletDto,
   EBookletCheckoutDto,
+  EBookletDeviceAllowanceDto,
+  EBookletDeviceBindDto,
   EBookletInviteAccessPathDto,
   UpdateEBookletPurchaseStatusDto,
   UpdateEBookletQuotaDto,
@@ -139,12 +141,16 @@ export const eBookletController = {
     }
   },
 
-  async checkout(req: Request, res: Response, next: NextFunction) {
+  async createPurchaseDeal(req: Request, res: Response, next: NextFunction) {
     try {
       const dto = await validateDto(EBookletCheckoutDto, req.body);
+      if (!dto.teacher_id) {
+        throw new BadRequestError("Teacher ID is required for e-booklet deal creation.");
+      }
       const data = await getEBookletService().createPurchaseRequest(
-        currentUserId(req),
+        dto.teacher_id,
         dto,
+        currentUserId(req),
       );
       res.status(201).json({ success: true, data });
     } catch (error) {
@@ -525,6 +531,79 @@ export const eBookletController = {
         currentUserId(req),
       );
       setPrivateNoStore(res);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async bindViewerDevice(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dto = await validateDto(EBookletDeviceBindDto, req.body);
+      const data = await getEBookletService().bindViewerDevice(
+        parseId(req.params.instanceId, "instance ID"),
+        currentUserId(req),
+        {
+          deviceFingerprint: dto.deviceFingerprint,
+          deviceLabel: dto.deviceLabel,
+          userAgent: req.get("user-agent"),
+          ipAddress: req.ip,
+        },
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async listViewerDevices(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().listViewerDevices(
+        parseId(req.params.instanceId, "instance ID"),
+        parseId(req.params.userId, "user ID"),
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async resetViewerDevices(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().resetViewerDevices(
+        parseId(req.params.instanceId, "instance ID"),
+        parseId(req.params.userId, "user ID"),
+        currentUserId(req),
+        req.body?.reason,
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async addDeviceAllowance(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dto = await validateDto(EBookletDeviceAllowanceDto, req.body);
+      const data = await getEBookletService().addDeviceAllowance(
+        parseId(req.params.instanceId, "instance ID"),
+        parseId(req.params.userId, "user ID"),
+        currentUserId(req),
+        dto.allowedDevices,
+        dto.reason,
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async approveStudentPurchaseLink(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().approveStudentPurchaseLink(
+        parseId(req.params.purchaseId, "purchase ID"),
+        currentUserId(req),
+      );
       res.status(200).json({ success: true, data });
     } catch (error) {
       next(error);

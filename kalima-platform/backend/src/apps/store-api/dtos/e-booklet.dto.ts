@@ -219,6 +219,10 @@ export class UpsertEBookletHotspotDto {
 }
 
 export class EBookletCheckoutDto {
+  @IsOptional()
+  @IsInt()
+  teacher_id?: number;
+
   @IsInt()
   template_id!: number;
 
@@ -283,9 +287,8 @@ export class DeliverEBookletDto {
   @IsArray()
   page_dimensions?: Array<{ width: number; height: number }>;
 
-  @IsOptional()
   @IsDateString()
-  access_expires_at?: string;
+  access_expires_at!: string;
 
   @IsOptional()
   @IsNumber()
@@ -317,6 +320,10 @@ export class CreateEBookletInviteDto {
   @IsString()
   @MaxLength(20)
   passcode_hint?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  require_passcode?: boolean;
 }
 
 export class UpdateEBookletQuotaDto {
@@ -337,6 +344,11 @@ export class AcceptEBookletInviteDto {
   @IsInt()
   @Min(1)
   purchaseId?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  paymentProofFileId?: number;
 
   @IsOptional()
   @IsBoolean()

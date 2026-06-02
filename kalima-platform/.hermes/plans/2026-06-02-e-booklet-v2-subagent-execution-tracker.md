@@ -117,7 +117,7 @@ npm run build
 
 ### Phase 3 — Backend Commercial Access, Passcodes, Purchase Bridge, Devices
 
-Status: Next
+Status: Completed — spec review PASS and quality/security review APPROVED on 2026-06-02.
 
 Source plan tasks:
 - Task 7: Implement teacher deal, pricing, terms, and expiry backend rules.
@@ -125,21 +125,21 @@ Source plan tasks:
 - Task 9: Implement device binding backend flows.
 
 Detailed todo:
-- [ ] Treat `e_booklet_purchases` as Teacher E-booklet Deal/admin onboarding, not teacher checkout.
-- [ ] Snapshot effective marketing/internal price on admin-created instance.
-- [ ] Validate `internal_price <= effective marketing_price`.
-- [ ] Require access expiry date for delivered instances.
-- [ ] Enforce expiry in all viewer access paths.
-- [ ] Implement `archiveExpiredInstances` service method.
-- [ ] Generate and store recoverable six-digit invite passcodes where required.
-- [ ] Implement online purchase bridge to existing generic purchase/manual screenshot flow.
-- [ ] Auto-create access after admin purchase approval and store `marketing_price_snapshot`.
-- [ ] Implement offline-paid passcode access with terms, seat consumption, and snapshot.
-- [ ] Implement zero-price access with terms, no proof/passcode.
-- [ ] Audit passcode failures/successes, purchase-link creation, access creation.
-- [ ] Implement device first-bind, same-device allow, different-device block.
-- [ ] Implement admin device list/reset/additional allowance routes.
-- [ ] Run focused tests and backend build.
+- [x] Treat `e_booklet_purchases` as Teacher E-booklet Deal/admin onboarding, not teacher checkout.
+- [x] Snapshot effective marketing/internal price on admin-created instance.
+- [x] Validate `internal_price <= effective marketing_price`.
+- [x] Require access expiry date for delivered instances.
+- [x] Enforce expiry in all viewer access paths.
+- [x] Implement `archiveExpiredInstances` service method.
+- [x] Generate and store recoverable six-digit invite passcodes where required.
+- [x] Implement online purchase bridge to existing generic purchase/manual screenshot flow.
+- [x] Auto-create access after admin purchase approval and store `marketing_price_snapshot`.
+- [x] Implement offline-paid passcode access with terms, seat consumption, and snapshot.
+- [x] Implement zero-price access with terms, no proof/passcode.
+- [x] Audit passcode failures/successes, purchase-link creation, access creation, device reset/allowance.
+- [x] Implement device first-bind, same-device allow, different-device block.
+- [x] Implement admin device list/reset/additional allowance routes.
+- [x] Run focused tests and backend build: 48 e-booklet tests passed; backend build passed.
 
 Fresh agent plan:
 - `kalima-p3-access-commerce-dev`: implements Tasks 7–9 serially. No parallel backend implementers because this touches shared service/controller/route files.
@@ -158,7 +158,7 @@ npm run build
 
 ### Phase 4 — Admin Editor V2 Frontend
 
-Status: Pending
+Status: Next
 
 Source plan task:
 - Task 10: Update admin editor frontend for hotspot V2.
