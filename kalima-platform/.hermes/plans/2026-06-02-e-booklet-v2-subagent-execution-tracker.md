@@ -158,29 +158,29 @@ npm run build
 
 ### Phase 4 — Admin Editor V2 Frontend
 
-Status: Next
+Status: Completed — spec review PASS and quality/security review APPROVED on 2026-06-02.
 
 Source plan task:
 - Task 10: Update admin editor frontend for hotspot V2.
 
 Detailed todo:
-- [ ] Add V2 hotspot form defaults.
-- [ ] Add shape selector and geometry controls.
-- [ ] Add reference number display.
-- [ ] Add content blocks editor.
-- [ ] Add 5-font text selector.
-- [ ] Add file upload block.
-- [ ] Add link URL block.
-- [ ] Add Q&A editor.
-- [ ] Add uploaded video vs YouTube selector.
-- [ ] Add audio autoplay only; do not add video autoplay.
-- [ ] Add image auto-expand/expand-on-click toggle.
-- [ ] Make canvas hotspots draggable.
-- [ ] Add resize/minimize controls.
-- [ ] Add large hotspot list column sorted by `created_at`.
-- [ ] Ensure save payload sends `content_json` and `interaction_json`.
-- [ ] Update Arabic/English translations.
-- [ ] Run frontend build.
+- [x] Add V2 hotspot form defaults.
+- [x] Add shape selector and geometry controls.
+- [x] Add reference number display.
+- [x] Add content blocks editor.
+- [x] Add 5-font text selector.
+- [x] Add file upload block.
+- [x] Add link URL block.
+- [x] Add Q&A editor.
+- [x] Add uploaded video vs YouTube selector.
+- [x] Add audio autoplay only; do not add video autoplay.
+- [x] Add image auto-expand/expand-on-click toggle.
+- [x] Make canvas hotspots draggable.
+- [x] Add resize/minimize controls.
+- [x] Add large hotspot list column sorted by `created_at`.
+- [x] Ensure save payload sends `content_json` and `interaction_json`.
+- [x] Update Arabic/English translations.
+- [x] Run frontend build.
 
 Fresh agent plan:
 - `kalima-p4-admin-editor-dev`: implements Task 10.
@@ -198,7 +198,7 @@ npm run build
 
 ### Phase 5 — Viewer V2 Frontend
 
-Status: Pending
+Status: Next
 
 Source plan task:
 - Task 11: Update viewer frontend for hotspot V2.
