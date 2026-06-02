@@ -248,5 +248,11 @@ router.get(
   ...viewerAuth,
   eBookletController.getHotspotContent,
 );
+router.get(
+  "/e-booklet-viewer/hotspots/:hotspotId/assets/:assetId",
+  viewerLimiter,
+  ...viewerAuth,
+  eBookletController.getAuthorizedHotspotAsset,
+);
 
 export default router;

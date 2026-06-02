@@ -17,6 +17,7 @@ const mockService = {
   acceptInvitePasscode: jest.fn(),
   createStudentPurchaseLink: jest.fn(),
   getViewerPage: jest.fn(),
+  getAuthorizedHotspotAsset: jest.fn(),
   createFileAsset: jest.fn(),
 };
 
@@ -278,5 +279,29 @@ describe("e-booklet routes", () => {
       });
 
     expect(mockService.getViewerPage).toHaveBeenCalledWith(10, 1, 55);
+  });
+
+  test("serves authorized hotspot assets with private no-store headers", async () => {
+    mockService.getAuthorizedHotspotAsset.mockResolvedValue({
+      asset: {
+        id: 123,
+        mime_type: "audio/mpeg",
+        original_filename: "audio.mp3",
+        size_bytes: 1024,
+      },
+      absolutePath: __filename,
+      cacheControl: "private, no-store",
+    });
+
+    await request(app)
+      .get("/api/v2/e-booklet-viewer/hotspots/77/assets/123")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .expect(200)
+      .expect("Cache-Control", "private, no-store")
+      .expect("Pragma", "no-cache")
+      .expect("Expires", "0")
+      .expect("Content-Type", /audio\/mpeg/);
+
+    expect(mockService.getAuthorizedHotspotAsset).toHaveBeenCalledWith(77, 123, 55);
   });
 });
