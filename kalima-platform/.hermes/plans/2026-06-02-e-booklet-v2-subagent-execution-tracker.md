@@ -82,23 +82,23 @@ npm run build
 
 ### Phase 2 — Backend Hotspot V2 + Authorized Media Access
 
-Status: Next
+Status: Completed — parent verification PASS on 2026-06-02; independent reviewer retry blocked by provider 429, parent performed focused spec/quality inspection.
 
 Source plan tasks:
 - Task 5: Implement hotspot V2 service normalization and validation.
 - Task 6: Add authorized file download/media access for viewer hotspots.
 
 Detailed todo:
-- [ ] Add `normalizeLegacyHotspotContent` helper.
-- [ ] Add `validateHotspotContent` helper.
-- [ ] Update create/update hotspot service methods for V2 blocks and reference assignment.
-- [ ] Normalize old and new hotspots in list/viewer/content responses.
-- [ ] Add authorized viewer asset route.
-- [ ] Check user active access and expiry/archive before serving asset.
-- [ ] Return private/no-store file stream or metadata.
-- [ ] Add hotspot media/file audit events.
-- [ ] Update frontend hook to request authorized blob URLs where needed.
-- [ ] Run focused tests.
+- [x] Add `normalizeLegacyHotspotContent` helper.
+- [x] Add `validateHotspotContent` helper.
+- [x] Update create/update hotspot service methods for V2 blocks and reference assignment.
+- [x] Normalize old and new hotspots in list/viewer/content responses.
+- [x] Add authorized viewer asset route: `GET /e-booklet-viewer/hotspots/:hotspotId/assets/:assetId`.
+- [x] Check user active access and expiry/archive before serving asset.
+- [x] Return private/no-store file stream or metadata.
+- [x] Add hotspot media/file audit events.
+- [x] Frontend hook not changed; backend authorized streaming route was sufficient for Phase 2 scope.
+- [x] Run focused tests: 43 e-booklet tests passed; backend build passed.
 
 Fresh agent plan:
 - `kalima-p2-hotspots-media-dev`: implements Tasks 5–6.
@@ -117,7 +117,7 @@ npm run build
 
 ### Phase 3 — Backend Commercial Access, Passcodes, Purchase Bridge, Devices
 
-Status: Pending
+Status: Next
 
 Source plan tasks:
 - Task 7: Implement teacher deal, pricing, terms, and expiry backend rules.

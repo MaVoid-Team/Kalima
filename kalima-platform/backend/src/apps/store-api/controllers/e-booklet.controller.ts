@@ -571,4 +571,23 @@ export const eBookletController = {
       next(error);
     }
   },
+
+  async getAuthorizedHotspotAsset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { asset, absolutePath } = await getEBookletService().getAuthorizedHotspotAsset(
+        parseId(req.params.hotspotId, "hotspot ID"),
+        parseId(req.params.assetId, "asset ID"),
+        currentUserId(req),
+      );
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "application/octet-stream");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
+      );
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
 };

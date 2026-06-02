@@ -124,6 +124,11 @@ type HotspotContentInput = {
   content_json?: any;
 };
 
+type NormalizedHotspotContent = {
+  version: 2;
+  blocks: any[];
+};
+
 type TermsInput = {
   termsAccepted?: boolean;
   termsVersion?: string;
@@ -578,7 +583,7 @@ export class EBookletService {
     };
     if (pageNumber) where.page_number = pageNumber;
 
-    return this.db.e_booklet_hotspots.findMany({
+    const hotspots = await this.db.e_booklet_hotspots.findMany({
       where,
       orderBy: [
         { page_number: "asc" },
@@ -586,6 +591,7 @@ export class EBookletService {
         { created_at: "asc" },
       ],
     });
+    return hotspots.map((hotspot: any) => this.normalizeHotspotRecord(hotspot));
   }
 
   async publishTemplateVersion(versionId: number): Promise<unknown> {
@@ -614,6 +620,7 @@ export class EBookletService {
 
   async createHotspot(dto: any, adminUserId: number): Promise<unknown> {
     this.validateHotspotContent(dto);
+    const normalizedContent = this.normalizeLegacyHotspotContent(dto);
     const lastReference = dto.reference_number
       ? null
       : await this.db.e_booklet_hotspots.findFirst({
@@ -641,25 +648,90 @@ export class EBookletService {
         asset_file_id: dto.asset_file_id,
         trigger_type: dto.trigger_type || "click",
         display_behavior: dto.display_behavior,
-        content_json: dto.content_json,
+        content_json: normalizedContent,
         interaction_json: dto.interaction_json,
         created_by: adminUserId,
       },
     });
   }
 
-  validateHotspotContent(input: HotspotContentInput): void {
-    const blocks = Array.isArray(input.content_json?.blocks)
+  normalizeLegacyHotspotContent(input: HotspotContentInput): NormalizedHotspotContent {
+    const existingBlocks = Array.isArray(input.content_json?.blocks)
       ? input.content_json.blocks
-      : [];
+      : null;
+    if (existingBlocks) {
+      return {
+        ...(input.content_json || {}),
+        version: 2,
+        blocks: existingBlocks.map((block: any) => ({ ...block })),
+      };
+    }
+
+    const block: any = { type: input.type };
+    if (input.asset_file_id !== undefined && input.asset_file_id !== null) {
+      block.asset_file_id = input.asset_file_id;
+    }
+    if (input.type === "text" && input.text_content) {
+      block.text_content = input.text_content;
+    } else if (input.text_content) {
+      block.supplementary_text = input.text_content;
+    }
+    if (input.content_json?.url) block.url = input.content_json.url;
+    if (input.content_json?.youtube_url) block.youtube_url = input.content_json.youtube_url;
+    if (input.content_json?.source) block.source = input.content_json.source;
+    if (input.content_json?.answers) block.answers = input.content_json.answers;
+
+    return { version: 2, blocks: [block] };
+  }
+
+  private normalizeHotspotRecord(hotspot: any): any {
+    if (!hotspot || typeof hotspot !== "object") return hotspot;
+    return {
+      ...hotspot,
+      content_json: this.normalizeLegacyHotspotContent(hotspot),
+    };
+  }
+
+  validateHotspotContent(input: HotspotContentInput): void {
+    const normalized = this.normalizeLegacyHotspotContent(input);
+    const blocks = normalized.blocks;
     const primaryBlock = blocks[0] || {};
     const url = primaryBlock.url || input.content_json?.url;
     const youtubeUrl = primaryBlock.youtube_url || input.content_json?.youtube_url;
 
+    blocks.forEach((block: any) => {
+      const blockType = block?.type;
+      if (["image", "audio", "file"].includes(blockType) && !block.asset_file_id) {
+        const label = blockType === "file" ? "File" : `${blockType[0].toUpperCase()}${blockType.slice(1)}`;
+        throw new BadRequestError(`${label} hotspots require an attached file asset.`);
+      }
+      if (blockType === "link" && !this.isHttpUrl(block.url)) {
+        throw new BadRequestError("Link hotspots require a valid HTTP/HTTPS URL.");
+      }
+      if (blockType === "video") {
+        if (block.source === "youtube") {
+          if (!this.isYoutubeUrl(block.youtube_url)) {
+            throw new BadRequestError("YouTube video hotspots require a valid YouTube HTTP/HTTPS URL.");
+          }
+        } else if (!block.asset_file_id) {
+          throw new BadRequestError("Video hotspots require an attached file asset or YouTube URL.");
+        }
+      }
+      if (blockType === "question_answer") {
+        const answers = Array.isArray(block.answers) ? block.answers : [];
+        const correctCount = answers.filter(
+          (answer: any) => answer?.isCorrect === true || answer?.is_correct === true,
+        ).length;
+        if (correctCount !== 1) {
+          throw new BadRequestError("Q&A hotspots require exactly one correct answer.");
+        }
+      }
+    });
+
     if (
       ["image", "audio", "file"].includes(input.type) &&
       !input.asset_file_id &&
-      !primaryBlock.asset_file_id
+      !blocks.some((block: any) => block?.type === input.type && block?.asset_file_id)
     ) {
       const label =
         input.type === "file"
@@ -676,7 +748,7 @@ export class EBookletService {
             "YouTube video hotspots require a valid YouTube HTTP/HTTPS URL.",
           );
         }
-      } else if (!input.asset_file_id && !primaryBlock.asset_file_id) {
+      } else if (!input.asset_file_id && !blocks.some((block: any) => block?.type === "video" && block?.asset_file_id)) {
         throw new BadRequestError(
           "Video hotspots require an attached file asset or YouTube URL.",
         );
@@ -753,10 +825,19 @@ export class EBookletService {
     dto: any,
     adminUserId: number,
   ): Promise<unknown> {
+    let normalizedContent = dto.content_json;
+    if (dto.content_json !== undefined || dto.type !== undefined || dto.asset_file_id !== undefined || dto.text_content !== undefined) {
+      const existing = await this.db.e_booklet_hotspots.findUnique({ where: { id: hotspotId } });
+      if (!existing) throw new NotFoundError("E-booklet hotspot not found");
+      const validationInput = { ...existing, ...dto };
+      this.validateHotspotContent(validationInput);
+      normalizedContent = this.normalizeLegacyHotspotContent(validationInput);
+    }
     return this.db.e_booklet_hotspots.update({
       where: { id: hotspotId },
       data: {
         ...dto,
+        ...(normalizedContent !== undefined ? { content_json: normalizedContent } : {}),
         updated_by: adminUserId,
         updated_at: new Date(),
       },
@@ -1270,7 +1351,7 @@ export class EBookletService {
     userId: number,
   ) {
     const access: any = await this.assertViewerAccess(instanceId, userId);
-    return this.db.e_booklet_hotspots.findMany({
+    const hotspots = await this.db.e_booklet_hotspots.findMany({
       where: {
         template_version_id: access.booklet_instance.template_version_id,
         page_number: pageNumber,
@@ -1278,6 +1359,71 @@ export class EBookletService {
       },
       orderBy: { sort_order: "asc" },
     });
+    return hotspots.map((hotspot: any) => this.normalizeHotspotRecord(hotspot));
+  }
+
+  async getAuthorizedHotspotAsset(hotspotId: number, assetId: number, userId: number) {
+    const hotspot = await this.db.e_booklet_hotspots.findUnique({
+      where: { id: hotspotId },
+      include: {
+        template_version: {
+          include: {
+            instances: {
+              where: {
+                access_records: {
+                  some: { user_id: userId, status: "active" },
+                },
+              },
+              take: 1,
+            },
+          },
+        },
+      },
+    });
+    const referencedAssetIds = new Set<number>();
+    if (hotspot?.asset_file_id) referencedAssetIds.add(Number(hotspot.asset_file_id));
+    const blocks = Array.isArray(hotspot?.content_json?.blocks)
+      ? hotspot.content_json.blocks
+      : [];
+    blocks.forEach((block: any) => {
+      if (block?.asset_file_id) referencedAssetIds.add(Number(block.asset_file_id));
+    });
+
+    if (!hotspot || !referencedAssetIds.has(assetId) || !hotspot.template_version?.instances?.length) {
+      throw new ForbiddenError("You do not have access to this hotspot asset.");
+    }
+
+    const instanceId = hotspot.template_version.instances[0].id;
+    await this.assertViewerAccess(instanceId, userId);
+
+    const asset = await this.db.e_booklet_file_assets.findUnique({
+      where: { id: assetId },
+    });
+    if (!asset) throw new NotFoundError("E-booklet file asset not found");
+
+    await this.db.e_booklet_audit_logs.create({
+      data: {
+        actor_user_id: userId,
+        action: "hotspot_file_downloaded",
+        entity_type: "e_booklet_hotspot",
+        entity_id: hotspotId,
+        metadata_json: { asset_id: assetId, booklet_instance_id: instanceId },
+      },
+    });
+
+    const filename = path.basename(asset.storage_key || "");
+    return {
+      asset: {
+        id: asset.id,
+        file_type: asset.file_type,
+        original_filename: asset.original_filename,
+        mime_type: asset.mime_type,
+        size_bytes: asset.size_bytes,
+        visibility: asset.visibility,
+      },
+      absolutePath: path.join(E_BOOKLET_UPLOAD_DIR, filename),
+      cacheControl: "private, no-store",
+    };
   }
 
   async getHotspotContent(hotspotId: number, userId: number) {
@@ -1316,6 +1462,7 @@ export class EBookletService {
       asset_file_id: hotspot.asset_file_id,
       trigger_type: hotspot.trigger_type,
       display_behavior: hotspot.display_behavior,
+      content_json: this.normalizeLegacyHotspotContent(hotspot),
       asset_file: hotspot.asset_file
         ? {
             id: hotspot.asset_file.id,

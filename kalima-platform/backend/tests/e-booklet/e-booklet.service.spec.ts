@@ -18,9 +18,11 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
       findUnique: jest.fn(),
       findFirst: jest.fn(),
       create: jest.fn(),
+      update: jest.fn(),
     },
     e_booklet_file_assets: {
       create: jest.fn(),
+      findUnique: jest.fn(),
     },
     e_booklet_devices: {
       findFirst: jest.fn(),
@@ -313,7 +315,14 @@ describe("EBookletService", () => {
           { created_at: "asc" },
         ],
       });
-      expect(result).toBe(hotspots);
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 7,
+          page_number: 2,
+          is_active: true,
+          content_json: { version: 2, blocks: [{ type: undefined }] },
+        }),
+      ]);
     });
   });
 
@@ -379,6 +388,89 @@ describe("EBookletService", () => {
       });
       expect(db.e_booklet_hotspots.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ reference_number: 8 }) }));
       expect(result).toEqual({ id: 99, reference_number: 8 });
+    });
+
+    test("normalizes legacy text and asset hotspots to the V2 content shape on reads", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspots.findMany.mockResolvedValue([
+        {
+          id: 1,
+          type: "text",
+          title: "Legacy note",
+          text_content: "Read me",
+          asset_file_id: null,
+          content_json: null,
+        },
+        {
+          id: 2,
+          type: "image",
+          title: "Legacy image",
+          text_content: "Caption",
+          asset_file_id: 44,
+          content_json: null,
+        },
+      ]);
+      const service = new EBookletService(db);
+
+      const result: any = await service.listVersionHotspots(22, 1);
+
+      expect(result[0].content_json).toEqual({
+        version: 2,
+        blocks: [{ type: "text", text_content: "Read me" }],
+      });
+      expect(result[1].content_json).toEqual({
+        version: 2,
+        blocks: [{ type: "image", asset_file_id: 44, supplementary_text: "Caption" }],
+      });
+    });
+
+    test("preserves and validates multi-block V2 hotspot content on create and update", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspots.findFirst.mockResolvedValue(null);
+      db.e_booklet_hotspots.create.mockResolvedValue({ id: 100 });
+      db.e_booklet_hotspots.findUnique.mockResolvedValue({
+        id: 100,
+        type: "audio",
+        asset_file_id: 123,
+        content_json: { blocks: [{ type: "audio", asset_file_id: 123 }] },
+      });
+      db.e_booklet_hotspots.update.mockResolvedValue({ id: 100 });
+      const service = new EBookletService(db);
+
+      await service.createHotspot(
+        {
+          template_version_id: 22,
+          page_number: 1,
+          x_percent: 10,
+          y_percent: 20,
+          type: "audio",
+          content_json: {
+            version: 2,
+            blocks: [
+              { type: "audio", asset_file_id: 123, supplementary_text: "Listen first" },
+              { type: "text", text_content: "Then answer." },
+            ],
+          },
+        },
+        1,
+      );
+
+      expect(db.e_booklet_hotspots.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({
+          content_json: {
+            version: 2,
+            blocks: [
+              { type: "audio", asset_file_id: 123, supplementary_text: "Listen first" },
+              { type: "text", text_content: "Then answer." },
+            ],
+          },
+        }),
+      }));
+
+      await expect(service.updateHotspot(100, {
+        type: "link",
+        content_json: { blocks: [{ type: "link", url: "javascript:alert(1)" }] },
+      }, 1)).rejects.toThrow("Link hotspots require a valid HTTP/HTTPS URL.");
     });
   });
 
@@ -820,6 +912,10 @@ describe("EBookletService", () => {
             size_bytes: 1024,
             visibility: "private",
           },
+          content_json: {
+            version: 2,
+            blocks: [{ type: "audio", asset_file_id: 123 }],
+          },
         }),
       );
     });
@@ -840,6 +936,59 @@ describe("EBookletService", () => {
         where: { id: 10 },
         data: expect.objectContaining({ status: "archived", archive_reason: "expired" }),
       });
+    });
+
+    test("authorizes hotspot asset access by active instance access and audits the download", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspots.findUnique.mockResolvedValue({
+        id: 77,
+        template_version_id: 22,
+        asset_file_id: null,
+        content_json: { blocks: [{ type: "audio", asset_file_id: 123 }] },
+        template_version: { instances: [{ id: 10 }] },
+      });
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 1,
+        booklet_instance: { id: 10, status: "active", access_expires_at: null },
+      });
+      db.e_booklet_file_assets.findUnique.mockResolvedValue({
+        id: 123,
+        file_type: "audio",
+        storage_key: "e-booklets/private/audio.mp3",
+        original_filename: "audio.mp3",
+        mime_type: "audio/mpeg",
+        size_bytes: 1024,
+        visibility: "private",
+      });
+
+      const service = new EBookletService(db);
+      const result: any = await service.getAuthorizedHotspotAsset(77, 123, 55);
+
+      expect(result.asset).toEqual(expect.objectContaining({ id: 123, original_filename: "audio.mp3" }));
+      expect(result.absolutePath).toContain("audio.mp3");
+      expect(result.cacheControl).toBe("private, no-store");
+      expect(db.e_booklet_audit_logs.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          actor_user_id: 55,
+          action: "hotspot_file_downloaded",
+          entity_type: "e_booklet_hotspot",
+          entity_id: 77,
+          metadata_json: { asset_id: 123, booklet_instance_id: 10 },
+        }),
+      });
+    });
+
+    test("denies hotspot asset access without active access or when asset is not referenced by hotspot", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspots.findUnique.mockResolvedValue({
+        id: 77,
+        asset_file_id: 999,
+        content_json: { blocks: [] },
+        template_version: { instances: [] },
+      });
+      const service = new EBookletService(db);
+
+      await expect(service.getAuthorizedHotspotAsset(77, 123, 55)).rejects.toThrow("You do not have access to this hotspot asset.");
     });
   });
 
