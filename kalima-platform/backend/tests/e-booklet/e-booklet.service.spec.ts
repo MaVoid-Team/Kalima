@@ -57,6 +57,7 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
       create: jest.fn(),
       update: jest.fn(),
       updateMany: jest.fn(),
+      findFirst: jest.fn(),
       findMany: jest.fn(),
     },
     e_booklet_access: {
@@ -1063,6 +1064,58 @@ describe("EBookletService", () => {
       const service = new EBookletService(db);
 
       await expect(service.getAuthorizedHotspotAsset(77, 123, 55)).rejects.toThrow("You do not have access to this hotspot asset.");
+    });
+  });
+
+  describe("revokeStudentAccess", () => {
+    test("requires the acting teacher to own the e-booklet instance", async () => {
+      const db = createMockDb();
+      db.e_booklet_instances.findFirst.mockResolvedValue(null);
+      const service = new EBookletService(db);
+
+      await expect(service.revokeStudentAccess(10, 55, 9)).rejects.toThrow("Teacher e-booklet not found");
+
+      expect(db.e_booklet_instances.findFirst).toHaveBeenCalledWith({
+        where: { id: 10, teacher_id: 9 },
+        select: { id: true },
+      });
+      expect(db.e_booklet_audit_logs.create).not.toHaveBeenCalled();
+      expect(db.e_booklet_access.updateMany).not.toHaveBeenCalled();
+    });
+
+    test("revokes active student access after teacher ownership is verified", async () => {
+      const db = createMockDb();
+      db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10 });
+      db.e_booklet_access.updateMany.mockResolvedValue({ count: 1 });
+      const service = new EBookletService(db);
+
+      await expect(service.revokeStudentAccess(10, 55, 9)).resolves.toEqual({ count: 1 });
+
+      expect(db.e_booklet_instances.findFirst).toHaveBeenCalledWith({
+        where: { id: 10, teacher_id: 9 },
+        select: { id: true },
+      });
+      expect(db.e_booklet_audit_logs.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          actor_user_id: 9,
+          action: "student_access_revoked",
+          entity_type: "e_booklet_instance",
+          entity_id: 10,
+          metadata_json: { student_id: 55 },
+        }),
+      });
+      expect(db.e_booklet_access.updateMany).toHaveBeenCalledWith({
+        where: {
+          booklet_instance_id: 10,
+          user_id: 55,
+          role: "student",
+          status: "active",
+        },
+        data: {
+          status: "revoked",
+          revoked_at: expect.any(Date),
+        },
+      });
     });
   });
 
