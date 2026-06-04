@@ -206,6 +206,38 @@ function viewerTokenSecret(): string {
   );
 }
 
+function inviteShareTokenSecret(): string {
+  return (
+    process.env.E_BOOKLET_INVITE_TOKEN_SECRET ||
+    process.env.JWT_SECRET ||
+    "dev-e-booklet-invite-token-secret"
+  );
+}
+
+function encryptInviteShareToken(token: string): string {
+  const key = crypto.createHash("sha256").update(inviteShareTokenSecret()).digest();
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const ciphertext = Buffer.concat([cipher.update(token, "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return [iv, tag, ciphertext].map((part) => part.toString("base64url")).join(".");
+}
+
+function decryptInviteShareToken(ciphertext: string | null | undefined): string | null {
+  if (!ciphertext) return null;
+  const parts = ciphertext.split(".");
+  if (parts.length !== 3) return null;
+  try {
+    const [iv, tag, encrypted] = parts.map((part) => Buffer.from(part, "base64url"));
+    const key = crypto.createHash("sha256").update(inviteShareTokenSecret()).digest();
+    const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+    decipher.setAuthTag(tag);
+    return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString("utf8");
+  } catch {
+    return null;
+  }
+}
+
 function createViewerPageToken(input: {
   instanceId: number;
   pageNumber: number;
@@ -1039,6 +1071,7 @@ export class EBookletService {
           template: true,
           template_version: true,
           teacher: { select: { id: true, name: true, email: true } },
+          devices: { select: { id: true, status: true } },
           _count: { select: { access_records: true, invites: true } },
         },
         orderBy: { created_at: "desc" },
@@ -1047,7 +1080,15 @@ export class EBookletService {
       }),
       this.db.e_booklet_instances.count({ where }),
     ]);
-    return { data, total, page, limit };
+    return {
+      data: data.map(({ devices = [], ...instance }: any) => ({
+        ...instance,
+        used_devices_count: devices.filter((device: any) => device.status === "active").length,
+      })),
+      total,
+      page,
+      limit,
+    };
   }
 
   async updateQuota(instanceId: number, inviteQuota: number): Promise<unknown> {
@@ -1086,21 +1127,66 @@ export class EBookletService {
         booklet_instance_id: instanceId,
         teacher_id: teacherId,
         token_hash: hashInviteToken(token),
+        share_token_ciphertext: encryptInviteShareToken(token),
         passcode_hash: passcode ? this.hashPasscode(passcode) : undefined,
         passcode_hint: dto.passcode_hint,
         max_uses: dto.max_uses,
         expires_at: dto.expires_at ? new Date(dto.expires_at) : undefined,
         status: "active",
       },
+      select: {
+        id: true,
+        booklet_instance_id: true,
+        teacher_id: true,
+        passcode_hash: true,
+        passcode_hint: true,
+        max_uses: true,
+        used_count: true,
+        expires_at: true,
+        status: true,
+        created_at: true,
+      },
     });
-    return generatedPasscode ? { invite, token, passcode: generatedPasscode } : { invite, token };
+    const safeInvite = {
+      id: invite.id,
+      booklet_instance_id: invite.booklet_instance_id,
+      teacher_id: invite.teacher_id,
+      passcode_hint: invite.passcode_hint,
+      max_uses: invite.max_uses,
+      used_count: invite.used_count,
+      expires_at: invite.expires_at,
+      status: invite.status,
+      created_at: invite.created_at,
+      has_passcode: Boolean(invite.passcode_hash),
+    };
+    return generatedPasscode
+      ? { invite: safeInvite, token, passcode: generatedPasscode }
+      : { invite: safeInvite, token };
   }
 
   async listInvites(instanceId: number, teacherId: number): Promise<unknown[]> {
-    return this.db.e_booklet_invites.findMany({
+    const invites = await this.db.e_booklet_invites.findMany({
       where: { booklet_instance_id: instanceId, teacher_id: teacherId },
       orderBy: { created_at: "desc" },
+      select: {
+        id: true,
+        booklet_instance_id: true,
+        teacher_id: true,
+        share_token_ciphertext: true,
+        passcode_hash: true,
+        passcode_hint: true,
+        max_uses: true,
+        used_count: true,
+        expires_at: true,
+        status: true,
+        created_at: true,
+      },
     });
+    return invites.map(({ share_token_ciphertext: shareTokenCiphertext, passcode_hash: passcodeHash, ...invite }) => ({
+      ...invite,
+      token: decryptInviteShareToken(shareTokenCiphertext),
+      has_passcode: Boolean(passcodeHash),
+    }));
   }
 
   async disableInvite(inviteId: number, teacherId: number): Promise<unknown> {
@@ -1134,6 +1220,12 @@ export class EBookletService {
     studentId: number,
     actorUserId: number,
   ): Promise<unknown> {
+    const instance = await this.db.e_booklet_instances.findFirst({
+      where: { id: instanceId, teacher_id: actorUserId },
+      select: { id: true },
+    });
+    if (!instance) throw new NotFoundError("Teacher e-booklet not found");
+
     const revokedAt = new Date();
     await this.db.e_booklet_audit_logs.create({
       data: {
@@ -1168,12 +1260,23 @@ export class EBookletService {
             template: true,
             template_version: true,
             teacher: { select: { id: true, name: true } },
+            devices: { select: { id: true, status: true } },
           },
         },
       },
       orderBy: { granted_at: "desc" },
     });
-    return this.sanitizeViewerAccess(access);
+    const withDeviceCounts = access.map(({ booklet_instance: bookletInstance, ...record }: any) => {
+      const { devices = [], ...safeInstance } = bookletInstance ?? {};
+      return {
+        ...record,
+        booklet_instance: {
+          ...safeInstance,
+          used_devices_count: devices.filter((device: any) => device.status === "active").length,
+        },
+      };
+    });
+    return this.sanitizeViewerAccess(withDeviceCounts);
   }
 
   async assertViewerAccess(instanceId: number, userId: number, now = new Date()) {
