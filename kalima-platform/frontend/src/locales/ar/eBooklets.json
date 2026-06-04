@@ -389,7 +389,20 @@
     "emptyHotspots": "لا توجد نقاط تفاعل في هذه الصفحة.",
     "hotspotFallback": "نقطة تفاعل",
     "noText": "لا يوجد محتوى نصي.",
-    "privateMedia": "ملف الوسائط الخاص #{{id}} متاح عبر نقطة النهاية المضبوطة لنقاط التفاعل."
+    "privateMedia": "ملف الوسائط الخاص #{{id}} متاح عبر نقطة النهاية المضبوطة لنقاط التفاعل.",
+    "noAsset": "لا يوجد ملف خاص مرفق بهذا المحتوى.",
+    "loadingAsset": "جار تحميل الملف الخاص...",
+    "assetUnavailable": "تعذر تحميل هذا الملف الخاص.",
+    "questionFallback": "اختر الإجابة الصحيحة.",
+    "answerFeedback": "تم فحص إجابتك.",
+    "unsupportedBlock": "كتلة محتوى غير مدعومة: {{type}}",
+    "pageFrameTitle": "صفحة البوكليت {{page}}",
+    "deviceBlocked": "هذا الجهاز غير مسموح له بفتح هذا البوكليت.",
+    "securePageReady": "تم تجهيز الوصول الآمن للصفحة",
+    "securePagePending": "محرك عرض الصفحة الآمن يجهز هذه الصفحة.",
+    "renderMode": "وضع العرض: {{mode}}",
+    "pageTokenExpires": "ينتهي رمز الصفحة: {{value}}",
+    "fileProtected": "يظهر هذا الملف داخل العارض المحمي بدلا من فتح تبويب تحميل منفصل."
   },
   "inviteAccept": {
     "accessGranted": "تم منح الوصول.",

@@ -198,39 +198,42 @@ npm run build
 
 ### Phase 5 — Viewer V2 Frontend
 
-Status: Next
+Status: Completed — spec review PASS; quality/security re-review APPROVED on 2026-06-04 after fixing iframe sandboxing, link URL validation, and asset object-URL lifecycle.
 
 Source plan task:
 - Task 11: Update viewer frontend for hotspot V2.
 
 Detailed todo:
-- [ ] Add device fingerprint generation/storage helper.
-- [ ] Send fingerprint when fetching/opening viewer metadata.
-- [ ] Render hotspot reference numbers and quick reference toggle.
-- [ ] Render circle/rectangle/square/triangle/oval shapes.
-- [ ] Support multiple open hotspots where allowed.
-- [ ] Render text with selected font.
-- [ ] Render audio with autoplay toggle handling.
-- [ ] Render uploaded video and YouTube video.
-- [ ] Pause other videos when one starts.
-- [ ] Render authorized file download buttons.
-- [ ] Render external links.
-- [ ] Render Q&A block and celebration effect on correct answer.
-- [ ] Preserve watermark/no-download behavior.
-- [ ] Update translations.
-- [ ] Run frontend build.
+- [x] Add device fingerprint generation/storage helper.
+- [x] Send fingerprint when binding/opening viewer access.
+- [x] Render hotspot reference numbers.
+- [x] Render circle/rectangle/square/triangle/oval shapes.
+- [x] Render hotspot content cards from V2 blocks.
+- [x] Render text with selected font.
+- [x] Render audio with autoplay toggle handling.
+- [x] Render uploaded video and YouTube video.
+- [x] Render authorized file/media previews with strict sandboxing.
+- [x] Render safe external links only (`http`, `https`, `mailto`, `tel`).
+- [x] Render Q&A block feedback.
+- [x] Preserve watermark/no-download behavior.
+- [x] Update translations.
+- [x] Run frontend lint/build and targeted diff check.
 
 Fresh agent plan:
-- `kalima-p5-viewer-dev`: implements Task 11.
-- `kalima-p5-spec-reviewer`: checks viewer interaction requirements and device fingerprint integration.
-- `kalima-p5-quality-reviewer`: checks UI complexity, media lifecycle, accessibility, and build safety.
-- `kalima-p5-fix-agent`: only if reviewers request changes.
+- `kalima-p5-viewer-dev`: implemented Task 11.
+- `kalima-p5-spec-reviewer`: checked viewer interaction requirements and device fingerprint integration — PASS per session handoff.
+- `kalima-p5-quality-reviewer`: checked UI complexity, media lifecycle, accessibility, and build safety — APPROVED on focused re-review.
+- `kalima-p5-fix-agent`: fixed required quality/security findings.
 
 Verification gate:
 ```bash
 cd /Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/frontend
+npm run lint
 npm run build
+cd /Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform
+git diff --check -- frontend/src/pages/e-booklets/EBookletViewerPage.jsx frontend/src/hooks/useEBookletAccess.js frontend/src/locales/en/eBooklets.json frontend/src/locales/ar/eBooklets.json
 ```
+Latest result: PASS; build emitted existing non-blocking Vite warnings for `module.register()` deprecation, browser-externalized `crypto`, and large chunks.
 
 ---
 
