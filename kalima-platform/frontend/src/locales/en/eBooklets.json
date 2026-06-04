@@ -389,7 +389,20 @@
     "emptyHotspots": "No hotspots on this page.",
     "hotspotFallback": "Hotspot",
     "noText": "No text content.",
-    "privateMedia": "Private media asset #{{id}} is available through the controlled hotspot endpoint."
+    "privateMedia": "Private media asset #{{id}} is available through the controlled hotspot endpoint.",
+    "noAsset": "No private asset is attached to this content.",
+    "loadingAsset": "Loading private asset...",
+    "assetUnavailable": "This private asset could not be loaded.",
+    "questionFallback": "Choose the correct answer.",
+    "answerFeedback": "Your answer has been checked.",
+    "unsupportedBlock": "Unsupported content block: {{type}}",
+    "pageFrameTitle": "E-booklet page {{page}}",
+    "deviceBlocked": "This device is not allowed to open this e-booklet.",
+    "securePageReady": "Secure page access prepared",
+    "securePagePending": "The secure page renderer is preparing this page.",
+    "renderMode": "Render mode: {{mode}}",
+    "pageTokenExpires": "Page token expires: {{value}}",
+    "fileProtected": "This file is shown inside the protected viewer instead of opening a separate download tab."
   },
   "inviteAccept": {
     "accessGranted": "Access granted.",

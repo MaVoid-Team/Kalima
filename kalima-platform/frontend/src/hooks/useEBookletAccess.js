@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import i18n from "@/i18n";
+import api from "@/api/axios";
 import useApiMutation from "./useApiMutation";
 
 export function useTeacherEBooklets() {
@@ -150,6 +151,27 @@ export function useEBookletViewer() {
     [fetchApi],
   );
 
+  const bindDevice = useCallback(
+    (instanceId, data) =>
+      fetchApi(
+        {
+          endpoint: `/e-booklet-viewer/${instanceId}/devices/bind`,
+          method: "post",
+          data,
+        },
+        false,
+      ),
+    [fetchApi],
+  );
+
+  const fetchHotspotAssetBlobUrl = useCallback(async (hotspotId, assetId) => {
+    const response = await api.get(
+      `/e-booklet-viewer/hotspots/${hotspotId}/assets/${assetId}`,
+      { responseType: "blob" },
+    );
+    return URL.createObjectURL(response.data);
+  }, []);
+
   return {
     metadata,
     page,
@@ -158,6 +180,8 @@ export function useEBookletViewer() {
     fetchMetadata,
     fetchPage,
     fetchHotspotContent,
+    bindDevice,
+    fetchHotspotAssetBlobUrl,
   };
 }
 
