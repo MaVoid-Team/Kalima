@@ -239,7 +239,7 @@ Latest result: PASS; build emitted existing non-blocking Vite warnings for `modu
 
 ### Phase 6 — Teacher, Student, and Admin Access UIs
 
-Status: Pending
+Status: Completed (2026-06-05)
 
 Source plan tasks:
 - Task 12: Update teacher invite/share page.
@@ -248,12 +248,16 @@ Source plan tasks:
 - Task 15: Update teacher/student dashboard pages.
 
 Detailed todo:
-- [ ] Teacher share page: expiry, quota/used seats/devices, invite link, passcode, combined copy, WhatsApp, zero-price copy.
-- [ ] Admin devices/access UI: instances/devices route, teacher instances, student/device list, drawer, reset with reason, additional-device allowance, quota editor, Admin View Mode banner/exit.
-- [ ] Student invite access/purchase: login/register gate, effective price/expiry, online purchase path, offline passcode path, zero-price path, terms acceptance, hide internal price.
-- [ ] Teacher/student dashboards: expiry date, archived/expired status, device lock status, active opens viewer, expired blocked copy.
-- [ ] Update translations.
-- [ ] Run frontend build.
+- [x] Teacher share page: expiry, quota/used seats/devices, invite link, passcode, combined copy, WhatsApp, zero-price copy.
+- [x] Admin devices/access UI: instances/devices route, teacher instances, student/device list, reset with reason, additional-device allowance, quota editor, Admin View Mode banner. Exit action not added because no existing frontend impersonation/view-as pattern was found in Phase 6 scope.
+- [x] Student invite access/purchase: login/register gate, online purchase path, offline passcode path, zero-price path, terms acceptance, hide internal price. Effective price/expiry display is fail-closed because there is no public invite preview endpoint; backend validates on submit.
+- [x] Teacher/student dashboards: expiry date, archived/expired status, device lock status if returned, active opens viewer, expired blocked copy.
+- [x] Update translations.
+- [x] Run frontend build and lint.
+
+Verification completed:
+- `cd /Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/frontend && npm run build` — passed.
+- `cd /Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/frontend && npm run lint` — passed.
 
 Fresh agent plan:
 - `kalima-p6-teacher-student-admin-ui-dev`: implements Tasks 12–15. If the phase is too large after inspection, split into these fresh task agents:
@@ -275,28 +279,28 @@ npm run build
 
 ### Phase 7 — Expiry Operations + Launch Analytics
 
-Status: Pending
+Status: Backend/API required analytics/ops review fixes complete and verified.
 
 Source plan tasks:
 - Task 16: Add operational expiry archive job/script.
 - Task 17: Implement basic access analytics and CSV export.
 
 Detailed todo:
-- [ ] Add archive expired e-booklets script matching project conventions.
-- [ ] Add npm script if appropriate.
-- [ ] Document production scheduler/cron usage.
-- [ ] Add `e_booklet_analytics_events` schema/migration.
-- [ ] Add event recording helper for invite, purchase, passcode, access, viewer, and device flows.
-- [ ] Track anonymous invite opens separately from logged-in users and access records.
-- [ ] Track share/open source labels as attribution hints only.
-- [ ] Add failed passcode rate limit and neutral blocked copy.
-- [ ] Keep online purchase funnel states separate; revenue only after approval/access.
-- [ ] Snapshot marketing price for online/offline access revenue.
-- [ ] Add teacher analytics API scoped to own instances.
-- [ ] Add admin analytics API filters and admin-only CSV export.
-- [ ] Add teacher dashboard analytics cards/table and admin analytics UI/export.
-- [ ] Hide raw wrong passcodes, raw IP/user-agent, Internal Price, admin notes, and global revenue from teachers.
-- [ ] Run backend tests, backend build, frontend build.
+- [x] Add archive expired e-booklets script matching project conventions.
+- [x] Add npm script if appropriate.
+- [x] Document production scheduler/cron usage and add dry-run/structured logging guardrails.
+- [x] Add `e_booklet_analytics_events` schema/migration.
+- [x] Add event recording helper for invite, purchase, passcode, access, viewer, and device flows.
+- [x] Track anonymous invite opens separately from logged-in users and access records.
+- [x] Track share/open source labels as attribution hints only.
+- [x] Add failed passcode rate limit and neutral blocked copy.
+- [x] Keep online purchase funnel states separate; revenue only after approval/access.
+- [x] Snapshot marketing price for online/offline access revenue.
+- [x] Add teacher analytics API scoped to own instances.
+- [x] Add admin analytics API filters and admin-only CSV export.
+- [x] Add teacher dashboard analytics cards/table and admin analytics UI/export.
+- [x] Hide raw wrong passcodes, raw IP/user-agent, Internal Price, admin notes, and global revenue from teachers.
+- [x] Run frontend lint and build for Phase 7 frontend UI pass.
 
 Fresh agent plan:
 - `kalima-p7-ops-analytics-dev`: implements Tasks 16–17 serially because analytics touches schema, service, routes, controllers, and UI.

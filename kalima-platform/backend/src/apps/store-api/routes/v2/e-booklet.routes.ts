@@ -209,6 +209,16 @@ router.post(
   ...adminAuth,
   eBookletController.approveStudentPurchaseLink,
 );
+router.get(
+  "/admin/e-booklet-analytics",
+  ...adminAuth,
+  eBookletController.adminAnalytics,
+);
+router.get(
+  "/admin/e-booklet-analytics.csv",
+  ...adminAuth,
+  eBookletController.exportAdminAnalyticsCsv,
+);
 
 // Teacher APIs.
 router.get("/teacher/e-booklets", ...teacherAuth, eBookletController.listTeacherEBooklets);
@@ -237,9 +247,19 @@ router.patch(
   ...teacherAuth,
   eBookletController.revokeStudentAccess,
 );
+router.get(
+  "/teacher/e-booklet-analytics",
+  ...teacherAuth,
+  eBookletController.teacherAnalytics,
+);
 
 // Student APIs.
 router.get("/student/e-booklets", ...studentAuth, eBookletController.listStudentEBooklets);
+router.get(
+  "/e-booklet-invites/:token/open",
+  inviteAcceptanceLimiter,
+  eBookletController.recordInviteOpen,
+);
 router.post(
   "/e-booklet-invites/:token/accept",
   inviteAcceptanceLimiter,

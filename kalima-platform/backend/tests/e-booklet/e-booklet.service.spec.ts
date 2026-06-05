@@ -57,6 +57,8 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
       create: jest.fn(),
       update: jest.fn(),
       updateMany: jest.fn(),
+      count: jest.fn(),
+      groupBy: jest.fn(),
       findFirst: jest.fn(),
       findMany: jest.fn(),
     },
@@ -72,6 +74,12 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     },
     e_booklet_audit_logs: {
       create: jest.fn(),
+    },
+    e_booklet_analytics_events: {
+      create: jest.fn(),
+      groupBy: jest.fn(),
+      aggregate: jest.fn(),
+      findMany: jest.fn(),
     },
     ...overrides,
   };
@@ -536,6 +544,33 @@ describe("EBookletService", () => {
   });
 
   describe("V2 access paths, terms, pricing, and expiry", () => {
+    test("records analytics events without raw wrong passcodes and returns scoped teacher/admin summaries", async () => {
+      const db = createMockDb();
+      db.e_booklet_invites.findFirst.mockResolvedValue({
+        id: 2,
+        booklet_instance_id: 10,
+        teacher_id: 9,
+        passcode_hash: hmacPasscode("123456"),
+        max_uses: null,
+        used_count: 0,
+        booklet_instance: { id: 10, invite_quota: 10, status: "active", student_marketing_price: 150, internal_price: 60, teacher_id: 9, template_id: 3 },
+      });
+      db.e_booklet_access.findFirst.mockResolvedValue(null);
+      db.e_booklet_access.count.mockResolvedValue(0);
+      db.e_booklet_access.create.mockResolvedValue({ id: 30, access_source: "offline_passcode" });
+      db.e_booklet_analytics_events.groupBy.mockResolvedValue([{ event_type: "access_created", _count: { _all: 1 } }]);
+      db.e_booklet_analytics_events.aggregate.mockResolvedValue({ _sum: { marketing_price_snapshot: 150 } });
+      const service = new EBookletService(db);
+
+      await expect(service.acceptInvitePasscode("token", 55, { termsAccepted: true, passcode: "000000" })).rejects.toThrow("Invalid e-booklet invite passcode.");
+      expect(JSON.stringify(db.e_booklet_analytics_events.create.mock.calls)).not.toContain("000000");
+      await service.acceptInvitePasscode("token", 55, { termsAccepted: true, passcode: "123456", termsVersion: "v1" });
+      expect(db.e_booklet_analytics_events.create).toHaveBeenCalledWith({ data: expect.objectContaining({ event_type: "access_created", source: "offline_passcode", marketing_price_snapshot: 150 }) });
+      await expect(service.getTeacherAnalytics(9, { instanceId: 10 })).resolves.toEqual(expect.objectContaining({ revenue: expect.objectContaining({ offlineEstimated: 150 }) }));
+      expect(db.e_booklet_analytics_events.groupBy).toHaveBeenLastCalledWith(expect.objectContaining({ where: expect.objectContaining({ teacher_id: 9, booklet_instance_id: 10 }) }));
+      expect(JSON.stringify(await service.getTeacherAnalytics(9, {}))).not.toContain("internal_price");
+    });
+
     test("requires access expiry at delivery and archives expired active instances in bulk", async () => {
       const db = createMockDb();
       db.e_booklet_purchases.findUnique.mockResolvedValue({

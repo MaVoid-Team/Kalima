@@ -28,7 +28,9 @@
     "closeSidebar": "Close Sidebar",
     "analytics": "Analytics",
     "dashboard": "Dashboard",
-    "employeePerformance": "Employee Performance"
+    "employeePerformance": "Employee Performance",
+    "eBookletInstances": "E-Booklet Access",
+    "eBookletAnalytics": "E-Booklet Analytics"
   },
   "common": {
     "currencyEGP": "EGP",

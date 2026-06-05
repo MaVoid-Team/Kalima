@@ -16,6 +16,11 @@ const E_BOOKLET_UPLOAD_DIR = path.resolve(
   __dirname,
   "../../../../uploads/e-booklets/private",
 );
+const PASSCODE_BLOCK_MESSAGE = "Invalid e-booklet invite passcode.";
+const PASSCODE_MAX_FAILURES = 5;
+const PASSCODE_WINDOW_MS = 10 * 60 * 1000;
+const PASSCODE_BLOCK_MS = 15 * 60 * 1000;
+const passcodeFailures = new Map<string, { count: number; firstFailureAt: number; blockedUntil?: number }>();
 
 const MIME_TO_FILE_TYPE: Record<string, string> = {
   "application/pdf": "pdf",
@@ -115,6 +120,7 @@ export interface ValidateTeacherDocumentInput {
 export interface AcceptInviteMeta {
   ipAddress?: string;
   userAgent?: string;
+  deviceFingerprint?: string;
 }
 
 type HotspotContentInput = {
@@ -1098,9 +1104,14 @@ export class EBookletService {
     });
   }
 
-  async archiveExpiredInstances(now = new Date()) {
+  async archiveExpiredInstances(now = new Date(), options: { dryRun?: boolean } = {}) {
+    const where = { status: "active", access_expires_at: { lte: now } };
+    if (options.dryRun) {
+      const count = await this.db.e_booklet_instances.count({ where });
+      return { count, dryRun: true };
+    }
     return this.db.e_booklet_instances.updateMany({
-      where: { status: "active", access_expires_at: { lte: now } },
+      where,
       data: {
         status: "archived",
         archived_at: now,
@@ -1493,6 +1504,15 @@ export class EBookletService {
         entity_id: instanceId,
       },
     });
+    await this.recordAnalyticsEvent(this.db, {
+      event_type: "viewer_opened",
+      teacher_id: (access as any).booklet_instance?.teacher_id,
+      student_id: userId,
+      template_id: (access as any).booklet_instance?.template_id,
+      booklet_instance_id: instanceId,
+      access_id: (access as any).id,
+      source: (access as any).access_source,
+    });
     return access;
   }
 
@@ -1706,6 +1726,163 @@ export class EBookletService {
     }
   }
 
+  private async recordAnalyticsEvent(db: EBookletDb, input: Record<string, any>) {
+    if (!db?.e_booklet_analytics_events?.create) return;
+    const { ip_address, ipAddress, user_agent, userAgent, raw_passcode, passcode, ...safe } = input;
+    try {
+      await db.e_booklet_analytics_events.create({
+        data: {
+          ...safe,
+          metadata: this.redactAnalyticsMetadata({
+            ...(safe.metadata || {}),
+            ip_redacted: ip_address || ipAddress ? "captured_for_security" : undefined,
+            user_agent_family: this.userAgentFamily(user_agent || userAgent),
+          }),
+        },
+      });
+    } catch {
+      // Analytics must never block access operations.
+    }
+  }
+
+  private redactAnalyticsMetadata(metadata: Record<string, any>) {
+    const { ip_address, ipAddress, user_agent, userAgent, raw_passcode, passcode, wrong_passcode, ...safe } = metadata || {};
+    return safe;
+  }
+
+  private userAgentFamily(userAgent?: string): string | undefined {
+    if (!userAgent) return undefined;
+    if (/Mobile|Android|iPhone|iPad/i.test(userAgent)) return "mobile";
+    if (/Windows|Macintosh|Linux/i.test(userAgent)) return "desktop";
+    return "unknown";
+  }
+
+  private analyticsWhere(filters: { teacherId?: number; instanceId?: number; studentId?: number; startDate?: string; endDate?: string; source?: string }) {
+    const where: Record<string, any> = {};
+    if (filters.teacherId) where.teacher_id = filters.teacherId;
+    if (filters.instanceId) where.booklet_instance_id = filters.instanceId;
+    if (filters.studentId) where.student_id = filters.studentId;
+    if (filters.source) where.source = filters.source;
+    if (filters.startDate || filters.endDate) {
+      where.created_at = {};
+      if (filters.startDate) where.created_at.gte = new Date(filters.startDate);
+      if (filters.endDate) where.created_at.lte = new Date(filters.endDate);
+    }
+    return where;
+  }
+
+  async getTeacherAnalytics(teacherId: number, filters: { instanceId?: number; startDate?: string; endDate?: string } = {}) {
+    const where = this.analyticsWhere({ teacherId, ...filters });
+    const [events, sources, offlineRevenue, onlineRevenue, openAgg, uniqueAnon, failedPasscodes, seatUsage] = await Promise.all([
+      this.db.e_booklet_analytics_events.groupBy({ by: ["event_type"], where, _count: { _all: true } }),
+      this.db.e_booklet_analytics_events.groupBy({ by: ["source"], where, _count: { _all: true } }),
+      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "offline_passcode" }, _sum: { marketing_price_snapshot: true } }),
+      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "online_purchase" }, _sum: { marketing_price_snapshot: true } }),
+      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "invite_opened" }, _count: { _all: true }, _min: { created_at: true }, _max: { created_at: true } }),
+      this.db.e_booklet_analytics_events.groupBy({ by: ["anonymous_session_id"], where: { ...where, event_type: "invite_opened", anonymous_session_id: { not: null } }, _count: { _all: true } }),
+      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: { in: ["passcode_failed", "passcode_blocked"] } }, _count: { _all: true } }),
+      this.db.e_booklet_instances.findMany ? this.db.e_booklet_instances.findMany({ where: { teacher_id: teacherId, ...(filters.instanceId ? { id: filters.instanceId } : {}) }, select: { id: true, invite_quota: true, used_invites_count: true, status: true, access_expires_at: true } }) : Promise.resolve([]),
+    ]);
+    return {
+      events: Object.fromEntries((events || []).map((row: any) => [row.event_type, row._count?._all ?? 0])),
+      inviteOpens: { total: openAgg?._count?._all ?? 0, first: openAgg?._min?.created_at ?? null, last: openAgg?._max?.created_at ?? null, approximateUniqueAnonymousVisitors: (uniqueAnon || []).length },
+      sourceBreakdown: Object.fromEntries((sources || []).filter((row: any) => row.source).map((row: any) => [row.source, row._count?._all ?? 0])),
+      access: { failedPasscodes: failedPasscodes?._count?._all ?? 0, status: "sanitized_teacher_scope" },
+      seatUsage: seatUsage || [],
+      devices: { accessStatus: "aggregated", securityDetails: "hidden_from_teacher" },
+      revenue: {
+        offlineEstimated: Number(offlineRevenue?._sum?.marketing_price_snapshot ?? 0),
+        onlineApproved: Number(onlineRevenue?._sum?.marketing_price_snapshot ?? 0),
+        purchaseFunnelPending: 0,
+      },
+    };
+  }
+
+  async getAdminAnalytics(filters: { teacherId?: number; instanceId?: number; studentId?: number; startDate?: string; endDate?: string; source?: string } = {}) {
+    const where = this.analyticsWhere(filters);
+    const [events, sources, revenue, offline, online, failures, instances] = await Promise.all([
+      this.db.e_booklet_analytics_events.groupBy({ by: ["event_type"], where, _count: { _all: true } }),
+      this.db.e_booklet_analytics_events.groupBy({ by: ["source"], where, _count: { _all: true } }),
+      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created" }, _sum: { marketing_price_snapshot: true, internal_price_snapshot: true } }),
+      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "offline_passcode" }, _sum: { marketing_price_snapshot: true } }),
+      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "online_purchase" }, _sum: { marketing_price_snapshot: true } }),
+      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: { in: ["passcode_failed", "passcode_blocked"] } }, _count: { _all: true } }),
+      this.db.e_booklet_instances.groupBy ? this.db.e_booklet_instances.groupBy({ by: ["status"], _count: { _all: true } }) : Promise.resolve([]),
+    ]);
+    const marketing = Number(revenue?._sum?.marketing_price_snapshot ?? 0);
+    const internal = Number(revenue?._sum?.internal_price_snapshot ?? 0);
+    return {
+      events: Object.fromEntries((events || []).map((row: any) => [row.event_type, row._count?._all ?? 0])),
+      launchMetrics: { teacher: {}, template: {}, instance: { byStatus: instances || [] }, studentAccess: {}, operationalHealth: { analyticsRetention: "Sanitized security metadata only; purge/export analytics rows per retention policy via database maintenance job." } },
+      sourceBreakdown: Object.fromEntries((sources || []).filter((row: any) => row.source).map((row: any) => [row.source, row._count?._all ?? 0])),
+      deviceSecurity: { failedPasscodes: failures?._count?._all ?? 0 },
+      expiryArchive: { byStatus: instances || [] },
+      revenue: {
+        marketing,
+        internal,
+        margin: marketing - internal,
+        offlineEstimated: Number(offline?._sum?.marketing_price_snapshot ?? 0),
+        onlineApproved: Number(online?._sum?.marketing_price_snapshot ?? 0),
+        purchaseFunnelPending: 0,
+      },
+    };
+  }
+
+  async exportAdminAnalyticsCsv(filters: { teacherId?: number; instanceId?: number; studentId?: number; startDate?: string; endDate?: string; source?: string; limit?: number } = {}) {
+    const rows = await this.db.e_booklet_analytics_events.findMany({ where: this.analyticsWhere(filters), orderBy: { created_at: "desc" }, take: Math.min(Math.max(filters.limit || 10000, 1), 10000) });
+    const header = ["id", "event_type", "teacher_id", "student_id", "anonymous_session_id", "template_id", "booklet_instance_id", "invite_id", "access_id", "purchase_id", "source", "marketing_price_snapshot", "internal_price_snapshot", "created_at"];
+    const csv = [header.join(","), ...(rows || []).map((row: any) => header.map((key) => JSON.stringify(row[key] ?? "")).join(","))].join("\n");
+    return csv;
+  }
+
+  async recordInviteOpen(rawToken: string, input: { anonymousSessionId?: string; studentId?: number; source?: string; ipAddress?: string; userAgent?: string } = {}) {
+    const invite = await this.findInviteByToken(rawToken);
+    if (!invite) throw new NotFoundError("E-booklet invite not found");
+    const instance = invite.booklet_instance ?? invite.e_booklet_instances;
+    await this.recordAnalyticsEvent(this.db, {
+      event_type: "invite_opened",
+      teacher_id: invite.teacher_id ?? instance?.teacher_id,
+      student_id: input.studentId,
+      anonymous_session_id: input.studentId ? undefined : input.anonymousSessionId,
+      template_id: instance?.template_id,
+      booklet_instance_id: invite.booklet_instance_id,
+      invite_id: invite.id,
+      source: input.source,
+      ipAddress: input.ipAddress,
+      userAgent: input.userAgent,
+      metadata: { security_context: "ip_user_agent_captured_sanitized" },
+    });
+    return { invite_id: invite.id, has_passcode: Boolean(invite.passcode_hash), passcode_hint: invite.passcode_hint, anonymous_session_id: input.anonymousSessionId };
+  }
+
+  private assertPasscodeNotBlocked(key: string) {
+    const now = Date.now();
+    const current = passcodeFailures.get(key);
+    if (current?.blockedUntil && current.blockedUntil > now) throw new ForbiddenError(PASSCODE_BLOCK_MESSAGE);
+  }
+
+  private registerPasscodeFailure(key: string) {
+    const now = Date.now();
+    const current = passcodeFailures.get(key);
+    const next = !current || now - current.firstFailureAt > PASSCODE_WINDOW_MS
+      ? { count: 1, firstFailureAt: now }
+      : { ...current, count: current.count + 1 };
+    if (next.count >= PASSCODE_MAX_FAILURES) next.blockedUntil = now + PASSCODE_BLOCK_MS;
+    passcodeFailures.set(key, next);
+  }
+
+  private clearPasscodeFailures(key: string) {
+    passcodeFailures.delete(key);
+  }
+
+  private passcodeRateLimitKeys(tokenHash: string, studentId: number, meta: AcceptInviteMeta = {}) {
+    return [
+      `invite:${tokenHash}:student:${studentId}`,
+      meta.ipAddress ? `invite:${tokenHash}:ip:${crypto.createHash("sha256").update(meta.ipAddress).digest("hex").slice(0, 16)}` : undefined,
+      meta.deviceFingerprint ? `invite:${tokenHash}:device:${crypto.createHash("sha256").update(meta.deviceFingerprint).digest("hex").slice(0, 16)}` : undefined,
+    ].filter(Boolean) as string[];
+  }
+
   private hashPasscode(passcode: string): string {
     const pepper =
       process.env.E_BOOKLET_PASSCODE_PEPPER ||
@@ -1727,6 +1904,8 @@ export class EBookletService {
             id: true,
             invite_quota: true,
             status: true,
+            teacher_id: true,
+            template_id: true,
             student_marketing_price: true,
             internal_price: true,
           },
@@ -1790,6 +1969,20 @@ export class EBookletService {
             terms_version: link.terms_version,
             status: "active",
           },
+        });
+        await this.recordAnalyticsEvent(tx, {
+          event_type: "access_created",
+          teacher_id: (link as any).booklet_instance?.teacher_id ?? (link as any).invite?.teacher_id,
+          student_id: link.student_id,
+          template_id: (link as any).booklet_instance?.template_id,
+          booklet_instance_id: link.booklet_instance_id,
+          invite_id: link.invite_id,
+          access_id: access.id,
+          purchase_id: purchaseId,
+          source: "online_purchase",
+          marketing_price_snapshot: Number((link as any).marketing_price_snapshot ?? (link as any).booklet_instance?.student_marketing_price ?? 0),
+          internal_price_snapshot: Number((link as any).booklet_instance?.internal_price ?? 0),
+          metadata: { terms_version: link.terms_version },
         });
         await tx.e_booklet_invites.update({
           where: { id: link.invite_id },
@@ -1881,6 +2074,18 @@ export class EBookletService {
           terms_version: input.termsVersion,
         },
       });
+      await this.recordAnalyticsEvent(this.db, {
+        event_type: "online_purchase_selected",
+        teacher_id: invite.teacher_id ?? (instance as any).teacher_id,
+        student_id: studentId,
+        template_id: (instance as any).template_id,
+        booklet_instance_id: invite.booklet_instance_id,
+        invite_id: invite.id,
+        purchase_id: input.purchaseId,
+        source: "online_purchase",
+        marketing_price_snapshot: Number(instance.student_marketing_price ?? 0),
+        metadata: { terms_version: input.termsVersion, payment_proof_uploaded: Boolean(proofFileId) },
+      });
       await this.auditSafely(this.db, {
         actor_user_id: studentId,
         action: "student_purchase_link_created",
@@ -1911,10 +2116,13 @@ export class EBookletService {
     rawToken: string,
     studentId: number,
     input: TermsInput,
+    meta: AcceptInviteMeta = {},
   ) {
     const tokenHash = hashInviteToken(rawToken);
+    const rateLimitKeys = this.passcodeRateLimitKeys(tokenHash, studentId, meta);
     try {
       this.requireStudentTerms(input);
+      for (const key of rateLimitKeys) this.assertPasscodeNotBlocked(key);
       return await this.transaction(async (tx: EBookletDb) => {
       const invite = await tx.e_booklet_invites.findFirst({
         where: { token_hash: tokenHash },
@@ -1925,8 +2133,22 @@ export class EBookletService {
         throw new ForbiddenError("This e-booklet invite does not allow passcode access.");
       }
       if (this.hashPasscode(String(input.passcode || "")) !== invite.passcode_hash) {
-        throw new ForbiddenError("Invalid e-booklet invite passcode.");
+        for (const key of rateLimitKeys) this.registerPasscodeFailure(key);
+        await this.recordAnalyticsEvent(tx, {
+          event_type: rateLimitKeys.some((key) => passcodeFailures.get(key)?.blockedUntil) ? "passcode_blocked" : "passcode_failed",
+          teacher_id: invite.teacher_id ?? (instance as any).teacher_id,
+          student_id: studentId,
+          template_id: (instance as any).template_id,
+          booklet_instance_id: invite.booklet_instance_id,
+          invite_id: invite.id,
+          source: "offline_passcode",
+          ipAddress: meta.ipAddress,
+          userAgent: meta.userAgent,
+          metadata: { reason: "invalid_or_blocked", dimensions: { student: true, invite: true, ip: Boolean(meta.ipAddress), device: Boolean(meta.deviceFingerprint) } },
+        });
+        throw new ForbiddenError(PASSCODE_BLOCK_MESSAGE);
       }
+      for (const key of rateLimitKeys) this.clearPasscodeFailures(key);
       if (invite.max_uses !== null && invite.max_uses !== undefined && invite.used_count >= invite.max_uses) {
         throw new ForbiddenError("This e-booklet invite has reached its access limit.");
       }
@@ -1977,6 +2199,19 @@ export class EBookletService {
           terms_version: input.termsVersion,
           status: "active",
         },
+      });
+      await this.recordAnalyticsEvent(tx, {
+        event_type: "access_created",
+        teacher_id: invite.teacher_id ?? (instance as any).teacher_id,
+        student_id: studentId,
+        template_id: (instance as any).template_id,
+        booklet_instance_id: invite.booklet_instance_id,
+        invite_id: invite.id,
+        access_id: access.id,
+        source: "offline_passcode",
+        marketing_price_snapshot: Number((instance as any).student_marketing_price ?? 0),
+        internal_price_snapshot: Number((instance as any).internal_price ?? 0),
+        metadata: { terms_version: input.termsVersion },
       });
       await tx.e_booklet_invites.update({
         where: { id: invite.id },
@@ -2080,6 +2315,19 @@ export class EBookletService {
           terms_version: input.termsVersion,
           status: "active",
         },
+      });
+      await this.recordAnalyticsEvent(tx, {
+        event_type: "access_created",
+        teacher_id: invite.teacher_id ?? (instance as any).teacher_id,
+        student_id: studentId,
+        template_id: (instance as any).template_id,
+        booklet_instance_id: invite.booklet_instance_id,
+        invite_id: invite.id,
+        access_id: access.id,
+        source: "free_invite",
+        marketing_price_snapshot: Number((instance as any).student_marketing_price ?? 0),
+        internal_price_snapshot: Number((instance as any).internal_price ?? 0),
+        metadata: { terms_version: input.termsVersion },
       });
       await tx.e_booklet_invites.update({
         where: { id: invite.id },

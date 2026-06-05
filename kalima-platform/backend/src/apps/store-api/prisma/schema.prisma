@@ -1108,6 +1108,32 @@ model e_booklet_audit_logs {
   @@index([action, created_at], map: "ix_e_booklet_audit_action_created")
 }
 
+model e_booklet_analytics_events {
+  id                      Int       @id @default(autoincrement())
+  event_type              String    @db.VarChar(80)
+  teacher_id              Int?
+  student_id              Int?
+  anonymous_session_id    String?   @db.VarChar(128)
+  template_id             Int?
+  booklet_instance_id     Int?
+  invite_id               Int?
+  access_id               Int?
+  purchase_id             Int?
+  source                  String?   @db.VarChar(40)
+  marketing_price_snapshot Decimal? @db.Decimal(10, 2)
+  internal_price_snapshot Decimal?  @db.Decimal(10, 2)
+  metadata                Json?
+  created_at              DateTime  @default(now()) @db.Timestamp(6)
+
+  @@index([booklet_instance_id, event_type, created_at], map: "ix_e_booklet_analytics_instance_event_created")
+  @@index([teacher_id, created_at], map: "ix_e_booklet_analytics_teacher_created")
+  @@index([student_id, created_at], map: "ix_e_booklet_analytics_student_created")
+  @@index([invite_id, created_at], map: "ix_e_booklet_analytics_invite_created")
+  @@index([anonymous_session_id, created_at], map: "ix_e_booklet_analytics_anon_created")
+  @@index([source, created_at], map: "ix_e_booklet_analytics_source_created")
+  @@index([event_type, created_at], map: "ix_e_booklet_analytics_event_created")
+}
+
 model product_gallery {
   id         Int       @id @default(autoincrement())
   product_id Int

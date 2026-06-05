@@ -93,6 +93,42 @@ export function useTeacherEBooklets() {
   };
 }
 
+const ANALYTICS_QUERY_KEYS = {
+  startDate: "start_date",
+  endDate: "end_date",
+  teacherId: "teacher_id",
+  instanceId: "instance_id",
+  studentId: "student_id",
+};
+
+const buildAnalyticsQueryString = (filters = {}) => {
+  const query = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "" && value !== "all") {
+      query.set(ANALYTICS_QUERY_KEYS[key] || key, String(value));
+    }
+  });
+  return query.toString();
+};
+
+export function useTeacherEBookletAnalytics() {
+  const { mutate: fetchApi, loading } = useApiMutation();
+  const [analytics, setAnalytics] = useState({ events: {}, revenue: {} });
+
+  const fetchAnalytics = useCallback(async (filters = {}) => {
+    const query = buildAnalyticsQueryString(filters);
+    const suffix = query ? `?${query}` : "";
+    const response = await fetchApi(
+      { endpoint: `/teacher/e-booklet-analytics${suffix}`, method: "get" },
+      false,
+    );
+    setAnalytics(response?.data || { events: {}, revenue: {} });
+    return response;
+  }, [fetchApi]);
+
+  return { analytics, loading, fetchAnalytics };
+}
+
 export function useEBookletViewer() {
   const { mutate: fetchApi, loading } = useApiMutation();
   const [metadata, setMetadata] = useState(null);
@@ -198,11 +234,23 @@ export function useStudentEBooklets() {
     return response;
   }, [fetchApi]);
 
+  const openInvite = useCallback(
+    (token) => fetchApi(
+      {
+        endpoint: `/e-booklet-invites/${token}/open`,
+        method: "get",
+      },
+      false,
+    ),
+    [fetchApi],
+  );
+
   const acceptInvite = useCallback(
-    (token) =>
+    (token, data = {}) =>
       fetchApi({
         endpoint: `/e-booklet-invites/${token}/accept`,
         method: "post",
+        data,
         defaultSuccessMessage: i18n.t("eBooklets:toasts.accessGranted"),
       }),
     [fetchApi],
@@ -212,6 +260,7 @@ export function useStudentEBooklets() {
     items,
     loading,
     fetchStudentEBooklets,
+    openInvite,
     acceptInvite,
   };
 }

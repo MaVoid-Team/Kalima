@@ -14,6 +14,7 @@
     "seed:local-test-data": "node scripts/seed-local-test-data.js",
     "seed:governments": "node utils/seeds/seedGovernments.js",
     "cleanup:watermarks": "node scripts/cleanupOldWatermarks.js",
+    "archive:e-booklet-expired": "node scripts/archiveExpiredEBookletInstances.js",
     "backfill:monthly-count": "node scripts/backfillMonthlyConfirmedCount.js",
     "backfill:user-purchase-stats": "node scripts/migrateUserPurchaseStats.js",
     "test": "jest"

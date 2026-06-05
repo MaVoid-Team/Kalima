@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import crypto from "crypto";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { getEBookletService } from "../services/e-booklet.service";
@@ -68,6 +69,52 @@ function pagination(req: Request) {
     page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
     limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 20,
   };
+}
+
+const ANALYTICS_SOURCES = new Set(["free_invite", "offline_passcode", "online_purchase", "invite_link", "qr_code", "teacher_share"]);
+
+function parseOptionalPositiveInt(raw: unknown, label: string, max?: number): number | undefined {
+  if (raw === undefined || raw === null || raw === "") return undefined;
+  const value = Number(Array.isArray(raw) ? raw[0] : raw);
+  if (!Number.isInteger(value) || value <= 0 || (max !== undefined && value > max)) {
+    throw new BadRequestError(`Invalid ${label}`);
+  }
+  return value;
+}
+
+function parseOptionalIsoDate(raw: unknown, label: string): string | undefined {
+  if (!raw) return undefined;
+  const value = String(Array.isArray(raw) ? raw[0] : raw);
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) throw new BadRequestError(`Invalid ${label}`);
+  return parsed.toISOString();
+}
+
+function analyticsFilters(req: Request) {
+  const startDate = parseOptionalIsoDate(req.query.start_date, "start_date");
+  const endDate = parseOptionalIsoDate(req.query.end_date, "end_date");
+  if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+    throw new BadRequestError("start_date must be before end_date");
+  }
+  const source = req.query.source ? String(Array.isArray(req.query.source) ? req.query.source[0] : req.query.source) : undefined;
+  if (source && !ANALYTICS_SOURCES.has(source)) throw new BadRequestError("Invalid analytics source");
+  return {
+    teacherId: parseOptionalPositiveInt(req.query.teacher_id, "teacher_id"),
+    instanceId: parseOptionalPositiveInt(req.query.instance_id, "instance_id"),
+    studentId: parseOptionalPositiveInt(req.query.student_id, "student_id"),
+    startDate,
+    endDate,
+    source,
+    limit: parseOptionalPositiveInt(req.query.limit, "limit", 10000),
+  };
+}
+
+function inviteAnonymousSessionId(req: Request, res: Response): string {
+  const cookieValue = String((req as any).cookies?.e_booklet_anon_session || "");
+  const supplied = String(req.get("x-e-booklet-session") || req.query.session_id || cookieValue || "");
+  const sessionId = /^[A-Za-z0-9._:-]{4,128}$/.test(supplied) ? supplied : crypto.randomUUID();
+  res.cookie("e_booklet_anon_session", sessionId, { httpOnly: true, sameSite: "lax", maxAge: 180 * 24 * 60 * 60 * 1000 });
+  return sessionId;
 }
 
 function setPrivateNoStore(res: Response) {
@@ -499,6 +546,53 @@ export const eBookletController = {
     }
   },
 
+  async recordInviteOpen(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().recordInviteOpen(
+        parseParam(req.params.token, "invite token"),
+        {
+          anonymousSessionId: inviteAnonymousSessionId(req, res),
+          source: req.query.source as string | undefined,
+          ipAddress: req.ip,
+          userAgent: req.get("user-agent"),
+        },
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async teacherAnalytics(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { teacherId: _ignored, studentId: _studentId, source: _source, ...filters } = analyticsFilters(req);
+      const data = await getEBookletService().getTeacherAnalytics(currentUserId(req), filters);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminAnalytics(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getAdminAnalytics(analyticsFilters(req));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async exportAdminAnalyticsCsv(req: Request, res: Response, next: NextFunction) {
+    try {
+      const csv = await getEBookletService().exportAdminAnalyticsCsv(analyticsFilters(req));
+      res.type("text/csv");
+      res.set("Content-Disposition", "attachment; filename=\"e-booklet-analytics.csv\"");
+      res.status(200).send(csv);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async acceptInvite(req: Request, res: Response, next: NextFunction) {
     try {
       const inviteToken = parseParam(req.params.token, "invite token");
@@ -512,7 +606,11 @@ export const eBookletController = {
       if (dto.accessPath === EBookletInviteAccessPathDto.free) {
         data = await service.acceptFreeInvite(inviteToken, userId, dto);
       } else if (dto.accessPath === EBookletInviteAccessPathDto.offline_passcode) {
-        data = await service.acceptInvitePasscode(inviteToken, userId, dto);
+        data = await service.acceptInvitePasscode(inviteToken, userId, dto, {
+          ipAddress: req.ip,
+          userAgent: req.get("user-agent"),
+          deviceFingerprint: req.get("x-e-booklet-device") || req.body?.deviceFingerprint,
+        });
       } else if (dto.accessPath === EBookletInviteAccessPathDto.online_purchase) {
         data = await service.createStudentPurchaseLink(inviteToken, userId, dto);
       } else {

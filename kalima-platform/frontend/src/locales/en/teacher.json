@@ -16,7 +16,8 @@
     "lightMode": "Light mode",
     "darkMode": "Dark mode",
     "backToStore": "Back to Store",
-    "logout": "Logout"
+    "logout": "Logout",
+    "eBookletAnalytics": "E-Booklet Analytics"
   },
   "settings": {
     "title": "Account Settings",

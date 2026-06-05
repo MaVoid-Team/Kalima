@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BookOpenCheck, Play } from "lucide-react";
+import { BookOpenCheck, CalendarClock, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useStudentEBooklets } from "@/hooks/useEBookletAccess";
 import { useTranslation } from "react-i18next";
 
 export default function StudentEBookletsPage() {
-  const { t } = useTranslation("eBooklets");
+  const { t, i18n } = useTranslation("eBooklets");
   const { items, loading, fetchStudentEBooklets } = useStudentEBooklets();
 
   useEffect(() => {
@@ -44,6 +44,9 @@ export default function StudentEBookletsPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         {items.map((access) => {
           const instance = access.booklet_instance;
+          const expiry = access.access_expires_at || instance?.access_expires_at || instance?.expires_at;
+          const expired = expiry && new Date(expiry).getTime() <= Date.now();
+          const formatDate = (value) => value ? new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(new Date(value)) : t("teacher.invites.noExpiry");
           return (
             <article key={access.id} className="rounded-lg border bg-background p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -63,11 +66,13 @@ export default function StudentEBookletsPage() {
                   </p>
                 </div>
                 <div className="rounded-md border px-3 py-2 text-sm">
-                  <div className="text-xs text-muted-foreground">{t("common.pages")}</div>
-                  <div className="text-lg font-semibold">{instance?.template_version?.page_count || 0}</div>
+                  <div className="text-xs text-muted-foreground">{t("student.expiry")}</div>
+                  <div className="text-sm font-semibold"><CalendarClock className="me-1 inline h-4 w-4" />{formatDate(expiry)}</div>
                 </div>
               </div>
-              <Button asChild className="mt-5">
+              {expired && <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">{t("student.expiredBlocked")}</div>}
+              {access.device_lock_status && <div className="mt-3 rounded-md border p-3 text-sm text-muted-foreground">{t("student.deviceLocked", { value: access.device_lock_status })}</div>}
+              <Button asChild className="mt-5" disabled={expired}>
                 <Link to={`/student/e-booklets/${instance.id}`}>
                   <Play className="h-4 w-4" />
                   {t("common.open")}
