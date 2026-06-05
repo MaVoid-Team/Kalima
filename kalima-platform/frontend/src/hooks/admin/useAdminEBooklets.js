@@ -10,6 +10,61 @@ const normalizeListResponse = (response) => ({
   limit: Number(response?.limit ?? 20),
 });
 
+const ANALYTICS_QUERY_KEYS = {
+  startDate: "start_date",
+  endDate: "end_date",
+  teacherId: "teacher_id",
+  instanceId: "instance_id",
+  studentId: "student_id",
+};
+
+const buildQueryString = (filters = {}) => {
+  const query = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "" && value !== "all") {
+      query.set(ANALYTICS_QUERY_KEYS[key] || key, String(value));
+    }
+  });
+  return query.toString();
+};
+
+export function useAdminEBookletAnalytics() {
+  const { mutate: fetchApi, loading } = useApiMutation();
+  const [analytics, setAnalytics] = useState({ events: {}, revenue: {} });
+
+  const fetchAnalytics = useCallback(async (filters = {}) => {
+    const query = buildQueryString(filters);
+    const response = await fetchApi(
+      {
+        endpoint: `/admin/e-booklet-analytics${query ? `?${query}` : ""}`,
+        method: "get",
+      },
+      false,
+    );
+    setAnalytics(response?.data || { events: {}, revenue: {} });
+    return response;
+  }, [fetchApi]);
+
+  const exportCsv = useCallback(async (filters = {}) => {
+    const query = buildQueryString(filters);
+    const response = await axiosInstance.get(
+      `/admin/e-booklet-analytics.csv${query ? `?${query}` : ""}`,
+      { responseType: "blob" },
+    );
+    const url = URL.createObjectURL(response.data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "e-booklet-analytics.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    return response;
+  }, []);
+
+  return { analytics, loading, fetchAnalytics, exportCsv };
+}
+
 export function useAdminEBookletTemplates() {
   const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
   const [templates, setTemplates] = useState([]);
@@ -417,4 +472,55 @@ export function useAdminEBookletPurchases() {
     deliverPurchase,
     uploadTeacherDocument,
   };
+}
+
+
+export function useAdminEBookletInstances() {
+  const { mutate: fetchApi, loading } = useApiMutation();
+  const [instances, setInstances] = useState([]);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20 });
+  const [status, setStatusState] = useState("all");
+
+  const fetchInstances = useCallback(async (overrides = {}) => {
+    const query = new URLSearchParams();
+    query.set("page", String(overrides.page ?? pagination.page));
+    query.set("limit", String(overrides.limit ?? pagination.limit));
+    const nextStatus = overrides.status ?? status;
+    if (nextStatus && nextStatus !== "all") query.set("status", nextStatus);
+    if (overrides.teacher_id) query.set("teacher_id", String(overrides.teacher_id));
+    const response = await fetchApi({ endpoint: `/admin/e-booklet-instances?${query.toString()}`, method: "get" }, false);
+    const normalized = normalizeListResponse(response);
+    setInstances(normalized.data);
+    setPagination((current) => ({ ...current, total: normalized.total, page: normalized.page, limit: normalized.limit }));
+    return response;
+  }, [fetchApi, pagination.limit, pagination.page, status]);
+
+  const setPage = useCallback((page) => setPagination((current) => ({ ...current, page })), []);
+  const setStatus = useCallback((value) => { setStatusState(value); setPagination((current) => ({ ...current, page: 1 })); }, []);
+  const updateQuota = useCallback((instanceId, invite_quota) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/update-quota`, method: "post", data: { invite_quota }, defaultSuccessMessage: i18n.t("eBooklets:toasts.quotaUpdated") }), [fetchApi]);
+  const revokeTeacherAccess = useCallback((instanceId) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/revoke-access`, method: "post", defaultSuccessMessage: i18n.t("eBooklets:toasts.teacherAccessRevoked") }), [fetchApi]);
+
+  return { instances, pagination, status, loading, fetchInstances, setPage, setStatus, updateQuota, revokeTeacherAccess };
+}
+
+export function useAdminEBookletDevices() {
+  const { mutate: fetchApi, loading } = useApiMutation();
+  const [devices, setDevices] = useState([]);
+  const [students, setStudents] = useState([]);
+
+  const fetchDevices = useCallback(async (instanceId, userId) => {
+    if (!instanceId || !userId) { setDevices([]); return { data: [] }; }
+    const response = await fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/users/${userId}/devices`, method: "get" }, false);
+    setDevices(Array.isArray(response?.data) ? response.data : []);
+    return response;
+  }, [fetchApi]);
+
+  const resetDevices = useCallback((instanceId, userId, reason) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/users/${userId}/devices/reset`, method: "post", data: { reason }, defaultSuccessMessage: i18n.t("eBooklets:toasts.devicesReset") }), [fetchApi]);
+  const addDeviceAllowance = useCallback((instanceId, userId, allowedDevices, reason) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/users/${userId}/device-allowance`, method: "post", data: { allowedDevices: Number(allowedDevices), reason }, defaultSuccessMessage: i18n.t("eBooklets:toasts.deviceAllowanceUpdated") }), [fetchApi]);
+
+  const setDiscoveredStudents = useCallback((rows = []) => {
+    setStudents(Array.isArray(rows) ? rows : []);
+  }, []);
+
+  return { devices, students, loading, fetchDevices, resetDevices, addDeviceAllowance, setDiscoveredStudents };
 }

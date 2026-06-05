@@ -152,7 +152,7 @@ export default function TeacherInviteManagementPage() {
     const payload = {};
     if (form.max_uses) payload.max_uses = Number(form.max_uses);
     if (form.expires_at) payload.expires_at = new Date(form.expires_at).toISOString();
-    if (form.require_passcode) {
+    if (!isFreeAccess && form.require_passcode) {
       payload.require_passcode = true;
       if (form.passcode) payload.passcode = form.passcode;
       if (form.passcode_hint) payload.passcode_hint = form.passcode_hint;
@@ -276,7 +276,7 @@ export default function TeacherInviteManagementPage() {
               }
             />
           </div>
-          <label className="flex items-center gap-2 rounded-md border p-3 text-sm">
+          {!isFreeAccess && <label className="flex items-center gap-2 rounded-md border p-3 text-sm">
             <input
               type="checkbox"
               checked={form.require_passcode}
@@ -288,8 +288,8 @@ export default function TeacherInviteManagementPage() {
               }
             />
             <span>{t("teacher.invites.requirePasscode")}</span>
-          </label>
-          {form.require_passcode && (
+          </label>}
+          {!isFreeAccess && form.require_passcode && (
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>{t("teacher.invites.passcode")}</Label>

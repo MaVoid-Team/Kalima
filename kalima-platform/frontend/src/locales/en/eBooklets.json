@@ -96,7 +96,11 @@
     "accessGranted": "E-booklet access granted",
     "inviteCopied": "Invite link copied",
     "coverUploaded": "Cover image uploaded.",
-    "pdfDetected": "Detected {{count}} pages from the uploaded PDF."
+    "pdfDetected": "Detected {{count}} pages from the uploaded PDF.",
+    "quotaUpdated": "Invite quota updated",
+    "teacherAccessRevoked": "Teacher access revoked",
+    "devicesReset": "Devices reset",
+    "deviceAllowanceUpdated": "Device allowance updated"
   },
   "admin": {
     "templates": {
@@ -266,6 +270,51 @@
         "pageCountMismatch": "Page count mismatch. Template requires {{expected}} pages, but the uploaded PDF has {{actual}}.",
         "pageSizeMismatch": "Page size mismatch. The uploaded PDF pages must match the template width and height so hotspots align."
       }
+    },
+    "instances": {
+      "title": "Teacher E-Booklet Access",
+      "description": "List teachers, delivered e-booklet instances, invite quotas, seats, and devices.",
+      "adminViewNote": "Admin View Mode: use normal viewer routes only when an existing impersonation/view-as pattern is available; this page does not create fake impersonation data.",
+      "loading": "Loading e-booklet instances...",
+      "empty": "No e-booklet instances returned by the backend.",
+      "noExpiry": "No expiry",
+      "teacherMissing": "Teacher details unavailable",
+      "instanceCount": "{{count}} instances",
+      "pagination": "Page {{page}} — {{total}} total",
+      "expiry": "Expiry",
+      "devices": "Devices",
+      "revoke": "Revoke",
+      "revokeConfirm": "Revoke teacher access for this e-booklet instance?"
+    },
+    "devices": {
+      "title": "E-Booklet Devices",
+      "description": "Inspect student devices for an instance, reset with a reason, or grant additional device allowance.",
+      "backToInstances": "Back to access list",
+      "instanceId": "Instance ID",
+      "userId": "User ID",
+      "reason": "Reason",
+      "reasonPlaceholder": "Example: student replaced phone",
+      "allowedDevices": "Allowed devices",
+      "allow": "Allow",
+      "reset": "Reset",
+      "studentsDevices": "Student devices",
+      "loading": "Loading devices...",
+      "empty": "Enter an instance/user ID or no active devices were returned.",
+      "unnamed": "Unnamed device",
+      "never": "Never",
+      "lastSeen": "Last seen: {{value}}",
+      "bound": "Bound: {{value}}"
+    },
+    "analytics": {
+      "title": "E-Booklet Analytics",
+      "description": "Global e-booklet analytics with revenue estimates, margin, security, expiry/archive, and operational health.",
+      "exportCsv": "Export CSV",
+      "sourceBreakdown": "Source breakdown",
+      "deviceSecurityTitle": "Device and security",
+      "deviceSecurityCopy": "Monitor device-bound opens and access-created events without exposing raw IP or user-agent data.",
+      "redactionCopy": "Raw wrong passcodes and detailed per-student ledgers are intentionally hidden from this UI.",
+      "expiryArchiveTitle": "Expiry and archive",
+      "expiryArchiveCopy": "Use date/source/teacher/instance filters to review expiring or archived operational segments."
     }
   },
   "store": {
@@ -410,7 +459,25 @@
     "error": "This e-booklet invite cannot be accepted.",
     "title": "E-Booklet Invite",
     "loading": "Validating invite and quota...",
-    "openMyEBooklets": "Open My E-Booklets"
+    "openMyEBooklets": "Open My E-Booklets",
+    "description": "Choose an access path. Login is required before passcode entry or purchase.",
+    "loginRequired": "Login or register as a student before accepting this e-booklet invite.",
+    "login": "Login",
+    "register": "Register",
+    "metadataUnavailable": "No public invite preview endpoint exists, so internal price is hidden. Effective price/expiry are validated by the backend when you continue.",
+    "offlineTitle": "Offline-paid passcode access",
+    "offlineDescription": "A passcode means your teacher/admin confirmed offline payment. It is not an online purchase.",
+    "passcode": "Passcode",
+    "passcodePlaceholder": "Enter the code from your teacher",
+    "unlockWithPasscode": "Unlock with passcode",
+    "purchaseTitle": "Online purchase",
+    "purchaseDescription": "For priced invites, request the online purchase path or use the offline-paid passcode path.",
+    "internalPriceHidden": "Internal price is hidden on this screen.",
+    "requestOnlinePurchase": "Request online purchase",
+    "acceptFree": "Continue if free",
+    "terms": "I accept the access terms and understand access is tied to my account and device.",
+    "termsRequired": "Accept the terms before continuing.",
+    "purchaseSubmitted": "Purchase request submitted. Access will appear after approval."
   },
   "teacher": {
     "title": "My E-Booklets",
@@ -470,6 +537,15 @@
       "emptyLinks": "No invite links created yet.",
       "studentsTitle": "Students",
       "emptyStudents": "No students accepted this invite yet."
+    },
+    "expiry": "Expiry",
+    "expiredBlocked": "Access expired. Ask admin to renew access.",
+    "deviceLocked": "Device lock: {{value}}",
+    "analytics": {
+      "title": "E-Booklet Analytics",
+      "description": "Teacher-scoped analytics for your own delivered e-booklet instances only.",
+      "instancesTitle": "Per-instance drilldown",
+      "instancesDescription": "Shows source/status, access created, seats, expiry, and device/access status without internal prices or raw security data."
     }
   },
   "student": {
@@ -478,6 +554,56 @@
     "loading": "Loading assigned e-booklets...",
     "emptyTitle": "No assigned e-booklets yet",
     "emptyDescription": "Ask your teacher for an e-booklet invite link.",
-    "teacherLabel": "Teacher: {{value}}"
+    "teacherLabel": "Teacher: {{value}}",
+    "expiry": "Expiry",
+    "expiredBlocked": "This e-booklet has expired and cannot be opened.",
+    "deviceLocked": "Device lock: {{value}}"
+  },
+  "analytics": {
+    "loading": "Loading analytics...",
+    "drilldown": "Drill down",
+    "filtered": "Filtered",
+    "available": "Available",
+    "dateRanges": {
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "all": "All time"
+    },
+    "sources": {
+      "all": "All sources",
+      "offline_passcode": "Offline passcode",
+      "online_purchase": "Online purchase",
+      "free_invite": "Free invite"
+    },
+    "filters": {
+      "dateRange": "Date range",
+      "teacher": "Teacher",
+      "teacherPlaceholder": "Teacher ID",
+      "template": "Template",
+      "templatePlaceholder": "Template filter pending backend support",
+      "instance": "Instance",
+      "instancePlaceholder": "Instance ID",
+      "allInstances": "All instances",
+      "source": "Source"
+    },
+    "metrics": {
+      "inviteOpens": "Invite opens",
+      "uniqueAnonymous": "Approx. unique anonymous visitors: {{value}}",
+      "loggedInStudents": "Logged-in students",
+      "accessCreated": "Access created from approved student entry",
+      "revenueEstimate": "Aggregated revenue estimate",
+      "teacherRevenueHelper": "Online {{online}} · offline {{offline}}",
+      "opensSeatsDevices": "Opens, seats, devices",
+      "seats": "Seats used: {{value}}",
+      "deviceAccess": "Device/access status",
+      "approvedOnlineRevenue": "Approved online revenue",
+      "estimatedOfflineRevenue": "Estimated offline access count: {{value}}",
+      "internalCostMargin": "Internal cost / margin",
+      "internalCost": "Internal cost: {{value}}",
+      "deviceSecurity": "Device / security",
+      "failedPasscodeSafe": "Wrong passcodes counted only, raw codes hidden: {{value}}",
+      "operationalHealth": "Operational health",
+      "expiryArchive": "Review expiry and archive queues"
+    }
   }
 }

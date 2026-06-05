@@ -96,7 +96,11 @@
     "accessGranted": "تم منح الوصول إلى البوكليت",
     "inviteCopied": "تم نسخ رابط الدعوة",
     "coverUploaded": "تم رفع صورة الغلاف.",
-    "pdfDetected": "تم اكتشاف {{count}} صفحة من ملف PDF المرفوع."
+    "pdfDetected": "تم اكتشاف {{count}} صفحة من ملف PDF المرفوع.",
+    "quotaUpdated": "تم تحديث الحصة",
+    "teacherAccessRevoked": "تم إلغاء وصول المعلم",
+    "devicesReset": "تمت إعادة ضبط الأجهزة",
+    "deviceAllowanceUpdated": "تم تحديث حد الأجهزة"
   },
   "admin": {
     "templates": {
@@ -266,6 +270,51 @@
         "pageCountMismatch": "عدد الصفحات غير مطابق. القالب يتطلب {{expected}} صفحة، لكن ملف PDF المرفوع يحتوي على {{actual}}.",
         "pageSizeMismatch": "مقاس الصفحة غير مطابق. يجب أن تطابق صفحات PDF المرفوع عرض وارتفاع القالب حتى تبقى نقاط التفاعل في موضعها."
       }
+    },
+    "instances": {
+      "title": "وصول كتيبات المعلمين",
+      "description": "عرض المعلمين ونسخ الكتيبات والحصص والأجهزة.",
+      "adminViewNote": "وضع عرض المدير: استخدم صفحات العارض العادية فقط إذا كان نمط الانتحال الحالي متاحا؛ هذه الصفحة لا تنشئ انتحالا جديدا.",
+      "loading": "جاري تحميل النسخ...",
+      "empty": "لا توجد نسخ كتيبات من الواجهة الخلفية.",
+      "noExpiry": "بدون انتهاء",
+      "teacherMissing": "بيانات المعلم غير متاحة",
+      "instanceCount": "{{count}} نسخة",
+      "pagination": "صفحة {{page}} من إجمالي {{total}}",
+      "expiry": "الانتهاء",
+      "devices": "الأجهزة",
+      "revoke": "إلغاء",
+      "revokeConfirm": "إلغاء وصول المعلم لهذه النسخة؟"
+    },
+    "devices": {
+      "title": "أجهزة كتيب إلكتروني",
+      "description": "اعرض أجهزة طالب لنسخة محددة، أعد ضبطها بسبب، أو امنح جهازا إضافيا.",
+      "backToInstances": "العودة إلى الوصول",
+      "instanceId": "معرف النسخة",
+      "userId": "معرف المستخدم",
+      "reason": "السبب",
+      "reasonPlaceholder": "مثال: هاتف جديد للطالب",
+      "allowedDevices": "الأجهزة المسموحة",
+      "allow": "سماح",
+      "reset": "إعادة ضبط",
+      "studentsDevices": "أجهزة الطالب",
+      "loading": "جاري تحميل الأجهزة...",
+      "empty": "أدخل معرف النسخة والمستخدم أو لا توجد أجهزة نشطة.",
+      "unnamed": "جهاز بدون اسم",
+      "never": "غير متاح",
+      "lastSeen": "آخر ظهور: {{value}}",
+      "bound": "تم الربط: {{value}}"
+    },
+    "analytics": {
+      "title": "تحليلات الكتيبات الإلكترونية",
+      "description": "تحليلات عامة للكتيبات الإلكترونية مع تقديرات الإيراد والهامش والأمان والانتهاء/الأرشفة والصحة التشغيلية.",
+      "exportCsv": "تصدير CSV",
+      "sourceBreakdown": "تفصيل المصادر",
+      "deviceSecurityTitle": "الأجهزة والأمان",
+      "deviceSecurityCopy": "راقب فتحات الأجهزة وإنشاء الوصول بدون كشف IP أو user-agent الخام.",
+      "redactionCopy": "الأكواد الخاطئة الخام ودفتر الحسابات التفصيلي لكل طالب مخفية عمدًا من هذه الواجهة.",
+      "expiryArchiveTitle": "الانتهاء والأرشفة",
+      "expiryArchiveCopy": "استخدم فلاتر التاريخ والمصدر والمعلم والنسخة لمراجعة القطاعات التشغيلية المنتهية أو المؤرشفة."
     }
   },
   "store": {
@@ -410,7 +459,25 @@
     "error": "لا يمكن قبول دعوة هذا البوكليت.",
     "title": "دعوة بوكليت تفاعلي",
     "loading": "جار التحقق من الدعوة والحد المتاح...",
-    "openMyEBooklets": "فتح بوكليتاتي"
+    "openMyEBooklets": "فتح بوكليتاتي",
+    "description": "اختر طريقة الوصول. تسجيل الدخول مطلوب قبل الشراء أو إدخال رمز المرور.",
+    "loginRequired": "سجل الدخول أو أنشئ حساب طالب لفتح دعوة الكتيب.",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "metadataUnavailable": "لا توجد واجهة معاينة عامة للدعوة، لذلك لا نعرض السعر الداخلي. سيتم التحقق من السعر/الانتهاء بواسطة الخادم عند المتابعة.",
+    "offlineTitle": "وصول مدفوع خارجيا برمز مرور",
+    "offlineDescription": "رمز المرور يعني أن المعلم أو الإدارة أكدوا الدفع خارج نظام الشراء الإلكتروني. ليس عملية شراء أونلاين.",
+    "passcode": "رمز المرور",
+    "passcodePlaceholder": "أدخل الرمز من المعلم",
+    "unlockWithPasscode": "فتح برمز المرور",
+    "purchaseTitle": "شراء أونلاين",
+    "purchaseDescription": "إذا كانت الدعوة بسعر، يمكنك طلب مسار الشراء الإلكتروني أو استخدام رمز دفع خارجي.",
+    "internalPriceHidden": "السعر الداخلي مخفي في هذه الشاشة.",
+    "requestOnlinePurchase": "طلب الشراء أونلاين",
+    "acceptFree": "متابعة إذا كانت مجانية",
+    "terms": "أوافق على شروط الوصول وأفهم أن الوصول مرتبط بحسابي وجهازي.",
+    "termsRequired": "يجب قبول الشروط للمتابعة.",
+    "purchaseSubmitted": "تم إرسال طلب الشراء. سيظهر الوصول بعد الموافقة."
   },
   "teacher": {
     "title": "بوكليتاتي",
@@ -470,6 +537,15 @@
       "emptyLinks": "لم يتم إنشاء روابط دعوة بعد.",
       "studentsTitle": "الطلاب",
       "emptyStudents": "لم يقبل أي طالب هذه الدعوة بعد."
+    },
+    "expiry": "الانتهاء",
+    "expiredBlocked": "انتهى الوصول. اطلب من الإدارة التجديد.",
+    "deviceLocked": "حالة الجهاز: {{value}}",
+    "analytics": {
+      "title": "تحليلات الكتيبات الإلكترونية",
+      "description": "تحليلات خاصة بالمعلم لنسخ الكتيبات الإلكترونية المسلّمة له فقط.",
+      "instancesTitle": "تفاصيل حسب النسخة",
+      "instancesDescription": "يعرض المصدر والحالة وإنشاء الوصول والمقاعد والانتهاء وحالة الجهاز/الوصول بدون أسعار داخلية أو بيانات أمنية خام."
     }
   },
   "student": {
@@ -478,6 +554,56 @@
     "loading": "جار تحميل البوكليتات المعينة...",
     "emptyTitle": "لا توجد بوكليتات معينة بعد",
     "emptyDescription": "اطلب من معلمك رابط دعوة البوكليت.",
-    "teacherLabel": "المعلم: {{value}}"
+    "teacherLabel": "المعلم: {{value}}",
+    "expiry": "الانتهاء",
+    "expiredBlocked": "انتهى هذا الكتيب ولا يمكن فتحه.",
+    "deviceLocked": "حالة الجهاز: {{value}}"
+  },
+  "analytics": {
+    "loading": "جاري تحميل التحليلات...",
+    "drilldown": "تفاصيل",
+    "filtered": "مفلتر",
+    "available": "متاح",
+    "dateRanges": {
+      "7d": "آخر 7 أيام",
+      "30d": "آخر 30 يومًا",
+      "all": "كل الوقت"
+    },
+    "sources": {
+      "all": "كل المصادر",
+      "offline_passcode": "كود دفع أوفلاين",
+      "online_purchase": "شراء أونلاين",
+      "free_invite": "دعوة مجانية"
+    },
+    "filters": {
+      "dateRange": "نطاق التاريخ",
+      "teacher": "المعلم",
+      "teacherPlaceholder": "رقم المعلم",
+      "template": "القالب",
+      "templatePlaceholder": "فلتر القالب ينتظر دعم الخادم",
+      "instance": "النسخة",
+      "instancePlaceholder": "رقم النسخة",
+      "allInstances": "كل النسخ",
+      "source": "المصدر"
+    },
+    "metrics": {
+      "inviteOpens": "فتح روابط الدعوة",
+      "uniqueAnonymous": "زوار مجهولون تقريبيًا: {{value}}",
+      "loggedInStudents": "طلاب مسجلون",
+      "accessCreated": "تم إنشاء الوصول من دخول طالب معتمد",
+      "revenueEstimate": "تقدير الإيراد المجمع",
+      "teacherRevenueHelper": "أونلاين {{online}} · أوفلاين {{offline}}",
+      "opensSeatsDevices": "الفتح والمقاعد والأجهزة",
+      "seats": "المقاعد المستخدمة: {{value}}",
+      "deviceAccess": "حالة الجهاز/الوصول",
+      "approvedOnlineRevenue": "إيراد أونلاين معتمد",
+      "estimatedOfflineRevenue": "عدد وصول أوفلاين تقديري: {{value}}",
+      "internalCostMargin": "التكلفة الداخلية / الهامش",
+      "internalCost": "التكلفة الداخلية: {{value}}",
+      "deviceSecurity": "الأجهزة / الأمان",
+      "failedPasscodeSafe": "يتم عرض عدد الأكواد الخاطئة فقط بدون القيم الخام: {{value}}",
+      "operationalHealth": "الصحة التشغيلية",
+      "expiryArchive": "راجع صفوف الانتهاء والأرشفة"
+    }
   }
 }

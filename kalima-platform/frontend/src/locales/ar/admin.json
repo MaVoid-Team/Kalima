@@ -28,7 +28,9 @@
     "closeSidebar": "إغلاق الشريط الجانبي",
     "analytics": "الإحصائيات",
     "dashboard": "لوحة التحكم",
-    "employeePerformance": "أداء الموظفين"
+    "employeePerformance": "أداء الموظفين",
+    "eBookletInstances": "وصول البوكليتات",
+    "eBookletAnalytics": "تحليلات البوكليتات"
   },
   "common": {
     "currencyEGP": "ج.م",

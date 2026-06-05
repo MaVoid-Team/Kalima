@@ -25,6 +25,10 @@ const mockService = {
   approveStudentPurchaseLink: jest.fn(),
   getAuthorizedHotspotAsset: jest.fn(),
   createFileAsset: jest.fn(),
+  recordInviteOpen: jest.fn(),
+  getTeacherAnalytics: jest.fn(),
+  getAdminAnalytics: jest.fn(),
+  exportAdminAnalyticsCsv: jest.fn(),
 };
 
 jest.mock("../../src/apps/store-api/services/e-booklet.service", () => ({
@@ -294,8 +298,38 @@ describe("e-booklet routes", () => {
 
     expect(mockService.acceptInvite).not.toHaveBeenCalled();
     expect(mockService.acceptFreeInvite).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ termsAccepted: true, termsVersion: "v1" }));
-    expect(mockService.acceptInvitePasscode).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ passcode: "123456", termsAccepted: true }));
+    expect(mockService.acceptInvitePasscode).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ passcode: "123456", termsAccepted: true }), expect.objectContaining({ ipAddress: expect.any(String) }));
     expect(mockService.createStudentPurchaseLink).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ purchaseId: 500, termsAccepted: true }));
+  });
+
+  test("records anonymous invite opens and exposes scoped analytics APIs", async () => {
+    mockService.recordInviteOpen.mockResolvedValue({ invite_id: 2, has_passcode: true });
+    mockService.getTeacherAnalytics.mockResolvedValue({ events: { invite_opened: 3 }, revenue: { offlineEstimated: 150 } });
+    mockService.getAdminAnalytics.mockResolvedValue({ events: { access_created: 2 }, revenue: { marketing: 300, internal: 120 } });
+    mockService.exportAdminAnalyticsCsv.mockResolvedValue("id,event_type\n1,access_created");
+
+    await request(app)
+      .get("/api/v2/e-booklet-invites/raw-token/open?source=whatsapp")
+      .set("x-e-booklet-session", "anon-1")
+      .expect(200);
+    await request(app)
+      .get("/api/v2/teacher/e-booklet-analytics?instance_id=10")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+      .expect(200);
+    await request(app)
+      .get("/api/v2/admin/e-booklet-analytics?teacher_id=9")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .expect(200);
+    await request(app)
+      .get("/api/v2/admin/e-booklet-analytics.csv")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .expect(200)
+      .expect("Content-Type", /text\/csv/);
+
+    expect(mockService.recordInviteOpen).toHaveBeenCalledWith("raw-token", expect.objectContaining({ anonymousSessionId: "anon-1", source: "whatsapp" }));
+    expect(mockService.getTeacherAnalytics).toHaveBeenCalledWith(9, expect.objectContaining({ instanceId: 10 }));
+    expect(mockService.getAdminAnalytics).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9 }));
+    expect(mockService.exportAdminAnalyticsCsv).toHaveBeenCalled();
   });
 
   test("marks viewer page responses as private no-store", async () => {
