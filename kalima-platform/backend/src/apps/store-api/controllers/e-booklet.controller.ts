@@ -164,7 +164,7 @@ export const eBookletController = {
 
   async listStoreTemplates(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await getEBookletService().listPublishedTemplates({
+      const result = await getEBookletService().listPublicInstances({
         search: req.query.search as string | undefined,
         categoryId: req.query.category_id
           ? parseInt(req.query.category_id as string, 10)
@@ -179,10 +179,23 @@ export const eBookletController = {
 
   async getStoreTemplate(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await getEBookletService().getPublishedTemplateBySlug(
-        parseParam(req.params.slug, "template slug"),
+      const data = await getEBookletService().getPublicInstance(
+        parseId(req.params.instanceId, "instance ID"),
       );
       res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async createPublicCheckout(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dto = await validateDto(EBookletCheckoutDto, req.body);
+      const data = await getEBookletService().createPublicCheckoutRequest(
+        currentUserId(req),
+        dto,
+      );
+      res.status(201).json({ success: true, data });
     } catch (error) {
       next(error);
     }

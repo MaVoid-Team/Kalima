@@ -96,14 +96,14 @@ function NotFoundState({ t }) {
 
 export default function EBookletDetailsPage() {
   const { t, i18n } = useTranslation("eBooklets");
-  const { slug } = useParams();
+  const { instanceId } = useParams();
   const navigate = useNavigate();
-  const { template, loading, notFound } = useEBookletTemplate(slug);
+  const { template, loading, notFound } = useEBookletTemplate(instanceId);
   const { replaceWithTemplate } = useEBookletCart();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [slug]);
+  }, [instanceId]);
 
   if (loading) return <DetailSkeleton />;
   if (notFound || !template) return <NotFoundState t={t} />;
@@ -145,6 +145,11 @@ export default function EBookletDetailsPage() {
                 {template.categoryTitle}
               </span>
             )}
+            {template.teacherName && (
+              <span className="text-sm font-medium text-muted-foreground">
+                {template.teacherName}
+              </span>
+            )}
           </div>
 
           <h1 className="mt-5 max-w-4xl text-4xl font-black leading-tight tracking-tight text-slate-950 md:text-5xl">
@@ -159,7 +164,7 @@ export default function EBookletDetailsPage() {
               { label: t("details.stats.pages"), value: template.pageCount || "-", Icon: FileText },
               { label: t("details.stats.hotspots"), value: template.hotspotCount || 0, Icon: MousePointerClick },
               { label: t("details.stats.version"), value: activeVersion?.version_number || "-", Icon: ShieldCheck },
-              { label: t("details.stats.access"), value: t("common.invite"), Icon: Users },
+              { label: t("details.stats.access"), value: Number.isFinite(Number(template.seatsRemaining)) ? template.seatsRemaining : t("common.invite"), Icon: Users },
             ].map(({ label, value, Icon }) => (
               <div key={label} className="rounded-lg border border-border/70 bg-white p-4">
                 <Icon className="mb-3 h-5 w-5 text-emerald-800" />

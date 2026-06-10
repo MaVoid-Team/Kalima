@@ -7,11 +7,14 @@ process.env.DATABASE_URL =
 process.env.JWT_SECRET = process.env.JWT_SECRET || "test-secret";
 
 const mockService = {
-  listPublishedTemplates: jest.fn(),
+  listPublicInstances: jest.fn(),
+  getPublicInstance: jest.fn(),
+  createPublicCheckoutRequest: jest.fn(),
   createTemplate: jest.fn(),
   createPurchaseRequest: jest.fn(),
   listTemplateVersions: jest.fn(),
   listVersionHotspots: jest.fn(),
+  listUserEBooklets: jest.fn(),
   createInvite: jest.fn(),
   acceptInvite: jest.fn(),
   acceptFreeInvite: jest.fn(),
@@ -53,11 +56,12 @@ function createApp() {
 function tokenFor(
   role: "Admin" | "SubAdmin" | "Moderator" | "Teacher" | "Student",
   userId = 1,
+  portal = "store",
 ) {
   return jwt.sign(
     {
       userId,
-      roles: [{ role, portal: "store" }],
+      roles: [{ role, portal }],
     },
     process.env.JWT_SECRET as string,
     { expiresIn: "1h" },
@@ -71,9 +75,9 @@ describe("e-booklet routes", () => {
     jest.clearAllMocks();
   });
 
-  test("serves e-booklet store from a namespace separate from products", async () => {
-    mockService.listPublishedTemplates.mockResolvedValue({
-      data: [{ id: 1, title: "Grade 5 Arabic Reading" }],
+  test("serves e-booklet store as active teacher-specific instances", async () => {
+    mockService.listPublicInstances.mockResolvedValue({
+      data: [{ id: 10, display_title: "Grade 5 Arabic with Ms Sara", teacher: { id: 7, name: "Sara" }, remaining_seats: 4 }],
       total: 1,
       page: 1,
       limit: 20,
@@ -85,16 +89,29 @@ describe("e-booklet routes", () => {
       .expect((res) => {
         expect(res.body.success).toBe(true);
         expect(res.body.data).toEqual([
-          { id: 1, title: "Grade 5 Arabic Reading" },
+          { id: 10, display_title: "Grade 5 Arabic with Ms Sara", teacher: { id: 7, name: "Sara" }, remaining_seats: 4 },
         ]);
       });
 
-    expect(mockService.listPublishedTemplates).toHaveBeenCalledWith({
+    expect(mockService.listPublicInstances).toHaveBeenCalledWith({
       categoryId: undefined,
       limit: 20,
       page: 1,
       search: undefined,
     });
+  });
+
+  test("serves e-booklet store detail by teacher instance id", async () => {
+    mockService.getPublicInstance.mockResolvedValue({ id: 10, display_title: "Grade 5 Arabic with Ms Sara" });
+
+    await request(app)
+      .get("/api/v2/e-booklet-store/instances/10")
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data).toEqual({ id: 10, display_title: "Grade 5 Arabic with Ms Sara" });
+      });
+
+    expect(mockService.getPublicInstance).toHaveBeenCalledWith(10);
   });
 
   test("blocks non-admin users from admin e-booklet template creation", async () => {
@@ -125,34 +142,27 @@ describe("e-booklet routes", () => {
     );
   });
 
-  test("does not expose teacher checkout and uses admin deal creation for e_booklet_purchases", async () => {
-    mockService.createPurchaseRequest.mockResolvedValue({ id: 99, teacher_id: 2 });
+  test("public checkout requires auth and creates an instance-scoped purchase request", async () => {
+    mockService.createPublicCheckoutRequest.mockResolvedValue({ purchase_id: 91 });
 
     await request(app)
       .post("/api/v2/e-booklet-checkout")
       .send({ template_id: 3, template_version_id: 4, branding_json: {} })
-      .expect(404);
+      .expect(401);
 
     await request(app)
       .post("/api/v2/e-booklet-checkout")
-      .set("Authorization", `Bearer ${tokenFor("Teacher", 2)}`)
-      .send({ template_id: 3, template_version_id: 4, branding_json: {} })
-      .expect(404);
-
-    await request(app)
-      .post("/api/v2/admin/e-booklet-purchases")
-      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
-      .send({ teacher_id: 2, template_id: 3, template_version_id: 4, branding_json: {}, price: 120 })
+      .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
+      .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0 })
       .expect(201)
       .expect((res) => {
-        expect(res.body.data).toEqual({ id: 99, teacher_id: 2 });
+        expect(res.body.data).toEqual({ purchase_id: 91 });
       });
 
-    expect(mockService.createPurchaseRequest).toHaveBeenCalledTimes(1);
-    expect(mockService.createPurchaseRequest).toHaveBeenCalledWith(
-      2,
-      expect.objectContaining({ teacher_id: 2, template_id: 3, template_version_id: 4 }),
-      1,
+    expect(mockService.createPurchaseRequest).not.toHaveBeenCalled();
+    expect(mockService.createPublicCheckoutRequest).toHaveBeenCalledWith(
+      55,
+      expect.objectContaining({ instance_id: 7, template_id: 3, template_version_id: 4 }),
     );
   });
 
@@ -300,6 +310,28 @@ describe("e-booklet routes", () => {
     expect(mockService.acceptFreeInvite).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ termsAccepted: true, termsVersion: "v1" }));
     expect(mockService.acceptInvitePasscode).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ passcode: "123456", termsAccepted: true }), expect.objectContaining({ ipAddress: expect.any(String) }));
     expect(mockService.createStudentPurchaseLink).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ purchaseId: 500, termsAccepted: true }));
+  });
+
+  test("allows academy student accounts to accept e-booklet invites and list granted booklets", async () => {
+    mockService.acceptInvitePasscode.mockResolvedValue({ id: 13, access_source: "offline_passcode" });
+    mockService.listUserEBooklets.mockResolvedValue([{ id: 13 }]);
+
+    await request(app)
+      .post("/api/v2/e-booklet-invites/raw-token/accept")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
+      .send({ accessPath: "offline_passcode", passcode: "123456", termsAccepted: true })
+      .expect(200);
+
+    await request(app)
+      .get("/api/v2/student/e-booklets")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data).toEqual([{ id: 13 }]);
+      });
+
+    expect(mockService.acceptInvitePasscode).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ passcode: "123456", termsAccepted: true }), expect.objectContaining({ ipAddress: expect.any(String) }));
+    expect(mockService.listUserEBooklets).toHaveBeenCalledWith(55, "student");
   });
 
   test("records anonymous invite opens and exposes scoped analytics APIs", async () => {

@@ -143,19 +143,29 @@ const router = createBrowserRouter(
       <Route element={<MainLayout />}>
         <Route path="/" element={<LandingPage />} />
 
+        {/* E-booklet storefront is public to students/visitors; access is only required for owned viewer pages. */}
+        <Route path="/e-booklets" element={<EBookletStorePage />} />
+        <Route path="/e-booklets/instances/:instanceId" element={<EBookletDetailsPage />} />
+
         {/* Market and Product Routes - Restricted by store access */}
         <Route element={<RoleRoute requireStoreAccess={true} />}>
           <Route path="/market" element={<MarketPage />} />
           <Route path="/product/:id" element={<ProductDetailsPage />} />
           <Route path="/booklet/:id" element={<BookletDetailsPage />} />
-          <Route path="/e-booklets" element={<EBookletStorePage />} />
-          <Route path="/e-booklets/:slug" element={<EBookletDetailsPage />} />
         </Route>
         {/* Samples Routes - Restricted by store access */}
         <Route element={<RoleRoute requireStoreAccess={true} />}>
           <Route path="/samples" element={<SamplesDirectoryPage />} />
           <Route path="/samples/:id" element={<SamplePage />} />
           <Route path="/samples/:id/preview" element={<SamplePreview />} />
+        </Route>
+
+        {/* E-booklet purchase flow: authenticated users can buy from the public storefront without store portal access. */}
+        <Route element={<ProtectedRoute requireAuth={true} />}>
+          <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin"]} />}>
+            <Route path="/e-booklet-cart" element={<EBookletCartPage />} />
+            <Route path="/e-booklet-checkout" element={<EBookletCheckoutPage />} />
+          </Route>
         </Route>
 
         {/* Protected Store Routes (Auth Required) - Restricted by store access */}
@@ -165,8 +175,6 @@ const router = createBrowserRouter(
             <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin"]} />}>
               <Route path="/cart" element={<WizardCheckoutPage />} />
               <Route path="/checkout" element={<WizardCheckoutPage />} />
-              <Route path="/e-booklet-cart" element={<EBookletCartPage />} />
-              <Route path="/e-booklet-checkout" element={<EBookletCheckoutPage />} />
               <Route
                 path="/fast-buy/checkout"
                 element={<FastBuyCheckoutPage />}

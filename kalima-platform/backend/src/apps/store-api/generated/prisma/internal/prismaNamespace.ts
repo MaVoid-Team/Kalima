@@ -438,6 +438,7 @@ export const ModelName = {
   e_booklet_invite_redemptions: 'e_booklet_invite_redemptions',
   e_booklet_file_assets: 'e_booklet_file_assets',
   e_booklet_audit_logs: 'e_booklet_audit_logs',
+  e_booklet_analytics_events: 'e_booklet_analytics_events',
   product_gallery: 'product_gallery',
   product_gallery_videos: 'product_gallery_videos',
   general_settings: 'general_settings',
@@ -457,7 +458,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "user_appreciation_pages" | "user_appreciation_comments" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "e_booklet_templates" | "e_booklet_template_versions" | "e_booklet_hotspots" | "e_booklet_purchases" | "e_booklet_instances" | "e_booklet_access" | "e_booklet_invites" | "e_booklet_devices" | "e_booklet_device_allowances" | "e_booklet_student_purchase_links" | "e_booklet_invite_redemptions" | "e_booklet_file_assets" | "e_booklet_audit_logs" | "product_gallery" | "product_gallery_videos" | "general_settings" | "notifications"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "user_appreciation_pages" | "user_appreciation_comments" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "product_reviews" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "e_booklet_templates" | "e_booklet_template_versions" | "e_booklet_hotspots" | "e_booklet_purchases" | "e_booklet_instances" | "e_booklet_access" | "e_booklet_invites" | "e_booklet_devices" | "e_booklet_device_allowances" | "e_booklet_student_purchase_links" | "e_booklet_invite_redemptions" | "e_booklet_file_assets" | "e_booklet_audit_logs" | "e_booklet_analytics_events" | "product_gallery" | "product_gallery_videos" | "general_settings" | "notifications"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4457,6 +4458,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    e_booklet_analytics_events: {
+      payload: Prisma.$e_booklet_analytics_eventsPayload<ExtArgs>
+      fields: Prisma.e_booklet_analytics_eventsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.e_booklet_analytics_eventsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$e_booklet_analytics_eventsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.e_booklet_analytics_eventsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$e_booklet_analytics_eventsPayload>
+        }
+        findFirst: {
+          args: Prisma.e_booklet_analytics_eventsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$e_booklet_analytics_eventsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.e_booklet_analytics_eventsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$e_booklet_analytics_eventsPayload>
+        }
+        findMany: {
+          args: Prisma.e_booklet_analytics_eventsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$e_booklet_analytics_eventsPayload>[]
+        }
+        create: {
+          args: Prisma.e_booklet_analytics_eventsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$e_booklet_analytics_eventsPayload>
+        }
+        createMany: {
+          args: Prisma.e_booklet_analytics_eventsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.e_booklet_analytics_eventsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$e_booklet_analytics_eventsPayload>[]
+        }
+        delete: {
+          args: Prisma.e_booklet_analytics_eventsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$e_booklet_analytics_eventsPayload>
+        }
+        update: {
+          args: Prisma.e_booklet_analytics_eventsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$e_booklet_analytics_eventsPayload>
+        }
+        deleteMany: {
+          args: Prisma.e_booklet_analytics_eventsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.e_booklet_analytics_eventsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.e_booklet_analytics_eventsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$e_booklet_analytics_eventsPayload>[]
+        }
+        upsert: {
+          args: Prisma.e_booklet_analytics_eventsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$e_booklet_analytics_eventsPayload>
+        }
+        aggregate: {
+          args: Prisma.E_booklet_analytics_eventsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateE_booklet_analytics_events>
+        }
+        groupBy: {
+          args: Prisma.e_booklet_analytics_eventsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.E_booklet_analytics_eventsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.e_booklet_analytics_eventsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.E_booklet_analytics_eventsCountAggregateOutputType> | number
+        }
+      }
+    }
     product_gallery: {
       payload: Prisma.$product_galleryPayload<ExtArgs>
       fields: Prisma.product_galleryFieldRefs
@@ -5480,7 +5555,9 @@ export const E_booklet_invitesScalarFieldEnum = {
   booklet_instance_id: 'booklet_instance_id',
   teacher_id: 'teacher_id',
   token_hash: 'token_hash',
+  share_token_ciphertext: 'share_token_ciphertext',
   passcode_hash: 'passcode_hash',
+  passcode_ciphertext: 'passcode_ciphertext',
   passcode_hint: 'passcode_hint',
   max_uses: 'max_uses',
   used_count: 'used_count',
@@ -5582,6 +5659,27 @@ export const E_booklet_audit_logsScalarFieldEnum = {
 } as const
 
 export type E_booklet_audit_logsScalarFieldEnum = (typeof E_booklet_audit_logsScalarFieldEnum)[keyof typeof E_booklet_audit_logsScalarFieldEnum]
+
+
+export const E_booklet_analytics_eventsScalarFieldEnum = {
+  id: 'id',
+  event_type: 'event_type',
+  teacher_id: 'teacher_id',
+  student_id: 'student_id',
+  anonymous_session_id: 'anonymous_session_id',
+  template_id: 'template_id',
+  booklet_instance_id: 'booklet_instance_id',
+  invite_id: 'invite_id',
+  access_id: 'access_id',
+  purchase_id: 'purchase_id',
+  source: 'source',
+  marketing_price_snapshot: 'marketing_price_snapshot',
+  internal_price_snapshot: 'internal_price_snapshot',
+  metadata: 'metadata',
+  created_at: 'created_at'
+} as const
+
+export type E_booklet_analytics_eventsScalarFieldEnum = (typeof E_booklet_analytics_eventsScalarFieldEnum)[keyof typeof E_booklet_analytics_eventsScalarFieldEnum]
 
 
 export const Product_galleryScalarFieldEnum = {
@@ -6275,6 +6373,7 @@ export type GlobalOmitConfig = {
   e_booklet_invite_redemptions?: Prisma.e_booklet_invite_redemptionsOmit
   e_booklet_file_assets?: Prisma.e_booklet_file_assetsOmit
   e_booklet_audit_logs?: Prisma.e_booklet_audit_logsOmit
+  e_booklet_analytics_events?: Prisma.e_booklet_analytics_eventsOmit
   product_gallery?: Prisma.product_galleryOmit
   product_gallery_videos?: Prisma.product_gallery_videosOmit
   general_settings?: Prisma.general_settingsOmit

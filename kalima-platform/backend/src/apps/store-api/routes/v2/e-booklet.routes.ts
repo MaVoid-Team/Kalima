@@ -24,7 +24,7 @@ const teacherAuth = [
 
 const studentAuth = [
   authenticateToken,
-  requireRole([role_enum.Student], portal_enum.store),
+  requireRole([role_enum.Student]),
 ];
 
 const viewerAuth = [authenticateToken];
@@ -53,7 +53,8 @@ const viewerLimiter = rateLimit({
 
 // Store APIs - separate from normal Market products.
 router.get("/e-booklet-store", eBookletController.listStoreTemplates);
-router.get("/e-booklet-store/:slug", eBookletController.getStoreTemplate);
+router.get("/e-booklet-store/instances/:instanceId", eBookletController.getStoreTemplate);
+router.post("/e-booklet-checkout", authenticateToken, eBookletController.createPublicCheckout);
 
 // Admin APIs.
 router.post(

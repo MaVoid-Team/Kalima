@@ -8,7 +8,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../libs/errors";
-import { hashInviteToken } from "../utils/e-booklet-token";
+import { generateInviteToken, hashInviteToken } from "../utils/e-booklet-token";
 
 type EBookletDb = PrismaClient | any;
 
@@ -220,28 +220,53 @@ function inviteShareTokenSecret(): string {
   );
 }
 
-function encryptInviteShareToken(token: string): string {
-  const key = crypto.createHash("sha256").update(inviteShareTokenSecret()).digest();
+function invitePasscodeSecret(): string {
+  return (
+    process.env.E_BOOKLET_INVITE_PASSCODE_SECRET ||
+    process.env.APP_SECRET ||
+    process.env.JWT_SECRET ||
+    "dev-e-booklet-invite-passcode-secret"
+  );
+}
+
+function encryptSecretValue(value: string, secret: string): string {
+  const key = crypto.createHash("sha256").update(secret).digest();
   const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
-  const ciphertext = Buffer.concat([cipher.update(token, "utf8"), cipher.final()]);
+  const ciphertext = Buffer.concat([cipher.update(value, "utf8"), cipher.final()]);
   const tag = cipher.getAuthTag();
   return [iv, tag, ciphertext].map((part) => part.toString("base64url")).join(".");
 }
 
-function decryptInviteShareToken(ciphertext: string | null | undefined): string | null {
+function decryptSecretValue(ciphertext: string | null | undefined, secret: string): string | null {
   if (!ciphertext) return null;
   const parts = ciphertext.split(".");
   if (parts.length !== 3) return null;
   try {
     const [iv, tag, encrypted] = parts.map((part) => Buffer.from(part, "base64url"));
-    const key = crypto.createHash("sha256").update(inviteShareTokenSecret()).digest();
+    const key = crypto.createHash("sha256").update(secret).digest();
     const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
     decipher.setAuthTag(tag);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString("utf8");
   } catch {
     return null;
   }
+}
+
+function encryptInviteShareToken(token: string): string {
+  return encryptSecretValue(token, inviteShareTokenSecret());
+}
+
+function decryptInviteShareToken(ciphertext: string | null | undefined): string | null {
+  return decryptSecretValue(ciphertext, inviteShareTokenSecret());
+}
+
+function encryptInvitePasscode(passcode: string): string {
+  return encryptSecretValue(passcode, invitePasscodeSecret());
+}
+
+function decryptInvitePasscode(ciphertext: string | null | undefined): string | null {
+  return decryptSecretValue(ciphertext, invitePasscodeSecret());
 }
 
 function createViewerPageToken(input: {
@@ -837,6 +862,12 @@ export class EBookletService {
 
   private sanitizeViewerAccess<T>(value: T): T {
     if (!value || typeof value !== "object") return value;
+    if (value instanceof Date) {
+      return value.toISOString() as T;
+    }
+    if (typeof (value as any).toJSON === "function") {
+      return (value as any).toJSON() as T;
+    }
     if (Array.isArray(value)) {
       return value.map((item) => this.sanitizeViewerAccess(item)) as T;
     }
@@ -899,6 +930,207 @@ export class EBookletService {
         updated_by: adminUserId,
         updated_at: new Date(),
       },
+    });
+  }
+
+  private serializePublicInstance(instance: any): Record<string, unknown> {
+    const usedSeats = Array.isArray(instance.access_records)
+      ? instance.access_records.length
+      : Number(instance._count?.access_records ?? 0);
+    const inviteQuota = Number(instance.invite_quota ?? 0);
+    const serialized = this.sanitizeViewerAccess({ ...instance }) as any;
+    delete serialized.internal_price;
+    delete serialized.access_records;
+    return {
+      ...serialized,
+      used_seats: usedSeats,
+      remaining_seats: Math.max(inviteQuota - usedSeats, 0),
+    };
+  }
+
+  async listPublicInstances(filters: {
+    search?: string;
+    categoryId?: number;
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: unknown[]; total: number; page: number; limit: number }> {
+    const page = filters.page ?? 1;
+    const limit = filters.limit ?? 20;
+    const skip = (page - 1) * limit;
+    const now = new Date();
+    const where: any = {
+      status: "active",
+      access_expires_at: { gt: now },
+    };
+
+    if (filters.categoryId) {
+      where.template = { category_id: filters.categoryId };
+    }
+    if (filters.search) {
+      where.OR = [
+        { display_title: { contains: filters.search, mode: "insensitive" } },
+        { teacher: { name: { contains: filters.search, mode: "insensitive" } } },
+        { template: { title: { contains: filters.search, mode: "insensitive" } } },
+        { template: { description: { contains: filters.search, mode: "insensitive" } } },
+      ];
+    }
+
+    const include = {
+      teacher: { select: { id: true, name: true } },
+      template: {
+        include: {
+          cover_file: true,
+          category: { select: { id: true, title: true } },
+        },
+      },
+      template_version: {
+        include: { _count: { select: { hotspots: true } } },
+      },
+      access_records: {
+        where: { role: "student", status: "active" },
+        select: { id: true },
+      },
+    };
+
+    const [instances, total] = await Promise.all([
+      this.db.e_booklet_instances.findMany({
+        where,
+        include,
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.e_booklet_instances.count({ where }),
+    ]);
+
+    return {
+      data: instances.map((instance: any) => this.serializePublicInstance(instance)),
+      total,
+      page,
+      limit,
+    };
+  }
+
+  async getPublicInstance(instanceId: number): Promise<unknown> {
+    const instance = await this.db.e_booklet_instances.findFirst({
+      where: {
+        id: instanceId,
+        status: "active",
+        access_expires_at: { gt: new Date() },
+      },
+      include: {
+        teacher: { select: { id: true, name: true } },
+        template: {
+          include: {
+            cover_file: true,
+            category: { select: { id: true, title: true } },
+          },
+        },
+        template_version: {
+          include: { _count: { select: { hotspots: true } } },
+        },
+        access_records: {
+          where: { role: "student", status: "active" },
+          select: { id: true },
+        },
+      },
+    });
+    if (!instance) throw new NotFoundError("E-booklet instance not found");
+    return this.serializePublicInstance(instance);
+  }
+
+  async createPublicCheckoutRequest(studentId: number, dto: any): Promise<unknown> {
+    if (!dto.instance_id) {
+      throw new BadRequestError("E-booklet instance is required for checkout.");
+    }
+
+    const instance = await this.db.e_booklet_instances.findFirst({
+      where: {
+        id: dto.instance_id,
+        status: "active",
+        access_expires_at: { gt: new Date() },
+      },
+      include: {
+        template: true,
+        template_version: true,
+      },
+    });
+    if (!instance) throw new NotFoundError("E-booklet instance not found");
+    if (Number(instance.template_id) !== Number(dto.template_id)) {
+      throw new BadRequestError("Checkout template does not match the selected e-booklet instance.");
+    }
+    if (Number(instance.template_version_id) !== Number(dto.template_version_id)) {
+      throw new BadRequestError("Checkout version does not match the selected e-booklet instance.");
+    }
+
+    const activeStudentAccessCount = await this.db.e_booklet_access.count({
+      where: { booklet_instance_id: instance.id, role: "student", status: "active" },
+    });
+    if (activeStudentAccessCount >= Number(instance.invite_quota ?? 0)) {
+      throw new ForbiddenError("This e-booklet has reached its student seat limit.");
+    }
+
+    const price = Number(instance.student_marketing_price ?? 0);
+    const shareToken = generateInviteToken();
+
+    return this.transaction(async (tx: EBookletDb) => {
+      const purchase = await tx.purchases.create({
+        data: {
+          user_id: studentId,
+          status: price > 0 ? "pending" : "confirmed",
+          subtotal: price,
+          discount: 0,
+          total: price,
+          notes: dto.notes,
+        },
+      });
+
+      const invite = await tx.e_booklet_invites.create({
+        data: {
+          booklet_instance_id: instance.id,
+          teacher_id: instance.teacher_id,
+          token_hash: hashInviteToken(shareToken),
+          share_token_ciphertext: encryptInviteShareToken(shareToken),
+          max_uses: 1,
+          expires_at: instance.access_expires_at,
+          status: "active",
+        },
+      });
+
+      const link = await tx.e_booklet_student_purchase_links.create({
+        data: {
+          purchase_id: purchase.id,
+          invite_id: invite.id,
+          booklet_instance_id: instance.id,
+          student_id: studentId,
+          marketing_price_snapshot: price,
+          terms_accepted_at: new Date(),
+          terms_version: dto.terms_version || "public-checkout-v1",
+        },
+      });
+
+      await this.recordAnalyticsEvent(tx, {
+        event_type: "student_purchase_requested",
+        teacher_id: instance.teacher_id,
+        student_id: studentId,
+        template_id: instance.template_id,
+        booklet_instance_id: instance.id,
+        invite_id: invite.id,
+        purchase_id: purchase.id,
+        source: "public_store",
+        marketing_price_snapshot: price,
+        internal_price_snapshot: Number(instance.internal_price ?? 0),
+      });
+
+      return {
+        id: purchase.id,
+        purchase_id: purchase.id,
+        status: purchase.status,
+        total: price,
+        currency: "EGP",
+        student_purchase_link_id: link.id,
+        booklet_instance_id: instance.id,
+      };
     });
   }
 
@@ -1140,6 +1372,7 @@ export class EBookletService {
         token_hash: hashInviteToken(token),
         share_token_ciphertext: encryptInviteShareToken(token),
         passcode_hash: passcode ? this.hashPasscode(passcode) : undefined,
+        passcode_ciphertext: passcode ? encryptInvitePasscode(passcode) : undefined,
         passcode_hint: dto.passcode_hint,
         max_uses: dto.max_uses,
         expires_at: dto.expires_at ? new Date(dto.expires_at) : undefined,
@@ -1150,6 +1383,7 @@ export class EBookletService {
         booklet_instance_id: true,
         teacher_id: true,
         passcode_hash: true,
+        passcode_ciphertext: true,
         passcode_hint: true,
         max_uses: true,
         used_count: true,
@@ -1185,6 +1419,7 @@ export class EBookletService {
         teacher_id: true,
         share_token_ciphertext: true,
         passcode_hash: true,
+        passcode_ciphertext: true,
         passcode_hint: true,
         max_uses: true,
         used_count: true,
@@ -1193,9 +1428,10 @@ export class EBookletService {
         created_at: true,
       },
     });
-    return invites.map(({ share_token_ciphertext: shareTokenCiphertext, passcode_hash: passcodeHash, ...invite }) => ({
+    return invites.map(({ share_token_ciphertext: shareTokenCiphertext, passcode_hash: passcodeHash, passcode_ciphertext: passcodeCiphertext, ...invite }) => ({
       ...invite,
       token: decryptInviteShareToken(shareTokenCiphertext),
+      passcode: decryptInvitePasscode(passcodeCiphertext),
       has_passcode: Boolean(passcodeHash),
     }));
   }
@@ -2263,7 +2499,7 @@ export class EBookletService {
         },
       });
       const instance = this.ensureInviteUsable(invite);
-      if (Number(instance.student_marketing_price ?? 0) !== 0 || Number(instance.internal_price ?? 0) !== 0) {
+      if (Number(instance.student_marketing_price ?? 0) !== 0) {
         throw new ForbiddenError("This e-booklet invite requires purchase.");
       }
       if (invite.max_uses !== null && invite.max_uses !== undefined && invite.used_count >= invite.max_uses) {

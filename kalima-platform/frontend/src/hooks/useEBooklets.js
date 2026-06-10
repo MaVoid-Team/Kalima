@@ -28,28 +28,45 @@ const getHotspotCount = (template, version) => {
   );
 };
 
+const getInstanceTemplate = (instance) => instance?.template || instance;
+
+const getInstanceVersion = (instance, template) =>
+  instance?.template_version || template?.active_version || template?.template_version;
+
 export const normalizeEBookletTemplate = (template) => {
-  const activeVersion = getActiveVersion(template);
+  const sourceTemplate = getInstanceTemplate(template);
+  const activeVersion = getInstanceVersion(template, sourceTemplate) || getActiveVersion(sourceTemplate);
 
   return {
     ...template,
+    template: sourceTemplate,
+    instanceId: template?.id,
+    template_id: template?.template_id || sourceTemplate?.id,
+    template_version_id: template?.template_version_id || activeVersion?.id,
     activeVersion,
     coverUrl:
-      template?.cover_url ||
-      template?.cover_file?.url ||
-      template?.cover_file?.storage_url ||
+      sourceTemplate?.cover_url ||
+      sourceTemplate?.cover_file?.url ||
+      sourceTemplate?.cover_file?.storage_url ||
       null,
     categoryTitle:
-      template?.category?.title ||
-      template?.category_title ||
+      sourceTemplate?.category?.title ||
+      sourceTemplate?.category_title ||
       null,
     pageCount: parseNumber(
-      template?.page_count ?? activeVersion?.page_count,
+      sourceTemplate?.page_count ?? activeVersion?.page_count,
       0,
     ),
-    hotspotCount: parseNumber(getHotspotCount(template, activeVersion), 0),
-    price: parseNumber(template?.price, 0),
-    currency: template?.currency || "EGP",
+    hotspotCount: parseNumber(getHotspotCount(sourceTemplate, activeVersion), 0),
+    price: parseNumber(template?.student_marketing_price ?? template?.price, 0),
+    currency: template?.currency || sourceTemplate?.currency || "EGP",
+    title: sourceTemplate?.title || template?.title,
+    slug: sourceTemplate?.slug || template?.slug || String(template?.id || ""),
+    description: sourceTemplate?.description || template?.description,
+    teacherName: template?.teacher?.name || template?.teacher?.full_name || template?.teacher_name || null,
+    seatsRemaining: template?.seats_remaining ?? template?.remaining_seats,
+    studentLimit: template?.student_limit,
+    accessExpiresAt: template?.access_expires_at,
   };
 };
 
@@ -75,9 +92,10 @@ export const buildEBookletCartItem = (template) => {
   const normalized = normalizeEBookletTemplate(template);
 
   return {
-    id: normalized.id,
-    template_id: normalized.id,
-    template_version_id: normalized.activeVersion?.id,
+    id: normalized.instanceId,
+    instance_id: normalized.instanceId,
+    template_id: normalized.template_id,
+    template_version_id: normalized.template_version_id || normalized.activeVersion?.id,
     slug: normalized.slug,
     title: normalized.title,
     description: normalized.description,
@@ -222,14 +240,14 @@ export function useEBookletStore(initialParams = {}) {
   };
 }
 
-export function useEBookletTemplate(slug) {
+export function useEBookletTemplate(instanceId) {
   const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
   const [template, setTemplate] = useState(null);
   const [notFound, setNotFound] = useState(false);
-  const [initLoading, setInitLoading] = useState(Boolean(slug));
+  const [initLoading, setInitLoading] = useState(Boolean(instanceId));
 
   useEffect(() => {
-    if (!slug) return undefined;
+    if (!instanceId) return undefined;
     let active = true;
 
     const fetchTemplate = async () => {
@@ -238,7 +256,7 @@ export function useEBookletTemplate(slug) {
 
       try {
         const response = await fetchApi({
-          endpoint: `/e-booklet-store/${slug}`,
+          endpoint: `/e-booklet-store/instances/${instanceId}`,
           method: "get",
         }, false);
 
@@ -251,7 +269,7 @@ export function useEBookletTemplate(slug) {
         }
       } catch (error) {
         if (!active) return;
-        console.error(`Failed to fetch e-booklet template ${slug}:`, error);
+        console.error(`Failed to fetch e-booklet instance ${instanceId}:`, error);
         setTemplate(null);
         setNotFound(true);
       } finally {
@@ -263,7 +281,7 @@ export function useEBookletTemplate(slug) {
     return () => {
       active = false;
     };
-  }, [fetchApi, slug]);
+  }, [fetchApi, instanceId]);
 
   return {
     template,

@@ -223,6 +223,11 @@ export class EBookletCheckoutDto {
   @IsInt()
   teacher_id?: number;
 
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  instance_id?: number;
+
   @IsInt()
   template_id!: number;
 
