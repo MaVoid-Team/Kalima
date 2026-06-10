@@ -80,7 +80,7 @@ export default function AdminEBookletInstancesPage() {
               <div><h2 className="font-semibold">{group.teacher?.name || t("common.teacher")}</h2><p className="text-xs text-muted-foreground">{group.teacher?.email || t("admin.instances.teacherMissing")}</p></div>
               <Badge variant="outline">{t("admin.instances.instanceCount", { count: group.rows.length })}</Badge>
             </div>
-            <div className="overflow-x-auto"><table className="w-full min-w-[900px] text-sm"><thead><tr className="border-b text-left text-xs uppercase text-muted-foreground"><th className="py-2">{t("common.eBooklet")}</th><th>{t("common.status")}</th><th>{t("admin.instances.expiry")}</th><th>{t("teacher.invites.totalQuota")}</th><th>{t("teacher.invites.usedSeats")}</th><th>{t("teacher.invites.usedDevices")}</th><th>{t("common.actions")}</th></tr></thead><tbody>
+            <div className="overflow-x-auto"><table className="w-full min-w-[900px] text-sm"><thead><tr className="border-b text-left text-xs uppercase text-muted-foreground"><th className="py-2">{t("common.eBooklet")}</th><th>{t("common.status")}</th><th>{t("admin.instances.expiry")}</th><th>{t("admin.instances.studentSeatQuota", { defaultValue: "Student seat quota" })}</th><th>{t("admin.instances.usedStudentSeats", { defaultValue: "Used student seats" })}</th><th>{t("teacher.invites.usedDevices")}</th><th>{t("common.actions")}</th></tr></thead><tbody>
               {group.rows.map((instance) => {
                 const usedSeats = numberValue(instance.used_invites_count, instance._count?.access_records || 0);
                 const usedDevices = optionalNumberValue(instance.used_devices_count ?? instance.active_devices_count ?? instance.devices_count);

@@ -18,6 +18,8 @@ export default function AcceptEBookletInvitePage() {
   const { acceptInvite, openInvite } = useStudentEBooklets();
   const [state, setState] = useState({ status: "idle", message: "" });
   const [passcode, setPasscode] = useState("");
+  const [purchaseId, setPurchaseId] = useState("");
+  const [paymentProofFileId, setPaymentProofFileId] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
@@ -39,6 +41,10 @@ export default function AcceptEBookletInvitePage() {
         termsVersion: TERMS_VERSION,
       };
       if (accessPath === "offline_passcode") payload.passcode = passcode;
+      if (accessPath === "online_purchase") {
+        payload.purchaseId = Number(purchaseId);
+        if (paymentProofFileId) payload.paymentProofFileId = Number(paymentProofFileId);
+      }
       const response = await acceptInvite(token, payload);
       const instanceId = response?.data?.bookletInstanceId || response?.data?.booklet_instance_id;
       if (accessPath === "online_purchase") {
@@ -73,7 +79,7 @@ export default function AcceptEBookletInvitePage() {
       <div className="rounded-lg border bg-amber-50 p-3 text-sm text-amber-900">{t("inviteAccept.metadataUnavailable")}</div>
       <div className="grid gap-4 md:grid-cols-2">
         <section className="space-y-3 rounded-lg border bg-background p-4"><h2 className="flex items-center gap-2 font-semibold"><KeyRound className="h-4 w-4" />{t("inviteAccept.offlineTitle")}</h2><p className="text-sm text-muted-foreground">{t("inviteAccept.offlineDescription")}</p><Label>{t("inviteAccept.passcode")}</Label><Input value={passcode} onChange={(event) => setPasscode(event.target.value)} placeholder={t("inviteAccept.passcodePlaceholder")} /><Button className="w-full" onClick={() => submit("offline_passcode")} disabled={state.status === "loading" || !passcode}>{state.status === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}{t("inviteAccept.unlockWithPasscode")}</Button></section>
-        <section className="space-y-3 rounded-lg border bg-background p-4"><h2 className="flex items-center gap-2 font-semibold"><CreditCard className="h-4 w-4" />{t("inviteAccept.purchaseTitle")}</h2><p className="text-sm text-muted-foreground">{t("inviteAccept.purchaseDescription")}</p><div className="rounded-md bg-muted p-2 text-xs text-muted-foreground">{t("inviteAccept.internalPriceHidden")}</div><div className="rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-900">{t("inviteAccept.purchaseUnavailable", { defaultValue: "Online purchase from invite links is unavailable until payment proof upload is connected. Use the passcode option provided by your teacher." })}</div><Button className="w-full" variant="outline" disabled>{t("inviteAccept.requestOnlinePurchase")}</Button><Button className="w-full" variant="outline" disabled>{t("inviteAccept.acceptFree")}</Button></section>
+        <section className="space-y-3 rounded-lg border bg-background p-4"><h2 className="flex items-center gap-2 font-semibold"><CreditCard className="h-4 w-4" />{t("inviteAccept.purchaseTitle")}</h2><p className="text-sm text-muted-foreground">{t("inviteAccept.purchaseDescription")}</p><div className="rounded-md bg-muted p-2 text-xs text-muted-foreground">{t("inviteAccept.internalPriceHidden")}</div><Label>{t("inviteAccept.purchaseId", { defaultValue: "Purchase ID" })}</Label><Input inputMode="numeric" value={purchaseId} onChange={(event) => setPurchaseId(event.target.value)} placeholder={t("inviteAccept.purchaseIdPlaceholder", { defaultValue: "Enter your submitted purchase ID" })} /><Label>{t("inviteAccept.paymentProofFileId", { defaultValue: "Payment proof file ID" })}</Label><Input inputMode="numeric" value={paymentProofFileId} onChange={(event) => setPaymentProofFileId(event.target.value)} placeholder={t("inviteAccept.paymentProofFileIdPlaceholder", { defaultValue: "Optional when already attached to purchase" })} /><Button className="w-full" variant="outline" onClick={() => submit("online_purchase")} disabled={state.status === "loading" || !purchaseId}>{t("inviteAccept.requestOnlinePurchase")}</Button><Button className="w-full" variant="outline" onClick={() => submit("free")} disabled={state.status === "loading"}>{t("inviteAccept.acceptFree")}</Button></section>
       </div>
       <label className="flex items-start gap-2 rounded-md border p-3 text-sm"><input type="checkbox" className="mt-1" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} /><span>{t("inviteAccept.terms")}</span></label>
       {state.message && <div className={`rounded-md border p-3 text-sm ${state.status === "error" ? "text-destructive" : "text-emerald-700"}`}>{state.message}</div>}

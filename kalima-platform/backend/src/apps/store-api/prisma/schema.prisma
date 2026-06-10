@@ -973,6 +973,7 @@ model e_booklet_invites {
   token_hash          String                           @unique @db.VarChar(128)
   share_token_ciphertext String?                       @db.Text
   passcode_hash       String?                          @db.VarChar(128)
+  passcode_ciphertext String?                          @db.Text
   passcode_hint       String?                          @db.VarChar(20)
   max_uses            Int?
   used_count          Int                              @default(0)

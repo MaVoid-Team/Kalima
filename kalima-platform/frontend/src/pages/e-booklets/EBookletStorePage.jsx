@@ -88,7 +88,7 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
       )}
     >
       <Link
-        to={`/e-booklets/${template.slug}`}
+        to={`/e-booklets/instances/${template.instanceId || template.id}`}
         className={cn(
           "block overflow-hidden bg-muted",
           featured ? "min-h-[300px] md:min-h-full" : "aspect-[4/3]",
@@ -107,10 +107,15 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
               {template.categoryTitle}
             </span>
           )}
+          {template.teacherName && (
+            <span className="text-xs font-medium text-muted-foreground">
+              {template.teacherName}
+            </span>
+          )}
         </div>
 
         <Link
-          to={`/e-booklets/${template.slug}`}
+          to={`/e-booklets/instances/${template.instanceId || template.id}`}
           className={cn(
             "mt-4 line-clamp-2 font-bold tracking-tight text-foreground transition-colors group-hover:text-emerald-800",
             featured ? "text-2xl md:text-3xl" : "text-xl",
@@ -138,7 +143,11 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
           </div>
           <div className="rounded-md border border-border/70 px-3 py-2">
             <LockKeyhole className="mb-1 h-4 w-4 text-foreground" />
-            <span>{t("common.noDownload")}</span>
+            <span>
+              {Number.isFinite(Number(template.seatsRemaining))
+                ? t("store.seatsRemaining", { count: template.seatsRemaining, defaultValue: "{{count}} seats" })
+                : t("common.noDownload")}
+            </span>
           </div>
         </div>
 

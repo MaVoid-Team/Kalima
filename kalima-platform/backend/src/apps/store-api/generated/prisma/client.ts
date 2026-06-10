@@ -308,6 +308,11 @@ export type e_booklet_file_assets = Prisma.e_booklet_file_assetsModel
  */
 export type e_booklet_audit_logs = Prisma.e_booklet_audit_logsModel
 /**
+ * Model e_booklet_analytics_events
+ * 
+ */
+export type e_booklet_analytics_events = Prisma.e_booklet_analytics_eventsModel
+/**
  * Model product_gallery
  * 
  */

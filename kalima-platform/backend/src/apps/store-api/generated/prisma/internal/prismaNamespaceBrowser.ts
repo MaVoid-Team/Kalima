@@ -105,6 +105,7 @@ export const ModelName = {
   e_booklet_invite_redemptions: 'e_booklet_invite_redemptions',
   e_booklet_file_assets: 'e_booklet_file_assets',
   e_booklet_audit_logs: 'e_booklet_audit_logs',
+  e_booklet_analytics_events: 'e_booklet_analytics_events',
   product_gallery: 'product_gallery',
   product_gallery_videos: 'product_gallery_videos',
   general_settings: 'general_settings',
@@ -815,7 +816,9 @@ export const E_booklet_invitesScalarFieldEnum = {
   booklet_instance_id: 'booklet_instance_id',
   teacher_id: 'teacher_id',
   token_hash: 'token_hash',
+  share_token_ciphertext: 'share_token_ciphertext',
   passcode_hash: 'passcode_hash',
+  passcode_ciphertext: 'passcode_ciphertext',
   passcode_hint: 'passcode_hint',
   max_uses: 'max_uses',
   used_count: 'used_count',
@@ -917,6 +920,27 @@ export const E_booklet_audit_logsScalarFieldEnum = {
 } as const
 
 export type E_booklet_audit_logsScalarFieldEnum = (typeof E_booklet_audit_logsScalarFieldEnum)[keyof typeof E_booklet_audit_logsScalarFieldEnum]
+
+
+export const E_booklet_analytics_eventsScalarFieldEnum = {
+  id: 'id',
+  event_type: 'event_type',
+  teacher_id: 'teacher_id',
+  student_id: 'student_id',
+  anonymous_session_id: 'anonymous_session_id',
+  template_id: 'template_id',
+  booklet_instance_id: 'booklet_instance_id',
+  invite_id: 'invite_id',
+  access_id: 'access_id',
+  purchase_id: 'purchase_id',
+  source: 'source',
+  marketing_price_snapshot: 'marketing_price_snapshot',
+  internal_price_snapshot: 'internal_price_snapshot',
+  metadata: 'metadata',
+  created_at: 'created_at'
+} as const
+
+export type E_booklet_analytics_eventsScalarFieldEnum = (typeof E_booklet_analytics_eventsScalarFieldEnum)[keyof typeof E_booklet_analytics_eventsScalarFieldEnum]
 
 
 export const Product_galleryScalarFieldEnum = {

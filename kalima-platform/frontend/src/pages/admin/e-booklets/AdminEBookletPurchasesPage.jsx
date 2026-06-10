@@ -91,6 +91,9 @@ export default function AdminEBookletPurchasesPage() {
     custom_document_file_id: "",
     display_title: "",
     invite_quota: "30",
+    access_expires_at: "",
+    student_marketing_price: "",
+    internal_price: "",
     page_count: "",
     page_dimensions: [],
     document_filename: "",
@@ -126,6 +129,9 @@ export default function AdminEBookletPurchasesPage() {
         activePurchase.branding_json?.bookletTitle ||
         activePurchase.template?.title ||
         current.display_title,
+      access_expires_at: current.access_expires_at,
+      student_marketing_price: String(activePurchase.marketing_price ?? activePurchase.price ?? current.student_marketing_price ?? ""),
+      internal_price: String(activePurchase.internal_price ?? current.internal_price ?? ""),
       page_count: "",
       page_dimensions: [],
       document_filename: "",
@@ -172,11 +178,14 @@ export default function AdminEBookletPurchasesPage() {
 
   const handleDeliver = async () => {
     if (!activePurchase) return;
-    if (deliveryForm.validation_message || !deliveryForm.custom_document_file_id) return;
+    if (deliveryForm.validation_message || !deliveryForm.custom_document_file_id || !deliveryForm.access_expires_at) return;
     await deliverPurchase(activePurchase.id, {
       custom_document_file_id: Number(deliveryForm.custom_document_file_id),
       display_title: deliveryForm.display_title,
       invite_quota: asNumber(deliveryForm.invite_quota, 0),
+      access_expires_at: deliveryForm.access_expires_at,
+      student_marketing_price: asNumber(deliveryForm.student_marketing_price, 0),
+      internal_price: asNumber(deliveryForm.internal_price, 0),
       page_count: asNumber(deliveryForm.page_count, 0),
       page_dimensions: deliveryForm.page_dimensions,
     });
@@ -373,7 +382,7 @@ export default function AdminEBookletPurchasesPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>{t("admin.purchases.inviteQuota")}</Label>
+                    <Label>{t("admin.purchases.inviteQuota", { defaultValue: "Student seat quota" })}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -386,6 +395,49 @@ export default function AdminEBookletPurchasesPage() {
                       }
                     />
                   </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label>{t("admin.purchases.accessExpiresAt", { defaultValue: "Student access expires" })}</Label>
+                    <Input
+                      type="date"
+                      value={deliveryForm.access_expires_at}
+                      onChange={(event) =>
+                        setDeliveryForm((current) => ({
+                          ...current,
+                          access_expires_at: event.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t("admin.purchases.studentMarketingPrice", { defaultValue: "Student store price" })}</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={deliveryForm.student_marketing_price}
+                      onChange={(event) =>
+                        setDeliveryForm((current) => ({
+                          ...current,
+                          student_marketing_price: event.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("admin.purchases.internalPrice", { defaultValue: "Internal teacher cost" })}</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={deliveryForm.internal_price}
+                    onChange={(event) =>
+                      setDeliveryForm((current) => ({
+                        ...current,
+                        internal_price: event.target.value,
+                      }))
+                    }
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("admin.purchases.adminNotes")}</Label>
@@ -412,7 +464,7 @@ export default function AdminEBookletPurchasesPage() {
                 </Button>
                 <Button
                   onClick={handleDeliver}
-                  disabled={loading || Boolean(deliveryForm.validation_message) || !deliveryForm.custom_document_file_id}
+                  disabled={loading || Boolean(deliveryForm.validation_message) || !deliveryForm.custom_document_file_id || !deliveryForm.access_expires_at}
                 >
                   {t("admin.purchases.deliver")}
                 </Button>

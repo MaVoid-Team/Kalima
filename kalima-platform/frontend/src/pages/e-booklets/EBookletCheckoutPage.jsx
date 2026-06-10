@@ -123,6 +123,7 @@ export default function EBookletCheckoutPage() {
 
     try {
       const response = await submitCheckout({
+        instance_id: Number(item.instance_id || item.id),
         template_id: Number(item.template_id),
         template_version_id: Number(item.template_version_id),
         price: Number(item.price || 0),
