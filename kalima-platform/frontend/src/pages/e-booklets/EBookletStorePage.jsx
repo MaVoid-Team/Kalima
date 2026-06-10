@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   BookOpenCheck,
+  CalendarDays,
   CircleDollarSign,
   FileText,
   ImageIcon,
@@ -27,6 +28,16 @@ const formatMoney = (amount, currency = "EGP", language = "en") => {
     currency,
     maximumFractionDigits: 0,
   }).format(Number(amount || 0));
+};
+
+const formatDate = (value, language = "en") => {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return new Intl.DateTimeFormat(language?.startsWith("ar") ? "ar-EG" : "en-EG", {
+    dateStyle: "medium",
+  }).format(date);
 };
 
 function StoreSkeleton() {
@@ -80,6 +91,8 @@ function EBookletCover({ template, featured = false, t }) {
 }
 
 function EBookletCard({ template, featured, onAdd, t, language }) {
+  const expiryLabel = formatDate(template.accessExpiresAt, language);
+
   return (
     <article
       className={cn(
@@ -147,6 +160,15 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
                 : t("common.noDownload")}
             </span>
           </div>
+        </div>
+
+        <div className="mt-3 rounded-md border border-border/70 px-3 py-2 text-xs text-muted-foreground">
+          <CalendarDays className="mb-1 h-4 w-4 text-foreground" />
+          <span>
+            {expiryLabel
+              ? t("store.accessExpires", { value: expiryLabel, defaultValue: "Expires {{value}}" })
+              : t("store.noExpiry", { defaultValue: "No expiry" })}
+          </span>
         </div>
 
         <div className="mt-auto flex items-center justify-between gap-4 pt-6">
