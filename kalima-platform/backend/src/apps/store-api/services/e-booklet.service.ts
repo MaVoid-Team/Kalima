@@ -933,18 +933,57 @@ export class EBookletService {
     });
   }
 
-  private serializePublicInstance(instance: any): Record<string, unknown> {
-    const usedSeats = Array.isArray(instance.access_records)
+  private getIncludedActiveSeatCount(instance: any): number {
+    return Array.isArray(instance.access_records)
       ? instance.access_records.length
       : Number(instance._count?.access_records ?? 0);
+  }
+
+  private getIncludedPendingSeatCount(instance: any): number {
+    return Array.isArray(instance.student_purchase_links)
+      ? instance.student_purchase_links.length
+      : Number(instance._count?.student_purchase_links ?? 0);
+  }
+
+  private async countReservedStudentSeats(db: EBookletDb, instanceId: number, options: { excludePurchaseId?: number } = {}): Promise<number> {
+    const pendingWhere: any = {
+      booklet_instance_id: instanceId,
+      access_id: null,
+      invite: { status: "active", expires_at: { gt: new Date() } },
+    };
+    if (options.excludePurchaseId) {
+      pendingWhere.purchase_id = { not: options.excludePurchaseId };
+    }
+    const [activeAccessCount, pendingPurchaseLinkCount] = await Promise.all([
+      db.e_booklet_access.count({
+        where: { booklet_instance_id: instanceId, role: "student", status: "active" },
+      }),
+      db.e_booklet_student_purchase_links.count({ where: pendingWhere }),
+    ]);
+    return Number(activeAccessCount ?? 0) + Number(pendingPurchaseLinkCount ?? 0);
+  }
+
+  private async assertStudentSeatAvailable(db: EBookletDb, instance: any, options: { excludePurchaseId?: number } = {}): Promise<void> {
+    const inviteQuota = Number(instance.invite_quota ?? 0);
+    const reservedSeats = await this.countReservedStudentSeats(db, instance.id, options);
+    if (reservedSeats >= inviteQuota) {
+      throw new ForbiddenError("This e-booklet has reached its student seat limit.");
+    }
+  }
+
+  private serializePublicInstance(instance: any): Record<string, unknown> {
+    const usedSeats = this.getIncludedActiveSeatCount(instance);
+    const pendingSeats = this.getIncludedPendingSeatCount(instance);
     const inviteQuota = Number(instance.invite_quota ?? 0);
     const serialized = this.sanitizeViewerAccess({ ...instance }) as any;
     delete serialized.internal_price;
     delete serialized.access_records;
+    delete serialized.student_purchase_links;
     return {
       ...serialized,
       used_seats: usedSeats,
-      remaining_seats: Math.max(inviteQuota - usedSeats, 0),
+      reserved_seats: pendingSeats,
+      remaining_seats: Math.max(inviteQuota - usedSeats - pendingSeats, 0),
     };
   }
 
@@ -990,6 +1029,13 @@ export class EBookletService {
         where: { role: "student", status: "active" },
         select: { id: true },
       },
+      student_purchase_links: {
+        where: {
+          access_id: null,
+          invite: { status: "active", expires_at: { gt: now } },
+        },
+        select: { id: true },
+      },
     };
 
     const [instances, total] = await Promise.all([
@@ -1012,11 +1058,12 @@ export class EBookletService {
   }
 
   async getPublicInstance(instanceId: number): Promise<unknown> {
+    const now = new Date();
     const instance = await this.db.e_booklet_instances.findFirst({
       where: {
         id: instanceId,
         status: "active",
-        access_expires_at: { gt: new Date() },
+        access_expires_at: { gt: now },
       },
       include: {
         teacher: { select: { id: true, name: true } },
@@ -1031,6 +1078,13 @@ export class EBookletService {
         },
         access_records: {
           where: { role: "student", status: "active" },
+          select: { id: true },
+        },
+        student_purchase_links: {
+          where: {
+            access_id: null,
+            invite: { status: "active", expires_at: { gt: now } },
+          },
           select: { id: true },
         },
       },
@@ -1063,17 +1117,11 @@ export class EBookletService {
       throw new BadRequestError("Checkout version does not match the selected e-booklet instance.");
     }
 
-    const activeStudentAccessCount = await this.db.e_booklet_access.count({
-      where: { booklet_instance_id: instance.id, role: "student", status: "active" },
-    });
-    if (activeStudentAccessCount >= Number(instance.invite_quota ?? 0)) {
-      throw new ForbiddenError("This e-booklet has reached its student seat limit.");
-    }
-
     const price = Number(instance.student_marketing_price ?? 0);
     const shareToken = generateInviteToken();
 
-    return this.transaction(async (tx: EBookletDb) => {
+    return this.serializableTransaction(async (tx: EBookletDb) => {
+      await this.assertStudentSeatAvailable(tx, instance);
       const purchase = await tx.purchases.create({
         data: {
           user_id: studentId,
@@ -1109,6 +1157,34 @@ export class EBookletService {
         },
       });
 
+      let access: any = null;
+      if (price === 0) {
+        access = await tx.e_booklet_access.create({
+          data: {
+            booklet_instance_id: instance.id,
+            user_id: studentId,
+            role: "student",
+            source_invite_id: invite.id,
+            access_source: "public_store_free_checkout",
+            terms_accepted_at: new Date(),
+            terms_version: dto.terms_version || "public-checkout-v1",
+            status: "active",
+          },
+        });
+        await tx.e_booklet_student_purchase_links.update({
+          where: { purchase_id: purchase.id },
+          data: { access_id: access.id, approved_at: new Date() },
+        });
+        await tx.e_booklet_invites.update({
+          where: { id: invite.id },
+          data: { used_count: { increment: 1 } },
+        });
+        await tx.e_booklet_instances.update({
+          where: { id: instance.id },
+          data: { used_invites_count: { increment: 1 } },
+        });
+      }
+
       await this.recordAnalyticsEvent(tx, {
         event_type: "student_purchase_requested",
         teacher_id: instance.teacher_id,
@@ -1130,6 +1206,8 @@ export class EBookletService {
         currency: "EGP",
         student_purchase_link_id: link.id,
         booklet_instance_id: instance.id,
+        access_id: access?.id,
+        next_url: access ? `/student/e-booklets/${instance.id}` : undefined,
       };
     });
   }
@@ -2173,7 +2251,7 @@ export class EBookletService {
         include: { invite: true, booklet_instance: true },
       });
       if (!link) throw new NotFoundError("E-booklet student purchase link not found");
-      if (link.access_id) return link;
+      if (link.access_id || link.approved_at) return link;
       const instance = this.ensureInviteUsable({ ...link.invite, booklet_instance: link.booklet_instance });
       const existingAccess = await tx.e_booklet_access.findFirst({
         where: {
@@ -2188,12 +2266,7 @@ export class EBookletService {
         if (link.invite?.max_uses !== null && link.invite?.max_uses !== undefined && link.invite.used_count >= link.invite.max_uses) {
           throw new ForbiddenError("This e-booklet invite has reached its access limit.");
         }
-        const activeStudentAccessCount = await tx.e_booklet_access.count({
-          where: { booklet_instance_id: link.booklet_instance_id, role: "student", status: "active" },
-        });
-        if (activeStudentAccessCount >= instance.invite_quota) {
-          throw new ForbiddenError("This e-booklet invite has reached its access limit.");
-        }
+        await this.assertStudentSeatAvailable(tx, instance, { excludePurchaseId: purchaseId });
         access = await tx.e_booklet_access.create({
           data: {
             booklet_instance_id: link.booklet_instance_id,

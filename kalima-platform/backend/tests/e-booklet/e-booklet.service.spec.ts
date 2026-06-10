@@ -37,6 +37,7 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
       upsert: jest.fn(),
     },
     e_booklet_student_purchase_links: {
+      count: jest.fn(),
       create: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
@@ -369,6 +370,7 @@ describe("EBookletService", () => {
         internal_price: 70,
       });
       db.e_booklet_access.count.mockResolvedValue(2);
+      db.e_booklet_student_purchase_links.count.mockResolvedValue(0);
       db.purchases.create.mockResolvedValue({ id: 91, status: "pending" });
       db.e_booklet_invites.create.mockResolvedValue({ id: 92 });
       db.e_booklet_student_purchase_links.create.mockResolvedValue({ id: 93 });
@@ -383,6 +385,9 @@ describe("EBookletService", () => {
 
       expect(db.e_booklet_instances.findFirst).toHaveBeenCalledWith(expect.objectContaining({
         where: expect.objectContaining({ id: 10, status: "active", access_expires_at: { gt: expect.any(Date) } }),
+      }));
+      expect(db.e_booklet_student_purchase_links.count).toHaveBeenCalledWith(expect.objectContaining({
+        where: expect.objectContaining({ booklet_instance_id: 10, access_id: null }),
       }));
       expect(db.purchases.create).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({ user_id: 55, subtotal: 150, total: 150, status: "pending" }),
@@ -408,6 +413,32 @@ describe("EBookletService", () => {
       expect(result).toEqual(expect.objectContaining({ purchase_id: 91, student_purchase_link_id: 93, booklet_instance_id: 10 }));
     });
 
+    test("public checkout rejects when pending checkout links reserve all remaining seats", async () => {
+      const db = createMockDb();
+      db.e_booklet_instances.findFirst.mockResolvedValue({
+        id: 10,
+        teacher_id: 7,
+        template_id: 3,
+        template_version_id: 8,
+        invite_quota: 2,
+        access_expires_at: new Date("2027-01-15T10:30:00.000Z"),
+        status: "active",
+        student_marketing_price: 150,
+        internal_price: 70,
+      });
+      db.e_booklet_access.count.mockResolvedValue(1);
+      db.e_booklet_student_purchase_links.count.mockResolvedValue(1);
+
+      const service = new EBookletService(db);
+
+      await expect(service.createPublicCheckoutRequest(55, {
+        instance_id: 10,
+        template_id: 3,
+        template_version_id: 8,
+      })).rejects.toThrow("student seat limit");
+      expect(db.purchases.create).not.toHaveBeenCalled();
+    });
+
     test("public checkout creates zero-total confirmed purchases only when store price is zero", async () => {
       const db = createMockDb();
       db.e_booklet_instances.findFirst.mockResolvedValue({
@@ -422,16 +453,26 @@ describe("EBookletService", () => {
         internal_price: 70,
       });
       db.e_booklet_access.count.mockResolvedValue(0);
+      db.e_booklet_student_purchase_links.count.mockResolvedValue(0);
       db.purchases.create.mockResolvedValue({ id: 91, status: "confirmed" });
       db.e_booklet_invites.create.mockResolvedValue({ id: 92 });
       db.e_booklet_student_purchase_links.create.mockResolvedValue({ id: 93 });
+      db.e_booklet_access.create.mockResolvedValue({ id: 94 });
 
       const service = new EBookletService(db);
-      await service.createPublicCheckoutRequest(55, { instance_id: 10, template_id: 3, template_version_id: 8 });
+      const result: any = await service.createPublicCheckoutRequest(55, { instance_id: 10, template_id: 3, template_version_id: 8 });
 
       expect(db.purchases.create).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({ subtotal: 0, total: 0, status: "confirmed" }),
       }));
+      expect(db.e_booklet_access.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ booklet_instance_id: 10, user_id: 55, role: "student", access_source: "public_store_free_checkout" }),
+      }));
+      expect(db.e_booklet_student_purchase_links.update).toHaveBeenCalledWith(expect.objectContaining({
+        where: { purchase_id: 91 },
+        data: expect.objectContaining({ access_id: 94, approved_at: expect.any(Date) }),
+      }));
+      expect(result).toEqual(expect.objectContaining({ access_id: 94, next_url: "/student/e-booklets/10" }));
     });
   });
 
@@ -861,6 +902,50 @@ describe("EBookletService", () => {
       expect(db.e_booklet_access.create).toHaveBeenCalledWith({ data: expect.objectContaining({ access_source: "online_purchase", source_invite_id: 2, user_id: 55 }) });
       expect(db.e_booklet_student_purchase_links.update).toHaveBeenCalledWith(expect.objectContaining({ where: { purchase_id: 500 }, data: expect.objectContaining({ access_id: 88, approved_at: expect.any(Date) }) }));
       expect(db.e_booklet_audit_logs.create).toHaveBeenCalledWith({ data: expect.objectContaining({ actor_user_id: 1, action: "student_purchase_approved", entity_id: 10 }) });
+    });
+
+    test("student purchase approval is idempotent for already-approved links", async () => {
+      const db = createMockDb();
+      const approvedLink = {
+        purchase_id: 500,
+        invite_id: 2,
+        booklet_instance_id: 10,
+        student_id: 55,
+        access_id: 88,
+        approved_at: new Date("2026-01-02T00:00:00.000Z"),
+        invite: { id: 2, max_uses: null, used_count: 1 },
+        booklet_instance: { id: 10, invite_quota: 10, status: "active" },
+      };
+      db.e_booklet_student_purchase_links.findUnique.mockResolvedValue(approvedLink);
+
+      const service = new EBookletService(db);
+
+      await expect(service.approveStudentPurchaseLink(500, 1)).resolves.toEqual(approvedLink);
+      expect(db.e_booklet_access.create).not.toHaveBeenCalled();
+      expect(db.e_booklet_invites.update).not.toHaveBeenCalled();
+      expect(db.e_booklet_instances.update).not.toHaveBeenCalled();
+      expect(db.e_booklet_student_purchase_links.update).not.toHaveBeenCalled();
+    });
+
+    test("student purchase approval rejects when active access and pending links exhaust quota", async () => {
+      const db = createMockDb();
+      db.e_booklet_student_purchase_links.findUnique.mockResolvedValue({
+        purchase_id: 500,
+        invite_id: 2,
+        booklet_instance_id: 10,
+        student_id: 55,
+        access_id: null,
+        invite: { id: 2, max_uses: null, used_count: 0 },
+        booklet_instance: { id: 10, invite_quota: 2, status: "active" },
+      });
+      db.e_booklet_access.findFirst.mockResolvedValue(null);
+      db.e_booklet_access.count.mockResolvedValue(1);
+      db.e_booklet_student_purchase_links.count.mockResolvedValue(1);
+
+      const service = new EBookletService(db);
+
+      await expect(service.approveStudentPurchaseLink(500, 1)).rejects.toThrow("student seat limit");
+      expect(db.e_booklet_access.create).not.toHaveBeenCalled();
     });
 
     test("creates zero-price free invite access without a purchase link even when internal price is nonzero", async () => {
