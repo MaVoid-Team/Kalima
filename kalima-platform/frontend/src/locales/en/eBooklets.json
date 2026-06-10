@@ -338,6 +338,8 @@
     "emptyDescription": "Published e-booklet templates will appear here after the admin prepares the secure PDF version, cover, price, and hotspot content.",
     "coverFallback": "Interactive booklet",
     "cardDescription": "Interactive PDF booklet delivered by admin with teacher branding and controlled student access.",
+    "accessExpires": "Expires {{value}}",
+    "noExpiry": "No expiry",
     "add": "Add"
   },
   "details": {
