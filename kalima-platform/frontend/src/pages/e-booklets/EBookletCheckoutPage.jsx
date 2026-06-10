@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   BookOpenCheck,
   CheckCircle2,
@@ -66,6 +66,7 @@ function EmptyCheckout({ t }) {
 }
 
 export default function EBookletCheckoutPage() {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation("eBooklets");
   const { item, total, currency, clear } = useEBookletCart();
   const { submitCheckout, loading } = useEBookletCheckout();
@@ -140,8 +141,12 @@ export default function EBookletCheckoutPage() {
         },
       });
 
-      setSubmittedPurchase(response?.data || true);
+      const result = response?.data || true;
+      setSubmittedPurchase(result);
       clear();
+      if (result?.next_url) {
+        navigate(result.next_url);
+      }
     } catch (error) {
       setFormError(
         error?.response?.data?.message ||

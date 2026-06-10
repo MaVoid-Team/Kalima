@@ -152,6 +152,12 @@ describe("e-booklet routes", () => {
 
     await request(app)
       .post("/api/v2/e-booklet-checkout")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 77, "store")}`)
+      .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0 })
+      .expect(403);
+
+    await request(app)
+      .post("/api/v2/e-booklet-checkout")
       .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
       .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0 })
       .expect(201)
