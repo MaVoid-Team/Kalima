@@ -265,6 +265,41 @@ export class EBookletCheckoutDto {
   contact_whatsapp?: string;
 }
 
+export class PublicEBookletCheckoutDto {
+  @IsInt()
+  @Min(1)
+  instance_id!: number;
+
+  @IsInt()
+  template_id!: number;
+
+  @IsInt()
+  template_version_id!: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  payment_method_id?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  numberTransferredFrom?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  notes?: string;
+
+  @IsBoolean()
+  terms_accepted!: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  terms_version?: string;
+}
+
 export class UpdateEBookletPurchaseStatusDto {
   @IsEnum(EBookletPurchaseStatusDto)
   status!: EBookletPurchaseStatusDto;
@@ -354,6 +389,21 @@ export class AcceptEBookletInviteDto {
   @IsInt()
   @Min(1)
   paymentProofFileId?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  payment_method_id?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  numberTransferredFrom?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  notes?: string;
 
   @IsOptional()
   @IsBoolean()

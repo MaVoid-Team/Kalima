@@ -21,6 +21,11 @@ const mockService = {
   acceptInvitePasscode: jest.fn(),
   createStudentPurchaseLink: jest.fn(),
   getViewerPage: jest.fn(),
+  getAdminViewerMetadata: jest.fn(),
+  getAdminViewerPage: jest.fn(),
+  getAdminViewerPageHotspots: jest.fn(),
+  getAdminHotspotContent: jest.fn(),
+  getAdminAuthorizedHotspotAsset: jest.fn(),
   bindViewerDevice: jest.fn(),
   listViewerDevices: jest.fn(),
   resetViewerDevices: jest.fn(),
@@ -153,13 +158,13 @@ describe("e-booklet routes", () => {
     await request(app)
       .post("/api/v2/e-booklet-checkout")
       .set("Authorization", `Bearer ${tokenFor("Teacher", 77, "store")}`)
-      .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0 })
+      .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0, terms_accepted: true })
       .expect(403);
 
     await request(app)
       .post("/api/v2/e-booklet-checkout")
       .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
-      .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0 })
+      .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0, terms_accepted: true })
       .expect(201)
       .expect((res) => {
         expect(res.body.data).toEqual({ purchase_id: 91 });
@@ -168,7 +173,8 @@ describe("e-booklet routes", () => {
     expect(mockService.createPurchaseRequest).not.toHaveBeenCalled();
     expect(mockService.createPublicCheckoutRequest).toHaveBeenCalledWith(
       55,
-      expect.objectContaining({ instance_id: 7, template_id: 3, template_version_id: 4 }),
+      expect.objectContaining({ instance_id: 7, template_id: 3, template_version_id: 4, terms_accepted: true }),
+      undefined,
     );
   });
 
@@ -315,7 +321,7 @@ describe("e-booklet routes", () => {
     expect(mockService.acceptInvite).not.toHaveBeenCalled();
     expect(mockService.acceptFreeInvite).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ termsAccepted: true, termsVersion: "v1" }));
     expect(mockService.acceptInvitePasscode).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ passcode: "123456", termsAccepted: true }), expect.objectContaining({ ipAddress: expect.any(String) }));
-    expect(mockService.createStudentPurchaseLink).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ purchaseId: 500, termsAccepted: true }));
+    expect(mockService.createStudentPurchaseLink).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ purchaseId: 500, termsAccepted: true }), undefined);
   });
 
   test("allows academy student accounts to accept e-booklet invites and list granted booklets", async () => {
@@ -388,6 +394,41 @@ describe("e-booklet routes", () => {
       });
 
     expect(mockService.getViewerPage).toHaveBeenCalledWith(10, 1, 55);
+  });
+
+  test("serves admin view mode without student access or device binding", async () => {
+    mockService.getAdminViewerMetadata.mockResolvedValue({ admin_view_mode: true, booklet_instance_id: 10 });
+    mockService.getAdminViewerPage.mockResolvedValue({ pageNumber: 1, adminViewMode: true });
+    mockService.getAdminViewerPageHotspots.mockResolvedValue([{ id: 77, title: "Intro" }]);
+    mockService.getAdminHotspotContent.mockResolvedValue({ id: 77, title: "Intro" });
+
+    await request(app)
+      .get("/api/v2/admin/e-booklet-viewer/10/metadata")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .expect(200)
+      .expect("Cache-Control", "private, no-store");
+
+    await request(app)
+      .get("/api/v2/admin/e-booklet-viewer/10/pages/1")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .expect(200)
+      .expect("Cache-Control", "private, no-store");
+
+    await request(app)
+      .get("/api/v2/admin/e-booklet-viewer/10/pages/1/hotspots")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .expect(200);
+
+    await request(app)
+      .get("/api/v2/admin/e-booklet-viewer/hotspots/77/content")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .expect(200);
+
+    expect(mockService.getAdminViewerMetadata).toHaveBeenCalledWith(10, 1);
+    expect(mockService.getAdminViewerPage).toHaveBeenCalledWith(10, 1, 1);
+    expect(mockService.getAdminViewerPageHotspots).toHaveBeenCalledWith(10, 1);
+    expect(mockService.getAdminHotspotContent).toHaveBeenCalledWith(77);
+    expect(mockService.bindViewerDevice).not.toHaveBeenCalled();
   });
 
   test("binds/lists viewer devices and exposes admin device reset/allowance/approval routes", async () => {

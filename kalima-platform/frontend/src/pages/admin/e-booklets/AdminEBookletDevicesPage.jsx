@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { HardDrive, RefreshCcw, RotateCcw, ShieldPlus } from "lucide-react";
+import { HardDrive, RefreshCcw, RotateCcw, ShieldPlus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ export default function AdminEBookletDevicesPage() {
   const [userId, setUserId] = useState(searchParams.get("userId") || "");
   const [reason, setReason] = useState("");
   const [allowedDevices, setAllowedDevices] = useState("2");
-  const { devices, loading, fetchDevices, resetDevices, addDeviceAllowance } = useAdminEBookletDevices();
+  const { devices, students, loading, fetchDevices, fetchStudents, resetDevices, addDeviceAllowance } = useAdminEBookletDevices();
   const { instances, loading: instancesLoading, fetchInstances } = useAdminEBookletInstances();
 
   useEffect(() => { fetchInstances({ limit: 100 }).catch(() => {}); }, [fetchInstances]);
@@ -26,8 +26,17 @@ export default function AdminEBookletDevicesPage() {
   }, [routeInstanceId]);
 
   useEffect(() => {
+    if (instanceId) fetchStudents(instanceId).catch(() => {});
+  }, [fetchStudents, instanceId]);
+
+  useEffect(() => {
     if (instanceId && userId) fetchDevices(instanceId, userId).catch(() => {});
   }, [fetchDevices, instanceId, userId]);
+
+  const selectedStudent = useMemo(
+    () => students.find((row) => String(row.user_id || row.user?.id) === String(userId)),
+    [students, userId],
+  );
 
   const runSearch = () => {
     setSearchParams({ instanceId, userId });
@@ -50,11 +59,11 @@ export default function AdminEBookletDevicesPage() {
         <p className="mt-1 text-sm text-muted-foreground">{t("admin.devices.description")}</p>
       </div>
       <section className="grid gap-3 rounded-lg border bg-background p-4 md:grid-cols-[1fr_1fr_auto]">
-        <div className="space-y-2"><Label>{t("admin.devices.instanceId")}</Label><select className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={instanceId} onChange={(event) => setInstanceId(event.target.value)} disabled={Boolean(routeInstanceId)}><option value="">{instancesLoading ? t("admin.instances.loading") : t("admin.devices.selectInstance", { defaultValue: "Select an instance" })}</option>{instances.map((instance) => <option key={instance.id} value={instance.id}>{instance.display_title || instance.template?.title || `${t("common.eBooklet")} #${instance.id}`}</option>)}</select><Input value={instanceId} onChange={(event) => setInstanceId(event.target.value)} placeholder="123" disabled={Boolean(routeInstanceId)} /></div>
-        <div className="space-y-2"><Label>{t("admin.devices.userId")}</Label><Input value={userId} onChange={(event) => setUserId(event.target.value)} placeholder="456" /></div>
+        <div className="space-y-2"><Label>{t("admin.devices.instanceId")}</Label><select className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={instanceId} onChange={(event) => { setInstanceId(event.target.value); setUserId(""); }} disabled={Boolean(routeInstanceId)}><option value="">{instancesLoading ? t("admin.instances.loading") : t("admin.devices.selectInstance", { defaultValue: "Select an instance" })}</option>{instances.map((instance) => <option key={instance.id} value={instance.id}>{instance.display_title || instance.template?.title || `${t("common.eBooklet")} #${instance.id}`}</option>)}</select></div>
+        <div className="space-y-2"><Label>{t("admin.devices.student", { defaultValue: "Student" })}</Label><select className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={userId} onChange={(event) => setUserId(event.target.value)} disabled={!instanceId || loading}><option value="">{loading ? t("admin.devices.loading") : t("admin.devices.selectStudent", { defaultValue: "Select a student" })}</option>{students.map((row) => { const id = row.user_id || row.user?.id; const label = row.user?.name || row.user?.email || `${t("admin.devices.userId")} #${id}`; return <option key={row.id || id} value={id}>{label}</option>; })}</select><Input value={userId} onChange={(event) => setUserId(event.target.value)} placeholder={t("admin.devices.manualUserId", { defaultValue: "Manual student ID fallback" })} /></div>
         <Button className="self-end" onClick={runSearch} disabled={!instanceId || !userId || loading}><RefreshCcw className="h-4 w-4" />{t("common.refresh")}</Button>
       </section>
-      <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">{t("admin.devices.discoveryUnavailable", { defaultValue: "Admin APIs expose instance discovery, but no admin student/access selector endpoint for a selected instance. Enter the student user ID manually; actions stay disabled until both IDs are present." })}</div>
+      <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900"><Users className="me-2 inline h-4 w-4" />{selectedStudent ? t("admin.devices.selectedStudent", { defaultValue: "Selected student access is loaded from this e-booklet instance." }) : t("admin.devices.studentSelectorHint", { defaultValue: "Choose an instance to load students with access, then select a student before resetting or allowing devices." })}</div>
       <section className="grid gap-4 rounded-lg border bg-background p-4 lg:grid-cols-[1fr_240px_240px]">
         <div className="space-y-2"><Label>{t("admin.devices.reason")}</Label><Input value={reason} onChange={(event) => setReason(event.target.value)} placeholder={t("admin.devices.reasonPlaceholder")} /></div>
         <div className="space-y-2"><Label>{t("admin.devices.allowedDevices")}</Label><Input type="number" min="1" value={allowedDevices} onChange={(event) => setAllowedDevices(event.target.value)} /></div>

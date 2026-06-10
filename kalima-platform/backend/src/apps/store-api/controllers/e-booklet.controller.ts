@@ -9,6 +9,7 @@ import {
   CreateEBookletTemplateDto,
   DeliverEBookletDto,
   EBookletCheckoutDto,
+  PublicEBookletCheckoutDto,
   EBookletDeviceAllowanceDto,
   EBookletDeviceBindDto,
   EBookletInviteAccessPathDto,
@@ -18,6 +19,17 @@ import {
   UpsertEBookletHotspotDto,
 } from "../dtos/e-booklet.dto";
 import { BadRequestError, ValidationError } from "../../../libs/errors";
+
+function normalizeMultipartEBookletBody(body: any) {
+  const next = { ...(body || {}) };
+  ["instance_id", "template_id", "template_version_id", "payment_method_id", "purchaseId", "paymentProofFileId"].forEach((key) => {
+    if (next[key] !== undefined && next[key] !== null && next[key] !== "") next[key] = Number(next[key]);
+  });
+  ["terms_accepted", "termsAccepted"].forEach((key) => {
+    if (next[key] !== undefined) next[key] = next[key] === true || next[key] === "true" || next[key] === "1";
+  });
+  return next;
+}
 
 async function validateDto<T extends object>(
   DtoClass: new () => T,
@@ -190,10 +202,11 @@ export const eBookletController = {
 
   async createPublicCheckout(req: Request, res: Response, next: NextFunction) {
     try {
-      const dto = await validateDto(EBookletCheckoutDto, req.body);
+      const dto = await validateDto(PublicEBookletCheckoutDto, normalizeMultipartEBookletBody(req.body));
       const data = await getEBookletService().createPublicCheckoutRequest(
         currentUserId(req),
         dto,
+        (req as any).file,
       );
       res.status(201).json({ success: true, data });
     } catch (error) {
@@ -610,7 +623,7 @@ export const eBookletController = {
     try {
       const inviteToken = parseParam(req.params.token, "invite token");
       const dto = await validateDto(AcceptEBookletInviteDto, {
-        ...(req.body || {}),
+        ...normalizeMultipartEBookletBody(req.body),
         token: inviteToken,
       });
       const service = getEBookletService();
@@ -625,7 +638,7 @@ export const eBookletController = {
           deviceFingerprint: req.get("x-e-booklet-device") || req.body?.deviceFingerprint,
         });
       } else if (dto.accessPath === EBookletInviteAccessPathDto.online_purchase) {
-        data = await service.createStudentPurchaseLink(inviteToken, userId, dto);
+        data = await service.createStudentPurchaseLink(inviteToken, userId, dto, (req as any).file);
       } else {
         throw new BadRequestError("Invite accessPath is required.");
       }
@@ -638,6 +651,19 @@ export const eBookletController = {
   async getViewerMetadata(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await getEBookletService().getViewerMetadata(
+        parseId(req.params.instanceId, "instance ID"),
+        currentUserId(req),
+      );
+      setPrivateNoStore(res);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getAdminViewerMetadata(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getAdminViewerMetadata(
         parseId(req.params.instanceId, "instance ID"),
         currentUserId(req),
       );
@@ -735,12 +761,39 @@ export const eBookletController = {
     }
   },
 
+  async getAdminViewerPage(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getAdminViewerPage(
+        parseId(req.params.instanceId, "instance ID"),
+        parseId(req.params.pageNumber, "page number"),
+        currentUserId(req),
+      );
+      setPrivateNoStore(res);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async getViewerPageHotspots(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await getEBookletService().getViewerPageHotspots(
         parseId(req.params.instanceId, "instance ID"),
         parseId(req.params.pageNumber, "page number"),
         currentUserId(req),
+      );
+      setPrivateNoStore(res);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getAdminViewerPageHotspots(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getAdminViewerPageHotspots(
+        parseId(req.params.instanceId, "instance ID"),
+        parseId(req.params.pageNumber, "page number"),
       );
       setPrivateNoStore(res);
       res.status(200).json({ success: true, data });
@@ -762,12 +815,42 @@ export const eBookletController = {
     }
   },
 
+  async getAdminHotspotContent(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getAdminHotspotContent(
+        parseId(req.params.hotspotId, "hotspot ID"),
+      );
+      setPrivateNoStore(res);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async getAuthorizedHotspotAsset(req: Request, res: Response, next: NextFunction) {
     try {
       const { asset, absolutePath } = await getEBookletService().getAuthorizedHotspotAsset(
         parseId(req.params.hotspotId, "hotspot ID"),
         parseId(req.params.assetId, "asset ID"),
         currentUserId(req),
+      );
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "application/octet-stream");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
+      );
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getAdminAuthorizedHotspotAsset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { asset, absolutePath } = await getEBookletService().getAdminAuthorizedHotspotAsset(
+        parseId(req.params.hotspotId, "hotspot ID"),
+        parseId(req.params.assetId, "asset ID"),
       );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/octet-stream");
