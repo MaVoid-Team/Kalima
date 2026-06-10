@@ -755,6 +755,7 @@ enum e_booklet_file_type_enum {
   audio
   doc
   docx
+  file
 }
 
 enum e_booklet_file_visibility_enum {

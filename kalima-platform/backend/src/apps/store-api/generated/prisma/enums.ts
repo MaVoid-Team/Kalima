@@ -232,7 +232,8 @@ export const e_booklet_file_type_enum = {
   video: 'video',
   audio: 'audio',
   doc: 'doc',
-  docx: 'docx'
+  docx: 'docx',
+  file: 'file'
 } as const
 
 export type e_booklet_file_type_enum = (typeof e_booklet_file_type_enum)[keyof typeof e_booklet_file_type_enum]
