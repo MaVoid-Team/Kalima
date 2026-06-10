@@ -1408,6 +1408,15 @@ export class EBookletService {
   }
 
   async updateQuota(instanceId: number, inviteQuota: number): Promise<unknown> {
+    const instance = await this.db.e_booklet_instances.findUnique({
+      where: { id: instanceId },
+      select: { id: true },
+    });
+    if (!instance) throw new NotFoundError("Teacher e-booklet not found");
+    const reservedSeats = await this.countReservedStudentSeats(this.db, instanceId);
+    if (inviteQuota < reservedSeats) {
+      throw new BadRequestError("Invite quota cannot be below existing student seats or pending reservations.");
+    }
     return this.db.e_booklet_instances.update({
       where: { id: instanceId },
       data: { invite_quota: inviteQuota, updated_at: new Date() },
@@ -2432,7 +2441,7 @@ export class EBookletService {
     try {
       this.requireStudentTerms(input);
       for (const key of rateLimitKeys) this.assertPasscodeNotBlocked(key);
-      return await this.transaction(async (tx: EBookletDb) => {
+      return await this.serializableTransaction(async (tx: EBookletDb) => {
       const invite = await tx.e_booklet_invites.findFirst({
         where: { token_hash: tokenHash },
         include: { booklet_instance: { select: { id: true, invite_quota: true, status: true, student_marketing_price: true, internal_price: true } } },
@@ -2487,16 +2496,7 @@ export class EBookletService {
         });
         return existingAccess;
       }
-      const activeStudentAccessCount = await tx.e_booklet_access.count({
-        where: {
-          booklet_instance_id: invite.booklet_instance_id,
-          role: "student",
-          status: "active",
-        },
-      });
-      if (activeStudentAccessCount >= instance.invite_quota) {
-        throw new ForbiddenError("This e-booklet invite has reached its access limit.");
-      }
+      await this.assertStudentSeatAvailable(tx, instance);
       const access = await tx.e_booklet_access.create({
         data: {
           booklet_instance_id: invite.booklet_instance_id,
@@ -2562,7 +2562,7 @@ export class EBookletService {
     const tokenHash = hashInviteToken(rawToken);
     try {
       this.requireStudentTerms(input);
-      return await this.transaction(async (tx: EBookletDb) => {
+      return await this.serializableTransaction(async (tx: EBookletDb) => {
       const invite = await tx.e_booklet_invites.findFirst({
         where: { token_hash: tokenHash },
         include: {
@@ -2603,16 +2603,7 @@ export class EBookletService {
         });
         return existingAccess;
       }
-      const activeStudentAccessCount = await tx.e_booklet_access.count({
-        where: {
-          booklet_instance_id: invite.booklet_instance_id,
-          role: "student",
-          status: "active",
-        },
-      });
-      if (activeStudentAccessCount >= instance.invite_quota) {
-        throw new ForbiddenError("This e-booklet invite has reached its access limit.");
-      }
+      await this.assertStudentSeatAvailable(tx, instance);
       const access = await tx.e_booklet_access.create({
         data: {
           booklet_instance_id: invite.booklet_instance_id,
@@ -2684,7 +2675,7 @@ export class EBookletService {
   }> {
     const tokenHash = hashInviteToken(rawToken);
 
-    return this.db.$transaction(async (tx: EBookletDb) => {
+    return this.serializableTransaction(async (tx: EBookletDb) => {
       const invite = await tx.e_booklet_invites.findFirst({
         where: { token_hash: tokenHash },
         include: {
@@ -2740,19 +2731,7 @@ export class EBookletService {
         };
       }
 
-      const activeStudentAccessCount = await tx.e_booklet_access.count({
-        where: {
-          booklet_instance_id: invite.booklet_instance_id,
-          role: "student",
-          status: "active",
-        },
-      });
-
-      if (activeStudentAccessCount >= bookletInstance.invite_quota) {
-        throw new ForbiddenError(
-          "This e-booklet invite has reached its access limit.",
-        );
-      }
+      await this.assertStudentSeatAvailable(tx, { ...bookletInstance, id: invite.booklet_instance_id });
 
       const access = await tx.e_booklet_access.create({
         data: {

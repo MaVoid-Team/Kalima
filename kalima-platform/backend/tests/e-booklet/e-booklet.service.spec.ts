@@ -65,6 +65,7 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
       groupBy: jest.fn(),
       findFirst: jest.fn(),
       findMany: jest.fn(),
+      findUnique: jest.fn(),
     },
     e_booklet_access: {
       findFirst: jest.fn(),
@@ -1017,7 +1018,7 @@ describe("EBookletService", () => {
       });
       db.e_booklet_access.findFirst.mockResolvedValue(null);
       db.e_booklet_access.count.mockResolvedValue(1);
-      await expect(service.acceptFreeInvite("token", 55, { termsAccepted: true })).rejects.toThrow("This e-booklet invite has reached its access limit.");
+      await expect(service.acceptFreeInvite("token", 55, { termsAccepted: true })).rejects.toThrow("student seat limit");
     });
 
     test("does not expose internal price in user booklet lists or viewer metadata", async () => {
@@ -1048,6 +1049,45 @@ describe("EBookletService", () => {
       const service = new EBookletService(createMockDb());
       expect(() => service.validateInstancePricing({ marketing_price: 100, internal_price: 101 })).toThrow("Internal price cannot exceed marketing price.");
       expect(service.validateInstancePricing({ template_marketing_price: 100, student_marketing_price: 80, internal_price: 60 })).toEqual({ marketingPrice: 80, internalPrice: 60 });
+    });
+
+    test("rejects quota reductions below active and pending reserved seats", async () => {
+      const db = createMockDb();
+      db.e_booklet_instances.findUnique.mockResolvedValue({ id: 10, invite_quota: 5 });
+      db.e_booklet_access.count.mockResolvedValue(2);
+      db.e_booklet_student_purchase_links.count.mockResolvedValue(2);
+      const service = new EBookletService(db);
+
+      await expect(service.updateQuota(10, 3)).rejects.toThrow("below existing student seats");
+      expect(db.e_booklet_instances.update).not.toHaveBeenCalled();
+    });
+
+    test("free and passcode invite acceptance count pending reservations before creating access", async () => {
+      const db = createMockDb();
+      db.e_booklet_invites.findFirst
+        .mockResolvedValueOnce({
+          id: 2,
+          booklet_instance_id: 10,
+          max_uses: null,
+          used_count: 0,
+          booklet_instance: { id: 10, invite_quota: 2, status: "active", student_marketing_price: 0, internal_price: 0 },
+        })
+        .mockResolvedValueOnce({
+          id: 3,
+          booklet_instance_id: 11,
+          passcode_hash: hmacPasscode("123456"),
+          max_uses: null,
+          used_count: 0,
+          booklet_instance: { id: 11, invite_quota: 2, status: "active", student_marketing_price: 0, internal_price: 0 },
+        });
+      db.e_booklet_access.findFirst.mockResolvedValue(null);
+      db.e_booklet_access.count.mockResolvedValue(1);
+      db.e_booklet_student_purchase_links.count.mockResolvedValue(1);
+      const service = new EBookletService(db);
+
+      await expect(service.acceptFreeInvite("free-token", 55, { termsAccepted: true })).rejects.toThrow("student seat limit");
+      await expect(service.acceptInvitePasscode("pass-token", 55, { termsAccepted: true, passcode: "123456" })).rejects.toThrow("student seat limit");
+      expect(db.e_booklet_access.create).not.toHaveBeenCalled();
     });
 
     test("blocks viewer access after expiry and archives the instance", async () => {
@@ -1206,7 +1246,38 @@ describe("EBookletService", () => {
       const service = new EBookletService(db);
 
       await expect(service.acceptInvite("invite-token", 55)).rejects.toThrow(
-        "This e-booklet invite has reached its access limit.",
+        "student seat limit",
+      );
+      expect(db.e_booklet_access.create).not.toHaveBeenCalled();
+      expect(db.e_booklet_invite_redemptions.create).not.toHaveBeenCalled();
+    });
+
+    test("blocks legacy invite redemption when active plus pending reservations exhaust quota", async () => {
+      const db = createMockDb();
+
+      db.e_booklet_invites.findFirst.mockResolvedValue({
+        id: 7,
+        token_hash: hashInviteToken("invite-token"),
+        status: "active",
+        expires_at: null,
+        booklet_instance_id: 10,
+        teacher_id: 99,
+        max_uses: null,
+        used_count: 0,
+        e_booklet_instances: {
+          id: 10,
+          status: "active",
+          invite_quota: 2,
+        },
+      });
+      db.e_booklet_access.findFirst.mockResolvedValue(null);
+      db.e_booklet_access.count.mockResolvedValue(1);
+      db.e_booklet_student_purchase_links.count.mockResolvedValue(1);
+
+      const service = new EBookletService(db);
+
+      await expect(service.acceptInvite("invite-token", 55)).rejects.toThrow(
+        "student seat limit",
       );
       expect(db.e_booklet_access.create).not.toHaveBeenCalled();
       expect(db.e_booklet_invite_redemptions.create).not.toHaveBeenCalled();
