@@ -129,17 +129,18 @@ export function useTeacherEBookletAnalytics() {
   return { analytics, loading, fetchAnalytics };
 }
 
-export function useEBookletViewer() {
+export function useEBookletViewer({ adminMode = false } = {}) {
   const { mutate: fetchApi, loading } = useApiMutation();
   const [metadata, setMetadata] = useState(null);
   const [page, setPage] = useState(null);
   const [hotspots, setHotspots] = useState([]);
+  const viewerBase = adminMode ? "/admin/e-booklet-viewer" : "/e-booklet-viewer";
 
   const fetchMetadata = useCallback(
     async (instanceId) => {
       const response = await fetchApi(
         {
-          endpoint: `/e-booklet-viewer/${instanceId}/metadata`,
+          endpoint: `${viewerBase}/${instanceId}/metadata`,
           method: "get",
         },
         false,
@@ -147,7 +148,7 @@ export function useEBookletViewer() {
       setMetadata(response?.data || null);
       return response;
     },
-    [fetchApi],
+    [fetchApi, viewerBase],
   );
 
   const fetchPage = useCallback(
@@ -155,14 +156,14 @@ export function useEBookletViewer() {
       const [pageResponse, hotspotsResponse] = await Promise.all([
         fetchApi(
           {
-            endpoint: `/e-booklet-viewer/${instanceId}/pages/${pageNumber}`,
+            endpoint: `${viewerBase}/${instanceId}/pages/${pageNumber}`,
             method: "get",
           },
           false,
         ),
         fetchApi(
           {
-            endpoint: `/e-booklet-viewer/${instanceId}/pages/${pageNumber}/hotspots`,
+            endpoint: `${viewerBase}/${instanceId}/pages/${pageNumber}/hotspots`,
             method: "get",
           },
           false,
@@ -172,19 +173,19 @@ export function useEBookletViewer() {
       setHotspots(Array.isArray(hotspotsResponse?.data) ? hotspotsResponse.data : []);
       return { page: pageResponse?.data, hotspots: hotspotsResponse?.data };
     },
-    [fetchApi],
+    [fetchApi, viewerBase],
   );
 
   const fetchHotspotContent = useCallback(
     (hotspotId) =>
       fetchApi(
         {
-          endpoint: `/e-booklet-viewer/hotspots/${hotspotId}/content`,
+          endpoint: `${viewerBase}/hotspots/${hotspotId}/content`,
           method: "get",
         },
         false,
       ),
-    [fetchApi],
+    [fetchApi, viewerBase],
   );
 
   const bindDevice = useCallback(
@@ -202,11 +203,11 @@ export function useEBookletViewer() {
 
   const fetchHotspotAssetBlobUrl = useCallback(async (hotspotId, assetId) => {
     const response = await api.get(
-      `/e-booklet-viewer/hotspots/${hotspotId}/assets/${assetId}`,
+      `${viewerBase}/hotspots/${hotspotId}/assets/${assetId}`,
       { responseType: "blob" },
     );
     return URL.createObjectURL(response.data);
-  }, []);
+  }, [viewerBase]);
 
   return {
     metadata,

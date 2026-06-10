@@ -83,15 +83,13 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
   return (
     <article
       className={cn(
-        "group grid overflow-hidden rounded-lg border border-border/70 bg-card transition duration-300 hover:-translate-y-0.5 hover:border-emerald-600/40 hover:shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)]",
-        featured ? "md:grid-cols-[0.92fr_1.08fr] xl:row-span-2" : "grid-rows-[auto_1fr]",
+        "group grid min-h-full grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-border/70 bg-card transition duration-300 hover:-translate-y-0.5 hover:border-emerald-600/40 hover:shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)]",
       )}
     >
       <Link
         to={`/e-booklets/instances/${template.instanceId || template.id}`}
         className={cn(
-          "block overflow-hidden bg-muted",
-          featured ? "min-h-[300px] md:min-h-full" : "aspect-[4/3]",
+          "block aspect-[4/3] overflow-hidden bg-muted",
         )}
       >
         <EBookletCover template={template} featured={featured} t={t} />

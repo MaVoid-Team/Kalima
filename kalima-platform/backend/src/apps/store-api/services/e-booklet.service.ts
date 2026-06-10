@@ -140,6 +140,9 @@ type TermsInput = {
   termsVersion?: string;
   purchaseId?: number;
   paymentProofFileId?: number;
+  payment_method_id?: number;
+  numberTransferredFrom?: string;
+  notes?: string;
   passcode?: string;
 };
 
@@ -1093,9 +1096,16 @@ export class EBookletService {
     return this.serializePublicInstance(instance);
   }
 
-  async createPublicCheckoutRequest(studentId: number, dto: any): Promise<unknown> {
+  async createPublicCheckoutRequest(
+    studentId: number,
+    dto: any,
+    paymentScreenshotFile?: Express.Multer.File,
+  ): Promise<unknown> {
     if (!dto.instance_id) {
       throw new BadRequestError("E-booklet instance is required for checkout.");
+    }
+    if (!dto.terms_accepted) {
+      throw new BadRequestError("Terms must be accepted before e-booklet checkout.");
     }
 
     const instance = await this.db.e_booklet_instances.findFirst({
@@ -1119,17 +1129,41 @@ export class EBookletService {
 
     const price = Number(instance.student_marketing_price ?? 0);
     const shareToken = generateInviteToken();
+    let paymentScreenshotId: number | null = null;
+    let paymentMethod: { phone_number: string | null } | null = null;
+
+    if (price > 0) {
+      if (!paymentScreenshotFile) {
+        throw new BadRequestError("Payment screenshot is required for paid e-booklet checkout.");
+      }
+      const { imageService } = await import("./image.service");
+      const { validatePaymentForCheckout } = await import("./checkout-validation.service");
+      const paymentScreenshot = await imageService.uploadImage(
+        paymentScreenshotFile,
+        { compress: true, quality: 80 },
+      );
+      paymentScreenshotId = paymentScreenshot.id;
+      paymentMethod = await validatePaymentForCheckout(this.db, {
+        total: price,
+        numberTransferredFrom: dto.numberTransferredFrom,
+        payment_method_id: dto.payment_method_id,
+      });
+    }
 
     return this.serializableTransaction(async (tx: EBookletDb) => {
       await this.assertStudentSeatAvailable(tx, instance);
       const purchase = await tx.purchases.create({
         data: {
           user_id: studentId,
+          payment_method_id: price > 0 ? (dto.payment_method_id ?? null) : null,
+          payment_screenshot_id: paymentScreenshotId,
           status: price > 0 ? "pending" : "confirmed",
           subtotal: price,
           discount: 0,
           total: price,
           notes: dto.notes,
+          number_transferred_from: price > 0 ? (dto.numberTransferredFrom || null) : null,
+          payment_number: price > 0 ? (paymentMethod?.phone_number || null) : null,
         },
       });
 
@@ -1817,6 +1851,151 @@ export class EBookletService {
     return allowance;
   }
 
+  private async getAdminViewerAccess(instanceId: number) {
+    const instance = await this.db.e_booklet_instances.findUnique({
+      where: { id: instanceId },
+      include: {
+        template: true,
+        template_version: true,
+        teacher: { select: { id: true, name: true } },
+      },
+    });
+    if (!instance || instance.status === "revoked") {
+      throw new NotFoundError("E-booklet instance not found.");
+    }
+    return this.sanitizeViewerAccess({
+      id: 0,
+      status: "active",
+      access_source: "admin_view",
+      admin_view_mode: true,
+      booklet_instance_id: instanceId,
+      booklet_instance: instance,
+    });
+  }
+
+  async getAdminViewerMetadata(instanceId: number, adminUserId: number) {
+    const access = await this.getAdminViewerAccess(instanceId);
+    await this.db.e_booklet_audit_logs.create({
+      data: {
+        actor_user_id: adminUserId,
+        action: "admin_view_opened",
+        entity_type: "e_booklet_instance",
+        entity_id: instanceId,
+      },
+    });
+    return access;
+  }
+
+  async getAdminViewerPage(instanceId: number, pageNumber: number, adminUserId: number) {
+    const access: any = await this.getAdminViewerAccess(instanceId);
+    const pageCount = Number(access.booklet_instance?.template_version?.page_count || 0);
+    if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pageCount) {
+      throw new BadRequestError("Invalid e-booklet page number.");
+    }
+    const expiresAt = new Date(Date.now() + VIEWER_PAGE_TOKEN_TTL_MS);
+    await this.db.e_booklet_audit_logs.create({
+      data: {
+        actor_user_id: adminUserId,
+        action: "admin_page_viewed",
+        entity_type: "e_booklet_instance",
+        entity_id: instanceId,
+        metadata_json: { page_number: pageNumber },
+      },
+    });
+    return {
+      pageNumber,
+      renderMode: "server-page",
+      pageAccessToken: createViewerPageToken({ instanceId, pageNumber, userId: adminUserId, expiresAt }),
+      expiresAt,
+      cacheControl: "private, no-store",
+      adminViewMode: true,
+      watermark: {
+        teacherName: access.booklet_instance?.teacher?.name || null,
+        templateTitle: access.booklet_instance?.template?.title || null,
+      },
+      message: "Admin View Mode: previewing the delivered e-booklet without consuming a student seat or binding a device.",
+    };
+  }
+
+  async getAdminViewerPageHotspots(instanceId: number, pageNumber: number) {
+    const access: any = await this.getAdminViewerAccess(instanceId);
+    const hotspots = await this.db.e_booklet_hotspots.findMany({
+      where: {
+        template_version_id: access.booklet_instance.template_version_id,
+        page_number: pageNumber,
+        is_active: true,
+      },
+      orderBy: { sort_order: "asc" },
+    });
+    return hotspots.map((hotspot: any) => this.normalizeHotspotRecord(hotspot));
+  }
+
+  async getAdminHotspotContent(hotspotId: number) {
+    const hotspot = await this.db.e_booklet_hotspots.findUnique({
+      where: { id: hotspotId },
+      include: { asset_file: true, template_version: { include: { instances: { take: 1 } } } },
+    });
+    if (!hotspot || !hotspot.template_version.instances.length) {
+      throw new NotFoundError("E-booklet hotspot not found.");
+    }
+    return {
+      id: hotspot.id,
+      template_version_id: hotspot.template_version_id,
+      page_number: hotspot.page_number,
+      x_percent: hotspot.x_percent,
+      y_percent: hotspot.y_percent,
+      radius_percent: hotspot.radius_percent,
+      type: hotspot.type,
+      title: hotspot.title,
+      text_content: hotspot.text_content,
+      asset_file_id: hotspot.asset_file_id,
+      trigger_type: hotspot.trigger_type,
+      display_behavior: hotspot.display_behavior,
+      content_json: this.normalizeLegacyHotspotContent(hotspot),
+      asset_file: hotspot.asset_file
+        ? {
+            id: hotspot.asset_file.id,
+            file_type: hotspot.asset_file.file_type,
+            original_filename: hotspot.asset_file.original_filename,
+            mime_type: hotspot.asset_file.mime_type,
+            size_bytes: hotspot.asset_file.size_bytes,
+            visibility: hotspot.asset_file.visibility,
+          }
+        : null,
+    };
+  }
+
+  async getAdminAuthorizedHotspotAsset(hotspotId: number, assetId: number) {
+    const hotspot = await this.db.e_booklet_hotspots.findUnique({
+      where: { id: hotspotId },
+      include: { template_version: { include: { instances: { take: 1 } } } },
+    });
+    const referencedAssetIds = new Set<number>();
+    if (hotspot?.asset_file_id) referencedAssetIds.add(Number(hotspot.asset_file_id));
+    const blocks = Array.isArray(hotspot?.content_json?.blocks) ? hotspot.content_json.blocks : [];
+    blocks.forEach((block: any) => {
+      if (block?.asset_file_id) referencedAssetIds.add(Number(block.asset_file_id));
+    });
+    if (!hotspot || !referencedAssetIds.has(assetId) || !hotspot.template_version?.instances?.length) {
+      throw new ForbiddenError("You do not have access to this hotspot asset.");
+    }
+    const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: assetId } });
+    if (!asset) throw new NotFoundError("E-booklet file asset not found");
+    const filename = path.basename(asset.storage_key || "");
+    return {
+      asset: {
+        id: asset.id,
+        file_type: asset.file_type,
+        original_filename: asset.original_filename,
+        mime_type: asset.mime_type,
+        size_bytes: asset.size_bytes,
+        visibility: asset.visibility,
+      },
+      absolutePath: path.join(E_BOOKLET_UPLOAD_DIR, filename),
+      cacheControl: "private, no-store",
+    };
+  }
+
   async getViewerMetadata(instanceId: number, userId: number) {
     const access = await this.assertViewerAccess(instanceId, userId);
     await this.db.e_booklet_audit_logs.create({
@@ -2342,14 +2521,103 @@ export class EBookletService {
     rawToken: string,
     studentId: number,
     input: TermsInput,
+    paymentScreenshotFile?: Express.Multer.File,
   ) {
     try {
       this.requireStudentTerms(input);
-      if (!input.purchaseId) {
-        throw new BadRequestError("Student purchase ID is required.");
-      }
       const invite = await this.findInviteByToken(rawToken);
       const instance = this.ensureInviteUsable(invite);
+      const price = Number(instance.student_marketing_price ?? 0);
+
+      if (!input.purchaseId) {
+        let paymentScreenshotId: number | null = null;
+        let paymentMethod: { phone_number: string | null } | null = null;
+        if (price > 0) {
+          if (!paymentScreenshotFile) {
+            throw new BadRequestError("Payment screenshot is required for online e-booklet invite purchases.");
+          }
+          const { imageService } = await import("./image.service");
+          const { validatePaymentForCheckout } = await import("./checkout-validation.service");
+          const paymentScreenshot = await imageService.uploadImage(
+            paymentScreenshotFile,
+            { compress: true, quality: 80 },
+          );
+          paymentScreenshotId = paymentScreenshot.id;
+          paymentMethod = await validatePaymentForCheckout(this.db, {
+            total: price,
+            numberTransferredFrom: input.numberTransferredFrom,
+            payment_method_id: input.payment_method_id,
+          });
+        }
+
+        const result = await this.serializableTransaction(async (tx: EBookletDb) => {
+          await this.assertStudentSeatAvailable(tx, instance);
+          const purchase = await tx.purchases.create({
+            data: {
+              user_id: studentId,
+              payment_method_id: price > 0 ? (input.payment_method_id ?? null) : null,
+              payment_screenshot_id: paymentScreenshotId,
+              status: price > 0 ? "pending" : "confirmed",
+              subtotal: price,
+              discount: 0,
+              total: price,
+              notes: input.notes,
+              number_transferred_from: price > 0 ? (input.numberTransferredFrom || null) : null,
+              payment_number: price > 0 ? (paymentMethod?.phone_number || null) : null,
+            },
+          });
+          const link = await tx.e_booklet_student_purchase_links.create({
+            data: {
+              purchase_id: purchase.id,
+              invite_id: invite.id,
+              booklet_instance_id: invite.booklet_instance_id,
+              student_id: studentId,
+              marketing_price_snapshot: price,
+              terms_accepted_at: new Date(),
+              terms_version: input.termsVersion,
+            },
+          });
+
+          await this.recordAnalyticsEvent(tx, {
+            event_type: "online_purchase_selected",
+            teacher_id: invite.teacher_id ?? (instance as any).teacher_id,
+            student_id: studentId,
+            template_id: (instance as any).template_id,
+            booklet_instance_id: invite.booklet_instance_id,
+            invite_id: invite.id,
+            purchase_id: purchase.id,
+            source: "online_purchase",
+            marketing_price_snapshot: price,
+            internal_price_snapshot: Number((instance as any).internal_price ?? 0),
+            metadata: { terms_version: input.termsVersion, payment_proof_uploaded: Boolean(paymentScreenshotId) },
+          });
+          await tx.e_booklet_audit_logs.create({
+            data: {
+              actor_user_id: studentId,
+              action: "student_purchase_link_created",
+              entity_type: "e_booklet_instance",
+              entity_id: invite.booklet_instance_id,
+              metadata_json: {
+                invite_id: invite.id,
+                purchase_id: purchase.id,
+                payment_screenshot_id: paymentScreenshotId,
+                marketing_price_snapshot: price,
+                terms_version: input.termsVersion,
+              },
+            },
+          });
+          return {
+            ...link,
+            purchase_id: purchase.id,
+            status: purchase.status,
+            total: price,
+            currency: "EGP",
+            booklet_instance_id: invite.booklet_instance_id,
+          };
+        });
+        return result;
+      }
+
       const purchase = await this.db.purchases.findFirst({
         where: {
           id: input.purchaseId,
@@ -2387,7 +2655,7 @@ export class EBookletService {
           invite_id: invite.id,
           booklet_instance_id: invite.booklet_instance_id,
           student_id: studentId,
-          marketing_price_snapshot: Number(instance.student_marketing_price ?? 0),
+          marketing_price_snapshot: price,
           terms_accepted_at: new Date(),
           terms_version: input.termsVersion,
         },
@@ -2401,7 +2669,7 @@ export class EBookletService {
         invite_id: invite.id,
         purchase_id: input.purchaseId,
         source: "online_purchase",
-        marketing_price_snapshot: Number(instance.student_marketing_price ?? 0),
+        marketing_price_snapshot: price,
         metadata: { terms_version: input.termsVersion, payment_proof_uploaded: Boolean(proofFileId) },
       });
       await this.auditSafely(this.db, {
@@ -2413,7 +2681,7 @@ export class EBookletService {
           invite_id: invite.id,
           purchase_id: input.purchaseId,
           payment_proof_file_id: proofFileId,
-          marketing_price_snapshot: Number(instance.student_marketing_price ?? 0),
+          marketing_price_snapshot: price,
           terms_version: input.termsVersion,
         },
       });

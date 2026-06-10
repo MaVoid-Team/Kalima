@@ -1,4 +1,13 @@
 import crypto from "crypto";
+
+jest.mock("../../src/apps/store-api/services/image.service", () => ({
+  imageService: { uploadImage: jest.fn().mockResolvedValue({ id: 700 }) },
+}));
+
+jest.mock("../../src/apps/store-api/services/checkout-validation.service", () => ({
+  validatePaymentForCheckout: jest.fn().mockResolvedValue({ phone_number: "01000000000" }),
+}));
+
 import { EBookletService } from "../../src/apps/store-api/services/e-booklet.service";
 import { hashInviteToken } from "../../src/apps/store-api/utils/e-booklet-token";
 
@@ -382,7 +391,10 @@ describe("EBookletService", () => {
         template_id: 3,
         template_version_id: 8,
         terms_version: "v1",
-      });
+        terms_accepted: true,
+        payment_method_id: 1,
+        numberTransferredFrom: "01000000000",
+      }, { buffer: Buffer.from("png"), mimetype: "image/png", originalname: "proof.png" } as any);
 
       expect(db.e_booklet_instances.findFirst).toHaveBeenCalledWith(expect.objectContaining({
         where: expect.objectContaining({ id: 10, status: "active", access_expires_at: { gt: expect.any(Date) } }),
@@ -436,7 +448,10 @@ describe("EBookletService", () => {
         instance_id: 10,
         template_id: 3,
         template_version_id: 8,
-      })).rejects.toThrow("student seat limit");
+        terms_accepted: true,
+        payment_method_id: 1,
+        numberTransferredFrom: "01000000000",
+      }, { buffer: Buffer.from("png"), mimetype: "image/png", originalname: "proof.png" } as any)).rejects.toThrow("student seat limit");
       expect(db.purchases.create).not.toHaveBeenCalled();
     });
 
@@ -461,7 +476,7 @@ describe("EBookletService", () => {
       db.e_booklet_access.create.mockResolvedValue({ id: 94 });
 
       const service = new EBookletService(db);
-      const result: any = await service.createPublicCheckoutRequest(55, { instance_id: 10, template_id: 3, template_version_id: 8 });
+      const result: any = await service.createPublicCheckoutRequest(55, { instance_id: 10, template_id: 3, template_version_id: 8, terms_accepted: true });
 
       expect(db.purchases.create).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({ subtotal: 0, total: 0, status: "confirmed" }),

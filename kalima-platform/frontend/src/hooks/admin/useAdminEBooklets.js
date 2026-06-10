@@ -515,6 +515,13 @@ export function useAdminEBookletDevices() {
     return response;
   }, [fetchApi]);
 
+  const fetchStudents = useCallback(async (instanceId) => {
+    if (!instanceId) { setStudents([]); return { data: [] }; }
+    const response = await fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/students`, method: "get" }, false);
+    setStudents(Array.isArray(response?.data) ? response.data : []);
+    return response;
+  }, [fetchApi]);
+
   const resetDevices = useCallback((instanceId, userId, reason) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/users/${userId}/devices/reset`, method: "post", data: { reason }, defaultSuccessMessage: i18n.t("eBooklets:toasts.devicesReset") }), [fetchApi]);
   const addDeviceAllowance = useCallback((instanceId, userId, allowedDevices, reason) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/users/${userId}/device-allowance`, method: "post", data: { allowedDevices: Number(allowedDevices), reason }, defaultSuccessMessage: i18n.t("eBooklets:toasts.deviceAllowanceUpdated") }), [fetchApi]);
 
@@ -522,5 +529,5 @@ export function useAdminEBookletDevices() {
     setStudents(Array.isArray(rows) ? rows : []);
   }, []);
 
-  return { devices, students, loading, fetchDevices, resetDevices, addDeviceAllowance, setDiscoveredStudents };
+  return { devices, students, loading, fetchDevices, fetchStudents, resetDevices, addDeviceAllowance, setDiscoveredStudents };
 }

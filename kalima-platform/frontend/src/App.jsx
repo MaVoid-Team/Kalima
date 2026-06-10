@@ -206,6 +206,7 @@ const router = createBrowserRouter(
           <Route path="/admin/e-booklets/:id/edit" element={<AdminEBookletEditorPage />} />
           <Route path="/admin/e-booklet-purchases" element={<AdminEBookletPurchasesPage />} />
           <Route path="/admin/e-booklet-instances" element={<AdminEBookletInstancesPage />} />
+          <Route path="/admin/e-booklet-instances/:instanceId/view" element={<EBookletViewerPage />} />
           <Route path="/admin/e-booklet-analytics" element={<AdminEBookletAnalyticsPage />} />
           <Route path="/admin/e-booklet-instances/:instanceId/devices" element={<AdminEBookletDevicesPage />} />
           <Route path="/admin/categories" element={<CategoriesPage />} />

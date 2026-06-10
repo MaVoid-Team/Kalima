@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
   Download,
   ExternalLink,
+  Eye,
   FileText,
   Image as ImageIcon,
   Link as LinkIcon,
@@ -371,11 +372,13 @@ function ContentBlock({ block, hotspot, viewer, t }) {
 }
 
 export default function EBookletViewerPage() {
-  const { t, i18n } = useTranslation("eBooklets");
   const { instanceId } = useParams();
+  const location = useLocation();
+  const adminMode = location.pathname.startsWith("/admin/");
+  const { t, i18n } = useTranslation("eBooklets");
   const { user } = useAuth();
   const { isStudent } = useRole();
-  const viewer = useEBookletViewer();
+  const viewer = useEBookletViewer({ adminMode });
   const [pageNumber, setPageNumber] = useState(1);
   const [zoom, setZoom] = useState(1);
   const [activeHotspot, setActiveHotspot] = useState(null);
@@ -389,6 +392,12 @@ export default function EBookletViewerPage() {
     setDeviceError("");
     const initializeViewer = async () => {
       try {
+        if (adminMode) {
+          if (!active) return;
+          setDeviceStatus("allowed");
+          viewer.fetchMetadata(instanceId).catch(() => {});
+          return;
+        }
         const fingerprint = await buildDeviceFingerprint();
         if (!active) return;
         await viewer.bindDevice(instanceId, {
@@ -408,7 +417,7 @@ export default function EBookletViewerPage() {
     return () => {
       active = false;
     };
-  }, [instanceId, t, viewer.bindDevice, viewer.fetchMetadata]);
+  }, [adminMode, instanceId, t, viewer.bindDevice, viewer.fetchMetadata]);
 
   useEffect(() => {
     if (deviceStatus !== "allowed") return;
@@ -448,7 +457,7 @@ export default function EBookletViewerPage() {
     user: user?.name || user?.email || t("common.user"),
     date: today,
   });
-  const backHref = isStudent ? "/student/e-booklets" : "/teacher/e-booklets";
+  const backHref = adminMode ? "/admin/e-booklet-instances" : isStudent ? "/student/e-booklets" : "/teacher/e-booklets";
 
   const pageStyle = useMemo(
     () => ({
@@ -499,6 +508,12 @@ export default function EBookletViewerPage() {
               {instance?.display_title || instance?.template?.title || t("viewer.titleFallback")}
             </h1>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              {adminMode && (
+                <Badge variant="secondary" className="gap-1">
+                  <Eye className="h-3 w-3" />
+                  Admin View Mode
+                </Badge>
+              )}
               <Badge variant="outline" className="gap-1">
                 <Lock className="h-3 w-3" />
                 {t("common.noDownload")}
