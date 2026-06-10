@@ -551,7 +551,7 @@ export const eBookletController = {
     try {
       const data = await getEBookletService().listInstanceStudents(
         parseId(req.params.instanceId, "instance ID"),
-        currentUserId(req),
+        req.path.startsWith("/admin/") ? undefined : currentUserId(req),
       );
       res.status(200).json({ success: true, data });
     } catch (error) {
