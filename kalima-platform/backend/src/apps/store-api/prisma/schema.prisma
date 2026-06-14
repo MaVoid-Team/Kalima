@@ -89,6 +89,19 @@ model users {
   account_review_settings_updated account_review_settings[] @relation("AccountReviewUpdatedBy")
   notifications_received    notifications[]            @relation("NotificationRecipient")
   notifications_created     notifications[]            @relation("NotificationCreator")
+  e_booklet_templates_created e_booklet_templates[]     @relation("EBookletTemplateCreator")
+  e_booklet_template_versions_created e_booklet_template_versions[] @relation("EBookletTemplateVersionCreator")
+  e_booklet_hotspots_created e_booklet_hotspots[]       @relation("EBookletHotspotCreator")
+  e_booklet_hotspots_updated e_booklet_hotspots[]       @relation("EBookletHotspotUpdater")
+  e_booklet_purchases        e_booklet_purchases[]      @relation("EBookletPurchaseTeacher")
+  e_booklet_instances        e_booklet_instances[]      @relation("EBookletInstanceTeacher")
+  e_booklet_access           e_booklet_access[]
+  e_booklet_invites          e_booklet_invites[]        @relation("EBookletInviteTeacher")
+  e_booklet_invite_redemptions e_booklet_invite_redemptions[] @relation("EBookletInviteRedemptionStudent")
+  e_booklet_audit_logs       e_booklet_audit_logs[]     @relation("EBookletAuditActor")
+  e_booklet_devices          e_booklet_devices[]
+  e_booklet_device_allowances e_booklet_device_allowances[]
+  e_booklet_student_purchase_links e_booklet_student_purchase_links[] @relation("EBookletStudentPurchaseStudent")
 
   @@index([mongo_id], map: "ix_users_mongo_id")
 }
@@ -300,6 +313,7 @@ model categories {
   parent             categories?          @relation("categoriesTocategories", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   product_categories product_categories[]
   sub_categories     categories[]         @relation("categoriesTocategories")
+  e_booklet_templates e_booklet_templates[]
 }
 
 model product_categories {
@@ -531,6 +545,7 @@ model purchases {
   payment_methods         payment_methods? @relation(fields: [payment_method_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   payment_screenshot      images?          @relation("PurchasePaymentScreenshot", fields: [payment_screenshot_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   watermark               images?          @relation("PurchaseWatermark", fields: [watermark_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  e_booklet_student_purchase_link e_booklet_student_purchase_links?
 
   @@index([user_id], map: "ix_purchases_user_id")
   @@index([status], map: "ix_purchases_status")
@@ -660,6 +675,94 @@ enum user_flag_enum {
   BANNED
 }
 
+enum e_booklet_template_status_enum {
+  draft
+  published
+  archived
+}
+
+enum e_booklet_template_version_status_enum {
+  draft
+  active
+  archived
+}
+
+enum e_booklet_hotspot_type_enum {
+  text
+  image
+  video
+  audio
+  file
+  link
+  question_answer
+}
+
+enum e_booklet_hotspot_shape_enum {
+  circle
+  rectangle
+  square
+  triangle
+  oval
+}
+
+enum e_booklet_video_source_enum {
+  uploaded
+  youtube
+}
+
+enum e_booklet_hotspot_trigger_type_enum {
+  hover
+  click
+  both
+}
+
+enum e_booklet_purchase_status_enum {
+  pending
+  awaiting_payment
+  paid
+  needs_branding_info
+  customization_in_progress
+  ready
+  cancelled
+  rejected
+}
+
+enum e_booklet_instance_status_enum {
+  active
+  suspended
+  archived
+}
+
+enum e_booklet_access_role_enum {
+  teacher
+  student
+}
+
+enum e_booklet_access_status_enum {
+  active
+  revoked
+}
+
+enum e_booklet_invite_status_enum {
+  active
+  disabled
+  expired
+}
+
+enum e_booklet_file_type_enum {
+  pdf
+  image
+  video
+  audio
+  doc
+  docx
+  file
+}
+
+enum e_booklet_file_visibility_enum {
+  private
+}
+
 model sample_sections {
   id           Int       @id @default(autoincrement())
   title        String    @db.VarChar(255)
@@ -690,6 +793,348 @@ model images {
   purchase_watermark          purchases[]       @relation("PurchaseWatermark")
   purchase_payment_screenshot purchases[]       @relation("PurchasePaymentScreenshot")
   payment_methods             payment_methods[] // <-- Added opposite relation for payment_methods
+}
+
+model e_booklet_templates {
+  id            Int                            @id @default(autoincrement())
+  title         String                         @db.VarChar(255)
+  slug          String                         @unique @db.VarChar(255)
+  description   String?                        @db.Text
+  cover_file_id Int?
+  price         Decimal                        @default(0) @db.Decimal(10, 2)
+  marketing_price Decimal                      @default(0) @db.Decimal(10, 2)
+  currency      String                         @default("EGP") @db.VarChar(3)
+  status        e_booklet_template_status_enum @default(draft)
+  category_id   Int?
+  created_by    Int
+  created_at    DateTime?                      @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?                      @db.Timestamp(6)
+
+  cover_file    e_booklet_file_assets?         @relation("EBookletTemplateCover", fields: [cover_file_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  category      categories?                    @relation(fields: [category_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  creator       users                          @relation("EBookletTemplateCreator", fields: [created_by], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  versions      e_booklet_template_versions[]
+  purchases     e_booklet_purchases[]
+  instances     e_booklet_instances[]
+
+  @@index([status], map: "ix_e_booklet_templates_status")
+  @@index([category_id], map: "ix_e_booklet_templates_category")
+  @@index([created_at], map: "ix_e_booklet_templates_created_at")
+}
+
+model e_booklet_template_versions {
+  id                        Int                                      @id @default(autoincrement())
+  template_id               Int
+  version_number            Int
+  base_document_file_id     Int?
+  rendered_document_file_id Int?
+  page_count                Int
+  page_dimensions_json      Json?
+  status                    e_booklet_template_version_status_enum   @default(draft)
+  created_by                Int
+  created_at                DateTime?                                @default(now()) @db.Timestamp(6)
+  published_at              DateTime?                                @db.Timestamp(6)
+
+  template                  e_booklet_templates                      @relation(fields: [template_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  base_document_file        e_booklet_file_assets?                   @relation("EBookletVersionBaseDocument", fields: [base_document_file_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  rendered_document_file    e_booklet_file_assets?                   @relation("EBookletVersionRenderedDocument", fields: [rendered_document_file_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  creator                   users                                    @relation("EBookletTemplateVersionCreator", fields: [created_by], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  hotspots                  e_booklet_hotspots[]
+  purchases                 e_booklet_purchases[]
+  instances                 e_booklet_instances[]
+
+  @@unique([template_id, version_number])
+  @@index([template_id, status], map: "ix_e_booklet_versions_template_status")
+}
+
+model e_booklet_hotspots {
+  id                  Int                                  @id @default(autoincrement())
+  template_version_id Int
+  page_number         Int
+  x_percent           Decimal                              @db.Decimal(6, 3)
+  y_percent           Decimal                              @db.Decimal(6, 3)
+  radius_percent      Decimal                              @db.Decimal(6, 3)
+  reference_number    Int?
+  shape               e_booklet_hotspot_shape_enum         @default(circle)
+  width_percent       Decimal?                             @db.Decimal(6, 3)
+  height_percent      Decimal?                             @db.Decimal(6, 3)
+  type                e_booklet_hotspot_type_enum
+  title               String?                              @db.VarChar(255)
+  text_content        String?                              @db.Text
+  asset_file_id       Int?
+  trigger_type        e_booklet_hotspot_trigger_type_enum   @default(click)
+  display_behavior    Json?
+  content_json        Json?
+  interaction_json    Json?
+  sort_order          Int?                                 @default(0)
+  is_active           Boolean                              @default(true)
+  created_by          Int
+  updated_by          Int?
+  created_at          DateTime?                            @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?                            @db.Timestamp(6)
+
+  template_version    e_booklet_template_versions          @relation(fields: [template_version_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  asset_file          e_booklet_file_assets?               @relation("EBookletHotspotAsset", fields: [asset_file_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  creator             users                                @relation("EBookletHotspotCreator", fields: [created_by], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  updater             users?                               @relation("EBookletHotspotUpdater", fields: [updated_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([template_version_id, page_number, is_active], map: "ix_e_booklet_hotspots_version_page_active")
+  @@unique([template_version_id, reference_number], map: "ux_e_booklet_hotspots_version_reference")
+}
+
+model e_booklet_purchases {
+  id                  Int                              @id @default(autoincrement())
+  teacher_id          Int
+  template_id         Int
+  template_version_id Int
+  status              e_booklet_purchase_status_enum   @default(pending)
+  price               Decimal                          @default(0) @db.Decimal(10, 2)
+  marketing_price     Decimal                          @default(0) @db.Decimal(10, 2)
+  internal_price      Decimal                          @default(0) @db.Decimal(10, 2)
+  access_expires_at   DateTime?                        @db.Timestamp(6)
+  currency            String                           @default("EGP") @db.VarChar(3)
+  payment_method      String?                          @db.VarChar(100)
+  payment_reference   String?                          @db.VarChar(255)
+  branding_json       Json?
+  admin_notes         String?                          @db.Text
+  created_at          DateTime?                        @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?                        @db.Timestamp(6)
+
+  teacher             users                            @relation("EBookletPurchaseTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  template            e_booklet_templates              @relation(fields: [template_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  template_version    e_booklet_template_versions      @relation(fields: [template_version_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  instances           e_booklet_instances[]
+
+  @@index([teacher_id, status], map: "ix_e_booklet_purchases_teacher_status")
+  @@index([status, created_at], map: "ix_e_booklet_purchases_status_created")
+}
+
+model e_booklet_instances {
+  id                      Int                              @id @default(autoincrement())
+  purchase_id             Int                              @unique
+  teacher_id              Int
+  template_id             Int
+  template_version_id     Int
+  custom_document_file_id Int?
+  display_title           String                           @db.VarChar(255)
+  branding_json           Json?
+  invite_quota            Int                              @default(0)
+  used_invites_count      Int                              @default(0)
+  access_expires_at       DateTime?                        @db.Timestamp(6)
+  archived_at             DateTime?                        @db.Timestamp(6)
+  archive_reason          String?                          @db.VarChar(100)
+  student_marketing_price Decimal                          @default(0) @db.Decimal(10, 2)
+  internal_price          Decimal                          @default(0) @db.Decimal(10, 2)
+  status                  e_booklet_instance_status_enum   @default(active)
+  created_at              DateTime?                        @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?                        @db.Timestamp(6)
+
+  purchase                e_booklet_purchases              @relation(fields: [purchase_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  teacher                 users                            @relation("EBookletInstanceTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  template                e_booklet_templates              @relation(fields: [template_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  template_version        e_booklet_template_versions      @relation(fields: [template_version_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  custom_document_file    e_booklet_file_assets?           @relation("EBookletInstanceCustomDocument", fields: [custom_document_file_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  access_records          e_booklet_access[]
+  invites                 e_booklet_invites[]
+  redemptions             e_booklet_invite_redemptions[]
+  devices                 e_booklet_devices[]
+  device_allowances       e_booklet_device_allowances[]
+  student_purchase_links  e_booklet_student_purchase_links[]
+
+  @@index([teacher_id, status], map: "ix_e_booklet_instances_teacher_status")
+  @@index([template_version_id], map: "ix_e_booklet_instances_template_version")
+}
+
+model e_booklet_access {
+  id                  Int                              @id @default(autoincrement())
+  booklet_instance_id Int
+  user_id             Int
+  role                e_booklet_access_role_enum
+  source_invite_id    Int?
+  access_source       String?                          @db.VarChar(40)
+  terms_accepted_at   DateTime?                        @db.Timestamp(6)
+  terms_version       String?                          @db.VarChar(50)
+  status              e_booklet_access_status_enum     @default(active)
+  granted_at          DateTime?                        @default(now()) @db.Timestamp(6)
+  revoked_at          DateTime?                        @db.Timestamp(6)
+
+  booklet_instance    e_booklet_instances              @relation(fields: [booklet_instance_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user                users                            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  source_invite       e_booklet_invites?               @relation(fields: [source_invite_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  student_purchase_links e_booklet_student_purchase_links[]
+
+  @@unique([booklet_instance_id, user_id, role])
+  @@index([user_id, role, status], map: "ix_e_booklet_access_user_role_status")
+  @@index([booklet_instance_id, role, status], map: "ix_e_booklet_access_instance_role_status")
+}
+
+model e_booklet_invites {
+  id                  Int                              @id @default(autoincrement())
+  booklet_instance_id Int
+  teacher_id          Int
+  token_hash          String                           @unique @db.VarChar(128)
+  share_token_ciphertext String?                       @db.Text
+  passcode_hash       String?                          @db.VarChar(128)
+  passcode_ciphertext String?                          @db.Text
+  passcode_hint       String?                          @db.VarChar(20)
+  max_uses            Int?
+  used_count          Int                              @default(0)
+  expires_at          DateTime?                        @db.Timestamp(6)
+  status              e_booklet_invite_status_enum     @default(active)
+  created_at          DateTime?                        @default(now()) @db.Timestamp(6)
+
+  booklet_instance    e_booklet_instances              @relation(fields: [booklet_instance_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  teacher             users                            @relation("EBookletInviteTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  access_records      e_booklet_access[]
+  redemptions         e_booklet_invite_redemptions[]
+  student_purchase_links e_booklet_student_purchase_links[]
+
+  @@index([booklet_instance_id, status], map: "ix_e_booklet_invites_instance_status")
+  @@index([teacher_id, status], map: "ix_e_booklet_invites_teacher_status")
+}
+
+model e_booklet_devices {
+  id                  Int       @id @default(autoincrement())
+  booklet_instance_id Int
+  user_id             Int
+  device_fingerprint  String    @db.VarChar(128)
+  device_label        String?   @db.VarChar(255)
+  user_agent          String?   @db.Text
+  ip_address          String?   @db.VarChar(64)
+  first_seen_at       DateTime? @default(now()) @db.Timestamp(6)
+  last_seen_at        DateTime? @db.Timestamp(6)
+  status              String    @default("active") @db.VarChar(20)
+  reset_by_admin_id   Int?
+  reset_reason        String?   @db.Text
+
+  booklet_instance    e_booklet_instances @relation(fields: [booklet_instance_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user                users               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([booklet_instance_id, user_id, device_fingerprint])
+  @@index([user_id, status])
+  @@index([booklet_instance_id, status])
+}
+
+model e_booklet_device_allowances {
+  id                  Int       @id @default(autoincrement())
+  booklet_instance_id Int
+  user_id             Int
+  allowed_devices     Int       @default(1)
+  updated_by_admin_id Int?
+  reason              String?   @db.Text
+  updated_at          DateTime? @db.Timestamp(6)
+
+  booklet_instance    e_booklet_instances @relation(fields: [booklet_instance_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user                users               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([booklet_instance_id, user_id])
+  @@index([user_id])
+}
+
+model e_booklet_student_purchase_links {
+  id                       Int       @id @default(autoincrement())
+  purchase_id              Int       @unique
+  invite_id                Int
+  booklet_instance_id      Int
+  student_id               Int
+  access_id                Int?
+  marketing_price_snapshot Decimal   @db.Decimal(10, 2)
+  terms_accepted_at        DateTime? @db.Timestamp(6)
+  terms_version            String?   @db.VarChar(50)
+  created_at               DateTime? @default(now()) @db.Timestamp(6)
+  approved_at              DateTime? @db.Timestamp(6)
+
+  purchase                 purchases            @relation(fields: [purchase_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  invite                   e_booklet_invites    @relation(fields: [invite_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  booklet_instance         e_booklet_instances  @relation(fields: [booklet_instance_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  student                  users                @relation("EBookletStudentPurchaseStudent", fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  access                   e_booklet_access?    @relation(fields: [access_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([booklet_instance_id, student_id])
+  @@index([invite_id, student_id])
+}
+
+model e_booklet_invite_redemptions {
+  id                  Int                  @id @default(autoincrement())
+  invite_id           Int
+  booklet_instance_id Int
+  student_id          Int
+  redeemed_at         DateTime?            @default(now()) @db.Timestamp(6)
+  ip_address          String?              @db.VarChar(64)
+  user_agent          String?              @db.Text
+
+  invite              e_booklet_invites    @relation(fields: [invite_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  booklet_instance    e_booklet_instances  @relation(fields: [booklet_instance_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  student             users                @relation("EBookletInviteRedemptionStudent", fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([invite_id, student_id])
+  @@index([booklet_instance_id, student_id], map: "ix_e_booklet_redemptions_instance_student")
+}
+
+model e_booklet_file_assets {
+  id                          Int                            @id @default(autoincrement())
+  owner_type                  String                         @db.VarChar(50)
+  owner_id                    Int?
+  file_type                   e_booklet_file_type_enum
+  storage_key                 String                         @unique @db.VarChar(500)
+  original_filename           String                         @db.VarChar(255)
+  mime_type                   String                         @db.VarChar(150)
+  size_bytes                  Int
+  visibility                  e_booklet_file_visibility_enum @default(private)
+  created_at                  DateTime?                      @default(now()) @db.Timestamp(6)
+
+  template_covers             e_booklet_templates[]          @relation("EBookletTemplateCover")
+  version_base_documents      e_booklet_template_versions[]  @relation("EBookletVersionBaseDocument")
+  version_rendered_documents  e_booklet_template_versions[]  @relation("EBookletVersionRenderedDocument")
+  hotspot_assets              e_booklet_hotspots[]           @relation("EBookletHotspotAsset")
+  instance_custom_documents   e_booklet_instances[]          @relation("EBookletInstanceCustomDocument")
+
+  @@index([owner_type, owner_id], map: "ix_e_booklet_file_assets_owner")
+  @@index([file_type], map: "ix_e_booklet_file_assets_file_type")
+}
+
+model e_booklet_audit_logs {
+  id            Int       @id @default(autoincrement())
+  actor_user_id Int?
+  action        String    @db.VarChar(100)
+  entity_type   String    @db.VarChar(80)
+  entity_id     Int
+  metadata_json Json?
+  ip_address    String?   @db.VarChar(64)
+  user_agent    String?   @db.Text
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+
+  actor         users?    @relation("EBookletAuditActor", fields: [actor_user_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([entity_type, entity_id, created_at], map: "ix_e_booklet_audit_entity_created")
+  @@index([actor_user_id, created_at], map: "ix_e_booklet_audit_actor_created")
+  @@index([action, created_at], map: "ix_e_booklet_audit_action_created")
+}
+
+model e_booklet_analytics_events {
+  id                      Int       @id @default(autoincrement())
+  event_type              String    @db.VarChar(80)
+  teacher_id              Int?
+  student_id              Int?
+  anonymous_session_id    String?   @db.VarChar(128)
+  template_id             Int?
+  booklet_instance_id     Int?
+  invite_id               Int?
+  access_id               Int?
+  purchase_id             Int?
+  source                  String?   @db.VarChar(40)
+  marketing_price_snapshot Decimal? @db.Decimal(10, 2)
+  internal_price_snapshot Decimal?  @db.Decimal(10, 2)
+  metadata                Json?
+  created_at              DateTime  @default(now()) @db.Timestamp(6)
+
+  @@index([booklet_instance_id, event_type, created_at], map: "ix_e_booklet_analytics_instance_event_created")
+  @@index([teacher_id, created_at], map: "ix_e_booklet_analytics_teacher_created")
+  @@index([student_id, created_at], map: "ix_e_booklet_analytics_student_created")
+  @@index([invite_id, created_at], map: "ix_e_booklet_analytics_invite_created")
+  @@index([anonymous_session_id, created_at], map: "ix_e_booklet_analytics_anon_created")
+  @@index([source, created_at], map: "ix_e_booklet_analytics_source_created")
+  @@index([event_type, created_at], map: "ix_e_booklet_analytics_event_created")
 }
 
 model product_gallery {
