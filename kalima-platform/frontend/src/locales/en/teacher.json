@@ -9,13 +9,15 @@
     "collapseSidebar": "Collapse sidebar",
     "closeSidebar": "Close sidebar",
     "profile": "My Profile",
+    "eBooklets": "My E-Booklets",
     "orders": "My Orders",
     "settings": "Settings",
     "themeToggle": "Toggle theme",
     "lightMode": "Light mode",
     "darkMode": "Dark mode",
     "backToStore": "Back to Store",
-    "logout": "Logout"
+    "logout": "Logout",
+    "eBookletAnalytics": "E-Booklet Analytics"
   },
   "settings": {
     "title": "Account Settings",

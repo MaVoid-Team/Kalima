@@ -247,6 +247,7 @@ export type categoriesWhereInput = {
   parent?: Prisma.XOR<Prisma.CategoriesNullableScalarRelationFilter, Prisma.categoriesWhereInput> | null
   product_categories?: Prisma.Product_categoriesListRelationFilter
   sub_categories?: Prisma.CategoriesListRelationFilter
+  e_booklet_templates?: Prisma.E_booklet_templatesListRelationFilter
 }
 
 export type categoriesOrderByWithRelationInput = {
@@ -261,6 +262,7 @@ export type categoriesOrderByWithRelationInput = {
   parent?: Prisma.categoriesOrderByWithRelationInput
   product_categories?: Prisma.product_categoriesOrderByRelationAggregateInput
   sub_categories?: Prisma.categoriesOrderByRelationAggregateInput
+  e_booklet_templates?: Prisma.e_booklet_templatesOrderByRelationAggregateInput
 }
 
 export type categoriesWhereUniqueInput = Prisma.AtLeast<{
@@ -278,6 +280,7 @@ export type categoriesWhereUniqueInput = Prisma.AtLeast<{
   parent?: Prisma.XOR<Prisma.CategoriesNullableScalarRelationFilter, Prisma.categoriesWhereInput> | null
   product_categories?: Prisma.Product_categoriesListRelationFilter
   sub_categories?: Prisma.CategoriesListRelationFilter
+  e_booklet_templates?: Prisma.E_booklet_templatesListRelationFilter
 }, "id" | "mongo_id">
 
 export type categoriesOrderByWithAggregationInput = {
@@ -320,6 +323,7 @@ export type categoriesCreateInput = {
   parent?: Prisma.categoriesCreateNestedOneWithoutSub_categoriesInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutCategoriesInput
   sub_categories?: Prisma.categoriesCreateNestedManyWithoutParentInput
+  e_booklet_templates?: Prisma.e_booklet_templatesCreateNestedManyWithoutCategoryInput
 }
 
 export type categoriesUncheckedCreateInput = {
@@ -333,6 +337,7 @@ export type categoriesUncheckedCreateInput = {
   updated_at?: Date | string | null
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutCategoriesInput
   sub_categories?: Prisma.categoriesUncheckedCreateNestedManyWithoutParentInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type categoriesUpdateInput = {
@@ -345,6 +350,7 @@ export type categoriesUpdateInput = {
   parent?: Prisma.categoriesUpdateOneWithoutSub_categoriesNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutCategoriesNestedInput
   sub_categories?: Prisma.categoriesUpdateManyWithoutParentNestedInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUpdateManyWithoutCategoryNestedInput
 }
 
 export type categoriesUncheckedUpdateInput = {
@@ -358,6 +364,7 @@ export type categoriesUncheckedUpdateInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutCategoriesNestedInput
   sub_categories?: Prisma.categoriesUncheckedUpdateManyWithoutParentNestedInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type categoriesCreateManyInput = {
@@ -526,6 +533,22 @@ export type categoriesUpdateOneRequiredWithoutProduct_categoriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.categoriesUpdateToOneWithWhereWithoutProduct_categoriesInput, Prisma.categoriesUpdateWithoutProduct_categoriesInput>, Prisma.categoriesUncheckedUpdateWithoutProduct_categoriesInput>
 }
 
+export type categoriesCreateNestedOneWithoutE_booklet_templatesInput = {
+  create?: Prisma.XOR<Prisma.categoriesCreateWithoutE_booklet_templatesInput, Prisma.categoriesUncheckedCreateWithoutE_booklet_templatesInput>
+  connectOrCreate?: Prisma.categoriesCreateOrConnectWithoutE_booklet_templatesInput
+  connect?: Prisma.categoriesWhereUniqueInput
+}
+
+export type categoriesUpdateOneWithoutE_booklet_templatesNestedInput = {
+  create?: Prisma.XOR<Prisma.categoriesCreateWithoutE_booklet_templatesInput, Prisma.categoriesUncheckedCreateWithoutE_booklet_templatesInput>
+  connectOrCreate?: Prisma.categoriesCreateOrConnectWithoutE_booklet_templatesInput
+  upsert?: Prisma.categoriesUpsertWithoutE_booklet_templatesInput
+  disconnect?: Prisma.categoriesWhereInput | boolean
+  delete?: Prisma.categoriesWhereInput | boolean
+  connect?: Prisma.categoriesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.categoriesUpdateToOneWithWhereWithoutE_booklet_templatesInput, Prisma.categoriesUpdateWithoutE_booklet_templatesInput>, Prisma.categoriesUncheckedUpdateWithoutE_booklet_templatesInput>
+}
+
 export type categoriesCreateWithoutSub_categoriesInput = {
   title: string
   active?: boolean | null
@@ -535,6 +558,7 @@ export type categoriesCreateWithoutSub_categoriesInput = {
   updated_at?: Date | string | null
   parent?: Prisma.categoriesCreateNestedOneWithoutSub_categoriesInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutCategoriesInput
+  e_booklet_templates?: Prisma.e_booklet_templatesCreateNestedManyWithoutCategoryInput
 }
 
 export type categoriesUncheckedCreateWithoutSub_categoriesInput = {
@@ -547,6 +571,7 @@ export type categoriesUncheckedCreateWithoutSub_categoriesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutCategoriesInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type categoriesCreateOrConnectWithoutSub_categoriesInput = {
@@ -563,6 +588,7 @@ export type categoriesCreateWithoutParentInput = {
   updated_at?: Date | string | null
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutCategoriesInput
   sub_categories?: Prisma.categoriesCreateNestedManyWithoutParentInput
+  e_booklet_templates?: Prisma.e_booklet_templatesCreateNestedManyWithoutCategoryInput
 }
 
 export type categoriesUncheckedCreateWithoutParentInput = {
@@ -575,6 +601,7 @@ export type categoriesUncheckedCreateWithoutParentInput = {
   updated_at?: Date | string | null
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutCategoriesInput
   sub_categories?: Prisma.categoriesUncheckedCreateNestedManyWithoutParentInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type categoriesCreateOrConnectWithoutParentInput = {
@@ -607,6 +634,7 @@ export type categoriesUpdateWithoutSub_categoriesInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parent?: Prisma.categoriesUpdateOneWithoutSub_categoriesNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutCategoriesNestedInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUpdateManyWithoutCategoryNestedInput
 }
 
 export type categoriesUncheckedUpdateWithoutSub_categoriesInput = {
@@ -619,6 +647,7 @@ export type categoriesUncheckedUpdateWithoutSub_categoriesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutCategoriesNestedInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type categoriesUpsertWithWhereUniqueWithoutParentInput = {
@@ -660,6 +689,7 @@ export type categoriesCreateWithoutProduct_categoriesInput = {
   updated_at?: Date | string | null
   parent?: Prisma.categoriesCreateNestedOneWithoutSub_categoriesInput
   sub_categories?: Prisma.categoriesCreateNestedManyWithoutParentInput
+  e_booklet_templates?: Prisma.e_booklet_templatesCreateNestedManyWithoutCategoryInput
 }
 
 export type categoriesUncheckedCreateWithoutProduct_categoriesInput = {
@@ -672,6 +702,7 @@ export type categoriesUncheckedCreateWithoutProduct_categoriesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   sub_categories?: Prisma.categoriesUncheckedCreateNestedManyWithoutParentInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type categoriesCreateOrConnectWithoutProduct_categoriesInput = {
@@ -699,6 +730,7 @@ export type categoriesUpdateWithoutProduct_categoriesInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parent?: Prisma.categoriesUpdateOneWithoutSub_categoriesNestedInput
   sub_categories?: Prisma.categoriesUpdateManyWithoutParentNestedInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUpdateManyWithoutCategoryNestedInput
 }
 
 export type categoriesUncheckedUpdateWithoutProduct_categoriesInput = {
@@ -710,6 +742,73 @@ export type categoriesUncheckedUpdateWithoutProduct_categoriesInput = {
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sub_categories?: Prisma.categoriesUncheckedUpdateManyWithoutParentNestedInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUncheckedUpdateManyWithoutCategoryNestedInput
+}
+
+export type categoriesCreateWithoutE_booklet_templatesInput = {
+  title: string
+  active?: boolean | null
+  description?: string | null
+  mongo_id?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  parent?: Prisma.categoriesCreateNestedOneWithoutSub_categoriesInput
+  product_categories?: Prisma.product_categoriesCreateNestedManyWithoutCategoriesInput
+  sub_categories?: Prisma.categoriesCreateNestedManyWithoutParentInput
+}
+
+export type categoriesUncheckedCreateWithoutE_booklet_templatesInput = {
+  id?: number
+  title: string
+  active?: boolean | null
+  description?: string | null
+  parent_id?: number | null
+  mongo_id?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutCategoriesInput
+  sub_categories?: Prisma.categoriesUncheckedCreateNestedManyWithoutParentInput
+}
+
+export type categoriesCreateOrConnectWithoutE_booklet_templatesInput = {
+  where: Prisma.categoriesWhereUniqueInput
+  create: Prisma.XOR<Prisma.categoriesCreateWithoutE_booklet_templatesInput, Prisma.categoriesUncheckedCreateWithoutE_booklet_templatesInput>
+}
+
+export type categoriesUpsertWithoutE_booklet_templatesInput = {
+  update: Prisma.XOR<Prisma.categoriesUpdateWithoutE_booklet_templatesInput, Prisma.categoriesUncheckedUpdateWithoutE_booklet_templatesInput>
+  create: Prisma.XOR<Prisma.categoriesCreateWithoutE_booklet_templatesInput, Prisma.categoriesUncheckedCreateWithoutE_booklet_templatesInput>
+  where?: Prisma.categoriesWhereInput
+}
+
+export type categoriesUpdateToOneWithWhereWithoutE_booklet_templatesInput = {
+  where?: Prisma.categoriesWhereInput
+  data: Prisma.XOR<Prisma.categoriesUpdateWithoutE_booklet_templatesInput, Prisma.categoriesUncheckedUpdateWithoutE_booklet_templatesInput>
+}
+
+export type categoriesUpdateWithoutE_booklet_templatesInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  parent?: Prisma.categoriesUpdateOneWithoutSub_categoriesNestedInput
+  product_categories?: Prisma.product_categoriesUpdateManyWithoutCategoriesNestedInput
+  sub_categories?: Prisma.categoriesUpdateManyWithoutParentNestedInput
+}
+
+export type categoriesUncheckedUpdateWithoutE_booklet_templatesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parent_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutCategoriesNestedInput
   sub_categories?: Prisma.categoriesUncheckedUpdateManyWithoutParentNestedInput
 }
 
@@ -732,6 +831,7 @@ export type categoriesUpdateWithoutParentInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_categories?: Prisma.product_categoriesUpdateManyWithoutCategoriesNestedInput
   sub_categories?: Prisma.categoriesUpdateManyWithoutParentNestedInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUpdateManyWithoutCategoryNestedInput
 }
 
 export type categoriesUncheckedUpdateWithoutParentInput = {
@@ -744,6 +844,7 @@ export type categoriesUncheckedUpdateWithoutParentInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutCategoriesNestedInput
   sub_categories?: Prisma.categoriesUncheckedUpdateManyWithoutParentNestedInput
+  e_booklet_templates?: Prisma.e_booklet_templatesUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type categoriesUncheckedUpdateManyWithoutParentInput = {
@@ -764,11 +865,13 @@ export type categoriesUncheckedUpdateManyWithoutParentInput = {
 export type CategoriesCountOutputType = {
   product_categories: number
   sub_categories: number
+  e_booklet_templates: number
 }
 
 export type CategoriesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product_categories?: boolean | CategoriesCountOutputTypeCountProduct_categoriesArgs
   sub_categories?: boolean | CategoriesCountOutputTypeCountSub_categoriesArgs
+  e_booklet_templates?: boolean | CategoriesCountOutputTypeCountE_booklet_templatesArgs
 }
 
 /**
@@ -795,6 +898,13 @@ export type CategoriesCountOutputTypeCountSub_categoriesArgs<ExtArgs extends run
   where?: Prisma.categoriesWhereInput
 }
 
+/**
+ * CategoriesCountOutputType without action
+ */
+export type CategoriesCountOutputTypeCountE_booklet_templatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_templatesWhereInput
+}
+
 
 export type categoriesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -808,6 +918,7 @@ export type categoriesSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   parent?: boolean | Prisma.categories$parentArgs<ExtArgs>
   product_categories?: boolean | Prisma.categories$product_categoriesArgs<ExtArgs>
   sub_categories?: boolean | Prisma.categories$sub_categoriesArgs<ExtArgs>
+  e_booklet_templates?: boolean | Prisma.categories$e_booklet_templatesArgs<ExtArgs>
   _count?: boolean | Prisma.CategoriesCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["categories"]>
 
@@ -851,6 +962,7 @@ export type categoriesInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   parent?: boolean | Prisma.categories$parentArgs<ExtArgs>
   product_categories?: boolean | Prisma.categories$product_categoriesArgs<ExtArgs>
   sub_categories?: boolean | Prisma.categories$sub_categoriesArgs<ExtArgs>
+  e_booklet_templates?: boolean | Prisma.categories$e_booklet_templatesArgs<ExtArgs>
   _count?: boolean | Prisma.CategoriesCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type categoriesIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -866,6 +978,7 @@ export type $categoriesPayload<ExtArgs extends runtime.Types.Extensions.Internal
     parent: Prisma.$categoriesPayload<ExtArgs> | null
     product_categories: Prisma.$product_categoriesPayload<ExtArgs>[]
     sub_categories: Prisma.$categoriesPayload<ExtArgs>[]
+    e_booklet_templates: Prisma.$e_booklet_templatesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1273,6 +1386,7 @@ export interface Prisma__categoriesClient<T, Null = never, ExtArgs extends runti
   parent<T extends Prisma.categories$parentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.categories$parentArgs<ExtArgs>>): Prisma.Prisma__categoriesClient<runtime.Types.Result.GetResult<Prisma.$categoriesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   product_categories<T extends Prisma.categories$product_categoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.categories$product_categoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$product_categoriesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sub_categories<T extends Prisma.categories$sub_categoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.categories$sub_categoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$categoriesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  e_booklet_templates<T extends Prisma.categories$e_booklet_templatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.categories$e_booklet_templatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_templatesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1779,6 +1893,30 @@ export type categories$sub_categoriesArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.CategoriesScalarFieldEnum | Prisma.CategoriesScalarFieldEnum[]
+}
+
+/**
+ * categories.e_booklet_templates
+ */
+export type categories$e_booklet_templatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_templates
+   */
+  select?: Prisma.e_booklet_templatesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_templates
+   */
+  omit?: Prisma.e_booklet_templatesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_templatesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_templatesWhereInput
+  orderBy?: Prisma.e_booklet_templatesOrderByWithRelationInput | Prisma.e_booklet_templatesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_templatesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_templatesScalarFieldEnum | Prisma.E_booklet_templatesScalarFieldEnum[]
 }
 
 /**

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput, BarChart3, Activity, Bell } from 'lucide-react';
+import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput, BarChart3, Activity, Bell, BookOpenCheck, PackageCheck, HardDrive } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 
 const ADMIN_THEME_STORAGE_KEY = 'adminTheme';
@@ -43,6 +43,10 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
     { name: t('nav.employeePerformance', 'Employee Performance'), href: '/admin/employee-performance', icon: Activity, id: 'employee-performance' },
     { name: t('nav.orders'), href: '/admin/orders', icon: ShoppingCart, id: 'orders' },
     { name: t('nav.products'), href: '/admin/products', icon: Package, id: 'products' },
+    { name: t('nav.eBooklets', 'E-Booklets'), href: '/admin/e-booklets', icon: BookOpenCheck, id: 'e-booklets' },
+    { name: t('nav.eBookletPurchases', 'E-Booklet Purchases'), href: '/admin/e-booklet-purchases', icon: PackageCheck, id: 'e-booklet-purchases' },
+    { name: t('nav.eBookletInstances', 'E-Booklet Access'), href: '/admin/e-booklet-instances', icon: HardDrive, id: 'e-booklet-instances' },
+    { name: t('nav.eBookletAnalytics', 'E-Booklet Analytics'), href: '/admin/e-booklet-analytics', icon: BarChart3, id: 'e-booklet-analytics' },
     { name: t('nav.samples'), href: '/admin/samples', icon: FileText, id: 'samples' },
     { name: t('nav.coupons'), href: '/admin/coupons', icon: Ticket, id: 'coupons' },
     { name: t('nav.categories'), href: '/admin/categories', icon: LayoutGrid, id: 'categories' },

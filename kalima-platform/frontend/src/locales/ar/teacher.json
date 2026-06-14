@@ -9,13 +9,15 @@
     "collapseSidebar": "طي القائمة الجانبية",
     "closeSidebar": "إغلاق القائمة الجانبية",
     "profile": "ملفي الشخصي",
+    "eBooklets": "بوكليتاتي",
     "orders": "طلباتي",
     "settings": "الإعدادات",
     "themeToggle": "تبديل المظهر",
     "lightMode": "الوضع المتزن (النهاري)",
     "darkMode": "الوضع الداكن (الليلي)",
     "backToStore": "العودة للمتجر",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "eBookletAnalytics": "تحليلات الكتيبات الإلكترونية"
   },
   "settings": {
     "title": "إعدادات الحساب",

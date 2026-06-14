@@ -10,6 +10,8 @@
   "nav": {
     "orders": "Orders",
     "products": "Products",
+    "eBooklets": "E-Booklets",
+    "eBookletPurchases": "E-Booklet Purchases",
     "samples": "Samples",
     "coupons": "Coupons",
     "categories": "Categories",
@@ -26,7 +28,9 @@
     "closeSidebar": "Close Sidebar",
     "analytics": "Analytics",
     "dashboard": "Dashboard",
-    "employeePerformance": "Employee Performance"
+    "employeePerformance": "Employee Performance",
+    "eBookletInstances": "E-Booklet Access",
+    "eBookletAnalytics": "E-Booklet Analytics"
   },
   "common": {
     "currencyEGP": "EGP",
