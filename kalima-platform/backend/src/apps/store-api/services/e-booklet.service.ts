@@ -1702,7 +1702,7 @@ export class EBookletService {
       ipAddress?: string;
     },
   ) {
-    await this.assertViewerAccess(instanceId, userId);
+    const access = await this.assertViewerAccess(instanceId, userId);
     return this.serializableTransaction(async (tx: EBookletDb) => {
       const existing = await tx.e_booklet_devices.findFirst({
         where: {
@@ -1749,7 +1749,7 @@ export class EBookletService {
         },
       });
       if (reusableDevice) {
-        return tx.e_booklet_devices.update({
+        const reactivatedDevice = await tx.e_booklet_devices.update({
           where: { id: reusableDevice.id },
           data: {
             status: "active",
@@ -1759,9 +1759,22 @@ export class EBookletService {
             last_seen_at: new Date(),
           },
         });
+        await this.recordAnalyticsEvent(tx, {
+          event_type: "device_bound",
+          teacher_id: (access as any).booklet_instance?.teacher_id,
+          student_id: userId,
+          template_id: (access as any).booklet_instance?.template_id,
+          booklet_instance_id: instanceId,
+          access_id: (access as any).id,
+          source: (access as any).access_source,
+          ipAddress: input.ipAddress,
+          userAgent: input.userAgent,
+          metadata: { device_label_present: Boolean(input.deviceLabel), binding_type: "reactivated" },
+        });
+        return reactivatedDevice;
       }
       try {
-        return await tx.e_booklet_devices.create({
+        const createdDevice = await tx.e_booklet_devices.create({
           data: {
             booklet_instance_id: instanceId,
             user_id: userId,
@@ -1773,6 +1786,19 @@ export class EBookletService {
             status: "active",
           },
         });
+        await this.recordAnalyticsEvent(tx, {
+          event_type: "device_bound",
+          teacher_id: (access as any).booklet_instance?.teacher_id,
+          student_id: userId,
+          template_id: (access as any).booklet_instance?.template_id,
+          booklet_instance_id: instanceId,
+          access_id: (access as any).id,
+          source: (access as any).access_source,
+          ipAddress: input.ipAddress,
+          userAgent: input.userAgent,
+          metadata: { device_label_present: Boolean(input.deviceLabel), binding_type: "created" },
+        });
+        return createdDevice;
       } catch (error: any) {
         if (error?.code === "P2002") {
           throw new ForbiddenError(
@@ -2037,6 +2063,16 @@ export class EBookletService {
         metadata_json: { page_number: pageNumber },
       },
     });
+    await this.recordAnalyticsEvent(this.db, {
+      event_type: "page_viewed",
+      teacher_id: access.booklet_instance?.teacher_id,
+      student_id: userId,
+      template_id: access.booklet_instance?.template_id,
+      booklet_instance_id: instanceId,
+      access_id: access.id,
+      source: access.access_source,
+      metadata: { page_number: pageNumber },
+    });
     return {
       pageNumber,
       renderMode: "server-page",
@@ -2274,8 +2310,19 @@ export class EBookletService {
   }
 
   async getTeacherAnalytics(teacherId: number, filters: { instanceId?: number; startDate?: string; endDate?: string } = {}) {
-    const where = this.analyticsWhere({ teacherId, ...filters });
-    const [events, sources, offlineRevenue, onlineRevenue, openAgg, uniqueAnon, failedPasscodes, seatUsage] = await Promise.all([
+    const seatUsage = this.db.e_booklet_instances.findMany
+      ? ((await this.db.e_booklet_instances.findMany({
+          where: { teacher_id: teacherId, ...(filters.instanceId ? { id: filters.instanceId } : {}) },
+          select: { id: true, invite_quota: true, used_invites_count: true, status: true, access_expires_at: true },
+        })) || [])
+      : [];
+    if (filters.instanceId && !seatUsage.some((instance: any) => instance.id === filters.instanceId)) {
+      throw new ForbiddenError("You do not have access to analytics for this e-booklet instance.");
+    }
+    const ownedInstanceIds = seatUsage.map((instance: any) => instance.id).filter((id: any) => Number.isInteger(Number(id)));
+    const where = this.analyticsWhere({ teacherId, startDate: filters.startDate, endDate: filters.endDate });
+    where.booklet_instance_id = { in: ownedInstanceIds };
+    const [events, sources, offlineRevenue, onlineRevenue, openAgg, uniqueAnon, failedPasscodes] = await Promise.all([
       this.db.e_booklet_analytics_events.groupBy({ by: ["event_type"], where, _count: { _all: true } }),
       this.db.e_booklet_analytics_events.groupBy({ by: ["source"], where, _count: { _all: true } }),
       this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "offline_passcode" }, _sum: { marketing_price_snapshot: true } }),
@@ -2283,14 +2330,13 @@ export class EBookletService {
       this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "invite_opened" }, _count: { _all: true }, _min: { created_at: true }, _max: { created_at: true } }),
       this.db.e_booklet_analytics_events.groupBy({ by: ["anonymous_session_id"], where: { ...where, event_type: "invite_opened", anonymous_session_id: { not: null } }, _count: { _all: true } }),
       this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: { in: ["passcode_failed", "passcode_blocked"] } }, _count: { _all: true } }),
-      this.db.e_booklet_instances.findMany ? this.db.e_booklet_instances.findMany({ where: { teacher_id: teacherId, ...(filters.instanceId ? { id: filters.instanceId } : {}) }, select: { id: true, invite_quota: true, used_invites_count: true, status: true, access_expires_at: true } }) : Promise.resolve([]),
     ]);
     return {
       events: Object.fromEntries((events || []).map((row: any) => [row.event_type, row._count?._all ?? 0])),
       inviteOpens: { total: openAgg?._count?._all ?? 0, first: openAgg?._min?.created_at ?? null, last: openAgg?._max?.created_at ?? null, approximateUniqueAnonymousVisitors: (uniqueAnon || []).length },
       sourceBreakdown: Object.fromEntries((sources || []).filter((row: any) => row.source).map((row: any) => [row.source, row._count?._all ?? 0])),
       access: { failedPasscodes: failedPasscodes?._count?._all ?? 0, status: "sanitized_teacher_scope" },
-      seatUsage: seatUsage || [],
+      seatUsage,
       devices: { accessStatus: "aggregated", securityDetails: "hidden_from_teacher" },
       revenue: {
         offlineEstimated: Number(offlineRevenue?._sum?.marketing_price_snapshot ?? 0),

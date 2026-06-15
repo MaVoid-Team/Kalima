@@ -96,6 +96,15 @@ model users {
   e_booklet_purchases        e_booklet_purchases[]      @relation("EBookletPurchaseTeacher")
   e_booklet_instances        e_booklet_instances[]      @relation("EBookletInstanceTeacher")
   e_booklet_access           e_booklet_access[]
+  e_booklet_terms_created    e_booklet_terms[]          @relation("EBookletTermCreator")
+  e_booklet_terms_updated    e_booklet_terms[]          @relation("EBookletTermUpdater")
+  e_booklet_access_codes_created e_booklet_access_codes[] @relation("EBookletAccessCodeCreator")
+  e_booklet_access_codes_bound e_booklet_access_codes[] @relation("EBookletAccessCodeBoundStudent")
+  e_booklet_access_code_redemptions e_booklet_access_code_redemptions[] @relation("EBookletAccessCodeRedemptionStudent")
+  e_booklet_milestone_achievements e_booklet_milestone_achievements[] @relation("EBookletMilestoneAchievementTeacher")
+  teacher_wallet              teacher_wallets?        @relation("TeacherWalletOwner")
+  teacher_wallet_ledger       teacher_wallet_ledger[]  @relation("TeacherWalletLedgerTeacher")
+  teacher_terms_acceptances   e_booklet_teacher_terms_acceptances[] @relation("EBookletTeacherTermsAcceptanceTeacher")
   e_booklet_invites          e_booklet_invites[]        @relation("EBookletInviteTeacher")
   e_booklet_invite_redemptions e_booklet_invite_redemptions[] @relation("EBookletInviteRedemptionStudent")
   e_booklet_audit_logs       e_booklet_audit_logs[]     @relation("EBookletAuditActor")
@@ -429,7 +438,6 @@ model samples {
   title            String?               @db.VarChar(255)
   is_archived      Boolean?              @default(false)
   media_type       sample_media_type_enum
-  thumbnail_url    String?
   high_quality_url String?
   low_quality_url  String?
   original_name    String                @db.VarChar(255)
@@ -538,6 +546,8 @@ model purchases {
   is_deleted              Boolean?         @default(false)
   purchase_items          purchase_items[]
   coupon_usages           coupon_usages[]
+  e_booklet_access_code_redemptions e_booklet_access_code_redemptions[]
+  teacher_wallet_ledger   teacher_wallet_ledger[]
   users                   users            @relation("PurchaseCreator", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   received_by_user        users?           @relation("PurchaseReceiver", fields: [received_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
   confirmed_by_user       users?           @relation("PurchaseConfirmer", fields: [confirmed_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
@@ -749,6 +759,42 @@ enum e_booklet_invite_status_enum {
   expired
 }
 
+enum e_booklet_term_status_enum {
+  draft
+  active
+  archived
+}
+
+enum e_booklet_access_code_kind_enum {
+  paid
+  free
+}
+
+enum e_booklet_access_code_status_enum {
+  active
+  redeemed
+  disabled
+  expired
+}
+
+enum teacher_wallet_ledger_type_enum {
+  credit
+  debit
+  adjustment
+}
+
+enum teacher_wallet_ledger_source_enum {
+  milestone_reward
+  order_spend
+  admin_adjustment
+  refund
+}
+
+enum e_booklet_teacher_terms_acceptance_type_enum {
+  code_generation
+  reward_claim
+}
+
 enum e_booklet_file_type_enum {
   pdf
   image
@@ -816,6 +862,7 @@ model e_booklet_templates {
   versions      e_booklet_template_versions[]
   purchases     e_booklet_purchases[]
   instances     e_booklet_instances[]
+  terms         e_booklet_terms[]
 
   @@index([status], map: "ix_e_booklet_templates_status")
   @@index([category_id], map: "ix_e_booklet_templates_category")
@@ -889,6 +936,8 @@ model e_booklet_purchases {
   template_version_id Int
   status              e_booklet_purchase_status_enum   @default(pending)
   price               Decimal                          @default(0) @db.Decimal(10, 2)
+  wallet_credit_applied Decimal                        @default(0) @db.Decimal(10, 2)
+  final_payable_price Decimal?                         @db.Decimal(10, 2)
   marketing_price     Decimal                          @default(0) @db.Decimal(10, 2)
   internal_price      Decimal                          @default(0) @db.Decimal(10, 2)
   access_expires_at   DateTime?                        @db.Timestamp(6)
@@ -904,9 +953,40 @@ model e_booklet_purchases {
   template            e_booklet_templates              @relation(fields: [template_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
   template_version    e_booklet_template_versions      @relation(fields: [template_version_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
   instances           e_booklet_instances[]
+  wallet_ledger_entries teacher_wallet_ledger[]        @relation("TeacherWalletLedgerEBookletPurchase")
 
   @@index([teacher_id, status], map: "ix_e_booklet_purchases_teacher_status")
   @@index([status, created_at], map: "ix_e_booklet_purchases_status_created")
+}
+
+model e_booklet_terms {
+  id                     Int                         @id @default(autoincrement())
+  template_id            Int?
+  name                   String                      @db.VarChar(255)
+  description            String?                     @db.Text
+  status                 e_booklet_term_status_enum  @default(draft)
+  active_guard           String?                     @db.VarChar(64)
+  starts_at              DateTime                    @db.Timestamp(6)
+  ends_at                DateTime?                   @db.Timestamp(6)
+  code_generation_terms  String?                     @db.Text
+  reward_claim_terms     String?                     @db.Text
+  created_by             Int
+  updated_by             Int?
+  created_at             DateTime?                   @default(now()) @db.Timestamp(6)
+  updated_at             DateTime?                   @db.Timestamp(6)
+
+  template               e_booklet_templates?        @relation(fields: [template_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  creator                users                       @relation("EBookletTermCreator", fields: [created_by], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  updater                users?                      @relation("EBookletTermUpdater", fields: [updated_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  access_codes           e_booklet_access_codes[]
+  milestones             e_booklet_milestones[]
+  milestone_achievements e_booklet_milestone_achievements[]
+  teacher_terms_acceptances e_booklet_teacher_terms_acceptances[]
+
+  /// DB-only partial unique indexes enforce one active global term and one active term per template.
+  /// DB CHECK constraints enforce ends_at > starts_at for persisted terms.
+  @@index([status, starts_at, ends_at], map: "ix_e_booklet_terms_status_dates")
+  @@index([template_id, status], map: "ix_e_booklet_terms_template_status")
 }
 
 model e_booklet_instances {
@@ -935,6 +1015,8 @@ model e_booklet_instances {
   template_version        e_booklet_template_versions      @relation(fields: [template_version_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
   custom_document_file    e_booklet_file_assets?           @relation("EBookletInstanceCustomDocument", fields: [custom_document_file_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   access_records          e_booklet_access[]
+  access_codes            e_booklet_access_codes[]
+  access_code_redemptions e_booklet_access_code_redemptions[]
   invites                 e_booklet_invites[]
   redemptions             e_booklet_invite_redemptions[]
   devices                 e_booklet_devices[]
@@ -943,6 +1025,170 @@ model e_booklet_instances {
 
   @@index([teacher_id, status], map: "ix_e_booklet_instances_teacher_status")
   @@index([template_version_id], map: "ix_e_booklet_instances_template_version")
+}
+
+model e_booklet_milestones {
+  id                         Int                    @id @default(autoincrement())
+  term_id                    Int
+  title                      String                 @db.VarChar(255)
+  description                String?                @db.Text
+  target_paid_redemptions    Int
+  milestone_price            Decimal                @db.Decimal(10, 2)
+  previous_price_snapshot    Decimal?               @db.Decimal(10, 2)
+  reward_amount_snapshot     Decimal?               @db.Decimal(10, 2)
+  notification_recipients    String                 @default("admins") @db.VarChar(50)
+  sort_order                 Int                    @default(0)
+  active                     Boolean                @default(true)
+  created_at                 DateTime?              @default(now()) @db.Timestamp(6)
+  updated_at                 DateTime?              @db.Timestamp(6)
+
+  term                       e_booklet_terms        @relation(fields: [term_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  achievements               e_booklet_milestone_achievements[]
+
+  @@unique([term_id, target_paid_redemptions])
+  @@index([term_id, sort_order], map: "ix_e_booklet_milestones_term_sort")
+  @@index([term_id, active], map: "ix_e_booklet_milestones_term_active")
+}
+
+model e_booklet_milestone_achievements {
+  id                          Int                    @id @default(autoincrement())
+  teacher_id                  Int
+  term_id                     Int
+  milestone_id                Int
+  paid_redemptions_snapshot   Int
+  previous_price_snapshot     Decimal                @db.Decimal(10, 2)
+  milestone_price_snapshot    Decimal                @db.Decimal(10, 2)
+  reward_amount               Decimal                @db.Decimal(10, 2)
+  achieved_at                 DateTime?              @default(now()) @db.Timestamp(6)
+  reward_terms_accepted_at    DateTime?              @db.Timestamp(6)
+  claimed_at                  DateTime?              @db.Timestamp(6)
+
+  teacher                     users                  @relation("EBookletMilestoneAchievementTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  term                        e_booklet_terms        @relation(fields: [term_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  milestone                   e_booklet_milestones   @relation(fields: [milestone_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  wallet_ledger_entries       teacher_wallet_ledger[]
+  terms_acceptances           e_booklet_teacher_terms_acceptances[]
+
+  @@unique([teacher_id, term_id, milestone_id])
+  @@index([teacher_id, term_id, achieved_at], map: "ix_e_booklet_achievements_teacher_term")
+  @@index([claimed_at], map: "ix_e_booklet_achievements_claimed")
+}
+
+model e_booklet_teacher_terms_acceptances {
+  id                       Int                                            @id @default(autoincrement())
+  teacher_id               Int
+  term_id                  Int
+  acceptance_type          e_booklet_teacher_terms_acceptance_type_enum
+  milestone_achievement_id Int?
+  terms_snapshot           String?                                        @db.Text
+  terms_version            String?                                        @db.VarChar(50)
+  accepted_at              DateTime?                                      @default(now()) @db.Timestamp(6)
+  ip_address               String?                                        @db.VarChar(64)
+  user_agent               String?                                        @db.Text
+
+  teacher                  users                                          @relation("EBookletTeacherTermsAcceptanceTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  term                     e_booklet_terms                                @relation(fields: [term_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  milestone_achievement    e_booklet_milestone_achievements?              @relation(fields: [milestone_achievement_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([teacher_id, term_id, acceptance_type], map: "ix_e_booklet_terms_accept_teacher_term_type")
+  @@index([milestone_achievement_id], map: "ix_e_booklet_terms_accept_achievement")
+}
+
+model teacher_wallets {
+  id             Int                     @id @default(autoincrement())
+  teacher_id     Int                     @unique
+  balance        Decimal                 @default(0) @db.Decimal(12, 2)
+  currency       String                  @default("EGP") @db.VarChar(3)
+  created_at     DateTime?               @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?               @db.Timestamp(6)
+
+  teacher        users                   @relation("TeacherWalletOwner", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  ledger_entries teacher_wallet_ledger[]
+
+  @@index([teacher_id], map: "ix_teacher_wallets_teacher")
+}
+
+model teacher_wallet_ledger {
+  id                       Int                                @id @default(autoincrement())
+  wallet_id                Int
+  teacher_id               Int
+  type                     teacher_wallet_ledger_type_enum
+  source                   teacher_wallet_ledger_source_enum
+  amount                   Decimal                            @db.Decimal(12, 2)
+  balance_after            Decimal                            @db.Decimal(12, 2)
+  milestone_achievement_id Int?
+  purchase_id              Int?
+  e_booklet_purchase_id    Int?
+  notes                    String?                            @db.Text
+  created_at               DateTime?                          @default(now()) @db.Timestamp(6)
+
+  wallet                   teacher_wallets                    @relation(fields: [wallet_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  teacher                  users                              @relation("TeacherWalletLedgerTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  milestone_achievement    e_booklet_milestone_achievements?  @relation(fields: [milestone_achievement_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  purchase                 purchases?                         @relation(fields: [purchase_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  e_booklet_purchase       e_booklet_purchases?                @relation("TeacherWalletLedgerEBookletPurchase", fields: [e_booklet_purchase_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([wallet_id, created_at], map: "ix_teacher_wallet_ledger_wallet_created")
+  @@index([teacher_id, created_at], map: "ix_teacher_wallet_ledger_teacher_created")
+  @@index([source, created_at], map: "ix_teacher_wallet_ledger_source_created")
+  @@index([milestone_achievement_id], map: "ix_teacher_wallet_ledger_achievement")
+  @@index([purchase_id], map: "ix_teacher_wallet_ledger_purchase")
+  @@index([e_booklet_purchase_id], map: "ix_teacher_wallet_ledger_e_booklet_purchase")
+  // Partial unique index ux_teacher_wallet_ledger_one_milestone_reward_credit is defined in SQL migration.
+}
+
+model e_booklet_access_codes {
+  id                  Int                                  @id @default(autoincrement())
+  booklet_instance_id Int
+  term_id             Int
+  teacher_id          Int
+  code_hash           String                               @unique @db.VarChar(128)
+  code_hint           String?                              @db.VarChar(20)
+  kind                e_booklet_access_code_kind_enum
+  status              e_booklet_access_code_status_enum    @default(active)
+  bound_student_id    Int?
+  max_redemptions     Int                                  @default(1)
+  redeemed_count      Int                                  @default(0)
+  expires_at          DateTime?                            @db.Timestamp(6)
+  disabled_at         DateTime?                            @db.Timestamp(6)
+  created_at          DateTime?                            @default(now()) @db.Timestamp(6)
+
+  booklet_instance    e_booklet_instances                  @relation(fields: [booklet_instance_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  term                e_booklet_terms                      @relation(fields: [term_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  teacher             users                                @relation("EBookletAccessCodeCreator", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  bound_student       users?                               @relation("EBookletAccessCodeBoundStudent", fields: [bound_student_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  redemptions         e_booklet_access_code_redemptions[]
+
+  @@index([booklet_instance_id, status], map: "ix_e_booklet_access_codes_instance_status")
+  @@index([teacher_id, status], map: "ix_e_booklet_access_codes_teacher_status")
+  @@index([term_id, kind, status], map: "ix_e_booklet_access_codes_term_kind_status")
+  @@index([bound_student_id], map: "ix_e_booklet_access_codes_bound_student")
+}
+
+model e_booklet_access_code_redemptions {
+  id                  Int                       @id @default(autoincrement())
+  access_code_id      Int
+  booklet_instance_id Int
+  student_id          Int
+  access_id           Int?
+  purchase_id         Int?
+  paid_redemption_guard String?                  @db.VarChar(64)
+  counted_for_progress Boolean                  @default(false)
+  redeemed_at         DateTime?                 @default(now()) @db.Timestamp(6)
+  ip_address          String?                   @db.VarChar(64)
+  user_agent          String?                   @db.Text
+
+  access_code         e_booklet_access_codes    @relation(fields: [access_code_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  booklet_instance    e_booklet_instances       @relation(fields: [booklet_instance_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  student             users                     @relation("EBookletAccessCodeRedemptionStudent", fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  access              e_booklet_access?         @relation(fields: [access_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  purchase            purchases?                @relation(fields: [purchase_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  /// DB-only partial unique index ux_e_booklet_paid_code_one_counted_redemption enforces one counted paid-code redemption per access code.
+  @@unique([access_code_id, student_id])
+  @@index([booklet_instance_id, student_id], map: "ix_e_booklet_code_redemptions_instance_student")
+  @@index([purchase_id], map: "ix_e_booklet_code_redemptions_purchase")
+  @@index([counted_for_progress, redeemed_at], map: "ix_e_booklet_code_redemptions_progress")
 }
 
 model e_booklet_access {
@@ -962,6 +1208,7 @@ model e_booklet_access {
   user                users                            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   source_invite       e_booklet_invites?               @relation(fields: [source_invite_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   student_purchase_links e_booklet_student_purchase_links[]
+  access_code_redemptions e_booklet_access_code_redemptions[]
 
   @@unique([booklet_instance_id, user_id, role])
   @@index([user_id, role, status], map: "ix_e_booklet_access_user_role_status")
@@ -1189,6 +1436,8 @@ enum notification_key_enum {
   ORDER_ADMIN_NOTE
   NEW_ORDER_CREATED
   NEW_ACCOUNT_CREATED
+  E_BOOKLET_MILESTONE_ACHIEVED
+  E_BOOKLET_MILESTONE_ADMIN_ALERT
   SYSTEM_ANNOUNCEMENT
   ACCOUNT_UPDATE
   CUSTOM
@@ -1230,4 +1479,5 @@ model notifications {
   @@index([role], map: "ix_notifications_role")
   @@index([entity_type, entity_id], map: "ix_notifications_entity")
   @@index([created_at], map: "ix_notifications_created_at")
+  /// DB-only partial unique index ux_notifications_user_message_entity enforces non-null user/message/entity idempotency.
 }

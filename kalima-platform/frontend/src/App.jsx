@@ -81,6 +81,7 @@ const AdminEBookletPurchasesPage = lazy(() => import("./pages/admin/e-booklets/A
 const AdminEBookletInstancesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstancesPage"));
 const AdminEBookletDevicesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletDevicesPage"));
 const AdminEBookletAnalyticsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletAnalyticsPage"));
+const AdminEBookletTermsMilestonesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTermsMilestonesPage"));
 
 // Public viewer (no layout)
 const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
@@ -186,6 +187,7 @@ const router = createBrowserRouter(
 
         </Route>
         <Route path="/e-booklet-invite/:token" element={<AcceptEBookletInvitePage />} />
+        <Route path="/e-booklet-code" element={<AcceptEBookletInvitePage mode="code" />} />
 
         {/* 404 Fallback */}
         <Route path="*" element={<NotFoundPage />} />
@@ -208,6 +210,7 @@ const router = createBrowserRouter(
           <Route path="/admin/e-booklet-instances" element={<AdminEBookletInstancesPage />} />
           <Route path="/admin/e-booklet-instances/:instanceId/view" element={<EBookletViewerPage />} />
           <Route path="/admin/e-booklet-analytics" element={<AdminEBookletAnalyticsPage />} />
+          <Route path="/admin/e-booklet-terms-milestones" element={<AdminEBookletTermsMilestonesPage />} />
           <Route path="/admin/e-booklet-instances/:instanceId/devices" element={<AdminEBookletDevicesPage />} />
           <Route path="/admin/categories" element={<CategoriesPage />} />
           <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
@@ -230,7 +233,6 @@ const router = createBrowserRouter(
       <Route element={<RoleRoute requiredRole={["Teacher"]} />}>
         <Route element={<TeacherLayout />}>
           <Route path="/teacher/profile" element={<TeacherProfilePage />} />
-          <Route path="/teacher/orders" element={<MyOrdersPage />} />
           <Route path="/teacher/settings" element={<TeacherSettingsPage />} />
           <Route path="/teacher/e-booklets" element={<TeacherEBookletsPage />} />
           <Route path="/teacher/e-booklet-analytics" element={<TeacherEBookletAnalyticsPage />} />

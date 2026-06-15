@@ -358,6 +358,8 @@ export type e_booklet_instancesWhereInput = {
   template_version?: Prisma.XOR<Prisma.E_booklet_template_versionsScalarRelationFilter, Prisma.e_booklet_template_versionsWhereInput>
   custom_document_file?: Prisma.XOR<Prisma.E_booklet_file_assetsNullableScalarRelationFilter, Prisma.e_booklet_file_assetsWhereInput> | null
   access_records?: Prisma.E_booklet_accessListRelationFilter
+  access_codes?: Prisma.E_booklet_access_codesListRelationFilter
+  access_code_redemptions?: Prisma.E_booklet_access_code_redemptionsListRelationFilter
   invites?: Prisma.E_booklet_invitesListRelationFilter
   redemptions?: Prisma.E_booklet_invite_redemptionsListRelationFilter
   devices?: Prisma.E_booklet_devicesListRelationFilter
@@ -390,6 +392,8 @@ export type e_booklet_instancesOrderByWithRelationInput = {
   template_version?: Prisma.e_booklet_template_versionsOrderByWithRelationInput
   custom_document_file?: Prisma.e_booklet_file_assetsOrderByWithRelationInput
   access_records?: Prisma.e_booklet_accessOrderByRelationAggregateInput
+  access_codes?: Prisma.e_booklet_access_codesOrderByRelationAggregateInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsOrderByRelationAggregateInput
   invites?: Prisma.e_booklet_invitesOrderByRelationAggregateInput
   redemptions?: Prisma.e_booklet_invite_redemptionsOrderByRelationAggregateInput
   devices?: Prisma.e_booklet_devicesOrderByRelationAggregateInput
@@ -425,6 +429,8 @@ export type e_booklet_instancesWhereUniqueInput = Prisma.AtLeast<{
   template_version?: Prisma.XOR<Prisma.E_booklet_template_versionsScalarRelationFilter, Prisma.e_booklet_template_versionsWhereInput>
   custom_document_file?: Prisma.XOR<Prisma.E_booklet_file_assetsNullableScalarRelationFilter, Prisma.e_booklet_file_assetsWhereInput> | null
   access_records?: Prisma.E_booklet_accessListRelationFilter
+  access_codes?: Prisma.E_booklet_access_codesListRelationFilter
+  access_code_redemptions?: Prisma.E_booklet_access_code_redemptionsListRelationFilter
   invites?: Prisma.E_booklet_invitesListRelationFilter
   redemptions?: Prisma.E_booklet_invite_redemptionsListRelationFilter
   devices?: Prisma.E_booklet_devicesListRelationFilter
@@ -501,6 +507,8 @@ export type e_booklet_instancesCreateInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
@@ -528,6 +536,8 @@ export type e_booklet_instancesUncheckedCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -554,6 +564,8 @@ export type e_booklet_instancesUpdateInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
@@ -581,6 +593,8 @@ export type e_booklet_instancesUncheckedUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -919,6 +933,34 @@ export type Enume_booklet_instance_status_enumFieldUpdateOperationsInput = {
   set?: $Enums.e_booklet_instance_status_enum
 }
 
+export type e_booklet_instancesCreateNestedOneWithoutAccess_codesInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutAccess_codesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutAccess_codesInput>
+  connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutAccess_codesInput
+  connect?: Prisma.e_booklet_instancesWhereUniqueInput
+}
+
+export type e_booklet_instancesUpdateOneRequiredWithoutAccess_codesNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutAccess_codesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutAccess_codesInput>
+  connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutAccess_codesInput
+  upsert?: Prisma.e_booklet_instancesUpsertWithoutAccess_codesInput
+  connect?: Prisma.e_booklet_instancesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_instancesUpdateToOneWithWhereWithoutAccess_codesInput, Prisma.e_booklet_instancesUpdateWithoutAccess_codesInput>, Prisma.e_booklet_instancesUncheckedUpdateWithoutAccess_codesInput>
+}
+
+export type e_booklet_instancesCreateNestedOneWithoutAccess_code_redemptionsInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutAccess_code_redemptionsInput, Prisma.e_booklet_instancesUncheckedCreateWithoutAccess_code_redemptionsInput>
+  connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutAccess_code_redemptionsInput
+  connect?: Prisma.e_booklet_instancesWhereUniqueInput
+}
+
+export type e_booklet_instancesUpdateOneRequiredWithoutAccess_code_redemptionsNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutAccess_code_redemptionsInput, Prisma.e_booklet_instancesUncheckedCreateWithoutAccess_code_redemptionsInput>
+  connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutAccess_code_redemptionsInput
+  upsert?: Prisma.e_booklet_instancesUpsertWithoutAccess_code_redemptionsInput
+  connect?: Prisma.e_booklet_instancesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_instancesUpdateToOneWithWhereWithoutAccess_code_redemptionsInput, Prisma.e_booklet_instancesUpdateWithoutAccess_code_redemptionsInput>, Prisma.e_booklet_instancesUncheckedUpdateWithoutAccess_code_redemptionsInput>
+}
+
 export type e_booklet_instancesCreateNestedOneWithoutAccess_recordsInput = {
   create?: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutAccess_recordsInput, Prisma.e_booklet_instancesUncheckedCreateWithoutAccess_recordsInput>
   connectOrCreate?: Prisma.e_booklet_instancesCreateOrConnectWithoutAccess_recordsInput
@@ -1063,6 +1105,8 @@ export type e_booklet_instancesCreateWithoutTeacherInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
@@ -1089,6 +1133,8 @@ export type e_booklet_instancesUncheckedCreateWithoutTeacherInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -1164,6 +1210,8 @@ export type e_booklet_instancesCreateWithoutTemplateInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
@@ -1190,6 +1238,8 @@ export type e_booklet_instancesUncheckedCreateWithoutTemplateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -1241,6 +1291,8 @@ export type e_booklet_instancesCreateWithoutTemplate_versionInput = {
   template: Prisma.e_booklet_templatesCreateNestedOneWithoutInstancesInput
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
@@ -1267,6 +1319,8 @@ export type e_booklet_instancesUncheckedCreateWithoutTemplate_versionInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -1318,6 +1372,8 @@ export type e_booklet_instancesCreateWithoutPurchaseInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
@@ -1344,6 +1400,8 @@ export type e_booklet_instancesUncheckedCreateWithoutPurchaseInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -1377,6 +1435,258 @@ export type e_booklet_instancesUpdateManyWithWhereWithoutPurchaseInput = {
   data: Prisma.XOR<Prisma.e_booklet_instancesUpdateManyMutationInput, Prisma.e_booklet_instancesUncheckedUpdateManyWithoutPurchaseInput>
 }
 
+export type e_booklet_instancesCreateWithoutAccess_codesInput = {
+  display_title: string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: number
+  used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.e_booklet_instance_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  purchase: Prisma.e_booklet_purchasesCreateNestedOneWithoutInstancesInput
+  teacher: Prisma.usersCreateNestedOneWithoutE_booklet_instancesInput
+  template: Prisma.e_booklet_templatesCreateNestedOneWithoutInstancesInput
+  template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
+  custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
+  access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
+}
+
+export type e_booklet_instancesUncheckedCreateWithoutAccess_codesInput = {
+  id?: number
+  purchase_id: number
+  teacher_id: number
+  template_id: number
+  template_version_id: number
+  custom_document_file_id?: number | null
+  display_title: string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: number
+  used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.e_booklet_instance_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
+}
+
+export type e_booklet_instancesCreateOrConnectWithoutAccess_codesInput = {
+  where: Prisma.e_booklet_instancesWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutAccess_codesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutAccess_codesInput>
+}
+
+export type e_booklet_instancesUpsertWithoutAccess_codesInput = {
+  update: Prisma.XOR<Prisma.e_booklet_instancesUpdateWithoutAccess_codesInput, Prisma.e_booklet_instancesUncheckedUpdateWithoutAccess_codesInput>
+  create: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutAccess_codesInput, Prisma.e_booklet_instancesUncheckedCreateWithoutAccess_codesInput>
+  where?: Prisma.e_booklet_instancesWhereInput
+}
+
+export type e_booklet_instancesUpdateToOneWithWhereWithoutAccess_codesInput = {
+  where?: Prisma.e_booklet_instancesWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_instancesUpdateWithoutAccess_codesInput, Prisma.e_booklet_instancesUncheckedUpdateWithoutAccess_codesInput>
+}
+
+export type e_booklet_instancesUpdateWithoutAccess_codesInput = {
+  display_title?: Prisma.StringFieldUpdateOperationsInput | string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
+  used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchase?: Prisma.e_booklet_purchasesUpdateOneRequiredWithoutInstancesNestedInput
+  teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_instancesNestedInput
+  template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutInstancesNestedInput
+  template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
+  custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
+  access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
+}
+
+export type e_booklet_instancesUncheckedUpdateWithoutAccess_codesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  purchase_id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  custom_document_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  display_title?: Prisma.StringFieldUpdateOperationsInput | string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
+  used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+}
+
+export type e_booklet_instancesCreateWithoutAccess_code_redemptionsInput = {
+  display_title: string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: number
+  used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.e_booklet_instance_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  purchase: Prisma.e_booklet_purchasesCreateNestedOneWithoutInstancesInput
+  teacher: Prisma.usersCreateNestedOneWithoutE_booklet_instancesInput
+  template: Prisma.e_booklet_templatesCreateNestedOneWithoutInstancesInput
+  template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
+  custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
+  access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksCreateNestedManyWithoutBooklet_instanceInput
+}
+
+export type e_booklet_instancesUncheckedCreateWithoutAccess_code_redemptionsInput = {
+  id?: number
+  purchase_id: number
+  teacher_id: number
+  template_id: number
+  template_version_id: number
+  custom_document_file_id?: number | null
+  display_title: string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: number
+  used_invites_count?: number
+  access_expires_at?: Date | string | null
+  archived_at?: Date | string | null
+  archive_reason?: string | null
+  student_marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.e_booklet_instance_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedManyWithoutBooklet_instanceInput
+}
+
+export type e_booklet_instancesCreateOrConnectWithoutAccess_code_redemptionsInput = {
+  where: Prisma.e_booklet_instancesWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutAccess_code_redemptionsInput, Prisma.e_booklet_instancesUncheckedCreateWithoutAccess_code_redemptionsInput>
+}
+
+export type e_booklet_instancesUpsertWithoutAccess_code_redemptionsInput = {
+  update: Prisma.XOR<Prisma.e_booklet_instancesUpdateWithoutAccess_code_redemptionsInput, Prisma.e_booklet_instancesUncheckedUpdateWithoutAccess_code_redemptionsInput>
+  create: Prisma.XOR<Prisma.e_booklet_instancesCreateWithoutAccess_code_redemptionsInput, Prisma.e_booklet_instancesUncheckedCreateWithoutAccess_code_redemptionsInput>
+  where?: Prisma.e_booklet_instancesWhereInput
+}
+
+export type e_booklet_instancesUpdateToOneWithWhereWithoutAccess_code_redemptionsInput = {
+  where?: Prisma.e_booklet_instancesWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_instancesUpdateWithoutAccess_code_redemptionsInput, Prisma.e_booklet_instancesUncheckedUpdateWithoutAccess_code_redemptionsInput>
+}
+
+export type e_booklet_instancesUpdateWithoutAccess_code_redemptionsInput = {
+  display_title?: Prisma.StringFieldUpdateOperationsInput | string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
+  used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchase?: Prisma.e_booklet_purchasesUpdateOneRequiredWithoutInstancesNestedInput
+  teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_instancesNestedInput
+  template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutInstancesNestedInput
+  template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
+  custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
+  access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUpdateManyWithoutBooklet_instanceNestedInput
+}
+
+export type e_booklet_instancesUncheckedUpdateWithoutAccess_code_redemptionsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  purchase_id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  custom_document_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  display_title?: Prisma.StringFieldUpdateOperationsInput | string
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  invite_quota?: Prisma.IntFieldUpdateOperationsInput | number
+  used_invites_count?: Prisma.IntFieldUpdateOperationsInput | number
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archived_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archive_reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  student_marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  student_purchase_links?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+}
+
 export type e_booklet_instancesCreateWithoutAccess_recordsInput = {
   display_title: string
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1395,6 +1705,8 @@ export type e_booklet_instancesCreateWithoutAccess_recordsInput = {
   template: Prisma.e_booklet_templatesCreateNestedOneWithoutInstancesInput
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
@@ -1421,6 +1733,8 @@ export type e_booklet_instancesUncheckedCreateWithoutAccess_recordsInput = {
   status?: $Enums.e_booklet_instance_status_enum
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -1462,6 +1776,8 @@ export type e_booklet_instancesUpdateWithoutAccess_recordsInput = {
   template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutInstancesNestedInput
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
@@ -1488,6 +1804,8 @@ export type e_booklet_instancesUncheckedUpdateWithoutAccess_recordsInput = {
   status?: Prisma.Enume_booklet_instance_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_instance_status_enum
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -1514,6 +1832,8 @@ export type e_booklet_instancesCreateWithoutInvitesInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
   device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
@@ -1540,6 +1860,8 @@ export type e_booklet_instancesUncheckedCreateWithoutInvitesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -1581,6 +1903,8 @@ export type e_booklet_instancesUpdateWithoutInvitesInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
   device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
@@ -1607,6 +1931,8 @@ export type e_booklet_instancesUncheckedUpdateWithoutInvitesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -1632,6 +1958,8 @@ export type e_booklet_instancesCreateWithoutDevicesInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
@@ -1658,6 +1986,8 @@ export type e_booklet_instancesUncheckedCreateWithoutDevicesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -1699,6 +2029,8 @@ export type e_booklet_instancesUpdateWithoutDevicesInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
@@ -1725,6 +2057,8 @@ export type e_booklet_instancesUncheckedUpdateWithoutDevicesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -1750,6 +2084,8 @@ export type e_booklet_instancesCreateWithoutDevice_allowancesInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
@@ -1776,6 +2112,8 @@ export type e_booklet_instancesUncheckedCreateWithoutDevice_allowancesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -1817,6 +2155,8 @@ export type e_booklet_instancesUpdateWithoutDevice_allowancesInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
@@ -1843,6 +2183,8 @@ export type e_booklet_instancesUncheckedUpdateWithoutDevice_allowancesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -1868,6 +2210,8 @@ export type e_booklet_instancesCreateWithoutStudent_purchase_linksInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
@@ -1894,6 +2238,8 @@ export type e_booklet_instancesUncheckedCreateWithoutStudent_purchase_linksInput
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -1935,6 +2281,8 @@ export type e_booklet_instancesUpdateWithoutStudent_purchase_linksInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
@@ -1961,6 +2309,8 @@ export type e_booklet_instancesUncheckedUpdateWithoutStudent_purchase_linksInput
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -1986,6 +2336,8 @@ export type e_booklet_instancesCreateWithoutRedemptionsInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
   custom_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
   device_allowances?: Prisma.e_booklet_device_allowancesCreateNestedManyWithoutBooklet_instanceInput
@@ -2012,6 +2364,8 @@ export type e_booklet_instancesUncheckedCreateWithoutRedemptionsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   device_allowances?: Prisma.e_booklet_device_allowancesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -2053,6 +2407,8 @@ export type e_booklet_instancesUpdateWithoutRedemptionsInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
   device_allowances?: Prisma.e_booklet_device_allowancesUpdateManyWithoutBooklet_instanceNestedInput
@@ -2079,6 +2435,8 @@ export type e_booklet_instancesUncheckedUpdateWithoutRedemptionsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   device_allowances?: Prisma.e_booklet_device_allowancesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -2103,6 +2461,8 @@ export type e_booklet_instancesCreateWithoutCustom_document_fileInput = {
   template: Prisma.e_booklet_templatesCreateNestedOneWithoutInstancesInput
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutInstancesInput
   access_records?: Prisma.e_booklet_accessCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesCreateNestedManyWithoutBooklet_instanceInput
@@ -2129,6 +2489,8 @@ export type e_booklet_instancesUncheckedCreateWithoutCustom_document_fileInput =
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutBooklet_instanceInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   invites?: Prisma.e_booklet_invitesUncheckedCreateNestedManyWithoutBooklet_instanceInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedCreateNestedManyWithoutBooklet_instanceInput
   devices?: Prisma.e_booklet_devicesUncheckedCreateNestedManyWithoutBooklet_instanceInput
@@ -2200,6 +2562,8 @@ export type e_booklet_instancesUpdateWithoutTeacherInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
@@ -2226,6 +2590,8 @@ export type e_booklet_instancesUncheckedUpdateWithoutTeacherInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -2291,6 +2657,8 @@ export type e_booklet_instancesUpdateWithoutTemplateInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
@@ -2317,6 +2685,8 @@ export type e_booklet_instancesUncheckedUpdateWithoutTemplateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -2382,6 +2752,8 @@ export type e_booklet_instancesUpdateWithoutTemplate_versionInput = {
   template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutInstancesNestedInput
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
@@ -2408,6 +2780,8 @@ export type e_booklet_instancesUncheckedUpdateWithoutTemplate_versionInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -2473,6 +2847,8 @@ export type e_booklet_instancesUpdateWithoutPurchaseInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
   custom_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutInstance_custom_documentsNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
@@ -2499,6 +2875,8 @@ export type e_booklet_instancesUncheckedUpdateWithoutPurchaseInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -2564,6 +2942,8 @@ export type e_booklet_instancesUpdateWithoutCustom_document_fileInput = {
   template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutInstancesNestedInput
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutInstancesNestedInput
   access_records?: Prisma.e_booklet_accessUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUpdateManyWithoutBooklet_instanceNestedInput
@@ -2590,6 +2970,8 @@ export type e_booklet_instancesUncheckedUpdateWithoutCustom_document_fileInput =
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_records?: Prisma.e_booklet_accessUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
+  access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   invites?: Prisma.e_booklet_invitesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   redemptions?: Prisma.e_booklet_invite_redemptionsUncheckedUpdateManyWithoutBooklet_instanceNestedInput
   devices?: Prisma.e_booklet_devicesUncheckedUpdateManyWithoutBooklet_instanceNestedInput
@@ -2624,6 +3006,8 @@ export type e_booklet_instancesUncheckedUpdateManyWithoutCustom_document_fileInp
 
 export type E_booklet_instancesCountOutputType = {
   access_records: number
+  access_codes: number
+  access_code_redemptions: number
   invites: number
   redemptions: number
   devices: number
@@ -2633,6 +3017,8 @@ export type E_booklet_instancesCountOutputType = {
 
 export type E_booklet_instancesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   access_records?: boolean | E_booklet_instancesCountOutputTypeCountAccess_recordsArgs
+  access_codes?: boolean | E_booklet_instancesCountOutputTypeCountAccess_codesArgs
+  access_code_redemptions?: boolean | E_booklet_instancesCountOutputTypeCountAccess_code_redemptionsArgs
   invites?: boolean | E_booklet_instancesCountOutputTypeCountInvitesArgs
   redemptions?: boolean | E_booklet_instancesCountOutputTypeCountRedemptionsArgs
   devices?: boolean | E_booklet_instancesCountOutputTypeCountDevicesArgs
@@ -2655,6 +3041,20 @@ export type E_booklet_instancesCountOutputTypeDefaultArgs<ExtArgs extends runtim
  */
 export type E_booklet_instancesCountOutputTypeCountAccess_recordsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.e_booklet_accessWhereInput
+}
+
+/**
+ * E_booklet_instancesCountOutputType without action
+ */
+export type E_booklet_instancesCountOutputTypeCountAccess_codesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_access_codesWhereInput
+}
+
+/**
+ * E_booklet_instancesCountOutputType without action
+ */
+export type E_booklet_instancesCountOutputTypeCountAccess_code_redemptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_access_code_redemptionsWhereInput
 }
 
 /**
@@ -2718,6 +3118,8 @@ export type e_booklet_instancesSelect<ExtArgs extends runtime.Types.Extensions.I
   template_version?: boolean | Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>
   custom_document_file?: boolean | Prisma.e_booklet_instances$custom_document_fileArgs<ExtArgs>
   access_records?: boolean | Prisma.e_booklet_instances$access_recordsArgs<ExtArgs>
+  access_codes?: boolean | Prisma.e_booklet_instances$access_codesArgs<ExtArgs>
+  access_code_redemptions?: boolean | Prisma.e_booklet_instances$access_code_redemptionsArgs<ExtArgs>
   invites?: boolean | Prisma.e_booklet_instances$invitesArgs<ExtArgs>
   redemptions?: boolean | Prisma.e_booklet_instances$redemptionsArgs<ExtArgs>
   devices?: boolean | Prisma.e_booklet_instances$devicesArgs<ExtArgs>
@@ -2807,6 +3209,8 @@ export type e_booklet_instancesInclude<ExtArgs extends runtime.Types.Extensions.
   template_version?: boolean | Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>
   custom_document_file?: boolean | Prisma.e_booklet_instances$custom_document_fileArgs<ExtArgs>
   access_records?: boolean | Prisma.e_booklet_instances$access_recordsArgs<ExtArgs>
+  access_codes?: boolean | Prisma.e_booklet_instances$access_codesArgs<ExtArgs>
+  access_code_redemptions?: boolean | Prisma.e_booklet_instances$access_code_redemptionsArgs<ExtArgs>
   invites?: boolean | Prisma.e_booklet_instances$invitesArgs<ExtArgs>
   redemptions?: boolean | Prisma.e_booklet_instances$redemptionsArgs<ExtArgs>
   devices?: boolean | Prisma.e_booklet_instances$devicesArgs<ExtArgs>
@@ -2838,6 +3242,8 @@ export type $e_booklet_instancesPayload<ExtArgs extends runtime.Types.Extensions
     template_version: Prisma.$e_booklet_template_versionsPayload<ExtArgs>
     custom_document_file: Prisma.$e_booklet_file_assetsPayload<ExtArgs> | null
     access_records: Prisma.$e_booklet_accessPayload<ExtArgs>[]
+    access_codes: Prisma.$e_booklet_access_codesPayload<ExtArgs>[]
+    access_code_redemptions: Prisma.$e_booklet_access_code_redemptionsPayload<ExtArgs>[]
     invites: Prisma.$e_booklet_invitesPayload<ExtArgs>[]
     redemptions: Prisma.$e_booklet_invite_redemptionsPayload<ExtArgs>[]
     devices: Prisma.$e_booklet_devicesPayload<ExtArgs>[]
@@ -3263,6 +3669,8 @@ export interface Prisma__e_booklet_instancesClient<T, Null = never, ExtArgs exte
   template_version<T extends Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>>): Prisma.Prisma__e_booklet_template_versionsClient<runtime.Types.Result.GetResult<Prisma.$e_booklet_template_versionsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   custom_document_file<T extends Prisma.e_booklet_instances$custom_document_fileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$custom_document_fileArgs<ExtArgs>>): Prisma.Prisma__e_booklet_file_assetsClient<runtime.Types.Result.GetResult<Prisma.$e_booklet_file_assetsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   access_records<T extends Prisma.e_booklet_instances$access_recordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$access_recordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_accessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  access_codes<T extends Prisma.e_booklet_instances$access_codesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$access_codesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_access_codesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  access_code_redemptions<T extends Prisma.e_booklet_instances$access_code_redemptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$access_code_redemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_access_code_redemptionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   invites<T extends Prisma.e_booklet_instances$invitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$invitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_invitesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   redemptions<T extends Prisma.e_booklet_instances$redemptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$redemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_invite_redemptionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   devices<T extends Prisma.e_booklet_instances$devicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_instances$devicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_devicesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3760,6 +4168,54 @@ export type e_booklet_instances$access_recordsArgs<ExtArgs extends runtime.Types
   take?: number
   skip?: number
   distinct?: Prisma.E_booklet_accessScalarFieldEnum | Prisma.E_booklet_accessScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_instances.access_codes
+ */
+export type e_booklet_instances$access_codesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_access_codes
+   */
+  select?: Prisma.e_booklet_access_codesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_access_codes
+   */
+  omit?: Prisma.e_booklet_access_codesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_access_codesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_access_codesWhereInput
+  orderBy?: Prisma.e_booklet_access_codesOrderByWithRelationInput | Prisma.e_booklet_access_codesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_access_codesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_access_codesScalarFieldEnum | Prisma.E_booklet_access_codesScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_instances.access_code_redemptions
+ */
+export type e_booklet_instances$access_code_redemptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_access_code_redemptions
+   */
+  select?: Prisma.e_booklet_access_code_redemptionsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_access_code_redemptions
+   */
+  omit?: Prisma.e_booklet_access_code_redemptionsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_access_code_redemptionsInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_access_code_redemptionsWhereInput
+  orderBy?: Prisma.e_booklet_access_code_redemptionsOrderByWithRelationInput | Prisma.e_booklet_access_code_redemptionsOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_access_code_redemptionsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_access_code_redemptionsScalarFieldEnum | Prisma.E_booklet_access_code_redemptionsScalarFieldEnum[]
 }
 
 /**

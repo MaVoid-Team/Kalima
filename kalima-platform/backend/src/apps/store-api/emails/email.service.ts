@@ -51,6 +51,13 @@ import {
   getOrderItemDeletedEmailText,
   getOrderItemDeletedEmailSubject,
   OrderItemDeletedEmailData,
+  getEBookletMilestoneTeacherEmailHtml,
+  getEBookletMilestoneTeacherEmailText,
+  getEBookletMilestoneTeacherEmailSubject,
+  getEBookletMilestoneAdminEmailHtml,
+  getEBookletMilestoneAdminEmailText,
+  getEBookletMilestoneAdminEmailSubject,
+  EBookletMilestoneEmailData,
 } from './templates';
 
 export interface EmailConfig {
@@ -85,9 +92,6 @@ export class EmailService {
       auth: {
         user: emailConfig.auth.user,
         pass: emailConfig.auth.pass,
-      },
-      tls: {
-        rejectUnauthorized: false,
       },
     });
 
@@ -338,6 +342,30 @@ export class EmailService {
       subject: getOrderItemDeletedEmailSubject(),
       html: getOrderItemDeletedEmailHtml(data),
       text: getOrderItemDeletedEmailText(data),
+    });
+  }
+
+  async sendEBookletMilestoneTeacherEmail(
+    to: string,
+    data: EBookletMilestoneEmailData
+  ): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: getEBookletMilestoneTeacherEmailSubject(data),
+      html: getEBookletMilestoneTeacherEmailHtml(data),
+      text: getEBookletMilestoneTeacherEmailText(data),
+    });
+  }
+
+  async sendEBookletMilestoneAdminEmail(
+    to: string,
+    data: EBookletMilestoneEmailData
+  ): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: getEBookletMilestoneAdminEmailSubject(data),
+      html: getEBookletMilestoneAdminEmailHtml(data),
+      text: getEBookletMilestoneAdminEmailText(data),
     });
   }
 
