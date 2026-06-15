@@ -514,6 +514,7 @@ export const SamplesScalarFieldEnum = {
   title: 'title',
   is_archived: 'is_archived',
   media_type: 'media_type',
+  thumbnail_url: 'thumbnail_url',
   high_quality_url: 'high_quality_url',
   low_quality_url: 'low_quality_url',
   original_name: 'original_name',
