@@ -8,6 +8,10 @@ export function useTeacherEBooklets() {
   const [items, setItems] = useState([]);
   const [invites, setInvites] = useState([]);
   const [students, setStudents] = useState([]);
+  const [milestones, setMilestones] = useState([]);
+  const [wallet, setWallet] = useState(null);
+  const [walletLedger, setWalletLedger] = useState([]);
+  const [currentTerms, setCurrentTerms] = useState(null);
 
   const fetchTeacherEBooklets = useCallback(async () => {
     const response = await fetchApi(
@@ -79,10 +83,82 @@ export function useTeacherEBooklets() {
     [fetchApi],
   );
 
+  const fetchCurrentTerms = useCallback(async (templateId) => {
+    const suffix = templateId ? `?template_id=${encodeURIComponent(templateId)}` : "";
+    const response = await fetchApi(
+      { endpoint: `/teacher/e-booklet-terms/current${suffix}`, method: "get" },
+      false,
+    );
+    setCurrentTerms(response?.data || null);
+    return response;
+  }, [fetchApi]);
+
+  const acceptCodeGenerationTerms = useCallback(
+    (templateId) => fetchApi({
+      endpoint: "/teacher/e-booklet-terms/accept-code-generation",
+      method: "post",
+      data: templateId ? { templateId } : {},
+      defaultSuccessMessage: i18n.t("eBooklets:toasts.termsAccepted"),
+    }),
+    [fetchApi],
+  );
+
+  const createAccessCode = useCallback(
+    (instanceId, data) => fetchApi({
+      endpoint: `/teacher/e-booklets/${instanceId}/access-codes`,
+      method: "post",
+      data,
+      defaultSuccessMessage: i18n.t("eBooklets:toasts.accessCodeCreated"),
+    }),
+    [fetchApi],
+  );
+
+  const fetchTeacherMilestones = useCallback(async (termId) => {
+    const suffix = termId ? `?term_id=${encodeURIComponent(termId)}` : "";
+    const response = await fetchApi(
+      { endpoint: `/teacher/e-booklet-milestones${suffix}`, method: "get" },
+      false,
+    );
+    setMilestones(Array.isArray(response?.data) ? response.data : []);
+    return response;
+  }, [fetchApi]);
+
+  const evaluateTeacherMilestones = useCallback(
+    (termId) => fetchApi(
+      { endpoint: "/teacher/e-booklet-milestones/evaluate", method: "post", data: termId ? { termId } : {} },
+      false,
+    ),
+    [fetchApi],
+  );
+
+  const fetchTeacherWallet = useCallback(async () => {
+    const response = await fetchApi(
+      { endpoint: "/teacher/e-booklet-wallet", method: "get" },
+      false,
+    );
+    setWallet(response?.data?.wallet || null);
+    setWalletLedger(Array.isArray(response?.data?.ledger) ? response.data.ledger : []);
+    return response;
+  }, [fetchApi]);
+
+  const claimMilestoneReward = useCallback(
+    (achievementId) => fetchApi({
+      endpoint: `/teacher/e-booklet-milestone-achievements/${achievementId}/claim`,
+      method: "post",
+      data: { termsAccepted: true },
+      defaultSuccessMessage: i18n.t("eBooklets:toasts.rewardClaimed"),
+    }),
+    [fetchApi],
+  );
+
   return {
     items,
     invites,
     students,
+    milestones,
+    wallet,
+    walletLedger,
+    currentTerms,
     loading,
     fetchTeacherEBooklets,
     fetchInvites,
@@ -90,6 +166,13 @@ export function useTeacherEBooklets() {
     disableInvite,
     fetchStudents,
     revokeStudent,
+    fetchCurrentTerms,
+    acceptCodeGenerationTerms,
+    createAccessCode,
+    fetchTeacherMilestones,
+    evaluateTeacherMilestones,
+    fetchTeacherWallet,
+    claimMilestoneReward,
   };
 }
 
@@ -257,11 +340,27 @@ export function useStudentEBooklets() {
     [fetchApi],
   );
 
+  const redeemAccessCode = useCallback(
+    (code, termsVersion) =>
+      fetchApi({
+        endpoint: "/e-booklet-access-codes/redeem",
+        method: "post",
+        data: {
+          code,
+          termsAccepted: true,
+          termsVersion,
+        },
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.accessGranted"),
+      }),
+    [fetchApi],
+  );
+
   return {
     items,
     loading,
     fetchStudentEBooklets,
     openInvite,
     acceptInvite,
+    redeemAccessCode,
   };
 }

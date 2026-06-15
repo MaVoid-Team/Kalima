@@ -10,3 +10,4 @@ export * from './order-accepted.template';
 export * from './order-returned.template';
 export * from './order-deleted.template';
 export * from './order-item-deleted.template';
+export * from './e-booklet-milestone-achievement.template';

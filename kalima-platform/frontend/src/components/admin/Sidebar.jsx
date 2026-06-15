@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput, BarChart3, Activity, Bell, BookOpenCheck, PackageCheck, HardDrive } from 'lucide-react';
+import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput, BarChart3, Activity, Bell, BookOpenCheck, PackageCheck, HardDrive, CalendarRange } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
+import { useRole } from '@/hooks/useRole';
 
 const ADMIN_THEME_STORAGE_KEY = 'adminTheme';
 
 export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
   const { t, i18n } = useTranslation(['admin', 'userManagement']);
   const { logout } = useAuth();
+  const { isAdmin, isSubAdmin } = useRole();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [theme, setTheme] = useState('light');
@@ -47,6 +49,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
     { name: t('nav.eBookletPurchases', 'E-Booklet Purchases'), href: '/admin/e-booklet-purchases', icon: PackageCheck, id: 'e-booklet-purchases' },
     { name: t('nav.eBookletInstances', 'E-Booklet Access'), href: '/admin/e-booklet-instances', icon: HardDrive, id: 'e-booklet-instances' },
     { name: t('nav.eBookletAnalytics', 'E-Booklet Analytics'), href: '/admin/e-booklet-analytics', icon: BarChart3, id: 'e-booklet-analytics' },
+    { name: t('nav.eBookletTermsMilestones', 'Terms & Milestones'), href: '/admin/e-booklet-terms-milestones', icon: CalendarRange, id: 'e-booklet-terms-milestones', managerOnly: true },
     { name: t('nav.samples'), href: '/admin/samples', icon: FileText, id: 'samples' },
     { name: t('nav.coupons'), href: '/admin/coupons', icon: Ticket, id: 'coupons' },
     { name: t('nav.categories'), href: '/admin/categories', icon: LayoutGrid, id: 'categories' },
@@ -107,7 +110,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
 
       {/* Navigation Links */}
       <nav className="flex-1 space-y-2 px-2 py-4 overflow-y-auto">
-        {navigation.map((item) => {
+        {navigation.filter((item) => !item.managerOnly || isAdmin || isSubAdmin).map((item) => {
           const isActive = location.pathname.startsWith(item.href);
           return (
             <Link

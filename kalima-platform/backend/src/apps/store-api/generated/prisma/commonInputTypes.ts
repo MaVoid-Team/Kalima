@@ -626,6 +626,23 @@ export type Enume_booklet_purchase_status_enumWithAggregatesFilter<$PrismaModel 
   _max?: Prisma.NestedEnume_booklet_purchase_status_enumFilter<$PrismaModel>
 }
 
+export type Enume_booklet_term_status_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_term_status_enum | Prisma.Enume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_term_status_enum[] | Prisma.ListEnume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_term_status_enum[] | Prisma.ListEnume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_term_status_enumFilter<$PrismaModel> | $Enums.e_booklet_term_status_enum
+}
+
+export type Enume_booklet_term_status_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_term_status_enum | Prisma.Enume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_term_status_enum[] | Prisma.ListEnume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_term_status_enum[] | Prisma.ListEnume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_term_status_enumWithAggregatesFilter<$PrismaModel> | $Enums.e_booklet_term_status_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnume_booklet_term_status_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnume_booklet_term_status_enumFilter<$PrismaModel>
+}
+
 export type Enume_booklet_instance_status_enumFilter<$PrismaModel = never> = {
   equals?: $Enums.e_booklet_instance_status_enum | Prisma.Enume_booklet_instance_status_enumFieldRefInput<$PrismaModel>
   in?: $Enums.e_booklet_instance_status_enum[] | Prisma.ListEnume_booklet_instance_status_enumFieldRefInput<$PrismaModel>
@@ -641,6 +658,91 @@ export type Enume_booklet_instance_status_enumWithAggregatesFilter<$PrismaModel 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnume_booklet_instance_status_enumFilter<$PrismaModel>
   _max?: Prisma.NestedEnume_booklet_instance_status_enumFilter<$PrismaModel>
+}
+
+export type Enume_booklet_teacher_terms_acceptance_type_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_teacher_terms_acceptance_type_enum | Prisma.Enume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_teacher_terms_acceptance_type_enum[] | Prisma.ListEnume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_teacher_terms_acceptance_type_enum[] | Prisma.ListEnume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_teacher_terms_acceptance_type_enumFilter<$PrismaModel> | $Enums.e_booklet_teacher_terms_acceptance_type_enum
+}
+
+export type Enume_booklet_teacher_terms_acceptance_type_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_teacher_terms_acceptance_type_enum | Prisma.Enume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_teacher_terms_acceptance_type_enum[] | Prisma.ListEnume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_teacher_terms_acceptance_type_enum[] | Prisma.ListEnume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_teacher_terms_acceptance_type_enumWithAggregatesFilter<$PrismaModel> | $Enums.e_booklet_teacher_terms_acceptance_type_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnume_booklet_teacher_terms_acceptance_type_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnume_booklet_teacher_terms_acceptance_type_enumFilter<$PrismaModel>
+}
+
+export type Enumteacher_wallet_ledger_type_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.teacher_wallet_ledger_type_enum | Prisma.Enumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.teacher_wallet_ledger_type_enum[] | Prisma.ListEnumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.teacher_wallet_ledger_type_enum[] | Prisma.ListEnumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumteacher_wallet_ledger_type_enumFilter<$PrismaModel> | $Enums.teacher_wallet_ledger_type_enum
+}
+
+export type Enumteacher_wallet_ledger_source_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.teacher_wallet_ledger_source_enum | Prisma.Enumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.teacher_wallet_ledger_source_enum[] | Prisma.ListEnumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.teacher_wallet_ledger_source_enum[] | Prisma.ListEnumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumteacher_wallet_ledger_source_enumFilter<$PrismaModel> | $Enums.teacher_wallet_ledger_source_enum
+}
+
+export type Enumteacher_wallet_ledger_type_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.teacher_wallet_ledger_type_enum | Prisma.Enumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.teacher_wallet_ledger_type_enum[] | Prisma.ListEnumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.teacher_wallet_ledger_type_enum[] | Prisma.ListEnumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumteacher_wallet_ledger_type_enumWithAggregatesFilter<$PrismaModel> | $Enums.teacher_wallet_ledger_type_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumteacher_wallet_ledger_type_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumteacher_wallet_ledger_type_enumFilter<$PrismaModel>
+}
+
+export type Enumteacher_wallet_ledger_source_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.teacher_wallet_ledger_source_enum | Prisma.Enumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.teacher_wallet_ledger_source_enum[] | Prisma.ListEnumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.teacher_wallet_ledger_source_enum[] | Prisma.ListEnumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumteacher_wallet_ledger_source_enumWithAggregatesFilter<$PrismaModel> | $Enums.teacher_wallet_ledger_source_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumteacher_wallet_ledger_source_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumteacher_wallet_ledger_source_enumFilter<$PrismaModel>
+}
+
+export type Enume_booklet_access_code_kind_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_access_code_kind_enum | Prisma.Enume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_access_code_kind_enum[] | Prisma.ListEnume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_access_code_kind_enum[] | Prisma.ListEnume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_access_code_kind_enumFilter<$PrismaModel> | $Enums.e_booklet_access_code_kind_enum
+}
+
+export type Enume_booklet_access_code_status_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_access_code_status_enum | Prisma.Enume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_access_code_status_enum[] | Prisma.ListEnume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_access_code_status_enum[] | Prisma.ListEnume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_access_code_status_enumFilter<$PrismaModel> | $Enums.e_booklet_access_code_status_enum
+}
+
+export type Enume_booklet_access_code_kind_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_access_code_kind_enum | Prisma.Enume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_access_code_kind_enum[] | Prisma.ListEnume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_access_code_kind_enum[] | Prisma.ListEnume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_access_code_kind_enumWithAggregatesFilter<$PrismaModel> | $Enums.e_booklet_access_code_kind_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnume_booklet_access_code_kind_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnume_booklet_access_code_kind_enumFilter<$PrismaModel>
+}
+
+export type Enume_booklet_access_code_status_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_access_code_status_enum | Prisma.Enume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_access_code_status_enum[] | Prisma.ListEnume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_access_code_status_enum[] | Prisma.ListEnume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_access_code_status_enumWithAggregatesFilter<$PrismaModel> | $Enums.e_booklet_access_code_status_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnume_booklet_access_code_status_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnume_booklet_access_code_status_enumFilter<$PrismaModel>
 }
 
 export type Enume_booklet_access_role_enumFilter<$PrismaModel = never> = {
@@ -1360,6 +1462,23 @@ export type NestedEnume_booklet_purchase_status_enumWithAggregatesFilter<$Prisma
   _max?: Prisma.NestedEnume_booklet_purchase_status_enumFilter<$PrismaModel>
 }
 
+export type NestedEnume_booklet_term_status_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_term_status_enum | Prisma.Enume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_term_status_enum[] | Prisma.ListEnume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_term_status_enum[] | Prisma.ListEnume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_term_status_enumFilter<$PrismaModel> | $Enums.e_booklet_term_status_enum
+}
+
+export type NestedEnume_booklet_term_status_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_term_status_enum | Prisma.Enume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_term_status_enum[] | Prisma.ListEnume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_term_status_enum[] | Prisma.ListEnume_booklet_term_status_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_term_status_enumWithAggregatesFilter<$PrismaModel> | $Enums.e_booklet_term_status_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnume_booklet_term_status_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnume_booklet_term_status_enumFilter<$PrismaModel>
+}
+
 export type NestedEnume_booklet_instance_status_enumFilter<$PrismaModel = never> = {
   equals?: $Enums.e_booklet_instance_status_enum | Prisma.Enume_booklet_instance_status_enumFieldRefInput<$PrismaModel>
   in?: $Enums.e_booklet_instance_status_enum[] | Prisma.ListEnume_booklet_instance_status_enumFieldRefInput<$PrismaModel>
@@ -1375,6 +1494,91 @@ export type NestedEnume_booklet_instance_status_enumWithAggregatesFilter<$Prisma
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnume_booklet_instance_status_enumFilter<$PrismaModel>
   _max?: Prisma.NestedEnume_booklet_instance_status_enumFilter<$PrismaModel>
+}
+
+export type NestedEnume_booklet_teacher_terms_acceptance_type_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_teacher_terms_acceptance_type_enum | Prisma.Enume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_teacher_terms_acceptance_type_enum[] | Prisma.ListEnume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_teacher_terms_acceptance_type_enum[] | Prisma.ListEnume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_teacher_terms_acceptance_type_enumFilter<$PrismaModel> | $Enums.e_booklet_teacher_terms_acceptance_type_enum
+}
+
+export type NestedEnume_booklet_teacher_terms_acceptance_type_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_teacher_terms_acceptance_type_enum | Prisma.Enume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_teacher_terms_acceptance_type_enum[] | Prisma.ListEnume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_teacher_terms_acceptance_type_enum[] | Prisma.ListEnume_booklet_teacher_terms_acceptance_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_teacher_terms_acceptance_type_enumWithAggregatesFilter<$PrismaModel> | $Enums.e_booklet_teacher_terms_acceptance_type_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnume_booklet_teacher_terms_acceptance_type_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnume_booklet_teacher_terms_acceptance_type_enumFilter<$PrismaModel>
+}
+
+export type NestedEnumteacher_wallet_ledger_type_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.teacher_wallet_ledger_type_enum | Prisma.Enumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.teacher_wallet_ledger_type_enum[] | Prisma.ListEnumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.teacher_wallet_ledger_type_enum[] | Prisma.ListEnumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumteacher_wallet_ledger_type_enumFilter<$PrismaModel> | $Enums.teacher_wallet_ledger_type_enum
+}
+
+export type NestedEnumteacher_wallet_ledger_source_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.teacher_wallet_ledger_source_enum | Prisma.Enumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.teacher_wallet_ledger_source_enum[] | Prisma.ListEnumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.teacher_wallet_ledger_source_enum[] | Prisma.ListEnumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumteacher_wallet_ledger_source_enumFilter<$PrismaModel> | $Enums.teacher_wallet_ledger_source_enum
+}
+
+export type NestedEnumteacher_wallet_ledger_type_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.teacher_wallet_ledger_type_enum | Prisma.Enumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.teacher_wallet_ledger_type_enum[] | Prisma.ListEnumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.teacher_wallet_ledger_type_enum[] | Prisma.ListEnumteacher_wallet_ledger_type_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumteacher_wallet_ledger_type_enumWithAggregatesFilter<$PrismaModel> | $Enums.teacher_wallet_ledger_type_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumteacher_wallet_ledger_type_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumteacher_wallet_ledger_type_enumFilter<$PrismaModel>
+}
+
+export type NestedEnumteacher_wallet_ledger_source_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.teacher_wallet_ledger_source_enum | Prisma.Enumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.teacher_wallet_ledger_source_enum[] | Prisma.ListEnumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.teacher_wallet_ledger_source_enum[] | Prisma.ListEnumteacher_wallet_ledger_source_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumteacher_wallet_ledger_source_enumWithAggregatesFilter<$PrismaModel> | $Enums.teacher_wallet_ledger_source_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumteacher_wallet_ledger_source_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumteacher_wallet_ledger_source_enumFilter<$PrismaModel>
+}
+
+export type NestedEnume_booklet_access_code_kind_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_access_code_kind_enum | Prisma.Enume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_access_code_kind_enum[] | Prisma.ListEnume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_access_code_kind_enum[] | Prisma.ListEnume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_access_code_kind_enumFilter<$PrismaModel> | $Enums.e_booklet_access_code_kind_enum
+}
+
+export type NestedEnume_booklet_access_code_status_enumFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_access_code_status_enum | Prisma.Enume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_access_code_status_enum[] | Prisma.ListEnume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_access_code_status_enum[] | Prisma.ListEnume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_access_code_status_enumFilter<$PrismaModel> | $Enums.e_booklet_access_code_status_enum
+}
+
+export type NestedEnume_booklet_access_code_kind_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_access_code_kind_enum | Prisma.Enume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_access_code_kind_enum[] | Prisma.ListEnume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_access_code_kind_enum[] | Prisma.ListEnume_booklet_access_code_kind_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_access_code_kind_enumWithAggregatesFilter<$PrismaModel> | $Enums.e_booklet_access_code_kind_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnume_booklet_access_code_kind_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnume_booklet_access_code_kind_enumFilter<$PrismaModel>
+}
+
+export type NestedEnume_booklet_access_code_status_enumWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.e_booklet_access_code_status_enum | Prisma.Enume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  in?: $Enums.e_booklet_access_code_status_enum[] | Prisma.ListEnume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  notIn?: $Enums.e_booklet_access_code_status_enum[] | Prisma.ListEnume_booklet_access_code_status_enumFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnume_booklet_access_code_status_enumWithAggregatesFilter<$PrismaModel> | $Enums.e_booklet_access_code_status_enum
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnume_booklet_access_code_status_enumFilter<$PrismaModel>
+  _max?: Prisma.NestedEnume_booklet_access_code_status_enumFilter<$PrismaModel>
 }
 
 export type NestedEnume_booklet_access_role_enumFilter<$PrismaModel = never> = {

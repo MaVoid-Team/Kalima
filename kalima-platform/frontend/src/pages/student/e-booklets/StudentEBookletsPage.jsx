@@ -38,6 +38,9 @@ export default function StudentEBookletsPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             {t("student.emptyDescription")}
           </p>
+          <Button asChild className="mt-4" variant="outline">
+            <Link to="/e-booklet-code">{t("student.redeemCodeCta")}</Link>
+          </Button>
         </div>
       )}
 

@@ -226,6 +226,60 @@ export const e_booklet_invite_status_enum = {
 export type e_booklet_invite_status_enum = (typeof e_booklet_invite_status_enum)[keyof typeof e_booklet_invite_status_enum]
 
 
+export const e_booklet_term_status_enum = {
+  draft: 'draft',
+  active: 'active',
+  archived: 'archived'
+} as const
+
+export type e_booklet_term_status_enum = (typeof e_booklet_term_status_enum)[keyof typeof e_booklet_term_status_enum]
+
+
+export const e_booklet_access_code_kind_enum = {
+  paid: 'paid',
+  free: 'free'
+} as const
+
+export type e_booklet_access_code_kind_enum = (typeof e_booklet_access_code_kind_enum)[keyof typeof e_booklet_access_code_kind_enum]
+
+
+export const e_booklet_access_code_status_enum = {
+  active: 'active',
+  redeemed: 'redeemed',
+  disabled: 'disabled',
+  expired: 'expired'
+} as const
+
+export type e_booklet_access_code_status_enum = (typeof e_booklet_access_code_status_enum)[keyof typeof e_booklet_access_code_status_enum]
+
+
+export const teacher_wallet_ledger_type_enum = {
+  credit: 'credit',
+  debit: 'debit',
+  adjustment: 'adjustment'
+} as const
+
+export type teacher_wallet_ledger_type_enum = (typeof teacher_wallet_ledger_type_enum)[keyof typeof teacher_wallet_ledger_type_enum]
+
+
+export const teacher_wallet_ledger_source_enum = {
+  milestone_reward: 'milestone_reward',
+  order_spend: 'order_spend',
+  admin_adjustment: 'admin_adjustment',
+  refund: 'refund'
+} as const
+
+export type teacher_wallet_ledger_source_enum = (typeof teacher_wallet_ledger_source_enum)[keyof typeof teacher_wallet_ledger_source_enum]
+
+
+export const e_booklet_teacher_terms_acceptance_type_enum = {
+  code_generation: 'code_generation',
+  reward_claim: 'reward_claim'
+} as const
+
+export type e_booklet_teacher_terms_acceptance_type_enum = (typeof e_booklet_teacher_terms_acceptance_type_enum)[keyof typeof e_booklet_teacher_terms_acceptance_type_enum]
+
+
 export const e_booklet_file_type_enum = {
   pdf: 'pdf',
   image: 'image',
@@ -263,6 +317,8 @@ export const notification_key_enum = {
   ORDER_ADMIN_NOTE: 'ORDER_ADMIN_NOTE',
   NEW_ORDER_CREATED: 'NEW_ORDER_CREATED',
   NEW_ACCOUNT_CREATED: 'NEW_ACCOUNT_CREATED',
+  E_BOOKLET_MILESTONE_ACHIEVED: 'E_BOOKLET_MILESTONE_ACHIEVED',
+  E_BOOKLET_MILESTONE_ADMIN_ALERT: 'E_BOOKLET_MILESTONE_ADMIN_ALERT',
   SYSTEM_ANNOUNCEMENT: 'SYSTEM_ANNOUNCEMENT',
   ACCOUNT_UPDATE: 'ACCOUNT_UPDATE',
   CUSTOM: 'CUSTOM'
