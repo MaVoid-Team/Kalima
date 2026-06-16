@@ -282,7 +282,7 @@
     },
     "instances": {
       "title": "وصول كتيبات المعلمين",
-      "description": "عرض المعلمين ونسخ الكتيبات والحصص والأجهزة.",
+      "description": "عرض المعلمين ونسخ الكتيبات والطلاب المشترين والأجهزة داخل الصف والتحليلات.",
       "adminViewNote": "وضع عرض المدير: استخدم صفحات العارض العادية فقط إذا كان نمط الانتحال الحالي متاحا؛ هذه الصفحة لا تنشئ انتحالا جديدا.",
       "loading": "جاري تحميل النسخ...",
       "empty": "لا توجد نسخ كتيبات من الواجهة الخلفية.",
@@ -293,7 +293,26 @@
       "expiry": "الانتهاء",
       "devices": "الأجهزة",
       "revoke": "إلغاء",
-      "revokeConfirm": "إلغاء وصول المعلم لهذه النسخة؟"
+      "revokeConfirm": "إلغاء وصول المعلم لهذه النسخة؟",
+      "showStudents": "الطلاب",
+      "hideStudents": "إخفاء الطلاب",
+      "studentsForEBooklet": "الطلاب الذين اشتروا هذا البوكليت",
+      "studentsForEBookletHint": "سجلات وصول الطلاب النشطة مع ملخصات آمنة للأجهزة والتحليلات.",
+      "studentsLoading": "جاري تحميل الطلاب...",
+      "studentsEmpty": "لا يوجد طلاب اشتروا أو استخدموا هذا البوكليت بعد.",
+      "studentAnalytics": "التحليلات",
+      "deviceSummary": "ملخص الأجهزة",
+      "accessSource": "المصدر: {{source}}",
+      "grantedAt": "تم المنح: {{value}}",
+      "activeDevices": "الأجهزة النشطة: {{count}}",
+      "allowedDevices": "الأجهزة المسموحة: {{count}}",
+      "lastSeen": "آخر ظهور: {{value}}",
+      "analyticsAccess": "الوصول {{count}}",
+      "analyticsDevices": "الأجهزة {{count}}",
+      "analyticsPages": "الصفحات {{count}}",
+      "manageDevicesInline": "إدارة الأجهزة",
+      "hideDevicesInline": "إخفاء الأجهزة",
+      "openFullDevicesPage": "فتح صفحة الأجهزة الكاملة"
     },
     "devices": {
       "title": "أجهزة كتيب إلكتروني",
@@ -312,7 +331,9 @@
       "unnamed": "جهاز بدون اسم",
       "never": "غير متاح",
       "lastSeen": "آخر ظهور: {{value}}",
-      "bound": "تم الربط: {{value}}"
+      "bound": "تم الربط: {{value}}",
+      "inlineTitle": "أجهزة {{name}}",
+      "emptyInline": "لا توجد أجهزة نشطة لهذا الطالب بعد."
     },
     "analytics": {
       "title": "تحليلات الكتيبات الإلكترونية",

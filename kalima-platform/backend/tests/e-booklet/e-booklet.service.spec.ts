@@ -36,6 +36,7 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     },
     e_booklet_devices: {
       findFirst: jest.fn(),
+      findMany: jest.fn(),
       count: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
@@ -43,6 +44,7 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     },
     e_booklet_device_allowances: {
       findUnique: jest.fn(),
+      findMany: jest.fn(),
       upsert: jest.fn(),
     },
     e_booklet_student_purchase_links: {
@@ -168,6 +170,87 @@ describe("EBookletService", () => {
       expect(result.warnings).toEqual([
         "This file has the same page count, but some page dimensions differ from the template. Hotspot positions may not align correctly.",
       ]);
+    });
+  });
+
+  describe("listInstanceStudents", () => {
+    test("returns active students with safe device and analytics summaries", async () => {
+      const db = createMockDb();
+      const grantedAt = new Date("2026-02-01T10:00:00.000Z");
+      const lastSeen = new Date("2026-02-03T12:30:00.000Z");
+      db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10 });
+      db.e_booklet_access.findMany.mockResolvedValue([
+        {
+          id: 100,
+          booklet_instance_id: 10,
+          user_id: 55,
+          role: "student",
+          status: "active",
+          access_source: "online_purchase",
+          granted_at: grantedAt,
+          user: { id: 55, name: "Student One", email: "one@example.com" },
+        },
+        {
+          id: 101,
+          booklet_instance_id: 10,
+          user_id: 56,
+          role: "student",
+          status: "active",
+          access_source: "offline_passcode",
+          granted_at: grantedAt,
+          user: { id: 56, name: "Student Two", email: "two@example.com" },
+        },
+      ]);
+      db.e_booklet_devices.findMany.mockResolvedValue([
+        { id: 1, user_id: 55, status: "active", last_seen_at: lastSeen, user_agent: "hidden", ip_address: "hidden" },
+        { id: 2, user_id: 55, status: "reset", last_seen_at: new Date("2026-02-02T12:00:00.000Z") },
+        { id: 3, user_id: 56, status: "active", last_seen_at: new Date("2026-02-01T12:00:00.000Z") },
+      ]);
+      db.e_booklet_device_allowances.findMany.mockResolvedValue([
+        { booklet_instance_id: 10, user_id: 55, allowed_devices: 3 },
+      ]);
+      db.e_booklet_analytics_events.findMany.mockResolvedValue([
+        { student_id: 55, event_type: "access_created", source: "online_purchase", marketing_price_snapshot: { toJSON: () => "120" } },
+        { student_id: 55, event_type: "device_bound", source: "online_purchase", marketing_price_snapshot: null },
+        { student_id: 55, event_type: "page_viewed", source: "online_purchase", marketing_price_snapshot: null },
+        { student_id: 56, event_type: "access_created", source: "offline_passcode", marketing_price_snapshot: 80 },
+      ]);
+
+      const service = new EBookletService(db);
+      const result: any = await service.listInstanceStudents(10);
+
+      expect(db.e_booklet_access.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: { booklet_instance_id: 10, role: "student", status: "active" },
+      }));
+      expect(result[0].devices_summary).toEqual({
+        active_count: 1,
+        total_count: 2,
+        last_seen_at: "2026-02-03T12:30:00.000Z",
+        allowed_devices: 3,
+      });
+      expect(result[0].analytics_summary).toMatchObject({
+        access_created: 1,
+        device_bound: 1,
+        page_viewed: 1,
+        source: "online_purchase",
+        marketing_price_snapshot: "120",
+      });
+      expect(result[1].devices_summary.allowed_devices).toBe(1);
+      expect(result[0]).not.toHaveProperty("ip_address");
+      expect(result[0]).not.toHaveProperty("user_agent");
+    });
+
+    test("keeps teacher ownership scoping", async () => {
+      const db = createMockDb();
+      db.e_booklet_instances.findFirst.mockResolvedValue(null);
+      const service = new EBookletService(db);
+
+      await expect(service.listInstanceStudents(10, 99)).rejects.toThrow("Teacher e-booklet not found");
+      expect(db.e_booklet_instances.findFirst).toHaveBeenCalledWith({
+        where: { id: 10, teacher_id: 99 },
+        select: { id: true },
+      });
+      expect(db.e_booklet_access.findMany).not.toHaveBeenCalled();
     });
   });
 
