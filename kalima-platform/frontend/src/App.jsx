@@ -1,4 +1,4 @@
-import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet, Navigate } from "react-router-dom";
 import { useState, useEffect, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
@@ -41,9 +41,6 @@ const EBookletDetailsPage = lazy(
 );
 const EBookletCartPage = lazy(
   () => import("./pages/e-booklets/EBookletCartPage"),
-);
-const EBookletCheckoutPage = lazy(
-  () => import("./pages/e-booklets/EBookletCheckoutPage"),
 );
 const AcceptEBookletInvitePage = lazy(
   () => import("./pages/e-booklets/AcceptEBookletInvitePage"),
@@ -161,11 +158,11 @@ const router = createBrowserRouter(
           <Route path="/samples/:id/preview" element={<SamplePreview />} />
         </Route>
 
-        {/* E-booklet purchase flow: authenticated users can buy from the public storefront without store portal access. */}
+        {/* E-booklet direct checkout is disabled; students access e-booklets via teacher/admin URL or code. */}
         <Route element={<ProtectedRoute requireAuth={true} />}>
           <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin"]} />}>
             <Route path="/e-booklet-cart" element={<EBookletCartPage />} />
-            <Route path="/e-booklet-checkout" element={<EBookletCheckoutPage />} />
+            <Route path="/e-booklet-checkout" element={<Navigate to="/e-booklet-code" replace />} />
           </Route>
         </Route>
 

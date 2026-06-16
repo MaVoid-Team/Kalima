@@ -416,7 +416,8 @@
     "cardDescription": "Interactive PDF booklet delivered by admin with teacher branding and controlled student access.",
     "accessExpires": "Expires {{value}}",
     "noExpiry": "No expiry",
-    "add": "Add"
+    "add": "Add",
+    "redeemCode": "Redeem code"
   },
   "details": {
     "coverLabel": "Kalima E-Booklet",
@@ -445,7 +446,8 @@
     ],
     "hotspotContent": "Hotspot content",
     "hotspotDescription": "Hotspots are rendered from normalized template coordinates, so the teacher PDF can change while the interactive layer stays reusable.",
-    "antiDownload": "Downloading is blocked inside Kalima through private storage, authenticated page access, hidden viewer download controls, and watermarking. Screenshots and camera capture cannot be fully prevented by any web platform."
+    "antiDownload": "Downloading is blocked inside Kalima through private storage, authenticated page access, hidden viewer download controls, and watermarking. Screenshots and camera capture cannot be fully prevented by any web platform.",
+    "redeemCode": "Redeem code"
   },
   "cart": {
     "emptyTitle": "Your e-booklet cart is empty",
@@ -459,21 +461,38 @@
     "summary": "Request summary",
     "adminNotice": "Admin will confirm payment, upload the teacher-specific PDF, assign invite quota, then deliver the booklet.",
     "checkout": "Continue to checkout",
-    "keepBrowsing": "Keep browsing"
+    "keepBrowsing": "Keep browsing",
+    "directCheckoutDisabled": "Direct student checkout is disabled. Ask your teacher or admin for an e-booklet URL or access code.",
+    "redeemCode": "Redeem access code"
   },
   "checkout": {
     "emptyTitle": "Choose an e-booklet before checkout",
     "emptyDescription": "E-booklet checkout is separate from the Market cart and requires one selected template.",
     "activeVersionMissing": "This e-booklet does not have an active published version.",
+    "instanceMissing": "Selected e-booklet instance is missing.",
+    "termsRequired": "Accept the terms before continuing.",
+    "paymentRequired": "Choose a payment method, enter the number you paid from, and upload payment proof.",
     "fieldRequired": "This field is required.",
     "submitError": "Checkout could not be submitted. Please review the form and try again.",
     "successBadge": "Request created",
     "successTitle": "Your e-booklet request is pending admin delivery",
     "successDescription": "Kalima admin will confirm payment, collect or prepare the teacher-specific PDF, validate page count, set invite quota, and deliver the ready booklet to your account.",
+    "purchaseSubmittedTitle": "Purchase submitted for review",
+    "purchaseSubmittedDescription": "We received your payment proof. Your e-booklet access will appear in your student library after admin approval.",
+    "openStudentLibrary": "Open my e-booklets",
     "openTeacherPortal": "Open teacher portal",
     "badge": "E-booklet checkout",
     "title": "Branding and delivery details",
+    "studentTitle": "Complete your e-booklet purchase",
+    "studentDescriptionPaid": "Upload your payment proof so the admin can approve access to this teacher e-booklet instance.",
+    "studentDescriptionFree": "Accept the terms to unlock this free e-booklet instance.",
     "description": "This creates an admin-handled request. The booklet becomes usable only after admin payment confirmation and delivery.",
+    "paymentTitle": "Payment proof",
+    "paymentMethod": "Payment method",
+    "selectPaymentMethod": "Select payment method",
+    "numberTransferredFrom": "Number transferred from",
+    "numberTransferredFromPlaceholder": "Your wallet/mobile number",
+    "paymentScreenshot": "Payment proof screenshot",
     "fields": {
       "teacherName": "Teacher display name",
       "teacherNameHelper": "Shown in viewer watermarking and invite context.",
@@ -498,15 +517,21 @@
       "notesPlaceholder": "Payment will be sent manually. Please use the teacher name in the footer watermark."
     },
     "backToCart": "Back to cart",
+    "terms": "I accept the e-booklet access terms and understand access is tied to my student account.",
     "submitting": "Submitting...",
     "submit": "Submit request",
+    "submitForReview": "Submit purchase for review",
+    "unlockFree": "Get access",
     "selectedTemplate": "Selected template",
     "teacherPdfNotice": "The teacher-specific PDF is uploaded by admin after checkout. It must match the template page count before delivery.",
     "summary": {
+      "title": "Checkout summary",
       "template": "Template",
       "accessValue": "Invite quota set by admin",
       "deliveryValue": "Manual admin customization"
-    }
+    },
+    "pendingApprovalNotice": "Paid e-booklet purchases are reviewed by the admin before student access is activated.",
+    "freeAccessNotice": "This e-booklet is free. Access is activated immediately after you accept the terms."
   },
   "viewer": {
     "titleFallback": "E-Booklet",
@@ -568,7 +593,11 @@
       "paidSuccess": "Paid code accepted. Opening your e-booklet...",
       "freeAccessNoPaidProgressSuccess": "Free shared code accepted and booklet access opened. This entry does not count toward paid seats or milestone rewards.",
       "error": "This e-booklet code cannot be redeemed."
-    }
+    },
+    "teacherCodeTitle": "Use a teacher/admin code",
+    "teacherCodeDescription": "Students access e-booklets through a teacher/admin URL, shared code, or passcode.",
+    "directPurchaseDisabled": "Direct student purchase checkout is disabled.",
+    "openCodeRedemption": "Open code redemption"
   },
   "teacher": {
     "title": "My E-Booklets",
@@ -722,9 +751,6 @@
       "dateRange": "Date range",
       "teacher": "Teacher",
       "teacherPlaceholder": "Teacher ID",
-      "teacherSearchPlaceholder": "Search teacher name",
-      "allTeachers": "All teachers",
-      "loadingTeachers": "Loading teachers...",
       "template": "Template",
       "templatePlaceholder": "Template filter pending backend support",
       "instance": "Instance",

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import i18n from "@/i18n";
 import useApiMutation from "./useApiMutation";
 
 const E_BOOKLET_CART_KEY = "kalima:e-booklet-cart:v1";
@@ -290,24 +289,4 @@ export function useEBookletTemplate(instanceId) {
   };
 }
 
-export function useEBookletCheckout() {
-  const { mutate, loading, error } = useApiMutation();
 
-  const submitCheckout = useCallback(
-    async (payload) => {
-      return mutate({
-        endpoint: "/e-booklet-checkout",
-        method: "post",
-        data: payload,
-        defaultSuccessMessage: i18n.t("eBooklets:toasts.requestSubmitted"),
-      });
-    },
-    [mutate],
-  );
-
-  return {
-    submitCheckout,
-    loading,
-    error,
-  };
-}

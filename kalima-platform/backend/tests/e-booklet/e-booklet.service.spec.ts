@@ -448,83 +448,8 @@ describe("EBookletService", () => {
       expect(result.internal_price).toBeUndefined();
       await expect(service.getPublicInstance(99)).rejects.toThrow("E-booklet instance not found");
     });
-    test("public checkout creates purchase, one-use invite, and student purchase link for the selected instance", async () => {
+    test("public checkout is disabled for students", async () => {
       const db = createMockDb();
-      const expiry = new Date("2027-01-15T10:30:00.000Z");
-      db.e_booklet_instances.findFirst.mockResolvedValue({
-        id: 10,
-        teacher_id: 7,
-        template_id: 3,
-        template_version_id: 8,
-        invite_quota: 5,
-        access_expires_at: expiry,
-        status: "active",
-        student_marketing_price: 150,
-        internal_price: 70,
-      });
-      db.e_booklet_access.count.mockResolvedValue(2);
-      db.e_booklet_student_purchase_links.count.mockResolvedValue(0);
-      db.purchases.create.mockResolvedValue({ id: 91, status: "pending" });
-      db.e_booklet_invites.create.mockResolvedValue({ id: 92 });
-      db.e_booklet_student_purchase_links.create.mockResolvedValue({ id: 93 });
-
-      const service = new EBookletService(db);
-      const result: any = await service.createPublicCheckoutRequest(55, {
-        instance_id: 10,
-        template_id: 3,
-        template_version_id: 8,
-        terms_version: "v1",
-        terms_accepted: true,
-        payment_method_id: 1,
-        numberTransferredFrom: "01000000000",
-      }, { buffer: Buffer.from("png"), mimetype: "image/png", originalname: "proof.png" } as any);
-
-      expect(db.e_booklet_instances.findFirst).toHaveBeenCalledWith(expect.objectContaining({
-        where: expect.objectContaining({ id: 10, status: "active", access_expires_at: { gt: expect.any(Date) } }),
-      }));
-      expect(db.e_booklet_student_purchase_links.count).toHaveBeenCalledWith(expect.objectContaining({
-        where: expect.objectContaining({ booklet_instance_id: 10, access_id: null }),
-      }));
-      expect(db.purchases.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({ user_id: 55, subtotal: 150, total: 150, status: "pending" }),
-      }));
-      expect(db.e_booklet_invites.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({
-          booklet_instance_id: 10,
-          teacher_id: 7,
-          share_token_ciphertext: expect.any(String),
-          max_uses: 1,
-          expires_at: expiry,
-        }),
-      }));
-      expect(db.e_booklet_student_purchase_links.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({
-          purchase_id: 91,
-          invite_id: 92,
-          booklet_instance_id: 10,
-          student_id: 55,
-          marketing_price_snapshot: 150,
-        }),
-      }));
-      expect(result).toEqual(expect.objectContaining({ purchase_id: 91, student_purchase_link_id: 93, booklet_instance_id: 10 }));
-    });
-
-    test("public checkout rejects when pending checkout links reserve all remaining seats", async () => {
-      const db = createMockDb();
-      db.e_booklet_instances.findFirst.mockResolvedValue({
-        id: 10,
-        teacher_id: 7,
-        template_id: 3,
-        template_version_id: 8,
-        invite_quota: 2,
-        access_expires_at: new Date("2027-01-15T10:30:00.000Z"),
-        status: "active",
-        student_marketing_price: 150,
-        internal_price: 70,
-      });
-      db.e_booklet_access.count.mockResolvedValue(1);
-      db.e_booklet_student_purchase_links.count.mockResolvedValue(1);
-
       const service = new EBookletService(db);
 
       await expect(service.createPublicCheckoutRequest(55, {
@@ -532,46 +457,10 @@ describe("EBookletService", () => {
         template_id: 3,
         template_version_id: 8,
         terms_accepted: true,
-        payment_method_id: 1,
-        numberTransferredFrom: "01000000000",
-      }, { buffer: Buffer.from("png"), mimetype: "image/png", originalname: "proof.png" } as any)).rejects.toThrow("student seat limit");
+      })).rejects.toThrow("Direct student e-booklet checkout is disabled");
       expect(db.purchases.create).not.toHaveBeenCalled();
-    });
-
-    test("public checkout creates zero-total confirmed purchases only when store price is zero", async () => {
-      const db = createMockDb();
-      db.e_booklet_instances.findFirst.mockResolvedValue({
-        id: 10,
-        teacher_id: 7,
-        template_id: 3,
-        template_version_id: 8,
-        invite_quota: 5,
-        access_expires_at: new Date("2027-01-15T10:30:00.000Z"),
-        status: "active",
-        student_marketing_price: 0,
-        internal_price: 70,
-      });
-      db.e_booklet_access.count.mockResolvedValue(0);
-      db.e_booklet_student_purchase_links.count.mockResolvedValue(0);
-      db.purchases.create.mockResolvedValue({ id: 91, status: "confirmed" });
-      db.e_booklet_invites.create.mockResolvedValue({ id: 92 });
-      db.e_booklet_student_purchase_links.create.mockResolvedValue({ id: 93 });
-      db.e_booklet_access.create.mockResolvedValue({ id: 94 });
-
-      const service = new EBookletService(db);
-      const result: any = await service.createPublicCheckoutRequest(55, { instance_id: 10, template_id: 3, template_version_id: 8, terms_accepted: true });
-
-      expect(db.purchases.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({ subtotal: 0, total: 0, status: "confirmed" }),
-      }));
-      expect(db.e_booklet_access.create).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({ booklet_instance_id: 10, user_id: 55, role: "student", access_source: "public_store_free_checkout" }),
-      }));
-      expect(db.e_booklet_student_purchase_links.update).toHaveBeenCalledWith(expect.objectContaining({
-        where: { purchase_id: 91 },
-        data: expect.objectContaining({ access_id: 94, approved_at: expect.any(Date) }),
-      }));
-      expect(result).toEqual(expect.objectContaining({ access_id: 94, next_url: "/student/e-booklets/10" }));
+      expect(db.e_booklet_student_purchase_links.create).not.toHaveBeenCalled();
+      expect(db.e_booklet_access.create).not.toHaveBeenCalled();
     });
   });
 
@@ -992,14 +881,14 @@ describe("EBookletService", () => {
       });
     });
 
-    test("requires student terms before online, passcode-direct, or free access", async () => {
+    test("blocks online student purchase links and still requires terms for passcode/free access", async () => {
       const service = new EBookletService(createMockDb());
-      await expect(service.createStudentPurchaseLink("token", 55, { termsAccepted: false })).rejects.toThrow("Student terms acceptance is required.");
+      await expect(service.createStudentPurchaseLink("token", 55, { termsAccepted: false })).rejects.toThrow("Direct student e-booklet purchase is disabled");
       await expect(service.acceptInvitePasscode("token", 55, { passcode: "123456", termsAccepted: false })).rejects.toThrow("Student terms acceptance is required.");
       await expect(service.acceptFreeInvite("token", 55, { termsAccepted: false })).rejects.toThrow("Student terms acceptance is required.");
     });
 
-    test("uses online purchase link for priced instances and passcode/free access without generic purchase", async () => {
+    test("blocks online purchase links and keeps passcode/free access without generic purchase", async () => {
       const db = createMockDb();
       db.e_booklet_invites.findFirst.mockResolvedValue({
         id: 2,
@@ -1015,11 +904,9 @@ describe("EBookletService", () => {
       db.e_booklet_access.count.mockResolvedValue(0);
       db.e_booklet_access.create.mockResolvedValue({ id: 30 });
       const service = new EBookletService(db);
-      await service.createStudentPurchaseLink("token", 55, { termsAccepted: true, termsVersion: "v1", purchaseId: 500 });
+      await expect(service.createStudentPurchaseLink("token", 55, { termsAccepted: true, termsVersion: "v1", purchaseId: 500 })).rejects.toThrow("Direct student e-booklet purchase is disabled");
       await service.acceptInvitePasscode("token", 55, { termsAccepted: true, passcode: "123456" });
-      expect(db.e_booklet_student_purchase_links.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({ purchase_id: 500, marketing_price_snapshot: 150, terms_version: "v1" }),
-      });
+      expect(db.e_booklet_student_purchase_links.create).not.toHaveBeenCalled();
       expect(db.e_booklet_access.create).toHaveBeenCalledWith({ data: expect.objectContaining({ access_source: "offline_passcode" }) });
     });
 
@@ -1171,7 +1058,7 @@ describe("EBookletService", () => {
       db.purchases.findFirst.mockResolvedValue(null);
       const service = new EBookletService(db);
 
-      await expect(service.createStudentPurchaseLink("token", 55, { termsAccepted: true, purchaseId: 999 })).rejects.toThrow("Purchase does not belong to this student.");
+      await expect(service.createStudentPurchaseLink("token", 55, { termsAccepted: true, purchaseId: 999 })).rejects.toThrow("Direct student e-booklet purchase is disabled");
       await expect(service.acceptInvitePasscode("token", 55, { termsAccepted: true, passcode: "123456" })).rejects.toThrow("This e-booklet invite does not allow passcode access.");
       await expect(service.acceptFreeInvite("token", 55, { termsAccepted: true })).rejects.toThrow("This e-booklet invite requires purchase.");
     });

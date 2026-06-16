@@ -1100,6 +1100,8 @@ export class EBookletService {
     dto: any,
     paymentScreenshotFile?: Express.Multer.File,
   ): Promise<unknown> {
+    throw new ForbiddenError("Direct student e-booklet checkout is disabled. Students must redeem a teacher-provided URL or access code.");
+
     if (!dto.instance_id) {
       throw new BadRequestError("E-booklet instance is required for checkout.");
     }
@@ -2817,6 +2819,8 @@ export class EBookletService {
     input: TermsInput,
     paymentScreenshotFile?: Express.Multer.File,
   ) {
+    throw new ForbiddenError("Direct student e-booklet purchase is disabled. Students must redeem a teacher-provided URL or access code.");
+
     try {
       this.requireStudentTerms(input);
       const invite = await this.findInviteByToken(rawToken);
