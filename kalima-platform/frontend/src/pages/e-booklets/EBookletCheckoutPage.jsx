@@ -29,6 +29,7 @@ const formatMoney = (amount, currency = "EGP", language = "en") => {
 
 const normalizePaymentMethods = (payload) => {
   if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data?.data)) return payload.data.data;
   if (Array.isArray(payload?.data)) return payload.data;
   if (Array.isArray(payload?.payment_methods)) return payload.payment_methods;
   if (Array.isArray(payload?.methods)) return payload.methods;
