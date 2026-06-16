@@ -12,10 +12,9 @@ import { generateInviteToken, hashInviteToken } from "../utils/e-booklet-token";
 
 type EBookletDb = PrismaClient | any;
 
-const E_BOOKLET_UPLOAD_DIR = path.resolve(
-  __dirname,
-  "../../../../uploads/e-booklets/private",
-);
+const E_BOOKLET_UPLOAD_DIR = process.env.E_BOOKLET_UPLOAD_DIR
+  ? path.resolve(process.env.E_BOOKLET_UPLOAD_DIR)
+  : path.resolve(process.cwd(), "uploads/e-booklets/private");
 const PASSCODE_BLOCK_MESSAGE = "Invalid e-booklet invite passcode.";
 const PASSCODE_MAX_FAILURES = 5;
 const PASSCODE_WINDOW_MS = 10 * 60 * 1000;
