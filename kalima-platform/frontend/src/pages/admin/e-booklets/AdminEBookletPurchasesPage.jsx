@@ -228,9 +228,9 @@ export default function AdminEBookletPurchasesPage() {
         </Select>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_420px]">
-        <div className="overflow-hidden rounded-lg border bg-background">
-          <Table>
+      <div className="space-y-5">
+        <div className="w-full overflow-x-auto rounded-lg border bg-background" data-testid="admin-e-booklet-purchases-table-card">
+          <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow>
                 <TableHead>{t("admin.purchases.table.teacher")}</TableHead>
@@ -314,7 +314,7 @@ export default function AdminEBookletPurchasesPage() {
           </Table>
         </div>
 
-        <aside className="space-y-4 rounded-lg border bg-background p-4">
+        <aside className="space-y-4 rounded-lg border bg-background p-4" data-testid="admin-e-booklet-purchases-delivery-section">
           {activePurchase ? (
             <>
               <div>

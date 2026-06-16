@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BarChart3, Download, FileArchive, HardDrive, HeartPulse, Percent, ShieldCheck, Wallet } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useAdminEBookletAnalytics } from "@/hooks/admin/useAdminEBooklets";
+import { useAdminEBookletAnalytics, useAdminTeacherOptions } from "@/hooks/admin/useAdminEBooklets";
 
 const DATE_RANGES = ["7d", "30d", "all"];
 const SOURCES = ["all", "offline_passcode", "online_purchase", "free_invite"];
@@ -18,6 +18,7 @@ const getDateRange = (range) => {
 
 const numberValue = (value) => Number(value ?? 0).toLocaleString();
 const eventCount = (analytics, key) => Number(analytics?.events?.[key] ?? 0);
+const teacherLabel = (teacher) => [teacher?.name, teacher?.email || teacher?.phone].filter(Boolean).join(" — ") || "Unnamed teacher";
 
 function MetricCard({ icon: Icon, label, value, helper }) {
   return (
@@ -35,7 +36,10 @@ function MetricCard({ icon: Icon, label, value, helper }) {
 export default function AdminEBookletAnalyticsPage() {
   const { t } = useTranslation("eBooklets");
   const { analytics, loading, fetchAnalytics, exportCsv } = useAdminEBookletAnalytics();
+  const { teachers, loading: teachersLoading, fetchTeachers } = useAdminTeacherOptions();
   const [filters, setFilters] = useState({ range: "30d", teacherId: "", templateId: "", instanceId: "", source: "all" });
+  const [teacherSearch, setTeacherSearch] = useState("");
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
 
   const apiFilters = () => {
     const next = { ...getDateRange(filters.range) };
@@ -50,7 +54,23 @@ export default function AdminEBookletAnalyticsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.range, filters.teacherId, filters.instanceId, filters.source]);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      fetchTeachers(teacherSearch).catch(() => {});
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [fetchTeachers, teacherSearch]);
+
   const updateFilter = (key, value) => setFilters((current) => ({ ...current, [key]: value }));
+  const teacherOptions = useMemo(() => {
+    if (!selectedTeacher || teachers.some((teacher) => String(teacher.id) === String(selectedTeacher.id))) return teachers;
+    return [selectedTeacher, ...teachers];
+  }, [selectedTeacher, teachers]);
+  const updateTeacherFilter = (teacherId) => {
+    const nextTeacher = teacherOptions.find((teacher) => String(teacher.id) === String(teacherId)) || null;
+    setSelectedTeacher(nextTeacher);
+    updateFilter("teacherId", teacherId);
+  };
   const marketing = Number(analytics?.revenue?.marketing ?? 0);
   const internal = Number(analytics?.revenue?.internal ?? 0);
   const margin = marketing - internal;
@@ -80,7 +100,11 @@ export default function AdminEBookletAnalyticsPage() {
         </label>
         <label className="space-y-1 text-sm">
           <span className="text-muted-foreground">{t("analytics.filters.teacher")}</span>
-          <input className="w-full rounded-md border bg-background px-3 py-2" value={filters.teacherId} onChange={(event) => updateFilter("teacherId", event.target.value)} placeholder={t("analytics.filters.teacherPlaceholder")} />
+          <input className="w-full rounded-md border bg-background px-3 py-2" value={teacherSearch} onChange={(event) => setTeacherSearch(event.target.value)} placeholder={t("analytics.filters.teacherSearchPlaceholder")} />
+          <select className="w-full rounded-md border bg-background px-3 py-2" value={filters.teacherId} onChange={(event) => updateTeacherFilter(event.target.value)} disabled={teachersLoading && teacherOptions.length === 0}>
+            <option value="">{teachersLoading ? t("analytics.filters.loadingTeachers") : t("analytics.filters.allTeachers")}</option>
+            {teacherOptions.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacherLabel(teacher)}</option>)}
+          </select>
         </label>
         <label className="space-y-1 text-sm">
           <span className="text-muted-foreground">{t("analytics.filters.template")}</span>
