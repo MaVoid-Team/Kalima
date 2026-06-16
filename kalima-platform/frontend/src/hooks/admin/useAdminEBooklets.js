@@ -461,6 +461,18 @@ export function useAdminEBookletPurchases() {
     [fetchApi],
   );
 
+  const prepareCustomTemplate = useCallback(
+    (purchaseId) =>
+      fetchApi({
+        endpoint: `/admin/e-booklet-purchases/${purchaseId}/custom-template`,
+        method: "post",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.teacherTemplateReady", {
+          defaultValue: "Teacher-specific eBooklet template is ready to edit.",
+        }),
+      }),
+    [fetchApi],
+  );
+
   const uploadTeacherDocument = useCallback(
     (file, data = {}) => {
       const formData = new FormData();
@@ -492,6 +504,7 @@ export function useAdminEBookletPurchases() {
     updatePurchaseStatus,
     markPaid,
     deliverPurchase,
+    prepareCustomTemplate,
     uploadTeacherDocument,
   };
 }

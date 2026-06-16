@@ -181,6 +181,11 @@ router.post(
   ...adminAuth,
   eBookletController.deliverPurchase,
 );
+router.post(
+  "/admin/e-booklet-purchases/:id/custom-template",
+  ...adminAuth,
+  eBookletController.preparePurchaseCustomTemplate,
+);
 router.get(
   "/admin/e-booklet-instances",
   ...adminAuth,

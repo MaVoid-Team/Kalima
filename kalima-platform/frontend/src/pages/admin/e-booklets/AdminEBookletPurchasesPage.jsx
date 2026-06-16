@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   BookOpenCheck,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   PackageCheck,
+  PencilLine,
   Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -73,6 +75,7 @@ const dimensionsDiffer = (expected = [], uploaded = []) => {
 
 export default function AdminEBookletPurchasesPage() {
   const { t } = useTranslation("eBooklets");
+  const navigate = useNavigate();
   const {
     purchases,
     pagination,
@@ -84,6 +87,7 @@ export default function AdminEBookletPurchasesPage() {
     updatePurchaseStatus,
     markPaid,
     deliverPurchase,
+    prepareCustomTemplate,
     uploadTeacherDocument,
   } = useAdminEBookletPurchases();
   const [selectedPurchase, setSelectedPurchase] = useState(null);
@@ -200,6 +204,17 @@ export default function AdminEBookletPurchasesPage() {
   const handleStatus = async (purchase, nextStatus) => {
     await updatePurchaseStatus(purchase.id, nextStatus, deliveryForm.admin_notes);
     fetchPurchases();
+  };
+
+  const handleEditTeacherTemplate = async () => {
+    if (!activePurchase) return;
+    const response = await prepareCustomTemplate(activePurchase.id);
+    const custom = response?.data;
+    const templateId = custom?.template_id || activePurchase.template_id;
+    const versionId = custom?.template_version_id;
+    if (templateId && versionId) {
+      navigate(`/admin/e-booklets/${templateId}/edit?teacherTemplate=1&purchaseId=${activePurchase.id}&versionId=${versionId}`);
+    }
   };
 
   return (
@@ -455,6 +470,18 @@ export default function AdminEBookletPurchasesPage() {
               </div>
 
               <div className="grid gap-2 sm:grid-cols-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleEditTeacherTemplate}
+                  disabled={loading}
+                  className="sm:col-span-2"
+                >
+                  <PencilLine className="h-4 w-4" />
+                  {t("admin.purchases.editTeacherTemplate", {
+                    defaultValue: "Edit this teacher's eBooklet template",
+                  })}
+                </Button>
                 <Button
                   variant="outline"
                   onClick={() => handleStatus(activePurchase, "customization_in_progress")}
