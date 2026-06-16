@@ -394,6 +394,12 @@ router.get(
   eBookletController.getAdminViewerMetadata,
 );
 router.get(
+  "/admin/e-booklet-viewer/:instanceId/document",
+  viewerLimiter,
+  ...adminAuth,
+  eBookletController.getAdminAuthorizedViewerDocument,
+);
+router.get(
   "/admin/e-booklet-viewer/:instanceId/pages/:pageNumber",
   viewerLimiter,
   ...adminAuth,
@@ -430,6 +436,12 @@ router.post(
   viewerLimiter,
   ...viewerAuth,
   eBookletController.bindViewerDevice,
+);
+router.get(
+  "/e-booklet-viewer/:instanceId/document",
+  viewerLimiter,
+  ...viewerAuth,
+  eBookletController.getAuthorizedViewerDocument,
 );
 router.get(
   "/e-booklet-viewer/:instanceId/pages/:pageNumber",

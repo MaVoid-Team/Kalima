@@ -383,6 +383,7 @@ export default function EBookletViewerPage() {
   const [zoom, setZoom] = useState(1);
   const [activeHotspot, setActiveHotspot] = useState(null);
   const [hotspotContent, setHotspotContent] = useState(null);
+  const [documentPageUrl, setDocumentPageUrl] = useState(null);
   const [deviceStatus, setDeviceStatus] = useState("checking");
   const [deviceError, setDeviceError] = useState("");
 
@@ -425,6 +426,32 @@ export default function EBookletViewerPage() {
     setActiveHotspot(null);
     setHotspotContent(null);
   }, [deviceStatus, instanceId, pageNumber, viewer.fetchPage]);
+
+  useEffect(() => {
+    if (viewer.page?.renderMode !== "pdf-document" || !viewer.page?.documentAssetId) {
+      setDocumentPageUrl(null);
+      return undefined;
+    }
+    let active = true;
+    let createdUrl = null;
+    setDocumentPageUrl(null);
+    viewer.fetchViewerDocumentBlobUrl(instanceId)
+      .then((url) => {
+        createdUrl = url;
+        if (active) {
+          setDocumentPageUrl(url);
+        } else {
+          URL.revokeObjectURL(url);
+        }
+      })
+      .catch(() => {
+        if (active) setDocumentPageUrl(null);
+      });
+    return () => {
+      active = false;
+      if (createdUrl) URL.revokeObjectURL(createdUrl);
+    };
+  }, [instanceId, viewer.fetchViewerDocumentBlobUrl, viewer.page?.documentAssetId, viewer.page?.renderMode]);
 
   useEffect(() => {
     const preventContextMenu = (event) => event.preventDefault();
@@ -475,7 +502,7 @@ export default function EBookletViewerPage() {
   }, [viewer]);
 
   const contentHotspot = hotspotContent || activeHotspot;
-  const pageUrl = viewer.page?.url || viewer.page?.pageUrl || viewer.page?.assetUrl || null;
+  const pageUrl = documentPageUrl || viewer.page?.url || viewer.page?.pageUrl || viewer.page?.assetUrl || null;
   const serverPage = viewer.page?.renderMode === "server-page" ? viewer.page : null;
 
   if (deviceStatus === "blocked") {
@@ -551,9 +578,8 @@ export default function EBookletViewerPage() {
               {pageUrl ? (
                 <iframe
                   title={t("viewer.pageFrameTitle", { page: pageNumber })}
-                  src={`${pageUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                  src={`${pageUrl}#page=${pageNumber}&toolbar=0&navpanes=0&scrollbar=0`}
                   className="absolute inset-0 h-full w-full border-0"
-                  sandbox=""
                 />
               ) : serverPage ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-50 p-8 text-center">
