@@ -1118,6 +1118,41 @@ export const eBookletController = {
     }
   },
 
+  async getAuthorizedViewerDocument(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { asset, absolutePath } = await getEBookletService().getAuthorizedViewerDocument(
+        parseId(req.params.instanceId, "instance ID"),
+        currentUserId(req),
+      );
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "application/pdf");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-document.pdf").replace(/"/g, "")}"`,
+      );
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getAdminAuthorizedViewerDocument(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { asset, absolutePath } = await getEBookletService().getAdminAuthorizedViewerDocument(
+        parseId(req.params.instanceId, "instance ID"),
+      );
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "application/pdf");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-document.pdf").replace(/"/g, "")}"`,
+      );
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async getAuthorizedHotspotAsset(req: Request, res: Response, next: NextFunction) {
     try {
       const { asset, absolutePath } = await getEBookletService().getAuthorizedHotspotAsset(

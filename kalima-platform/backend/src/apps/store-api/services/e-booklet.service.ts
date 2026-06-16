@@ -1912,12 +1912,22 @@ export class EBookletService {
     return access;
   }
 
+  private resolveViewerDocumentAssetId(instance: any): number | null {
+    const assetId =
+      instance?.custom_document_file_id ??
+      instance?.template_version?.rendered_document_file_id ??
+      instance?.template_version?.base_document_file_id ??
+      null;
+    return assetId ? Number(assetId) : null;
+  }
+
   async getAdminViewerPage(instanceId: number, pageNumber: number, adminUserId: number) {
     const access: any = await this.getAdminViewerAccess(instanceId);
     const pageCount = Number(access.booklet_instance?.template_version?.page_count || 0);
     if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pageCount) {
       throw new BadRequestError("Invalid e-booklet page number.");
     }
+    const documentAssetId = this.resolveViewerDocumentAssetId(access.booklet_instance);
     const expiresAt = new Date(Date.now() + VIEWER_PAGE_TOKEN_TTL_MS);
     await this.db.e_booklet_audit_logs.create({
       data: {
@@ -1930,7 +1940,8 @@ export class EBookletService {
     });
     return {
       pageNumber,
-      renderMode: "server-page",
+      renderMode: documentAssetId ? "pdf-document" : "server-page",
+      documentAssetId,
       pageAccessToken: createViewerPageToken({ instanceId, pageNumber, userId: adminUserId, expiresAt }),
       expiresAt,
       cacheControl: "private, no-store",
@@ -2022,6 +2033,40 @@ export class EBookletService {
     };
   }
 
+  private async buildViewerDocumentResponse(instance: any) {
+    const documentAssetId = this.resolveViewerDocumentAssetId(instance);
+    if (!documentAssetId) {
+      throw new NotFoundError("E-booklet document is not available.");
+    }
+    const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: documentAssetId } });
+    if (!asset || asset.mime_type !== "application/pdf") {
+      throw new NotFoundError("E-booklet PDF document not found.");
+    }
+    const filename = path.basename(asset.storage_key || "");
+    return {
+      asset: {
+        id: asset.id,
+        file_type: asset.file_type,
+        original_filename: asset.original_filename,
+        mime_type: asset.mime_type,
+        size_bytes: asset.size_bytes,
+        visibility: asset.visibility,
+      },
+      absolutePath: path.join(E_BOOKLET_UPLOAD_DIR, filename),
+      cacheControl: "private, no-store",
+    };
+  }
+
+  async getAdminAuthorizedViewerDocument(instanceId: number) {
+    const access: any = await this.getAdminViewerAccess(instanceId);
+    return this.buildViewerDocumentResponse(access.booklet_instance);
+  }
+
+  async getAuthorizedViewerDocument(instanceId: number, userId: number) {
+    const access: any = await this.assertViewerAccess(instanceId, userId);
+    return this.buildViewerDocumentResponse(access.booklet_instance);
+  }
+
   async getViewerMetadata(instanceId: number, userId: number) {
     const access = await this.assertViewerAccess(instanceId, userId);
     await this.db.e_booklet_audit_logs.create({
@@ -2073,9 +2118,11 @@ export class EBookletService {
       source: access.access_source,
       metadata: { page_number: pageNumber },
     });
+    const documentAssetId = this.resolveViewerDocumentAssetId(access.booklet_instance);
     return {
       pageNumber,
-      renderMode: "server-page",
+      renderMode: documentAssetId ? "pdf-document" : "server-page",
+      documentAssetId,
       pageAccessToken: createViewerPageToken({
         instanceId,
         pageNumber,
@@ -2088,7 +2135,9 @@ export class EBookletService {
         teacherName: access.booklet_instance?.teacher?.name || null,
         templateTitle: access.booklet_instance?.template?.title || null,
       },
-      message: "Page rendering pipeline is pending document renderer integration.",
+      message: documentAssetId
+        ? null
+        : "Page rendering pipeline is pending document renderer integration.",
     };
   }
 
