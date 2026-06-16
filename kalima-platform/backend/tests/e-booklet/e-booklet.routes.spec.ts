@@ -1,6 +1,9 @@
 import express from "express";
 import request from "supertest";
 import jwt from "jsonwebtoken";
+import path from "path";
+import os from "os";
+import { promises as fs } from "fs";
 
 process.env.DATABASE_URL =
   process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/postgres?schema=test";
@@ -64,12 +67,14 @@ const mockService = {
   getAdminViewerPageHotspots: jest.fn(),
   getAdminHotspotContent: jest.fn(),
   getAdminAuthorizedHotspotAsset: jest.fn(),
+  getAdminAuthorizedViewerDocument: jest.fn(),
   bindViewerDevice: jest.fn(),
   listViewerDevices: jest.fn(),
   resetViewerDevices: jest.fn(),
   addDeviceAllowance: jest.fn(),
   approveStudentPurchaseLink: jest.fn(),
   getAuthorizedHotspotAsset: jest.fn(),
+  getAuthorizedViewerDocument: jest.fn(),
   createFileAsset: jest.fn(),
   recordInviteOpen: jest.fn(),
   getTeacherAnalytics: jest.fn(),
@@ -445,6 +450,30 @@ describe("e-booklet routes", () => {
       });
 
     expect(mockService.getViewerPage).toHaveBeenCalledWith(10, 1, 55);
+  });
+
+  test("serves the authorized viewer PDF document as private no-store", async () => {
+    const pdfPath = path.join(os.tmpdir(), `kalima-viewer-${Date.now()}.pdf`);
+    await fs.writeFile(pdfPath, Buffer.from("%PDF-1.4\n%stub\n"));
+    mockService.getAuthorizedViewerDocument.mockResolvedValue({
+      asset: { original_filename: "lesson.pdf", mime_type: "application/pdf" },
+      absolutePath: pdfPath,
+      cacheControl: "private, no-store",
+    });
+
+    try {
+      await request(app)
+        .get("/api/v2/e-booklet-viewer/10/document")
+        .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+        .expect(200)
+        .expect("Cache-Control", "private, no-store")
+        .expect("Content-Type", /application\/pdf/)
+        .expect("Content-Disposition", /inline; filename="lesson.pdf"/);
+
+      expect(mockService.getAuthorizedViewerDocument).toHaveBeenCalledWith(10, 55);
+    } finally {
+      await fs.rm(pdfPath, { force: true });
+    }
   });
 
   test("serves admin view mode without student access or device binding", async () => {

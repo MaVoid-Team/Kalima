@@ -284,6 +284,14 @@ export function useEBookletViewer({ adminMode = false } = {}) {
     [fetchApi],
   );
 
+  const fetchViewerDocumentBlobUrl = useCallback(async (instanceId) => {
+    const response = await api.get(
+      `${viewerBase}/${instanceId}/document`,
+      { responseType: "blob" },
+    );
+    return URL.createObjectURL(response.data);
+  }, [viewerBase]);
+
   const fetchHotspotAssetBlobUrl = useCallback(async (hotspotId, assetId) => {
     const response = await api.get(
       `${viewerBase}/hotspots/${hotspotId}/assets/${assetId}`,
@@ -301,6 +309,7 @@ export function useEBookletViewer({ adminMode = false } = {}) {
     fetchPage,
     fetchHotspotContent,
     bindDevice,
+    fetchViewerDocumentBlobUrl,
     fetchHotspotAssetBlobUrl,
   };
 }
