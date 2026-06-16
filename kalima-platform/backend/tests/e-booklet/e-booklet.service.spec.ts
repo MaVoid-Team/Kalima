@@ -1400,9 +1400,12 @@ describe("EBookletService", () => {
           access_source: "offline_passcode",
           teacher: { id: 99, name: "Ms. Sara" },
           template: { id: 7, title: "Grade 5 Arabic" },
+          custom_document_file_id: 99,
           template_version: {
             id: 22,
             page_count: 3,
+            base_document_file_id: 88,
+            rendered_document_file_id: 77,
           },
         },
       });
@@ -1414,7 +1417,9 @@ describe("EBookletService", () => {
       expect(result).toEqual(
         expect.objectContaining({
           pageNumber: 2,
-          renderMode: "server-page",
+          renderMode: "pdf-document",
+          documentAssetId: 99,
+          message: null,
           pageAccessToken: expect.stringMatching(
             /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/,
           ),
