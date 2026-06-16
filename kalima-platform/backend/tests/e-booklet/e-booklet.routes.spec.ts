@@ -195,8 +195,8 @@ describe("e-booklet routes", () => {
     );
   });
 
-  test("public checkout requires auth and creates an instance-scoped purchase request", async () => {
-    mockService.createPublicCheckoutRequest.mockResolvedValue({ purchase_id: 91 });
+  test("public checkout requires auth but blocks direct student e-booklet checkout", async () => {
+    mockService.createPublicCheckoutRequest.mockRejectedValue(Object.assign(new Error("Direct student e-booklet checkout is disabled."), { statusCode: 403 }));
 
     await request(app)
       .post("/api/v2/e-booklet-checkout")
@@ -213,9 +213,9 @@ describe("e-booklet routes", () => {
       .post("/api/v2/e-booklet-checkout")
       .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
       .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0, terms_accepted: true })
-      .expect(201)
+      .expect(403)
       .expect((res) => {
-        expect(res.body.data).toEqual({ purchase_id: 91 });
+        expect(res.body.message).toContain("Direct student e-booklet checkout is disabled");
       });
 
     expect(mockService.createPurchaseRequest).not.toHaveBeenCalled();
@@ -343,7 +343,7 @@ describe("e-booklet routes", () => {
   test("dispatches student invite acceptance to explicit Phase 1 access paths", async () => {
     mockService.acceptFreeInvite.mockResolvedValue({ id: 12, access_source: "free_invite" });
     mockService.acceptInvitePasscode.mockResolvedValue({ id: 13, access_source: "offline_passcode" });
-    mockService.createStudentPurchaseLink.mockResolvedValue({ id: 14, purchase_id: 500 });
+    mockService.createStudentPurchaseLink.mockRejectedValue(Object.assign(new Error("Direct student e-booklet purchase is disabled."), { statusCode: 403 }));
 
     await request(app)
       .post("/api/v2/e-booklet-invites/raw-token/accept")
@@ -364,7 +364,7 @@ describe("e-booklet routes", () => {
       .post("/api/v2/e-booklet-invites/raw-token/accept")
       .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
       .send({ accessPath: "online_purchase", purchaseId: 500, paymentProofFileId: 321, termsAccepted: true })
-      .expect(200);
+      .expect(403);
 
     expect(mockService.acceptInvite).not.toHaveBeenCalled();
     expect(mockService.acceptFreeInvite).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ termsAccepted: true, termsVersion: "v1" }));
@@ -511,12 +511,11 @@ describe("e-booklet routes", () => {
     expect(mockService.bindViewerDevice).not.toHaveBeenCalled();
   });
 
-  test("binds/lists viewer devices and exposes admin device reset/allowance/approval routes", async () => {
+  test("binds/lists viewer devices, exposes admin device reset/allowance routes, and blocks direct purchase approval", async () => {
     mockService.bindViewerDevice.mockResolvedValue({ id: 1, device_fingerprint: "dev-1" });
     mockService.listViewerDevices.mockResolvedValue([{ id: 1, device_fingerprint: "dev-1" }]);
     mockService.resetViewerDevices.mockResolvedValue({ count: 1 });
     mockService.addDeviceAllowance.mockResolvedValue({ allowed_devices: 2 });
-    mockService.approveStudentPurchaseLink.mockResolvedValue({ purchase_id: 500, access_id: 88 });
 
     await request(app)
       .post("/api/v2/e-booklet-viewer/10/devices/bind")
@@ -544,13 +543,13 @@ describe("e-booklet routes", () => {
     await request(app)
       .post("/api/v2/admin/e-booklet-student-purchases/500/approve")
       .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
-      .expect(200);
+      .expect(400);
 
     expect(mockService.bindViewerDevice).toHaveBeenCalledWith(10, 55, expect.objectContaining({ deviceFingerprint: "dev-1", deviceLabel: "iPad" }));
     expect(mockService.listViewerDevices).toHaveBeenCalledWith(10, 55);
     expect(mockService.resetViewerDevices).toHaveBeenCalledWith(10, 55, 1, "replacement");
     expect(mockService.addDeviceAllowance).toHaveBeenCalledWith(10, 55, 1, 2, "second tablet");
-    expect(mockService.approveStudentPurchaseLink).toHaveBeenCalledWith(500, 1);
+    expect(mockService.approveStudentPurchaseLink).not.toHaveBeenCalled();
   });
 
   test("serves authorized hotspot assets with private no-store headers", async () => {

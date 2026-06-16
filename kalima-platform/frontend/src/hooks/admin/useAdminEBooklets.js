@@ -65,28 +65,6 @@ export function useAdminEBookletAnalytics() {
   return { analytics, loading, fetchAnalytics, exportCsv };
 }
 
-export function useAdminTeacherOptions() {
-  const [teachers, setTeachers] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetchTeachers = useCallback(async (search = "") => {
-    setLoading(true);
-    try {
-      const query = new URLSearchParams({ page: "1", limit: "50", role: "Teacher" });
-      if (search.trim()) query.set("search", search.trim());
-
-      const response = await axiosInstance.get(`/admin/users?${query.toString()}`);
-      const users = response.data?.data?.users || [];
-      setTeachers(Array.isArray(users) ? users : []);
-      return users;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return { teachers, loading, fetchTeachers };
-}
-
 export function useAdminEBookletTemplates() {
   const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
   const [templates, setTemplates] = useState([]);

@@ -1028,11 +1028,7 @@ export const eBookletController = {
 
   async approveStudentPurchaseLink(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await getEBookletService().approveStudentPurchaseLink(
-        parseId(req.params.purchaseId, "purchase ID"),
-        currentUserId(req),
-      );
-      res.status(200).json({ success: true, data });
+      throw new BadRequestError("Direct student e-booklet purchase approval is disabled. Students must redeem a teacher-provided URL or access code.");
     } catch (error) {
       next(error);
     }

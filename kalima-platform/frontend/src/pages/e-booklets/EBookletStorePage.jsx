@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   ArrowRight,
   BookOpenCheck,
@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useEBookletCart, useEBookletStore } from "@/hooks/useEBooklets";
+import { useEBookletStore } from "@/hooks/useEBooklets";
 import { useTranslation } from "react-i18next";
 
 const formatMoney = (amount, currency = "EGP", language = "en") => {
@@ -180,14 +180,11 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
               {formatMoney(template.price, template.currency, language)}
             </div>
           </div>
-          <Button
-            type="button"
-            onClick={() => onAdd(template)}
-            disabled={!template.activeVersion?.id}
-            className="active:scale-[0.98]"
-          >
-            <ShoppingBag className="h-4 w-4" />
-            {t("store.add")}
+          <Button asChild disabled={!template.activeVersion?.id} className="active:scale-[0.98]">
+            <Link to="/e-booklet-code">
+              <ShoppingBag className="h-4 w-4" />
+              {t("store.redeemCode")}
+            </Link>
           </Button>
         </div>
       </div>
@@ -216,8 +213,7 @@ function EmptyState({ onClearSearch, t }) {
 
 export default function EBookletStorePage() {
   const { t, i18n } = useTranslation("eBooklets");
-  const navigate = useNavigate();
-  const { replaceWithTemplate } = useEBookletCart();
+
   const [searchValue, setSearchValue] = useState("");
   const {
     templates,
@@ -237,10 +233,6 @@ export default function EBookletStorePage() {
     setSearch(searchValue.trim());
   };
 
-  const handleAddToCart = (template) => {
-    replaceWithTemplate(template);
-    navigate("/e-booklet-cart");
-  };
 
   const totalPages = Math.max(1, Math.ceil((pagination.total || 0) / pagination.limit));
 
@@ -350,7 +342,7 @@ export default function EBookletStorePage() {
                   key={template.id}
                   template={template}
                   featured={index === 0}
-                  onAdd={handleAddToCart}
+                  onAdd={() => {}}
                   t={t}
                   language={i18n.language}
                 />
