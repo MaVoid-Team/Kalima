@@ -499,6 +499,18 @@ export const eBookletController = {
     }
   },
 
+  async preparePurchaseCustomTemplate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().preparePurchaseCustomTemplateVersion(
+        parseId(req.params.id, "purchase ID"),
+        currentUserId(req),
+      );
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async listInstances(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await getEBookletService().listInstances({
