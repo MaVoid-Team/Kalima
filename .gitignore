@@ -50,8 +50,10 @@ frontend/.cache/
 .fusebox/
 .dynamodb/
 
+uploads/
 # Config files
-#.env.*
+.env
+.env.*
 .pnpm-debug.log*
 .lock-wscript
 .eslintcache
