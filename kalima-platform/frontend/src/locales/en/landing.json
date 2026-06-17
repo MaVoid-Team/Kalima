@@ -35,7 +35,8 @@
     "parentPortal": "Parent Portal",
     "logout": "Log Out",
     "navigation": "Navigation",
-    "language": "Language"
+    "language": "Language",
+    "eBookletOrders": "E-Booklet Orders"
   },
   "notFound": {
     "title": "404",

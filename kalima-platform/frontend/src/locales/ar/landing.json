@@ -35,7 +35,8 @@
     "parentPortal": "بوابة ولي الأمر",
     "logout": "تسجيل الخروج",
     "navigation": "التصفح",
-    "language": "اللغة"
+    "language": "اللغة",
+    "eBookletOrders": "طلبات البوكليت"
   },
   "notFound": {
     "title": "404",

@@ -36,6 +36,14 @@ function arabicWhatsAppMessage(code: string, url: string): string {
 export class EBookletAccessCodeService {
   constructor(private readonly db: any) {}
 
+  private normalizeCount(count?: number | null): number {
+    if (count === undefined || count === null) return 1;
+    if (!Number.isInteger(count) || count < 1 || count > 100) {
+      throw new BadRequestError("Invalid access code count. Count must be between 1 and 100.");
+    }
+    return count;
+  }
+
   private async assertAcceptedGenerationTerms(teacherId: number, termId: number) {
     const now = new Date();
     const term = await this.db.e_booklet_terms.findFirst({
@@ -82,6 +90,25 @@ export class EBookletAccessCodeService {
     return safeRecord;
   }
 
+  private async assertPaidSeatCapacity(instance: any, input: { teacherId: number; bookletInstanceId: number; kind: EBookletAccessCodeKind; requiredSeats: number }) {
+    if (input.kind !== "paid") return;
+    if (instance.invite_quota === null || instance.invite_quota === undefined) return;
+    const inviteQuota = Number(instance.invite_quota ?? 0);
+    const reserved = await this.db.e_booklet_access_codes.aggregate({
+      where: {
+        booklet_instance_id: input.bookletInstanceId,
+        teacher_id: input.teacherId,
+        kind: "paid",
+        status: { in: ["active", "redeemed"] },
+      },
+      _sum: { max_redemptions: true },
+    });
+    const reservedSeats = Number(reserved?._sum?.max_redemptions ?? 0);
+    if (reservedSeats + input.requiredSeats > inviteQuota) {
+      throw new ConflictError("Not enough available student seats to generate paid e-booklet access codes.");
+    }
+  }
+
   private parseExpiresAt(value: Date | string | null | undefined): Date | null {
     if (!value) return null;
     const expiresAt = value instanceof Date ? value : new Date(value);
@@ -100,6 +127,7 @@ export class EBookletAccessCodeService {
     adminActorId?: number | null;
     ipAddress?: string | null;
     userAgent?: string | null;
+    skipCapacityCheck?: boolean;
   }) {
     if (!input.termId) throw new BadRequestError("Active terms are required to generate e-booklet codes.");
     const term = input.adminActorId
@@ -118,6 +146,17 @@ export class EBookletAccessCodeService {
 
     const maxRedemptions = input.maxRedemptions ?? (input.kind === "paid" ? 1 : 999999);
     const expiresAt = this.parseExpiresAt(input.expiresAt);
+    if (!Number.isInteger(maxRedemptions) || maxRedemptions < 1) {
+      throw new BadRequestError("Invalid max redemptions.");
+    }
+    if (!input.skipCapacityCheck) {
+      await this.assertPaidSeatCapacity(instance, {
+        teacherId: input.teacherId,
+        bookletInstanceId: input.bookletInstanceId,
+        kind: input.kind,
+        requiredSeats: maxRedemptions,
+      });
+    }
 
     for (let attempt = 0; attempt < 5; attempt += 1) {
       const code = generatePlainCode();
@@ -166,15 +205,60 @@ export class EBookletAccessCodeService {
     throw new ConflictError("Unable to generate a unique e-booklet access code.");
   }
 
-  async listCodes(filters: { teacherId?: number; bookletInstanceId?: number; termId?: number; kind?: EBookletAccessCodeKind } = {}) {
-    return this.db.e_booklet_access_codes.findMany({
+  async generateCodes(input: {
+    bookletInstanceId: number;
+    teacherId: number;
+    kind: EBookletAccessCodeKind;
+    termId: number;
+    count?: number | null;
+    expiresAt?: Date | string | null;
+    maxRedemptions?: number | null;
+    adminActorId?: number | null;
+    ipAddress?: string | null;
+    userAgent?: string | null;
+  }) {
+    const count = this.normalizeCount(input.count);
+    const term = input.adminActorId
+      ? await this.db.e_booklet_terms.findFirst({
+        where: {
+          id: input.termId,
+          status: "active",
+          starts_at: { lte: new Date() },
+          OR: [{ ends_at: null }, { ends_at: { gt: new Date() } }],
+        },
+      })
+      : await this.assertAcceptedGenerationTerms(input.teacherId, input.termId);
+    if (!term) throw new NotFoundError("Active e-booklet terms not found.");
+    const instance = await this.assertTeacherOwnsInstance(input.teacherId, input.bookletInstanceId);
+    this.assertTermMatchesInstance(term, instance);
+    const maxRedemptions = input.maxRedemptions ?? (input.kind === "paid" ? 1 : 999999);
+    if (!Number.isInteger(maxRedemptions) || maxRedemptions < 1) {
+      throw new BadRequestError("Invalid max redemptions.");
+    }
+    await this.assertPaidSeatCapacity(instance, {
+      teacherId: input.teacherId,
+      bookletInstanceId: input.bookletInstanceId,
+      kind: input.kind,
+      requiredSeats: count * maxRedemptions,
+    });
+    const codes = [];
+    for (let index = 0; index < count; index += 1) {
+      codes.push(await this.generateCode({ ...input, maxRedemptions, skipCapacityCheck: true }));
+    }
+    return { count: codes.length, codes };
+  }
+
+  async listCodes(filters: { teacherId?: number; bookletInstanceId?: number; termId?: number; kind?: EBookletAccessCodeKind; status?: string } = {}) {
+    const records = await this.db.e_booklet_access_codes.findMany({
       where: {
         ...(filters.teacherId ? { teacher_id: filters.teacherId } : {}),
         ...(filters.bookletInstanceId ? { booklet_instance_id: filters.bookletInstanceId } : {}),
         ...(filters.termId ? { term_id: filters.termId } : {}),
         ...(filters.kind ? { kind: filters.kind } : {}),
+        ...(filters.status ? { status: filters.status } : {}),
       },
       orderBy: { created_at: "desc" },
     });
+    return records.map((record: any) => this.sanitizeCodeRecord(record));
   }
 }

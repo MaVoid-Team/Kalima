@@ -111,10 +111,13 @@ export default function Navbar() {
   useEffect(() => {
     if (!open) return;
 
-    const routeValues = hasStoreAccess ? ["/samples", "/market", "/e-booklets"] : [];
+    const routeValues = hasStoreAccess ? ["/samples", "/market", "/e-booklets"] : ["/e-booklets"];
+    if (isAuthenticated && !hasAdminAccess) {
+      routeValues.push("/e-booklet-orders");
+    }
     const current = routeValues.find((route) => location.pathname.startsWith(route));
     setCommandValue(current || "");
-  }, [open, location.pathname, hasStoreAccess]);
+  }, [open, location.pathname, hasStoreAccess, isAuthenticated, hasAdminAccess]);
 
 
   const toggleLanguage = () => {
@@ -213,6 +216,16 @@ export default function Navbar() {
                   <BookOpenCheck className="mr-2 h-4 w-4"></BookOpenCheck>
                   {t("navbar.eBooklets")}
                 </Button>
+                {isAuthenticated && !hasAdminAccess && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate("/e-booklet-orders")}
+                    className="h-9 px-4"
+                  >
+                    <ShoppingBag className="mr-2 h-4 w-4"></ShoppingBag>
+                    {t("navbar.eBookletOrders")}
+                  </Button>
+                )}
 
                 {/* Language Toggle */}
                 <Button
@@ -532,6 +545,11 @@ export default function Navbar() {
             <CommandItem value="/e-booklets" onSelect={() => runCommand(() => navigate("/e-booklets"))}>
               {t("navbar.eBooklets")}
             </CommandItem>
+            {isAuthenticated && !hasAdminAccess && (
+              <CommandItem value="/e-booklet-orders" onSelect={() => runCommand(() => navigate("/e-booklet-orders"))}>
+                {t("navbar.eBookletOrders")}
+              </CommandItem>
+            )}
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading={t("navbar.settings")}>

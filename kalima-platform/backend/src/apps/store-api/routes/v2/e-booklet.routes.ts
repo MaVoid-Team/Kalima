@@ -284,6 +284,21 @@ router.post(
   eBookletController.reorderMilestones,
 );
 router.post(
+  "/admin/e-booklet-access-codes",
+  ...adminManagerAuth,
+  eBookletController.adminGenerateAccessCode,
+);
+router.get(
+  "/admin/e-booklet-access-codes",
+  ...adminManagerAuth,
+  eBookletController.adminListAccessCodes,
+);
+router.post(
+  "/admin/e-booklet-access-codes/bulk",
+  ...adminManagerAuth,
+  eBookletController.adminGenerateAccessCodes,
+);
+router.post(
   "/admin/e-booklet-access-codes/free",
   ...adminManagerAuth,
   eBookletController.adminGenerateFreeCode,
@@ -310,6 +325,16 @@ router.post(
   "/teacher/e-booklets/:instanceId/access-codes",
   ...teacherAuth,
   eBookletController.generateAccessCode,
+);
+router.get(
+  "/teacher/e-booklets/:instanceId/access-codes",
+  ...teacherAuth,
+  eBookletController.listAccessCodes,
+);
+router.post(
+  "/teacher/e-booklets/:instanceId/access-codes/bulk",
+  ...teacherAuth,
+  eBookletController.generateAccessCodes,
 );
 router.get(
   "/teacher/e-booklet-milestones",
