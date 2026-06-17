@@ -430,6 +430,8 @@ export type purchasesWhereInput = {
   is_deleted?: Prisma.BoolNullableFilter<"purchases"> | boolean | null
   purchase_items?: Prisma.Purchase_itemsListRelationFilter
   coupon_usages?: Prisma.Coupon_usagesListRelationFilter
+  e_booklet_access_code_redemptions?: Prisma.E_booklet_access_code_redemptionsListRelationFilter
+  teacher_wallet_ledger?: Prisma.Teacher_wallet_ledgerListRelationFilter
   users?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   received_by_user?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   confirmed_by_user?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
@@ -469,6 +471,8 @@ export type purchasesOrderByWithRelationInput = {
   is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   purchase_items?: Prisma.purchase_itemsOrderByRelationAggregateInput
   coupon_usages?: Prisma.coupon_usagesOrderByRelationAggregateInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsOrderByRelationAggregateInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerOrderByRelationAggregateInput
   users?: Prisma.usersOrderByWithRelationInput
   received_by_user?: Prisma.usersOrderByWithRelationInput
   confirmed_by_user?: Prisma.usersOrderByWithRelationInput
@@ -511,6 +515,8 @@ export type purchasesWhereUniqueInput = Prisma.AtLeast<{
   is_deleted?: Prisma.BoolNullableFilter<"purchases"> | boolean | null
   purchase_items?: Prisma.Purchase_itemsListRelationFilter
   coupon_usages?: Prisma.Coupon_usagesListRelationFilter
+  e_booklet_access_code_redemptions?: Prisma.E_booklet_access_code_redemptionsListRelationFilter
+  teacher_wallet_ledger?: Prisma.Teacher_wallet_ledgerListRelationFilter
   users?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   received_by_user?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   confirmed_by_user?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
@@ -608,6 +614,8 @@ export type purchasesCreateInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
   confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
@@ -647,6 +655,8 @@ export type purchasesUncheckedCreateInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
 }
 
@@ -671,6 +681,8 @@ export type purchasesUpdateInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
   confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
@@ -710,6 +722,8 @@ export type purchasesUncheckedUpdateInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
 }
 
@@ -1253,6 +1267,38 @@ export type purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput = {
   deleteMany?: Prisma.purchasesScalarWhereInput | Prisma.purchasesScalarWhereInput[]
 }
 
+export type purchasesCreateNestedOneWithoutTeacher_wallet_ledgerInput = {
+  create?: Prisma.XOR<Prisma.purchasesCreateWithoutTeacher_wallet_ledgerInput, Prisma.purchasesUncheckedCreateWithoutTeacher_wallet_ledgerInput>
+  connectOrCreate?: Prisma.purchasesCreateOrConnectWithoutTeacher_wallet_ledgerInput
+  connect?: Prisma.purchasesWhereUniqueInput
+}
+
+export type purchasesUpdateOneWithoutTeacher_wallet_ledgerNestedInput = {
+  create?: Prisma.XOR<Prisma.purchasesCreateWithoutTeacher_wallet_ledgerInput, Prisma.purchasesUncheckedCreateWithoutTeacher_wallet_ledgerInput>
+  connectOrCreate?: Prisma.purchasesCreateOrConnectWithoutTeacher_wallet_ledgerInput
+  upsert?: Prisma.purchasesUpsertWithoutTeacher_wallet_ledgerInput
+  disconnect?: Prisma.purchasesWhereInput | boolean
+  delete?: Prisma.purchasesWhereInput | boolean
+  connect?: Prisma.purchasesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.purchasesUpdateToOneWithWhereWithoutTeacher_wallet_ledgerInput, Prisma.purchasesUpdateWithoutTeacher_wallet_ledgerInput>, Prisma.purchasesUncheckedUpdateWithoutTeacher_wallet_ledgerInput>
+}
+
+export type purchasesCreateNestedOneWithoutE_booklet_access_code_redemptionsInput = {
+  create?: Prisma.XOR<Prisma.purchasesCreateWithoutE_booklet_access_code_redemptionsInput, Prisma.purchasesUncheckedCreateWithoutE_booklet_access_code_redemptionsInput>
+  connectOrCreate?: Prisma.purchasesCreateOrConnectWithoutE_booklet_access_code_redemptionsInput
+  connect?: Prisma.purchasesWhereUniqueInput
+}
+
+export type purchasesUpdateOneWithoutE_booklet_access_code_redemptionsNestedInput = {
+  create?: Prisma.XOR<Prisma.purchasesCreateWithoutE_booklet_access_code_redemptionsInput, Prisma.purchasesUncheckedCreateWithoutE_booklet_access_code_redemptionsInput>
+  connectOrCreate?: Prisma.purchasesCreateOrConnectWithoutE_booklet_access_code_redemptionsInput
+  upsert?: Prisma.purchasesUpsertWithoutE_booklet_access_code_redemptionsInput
+  disconnect?: Prisma.purchasesWhereInput | boolean
+  delete?: Prisma.purchasesWhereInput | boolean
+  connect?: Prisma.purchasesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.purchasesUpdateToOneWithWhereWithoutE_booklet_access_code_redemptionsInput, Prisma.purchasesUpdateWithoutE_booklet_access_code_redemptionsInput>, Prisma.purchasesUncheckedUpdateWithoutE_booklet_access_code_redemptionsInput>
+}
+
 export type purchasesCreateNestedOneWithoutE_booklet_student_purchase_linkInput = {
   create?: Prisma.XOR<Prisma.purchasesCreateWithoutE_booklet_student_purchase_linkInput, Prisma.purchasesUncheckedCreateWithoutE_booklet_student_purchase_linkInput>
   connectOrCreate?: Prisma.purchasesCreateOrConnectWithoutE_booklet_student_purchase_linkInput
@@ -1288,6 +1334,8 @@ export type purchasesCreateWithoutUsersInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
   confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
   returned_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_returnedInput
@@ -1325,6 +1373,8 @@ export type purchasesUncheckedCreateWithoutUsersInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
 }
 
@@ -1359,6 +1409,8 @@ export type purchasesCreateWithoutReceived_by_userInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
   returned_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_returnedInput
@@ -1396,6 +1448,8 @@ export type purchasesUncheckedCreateWithoutReceived_by_userInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
 }
 
@@ -1430,6 +1484,8 @@ export type purchasesCreateWithoutConfirmed_by_userInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
   returned_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_returnedInput
@@ -1467,6 +1523,8 @@ export type purchasesUncheckedCreateWithoutConfirmed_by_userInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
 }
 
@@ -1501,6 +1559,8 @@ export type purchasesCreateWithoutReturned_by_userInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
   confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
@@ -1538,6 +1598,8 @@ export type purchasesUncheckedCreateWithoutReturned_by_userInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
 }
 
@@ -1667,6 +1729,8 @@ export type purchasesCreateWithoutCoupon_usagesInput = {
   deleted_at?: Date | string | null
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
   confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
@@ -1705,6 +1769,8 @@ export type purchasesUncheckedCreateWithoutCoupon_usagesInput = {
   deleted_at?: Date | string | null
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
 }
 
@@ -1744,6 +1810,8 @@ export type purchasesUpdateWithoutCoupon_usagesInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
   confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
@@ -1782,6 +1850,8 @@ export type purchasesUncheckedUpdateWithoutCoupon_usagesInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
 }
 
@@ -1805,6 +1875,8 @@ export type purchasesCreateWithoutPurchase_itemsInput = {
   deleted_at?: Date | string | null
   is_deleted?: boolean | null
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
   confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
@@ -1843,6 +1915,8 @@ export type purchasesUncheckedCreateWithoutPurchase_itemsInput = {
   deleted_at?: Date | string | null
   is_deleted?: boolean | null
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
 }
 
@@ -1882,6 +1956,8 @@ export type purchasesUpdateWithoutPurchase_itemsInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
   confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
@@ -1920,6 +1996,8 @@ export type purchasesUncheckedUpdateWithoutPurchase_itemsInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
 }
 
@@ -1944,6 +2022,8 @@ export type purchasesCreateWithoutPayment_methodsInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
   confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
@@ -1981,6 +2061,8 @@ export type purchasesUncheckedCreateWithoutPayment_methodsInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
 }
 
@@ -2031,6 +2113,8 @@ export type purchasesCreateWithoutWatermarkInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
   confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
@@ -2068,6 +2152,8 @@ export type purchasesUncheckedCreateWithoutWatermarkInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
 }
 
@@ -2102,6 +2188,8 @@ export type purchasesCreateWithoutPayment_screenshotInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
   confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
@@ -2139,6 +2227,8 @@ export type purchasesUncheckedCreateWithoutPayment_screenshotInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
 }
 
@@ -2184,6 +2274,298 @@ export type purchasesUpdateManyWithWhereWithoutPayment_screenshotInput = {
   data: Prisma.XOR<Prisma.purchasesUpdateManyMutationInput, Prisma.purchasesUncheckedUpdateManyWithoutPayment_screenshotInput>
 }
 
+export type purchasesCreateWithoutTeacher_wallet_ledgerInput = {
+  status?: string
+  subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  purchase_serial?: string | null
+  number_transferred_from?: string | null
+  payment_number?: string | null
+  notes?: string | null
+  admin_notes?: string | null
+  admin_note_by?: number | null
+  has_admin_edits?: boolean | null
+  received_at?: Date | string | null
+  confirmed_at?: Date | string | null
+  returned_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  users: Prisma.usersCreateNestedOneWithoutPurchasesInput
+  received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
+  confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
+  returned_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_returnedInput
+  payment_methods?: Prisma.payment_methodsCreateNestedOneWithoutPurchasesInput
+  payment_screenshot?: Prisma.imagesCreateNestedOneWithoutPurchase_payment_screenshotInput
+  watermark?: Prisma.imagesCreateNestedOneWithoutPurchase_watermarkInput
+  e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksCreateNestedOneWithoutPurchaseInput
+}
+
+export type purchasesUncheckedCreateWithoutTeacher_wallet_ledgerInput = {
+  id?: number
+  user_id: number
+  status?: string
+  subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method_id?: number | null
+  payment_screenshot_id?: number | null
+  watermark_id?: number | null
+  purchase_serial?: string | null
+  number_transferred_from?: string | null
+  payment_number?: string | null
+  notes?: string | null
+  admin_notes?: string | null
+  admin_note_by?: number | null
+  has_admin_edits?: boolean | null
+  received_at?: Date | string | null
+  received_by?: number | null
+  confirmed_at?: Date | string | null
+  confirmed_by?: number | null
+  returned_at?: Date | string | null
+  returned_by?: number | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
+}
+
+export type purchasesCreateOrConnectWithoutTeacher_wallet_ledgerInput = {
+  where: Prisma.purchasesWhereUniqueInput
+  create: Prisma.XOR<Prisma.purchasesCreateWithoutTeacher_wallet_ledgerInput, Prisma.purchasesUncheckedCreateWithoutTeacher_wallet_ledgerInput>
+}
+
+export type purchasesUpsertWithoutTeacher_wallet_ledgerInput = {
+  update: Prisma.XOR<Prisma.purchasesUpdateWithoutTeacher_wallet_ledgerInput, Prisma.purchasesUncheckedUpdateWithoutTeacher_wallet_ledgerInput>
+  create: Prisma.XOR<Prisma.purchasesCreateWithoutTeacher_wallet_ledgerInput, Prisma.purchasesUncheckedCreateWithoutTeacher_wallet_ledgerInput>
+  where?: Prisma.purchasesWhereInput
+}
+
+export type purchasesUpdateToOneWithWhereWithoutTeacher_wallet_ledgerInput = {
+  where?: Prisma.purchasesWhereInput
+  data: Prisma.XOR<Prisma.purchasesUpdateWithoutTeacher_wallet_ledgerInput, Prisma.purchasesUncheckedUpdateWithoutTeacher_wallet_ledgerInput>
+}
+
+export type purchasesUpdateWithoutTeacher_wallet_ledgerInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  purchase_serial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  number_transferred_from?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
+  received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
+  confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
+  returned_by_user?: Prisma.usersUpdateOneWithoutPurchases_returnedNestedInput
+  payment_methods?: Prisma.payment_methodsUpdateOneWithoutPurchasesNestedInput
+  payment_screenshot?: Prisma.imagesUpdateOneWithoutPurchase_payment_screenshotNestedInput
+  watermark?: Prisma.imagesUpdateOneWithoutPurchase_watermarkNestedInput
+  e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUpdateOneWithoutPurchaseNestedInput
+}
+
+export type purchasesUncheckedUpdateWithoutTeacher_wallet_ledgerInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  user_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  watermark_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  purchase_serial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  number_transferred_from?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returned_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
+}
+
+export type purchasesCreateWithoutE_booklet_access_code_redemptionsInput = {
+  status?: string
+  subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  purchase_serial?: string | null
+  number_transferred_from?: string | null
+  payment_number?: string | null
+  notes?: string | null
+  admin_notes?: string | null
+  admin_note_by?: number | null
+  has_admin_edits?: boolean | null
+  received_at?: Date | string | null
+  confirmed_at?: Date | string | null
+  returned_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
+  users: Prisma.usersCreateNestedOneWithoutPurchasesInput
+  received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
+  confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
+  returned_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_returnedInput
+  payment_methods?: Prisma.payment_methodsCreateNestedOneWithoutPurchasesInput
+  payment_screenshot?: Prisma.imagesCreateNestedOneWithoutPurchase_payment_screenshotInput
+  watermark?: Prisma.imagesCreateNestedOneWithoutPurchase_watermarkInput
+  e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksCreateNestedOneWithoutPurchaseInput
+}
+
+export type purchasesUncheckedCreateWithoutE_booklet_access_code_redemptionsInput = {
+  id?: number
+  user_id: number
+  status?: string
+  subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method_id?: number | null
+  payment_screenshot_id?: number | null
+  watermark_id?: number | null
+  purchase_serial?: string | null
+  number_transferred_from?: string | null
+  payment_number?: string | null
+  notes?: string | null
+  admin_notes?: string | null
+  admin_note_by?: number | null
+  has_admin_edits?: boolean | null
+  received_at?: Date | string | null
+  received_by?: number | null
+  confirmed_at?: Date | string | null
+  confirmed_by?: number | null
+  returned_at?: Date | string | null
+  returned_by?: number | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
+  e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedCreateNestedOneWithoutPurchaseInput
+}
+
+export type purchasesCreateOrConnectWithoutE_booklet_access_code_redemptionsInput = {
+  where: Prisma.purchasesWhereUniqueInput
+  create: Prisma.XOR<Prisma.purchasesCreateWithoutE_booklet_access_code_redemptionsInput, Prisma.purchasesUncheckedCreateWithoutE_booklet_access_code_redemptionsInput>
+}
+
+export type purchasesUpsertWithoutE_booklet_access_code_redemptionsInput = {
+  update: Prisma.XOR<Prisma.purchasesUpdateWithoutE_booklet_access_code_redemptionsInput, Prisma.purchasesUncheckedUpdateWithoutE_booklet_access_code_redemptionsInput>
+  create: Prisma.XOR<Prisma.purchasesCreateWithoutE_booklet_access_code_redemptionsInput, Prisma.purchasesUncheckedCreateWithoutE_booklet_access_code_redemptionsInput>
+  where?: Prisma.purchasesWhereInput
+}
+
+export type purchasesUpdateToOneWithWhereWithoutE_booklet_access_code_redemptionsInput = {
+  where?: Prisma.purchasesWhereInput
+  data: Prisma.XOR<Prisma.purchasesUpdateWithoutE_booklet_access_code_redemptionsInput, Prisma.purchasesUncheckedUpdateWithoutE_booklet_access_code_redemptionsInput>
+}
+
+export type purchasesUpdateWithoutE_booklet_access_code_redemptionsInput = {
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  purchase_serial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  number_transferred_from?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
+  users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
+  received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
+  confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
+  returned_by_user?: Prisma.usersUpdateOneWithoutPurchases_returnedNestedInput
+  payment_methods?: Prisma.payment_methodsUpdateOneWithoutPurchasesNestedInput
+  payment_screenshot?: Prisma.imagesUpdateOneWithoutPurchase_payment_screenshotNestedInput
+  watermark?: Prisma.imagesUpdateOneWithoutPurchase_watermarkNestedInput
+  e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUpdateOneWithoutPurchaseNestedInput
+}
+
+export type purchasesUncheckedUpdateWithoutE_booklet_access_code_redemptionsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  user_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  watermark_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  purchase_serial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  number_transferred_from?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  admin_note_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  has_admin_edits?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  received_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  received_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  confirmed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  returned_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returned_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
+  e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
+}
+
 export type purchasesCreateWithoutE_booklet_student_purchase_linkInput = {
   status?: string
   subtotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2205,6 +2587,8 @@ export type purchasesCreateWithoutE_booklet_student_purchase_linkInput = {
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutPurchaseInput
   users: Prisma.usersCreateNestedOneWithoutPurchasesInput
   received_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_receivedInput
   confirmed_by_user?: Prisma.usersCreateNestedOneWithoutPurchases_confirmedInput
@@ -2243,6 +2627,8 @@ export type purchasesUncheckedCreateWithoutE_booklet_student_purchase_linkInput 
   is_deleted?: boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutPurchasesInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutPurchasesInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedCreateNestedManyWithoutPurchaseInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutPurchaseInput
 }
 
 export type purchasesCreateOrConnectWithoutE_booklet_student_purchase_linkInput = {
@@ -2282,6 +2668,8 @@ export type purchasesUpdateWithoutE_booklet_student_purchase_linkInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
   confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
@@ -2320,6 +2708,8 @@ export type purchasesUncheckedUpdateWithoutE_booklet_student_purchase_linkInput 
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
 }
 
 export type purchasesCreateManyUsersInput = {
@@ -2455,6 +2845,8 @@ export type purchasesUpdateWithoutUsersInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
   confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
   returned_by_user?: Prisma.usersUpdateOneWithoutPurchases_returnedNestedInput
@@ -2492,6 +2884,8 @@ export type purchasesUncheckedUpdateWithoutUsersInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
 }
 
@@ -2544,6 +2938,8 @@ export type purchasesUpdateWithoutReceived_by_userInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
   returned_by_user?: Prisma.usersUpdateOneWithoutPurchases_returnedNestedInput
@@ -2581,6 +2977,8 @@ export type purchasesUncheckedUpdateWithoutReceived_by_userInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
 }
 
@@ -2633,6 +3031,8 @@ export type purchasesUpdateWithoutConfirmed_by_userInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
   returned_by_user?: Prisma.usersUpdateOneWithoutPurchases_returnedNestedInput
@@ -2670,6 +3070,8 @@ export type purchasesUncheckedUpdateWithoutConfirmed_by_userInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
 }
 
@@ -2722,6 +3124,8 @@ export type purchasesUpdateWithoutReturned_by_userInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
   confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
@@ -2759,6 +3163,8 @@ export type purchasesUncheckedUpdateWithoutReturned_by_userInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
 }
 
@@ -2839,6 +3245,8 @@ export type purchasesUpdateWithoutPayment_methodsInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
   confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
@@ -2876,6 +3284,8 @@ export type purchasesUncheckedUpdateWithoutPayment_methodsInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
 }
 
@@ -2984,6 +3394,8 @@ export type purchasesUpdateWithoutWatermarkInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
   confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
@@ -3021,6 +3433,8 @@ export type purchasesUncheckedUpdateWithoutWatermarkInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
 }
 
@@ -3073,6 +3487,8 @@ export type purchasesUpdateWithoutPayment_screenshotInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUpdateManyWithoutPurchaseNestedInput
   users?: Prisma.usersUpdateOneRequiredWithoutPurchasesNestedInput
   received_by_user?: Prisma.usersUpdateOneWithoutPurchases_receivedNestedInput
   confirmed_by_user?: Prisma.usersUpdateOneWithoutPurchases_confirmedNestedInput
@@ -3110,6 +3526,8 @@ export type purchasesUncheckedUpdateWithoutPayment_screenshotInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutPurchasesNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutPurchasesNestedInput
+  e_booklet_access_code_redemptions?: Prisma.e_booklet_access_code_redemptionsUncheckedUpdateManyWithoutPurchaseNestedInput
+  teacher_wallet_ledger?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseNestedInput
   e_booklet_student_purchase_link?: Prisma.e_booklet_student_purchase_linksUncheckedUpdateOneWithoutPurchaseNestedInput
 }
 
@@ -3149,11 +3567,15 @@ export type purchasesUncheckedUpdateManyWithoutPayment_screenshotInput = {
 export type PurchasesCountOutputType = {
   purchase_items: number
   coupon_usages: number
+  e_booklet_access_code_redemptions: number
+  teacher_wallet_ledger: number
 }
 
 export type PurchasesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchase_items?: boolean | PurchasesCountOutputTypeCountPurchase_itemsArgs
   coupon_usages?: boolean | PurchasesCountOutputTypeCountCoupon_usagesArgs
+  e_booklet_access_code_redemptions?: boolean | PurchasesCountOutputTypeCountE_booklet_access_code_redemptionsArgs
+  teacher_wallet_ledger?: boolean | PurchasesCountOutputTypeCountTeacher_wallet_ledgerArgs
 }
 
 /**
@@ -3178,6 +3600,20 @@ export type PurchasesCountOutputTypeCountPurchase_itemsArgs<ExtArgs extends runt
  */
 export type PurchasesCountOutputTypeCountCoupon_usagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.coupon_usagesWhereInput
+}
+
+/**
+ * PurchasesCountOutputType without action
+ */
+export type PurchasesCountOutputTypeCountE_booklet_access_code_redemptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_access_code_redemptionsWhereInput
+}
+
+/**
+ * PurchasesCountOutputType without action
+ */
+export type PurchasesCountOutputTypeCountTeacher_wallet_ledgerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.teacher_wallet_ledgerWhereInput
 }
 
 
@@ -3210,6 +3646,8 @@ export type purchasesSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   is_deleted?: boolean
   purchase_items?: boolean | Prisma.purchases$purchase_itemsArgs<ExtArgs>
   coupon_usages?: boolean | Prisma.purchases$coupon_usagesArgs<ExtArgs>
+  e_booklet_access_code_redemptions?: boolean | Prisma.purchases$e_booklet_access_code_redemptionsArgs<ExtArgs>
+  teacher_wallet_ledger?: boolean | Prisma.purchases$teacher_wallet_ledgerArgs<ExtArgs>
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   received_by_user?: boolean | Prisma.purchases$received_by_userArgs<ExtArgs>
   confirmed_by_user?: boolean | Prisma.purchases$confirmed_by_userArgs<ExtArgs>
@@ -3326,6 +3764,8 @@ export type purchasesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type purchasesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchase_items?: boolean | Prisma.purchases$purchase_itemsArgs<ExtArgs>
   coupon_usages?: boolean | Prisma.purchases$coupon_usagesArgs<ExtArgs>
+  e_booklet_access_code_redemptions?: boolean | Prisma.purchases$e_booklet_access_code_redemptionsArgs<ExtArgs>
+  teacher_wallet_ledger?: boolean | Prisma.purchases$teacher_wallet_ledgerArgs<ExtArgs>
   users?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   received_by_user?: boolean | Prisma.purchases$received_by_userArgs<ExtArgs>
   confirmed_by_user?: boolean | Prisma.purchases$confirmed_by_userArgs<ExtArgs>
@@ -3360,6 +3800,8 @@ export type $purchasesPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   objects: {
     purchase_items: Prisma.$purchase_itemsPayload<ExtArgs>[]
     coupon_usages: Prisma.$coupon_usagesPayload<ExtArgs>[]
+    e_booklet_access_code_redemptions: Prisma.$e_booklet_access_code_redemptionsPayload<ExtArgs>[]
+    teacher_wallet_ledger: Prisma.$teacher_wallet_ledgerPayload<ExtArgs>[]
     users: Prisma.$usersPayload<ExtArgs>
     received_by_user: Prisma.$usersPayload<ExtArgs> | null
     confirmed_by_user: Prisma.$usersPayload<ExtArgs> | null
@@ -3792,6 +4234,8 @@ export interface Prisma__purchasesClient<T, Null = never, ExtArgs extends runtim
   readonly [Symbol.toStringTag]: "PrismaPromise"
   purchase_items<T extends Prisma.purchases$purchase_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.purchases$purchase_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchase_itemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   coupon_usages<T extends Prisma.purchases$coupon_usagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.purchases$coupon_usagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$coupon_usagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  e_booklet_access_code_redemptions<T extends Prisma.purchases$e_booklet_access_code_redemptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.purchases$e_booklet_access_code_redemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_access_code_redemptionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  teacher_wallet_ledger<T extends Prisma.purchases$teacher_wallet_ledgerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.purchases$teacher_wallet_ledgerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$teacher_wallet_ledgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   users<T extends Prisma.usersDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.usersDefaultArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   received_by_user<T extends Prisma.purchases$received_by_userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.purchases$received_by_userArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   confirmed_by_user<T extends Prisma.purchases$confirmed_by_userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.purchases$confirmed_by_userArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -4305,6 +4749,54 @@ export type purchases$coupon_usagesArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.Coupon_usagesScalarFieldEnum | Prisma.Coupon_usagesScalarFieldEnum[]
+}
+
+/**
+ * purchases.e_booklet_access_code_redemptions
+ */
+export type purchases$e_booklet_access_code_redemptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_access_code_redemptions
+   */
+  select?: Prisma.e_booklet_access_code_redemptionsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_access_code_redemptions
+   */
+  omit?: Prisma.e_booklet_access_code_redemptionsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_access_code_redemptionsInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_access_code_redemptionsWhereInput
+  orderBy?: Prisma.e_booklet_access_code_redemptionsOrderByWithRelationInput | Prisma.e_booklet_access_code_redemptionsOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_access_code_redemptionsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_access_code_redemptionsScalarFieldEnum | Prisma.E_booklet_access_code_redemptionsScalarFieldEnum[]
+}
+
+/**
+ * purchases.teacher_wallet_ledger
+ */
+export type purchases$teacher_wallet_ledgerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the teacher_wallet_ledger
+   */
+  select?: Prisma.teacher_wallet_ledgerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the teacher_wallet_ledger
+   */
+  omit?: Prisma.teacher_wallet_ledgerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.teacher_wallet_ledgerInclude<ExtArgs> | null
+  where?: Prisma.teacher_wallet_ledgerWhereInput
+  orderBy?: Prisma.teacher_wallet_ledgerOrderByWithRelationInput | Prisma.teacher_wallet_ledgerOrderByWithRelationInput[]
+  cursor?: Prisma.teacher_wallet_ledgerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Teacher_wallet_ledgerScalarFieldEnum | Prisma.Teacher_wallet_ledgerScalarFieldEnum[]
 }
 
 /**

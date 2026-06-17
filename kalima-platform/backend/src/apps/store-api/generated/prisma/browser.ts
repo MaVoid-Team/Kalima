@@ -243,10 +243,50 @@ export type e_booklet_hotspots = Prisma.e_booklet_hotspotsModel
  */
 export type e_booklet_purchases = Prisma.e_booklet_purchasesModel
 /**
+ * Model e_booklet_terms
+ * 
+ */
+export type e_booklet_terms = Prisma.e_booklet_termsModel
+/**
  * Model e_booklet_instances
  * 
  */
 export type e_booklet_instances = Prisma.e_booklet_instancesModel
+/**
+ * Model e_booklet_milestones
+ * 
+ */
+export type e_booklet_milestones = Prisma.e_booklet_milestonesModel
+/**
+ * Model e_booklet_milestone_achievements
+ * 
+ */
+export type e_booklet_milestone_achievements = Prisma.e_booklet_milestone_achievementsModel
+/**
+ * Model e_booklet_teacher_terms_acceptances
+ * 
+ */
+export type e_booklet_teacher_terms_acceptances = Prisma.e_booklet_teacher_terms_acceptancesModel
+/**
+ * Model teacher_wallets
+ * 
+ */
+export type teacher_wallets = Prisma.teacher_walletsModel
+/**
+ * Model teacher_wallet_ledger
+ * 
+ */
+export type teacher_wallet_ledger = Prisma.teacher_wallet_ledgerModel
+/**
+ * Model e_booklet_access_codes
+ * 
+ */
+export type e_booklet_access_codes = Prisma.e_booklet_access_codesModel
+/**
+ * Model e_booklet_access_code_redemptions
+ * 
+ */
+export type e_booklet_access_code_redemptions = Prisma.e_booklet_access_code_redemptionsModel
 /**
  * Model e_booklet_access
  * 

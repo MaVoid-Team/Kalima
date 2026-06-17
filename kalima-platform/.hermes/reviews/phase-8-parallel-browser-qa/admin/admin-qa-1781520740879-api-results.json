@@ -1,0 +1,1090 @@
+{
+  "runId": "admin-qa-1781520740879",
+  "startedAt": "2026-06-15T10:52:20.880Z",
+  "ids": {
+    "templateId": 24,
+    "pdfAssetId": 115,
+    "versionId": 24,
+    "imageAssetId": 116,
+    "audioAssetId": 117,
+    "videoAssetId": 118,
+    "fileAssetId": 119,
+    "hotspotIds": [
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167
+    ],
+    "publishedVersionId": 24,
+    "teacherId": 75,
+    "purchaseId": 30,
+    "customDocumentFileId": 120,
+    "instanceId": 26,
+    "studentUserIdForDeviceCheck": null
+  },
+  "steps": [
+    {
+      "label": "create template",
+      "method": "POST",
+      "url": "/admin/e-booklet-templates",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 24,
+          "title": "Phase 8 Admin QA admin-qa-1781520740879",
+          "slug": "phase-8-admin-qa-admin-qa-1781520740879",
+          "description": "Phase 8 admin QA template",
+          "cover_file_id": null,
+          "price": "100",
+          "marketing_price": "150",
+          "currency": "EGP",
+          "status": "draft",
+          "category_id": null,
+          "created_by": 67,
+          "created_at": "2026-06-15T10:52:20.929Z",
+          "updated_at": null,
+          "cover_file": null,
+          "category": null
+        }
+      }
+    },
+    {
+      "label": "upload valid PDF document",
+      "method": "POST",
+      "url": "/admin/e-booklet-files/document",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 115,
+          "owner_type": "template",
+          "owner_id": 24,
+          "file_type": "pdf",
+          "storage_key": "e-booklets/private/1781520740951-9a544f387aca1bfa-admin-qa-1781520740879.pdf",
+          "original_filename": "admin-qa-1781520740879.pdf",
+          "mime_type": "application/pdf",
+          "size_bytes": 588,
+          "visibility": "private",
+          "created_at": "2026-06-15T10:52:20.955Z",
+          "metadata": {
+            "page_count": 2,
+            "page_dimensions": [
+              {
+                "width": 612,
+                "height": 792
+              },
+              {
+                "width": 612,
+                "height": 792
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "reject DOCX document upload",
+      "method": "POST",
+      "url": "/admin/e-booklet-files/document",
+      "status": 400,
+      "ok": false,
+      "body": {
+        "success": false,
+        "message": "Invalid document type: application/vnd.openxmlformats-officedocument.wordprocessingml.document. Allowed: PDF only"
+      }
+    },
+    {
+      "label": "create template version with uploaded PDF",
+      "method": "POST",
+      "url": "/admin/e-booklet-templates/24/versions",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 24,
+          "template_id": 24,
+          "version_number": 1,
+          "base_document_file_id": 115,
+          "rendered_document_file_id": 115,
+          "page_count": 2,
+          "page_dimensions_json": [
+            {
+              "width": 612,
+              "height": 792
+            },
+            {
+              "width": 612,
+              "height": 792
+            }
+          ],
+          "status": "draft",
+          "created_by": 67,
+          "created_at": "2026-06-15T10:52:20.962Z",
+          "published_at": null
+        }
+      }
+    },
+    {
+      "label": "upload hotspot image asset",
+      "method": "POST",
+      "url": "/admin/e-booklet-files/hotspot-media",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 116,
+          "owner_type": "hotspot",
+          "owner_id": null,
+          "file_type": "image",
+          "storage_key": "e-booklets/private/1781520740965-9f42927bc8013e34-admin-qa-1781520740879.png",
+          "original_filename": "admin-qa-1781520740879.png",
+          "mime_type": "image/png",
+          "size_bytes": 70,
+          "visibility": "private",
+          "created_at": "2026-06-15T10:52:20.966Z"
+        }
+      }
+    },
+    {
+      "label": "upload hotspot audio asset",
+      "method": "POST",
+      "url": "/admin/e-booklet-files/hotspot-media",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 117,
+          "owner_type": "hotspot",
+          "owner_id": null,
+          "file_type": "audio",
+          "storage_key": "e-booklets/private/1781520740967-f71b338f3f2df54e-admin-qa-1781520740879.mp3",
+          "original_filename": "admin-qa-1781520740879.mp3",
+          "mime_type": "audio/mpeg",
+          "size_bytes": 54,
+          "visibility": "private",
+          "created_at": "2026-06-15T10:52:20.968Z"
+        }
+      }
+    },
+    {
+      "label": "upload hotspot video asset",
+      "method": "POST",
+      "url": "/admin/e-booklet-files/hotspot-media",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 118,
+          "owner_type": "hotspot",
+          "owner_id": null,
+          "file_type": "video",
+          "storage_key": "e-booklets/private/1781520740969-0938a9f07ccf3411-admin-qa-1781520740879.mp4",
+          "original_filename": "admin-qa-1781520740879.mp4",
+          "mime_type": "video/mp4",
+          "size_bytes": 40,
+          "visibility": "private",
+          "created_at": "2026-06-15T10:52:20.970Z"
+        }
+      }
+    },
+    {
+      "label": "upload hotspot file asset",
+      "method": "POST",
+      "url": "/admin/e-booklet-files/hotspot-media",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 119,
+          "owner_type": "hotspot",
+          "owner_id": null,
+          "file_type": "file",
+          "storage_key": "e-booklets/private/1781520740972-5d0843ccb103f485-admin-qa-1781520740879.txt",
+          "original_filename": "admin-qa-1781520740879.txt",
+          "mime_type": "text/plain",
+          "size_bytes": 25,
+          "visibility": "private",
+          "created_at": "2026-06-15T10:52:20.972Z"
+        }
+      }
+    },
+    {
+      "label": "text hotspot",
+      "method": "POST",
+      "url": "/admin/e-booklet-template-versions/24/hotspots",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 160,
+          "template_version_id": 24,
+          "page_number": 1,
+          "x_percent": "10",
+          "y_percent": "10",
+          "radius_percent": "3",
+          "reference_number": 1,
+          "shape": "circle",
+          "width_percent": null,
+          "height_percent": null,
+          "type": "text",
+          "title": "Text",
+          "text_content": "QA text block",
+          "asset_file_id": null,
+          "trigger_type": "click",
+          "display_behavior": {
+            "position": "popover"
+          },
+          "content_json": {
+            "blocks": [
+              {
+                "font": "serif",
+                "type": "text",
+                "text_content": "QA text block"
+              }
+            ],
+            "version": 2
+          },
+          "interaction_json": null,
+          "sort_order": 0,
+          "is_active": true,
+          "created_by": 67,
+          "updated_by": null,
+          "created_at": "2026-06-15T10:52:20.977Z",
+          "updated_at": null
+        }
+      }
+    },
+    {
+      "label": "image hotspot",
+      "method": "POST",
+      "url": "/admin/e-booklet-template-versions/24/hotspots",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 161,
+          "template_version_id": 24,
+          "page_number": 1,
+          "x_percent": "20",
+          "y_percent": "10",
+          "radius_percent": "3",
+          "reference_number": 2,
+          "shape": "circle",
+          "width_percent": null,
+          "height_percent": null,
+          "type": "image",
+          "title": "Image",
+          "text_content": null,
+          "asset_file_id": 116,
+          "trigger_type": "click",
+          "display_behavior": {
+            "position": "popover"
+          },
+          "content_json": {
+            "blocks": [
+              {
+                "type": "image",
+                "asset_file_id": 116,
+                "expand_on_click": true
+              }
+            ],
+            "version": 2
+          },
+          "interaction_json": null,
+          "sort_order": 0,
+          "is_active": true,
+          "created_by": 67,
+          "updated_by": null,
+          "created_at": "2026-06-15T10:52:20.980Z",
+          "updated_at": null
+        }
+      }
+    },
+    {
+      "label": "audio hotspot",
+      "method": "POST",
+      "url": "/admin/e-booklet-template-versions/24/hotspots",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 162,
+          "template_version_id": 24,
+          "page_number": 1,
+          "x_percent": "30",
+          "y_percent": "10",
+          "radius_percent": "3",
+          "reference_number": 3,
+          "shape": "circle",
+          "width_percent": null,
+          "height_percent": null,
+          "type": "audio",
+          "title": "Audio",
+          "text_content": null,
+          "asset_file_id": 117,
+          "trigger_type": "click",
+          "display_behavior": {
+            "position": "popover"
+          },
+          "content_json": {
+            "blocks": [
+              {
+                "type": "audio",
+                "autoplay": true,
+                "asset_file_id": 117
+              }
+            ],
+            "version": 2
+          },
+          "interaction_json": null,
+          "sort_order": 0,
+          "is_active": true,
+          "created_by": 67,
+          "updated_by": null,
+          "created_at": "2026-06-15T10:52:20.983Z",
+          "updated_at": null
+        }
+      }
+    },
+    {
+      "label": "uploaded video hotspot",
+      "method": "POST",
+      "url": "/admin/e-booklet-template-versions/24/hotspots",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 163,
+          "template_version_id": 24,
+          "page_number": 1,
+          "x_percent": "40",
+          "y_percent": "10",
+          "radius_percent": "3",
+          "reference_number": 4,
+          "shape": "circle",
+          "width_percent": null,
+          "height_percent": null,
+          "type": "video",
+          "title": "Uploaded video",
+          "text_content": null,
+          "asset_file_id": 118,
+          "trigger_type": "click",
+          "display_behavior": {
+            "position": "popover"
+          },
+          "content_json": {
+            "blocks": [
+              {
+                "type": "video",
+                "source": "upload",
+                "asset_file_id": 118
+              }
+            ],
+            "version": 2
+          },
+          "interaction_json": null,
+          "sort_order": 0,
+          "is_active": true,
+          "created_by": 67,
+          "updated_by": null,
+          "created_at": "2026-06-15T10:52:20.986Z",
+          "updated_at": null
+        }
+      }
+    },
+    {
+      "label": "youtube video hotspot",
+      "method": "POST",
+      "url": "/admin/e-booklet-template-versions/24/hotspots",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 164,
+          "template_version_id": 24,
+          "page_number": 1,
+          "x_percent": "50",
+          "y_percent": "10",
+          "radius_percent": "3",
+          "reference_number": 5,
+          "shape": "circle",
+          "width_percent": null,
+          "height_percent": null,
+          "type": "video",
+          "title": "YouTube video",
+          "text_content": null,
+          "asset_file_id": null,
+          "trigger_type": "click",
+          "display_behavior": {
+            "position": "popover"
+          },
+          "content_json": {
+            "blocks": [
+              {
+                "type": "video",
+                "source": "youtube",
+                "youtube_url": "https://youtu.be/dQw4w9WgXcQ"
+              }
+            ],
+            "version": 2
+          },
+          "interaction_json": null,
+          "sort_order": 0,
+          "is_active": true,
+          "created_by": 67,
+          "updated_by": null,
+          "created_at": "2026-06-15T10:52:20.989Z",
+          "updated_at": null
+        }
+      }
+    },
+    {
+      "label": "file hotspot",
+      "method": "POST",
+      "url": "/admin/e-booklet-template-versions/24/hotspots",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 165,
+          "template_version_id": 24,
+          "page_number": 1,
+          "x_percent": "60",
+          "y_percent": "10",
+          "radius_percent": "3",
+          "reference_number": 6,
+          "shape": "circle",
+          "width_percent": null,
+          "height_percent": null,
+          "type": "file",
+          "title": "File",
+          "text_content": null,
+          "asset_file_id": 119,
+          "trigger_type": "click",
+          "display_behavior": {
+            "position": "popover"
+          },
+          "content_json": {
+            "blocks": [
+              {
+                "type": "file",
+                "label": "Download notes",
+                "asset_file_id": 119
+              }
+            ],
+            "version": 2
+          },
+          "interaction_json": null,
+          "sort_order": 0,
+          "is_active": true,
+          "created_by": 67,
+          "updated_by": null,
+          "created_at": "2026-06-15T10:52:20.990Z",
+          "updated_at": null
+        }
+      }
+    },
+    {
+      "label": "link hotspot",
+      "method": "POST",
+      "url": "/admin/e-booklet-template-versions/24/hotspots",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 166,
+          "template_version_id": 24,
+          "page_number": 1,
+          "x_percent": "70",
+          "y_percent": "10",
+          "radius_percent": "3",
+          "reference_number": 7,
+          "shape": "circle",
+          "width_percent": null,
+          "height_percent": null,
+          "type": "link",
+          "title": "Link",
+          "text_content": null,
+          "asset_file_id": null,
+          "trigger_type": "click",
+          "display_behavior": {
+            "position": "popover"
+          },
+          "content_json": {
+            "blocks": [
+              {
+                "url": "https://kalima.example.test/resource",
+                "type": "link",
+                "label": "Open resource"
+              }
+            ],
+            "version": 2
+          },
+          "interaction_json": null,
+          "sort_order": 0,
+          "is_active": true,
+          "created_by": 67,
+          "updated_by": null,
+          "created_at": "2026-06-15T10:52:20.992Z",
+          "updated_at": null
+        }
+      }
+    },
+    {
+      "label": "question_answer hotspot",
+      "method": "POST",
+      "url": "/admin/e-booklet-template-versions/24/hotspots",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 167,
+          "template_version_id": 24,
+          "page_number": 1,
+          "x_percent": "80",
+          "y_percent": "10",
+          "radius_percent": "3",
+          "reference_number": 8,
+          "shape": "circle",
+          "width_percent": null,
+          "height_percent": null,
+          "type": "question_answer",
+          "title": "Q&A",
+          "text_content": null,
+          "asset_file_id": null,
+          "trigger_type": "click",
+          "display_behavior": {
+            "position": "popover"
+          },
+          "content_json": {
+            "blocks": [
+              {
+                "type": "question_answer",
+                "answers": [
+                  {
+                    "text": "3",
+                    "isCorrect": false
+                  },
+                  {
+                    "text": "4",
+                    "isCorrect": true
+                  }
+                ],
+                "question": "2+2?"
+              }
+            ],
+            "version": 2
+          },
+          "interaction_json": null,
+          "sort_order": 0,
+          "is_active": true,
+          "created_by": 67,
+          "updated_by": null,
+          "created_at": "2026-06-15T10:52:20.994Z",
+          "updated_at": null
+        }
+      }
+    },
+    {
+      "label": "publish version",
+      "method": "POST",
+      "url": "/admin/e-booklet-template-versions/24/publish",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 24,
+          "template_id": 24,
+          "version_number": 1,
+          "base_document_file_id": 115,
+          "rendered_document_file_id": 115,
+          "page_count": 2,
+          "page_dimensions_json": [
+            {
+              "width": 612,
+              "height": 792
+            },
+            {
+              "width": 612,
+              "height": 792
+            }
+          ],
+          "status": "active",
+          "created_by": 67,
+          "created_at": "2026-06-15T10:52:20.962Z",
+          "published_at": "2026-06-15T10:52:20.999Z"
+        }
+      }
+    },
+    {
+      "label": "create teacher instance/deal request",
+      "method": "POST",
+      "url": "/admin/e-booklet-purchases",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 30,
+          "teacher_id": 75,
+          "template_id": 24,
+          "template_version_id": 24,
+          "status": "pending",
+          "price": "120",
+          "wallet_credit_applied": "0",
+          "final_payable_price": null,
+          "marketing_price": "160",
+          "internal_price": "80",
+          "access_expires_at": null,
+          "currency": "EGP",
+          "payment_method": null,
+          "payment_reference": null,
+          "branding_json": {
+            "bookletTitle": "Phase 8 Admin QA admin-qa-1781520740879 Teacher Deal"
+          },
+          "admin_notes": "Phase 8 admin QA deal",
+          "created_at": "2026-06-15T10:52:21.003Z",
+          "updated_at": null
+        }
+      }
+    },
+    {
+      "label": "upload customized teacher PDF",
+      "method": "POST",
+      "url": "/admin/e-booklet-files/document",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 120,
+          "owner_type": "booklet",
+          "owner_id": 30,
+          "file_type": "pdf",
+          "storage_key": "e-booklets/private/1781520741007-db4fcb578a89c2d9-admin-qa-1781520740879-teacher.pdf",
+          "original_filename": "admin-qa-1781520740879-teacher.pdf",
+          "mime_type": "application/pdf",
+          "size_bytes": 588,
+          "visibility": "private",
+          "created_at": "2026-06-15T10:52:21.008Z",
+          "metadata": {
+            "page_count": 2,
+            "page_dimensions": [
+              {
+                "width": 612,
+                "height": 792
+              },
+              {
+                "width": 612,
+                "height": 792
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "deliver teacher instance/deal with quota expiry prices",
+      "method": "POST",
+      "url": "/admin/e-booklet-purchases/30/deliver",
+      "status": 201,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": {
+          "id": 26,
+          "purchase_id": 30,
+          "teacher_id": 75,
+          "template_id": 24,
+          "template_version_id": 24,
+          "custom_document_file_id": 120,
+          "display_title": "Phase 8 Admin QA admin-qa-1781520740879 Delivered",
+          "branding_json": {
+            "bookletTitle": "Phase 8 Admin QA admin-qa-1781520740879 Teacher Deal"
+          },
+          "invite_quota": 7,
+          "used_invites_count": 0,
+          "access_expires_at": "2026-07-15T10:52:21.008Z",
+          "archived_at": null,
+          "archive_reason": null,
+          "student_marketing_price": "160",
+          "internal_price": "80",
+          "status": "active",
+          "created_at": "2026-06-15T10:52:21.011Z",
+          "updated_at": null
+        }
+      }
+    },
+    {
+      "label": "list admin instances",
+      "method": "GET",
+      "url": "/admin/e-booklet-instances?limit=5",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": [
+          {
+            "id": 26,
+            "purchase_id": 30,
+            "teacher_id": 75,
+            "template_id": 24,
+            "template_version_id": 24,
+            "custom_document_file_id": 120,
+            "display_title": "Phase 8 Admin QA admin-qa-1781520740879 Delivered",
+            "branding_json": {
+              "bookletTitle": "Phase 8 Admin QA admin-qa-1781520740879 Teacher Deal"
+            },
+            "invite_quota": 7,
+            "used_invites_count": 0,
+            "access_expires_at": "2026-07-15T10:52:21.008Z",
+            "archived_at": null,
+            "archive_reason": null,
+            "student_marketing_price": "160",
+            "internal_price": "80",
+            "status": "active",
+            "created_at": "2026-06-15T10:52:21.011Z",
+            "updated_at": null,
+            "template": {
+              "id": 24,
+              "title": "Phase 8 Admin QA admin-qa-1781520740879",
+              "slug": "phase-8-admin-qa-admin-qa-1781520740879",
+              "description": "Phase 8 admin QA template",
+              "cover_file_id": null,
+              "price": "100",
+              "marketing_price": "150",
+              "currency": "EGP",
+              "status": "published",
+              "category_id": null,
+              "created_by": 67,
+              "created_at": "2026-06-15T10:52:20.929Z",
+              "updated_at": "2026-06-15T10:52:21.000Z"
+            },
+            "template_version": {
+              "id": 24,
+              "template_id": 24,
+              "version_number": 1,
+              "base_document_file_id": 115,
+              "rendered_document_file_id": 115,
+              "page_count": 2,
+              "page_dimensions_json": [
+                {
+                  "width": 612,
+                  "height": 792
+                },
+                {
+                  "width": 612,
+                  "height": 792
+                }
+              ],
+              "status": "active",
+              "created_by": 67,
+              "created_at": "2026-06-15T10:52:20.962Z",
+              "published_at": "2026-06-15T10:52:20.999Z"
+            },
+            "teacher": {
+              "id": 75,
+              "name": "Phase 7 Teacher",
+              "email": "phase7-1781480436590-teacher@example.com"
+            },
+            "_count": {
+              "access_records": 1,
+              "invites": 0
+            },
+            "used_devices_count": 0
+          },
+          {
+            "id": 25,
+            "purchase_id": 29,
+            "teacher_id": 75,
+            "template_id": 23,
+            "template_version_id": 23,
+            "custom_document_file_id": null,
+            "display_title": "Phase 7 Browser Booklet 1781480436590",
+            "branding_json": null,
+            "invite_quota": 10,
+            "used_invites_count": 0,
+            "access_expires_at": null,
+            "archived_at": null,
+            "archive_reason": null,
+            "student_marketing_price": "120",
+            "internal_price": "80",
+            "status": "active",
+            "created_at": "2026-06-14T23:40:36.802Z",
+            "updated_at": null,
+            "template": {
+              "id": 23,
+              "title": "Phase 7 Template 1781480436590",
+              "slug": "phase-7-template-1781480436590",
+              "description": null,
+              "cover_file_id": null,
+              "price": "100",
+              "marketing_price": "120",
+              "currency": "EGP",
+              "status": "published",
+              "category_id": null,
+              "created_by": 75,
+              "created_at": "2026-06-14T23:40:36.798Z",
+              "updated_at": null
+            },
+            "template_version": {
+              "id": 23,
+              "template_id": 23,
+              "version_number": 1,
+              "base_document_file_id": null,
+              "rendered_document_file_id": null,
+              "page_count": 1,
+              "page_dimensions_json": null,
+              "status": "active",
+              "created_by": 75,
+              "created_at": "2026-06-14T23:40:36.799Z",
+              "published_at": "2026-06-14T23:40:36.799Z"
+            },
+            "teacher": {
+              "id": 75,
+              "name": "Phase 7 Teacher",
+              "email": "phase7-1781480436590-teacher@example.com"
+            },
+            "_count": {
+              "access_records": 1,
+              "invites": 0
+            },
+            "used_devices_count": 1
+          },
+          {
+            "id": 24,
+            "purchase_id": 28,
+            "teacher_id": 72,
+            "template_id": 22,
+            "template_version_id": 22,
+            "custom_document_file_id": null,
+            "display_title": "Phase 7 Browser Booklet 1781480299124",
+            "branding_json": null,
+            "invite_quota": 10,
+            "used_invites_count": 0,
+            "access_expires_at": null,
+            "archived_at": null,
+            "archive_reason": null,
+            "student_marketing_price": "120",
+            "internal_price": "80",
+            "status": "active",
+            "created_at": "2026-06-14T23:38:19.341Z",
+            "updated_at": null,
+            "template": {
+              "id": 22,
+              "title": "Phase 7 Template 1781480299124",
+              "slug": "phase-7-template-1781480299124",
+              "description": null,
+              "cover_file_id": null,
+              "price": "100",
+              "marketing_price": "120",
+              "currency": "EGP",
+              "status": "published",
+              "category_id": null,
+              "created_by": 72,
+              "created_at": "2026-06-14T23:38:19.338Z",
+              "updated_at": null
+            },
+            "template_version": {
+              "id": 22,
+              "template_id": 22,
+              "version_number": 1,
+              "base_document_file_id": null,
+              "rendered_document_file_id": null,
+              "page_count": 1,
+              "page_dimensions_json": null,
+              "status": "active",
+              "created_by": 72,
+              "created_at": "2026-06-14T23:38:19.339Z",
+              "published_at": "2026-06-14T23:38:19.339Z"
+            },
+            "teacher": {
+              "id": 72,
+              "name": "Phase 7 Teacher",
+              "email": "phase7-1781480299124-teacher@example.com"
+            },
+            "_count": {
+              "access_records": 0,
+              "invites": 0
+            },
+            "used_devices_count": 0
+          },
+          {
+            "id": 23,
+            "purchase_id": 27,
+            "teacher_id": 69,
+            "template_id": 21,
+            "template_version_id": 21,
+            "custom_document_file_id": null,
+            "display_title": "Phase 7 Browser Booklet 1781480185842",
+            "branding_json": null,
+            "invite_quota": 10,
+            "used_invites_count": 0,
+            "access_expires_at": null,
+            "archived_at": null,
+            "archive_reason": null,
+            "student_marketing_price": "120",
+            "internal_price": "80",
+            "status": "active",
+            "created_at": "2026-06-14T23:36:26.065Z",
+            "updated_at": null,
+            "template": {
+              "id": 21,
+              "title": "Phase 7 Template 1781480185842",
+              "slug": "phase-7-template-1781480185842",
+              "description": null,
+              "cover_file_id": null,
+              "price": "100",
+              "marketing_price": "120",
+              "currency": "EGP",
+              "status": "published",
+              "category_id": null,
+              "created_by": 69,
+              "created_at": "2026-06-14T23:36:26.060Z",
+              "updated_at": null
+            },
+            "template_version": {
+              "id": 21,
+              "template_id": 21,
+              "version_number": 1,
+              "base_document_file_id": null,
+              "rendered_document_file_id": null,
+              "page_count": 1,
+              "page_dimensions_json": null,
+              "status": "active",
+              "created_by": 69,
+              "created_at": "2026-06-14T23:36:26.063Z",
+              "published_at": "2026-06-14T23:36:26.062Z"
+            },
+            "teacher": {
+              "id": 69,
+              "name": "Phase 7 Teacher",
+              "email": "phase7-1781480185842-teacher@example.com"
+            },
+            "_count": {
+              "access_records": 0,
+              "invites": 0
+            },
+            "used_devices_count": 0
+          },
+          {
+            "id": 22,
+            "purchase_id": 26,
+            "teacher_id": 63,
+            "template_id": 20,
+            "template_version_id": 20,
+            "custom_document_file_id": 109,
+            "display_title": "Delivered zero smoke-1781458293495",
+            "branding_json": {
+              "teacherName": "Teacher smoke-1781458293495"
+            },
+            "invite_quota": 5,
+            "used_invites_count": 1,
+            "access_expires_at": "2026-06-28T17:31:33.685Z",
+            "archived_at": null,
+            "archive_reason": null,
+            "student_marketing_price": "0",
+            "internal_price": "0",
+            "status": "active",
+            "created_at": "2026-06-14T17:31:33.686Z",
+            "updated_at": null,
+            "template": {
+              "id": 20,
+              "title": "Smoke E-Booklet zero smoke-1781458293495",
+              "slug": "smoke-1781458293495-zero",
+              "description": "Local E2E smoke template",
+              "cover_file_id": null,
+              "price": "0",
+              "marketing_price": "0",
+              "currency": "EGP",
+              "status": "published",
+              "category_id": null,
+              "created_by": 62,
+              "created_at": "2026-06-14T17:31:33.671Z",
+              "updated_at": "2026-06-14T17:31:33.683Z"
+            },
+            "template_version": {
+              "id": 20,
+              "template_id": 20,
+              "version_number": 1,
+              "base_document_file_id": 109,
+              "rendered_document_file_id": 109,
+              "page_count": 2,
+              "page_dimensions_json": [
+                {
+                  "width": 595,
+                  "height": 842
+                },
+                {
+                  "width": 595,
+                  "height": 842
+                }
+              ],
+              "status": "active",
+              "created_by": 62,
+              "created_at": "2026-06-14T17:31:33.673Z",
+              "published_at": "2026-06-14T17:31:33.683Z"
+            },
+            "teacher": {
+              "id": 63,
+              "name": "Teacher smoke-1781458293495",
+              "email": "smoke-1781458293495-teacher@example.test"
+            },
+            "_count": {
+              "access_records": 2,
+              "invites": 1
+            },
+            "used_devices_count": 0
+          }
+        ],
+        "total": 26,
+        "page": 1,
+        "limit": 5
+      }
+    },
+    {
+      "label": "list instance students",
+      "method": "GET",
+      "url": "/admin/e-booklet-instances/26/students",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "success": true,
+        "data": []
+      }
+    },
+    {
+      "label": "device/access list/reset/allowance",
+      "status": "BLOCKED_NO_STUDENT_ACCESS_SEED",
+      "ok": false,
+      "body": "Delivered teacher instance has no student access rows; cannot exercise student-specific device controls without student redemption/purchase seed."
+    }
+  ],
+  "errors": [],
+  "health": {
+    "status": "ok",
+    "version": "v2 new"
+  },
+  "docxRejectedAsExpected": true
+}

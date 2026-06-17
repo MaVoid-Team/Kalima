@@ -215,6 +215,15 @@ export default function CreateUserDialog({ onSuccess }) {
             case 'Teacher':
                 success = await createTeacherUser(payload);
                 break;
+            case 'Student':
+                success = await createStudentUser(payload);
+                break;
+            case 'Parent':
+                success = await createParentUser(payload);
+                break;
+            case 'Lecturer':
+                success = await createLecturerUser(payload);
+                break;
         }
 
         if (success) {

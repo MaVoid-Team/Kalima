@@ -321,26 +321,26 @@ npm run build
 
 ### Phase 8 — Browser QA and Mobile/Desktop Verification
 
-Status: Pending
+Status: Completed — parallel QA lanes, blank-page fix critique, lifecycle E2E, remaining browser proof rerun, and verification gate all passed.
 
 Source plan task:
 - Task 18: Browser QA and mobile/desktop verification.
 
 Detailed todo:
-- [ ] Verify admin creates template, uploads PDF, rejects DOCX.
-- [ ] Verify admin creates all hotspot types and publishes version.
-- [ ] Verify admin manually creates teacher instance/deal with quota, expiry, marketing price, internal price.
-- [ ] Verify teacher sees delivered e-booklet, viewer, share page, link, passcode, WhatsApp copy.
-- [ ] Verify logged-out student forced to login/register from invite.
-- [ ] Verify priced online purchase path creates pending generic purchase, no access until admin approval.
-- [ ] Verify admin approval auto-creates access and consumes seat.
-- [ ] Verify wrong passcode blocked without proof/access.
-- [ ] Verify correct passcode + terms creates access and consumes seat.
-- [ ] Verify zero-price + terms creates access without proof/passcode.
-- [ ] Verify first device binds, same device allowed, different fingerprint blocked.
-- [ ] Verify all hotspot interactions, video solo/no autoplay, multiple non-video cards, expiry block.
-- [ ] Verify admin device list, reset, new binding, additional device allowance, Admin View Mode.
-- [ ] Record URLs, accounts, screenshots/videos where useful, and pass/fail notes.
+- [x] Verify admin creates template, uploads PDF, rejects DOCX.
+- [x] Verify admin creates all hotspot types and publishes version.
+- [x] Verify admin manually creates teacher instance/deal with quota, expiry, marketing price, internal price.
+- [x] Verify teacher sees delivered e-booklet, viewer, share page, link, passcode, WhatsApp copy.
+- [x] Verify logged-out student forced to login/register from invite.
+- [x] Verify priced online purchase path creates pending generic purchase, no access until admin approval.
+- [x] Verify admin approval auto-creates access and consumes seat.
+- [x] Verify wrong passcode blocked without proof/access.
+- [x] Verify correct passcode + terms creates access and consumes seat.
+- [x] Verify zero-price + terms creates access without proof/passcode.
+- [x] Verify first device binds, same device allowed, different fingerprint blocked.
+- [x] Verify all hotspot interactions, video solo/no autoplay, multiple non-video cards, expiry block.
+- [x] Verify admin device list, reset, new binding, additional device allowance, Admin View Mode.
+- [x] Record URLs, accounts, screenshots/videos where useful, and pass/fail notes.
 
 Fresh agent plan:
 - `kalima-p8-browser-qa-agent`: runs browser QA and records evidence; no broad code edits unless explicitly assigned as fix-only.
@@ -356,23 +356,23 @@ Verification gate:
 
 ### Phase 9 — Final Feature Critique Gate
 
-Status: Pending
+Status: Completed — final critique `APPROVED` on 2026-06-15.
 
 Source plan task:
 - Task 19: Feature critique gate.
 
 Detailed todo:
-- [ ] Create `.hermes/reviews/fekra-e-booklet-v2/handoff.md`.
-- [ ] Include requirements coverage matrix.
-- [ ] Include changed files.
-- [ ] Include exact test/build/browser outputs.
-- [ ] Include known limitations/blockers.
-- [ ] Include screenshots/videos by path if available.
-- [ ] Trigger independent critique-agent review.
-- [ ] Fix every Required issue with fresh fix agent.
-- [ ] Re-run impacted tests/build/browser checks.
-- [ ] Re-review until verdict is `APPROVED`.
-- [ ] Only then report feature complete.
+- [x] Create `.hermes/reviews/fekra-e-booklet-v2/handoff.md`.
+- [x] Include requirements coverage matrix.
+- [x] Include changed files.
+- [x] Include exact test/build/browser outputs.
+- [x] Include known limitations/blockers.
+- [x] Include screenshots/videos by path if available.
+- [x] Trigger independent critique-agent review.
+- [x] Fix every Required issue with fresh fix agent. (No Phase 9 Required issues; prior Phase 7/8 Required fixes were already fixed and re-reviewed.)
+- [x] Re-run impacted tests/build/browser checks.
+- [x] Re-review until verdict is `APPROVED`.
+- [x] Only then report feature complete.
 
 Fresh agent plan:
 - `kalima-p9-handoff-agent`: drafts final handoff from verified evidence.

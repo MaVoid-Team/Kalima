@@ -65,6 +65,28 @@ export function useAdminEBookletAnalytics() {
   return { analytics, loading, fetchAnalytics, exportCsv };
 }
 
+export function useAdminTeacherOptions() {
+  const [teachers, setTeachers] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchTeachers = useCallback(async (search = "") => {
+    setLoading(true);
+    try {
+      const query = new URLSearchParams({ page: "1", limit: "50", role: "Teacher" });
+      if (search.trim()) query.set("search", search.trim());
+
+      const response = await axiosInstance.get(`/admin/users?${query.toString()}`);
+      const users = response.data?.data?.users || [];
+      setTeachers(Array.isArray(users) ? users : []);
+      return users;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { teachers, loading, fetchTeachers };
+}
+
 export function useAdminEBookletTemplates() {
   const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
   const [templates, setTemplates] = useState([]);
@@ -439,6 +461,18 @@ export function useAdminEBookletPurchases() {
     [fetchApi],
   );
 
+  const prepareCustomTemplate = useCallback(
+    (purchaseId) =>
+      fetchApi({
+        endpoint: `/admin/e-booklet-purchases/${purchaseId}/custom-template`,
+        method: "post",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.teacherTemplateReady", {
+          defaultValue: "Teacher-specific eBooklet template is ready to edit.",
+        }),
+      }),
+    [fetchApi],
+  );
+
   const uploadTeacherDocument = useCallback(
     (file, data = {}) => {
       const formData = new FormData();
@@ -470,6 +504,7 @@ export function useAdminEBookletPurchases() {
     updatePurchaseStatus,
     markPaid,
     deliverPurchase,
+    prepareCustomTemplate,
     uploadTeacherDocument,
   };
 }
@@ -501,6 +536,70 @@ export function useAdminEBookletInstances() {
   const revokeTeacherAccess = useCallback((instanceId) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/revoke-access`, method: "post", defaultSuccessMessage: i18n.t("eBooklets:toasts.teacherAccessRevoked") }), [fetchApi]);
 
   return { instances, pagination, status, loading, fetchInstances, setPage, setStatus, updateQuota, revokeTeacherAccess };
+}
+
+export function useAdminEBookletTermsMilestones() {
+  const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
+  const [terms, setTerms] = useState([]);
+  const [milestones, setMilestones] = useState([]);
+  const [progress, setProgress] = useState({ paidRedemptions: 0, achievements: [] });
+  const [actionLoading, setActionLoading] = useState(false);
+
+  const runAction = useCallback(async (action) => {
+    setActionLoading(true);
+    try {
+      return await action();
+    } finally {
+      setActionLoading(false);
+    }
+  }, []);
+
+  const fetchTerms = useCallback(async (filters = {}) => {
+    const query = new URLSearchParams();
+    if (filters.status && filters.status !== "all") query.set("status", filters.status);
+    if (filters.templateId !== undefined) query.set("template_id", filters.templateId === null ? "null" : String(filters.templateId));
+    const response = await fetchApi({ endpoint: `/admin/e-booklet-terms${query.toString() ? `?${query.toString()}` : ""}`, method: "get" }, false);
+    setTerms(Array.isArray(response?.data) ? response.data : []);
+    return response;
+  }, [fetchApi]);
+
+  const fetchMilestones = useCallback(async (termId) => {
+    const query = termId ? `?term_id=${termId}` : "";
+    const response = await fetchApi({ endpoint: `/admin/e-booklet-milestones${query}`, method: "get" }, false);
+    setMilestones(Array.isArray(response?.data) ? response.data : []);
+    return response;
+  }, [fetchApi]);
+
+  const fetchProgress = useCallback(async (termId) => {
+    const query = termId ? `?term_id=${termId}` : "";
+    const response = await fetchApi({ endpoint: `/admin/e-booklet-progress${query}`, method: "get" }, false);
+    setProgress(response?.data || { paidRedemptions: 0, achievements: [] });
+    return response;
+  }, [fetchApi]);
+
+  const createTerm = useCallback((data) => runAction(() => fetchApi({ endpoint: "/admin/e-booklet-terms", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.termSaved") })), [fetchApi, runAction]);
+  const updateTerm = useCallback((termId, data) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-terms/${termId}`, method: "patch", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.termSaved") })), [fetchApi, runAction]);
+  const activateTerm = useCallback((termId) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-terms/${termId}/activate`, method: "post", defaultSuccessMessage: i18n.t("eBooklets:toasts.termActivated") })), [fetchApi, runAction]);
+  const createMilestone = useCallback((data) => runAction(() => fetchApi({ endpoint: "/admin/e-booklet-milestones", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneSaved") })), [fetchApi, runAction]);
+  const updateMilestone = useCallback((milestoneId, data) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-milestones/${milestoneId}`, method: "patch", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneSaved") })), [fetchApi, runAction]);
+  const reorderMilestones = useCallback((termId, items) => runAction(() => fetchApi({ endpoint: "/admin/e-booklet-milestones/reorder", method: "post", data: { termId, items }, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestonesReordered") })), [fetchApi, runAction]);
+
+  return {
+    terms,
+    milestones,
+    progress,
+    loading: apiLoading,
+    actionLoading,
+    fetchTerms,
+    fetchMilestones,
+    fetchProgress,
+    createTerm,
+    updateTerm,
+    activateTerm,
+    createMilestone,
+    updateMilestone,
+    reorderMilestones,
+  };
 }
 
 export function useAdminEBookletDevices() {
