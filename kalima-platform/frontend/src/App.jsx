@@ -45,6 +45,9 @@ const EBookletCartPage = lazy(
 const EBookletCheckoutPage = lazy(
   () => import("./pages/e-booklets/EBookletCheckoutPage"),
 );
+const EBookletOrdersPage = lazy(
+  () => import("./pages/e-booklets/EBookletOrdersPage"),
+);
 const AcceptEBookletInvitePage = lazy(
   () => import("./pages/e-booklets/AcceptEBookletInvitePage"),
 );
@@ -80,7 +83,9 @@ const AdminEBookletEditorPage = lazy(() => import("./pages/admin/e-booklets/Admi
 const AdminEBookletPurchasesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchasesPage"));
 const AdminEBookletInstancesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstancesPage"));
 const AdminEBookletDevicesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletDevicesPage"));
+const AdminEBookletInstanceStudentsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstanceStudentsPage"));
 const AdminEBookletAnalyticsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletAnalyticsPage"));
+const AdminEBookletTermsMilestonesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTermsMilestonesPage"));
 
 // Public viewer (no layout)
 const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
@@ -146,6 +151,7 @@ const router = createBrowserRouter(
         {/* E-booklet storefront is public to students/visitors; access is only required for owned viewer pages. */}
         <Route path="/e-booklets" element={<EBookletStorePage />} />
         <Route path="/e-booklets/instances/:instanceId" element={<EBookletDetailsPage />} />
+        <Route path="/e-booklets/:templateId" element={<EBookletDetailsPage />} />
 
         {/* Market and Product Routes - Restricted by store access */}
         <Route element={<RoleRoute requireStoreAccess={true} />}>
@@ -165,6 +171,7 @@ const router = createBrowserRouter(
           <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin"]} />}>
             <Route path="/e-booklet-cart" element={<EBookletCartPage />} />
             <Route path="/e-booklet-checkout" element={<EBookletCheckoutPage />} />
+            <Route path="/e-booklet-orders" element={<EBookletOrdersPage />} />
           </Route>
         </Route>
 
@@ -186,6 +193,7 @@ const router = createBrowserRouter(
 
         </Route>
         <Route path="/e-booklet-invite/:token" element={<AcceptEBookletInvitePage />} />
+        <Route path="/e-booklet-code" element={<AcceptEBookletInvitePage mode="code" />} />
 
         {/* 404 Fallback */}
         <Route path="*" element={<NotFoundPage />} />
@@ -208,6 +216,8 @@ const router = createBrowserRouter(
           <Route path="/admin/e-booklet-instances" element={<AdminEBookletInstancesPage />} />
           <Route path="/admin/e-booklet-instances/:instanceId/view" element={<EBookletViewerPage />} />
           <Route path="/admin/e-booklet-analytics" element={<AdminEBookletAnalyticsPage />} />
+          <Route path="/admin/e-booklet-terms-milestones" element={<AdminEBookletTermsMilestonesPage />} />
+          <Route path="/admin/e-booklet-instances/:instanceId/students" element={<AdminEBookletInstanceStudentsPage />} />
           <Route path="/admin/e-booklet-instances/:instanceId/devices" element={<AdminEBookletDevicesPage />} />
           <Route path="/admin/categories" element={<CategoriesPage />} />
           <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />

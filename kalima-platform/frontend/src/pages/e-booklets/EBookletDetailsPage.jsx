@@ -96,20 +96,37 @@ function NotFoundState({ t }) {
 
 export default function EBookletDetailsPage() {
   const { t, i18n } = useTranslation("eBooklets");
-  const { instanceId } = useParams();
+  const { templateId, instanceId } = useParams();
+  const lookupId = templateId || instanceId;
+  const legacyInstanceRoute = Boolean(instanceId);
   const navigate = useNavigate();
-  const { template, loading, notFound } = useEBookletTemplate(instanceId);
-  const { replaceWithTemplate } = useEBookletCart();
+  const { template, loading, notFound } = useEBookletTemplate(lookupId, {
+    legacyInstance: legacyInstanceRoute,
+  });
+  const { addTemplate } = useEBookletCart();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [instanceId]);
+  }, [lookupId]);
+
+  useEffect(() => {
+    if (!legacyInstanceRoute || loading) return;
+    const canonicalTemplateId = template?.template_id || template?.templateId || template?.template?.id;
+    if (canonicalTemplateId) {
+      navigate(`/e-booklets/${canonicalTemplateId}`, { replace: true });
+      return;
+    }
+    if (notFound || template) {
+      navigate("/e-booklets", { replace: true });
+    }
+  }, [legacyInstanceRoute, loading, navigate, notFound, template]);
 
   if (loading) return <DetailSkeleton />;
+  if (legacyInstanceRoute) return <DetailSkeleton />;
   if (notFound || !template) return <NotFoundState t={t} />;
 
   const handleAddToCart = () => {
-    replaceWithTemplate(template);
+    addTemplate(template);
     navigate("/e-booklet-cart");
   };
 

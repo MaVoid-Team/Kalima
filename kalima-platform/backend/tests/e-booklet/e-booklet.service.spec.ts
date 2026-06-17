@@ -36,6 +36,7 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     },
     e_booklet_devices: {
       findFirst: jest.fn(),
+      findMany: jest.fn(),
       count: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
@@ -43,6 +44,7 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     },
     e_booklet_device_allowances: {
       findUnique: jest.fn(),
+      findMany: jest.fn(),
       upsert: jest.fn(),
     },
     e_booklet_student_purchase_links: {
@@ -57,6 +59,8 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     },
     e_booklet_purchases: {
       create: jest.fn(),
+      findMany: jest.fn(),
+      count: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
     },
@@ -168,6 +172,87 @@ describe("EBookletService", () => {
       expect(result.warnings).toEqual([
         "This file has the same page count, but some page dimensions differ from the template. Hotspot positions may not align correctly.",
       ]);
+    });
+  });
+
+  describe("listInstanceStudents", () => {
+    test("returns active students with safe device and analytics summaries", async () => {
+      const db = createMockDb();
+      const grantedAt = new Date("2026-02-01T10:00:00.000Z");
+      const lastSeen = new Date("2026-02-03T12:30:00.000Z");
+      db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10 });
+      db.e_booklet_access.findMany.mockResolvedValue([
+        {
+          id: 100,
+          booklet_instance_id: 10,
+          user_id: 55,
+          role: "student",
+          status: "active",
+          access_source: "online_purchase",
+          granted_at: grantedAt,
+          user: { id: 55, name: "Student One", email: "one@example.com" },
+        },
+        {
+          id: 101,
+          booklet_instance_id: 10,
+          user_id: 56,
+          role: "student",
+          status: "active",
+          access_source: "offline_passcode",
+          granted_at: grantedAt,
+          user: { id: 56, name: "Student Two", email: "two@example.com" },
+        },
+      ]);
+      db.e_booklet_devices.findMany.mockResolvedValue([
+        { id: 1, user_id: 55, status: "active", last_seen_at: lastSeen, user_agent: "hidden", ip_address: "hidden" },
+        { id: 2, user_id: 55, status: "reset", last_seen_at: new Date("2026-02-02T12:00:00.000Z") },
+        { id: 3, user_id: 56, status: "active", last_seen_at: new Date("2026-02-01T12:00:00.000Z") },
+      ]);
+      db.e_booklet_device_allowances.findMany.mockResolvedValue([
+        { booklet_instance_id: 10, user_id: 55, allowed_devices: 3 },
+      ]);
+      db.e_booklet_analytics_events.findMany.mockResolvedValue([
+        { student_id: 55, event_type: "access_created", source: "online_purchase", marketing_price_snapshot: { toJSON: () => "120" } },
+        { student_id: 55, event_type: "device_bound", source: "online_purchase", marketing_price_snapshot: null },
+        { student_id: 55, event_type: "page_viewed", source: "online_purchase", marketing_price_snapshot: null },
+        { student_id: 56, event_type: "access_created", source: "offline_passcode", marketing_price_snapshot: 80 },
+      ]);
+
+      const service = new EBookletService(db);
+      const result: any = await service.listInstanceStudents(10);
+
+      expect(db.e_booklet_access.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: { booklet_instance_id: 10, role: "student", status: "active" },
+      }));
+      expect(result[0].devices_summary).toEqual({
+        active_count: 1,
+        total_count: 2,
+        last_seen_at: "2026-02-03T12:30:00.000Z",
+        allowed_devices: 3,
+      });
+      expect(result[0].analytics_summary).toMatchObject({
+        access_created: 1,
+        device_bound: 1,
+        page_viewed: 1,
+        source: "online_purchase",
+        marketing_price_snapshot: "120",
+      });
+      expect(result[1].devices_summary.allowed_devices).toBe(1);
+      expect(result[0]).not.toHaveProperty("ip_address");
+      expect(result[0]).not.toHaveProperty("user_agent");
+    });
+
+    test("keeps teacher ownership scoping", async () => {
+      const db = createMockDb();
+      db.e_booklet_instances.findFirst.mockResolvedValue(null);
+      const service = new EBookletService(db);
+
+      await expect(service.listInstanceStudents(10, 99)).rejects.toThrow("Teacher e-booklet not found");
+      expect(db.e_booklet_instances.findFirst).toHaveBeenCalledWith({
+        where: { id: 10, teacher_id: 99 },
+        select: { id: true },
+      });
+      expect(db.e_booklet_access.findMany).not.toHaveBeenCalled();
     });
   });
 
@@ -365,6 +450,181 @@ describe("EBookletService", () => {
       expect(result.internal_price).toBeUndefined();
       await expect(service.getPublicInstance(99)).rejects.toThrow("E-booklet instance not found");
     });
+    test("lists only the current teacher's public e-booklet orders using the real e_booklet_purchases schema", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.findMany.mockResolvedValue([
+        {
+          id: 91,
+          status: "pending",
+          price: 250,
+          marketing_price: 250,
+          currency: "EGP",
+          created_at: new Date("2026-06-17T10:00:00.000Z"),
+          template: { id: 3, title: "Math booklet" },
+          template_version: { id: 8, version_number: 1 },
+          instances: [],
+        },
+      ]);
+      db.e_booklet_purchases.count.mockResolvedValue(1);
+
+      const service = new EBookletService(db);
+      const result: any = await service.listPublicOrders(55, { page: 2, limit: 5, status: "pending" });
+
+      expect(db.e_booklet_purchases.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: { teacher_id: 55, status: "pending" },
+        include: expect.objectContaining({
+          template: true,
+          template_version: true,
+          instances: true,
+        }),
+        orderBy: { created_at: "desc" },
+        skip: 5,
+        take: 5,
+      }));
+      expect(db.e_booklet_purchases.count).toHaveBeenCalledWith({ where: { teacher_id: 55, status: "pending" } });
+      expect(result).toEqual(expect.objectContaining({ data: expect.any(Array), total: 1, page: 2, limit: 5 }));
+      expect(result.data[0]).toEqual(expect.objectContaining({ id: 91, status: "pending", template: { id: 3, title: "Math booklet" } }));
+    });
+
+    test("admin approval of a teacher checkout purchase creates the teacher management instance and access", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.findUnique.mockResolvedValue({
+        id: 91,
+        teacher_id: 55,
+        template_id: 3,
+        template_version_id: 8,
+        branding_json: { teacherName: "Sara" },
+        price: 150,
+        marketing_price: 150,
+        internal_price: 0,
+        status: "pending",
+        instances: [],
+      });
+      db.e_booklet_instances.create.mockResolvedValue({ id: 10, purchase_id: 91, teacher_id: 55, status: "active" });
+      db.e_booklet_access.create.mockResolvedValue({ id: 11 });
+      db.e_booklet_purchases.update.mockResolvedValue({ id: 91, status: "ready" });
+
+      const service = new EBookletService(db);
+      const result: any = await service.updatePurchaseStatus(91, "paid", "Payment approved");
+
+      expect(db.e_booklet_instances.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({
+          purchase_id: 91,
+          teacher_id: 55,
+          template_id: 3,
+          template_version_id: 8,
+          branding_json: { teacherName: "Sara" },
+          display_title: "Teacher e-booklet #91",
+          invite_quota: 0,
+          status: "active",
+        }),
+      }));
+      expect(db.e_booklet_access.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({
+          booklet_instance_id: 10,
+          user_id: 55,
+          role: "teacher",
+          status: "active",
+        }),
+      }));
+      expect(db.e_booklet_purchases.update).toHaveBeenCalledWith(expect.objectContaining({
+        where: { id: 91 },
+        data: expect.objectContaining({ status: "ready", admin_notes: "Payment approved" }),
+      }));
+      expect(result).toEqual(expect.objectContaining({ id: 91, status: "ready" }));
+    });
+
+    test("admin rejection of a teacher checkout purchase does not create teacher management access", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.update.mockResolvedValue({ id: 91, status: "rejected" });
+
+      const service = new EBookletService(db);
+      await service.updatePurchaseStatus(91, "rejected", "Invalid proof");
+
+      expect(db.e_booklet_purchases.findUnique).not.toHaveBeenCalled();
+      expect(db.e_booklet_instances.create).not.toHaveBeenCalled();
+      expect(db.e_booklet_access.create).not.toHaveBeenCalled();
+      expect(db.e_booklet_purchases.update).toHaveBeenCalledWith(expect.objectContaining({
+        where: { id: 91 },
+        data: expect.objectContaining({ status: "rejected", admin_notes: "Invalid proof" }),
+      }));
+    });
+
+    test("admin approval retry reuses existing teacher management records", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.findUnique.mockResolvedValue({
+        id: 91,
+        teacher_id: 55,
+        template_id: 3,
+        template_version_id: 8,
+        branding_json: null,
+        price: 150,
+        marketing_price: 150,
+        internal_price: 0,
+        status: "ready",
+        instances: [{ id: 10, purchase_id: 91, teacher_id: 55, status: "active" }],
+      });
+      db.e_booklet_access.findFirst.mockResolvedValue({ id: 11, booklet_instance_id: 10, user_id: 55, role: "teacher" });
+      db.e_booklet_purchases.update.mockResolvedValue({ id: 91, status: "ready" });
+
+      const service = new EBookletService(db);
+      await service.updatePurchaseStatus(91, "paid", "Approved again");
+
+      expect(db.e_booklet_instances.create).not.toHaveBeenCalled();
+      expect(db.e_booklet_access.create).not.toHaveBeenCalled();
+      expect(db.e_booklet_purchases.update).toHaveBeenCalledWith(expect.objectContaining({
+        where: { id: 91 },
+        data: expect.objectContaining({ status: "ready", admin_notes: "Approved again" }),
+      }));
+    });
+
+    test("public teacher checkout accepts template items and creates pending e-booklet purchases without requiring delivered instances", async () => {
+      const db = createMockDb();
+      db.e_booklet_templates.findFirst
+        .mockResolvedValueOnce({
+          id: 3,
+          title: "Math booklet",
+          price: 150,
+          marketing_price: 150,
+          currency: "EGP",
+          versions: [{ id: 8, status: "active" }],
+        })
+        .mockResolvedValueOnce({
+          id: 4,
+          title: "Science booklet",
+          price: 100,
+          marketing_price: 100,
+          currency: "EGP",
+          versions: [{ id: 9, status: "active" }],
+        });
+      db.e_booklet_purchases.create
+        .mockResolvedValueOnce({ id: 91, status: "pending", price: 150, currency: "EGP" })
+        .mockResolvedValueOnce({ id: 92, status: "pending", price: 100, currency: "EGP" });
+
+      const service = new EBookletService(db);
+      const result: any = await service.createPublicCheckoutRequest(55, {
+        items: [
+          { template_id: 3, template_version_id: 8 },
+          { template_id: 4, template_version_id: 9 },
+        ],
+        terms_version: "v1",
+        terms_accepted: true,
+        payment_method_id: 1,
+        numberTransferredFrom: "01000000000",
+      }, { buffer: Buffer.from("png"), mimetype: "image/png", originalname: "proof.png" } as any);
+
+      expect(db.e_booklet_instances.findFirst).not.toHaveBeenCalled();
+      expect(db.e_booklet_purchases.create).toHaveBeenCalledTimes(2);
+      expect(db.e_booklet_purchases.create).toHaveBeenNthCalledWith(1, expect.objectContaining({
+        data: expect.objectContaining({ teacher_id: 55, template_id: 3, template_version_id: 8, price: 150, status: "pending" }),
+      }));
+      expect(db.e_booklet_purchases.create).toHaveBeenNthCalledWith(2, expect.objectContaining({
+        data: expect.objectContaining({ teacher_id: 55, template_id: 4, template_version_id: 9, price: 100, status: "pending" }),
+      }));
+      expect(db.purchases.create).not.toHaveBeenCalled();
+      expect(result).toEqual(expect.objectContaining({ purchase_id: 91, item_count: 2, total: 250, next_url: "/e-booklet-orders" }));
+    });
+
     test("public checkout creates purchase, one-use invite, and student purchase link for the selected instance", async () => {
       const db = createMockDb();
       const expiry = new Date("2027-01-15T10:30:00.000Z");
@@ -424,6 +684,69 @@ describe("EBookletService", () => {
         }),
       }));
       expect(result).toEqual(expect.objectContaining({ purchase_id: 91, student_purchase_link_id: 93, booklet_instance_id: 10 }));
+    });
+
+    test("public checkout creates one pending purchase with links for multiple e-booklet items", async () => {
+      const db = createMockDb();
+      const expiry = new Date("2027-01-15T10:30:00.000Z");
+      db.e_booklet_instances.findFirst
+        .mockResolvedValueOnce({
+          id: 10,
+          teacher_id: 7,
+          template_id: 3,
+          template_version_id: 8,
+          invite_quota: 5,
+          access_expires_at: expiry,
+          status: "active",
+          student_marketing_price: 150,
+          internal_price: 70,
+        })
+        .mockResolvedValueOnce({
+          id: 11,
+          teacher_id: 8,
+          template_id: 4,
+          template_version_id: 9,
+          invite_quota: 4,
+          access_expires_at: expiry,
+          status: "active",
+          student_marketing_price: 100,
+          internal_price: 40,
+        });
+      db.e_booklet_access.count.mockResolvedValue(0);
+      db.e_booklet_student_purchase_links.count.mockResolvedValue(0);
+      db.purchases.create.mockResolvedValue({ id: 91, status: "pending" });
+      db.e_booklet_invites.create
+        .mockResolvedValueOnce({ id: 92 })
+        .mockResolvedValueOnce({ id: 94 });
+      db.e_booklet_student_purchase_links.create
+        .mockResolvedValueOnce({ id: 93 })
+        .mockResolvedValueOnce({ id: 95 });
+
+      const service = new EBookletService(db);
+      const result: any = await service.createPublicCheckoutRequest(55, {
+        items: [
+          { instance_id: 10, template_id: 3, template_version_id: 8 },
+          { instance_id: 11, template_id: 4, template_version_id: 9 },
+        ],
+        terms_version: "v1",
+        terms_accepted: true,
+        payment_method_id: 1,
+        numberTransferredFrom: "01000000000",
+      }, { buffer: Buffer.from("png"), mimetype: "image/png", originalname: "proof.png" } as any);
+
+      expect(db.purchases.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ user_id: 55, subtotal: 250, total: 250, status: "pending" }),
+      }));
+      expect(db.e_booklet_invites.create).toHaveBeenCalledTimes(2);
+      expect(db.e_booklet_student_purchase_links.create).toHaveBeenCalledTimes(2);
+      expect(db.e_booklet_student_purchase_links.create).toHaveBeenNthCalledWith(1, expect.objectContaining({
+        data: expect.objectContaining({ purchase_id: 91, booklet_instance_id: 10, marketing_price_snapshot: 150 }),
+      }));
+      expect(db.e_booklet_student_purchase_links.create).toHaveBeenNthCalledWith(2, expect.objectContaining({
+        data: expect.objectContaining({ purchase_id: 91, booklet_instance_id: 11, marketing_price_snapshot: 100 }),
+      }));
+      expect(db.e_booklet_access.create).not.toHaveBeenCalled();
+      expect(result).toEqual(expect.objectContaining({ purchase_id: 91, item_count: 2, total: 250 }));
     });
 
     test("public checkout rejects when pending checkout links reserve all remaining seats", async () => {
@@ -782,7 +1105,8 @@ describe("EBookletService", () => {
       db.e_booklet_access.findFirst.mockResolvedValue({
         id: 9,
         status: "active",
-        booklet_instance: { id: 10, status: "active", access_expires_at: new Date("2026-12-31T00:00:00.000Z") },
+        access_source: "offline_passcode",
+        booklet_instance: { id: 10, status: "active", access_expires_at: new Date("2026-12-31T00:00:00.000Z"), teacher_id: 9, template_id: 3 },
       });
       db.e_booklet_devices.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
       db.e_booklet_devices.count.mockResolvedValueOnce(0).mockResolvedValueOnce(1);
@@ -794,6 +1118,18 @@ describe("EBookletService", () => {
       expect(db.$transaction).toHaveBeenCalledTimes(2);
       expect(db.$transaction).toHaveBeenNthCalledWith(1, expect.any(Function), { isolationLevel: "Serializable" });
       expect(db.$transaction).toHaveBeenNthCalledWith(2, expect.any(Function), { isolationLevel: "Serializable" });
+      expect(db.e_booklet_analytics_events.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          event_type: "device_bound",
+          teacher_id: 9,
+          student_id: 55,
+          template_id: 3,
+          booklet_instance_id: 10,
+          access_id: 9,
+          source: "offline_passcode",
+          metadata: expect.objectContaining({ device_label_present: false }),
+        }),
+      });
     });
 
     test("admin can reset devices and grant an additional-device allowance", async () => {
@@ -831,15 +1167,45 @@ describe("EBookletService", () => {
       db.e_booklet_access.create.mockResolvedValue({ id: 30, access_source: "offline_passcode" });
       db.e_booklet_analytics_events.groupBy.mockResolvedValue([{ event_type: "access_created", _count: { _all: 1 } }]);
       db.e_booklet_analytics_events.aggregate.mockResolvedValue({ _sum: { marketing_price_snapshot: 150 } });
+      db.e_booklet_instances.findMany.mockResolvedValue([{ id: 10, invite_quota: 10, used_invites_count: 1, status: "active", access_expires_at: null }]);
       const service = new EBookletService(db);
 
       await expect(service.acceptInvitePasscode("token", 55, { termsAccepted: true, passcode: "000000" })).rejects.toThrow("Invalid e-booklet invite passcode.");
       expect(JSON.stringify(db.e_booklet_analytics_events.create.mock.calls)).not.toContain("000000");
       await service.acceptInvitePasscode("token", 55, { termsAccepted: true, passcode: "123456", termsVersion: "v1" });
-      expect(db.e_booklet_analytics_events.create).toHaveBeenCalledWith({ data: expect.objectContaining({ event_type: "access_created", source: "offline_passcode", marketing_price_snapshot: 150 }) });
+      expect(db.e_booklet_analytics_events.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          event_type: "access_created",
+          source: "offline_passcode",
+          marketing_price_snapshot: 150,
+          internal_price_snapshot: 60,
+        }),
+      });
       await expect(service.getTeacherAnalytics(9, { instanceId: 10 })).resolves.toEqual(expect.objectContaining({ revenue: expect.objectContaining({ offlineEstimated: 150 }) }));
-      expect(db.e_booklet_analytics_events.groupBy).toHaveBeenLastCalledWith(expect.objectContaining({ where: expect.objectContaining({ teacher_id: 9, booklet_instance_id: 10 }) }));
+      expect(db.e_booklet_analytics_events.groupBy).toHaveBeenLastCalledWith(expect.objectContaining({ where: expect.objectContaining({ teacher_id: 9, booklet_instance_id: { in: [10] } }) }));
       expect(JSON.stringify(await service.getTeacherAnalytics(9, {}))).not.toContain("internal_price");
+    });
+
+    test("scopes teacher analytics to source-of-truth owned instances before aggregating events", async () => {
+      const db = createMockDb();
+      db.e_booklet_instances.findMany.mockResolvedValue([{ id: 10, invite_quota: 5, used_invites_count: 2, status: "active", access_expires_at: null }]);
+      db.e_booklet_analytics_events.groupBy.mockResolvedValue([]);
+      db.e_booklet_analytics_events.aggregate.mockResolvedValue({ _sum: { marketing_price_snapshot: 0 }, _count: { _all: 0 }, _min: { created_at: null }, _max: { created_at: null } });
+      const service = new EBookletService(db);
+
+      await service.getTeacherAnalytics(9, { instanceId: 10 });
+
+      expect(db.e_booklet_instances.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: { teacher_id: 9, id: 10 },
+        select: expect.objectContaining({ id: true }),
+      }));
+      expect(db.e_booklet_analytics_events.groupBy).toHaveBeenCalledWith(expect.objectContaining({
+        by: ["event_type"],
+        where: expect.objectContaining({ teacher_id: 9, booklet_instance_id: { in: [10] } }),
+      }));
+      expect(db.e_booklet_analytics_events.groupBy).not.toHaveBeenCalledWith(expect.objectContaining({
+        where: expect.objectContaining({ booklet_instance_id: 10 }),
+      }));
     });
 
     test("requires access expiry at delivery and archives expired active instances in bulk", async () => {
@@ -918,6 +1284,46 @@ describe("EBookletService", () => {
       expect(db.e_booklet_access.create).toHaveBeenCalledWith({ data: expect.objectContaining({ access_source: "online_purchase", source_invite_id: 2, user_id: 55 }) });
       expect(db.e_booklet_student_purchase_links.update).toHaveBeenCalledWith(expect.objectContaining({ where: { purchase_id: 500 }, data: expect.objectContaining({ access_id: 88, approved_at: expect.any(Date) }) }));
       expect(db.e_booklet_audit_logs.create).toHaveBeenCalledWith({ data: expect.objectContaining({ actor_user_id: 1, action: "student_purchase_approved", entity_id: 10 }) });
+    });
+
+    test("student purchase approval records approval-time analytics from the reserved purchase price snapshot", async () => {
+      const db = createMockDb();
+      db.e_booklet_student_purchase_links.findUnique.mockResolvedValue({
+        purchase_id: 500,
+        invite_id: 2,
+        booklet_instance_id: 10,
+        student_id: 55,
+        access_id: null,
+        terms_version: "v1",
+        marketing_price_snapshot: 150,
+        invite: { id: 2, max_uses: null, used_count: 0, teacher_id: 9 },
+        booklet_instance: {
+          id: 10,
+          invite_quota: 10,
+          status: "active",
+          teacher_id: 9,
+          template_id: 3,
+          student_marketing_price: 999,
+          internal_price: 60,
+        },
+      });
+      db.e_booklet_access.findFirst.mockResolvedValue(null);
+      db.e_booklet_access.count.mockResolvedValue(0);
+      db.e_booklet_access.create.mockResolvedValue({ id: 88, access_source: "online_purchase" });
+      db.e_booklet_student_purchase_links.update.mockResolvedValue({ purchase_id: 500, access_id: 88 });
+      const service = new EBookletService(db);
+
+      await service.approveStudentPurchaseLink(500, 1);
+
+      expect(db.e_booklet_analytics_events.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          event_type: "access_created",
+          source: "online_purchase",
+          marketing_price_snapshot: 150,
+          internal_price_snapshot: 60,
+        }),
+      });
+      expect(JSON.stringify(db.e_booklet_analytics_events.create.mock.calls)).not.toContain("999");
     });
 
     test("student purchase approval is idempotent for already-approved links", async () => {
@@ -1307,15 +1713,22 @@ describe("EBookletService", () => {
         booklet_instance_id: 10,
         user_id: 55,
         status: "active",
+        access_source: "offline_passcode",
         booklet_instance: {
           id: 10,
           status: "active",
           template_version_id: 22,
+          teacher_id: 99,
+          template_id: 7,
+          access_source: "offline_passcode",
           teacher: { id: 99, name: "Ms. Sara" },
           template: { id: 7, title: "Grade 5 Arabic" },
+          custom_document_file_id: 99,
           template_version: {
             id: 22,
             page_count: 3,
+            base_document_file_id: 88,
+            rendered_document_file_id: 77,
           },
         },
       });
@@ -1327,7 +1740,9 @@ describe("EBookletService", () => {
       expect(result).toEqual(
         expect.objectContaining({
           pageNumber: 2,
-          renderMode: "server-page",
+          renderMode: "pdf-document",
+          documentAssetId: 99,
+          message: null,
           pageAccessToken: expect.stringMatching(
             /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/,
           ),
@@ -1347,6 +1762,18 @@ describe("EBookletService", () => {
           entity_id: 10,
           metadata_json: { page_number: 2 },
         },
+      });
+      expect(db.e_booklet_analytics_events.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          event_type: "page_viewed",
+          teacher_id: 99,
+          student_id: 55,
+          template_id: 7,
+          booklet_instance_id: 10,
+          access_id: 1,
+          source: "offline_passcode",
+          metadata: expect.objectContaining({ page_number: 2 }),
+        }),
       });
 
       await expect(service.getViewerPage(10, 4, 55)).rejects.toThrow(

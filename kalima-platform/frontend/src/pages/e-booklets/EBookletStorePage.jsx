@@ -100,7 +100,7 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
       )}
     >
       <Link
-        to={`/e-booklets/instances/${template.instanceId || template.id}`}
+        to={`/e-booklets/${template.template_id || template.id}`}
         className={cn(
           "block aspect-[4/3] overflow-hidden bg-muted",
         )}
@@ -126,7 +126,7 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
         </div>
 
         <Link
-          to={`/e-booklets/instances/${template.instanceId || template.id}`}
+          to={`/e-booklets/${template.template_id || template.id}`}
           className={cn(
             "mt-4 line-clamp-2 font-bold tracking-tight text-foreground transition-colors group-hover:text-emerald-800",
             featured ? "text-2xl md:text-3xl" : "text-xl",
@@ -217,7 +217,7 @@ function EmptyState({ onClearSearch, t }) {
 export default function EBookletStorePage() {
   const { t, i18n } = useTranslation("eBooklets");
   const navigate = useNavigate();
-  const { replaceWithTemplate } = useEBookletCart();
+  const { addTemplate } = useEBookletCart();
   const [searchValue, setSearchValue] = useState("");
   const {
     templates,
@@ -238,7 +238,7 @@ export default function EBookletStorePage() {
   };
 
   const handleAddToCart = (template) => {
-    replaceWithTemplate(template);
+    addTemplate(template);
     navigate("/e-booklet-cart");
   };
 

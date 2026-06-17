@@ -1,0 +1,1795 @@
+
+===== FILE: .gitignore (129 lines) =====
+1|# Logs
+2|logs
+3|*.log
+4|npm-debug.log*
+5|yarn-debug.log*
+6|lerna-debug.log*
+7|.pnpm-debug.log*
+8|
+9|# Diagnostic reports
+10|report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+11|
+12|# Runtime data
+13|pids
+14|*.pid
+15|*.seed
+16|*.pid.lock
+17|kalima-platform/backend/.local-postgres/
+18|
+19|# Dependency directories
+20|node_modules/
+21|frontend/node_modules/
+22|jspm_packages/
+23|bower_components/
+24|backend/upload/
+25|# Build output
+26|build/
+27|**/build/
+28|dist/
+29|frontend/dist/
+30|
+31|# Capacitor
+32|android/
+33|frontend/android/
+34|
+35|# Vite
+36|frontend/.vite/
+37|
+38|# Cache and temp folders
+39|.cache/
+40|frontend/.cache/
+41|.parcel-cache/
+42|.temp/
+43|.nyc_output/
+44|.rpt2_cache/
+45|.rts2_cache_cjs/
+46|.rts2_cache_es/
+47|.rts2_cache_umd/
+48|.docusaurus/
+49|.serverless/
+50|.fusebox/
+51|.dynamodb/
+52|
+53|uploads/
+54|# Config files
+55|.env
+56|.env.*
+57|.pnpm-debug.log*
+58|.lock-wscript
+59|.eslintcache
+60|.stylelintcache
+61|.node_repl_history
+62|.yarn-integrity
+63|.yarn/cache/
+64|.yarn/unplugged/
+65|.yarn/build-state.yml
+66|.yarn/install-state.gz
+67|.pnp.*
+68|.pnp.js
+69|
+70|# Framework specific
+71|.next/
+72|out/
+73|.nuxt/
+74|.vuepress/dist/
+75|.docusaurus/
+76|.serverless/
+77|public/ # (only if needed)
+78|
+79|# Testing
+80|coverage/
+81|
+82|# Other
+83|.vscode-test
+84|.DS_Store
+85|*.tgz
+86|# Added by code-review-graph
+87|.code-review-graph/
+88|
+89|# Local agent/planning/working artifacts — keep inside the repo but never push
+90|kalima-platform/.local-workdocs/
+91|kalima-platform/CONTEXT.md
+92|.codegraph/
+93|
+94|# macOS metadata
+95|.DS_Store
+96|**/.DS_Store
+97|
+98|# AI/model/evaluation local artifacts — do not commit generated weights, caches, or harness output
+99|*.gguf
+100|*.ggml
+101|*.safetensors
+102|*.ckpt
+103|*.pt
+104|*.pth
+105|*.onnx
+106|*.tflite
+107|*.mlmodel
+108|*.mlpackage
+109|*.h5
+110|*.keras
+111|ai-models/
+112|model-artifacts/
+113|model-cache/
+114|models-cache/
+115|checkpoints/
+116|weights/
+117|loras/
+118|adapters/
+119|hf-cache/
+120|.hf-cache/
+121|.huggingface/
+122|.fallow/
+123|harness-artifacts/
+124|harness-results/
+125|eval-artifacts/
+126|eval-results/
+127|benchmark-results/
+128|artifacts/last-harness*.txt
+129|
+
+===== FILE: kalima-platform/backend/src/apps/store-api/controllers/e-booklet.controller.ts (1156 lines) =====
+1|import { Request, Response, NextFunction } from "express";
+2|import crypto from "crypto";
+3|import { plainToInstance } from "class-transformer";
+4|import { validate } from "class-validator";
+5|import { getEBookletService } from "../services/e-booklet.service";
+6|import { getEBookletDomainServices } from "../services/e-booklet-domain.service";
+7|import {
+8|  AcceptEBookletInviteDto,
+9|  CreateEBookletInviteDto,
+10|  CreateEBookletTemplateDto,
+11|  DeliverEBookletDto,
+12|  EBookletCheckoutDto,
+13|  PublicEBookletCheckoutDto,
+14|  EBookletDeviceAllowanceDto,
+15|  EBookletDeviceBindDto,
+16|  EBookletInviteAccessPathDto,
+17|  UpdateEBookletPurchaseStatusDto,
+18|  UpdateEBookletQuotaDto,
+19|  UpdateEBookletTemplateDto,
+20|  UpsertEBookletHotspotDto,
+21|} from "../dtos/e-booklet.dto";
+22|import { BadRequestError, ValidationError } from "../../../libs/errors";
+23|
+24|function normalizeMultipartEBookletBody(body: any) {
+25|  const next = { ...(body || {}) };
+26|  ["instance_id", "template_id", "template_version_id", "payment_method_id", "purchaseId", "paymentProofFileId"].forEach((key) => {
+27|    if (next[key] !== undefined && next[key] !== null && next[key] !== "") next[key] = Number(next[key]);
+28|  });
+29|  ["terms_accepted", "termsAccepted"].forEach((key) => {
+30|    if (next[key] !== undefined) next[key] = next[key] === true || next[key] === "true" || next[key] === "1";
+31|  });
+32|  return next;
+33|}
+34|
+35|async function validateDto<T extends object>(
+36|  DtoClass: new () => T,
+37|  body: unknown,
+38|): Promise<T> {
+39|  const dto = plainToInstance(DtoClass, body);
+40|  const errors = await validate(dto);
+41|  if (errors.length > 0) {
+42|    throw new ValidationError(
+43|      errors.flatMap((err) => Object.values(err.constraints || {})),
+44|    );
+45|  }
+46|  return dto;
+47|}
+48|
+49|function parseId(raw: string | string[] | undefined, label: string): number {
+50|  const id = Number(Array.isArray(raw) ? raw[0] : raw);
+51|  if (!Number.isInteger(id) || id <= 0) {
+52|    throw new BadRequestError(`Invalid ${label}`);
+53|  }
+54|  return id;
+55|}
+56|
+57|function parseOptionalId(raw: unknown): number | undefined {
+58|  if (raw === undefined || raw === null || raw === "") return undefined;
+59|  const id = Number(Array.isArray(raw) ? raw[0] : raw);
+60|  if (!Number.isInteger(id) || id <= 0) return undefined;
+61|  return id;
+62|}
+63|
+64|function parseParam(raw: string | string[] | undefined, label: string): string {
+65|  const value = Array.isArray(raw) ? raw[0] : raw;
+66|  if (!value) {
+67|    throw new BadRequestError(`Invalid ${label}`);
+68|  }
+69|  return value;
+70|}
+71|
+72|function currentUserId(req: Request): number {
+73|  const userId = (req as any).user?.userId;
+74|  if (!Number.isInteger(userId)) {
+75|    throw new BadRequestError("Authenticated user id is missing");
+76|  }
+77|  return userId;
+78|}
+79|
+80|function optionalNumber(raw: unknown): number | undefined {
+81|  if (raw === undefined || raw === null || raw === "") return undefined;
+82|  const n = Number(raw);
+83|  return Number.isFinite(n) ? n : undefined;
+84|}
+85|
+86|function parseBoolean(raw: unknown): boolean {
+87|  return raw === true || raw === "true" || raw === "1" || raw === 1;
+88|}
+89|
+90|function sanitizeAccessCodeResponse(data: any) {
+91|  if (!data?.record) return data;
+92|  const { code_hash: _codeHash, ...safeRecord } = data.record;
+93|  return { ...data, record: safeRecord };
+94|}
+95|
+96|function domainServices() {
+97|  return getEBookletDomainServices();
+98|}
+99|
+100|function pagination(req: Request) {
+101|  return {
+102|    page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
+103|    limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 20,
+104|  };
+105|}
+106|
+107|const ANALYTICS_SOURCES = new Set(["free_invite", "offline_passcode", "online_purchase", "invite_link", "qr_code", "teacher_share"]);
+108|
+109|function parseOptionalPositiveInt(raw: unknown, label: string, max?: number): number | undefined {
+110|  if (raw === undefined || raw === null || raw === "") return undefined;
+111|  const value = Number(Array.isArray(raw) ? raw[0] : raw);
+112|  if (!Number.isInteger(value) || value <= 0 || (max !== undefined && value > max)) {
+113|    throw new BadRequestError(`Invalid ${label}`);
+114|  }
+115|  return value;
+116|}
+117|
+118|function parseRequiredPositiveInt(raw: unknown, label: string, max?: number): number {
+119|  const value = parseOptionalPositiveInt(raw, label, max);
+120|  if (value === undefined) throw new BadRequestError(`Invalid ${label}`);
+121|  return value;
+122|}
+123|
+124|function parseAccessCodeKind(raw: unknown): "paid" | "free" {
+125|  const value = String(Array.isArray(raw) ? raw[0] : raw || "");
+126|  if (value !== "paid" && value !== "free") throw new BadRequestError("Invalid access code kind");
+127|  return value;
+128|}
+129|
+130|function parseOptionalIsoDate(raw: unknown, label: string): string | undefined {
+131|  if (!raw) return undefined;
+132|  const value = String(Array.isArray(raw) ? raw[0] : raw);
+133|  const parsed = new Date(value);
+134|  if (Number.isNaN(parsed.getTime())) throw new BadRequestError(`Invalid ${label}`);
+135|  return parsed.toISOString();
+136|}
+137|
+138|function parseOptionalFutureIsoDate(raw: unknown, label: string): string | undefined {
+139|  const value = parseOptionalIsoDate(raw, label);
+140|  if (!value) return undefined;
+141|  if (new Date(value).getTime() <= Date.now()) throw new BadRequestError(`${label} must be in the future`);
+142|  return value;
+143|}
+144|
+145|function parseRequiredFiniteMoney(raw: unknown, label: string, allowZero = false): number {
+146|  const value = Number(Array.isArray(raw) ? raw[0] : raw);
+147|  if (!Number.isFinite(value) || (allowZero ? value < 0 : value <= 0)) {
+148|    throw new BadRequestError(`Invalid ${label}`);
+149|  }
+150|  return value;
+151|}
+152|
+153|function parseStrictBoolean(raw: unknown, label: string): boolean {
+154|  if (raw === true || raw === "true" || raw === "1" || raw === 1) return true;
+155|  if (raw === false || raw === "false" || raw === "0" || raw === 0) return false;
+156|  throw new BadRequestError(`Invalid ${label}`);
+157|}
+158|
+159|function analyticsFilters(req: Request) {
+160|  const startDate = parseOptionalIsoDate(req.query.start_date, "start_date");
+161|  const endDate = parseOptionalIsoDate(req.query.end_date, "end_date");
+162|  if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+163|    throw new BadRequestError("start_date must be before end_date");
+164|  }
+165|  const source = req.query.source ? String(Array.isArray(req.query.source) ? req.query.source[0] : req.query.source) : undefined;
+166|  if (source && !ANALYTICS_SOURCES.has(source)) throw new BadRequestError("Invalid analytics source");
+167|  return {
+168|    teacherId: parseOptionalPositiveInt(req.query.teacher_id, "teacher_id"),
+169|    instanceId: parseOptionalPositiveInt(req.query.instance_id, "instance_id"),
+170|    studentId: parseOptionalPositiveInt(req.query.student_id, "student_id"),
+171|    startDate,
+172|    endDate,
+173|    source,
+174|    limit: parseOptionalPositiveInt(req.query.limit, "limit", 10000),
+175|  };
+176|}
+177|
+178|function inviteAnonymousSessionId(req: Request, res: Response): string {
+179|  const cookieValue = String((req as any).cookies?.e_booklet_anon_session || "");
+180|  const supplied = String(req.get("x-e-booklet-session") || req.query.session_id || cookieValue || "");
+181|  const sessionId = /^[A-Za-z0-9._:-]{4,128}$/.test(supplied) ? supplied : crypto.randomUUID();
+182|  res.cookie("e_booklet_anon_session", sessionId, { httpOnly: true, sameSite: "lax", maxAge: 180 * 24 * 60 * 60 * 1000 });
+183|  return sessionId;
+184|}
+185|
+186|function setPrivateNoStore(res: Response) {
+187|  res.set("Cache-Control", "private, no-store");
+188|  res.set("Pragma", "no-cache");
+189|  res.set("Expires", "0");
+190|}
+191|
+192|export const eBookletController = {
+193|  async uploadFileAsset(req: Request, res: Response, next: NextFunction) {
+194|    try {
+195|      const data = await getEBookletService().createFileAsset(
+196|        (req as any).file,
+197|        {
+198|          ownerType:
+199|            typeof req.body?.owner_type === "string"
+200|              ? req.body.owner_type
+201|              : "admin",
+202|          ownerId: parseOptionalId(req.body?.owner_id),
+203|          fileType:
+204|            typeof req.body?.file_type === "string" ? req.body.file_type : undefined,
+205|        },
+206|      );
+207|      res.status(201).json({ success: true, data });
+208|    } catch (error) {
+209|      next(error);
+210|    }
+211|  },
+212|
+213|  async previewAdminFileAsset(req: Request, res: Response, next: NextFunction) {
+214|    try {
+215|      const { asset, absolutePath } =
+216|        await getEBookletService().getPrivateFileAssetForAdmin(
+217|          parseId(req.params.assetId, "file asset ID"),
+218|        );
+219|      setPrivateNoStore(res);
+220|      res.type(asset.mime_type || "application/octet-stream");
+221|      res.set(
+222|        "Content-Disposition",
+223|        `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
+224|      );
+225|      res.sendFile(absolutePath);
+226|    } catch (error) {
+227|      next(error);
+228|    }
+229|  },
+230|
+231|  async listStoreTemplates(req: Request, res: Response, next: NextFunction) {
+232|    try {
+233|      const result = await getEBookletService().listPublicInstances({
+234|        search: req.query.search as string | undefined,
+235|        categoryId: req.query.category_id
+236|          ? parseInt(req.query.category_id as string, 10)
+237|          : undefined,
+238|        ...pagination(req),
+239|      });
+240|      res.status(200).json({ success: true, ...result });
+241|    } catch (error) {
+242|      next(error);
+243|    }
+244|  },
+245|
+246|  async getStoreTemplate(req: Request, res: Response, next: NextFunction) {
+247|    try {
+248|      const data = await getEBookletService().getPublicInstance(
+249|        parseId(req.params.instanceId, "instance ID"),
+250|      );
+251|      res.status(200).json({ success: true, data });
+252|    } catch (error) {
+253|      next(error);
+254|    }
+255|  },
+256|
+257|  async createPublicCheckout(req: Request, res: Response, next: NextFunction) {
+258|    try {
+259|      const dto = await validateDto(PublicEBookletCheckoutDto, normalizeMultipartEBookletBody(req.body));
+260|      const data = await getEBookletService().createPublicCheckoutRequest(
+261|        currentUserId(req),
+262|        dto,
+263|        (req as any).file,
+264|      );
+265|      res.status(201).json({ success: true, data });
+266|    } catch (error) {
+267|      next(error);
+268|    }
+269|  },
+270|
+271|  async createPurchaseDeal(req: Request, res: Response, next: NextFunction) {
+272|    try {
+273|      const dto = await validateDto(EBookletCheckoutDto, req.body);
+274|      if (!dto.teacher_id) {
+275|        throw new BadRequestError("Teacher ID is required for e-booklet deal creation.");
+276|      }
+277|      const data = await getEBookletService().createPurchaseRequest(
+278|        dto.teacher_id,
+279|        dto,
+280|        currentUserId(req),
+281|      );
+282|      res.status(201).json({ success: true, data });
+283|    } catch (error) {
+284|      next(error);
+285|    }
+286|  },
+287|
+288|  async listAdminTemplates(req: Request, res: Response, next: NextFunction) {
+289|    try {
+290|      const result = await getEBookletService().listAdminTemplates({
+291|        search: req.query.search as string | undefined,
+292|        status: req.query.status as string | undefined,
+293|        ...pagination(req),
+294|      });
+295|      res.status(200).json({ success: true, ...result });
+296|    } catch (error) {
+297|      next(error);
+298|    }
+299|  },
+300|
+301|  async createTemplate(req: Request, res: Response, next: NextFunction) {
+302|    try {
+303|      const dto = await validateDto(CreateEBookletTemplateDto, req.body);
+304|      const data = await getEBookletService().createTemplate(
+305|        dto,
+306|        currentUserId(req),
+307|      );
+308|      res.status(201).json({ success: true, data });
+309|    } catch (error) {
+310|      next(error);
+311|    }
+312|  },
+313|
+314|  async getAdminTemplate(req: Request, res: Response, next: NextFunction) {
+315|    try {
+316|      const data = await getEBookletService().getTemplateById(
+317|        parseId(req.params.id, "template ID"),
+318|      );
+319|      res.status(200).json({ success: true, data });
+320|    } catch (error) {
+321|      next(error);
+322|    }
+323|  },
+324|
+325|  async updateTemplate(req: Request, res: Response, next: NextFunction) {
+326|    try {
+327|      const dto = await validateDto(UpdateEBookletTemplateDto, req.body);
+328|      const data = await getEBookletService().updateTemplate(
+329|        parseId(req.params.id, "template ID"),
+330|        dto,
+331|      );
+332|      res.status(200).json({ success: true, data });
+333|    } catch (error) {
+334|      next(error);
+335|    }
+336|  },
+337|
+338|  async listTemplateVersions(req: Request, res: Response, next: NextFunction) {
+339|    try {
+340|      const data = await getEBookletService().listTemplateVersions(
+341|        parseId(req.params.id, "template ID"),
+342|      );
+343|      res.status(200).json({ success: true, data });
+344|    } catch (error) {
+345|      next(error);
+346|    }
+347|  },
+348|
+349|  async createVersion(req: Request, res: Response, next: NextFunction) {
+350|    try {
+351|      const data = await getEBookletService().createTemplateVersion(
+352|        parseId(req.params.id, "template ID"),
+353|        req.body,
+354|        currentUserId(req),
+355|      );
+356|      res.status(201).json({ success: true, data });
+357|    } catch (error) {
+358|      next(error);
+359|    }
+360|  },
+361|
+362|  async updateVersion(req: Request, res: Response, next: NextFunction) {
+363|    try {
+364|      const data = await getEBookletService().updateTemplateVersion(
+365|        parseId(req.params.versionId, "template version ID"),
+366|        req.body,
+367|      );
+368|      res.status(200).json({ success: true, data });
+369|    } catch (error) {
+370|      next(error);
+371|    }
+372|  },
+373|
+374|  async publishVersion(req: Request, res: Response, next: NextFunction) {
+375|    try {
+376|      const data = await getEBookletService().publishTemplateVersion(
+377|        parseId(req.params.versionId, "template version ID"),
+378|      );
+379|      res.status(200).json({ success: true, data });
+380|    } catch (error) {
+381|      next(error);
+382|    }
+383|  },
+384|
+385|  async listVersionHotspots(req: Request, res: Response, next: NextFunction) {
+386|    try {
+387|      const pageNumber = req.query.page_number
+388|        ? parseInt(req.query.page_number as string, 10)
+389|        : undefined;
+390|      const data = await getEBookletService().listVersionHotspots(
+391|        parseId(req.params.versionId, "template version ID"),
+392|        pageNumber,
+393|      );
+394|      res.status(200).json({ success: true, data });
+395|    } catch (error) {
+396|      next(error);
+397|    }
+398|  },
+399|
+400|  async createHotspot(req: Request, res: Response, next: NextFunction) {
+401|    try {
+402|      const dto = await validateDto(UpsertEBookletHotspotDto, req.body);
+403|      const data = await getEBookletService().createHotspot(
+404|        dto,
+405|        currentUserId(req),
+406|      );
+407|      res.status(201).json({ success: true, data });
+408|    } catch (error) {
+409|      next(error);
+410|    }
+411|  },
+412|
+413|  async updateHotspot(req: Request, res: Response, next: NextFunction) {
+414|    try {
+415|      const data = await getEBookletService().updateHotspot(
+416|        parseId(req.params.hotspotId, "hotspot ID"),
+417|        req.body,
+418|        currentUserId(req),
+419|      );
+420|      res.status(200).json({ success: true, data });
+421|    } catch (error) {
+422|      next(error);
+423|    }
+424|  },
+425|
+426|  async deleteHotspot(req: Request, res: Response, next: NextFunction) {
+427|    try {
+428|      const data = await getEBookletService().deleteHotspot(
+429|        parseId(req.params.hotspotId, "hotspot ID"),
+430|        currentUserId(req),
+431|      );
+432|      res.status(200).json({ success: true, data });
+433|    } catch (error) {
+434|      next(error);
+435|    }
+436|  },
+437|
+438|  async listPurchases(req: Request, res: Response, next: NextFunction) {
+439|    try {
+440|      const result = await getEBookletService().listPurchases({
+441|        status: req.query.status as string | undefined,
+442|        ...pagination(req),
+443|      });
+444|      res.status(200).json({ success: true, ...result });
+445|    } catch (error) {
+446|      next(error);
+447|    }
+448|  },
+449|
+450|  async getPurchase(req: Request, res: Response, next: NextFunction) {
+451|    try {
+452|      const data = await getEBookletService().getPurchase(
+453|        parseId(req.params.id, "purchase ID"),
+454|      );
+455|      res.status(200).json({ success: true, data });
+456|    } catch (error) {
+457|      next(error);
+458|    }
+459|  },
+460|
+461|  async updatePurchaseStatus(req: Request, res: Response, next: NextFunction) {
+462|    try {
+463|      const dto = await validateDto(UpdateEBookletPurchaseStatusDto, req.body);
+464|      const data = await getEBookletService().updatePurchaseStatus(
+465|        parseId(req.params.id, "purchase ID"),
+466|        dto.status,
+467|        dto.admin_notes,
+468|      );
+469|      res.status(200).json({ success: true, data });
+470|    } catch (error) {
+471|      next(error);
+472|    }
+473|  },
+474|
+475|  async markPurchasePaid(req: Request, res: Response, next: NextFunction) {
+476|    try {
+477|      const data = await getEBookletService().updatePurchaseStatus(
+478|        parseId(req.params.id, "purchase ID"),
+479|        "paid",
+480|        req.body?.admin_notes,
+481|      );
+482|      res.status(200).json({ success: true, data });
+483|    } catch (error) {
+484|      next(error);
+485|    }
+486|  },
+487|
+488|  async deliverPurchase(req: Request, res: Response, next: NextFunction) {
+489|    try {
+490|      const dto = await validateDto(DeliverEBookletDto, req.body);
+491|      const data = await getEBookletService().deliverPurchase(
+492|        parseId(req.params.id, "purchase ID"),
+493|        dto,
+494|        currentUserId(req),
+495|      );
+496|      res.status(201).json({ success: true, data });
+497|    } catch (error) {
+498|      next(error);
+499|    }
+500|  },
+501|
+502|  async listInstances(req: Request, res: Response, next: NextFunction) {
+503|    try {
+504|      const result = await getEBookletService().listInstances({
+505|        teacherId: req.query.teacher_id
+506|          ? parseInt(req.query.teacher_id as string, 10)
+507|          : undefined,
+508|        status: req.query.status as string | undefined,
+509|        ...pagination(req),
+510|      });
+511|      res.status(200).json({ success: true, ...result });
+512|    } catch (error) {
+513|      next(error);
+514|    }
+515|  },
+516|
+517|  async updateQuota(req: Request, res: Response, next: NextFunction) {
+518|    try {
+519|      const dto = await validateDto(UpdateEBookletQuotaDto, req.body);
+520|      const data = await getEBookletService().updateQuota(
+521|        parseId(req.params.id, "instance ID"),
+522|        dto.invite_quota,
+523|      );
+524|      res.status(200).json({ success: true, data });
+525|    } catch (error) {
+526|      next(error);
+527|    }
+528|  },
+529|
+530|  async revokeTeacherAccess(req: Request, res: Response, next: NextFunction) {
+531|    try {
+532|      await getEBookletService().revokeTeacherAccess(
+533|        parseId(req.params.id, "instance ID"),
+534|        currentUserId(req),
+535|      );
+536|      res.status(200).json({ success: true });
+537|    } catch (error) {
+538|      next(error);
+539|    }
+540|  },
+541|
+542|  async listTeacherEBooklets(req: Request, res: Response, next: NextFunction) {
+543|    try {
+544|      const data = await getEBookletService().listUserEBooklets(
+545|        currentUserId(req),
+546|        "teacher",
+547|      );
+548|      res.status(200).json({ success: true, data });
+549|    } catch (error) {
+550|      next(error);
+551|    }
+552|  },
+553|
+554|  async listStudentEBooklets(req: Request, res: Response, next: NextFunction) {
+555|    try {
+556|      const data = await getEBookletService().listUserEBooklets(
+557|        currentUserId(req),
+558|        "student",
+559|      );
+560|      res.status(200).json({ success: true, data });
+561|    } catch (error) {
+562|      next(error);
+563|    }
+564|  },
+565|
+566|  async listInvites(req: Request, res: Response, next: NextFunction) {
+567|    try {
+568|      const data = await getEBookletService().listInvites(
+569|        parseId(req.params.instanceId, "instance ID"),
+570|        currentUserId(req),
+571|      );
+572|      res.status(200).json({ success: true, data });
+573|    } catch (error) {
+574|      next(error);
+575|    }
+576|  },
+577|
+578|  async createInvite(req: Request, res: Response, next: NextFunction) {
+579|    try {
+580|      const dto = await validateDto(CreateEBookletInviteDto, req.body);
+581|      const data = await getEBookletService().createInvite(
+582|        parseId(req.params.instanceId, "instance ID"),
+583|        currentUserId(req),
+584|        dto,
+585|      );
+586|      res.status(201).json({ success: true, data });
+587|    } catch (error) {
+588|      next(error);
+589|    }
+590|  },
+591|
+592|  async disableInvite(req: Request, res: Response, next: NextFunction) {
+593|    try {
+594|      const data = await getEBookletService().disableInvite(
+595|        parseId(req.params.inviteId, "invite ID"),
+596|        currentUserId(req),
+597|      );
+598|      res.status(200).json({ success: true, data });
+599|    } catch (error) {
+600|      next(error);
+601|    }
+602|  },
+603|
+604|  async listInstanceStudents(req: Request, res: Response, next: NextFunction) {
+605|    try {
+606|      const data = await getEBookletService().listInstanceStudents(
+607|        parseId(req.params.instanceId, "instance ID"),
+608|        req.path.startsWith("/admin/") ? undefined : currentUserId(req),
+609|      );
+610|      res.status(200).json({ success: true, data });
+611|    } catch (error) {
+612|      next(error);
+613|    }
+614|  },
+615|
+616|  async revokeStudentAccess(req: Request, res: Response, next: NextFunction) {
+617|    try {
+618|      const data = await getEBookletService().revokeStudentAccess(
+619|        parseId(req.params.instanceId, "instance ID"),
+620|        parseId(req.params.studentId, "student ID"),
+621|        currentUserId(req),
+622|      );
+623|      res.status(200).json({ success: true, data });
+624|    } catch (error) {
+625|      next(error);
+626|    }
+627|  },
+628|
+629|  async recordInviteOpen(req: Request, res: Response, next: NextFunction) {
+630|    try {
+631|      const data = await getEBookletService().recordInviteOpen(
+632|        parseParam(req.params.token, "invite token"),
+633|        {
+634|          anonymousSessionId: inviteAnonymousSessionId(req, res),
+635|          source: req.query.source as string | undefined,
+636|          ipAddress: req.ip,
+637|          userAgent: req.get("user-agent"),
+638|        },
+639|      );
+640|      res.status(200).json({ success: true, data });
+641|    } catch (error) {
+642|      next(error);
+643|    }
+644|  },
+645|
+646|  async teacherAnalytics(req: Request, res: Response, next: NextFunction) {
+647|    try {
+648|      const { teacherId: _ignored, studentId: _studentId, source: _source, ...filters } = analyticsFilters(req);
+649|      const data = await getEBookletService().getTeacherAnalytics(currentUserId(req), filters);
+650|      res.status(200).json({ success: true, data });
+651|    } catch (error) {
+652|      next(error);
+653|    }
+654|  },
+655|
+656|  async adminAnalytics(req: Request, res: Response, next: NextFunction) {
+657|    try {
+658|      const data = await getEBookletService().getAdminAnalytics(analyticsFilters(req));
+659|      res.status(200).json({ success: true, data });
+660|    } catch (error) {
+661|      next(error);
+662|    }
+663|  },
+664|
+665|  async exportAdminAnalyticsCsv(req: Request, res: Response, next: NextFunction) {
+666|    try {
+667|      const csv = await getEBookletService().exportAdminAnalyticsCsv(analyticsFilters(req));
+668|      res.type("text/csv");
+669|      res.set("Content-Disposition", "attachment; filename=\"e-booklet-analytics.csv\"");
+670|      res.status(200).send(csv);
+671|    } catch (error) {
+672|      next(error);
+673|    }
+674|  },
+675|
+676|  async getCurrentTerms(req: Request, res: Response, next: NextFunction) {
+677|    try {
+678|      const data = await domainServices().terms.getLatestActiveTerms(optionalNumber(req.query.template_id));
+679|      res.status(200).json({ success: true, data });
+680|    } catch (error) {
+681|      next(error);
+682|    }
+683|  },
+684|
+685|  async acceptCodeGenerationTerms(req: Request, res: Response, next: NextFunction) {
+686|    try {
+687|      const data = await domainServices().terms.acceptLatestTerms(currentUserId(req), "code_generation", {
+688|        ipAddress: req.ip,
+689|        userAgent: req.get("user-agent"),
+690|      }, optionalNumber(req.body?.templateId ?? req.body?.template_id));
+691|      res.status(200).json({ success: true, data });
+692|    } catch (error) {
+693|      next(error);
+694|    }
+695|  },
+696|
+697|  async createTerms(req: Request, res: Response, next: NextFunction) {
+698|    try {
+699|      const data = await domainServices().terms.createTerms(req.body, currentUserId(req));
+700|      res.status(201).json({ success: true, data });
+701|    } catch (error) {
+702|      next(error);
+703|    }
+704|  },
+705|
+706|  async listTerms(req: Request, res: Response, next: NextFunction) {
+707|    try {
+708|      const templateId = req.query.template_id === "null" ? null : optionalNumber(req.query.template_id);
+709|      const data = await domainServices().terms.listTerms({
+710|        templateId,
+711|        status: typeof req.query.status === "string" ? req.query.status : undefined,
+712|      });
+713|      res.status(200).json({ success: true, data });
+714|    } catch (error) {
+715|      next(error);
+716|    }
+717|  },
+718|
+719|  async updateTerms(req: Request, res: Response, next: NextFunction) {
+720|    try {
+721|      const data = await domainServices().terms.updateTerms(parseId(req.params.termId, "term ID"), req.body);
+722|      res.status(200).json({ success: true, data });
+723|    } catch (error) {
+724|      next(error);
+725|    }
+726|  },
+727|
+728|  async activateTerms(req: Request, res: Response, next: NextFunction) {
+729|    try {
+730|      const data = await domainServices().terms.activateTerms(parseId(req.params.termId, "term ID"), currentUserId(req));
+731|      res.status(200).json({ success: true, data });
+732|    } catch (error) {
+733|      next(error);
+734|    }
+735|  },
+736|
+737|  async generateAccessCode(req: Request, res: Response, next: NextFunction) {
+738|    try {
+739|      const data = await domainServices().accessCodes.generateCode({
+740|        bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
+741|        teacherId: currentUserId(req),
+742|        kind: parseAccessCodeKind(req.body?.kind),
+743|        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+744|        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+745|        maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
+746|      });
+747|      res.status(201).json({ success: true, data: sanitizeAccessCodeResponse(data) });
+748|    } catch (error) {
+749|      next(error);
+750|    }
+751|  },
+752|
+753|  async adminGenerateFreeCode(req: Request, res: Response, next: NextFunction) {
+754|    try {
+755|      const data = await domainServices().accessCodes.generateCode({
+756|        bookletInstanceId: parseRequiredPositiveInt(req.body?.bookletInstanceId ?? req.body?.booklet_instance_id, "instance ID"),
+757|        teacherId: parseRequiredPositiveInt(req.body?.teacherId ?? req.body?.teacher_id, "teacher ID"),
+758|        kind: "free",
+759|        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+760|        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+761|        maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
+762|        adminActorId: currentUserId(req),
+763|        ipAddress: req.ip,
+764|        userAgent: req.get("user-agent") ?? null,
+765|      });
+766|      res.status(201).json({ success: true, data: sanitizeAccessCodeResponse(data) });
+767|    } catch (error) {
+768|      next(error);
+769|    }
+770|  },
+771|
+772|  async redeemAccessCode(req: Request, res: Response, next: NextFunction) {
+773|    try {
+774|      const code = String(req.body?.code || "").trim();
+775|      if (!code) throw new BadRequestError("E-booklet access code is required.");
+776|      const data = await domainServices().redemptions.redeemCode(code, currentUserId(req), {
+777|        termsAccepted: parseStrictBoolean(req.body?.termsAccepted ?? req.body?.terms_accepted, "terms acceptance"),
+778|        ipAddress: req.ip,
+779|        userAgent: req.get("user-agent"),
+780|        purchaseId: req.body?.purchaseId ?? req.body?.purchase_id,
+781|      });
+782|      res.status(200).json({ success: true, data });
+783|    } catch (error) {
+784|      next(error);
+785|    }
+786|  },
+787|
+788|  async listMilestones(req: Request, res: Response, next: NextFunction) {
+789|    try {
+790|      const isAdminRoute = req.path.startsWith("/admin/");
+791|      const data = await domainServices().milestones.listMilestones(
+792|        optionalNumber(req.query.term_id),
+793|        isAdminRoute ? undefined : currentUserId(req),
+794|        isAdminRoute,
+795|      );
+796|      res.status(200).json({ success: true, data });
+797|    } catch (error) {
+798|      next(error);
+799|    }
+800|  },
+801|
+802|  async createMilestone(req: Request, res: Response, next: NextFunction) {
+803|    try {
+804|      const data = await domainServices().milestones.createMilestone(req.body, currentUserId(req));
+805|      res.status(201).json({ success: true, data });
+806|    } catch (error) {
+807|      next(error);
+808|    }
+809|  },
+810|
+811|  async updateMilestone(req: Request, res: Response, next: NextFunction) {
+812|    try {
+813|      const data = await domainServices().milestones.updateMilestone(parseId(req.params.milestoneId, "milestone ID"), req.body);
+814|      res.status(200).json({ success: true, data });
+815|    } catch (error) {
+816|      next(error);
+817|    }
+818|  },
+819|
+820|  async deleteMilestone(req: Request, res: Response, next: NextFunction) {
+821|    try {
+822|      const data = await domainServices().milestones.deleteMilestone(parseId(req.params.milestoneId, "milestone ID"));
+823|      res.status(200).json({ success: true, data });
+824|    } catch (error) {
+825|      next(error);
+826|    }
+827|  },
+828|
+829|  async reorderMilestones(req: Request, res: Response, next: NextFunction) {
+830|    try {
+831|      const data = await domainServices().milestones.reorderMilestones(parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"), req.body?.items ?? []);
+832|      res.status(200).json({ success: true, data });
+833|    } catch (error) {
+834|      next(error);
+835|    }
+836|  },
+837|
+838|  async listAdminProgress(req: Request, res: Response, next: NextFunction) {
+839|    try {
+840|      const data = await domainServices().milestones.listProgress(optionalNumber(req.query.term_id));
+841|      res.status(200).json({ success: true, data });
+842|    } catch (error) {
+843|      next(error);
+844|    }
+845|  },
+846|
+847|  async evaluateMilestones(req: Request, res: Response, next: NextFunction) {
+848|    try {
+849|      const data = await domainServices().milestones.evaluateTeacherMilestones(currentUserId(req), optionalNumber(req.body?.termId ?? req.body?.term_id));
+850|      res.status(200).json({ success: true, data });
+851|    } catch (error) {
+852|      next(error);
+853|    }
+854|  },
+855|
+856|  async getTeacherWallet(req: Request, res: Response, next: NextFunction) {
+857|    try {
+858|      const [wallet, ledger] = await Promise.all([
+859|        domainServices().wallet.getWallet(currentUserId(req)),
+860|        domainServices().wallet.listLedger(currentUserId(req)),
+861|      ]);
+862|      res.status(200).json({ success: true, data: { wallet, ledger } });
+863|    } catch (error) {
+864|      next(error);
+865|    }
+866|  },
+867|
+868|  async previewTeacherWallet(req: Request, res: Response, next: NextFunction) {
+869|    try {
+870|      const data = await domainServices().wallet.previewPurchase({
+871|        teacherId: currentUserId(req),
+872|        purchaseTotal: parseRequiredFiniteMoney(req.body?.purchaseTotal ?? req.body?.purchase_total, "purchase total", true),
+873|        requestedAmount: parseRequiredFiniteMoney(req.body?.requestedAmount ?? req.body?.requested_amount, "wallet credit amount"),
+874|        couponApplied: parseBoolean(req.body?.couponApplied ?? req.body?.coupon_applied),
+875|      });
+876|      res.status(200).json({ success: true, data });
+877|    } catch (error) {
+878|      next(error);
+879|    }
+880|  },
+881|
+882|  async claimMilestoneReward(req: Request, res: Response, next: NextFunction) {
+883|    try {
+884|      const termsAccepted = parseBoolean(req.body?.termsAccepted ?? req.body?.terms_accepted);
+885|      if (!termsAccepted) throw new BadRequestError("Reward claim terms must be accepted.");
+886|      const data = await domainServices().milestones.claimReward(currentUserId(req), parseId(req.params.achievementId, "achievement ID"), {
+887|        ipAddress: req.ip,
+888|        userAgent: req.get("user-agent"),
+889|        termsAccepted,
+890|      });
+891|      res.status(200).json({ success: true, data });
+892|    } catch (error) {
+893|      next(error);
+894|    }
+895|  },
+896|
+897|  async applyTeacherWallet(req: Request, res: Response, next: NextFunction) {
+898|    try {
+899|      const data = await domainServices().wallet.applyToPurchase({
+900|        teacherId: currentUserId(req),
+901|        purchaseId: parseRequiredPositiveInt(req.body?.purchaseId ?? req.body?.purchase_id, "purchase ID"),
+902|        purchaseTotal: parseRequiredFiniteMoney(req.body?.purchaseTotal ?? req.body?.purchase_total, "purchase total", true),
+903|        requestedAmount: parseRequiredFiniteMoney(req.body?.requestedAmount ?? req.body?.requested_amount, "wallet credit amount"),
+904|        couponApplied: parseBoolean(req.body?.couponApplied ?? req.body?.coupon_applied),
+905|      });
+906|      res.status(200).json({ success: true, data });
+907|    } catch (error) {
+908|      next(error);
+909|    }
+910|  },
+911|
+912|  async acceptInvite(req: Request, res: Response, next: NextFunction) {
+913|    try {
+914|      const inviteToken = parseParam(req.params.token, "invite token");
+915|      const dto = await validateDto(AcceptEBookletInviteDto, {
+916|        ...normalizeMultipartEBookletBody(req.body),
+917|        token: inviteToken,
+918|      });
+919|      const service = getEBookletService();
+920|      const userId = currentUserId(req);
+921|      let data;
+922|      if (dto.accessPath === EBookletInviteAccessPathDto.free) {
+923|        data = await service.acceptFreeInvite(inviteToken, userId, dto);
+924|      } else if (dto.accessPath === EBookletInviteAccessPathDto.offline_passcode) {
+925|        data = await service.acceptInvitePasscode(inviteToken, userId, dto, {
+926|          ipAddress: req.ip,
+927|          userAgent: req.get("user-agent"),
+928|          deviceFingerprint: req.get("x-e-booklet-device") || req.body?.deviceFingerprint,
+929|        });
+930|      } else if (dto.accessPath === EBookletInviteAccessPathDto.online_purchase) {
+931|        data = await service.createStudentPurchaseLink(inviteToken, userId, dto, (req as any).file);
+932|      } else {
+933|        throw new BadRequestError("Invite accessPath is required.");
+934|      }
+935|      res.status(200).json({ success: true, data });
+936|    } catch (error) {
+937|      next(error);
+938|    }
+939|  },
+940|
+941|  async getViewerMetadata(req: Request, res: Response, next: NextFunction) {
+942|    try {
+943|      const data = await getEBookletService().getViewerMetadata(
+944|        parseId(req.params.instanceId, "instance ID"),
+945|        currentUserId(req),
+946|      );
+947|      setPrivateNoStore(res);
+948|      res.status(200).json({ success: true, data });
+949|    } catch (error) {
+950|      next(error);
+951|    }
+952|  },
+953|
+954|  async getAdminViewerMetadata(req: Request, res: Response, next: NextFunction) {
+955|    try {
+956|      const data = await getEBookletService().getAdminViewerMetadata(
+957|        parseId(req.params.instanceId, "instance ID"),
+958|        currentUserId(req),
+959|      );
+960|      setPrivateNoStore(res);
+961|      res.status(200).json({ success: true, data });
+962|    } catch (error) {
+963|      next(error);
+964|    }
+965|  },
+966|
+967|  async bindViewerDevice(req: Request, res: Response, next: NextFunction) {
+968|    try {
+969|      const dto = await validateDto(EBookletDeviceBindDto, req.body);
+970|      const data = await getEBookletService().bindViewerDevice(
+971|        parseId(req.params.instanceId, "instance ID"),
+972|        currentUserId(req),
+973|        {
+974|          deviceFingerprint: dto.deviceFingerprint,
+975|          deviceLabel: dto.deviceLabel,
+976|          userAgent: req.get("user-agent"),
+977|          ipAddress: req.ip,
+978|        },
+979|      );
+980|      res.status(200).json({ success: true, data });
+981|    } catch (error) {
+982|      next(error);
+983|    }
+984|  },
+985|
+986|  async listViewerDevices(req: Request, res: Response, next: NextFunction) {
+987|    try {
+988|      const data = await getEBookletService().listViewerDevices(
+989|        parseId(req.params.instanceId, "instance ID"),
+990|        parseId(req.params.userId, "user ID"),
+991|      );
+992|      res.status(200).json({ success: true, data });
+993|    } catch (error) {
+994|      next(error);
+995|    }
+996|  },
+997|
+998|  async resetViewerDevices(req: Request, res: Response, next: NextFunction) {
+999|    try {
+1000|      const data = await getEBookletService().resetViewerDevices(
+1001|        parseId(req.params.instanceId, "instance ID"),
+1002|        parseId(req.params.userId, "user ID"),
+1003|        currentUserId(req),
+1004|        req.body?.reason,
+1005|      );
+1006|      res.status(200).json({ success: true, data });
+1007|    } catch (error) {
+1008|      next(error);
+1009|    }
+1010|  },
+1011|
+1012|  async addDeviceAllowance(req: Request, res: Response, next: NextFunction) {
+1013|    try {
+1014|      const dto = await validateDto(EBookletDeviceAllowanceDto, req.body);
+1015|      const data = await getEBookletService().addDeviceAllowance(
+1016|        parseId(req.params.instanceId, "instance ID"),
+1017|        parseId(req.params.userId, "user ID"),
+1018|        currentUserId(req),
+1019|        dto.allowedDevices,
+1020|        dto.reason,
+1021|      );
+1022|      res.status(200).json({ success: true, data });
+1023|    } catch (error) {
+1024|      next(error);
+1025|    }
+1026|  },
+1027|
+1028|  async approveStudentPurchaseLink(req: Request, res: Response, next: NextFunction) {
+1029|    try {
+1030|      const data = await getEBookletService().approveStudentPurchaseLink(
+1031|        parseId(req.params.purchaseId, "purchase ID"),
+1032|        currentUserId(req),
+1033|      );
+1034|      res.status(200).json({ success: true, data });
+1035|    } catch (error) {
+1036|      next(error);
+1037|    }
+1038|  },
+1039|
+1040|  async getViewerPage(req: Request, res: Response, next: NextFunction) {
+1041|    try {
+1042|      const data = await getEBookletService().getViewerPage(
+1043|        parseId(req.params.instanceId, "instance ID"),
+1044|        parseId(req.params.pageNumber, "page number"),
+1045|        currentUserId(req),
+1046|      );
+1047|      setPrivateNoStore(res);
+1048|      res.status(200).json({ success: true, data });
+1049|    } catch (error) {
+1050|      next(error);
+1051|    }
+1052|  },
+1053|
+1054|  async getAdminViewerPage(req: Request, res: Response, next: NextFunction) {
+1055|    try {
+1056|      const data = await getEBookletService().getAdminViewerPage(
+1057|        parseId(req.params.instanceId, "instance ID"),
+1058|        parseId(req.params.pageNumber, "page number"),
+1059|        currentUserId(req),
+1060|      );
+1061|      setPrivateNoStore(res);
+1062|      res.status(200).json({ success: true, data });
+1063|    } catch (error) {
+1064|      next(error);
+1065|    }
+1066|  },
+1067|
+1068|  async getViewerPageHotspots(req: Request, res: Response, next: NextFunction) {
+1069|    try {
+1070|      const data = await getEBookletService().getViewerPageHotspots(
+1071|        parseId(req.params.instanceId, "instance ID"),
+1072|        parseId(req.params.pageNumber, "page number"),
+1073|        currentUserId(req),
+1074|      );
+1075|      setPrivateNoStore(res);
+1076|      res.status(200).json({ success: true, data });
+1077|    } catch (error) {
+1078|      next(error);
+1079|    }
+1080|  },
+1081|
+1082|  async getAdminViewerPageHotspots(req: Request, res: Response, next: NextFunction) {
+1083|    try {
+1084|      const data = await getEBookletService().getAdminViewerPageHotspots(
+1085|        parseId(req.params.instanceId, "instance ID"),
+1086|        parseId(req.params.pageNumber, "page number"),
+1087|      );
+1088|      setPrivateNoStore(res);
+1089|      res.status(200).json({ success: true, data });
+1090|    } catch (error) {
+1091|      next(error);
+1092|    }
+1093|  },
+1094|
+1095|  async getHotspotContent(req: Request, res: Response, next: NextFunction) {
+1096|    try {
+1097|      const data = await getEBookletService().getHotspotContent(
+1098|        parseId(req.params.hotspotId, "hotspot ID"),
+1099|        currentUserId(req),
+1100|      );
+1101|      setPrivateNoStore(res);
+1102|      res.status(200).json({ success: true, data });
+1103|    } catch (error) {
+1104|      next(error);
+1105|    }
+1106|  },
+1107|
+1108|  async getAdminHotspotContent(req: Request, res: Response, next: NextFunction) {
+1109|    try {
+1110|      const data = await getEBookletService().getAdminHotspotContent(
+1111|        parseId(req.params.hotspotId, "hotspot ID"),
+1112|      );
+1113|      setPrivateNoStore(res);
+1114|      res.status(200).json({ success: true, data });
+1115|    } catch (error) {
+1116|      next(error);
+1117|    }
+1118|  },
+1119|
+1120|  async getAuthorizedHotspotAsset(req: Request, res: Response, next: NextFunction) {
+1121|    try {
+1122|      const { asset, absolutePath } = await getEBookletService().getAuthorizedHotspotAsset(
+1123|        parseId(req.params.hotspotId, "hotspot ID"),
+1124|        parseId(req.params.assetId, "asset ID"),
+1125|        currentUserId(req),
+1126|      );
+1127|      setPrivateNoStore(res);
+1128|      res.type(asset.mime_type || "application/octet-stream");
+1129|      res.set(
+1130|        "Content-Disposition",
+1131|        `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
+1132|      );
+1133|      res.sendFile(absolutePath);
+1134|    } catch (error) {
+1135|      next(error);
+1136|    }
+1137|  },
+1138|
+1139|  async getAdminAuthorizedHotspotAsset(req: Request, res: Response, next: NextFunction) {
+1140|    try {
+1141|      const { asset, absolutePath } = await getEBookletService().getAdminAuthorizedHotspotAsset(
+1142|        parseId(req.params.hotspotId, "hotspot ID"),
+1143|        parseId(req.params.assetId, "asset ID"),
+1144|      );
+1145|      setPrivateNoStore(res);
+1146|      res.type(asset.mime_type || "application/octet-stream");
+1147|      res.set(
+1148|        "Content-Disposition",
+1149|        `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
+1150|      );
+1151|      res.sendFile(absolutePath);
+1152|    } catch (error) {
+1153|      next(error);
+1154|    }
+1155|  },
+1156|};
+
+===== FILE: kalima-platform/backend/src/apps/store-api/emails/email.service.ts (399 lines) =====
+1|import nodemailer from 'nodemailer';
+2|import path from 'path';
+3|import fs from 'fs';
+4|import type { Transporter } from 'nodemailer';
+5|import {
+6|  getVerificationEmailHtml,
+7|  getVerificationEmailText,
+8|  getVerificationEmailSubject,
+9|  VerificationEmailData,
+10|  getPasswordResetEmailHtml,
+11|  getPasswordResetEmailText,
+12|  getPasswordResetEmailSubject,
+13|  PasswordResetEmailData,
+14|  getWelcomeEmailHtml,
+15|  getWelcomeEmailText,
+16|  getWelcomeEmailSubject,
+17|  WelcomeEmailData,
+18|  getPasswordChangedEmailHtml,
+19|  getPasswordChangedEmailText,
+20|  getPasswordChangedEmailSubject,
+21|  PasswordChangedEmailData,
+22|  getAccountCreatedEmailHtml,
+23|  getAccountCreatedEmailText,
+24|  getAccountCreatedEmailSubject,
+25|  AccountCreatedEmailData,
+26|  getWelcomeOAuthEmailHtml,
+27|  getWelcomeOAuthEmailText,
+28|  getWelcomeOAuthEmailSubject,
+29|  WelcomeOAuthEmailData,
+30|  getOrderReceivedEmailHtml,
+31|  getOrderReceivedEmailText,
+32|  getOrderReceivedEmailSubject,
+33|  OrderReceivedEmailData,
+34|  getOrderPendingEmailHtml,
+35|  getOrderPendingEmailText,
+36|  getOrderPendingEmailSubject,
+37|  OrderPendingEmailData,
+38|  getOrderAcceptedEmailHtml,
+39|  getOrderAcceptedEmailText,
+40|  getOrderAcceptedEmailSubject,
+41|  OrderAcceptedEmailData,
+42|  getOrderReturnedEmailHtml,
+43|  getOrderReturnedEmailText,
+44|  getOrderReturnedEmailSubject,
+45|  OrderReturnedEmailData,
+46|  getOrderDeletedEmailHtml,
+47|  getOrderDeletedEmailText,
+48|  getOrderDeletedEmailSubject,
+49|  OrderDeletedEmailData,
+50|  getOrderItemDeletedEmailHtml,
+51|  getOrderItemDeletedEmailText,
+52|  getOrderItemDeletedEmailSubject,
+53|  OrderItemDeletedEmailData,
+54|  getEBookletMilestoneTeacherEmailHtml,
+55|  getEBookletMilestoneTeacherEmailText,
+56|  getEBookletMilestoneTeacherEmailSubject,
+57|  getEBookletMilestoneAdminEmailHtml,
+58|  getEBookletMilestoneAdminEmailText,
+59|  getEBookletMilestoneAdminEmailSubject,
+60|  EBookletMilestoneEmailData,
+61|} from './templates';
+62|
+63|export interface EmailConfig {
+64|  host: string;
+65|  port: number;
+66|  secure: boolean;
+67|  auth: {
+68|    user: string;
+69|    pass: string;
+70|  };
+71|  from: string;
+72|}
+73|
+74|export interface SendEmailOptions {
+75|  to: string;
+76|  subject: string;
+77|  html: string;
+78|  text: string;
+79|}
+80|
+81|export class EmailService {
+82|  private transporter: Transporter;
+83|  private fromAddress: string;
+84|
+85|  constructor(config?: EmailConfig) {
+86|    const emailConfig = config || this.getDefaultConfig();
+87|    
+88|    this.transporter = nodemailer.createTransport({
+89|      host: emailConfig.host,
+90|      port: emailConfig.port,
+91|      secure: emailConfig.secure,
+92|      auth: {
+93|        user: emailConfig.auth.user,
+94|        pass: emailConfig.auth.pass,
+95|      },
+96|      tls: {
+97|        rejectUnauthorized: false,
+98|      },
+99|    });
+100|
+101|    this.fromAddress = emailConfig.from;
+102|  }
+103|
+104|  private getDefaultConfig(): EmailConfig {
+105|    // Prefer Resend SMTP relay when RESEND_API_KEY is available
+106|    const resendKey = process.env.RESEND_API_KEY;
+107|    if (resendKey) {
+108|      return {
+109|        host: 'smtp.resend.com',
+110|        port: 465,
+111|        secure: true,
+112|        auth: {
+113|          user: 'resend',
+114|          pass: resendKey,
+115|        },
+116|        from: process.env.EMAIL_FROM || 'Kalima Platform <noreply@kalima.com>',
+117|      };
+118|    }
+119|
+120|    return {
+121|      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+122|      port: parseInt(process.env.SMTP_PORT || '587', 10),
+123|      secure: process.env.SMTP_SECURE === 'true',
+124|      auth: {
+125|        user: process.env.SMTP_USER || '',
+126|        pass: process.env.SMTP_PASS || '',
+127|      },
+128|      from: process.env.SMTP_FROM || process.env.EMAIL_FROM || 'Kalima Platform <noreply@kalima.com>',
+129|    };
+130|  }
+131|
+132|  /**
+133|   * Send a generic email
+134|   */
+135|  async sendEmail(options: SendEmailOptions): Promise<boolean> {
+136|    try {
+137|      const logoCandidates = [
+138|        path.resolve(__dirname, 'figs', 'kalima.jpg'),
+139|        path.resolve(process.cwd(), 'src', 'apps', 'store-api', 'emails', 'figs', 'kalima.jpg'),
+140|      ];
+141|      const logoPath = logoCandidates.find((candidate) =>
+142|        fs.existsSync(candidate),
+143|      );
+144|      const attachments = [] as Array<{
+145|        filename: string;
+146|        path: string;
+147|        cid: string;
+148|      }>;
+149|
+150|      if (logoPath && fs.existsSync(logoPath)) {
+151|        attachments.push({
+152|          filename: 'kalima.jpg',
+153|          path: logoPath,
+154|          cid: 'kalima-logo',
+155|        });
+156|      } else {
+157|        console.warn(
+158|          `Email logo not found at ${logoCandidates.join(' | ')}. Sending without logo.`,
+159|        );
+160|      }
+161|
+162|      await this.transporter.sendMail({
+163|        from: this.fromAddress,
+164|        to: options.to,
+165|        subject: options.subject,
+166|        html: options.html,
+167|        text: options.text,
+168|        attachments,
+169|      });
+170|      return true;
+171|    } catch (error) {
+172|      console.error('Failed to send email:', error);
+173|      return false;
+174|    }
+175|  }
+176|
+177|  /**
+178|   * Send email verification email
+179|   */
+180|  async sendVerificationEmail(
+181|    to: string,
+182|    data: VerificationEmailData
+183|  ): Promise<boolean> {
+184|    return this.sendEmail({
+185|      to,
+186|      subject: getVerificationEmailSubject(),
+187|      html: getVerificationEmailHtml(data),
+188|      text: getVerificationEmailText(data),
+189|    });
+190|  }
+191|
+192|  /**
+193|   * Send password reset email
+194|   */
+195|  async sendPasswordResetEmail(
+196|    to: string,
+197|    data: PasswordResetEmailData
+198|  ): Promise<boolean> {
+199|    return this.sendEmail({
+200|      to,
+201|      subject: getPasswordResetEmailSubject(),
+202|      html: getPasswordResetEmailHtml(data),
+203|      text: getPasswordResetEmailText(data),
+204|    });
+205|  }
+206|
+207|  /**
+208|   * Send welcome email after verification
+209|   */
+210|  async sendWelcomeEmail(to: string, data: WelcomeEmailData): Promise<boolean> {
+211|    return this.sendEmail({
+212|      to,
+213|      subject: getWelcomeEmailSubject(),
+214|      html: getWelcomeEmailHtml(data),
+215|      text: getWelcomeEmailText(data),
+216|    });
+217|  }
+218|
+219|  /**
+220|   * Send welcome email for OAuth Users (pre-verified)
+221|   */
+222|  async sendWelcomeOAuthEmail(to: string, data: WelcomeOAuthEmailData): Promise<boolean> {
+223|    return this.sendEmail({
+224|      to,
+225|      subject: getWelcomeOAuthEmailSubject(),
+226|      html: getWelcomeOAuthEmailHtml(data),
+227|      text: getWelcomeOAuthEmailText(data),
+228|    });
+229|  }
+230|
+231|  /**
+232|   * Send password changed notification
+233|   */
+234|  async sendPasswordChangedEmail(
+235|    to: string,
+236|    data: PasswordChangedEmailData
+237|  ): Promise<boolean> {
+238|    return this.sendEmail({
+239|      to,
+240|      subject: getPasswordChangedEmailSubject(),
+241|      html: getPasswordChangedEmailHtml(data),
+242|      text: getPasswordChangedEmailText(data),
+243|    });
+244|  }
+245|
+246|  /**
+247|   * Send account created email (registration confirmation with verification link)
+248|   */
+249|  async sendAccountCreatedEmail(
+250|    to: string,
+251|    data: AccountCreatedEmailData
+252|  ): Promise<boolean> {
+253|    return this.sendEmail({
+254|      to,
+255|      subject: getAccountCreatedEmailSubject(),
+256|      html: getAccountCreatedEmailHtml(data),
+257|      text: getAccountCreatedEmailText(data),
+258|    });
+259|  }
+260|
+261|  /**
+262|   * Send order received confirmation
+263|   */
+264|  async sendOrderReceivedEmail(
+265|    to: string,
+266|    data: OrderReceivedEmailData
+267|  ): Promise<boolean> {
+268|    return this.sendEmail({
+269|      to,
+270|      subject: getOrderReceivedEmailSubject(),
+271|      html: getOrderReceivedEmailHtml(data),
+272|      text: getOrderReceivedEmailText(data),
+273|    });
+274|  }
+275|
+276|  /**
+277|   * Send order pending confirmation
+278|   */
+279|  async sendOrderPendingEmail(
+280|    to: string,
+281|    data: OrderPendingEmailData
+282|  ): Promise<boolean> {
+283|    return this.sendEmail({
+284|      to,
+285|      subject: getOrderPendingEmailSubject(),
+286|      html: getOrderPendingEmailHtml(data),
+287|      text: getOrderPendingEmailText(data),
+288|    });
+289|  }
+290|
+291|  /**
+292|   * Send order accepted confirmation
+293|   */
+294|  async sendOrderAcceptedEmail(
+295|    to: string,
+296|    data: OrderAcceptedEmailData
+297|  ): Promise<boolean> {
+298|    return this.sendEmail({
+299|      to,
+300|      subject: getOrderAcceptedEmailSubject(),
+301|      html: getOrderAcceptedEmailHtml(data),
+302|      text: getOrderAcceptedEmailText(data),
+303|    });
+304|  }
+305|
+306|  /**
+307|   * Send order returned confirmation
+308|   */
+309|  async sendOrderReturnedEmail(
+310|    to: string,
+311|    data: OrderReturnedEmailData
+312|  ): Promise<boolean> {
+313|    return this.sendEmail({
+314|      to,
+315|      subject: getOrderReturnedEmailSubject(),
+316|      html: getOrderReturnedEmailHtml(data),
+317|      text: getOrderReturnedEmailText(data),
+318|    });
+319|  }
+320|
+321|  /**
+322|   * Send order deleted confirmation
+323|   */
+324|  async sendOrderDeletedEmail(
+325|    to: string,
+326|    data: OrderDeletedEmailData
+327|  ): Promise<boolean> {
+328|    return this.sendEmail({
+329|      to,
+330|      subject: getOrderDeletedEmailSubject(),
+331|      html: getOrderDeletedEmailHtml(data),
+332|      text: getOrderDeletedEmailText(data),
+333|    });
+334|  }
+335|
+336|  /**
+337|   * Send order item deleted confirmation
+338|   */
+339|  async sendOrderItemDeletedEmail(
+340|    to: string,
+341|    data: OrderItemDeletedEmailData
+342|  ): Promise<boolean> {
+343|    return this.sendEmail({
+344|      to,
+345|      subject: getOrderItemDeletedEmailSubject(),
+346|      html: getOrderItemDeletedEmailHtml(data),
+347|      text: getOrderItemDeletedEmailText(data),
+348|    });
+349|  }
+350|
+351|  async sendEBookletMilestoneTeacherEmail(
+352|    to: string,
+353|    data: EBookletMilestoneEmailData
+354|  ): Promise<boolean> {
+355|    return this.sendEmail({
+356|      to,
+357|      subject: getEBookletMilestoneTeacherEmailSubject(data),
+358|      html: getEBookletMilestoneTeacherEmailHtml(data),
+359|      text: getEBookletMilestoneTeacherEmailText(data),
+360|    });
+361|  }
+362|
+363|  async sendEBookletMilestoneAdminEmail(
+364|    to: string,
+365|    data: EBookletMilestoneEmailData
+366|  ): Promise<boolean> {
+367|    return this.sendEmail({
+368|      to,
+369|      subject: getEBookletMilestoneAdminEmailSubject(data),
+370|      html: getEBookletMilestoneAdminEmailHtml(data),
+371|      text: getEBookletMilestoneAdminEmailText(data),
+372|    });
+373|  }
+374|
+375|  /**
+376|   * Verify SMTP connection
+377|   */
+378|  async verifyConnection(): Promise<boolean> {
+379|    try {
+380|      await this.transporter.verify();
+381|      return true;
+382|    } catch (error) {
+383|      console.error('SMTP connection verification failed:', error);
+384|      return false;
+385|    }
+386|  }
+387|}
+388|
+389|// Singleton instance
+390|let emailServiceInstance: EmailService | null = null;
+391|
+392|export function getEmailService(config?: EmailConfig): EmailService {
+393|  if (!emailServiceInstance) {
+394|    emailServiceInstance = new EmailService(config);
+395|  }
+396|  return emailServiceInstance;
+397|}
+398|
+399|export default EmailService;
+
+===== FILE: kalima-platform/backend/src/apps/store-api/emails/templates/e-booklet-milestone-achievement.template.ts (88 lines) =====
+1|export interface EBookletMilestoneEmailData {
+2|  teacherName: string;
+3|  milestoneTitle: string;
+4|  paidRedemptions: number;
+5|  rewardAmount: number;
+6|  termName?: string | null;
+7|  dashboardUrl?: string;
+8|}
+9|
+10|const money = (value: number) => `${Number(value ?? 0).toLocaleString("en-US")} EGP`;
+11|
+12|function escapeHtml(value: unknown): string {
+13|  return String(value ?? "")
+14|    .replace(/&/g, "&amp;")
+15|    .replace(/</g, "&lt;")
+16|    .replace(/>/g, "&gt;")
+17|    .replace(/"/g, "&quot;")
+18|    .replace(/'/g, "&#39;");
+19|}
+20|
+21|function safeHref(value?: string): string | null {
+22|  if (!value) return null;
+23|  if (value.startsWith("/") && !value.startsWith("//")) return escapeHtml(value);
+24|  try {
+25|    const url = new URL(value);
+26|    if (url.protocol === "https:" || url.protocol === "http:") return escapeHtml(url.toString());
+27|  } catch {
+28|    return null;
+29|  }
+30|  return null;
+31|}
+32|
+33|export function getEBookletMilestoneTeacherEmailSubject(data: EBookletMilestoneEmailData): string {
+34|  return `Kalima milestone achieved: ${data.milestoneTitle}`;
+35|}
+36|
+37|export function getEBookletMilestoneTeacherEmailText(data: EBookletMilestoneEmailData): string {
+38|  return [
+39|    `Congratulations ${data.teacherName},`,
+40|    `You achieved the ${data.milestoneTitle} milestone${data.termName ? ` for ${data.termName}` : ""}.`,
+41|    `Paid redemptions: ${data.paidRedemptions}.`,
+42|    `Claimable wallet credit: ${money(data.rewardAmount)}.`,
+43|    data.dashboardUrl ? `Open your e-booklet dashboard: ${data.dashboardUrl}` : "Open your e-booklet dashboard to claim the reward.",
+44|  ].join("\n");
+45|}
+46|
+47|export function getEBookletMilestoneTeacherEmailHtml(data: EBookletMilestoneEmailData): string {
+48|  const href = safeHref(data.dashboardUrl);
+49|  return `
+50|    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
+51|      <h2>Congratulations ${escapeHtml(data.teacherName)}</h2>
+52|      <p>You achieved the <strong>${escapeHtml(data.milestoneTitle)}</strong> milestone${data.termName ? ` for <strong>${escapeHtml(data.termName)}</strong>` : ""}.</p>
+53|      <ul>
+54|        <li>Paid redemptions: <strong>${escapeHtml(data.paidRedemptions)}</strong></li>
+55|        <li>Claimable wallet credit: <strong>${escapeHtml(money(data.rewardAmount))}</strong></li>
+56|      </ul>
+57|      ${href ? `<p><a href="${href}">Open your e-booklet dashboard</a> to claim the reward.</p>` : "<p>Open your e-booklet dashboard to claim the reward.</p>"}
+58|    </div>
+59|  `;
+60|}
+61|
+62|export function getEBookletMilestoneAdminEmailSubject(data: EBookletMilestoneEmailData): string {
+63|  return `E-booklet milestone achieved by ${data.teacherName}`;
+64|}
+65|
+66|export function getEBookletMilestoneAdminEmailText(data: EBookletMilestoneEmailData): string {
+67|  return [
+68|    `${data.teacherName} achieved ${data.milestoneTitle}${data.termName ? ` for ${data.termName}` : ""}.`,
+69|    `Paid redemptions: ${data.paidRedemptions}.`,
+70|    `Reward amount: ${money(data.rewardAmount)}.`,
+71|    data.dashboardUrl ? `Review: ${data.dashboardUrl}` : "Review the teacher milestone dashboard.",
+72|  ].join("\n");
+73|}
+74|
+75|export function getEBookletMilestoneAdminEmailHtml(data: EBookletMilestoneEmailData): string {
+76|  const href = safeHref(data.dashboardUrl);
+77|  return `
+78|    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
+79|      <h2>E-booklet milestone achieved</h2>
+80|      <p><strong>${escapeHtml(data.teacherName)}</strong> achieved <strong>${escapeHtml(data.milestoneTitle)}</strong>${data.termName ? ` for <strong>${escapeHtml(data.termName)}</strong>` : ""}.</p>
+81|      <ul>
+82|        <li>Paid redemptions: <strong>${escapeHtml(data.paidRedemptions)}</strong></li>
+83|        <li>Reward amount: <strong>${escapeHtml(money(data.rewardAmount))}</strong></li>
+84|      </ul>
+85|      ${href ? `<p><a href="${href}">Review achievement</a></p>` : ""}
+86|    </div>
+87|  `;
+88|}
+
+===== FILE: kalima-platform/backend/src/apps/store-api/emails/templates/index.ts (13 lines) =====
+1|export * from './verification-email.template';
+2|export * from './password-reset.template';
+3|export * from './welcome.template';
+4|export * from './password-changed.template';
+5|export * from './account-created.template';
+6|export * from './welcome-oauth.template';
+7|export * from './order-received.template';
+8|export * from './order-pending.template';
+9|export * from './order-accepted.template';
+10|export * from './order-returned.template';
+11|export * from './order-deleted.template';
+12|export * from './order-item-deleted.template';
+13|export * from './e-booklet-milestone-achievement.template';

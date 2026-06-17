@@ -30,7 +30,8 @@
     "dashboard": "Dashboard",
     "employeePerformance": "Employee Performance",
     "eBookletInstances": "E-Booklet Access",
-    "eBookletAnalytics": "E-Booklet Analytics"
+    "eBookletAnalytics": "E-Booklet Analytics",
+    "eBookletTermsMilestones": "Terms & Milestones"
   },
   "common": {
     "currencyEGP": "EGP",

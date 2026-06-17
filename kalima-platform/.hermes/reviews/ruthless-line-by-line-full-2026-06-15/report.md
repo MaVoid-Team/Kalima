@@ -1,0 +1,205 @@
+# Ruthless Line-by-Line Full Review
+Verdict: REQUIRED_FIXES
+
+## Scope and method
+- Reviewed/accounted for all 98 entries in `files-to-review.txt`. No listed entry is silent-skipped.
+- Read the listed files from disk. Historical `.hermes/reviews/*` files were accounted for as artifacts; listed generated Prisma files were checked for schema/migration alignment and marked generated; source files were inspected for cross-boundary behavior.
+- Temporary accounting/source bundles were written only under `.hermes/reviews/ruthless-line-by-line-full-2026-06-15/`. Source code was not modified.
+- One listed artifact is missing (`kalima-platform/reports/firstlines.csv`), so the review fails closed.
+
+## Required fixes
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-redemption.service.ts:142-172`
+  - Blocker: Free-code redemption reserves capacity before the redemption row is created. Concurrent same-student free-code requests can both increment `redeemed_count`; one insert then loses to the unique constraint and returns the existing redemption, leaving capacity burned/corrupted.
+  - User impact: Free shared-code seats/counts can be exhausted incorrectly and redemption state becomes untrustworthy.
+  - Required change: Make free-code redemption idempotent at the DB boundary: create/upsert the redemption first or roll back/decrement on same-student unique conflict; only increment count for a newly inserted redemption.
+  - Suggested regression test: Concurrently redeem the same free code twice for one student and assert one redemption row and `redeemed_count === 1`.
+- `kalima-platform/backend/src/apps/store-api/controllers/e-booklet.controller.ts:737-746`
+  - Blocker: Teacher `generateAccessCode` accepts `kind` from the body, including `free`, while the admin route is the only route explicitly named for free access-code generation.
+  - User impact: Teachers can mint free multi-redemption access codes if they pass accepted terms, bypassing intended paid-seat/milestone economics.
+  - Required change: Force teacher-generated codes to `paid`, or add an explicit product-approved authorization gate for teacher free-code issuance.
+  - Suggested regression test: POST the teacher access-code route with `{ kind: "free" }` and assert 400/403 or a documented allowed policy.
+- `kalima-platform/backend/src/apps/store-api/controllers/e-booklet.controller.ts:753-766 and backend/src/apps/store-api/services/e-booklet-access-code.service.ts:104-107`
+  - Blocker: Admin free-code generation calls the same `generateCode()` path, which requires the target teacher to have accepted code-generation terms.
+  - User impact: Admins cannot issue free/shared codes for an otherwise valid teacher/instance unless the teacher has already performed teacher terms acceptance.
+  - Required change: Either document this as intentional or add an audited admin override path that validates active terms/template ownership without requiring teacher acceptance.
+  - Suggested regression test: Admin generates a free code for a teacher-owned instance with no teacher acceptance; assert the intended success/clean rejection contract.
+- `kalima-platform/backend/src/apps/store-api/controllers/e-booklet.controller.ts:772-781`
+  - Blocker: `purchaseId` is forwarded from request body without positive-integer parsing.
+  - User impact: Invalid strings/types can reach Prisma or associate a redemption with bogus purchase data.
+  - Required change: Parse with `parseOptionalPositiveInt()` before calling `redeemCode`.
+  - Suggested regression test: Redeem with `purchaseId: "abc"` and assert 400; redeem with `"123"` and assert numeric persistence.
+- `kalima-platform/backend/src/apps/store-api/services/teacher-wallet.service.ts:123-129`
+  - Blocker: Idempotent retry subtracts the already-applied credit from `purchase.price`, but the first application already mutated `purchase.price` to the discounted total.
+  - User impact: Retry responses report an incorrect lower final total, confusing checkout/accounting.
+  - Required change: On existing debit, return current purchase price/final total or store original structured totals and compute from those.
+  - Suggested regression test: Apply 20 credit to a 100 purchase, retry, and assert finalTotal remains 80, not 60.
+- `kalima-platform/backend/src/apps/store-api/services/teacher-wallet.service.ts:163-168`
+  - Blocker: Wallet application overwrites `e_booklet_purchases.price` with discounted total and leaves original price only implied by a text note.
+  - User impact: Refunds, audits, coupon-conflict checks, and accounting cannot reliably reconstruct original vs wallet-adjusted amounts.
+  - Required change: Add structured wallet-adjustment/original-total fields or adjustment rows; do not destroy the canonical purchase price.
+  - Suggested regression test: After wallet apply, assert original price and wallet credit are queryable as structured data and final payable total is reconstructable.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-terms.service.ts:217-238`
+  - Blocker: Terms acceptance is `findFirst` then `create` without unique-conflict handling.
+  - User impact: Double-click/concurrent acceptance can leak a raw Prisma unique error/500 instead of idempotently returning acceptance.
+  - Required change: Use upsert on the unique key or catch `P2002` and re-read existing acceptance.
+  - Suggested regression test: Call `acceptLatestTerms()` concurrently twice and assert both resolve to the same acceptance.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-terms.service.ts:58-70`
+  - Blocker: Active terms creation is `findFirst` then `create`; concurrent active creates can leak raw DB unique errors or create duplicates if guard fails.
+  - User impact: Admins can see noisy 500s and active terms invariants rely on race-prone app logic.
+  - Required change: Wrap in transaction and translate DB unique conflicts to clean 400/409; keep DB partial/guard uniqueness as source of truth.
+  - Suggested regression test: Run two concurrent active term creates for the same scope; assert exactly one active term and one clean conflict response.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-milestone-notification.service.ts:107-130`
+  - Blocker: Admin notification creation does find-many then createMany without skipDuplicates/unique-conflict handling.
+  - User impact: Concurrent milestone retries can duplicate admin notifications/emails or throw mid-side-effect.
+  - Required change: Use a unique key plus `createMany({ skipDuplicates: true })`/conflict handling, and email only newly-created/missing recipients deterministically.
+  - Suggested regression test: Call milestone notification concurrently for the same achievement/admins; assert one notification/email per admin.
+- `kalima-platform/backend/src/libs/auth/firebase.ts:31-39`
+  - Blocker: Firebase credentials fail closed only when `NODE_ENV === "production"`. Staging/preview/deployed envs with unset/mis-set NODE_ENV boot with fallback project ID.
+  - User impact: Auth behavior can be misconfigured open/fragile outside exact production env.
+  - Required change: Fail closed whenever Firebase auth is required unless an explicit local-dev bypass flag is set.
+  - Suggested regression test: Import/initialize auth with credentials absent and no bypass in non-test server mode; assert startup throws.
+- `kalima-platform/backend/src/config/corsOptions.ts:13-18`
+  - Blocker: Credentialed CORS allows `file://` origin.
+  - User impact: Local-file origins can make credentialed browser requests to authenticated APIs.
+  - Required change: Remove `file://` from credentialed CORS or gate it behind explicit local-dev-only config.
+  - Suggested regression test: In production config, `Origin: file://` must not receive credentialed CORS allow headers.
+- `kalima-platform/backend/src/apps/store-api/emails/email.service.ts:96-98`
+  - Blocker: SMTP transport disables TLS certificate validation globally with `rejectUnauthorized: false`.
+  - User impact: Email credentials/content are exposed to MITM risk on SMTP connections.
+  - Required change: Remove the setting or gate it behind an explicit local-dev flag that is impossible in production.
+  - Suggested regression test: Instantiate production email config and assert TLS verification is not disabled.
+- `kalima-platform/frontend/src/layouts/Navbar.jsx:208-217,449-466,536-540`
+  - Blocker: `/e-booklets` is registered as a public route, but desktop/mobile/command navigation only expose it when `hasStoreAccess` is true.
+  - User impact: Visitors and students cannot discover the public e-booklet storefront through normal navigation.
+  - Required change: Show `/e-booklets` independently of `hasStoreAccess`; keep `/market` and `/samples` gated if required.
+  - Suggested regression test: Source/unit test that `/e-booklets` nav exists without store access while market/sample gating remains.
+- `kalima-platform/frontend/src/pages/admin/e-booklets/AdminEBookletTermsMilestonesPage.jsx:47,163,175-186,341-343`
+  - Blocker: `rewardEnabled` exists in state/locales but no checkbox/switch is rendered and submit always sends `rewardAmountSnapshot`.
+  - User impact: Admins cannot actually disable rewards except by manually using zero; current source check falsely passed on a dead identifier.
+  - Required change: Render a real reward-enabled control and make submit behavior explicit, e.g. disabled sends zero or backend-supported disabled field.
+  - Suggested regression test: Assert the rendered control exists and `submitMilestone` conditionally applies `rewardEnabled`.
+- `kalima-platform/frontend/tests/e-booklet-phase6-source-check.mjs:53`
+  - Blocker: The test only regex-checks `/rewardEnabled/`, so it passed despite no reward-enabled UI/control behavior.
+  - User impact: Regression checks can approve fake contracts.
+  - Required change: Strengthen the source check to assert rendered control and payload behavior.
+  - Suggested regression test: Fail the current implementation before fixing the admin page.
+- `kalima-platform/reports/firstlines.csv`
+  - Blocker: The file listed in `files-to-review.txt` is absent from disk.
+  - User impact: Review/accounting inputs are stale or incomplete; fail-closed review cannot mark every listed file OK.
+  - Required change: Restore/generate the artifact or remove it from the review file list if obsolete.
+  - Suggested regression test: Artifact presence check for all listed review inputs.
+
+## Security / data risk findings
+- Credentialed CORS currently allows `file://` (`backend/src/config/corsOptions.ts:13-18`).
+- SMTP TLS certificate verification is disabled globally (`backend/src/apps/store-api/emails/email.service.ts:96-98`).
+- Firebase auth only fails closed for exact production NODE_ENV, not all deployed/server modes (`backend/src/libs/auth/firebase.ts:31-39`).
+- Wallet application destroys the structured original purchase price (`backend/src/apps/store-api/services/teacher-wallet.service.ts:163-168`).
+- Race conditions exist around free-code redemption counts, terms acceptance, active terms, and milestone admin notifications.
+- No hardcoded credentials were included in this report.
+
+## File-by-file verdict matrix
+- `.gitignore` — OK: Ignore rules reviewed; no blocking issue found.
+- `kalima-platform/.hermes/reviews/e-booklet-admin-editor-full-browser-proof/handoff.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/e-booklet-auth-e2e-followup/handoff.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/e-booklet-remaining-browser-proof/handoff.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/fekra-e-booklet-v2/handoff.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-required-blocker-fix/critique-report.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-required-blocker-fix/handoff.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/critique-report.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/handoff.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/ruthless-line-review.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/strict-24-file-review-fixup.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/strict-24-file-review.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/handoff.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/phase-6-admin-terms-milestones-handoff.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-rereview-prompt.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-rereview.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-review-prompt.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-review.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-background-review.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-final-rereview-prompt.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-final-rereview.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-rereview-prompt.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-rereview.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-review-prompt.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-phase-6-admin-terms-milestones/critique-report.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/kalima-phase-6-admin-terms-milestones/handoff.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/phase-7-student-code-redemption/critique-report.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/phase-7-student-code-redemption/handoff.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-2026-06-15/handoff.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-2026-06-15/prompt.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-2026-06-15/report.md` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/files-to-review.txt` — ARTIFACT/OK: Historical review artifact accounted for; not production runtime code.
+- `kalima-platform/backend/src/apps/store-api/controllers/e-booklet.controller.ts` — REQUIRED_FIXES: teacher route accepts free codes; admin free-code path requires teacher terms acceptance; redemption purchaseId is not parsed/validated.
+- `kalima-platform/backend/src/apps/store-api/emails/email.service.ts` — REQUIRED_FIXES: SMTP TLS certificate verification is disabled globally.
+- `kalima-platform/backend/src/apps/store-api/emails/templates/e-booklet-milestone-achievement.template.ts` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/backend/src/apps/store-api/emails/templates/index.ts` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/browser.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/client.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/commonInputTypes.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/enums.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/internal/class.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/internal/prismaNamespace.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/internal/prismaNamespaceBrowser.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_access_code_redemptions.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_access_codes.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_access.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_instances.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_milestone_achievements.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_milestones.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_purchases.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_teacher_terms_acceptances.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_templates.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_terms.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/purchases.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/teacher_wallet_ledger.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/teacher_wallets.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/users.ts` — GENERATED/OK: Generated Prisma client/model file accounted for; aligned with schema/migrations in practical checks.
+- `kalima-platform/backend/src/apps/store-api/prisma/migrations/20260614180000_e_booklet_terms_milestones_wallet/migration.sql` — OK: Schema/migration reviewed and Prisma validation passed.
+- `kalima-platform/backend/src/apps/store-api/prisma/migrations/20260614210000_e_booklet_milestone_notifications/migration.sql` — OK: Schema/migration reviewed and Prisma validation passed.
+- `kalima-platform/backend/src/apps/store-api/prisma/schema.prisma` — OK: Schema/migration reviewed and Prisma validation passed.
+- `kalima-platform/backend/src/apps/store-api/routes/v2/e-booklet.routes.ts` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-access-code.service.ts` — REQUIRED_FIXES: admin free-code generation is coupled to teacher accepted terms; free-code max redemptions defaults to effectively unlimited.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-domain.service.ts` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-milestone-notification.service.ts` — REQUIRED_FIXES: admin notification side effects are race-prone and can duplicate notifications/emails or throw.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-milestone.service.ts` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-redemption.service.ts` — REQUIRED_FIXES: concurrent same-student free-code redemption can over-increment redeemed_count/capacity.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-terms.service.ts` — REQUIRED_FIXES: active-term create and terms acceptance are check-then-create races with raw unique failures.
+- `kalima-platform/backend/src/apps/store-api/services/teacher-wallet.service.ts` — REQUIRED_FIXES: idempotent retry returns wrong finalTotal and wallet application destructively overwrites purchase price.
+- `kalima-platform/backend/src/config/corsOptions.ts` — REQUIRED_FIXES: credentialed CORS allows file:// origin.
+- `kalima-platform/backend/src/libs/auth/firebase.ts` — REQUIRED_FIXES: Firebase only fails closed for NODE_ENV=production, allowing misconfigured deployed envs to boot.
+- `kalima-platform/backend/tests/e-booklet/e-booklet-phase1-migration.spec.ts` — OK: Focused backend test reviewed and passed in targeted Jest run.
+- `kalima-platform/backend/tests/e-booklet/e-booklet-phase2-services.spec.ts` — OK: Focused backend test reviewed and passed in targeted Jest run.
+- `kalima-platform/backend/tests/e-booklet/e-booklet-phase4-notifications.spec.ts` — OK: Focused backend test reviewed and passed in targeted Jest run.
+- `kalima-platform/backend/tests/e-booklet/e-booklet.routes.spec.ts` — OK: Focused backend test reviewed and passed in targeted Jest run.
+- `kalima-platform/backend/tests/e-booklet/e-booklet.service.spec.ts` — OK: Focused backend test reviewed and passed in targeted Jest run.
+- `kalima-platform/frontend/src/App.jsx` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/frontend/src/components/admin/Sidebar.jsx` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/frontend/src/components/admin/users/CreateUserDialog.jsx` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/frontend/src/components/student/StudentSidebar.jsx` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/frontend/src/hooks/admin/useAdminEBooklets.js` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/frontend/src/hooks/useEBookletAccess.js` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/frontend/src/layouts/Navbar.jsx` — REQUIRED_FIXES: public /e-booklets route is hidden behind hasStoreAccess in desktop/mobile navigation.
+- `kalima-platform/frontend/src/locales/ar/admin.json` — OK: Localization JSON reviewed; no blocking runtime/security issue found.
+- `kalima-platform/frontend/src/locales/ar/eBooklets.json` — OK: Localization JSON reviewed; no blocking runtime/security issue found.
+- `kalima-platform/frontend/src/locales/ar/student.json` — OK: Localization JSON reviewed; no blocking runtime/security issue found.
+- `kalima-platform/frontend/src/locales/en/admin.json` — OK: Localization JSON reviewed; no blocking runtime/security issue found.
+- `kalima-platform/frontend/src/locales/en/eBooklets.json` — OK: Localization JSON reviewed; no blocking runtime/security issue found.
+- `kalima-platform/frontend/src/locales/en/student.json` — OK: Localization JSON reviewed; no blocking runtime/security issue found.
+- `kalima-platform/frontend/src/pages/admin/e-booklets/AdminEBookletTermsMilestonesPage.jsx` — REQUIRED_FIXES: rewardEnabled state has no rendered control and does not affect milestone payload.
+- `kalima-platform/frontend/src/pages/e-booklets/AcceptEBookletInvitePage.jsx` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/frontend/src/pages/student/e-booklets/StudentEBookletsPage.jsx` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/frontend/src/pages/teacher/e-booklets/TeacherEBookletsPage.jsx` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/frontend/src/pages/teacher/e-booklets/TeacherInviteManagementPage.jsx` — OK: Source file reviewed; no blocking issue found in assigned scope.
+- `kalima-platform/frontend/tests/e-booklet-phase5-source-check.mjs` — OK: Source contract test reviewed and passed; no blocker found.
+- `kalima-platform/frontend/tests/e-booklet-phase6-source-check.mjs` — REQUIRED_FIXES: source check only matches rewardEnabled identifier and missed the fake/non-rendered control.
+- `kalima-platform/frontend/tests/e-booklet-phase7-source-check.mjs` — OK: Source contract test reviewed and passed; no blocker found.
+- `kalima-platform/reports/firstlines.csv` — REQUIRED_FIXES: listed artifact is missing from disk.
+
+## Verification run
+- `cd /Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/backend && npm run build -- --pretty false` — PASS (`tsc`, exit 0).
+- `cd /Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/backend && npx prisma validate --schema src/apps/store-api/prisma/schema.prisma` — PASS (schema valid).
+- `cd /Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/backend && npm test -- --runInBand tests/e-booklet/e-booklet-phase1-migration.spec.ts tests/e-booklet/e-booklet-phase2-services.spec.ts tests/e-booklet/e-booklet-phase4-notifications.spec.ts tests/e-booklet/e-booklet.routes.spec.ts tests/e-booklet/e-booklet.service.spec.ts` — PASS (5 suites, 114 tests).
+- `cd /Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/frontend && node tests/e-booklet-phase5-source-check.mjs && node tests/e-booklet-phase6-source-check.mjs && node tests/e-booklet-phase7-source-check.mjs` — PASS, but Phase 6 passing is not sufficient because its rewardEnabled assertion is too weak and is itself listed as a required fix.
+- File presence/accounting check — FAIL for `kalima-platform/reports/firstlines.csv` (missing).

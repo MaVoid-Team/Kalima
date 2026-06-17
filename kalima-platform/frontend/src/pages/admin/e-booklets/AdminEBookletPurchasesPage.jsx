@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   BookOpenCheck,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   PackageCheck,
+  PencilLine,
   Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -73,6 +75,7 @@ const dimensionsDiffer = (expected = [], uploaded = []) => {
 
 export default function AdminEBookletPurchasesPage() {
   const { t } = useTranslation("eBooklets");
+  const navigate = useNavigate();
   const {
     purchases,
     pagination,
@@ -84,6 +87,7 @@ export default function AdminEBookletPurchasesPage() {
     updatePurchaseStatus,
     markPaid,
     deliverPurchase,
+    prepareCustomTemplate,
     uploadTeacherDocument,
   } = useAdminEBookletPurchases();
   const [selectedPurchase, setSelectedPurchase] = useState(null);
@@ -202,6 +206,17 @@ export default function AdminEBookletPurchasesPage() {
     fetchPurchases();
   };
 
+  const handleEditTeacherTemplate = async () => {
+    if (!activePurchase) return;
+    const response = await prepareCustomTemplate(activePurchase.id);
+    const custom = response?.data;
+    const templateId = custom?.template_id || activePurchase.template_id;
+    const versionId = custom?.template_version_id;
+    if (templateId && versionId) {
+      navigate(`/admin/e-booklets/${templateId}/edit?teacherTemplate=1&purchaseId=${activePurchase.id}&versionId=${versionId}`);
+    }
+  };
+
   return (
     <div className="space-y-6" data-testid="admin-e-booklet-purchases-page">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -228,9 +243,9 @@ export default function AdminEBookletPurchasesPage() {
         </Select>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_420px]">
-        <div className="overflow-hidden rounded-lg border bg-background">
-          <Table>
+      <div className="space-y-5">
+        <div className="w-full overflow-x-auto rounded-lg border bg-background" data-testid="admin-e-booklet-purchases-table-card">
+          <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow>
                 <TableHead>{t("admin.purchases.table.teacher")}</TableHead>
@@ -289,20 +304,25 @@ export default function AdminEBookletPurchasesPage() {
                     </TableCell>
                     <TableCell>v{purchase.template_version?.version_number || 1}</TableCell>
                     <TableCell>
-                      <div className="flex justify-end gap-2">
-                        {purchase.status !== "paid" && purchase.status !== "ready" && (
+                      <div className="flex flex-wrap justify-end gap-2">
+                        {["pending", "awaiting_payment", "needs_branding_info", "customization_in_progress"].includes(purchase.status) && (
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleMarkPaid(purchase)}
+                            aria-label={t("admin.purchases.approveUnlock", { defaultValue: "Approve and unlock teacher management" })}
                           >
                             <CheckCircle2 className="h-4 w-4" />
+                            <span className="hidden xl:inline">
+                              {t("admin.purchases.approveUnlockShort", { defaultValue: "Approve / unlock" })}
+                            </span>
                           </Button>
                         )}
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => setSelectedPurchase(purchase)}
+                          aria-label={t("admin.purchases.managePurchase", { defaultValue: "Manage eBooklet purchase" })}
                         >
                           <BookOpenCheck className="h-4 w-4" />
                         </Button>
@@ -314,7 +334,7 @@ export default function AdminEBookletPurchasesPage() {
           </Table>
         </div>
 
-        <aside className="space-y-4 rounded-lg border bg-background p-4">
+        <aside className="space-y-4 rounded-lg border bg-background p-4" data-testid="admin-e-booklet-purchases-delivery-section">
           {activePurchase ? (
             <>
               <div>
@@ -455,6 +475,18 @@ export default function AdminEBookletPurchasesPage() {
               </div>
 
               <div className="grid gap-2 sm:grid-cols-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleEditTeacherTemplate}
+                  disabled={loading}
+                  className="sm:col-span-2"
+                >
+                  <PencilLine className="h-4 w-4" />
+                  {t("admin.purchases.editTeacherTemplate", {
+                    defaultValue: "Edit this teacher's eBooklet template",
+                  })}
+                </Button>
                 <Button
                   variant="outline"
                   onClick={() => handleStatus(activePurchase, "customization_in_progress")}

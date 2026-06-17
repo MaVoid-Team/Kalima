@@ -96,7 +96,15 @@ export const ModelName = {
   e_booklet_template_versions: 'e_booklet_template_versions',
   e_booklet_hotspots: 'e_booklet_hotspots',
   e_booklet_purchases: 'e_booklet_purchases',
+  e_booklet_terms: 'e_booklet_terms',
   e_booklet_instances: 'e_booklet_instances',
+  e_booklet_milestones: 'e_booklet_milestones',
+  e_booklet_milestone_achievements: 'e_booklet_milestone_achievements',
+  e_booklet_teacher_terms_acceptances: 'e_booklet_teacher_terms_acceptances',
+  teacher_wallets: 'teacher_wallets',
+  teacher_wallet_ledger: 'teacher_wallet_ledger',
+  e_booklet_access_codes: 'e_booklet_access_codes',
+  e_booklet_access_code_redemptions: 'e_booklet_access_code_redemptions',
   e_booklet_access: 'e_booklet_access',
   e_booklet_invites: 'e_booklet_invites',
   e_booklet_devices: 'e_booklet_devices',
@@ -755,6 +763,8 @@ export const E_booklet_purchasesScalarFieldEnum = {
   template_version_id: 'template_version_id',
   status: 'status',
   price: 'price',
+  wallet_credit_applied: 'wallet_credit_applied',
+  final_payable_price: 'final_payable_price',
   marketing_price: 'marketing_price',
   internal_price: 'internal_price',
   access_expires_at: 'access_expires_at',
@@ -768,6 +778,26 @@ export const E_booklet_purchasesScalarFieldEnum = {
 } as const
 
 export type E_booklet_purchasesScalarFieldEnum = (typeof E_booklet_purchasesScalarFieldEnum)[keyof typeof E_booklet_purchasesScalarFieldEnum]
+
+
+export const E_booklet_termsScalarFieldEnum = {
+  id: 'id',
+  template_id: 'template_id',
+  name: 'name',
+  description: 'description',
+  status: 'status',
+  active_guard: 'active_guard',
+  starts_at: 'starts_at',
+  ends_at: 'ends_at',
+  code_generation_terms: 'code_generation_terms',
+  reward_claim_terms: 'reward_claim_terms',
+  created_by: 'created_by',
+  updated_by: 'updated_by',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_termsScalarFieldEnum = (typeof E_booklet_termsScalarFieldEnum)[keyof typeof E_booklet_termsScalarFieldEnum]
 
 
 export const E_booklet_instancesScalarFieldEnum = {
@@ -792,6 +822,125 @@ export const E_booklet_instancesScalarFieldEnum = {
 } as const
 
 export type E_booklet_instancesScalarFieldEnum = (typeof E_booklet_instancesScalarFieldEnum)[keyof typeof E_booklet_instancesScalarFieldEnum]
+
+
+export const E_booklet_milestonesScalarFieldEnum = {
+  id: 'id',
+  term_id: 'term_id',
+  title: 'title',
+  description: 'description',
+  target_paid_redemptions: 'target_paid_redemptions',
+  milestone_price: 'milestone_price',
+  previous_price_snapshot: 'previous_price_snapshot',
+  reward_amount_snapshot: 'reward_amount_snapshot',
+  notification_recipients: 'notification_recipients',
+  sort_order: 'sort_order',
+  active: 'active',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_milestonesScalarFieldEnum = (typeof E_booklet_milestonesScalarFieldEnum)[keyof typeof E_booklet_milestonesScalarFieldEnum]
+
+
+export const E_booklet_milestone_achievementsScalarFieldEnum = {
+  id: 'id',
+  teacher_id: 'teacher_id',
+  term_id: 'term_id',
+  milestone_id: 'milestone_id',
+  paid_redemptions_snapshot: 'paid_redemptions_snapshot',
+  previous_price_snapshot: 'previous_price_snapshot',
+  milestone_price_snapshot: 'milestone_price_snapshot',
+  reward_amount: 'reward_amount',
+  achieved_at: 'achieved_at',
+  reward_terms_accepted_at: 'reward_terms_accepted_at',
+  claimed_at: 'claimed_at'
+} as const
+
+export type E_booklet_milestone_achievementsScalarFieldEnum = (typeof E_booklet_milestone_achievementsScalarFieldEnum)[keyof typeof E_booklet_milestone_achievementsScalarFieldEnum]
+
+
+export const E_booklet_teacher_terms_acceptancesScalarFieldEnum = {
+  id: 'id',
+  teacher_id: 'teacher_id',
+  term_id: 'term_id',
+  acceptance_type: 'acceptance_type',
+  milestone_achievement_id: 'milestone_achievement_id',
+  terms_snapshot: 'terms_snapshot',
+  terms_version: 'terms_version',
+  accepted_at: 'accepted_at',
+  ip_address: 'ip_address',
+  user_agent: 'user_agent'
+} as const
+
+export type E_booklet_teacher_terms_acceptancesScalarFieldEnum = (typeof E_booklet_teacher_terms_acceptancesScalarFieldEnum)[keyof typeof E_booklet_teacher_terms_acceptancesScalarFieldEnum]
+
+
+export const Teacher_walletsScalarFieldEnum = {
+  id: 'id',
+  teacher_id: 'teacher_id',
+  balance: 'balance',
+  currency: 'currency',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Teacher_walletsScalarFieldEnum = (typeof Teacher_walletsScalarFieldEnum)[keyof typeof Teacher_walletsScalarFieldEnum]
+
+
+export const Teacher_wallet_ledgerScalarFieldEnum = {
+  id: 'id',
+  wallet_id: 'wallet_id',
+  teacher_id: 'teacher_id',
+  type: 'type',
+  source: 'source',
+  amount: 'amount',
+  balance_after: 'balance_after',
+  milestone_achievement_id: 'milestone_achievement_id',
+  purchase_id: 'purchase_id',
+  e_booklet_purchase_id: 'e_booklet_purchase_id',
+  notes: 'notes',
+  created_at: 'created_at'
+} as const
+
+export type Teacher_wallet_ledgerScalarFieldEnum = (typeof Teacher_wallet_ledgerScalarFieldEnum)[keyof typeof Teacher_wallet_ledgerScalarFieldEnum]
+
+
+export const E_booklet_access_codesScalarFieldEnum = {
+  id: 'id',
+  booklet_instance_id: 'booklet_instance_id',
+  term_id: 'term_id',
+  teacher_id: 'teacher_id',
+  code_hash: 'code_hash',
+  code_hint: 'code_hint',
+  kind: 'kind',
+  status: 'status',
+  bound_student_id: 'bound_student_id',
+  max_redemptions: 'max_redemptions',
+  redeemed_count: 'redeemed_count',
+  expires_at: 'expires_at',
+  disabled_at: 'disabled_at',
+  created_at: 'created_at'
+} as const
+
+export type E_booklet_access_codesScalarFieldEnum = (typeof E_booklet_access_codesScalarFieldEnum)[keyof typeof E_booklet_access_codesScalarFieldEnum]
+
+
+export const E_booklet_access_code_redemptionsScalarFieldEnum = {
+  id: 'id',
+  access_code_id: 'access_code_id',
+  booklet_instance_id: 'booklet_instance_id',
+  student_id: 'student_id',
+  access_id: 'access_id',
+  purchase_id: 'purchase_id',
+  paid_redemption_guard: 'paid_redemption_guard',
+  counted_for_progress: 'counted_for_progress',
+  redeemed_at: 'redeemed_at',
+  ip_address: 'ip_address',
+  user_agent: 'user_agent'
+} as const
+
+export type E_booklet_access_code_redemptionsScalarFieldEnum = (typeof E_booklet_access_code_redemptionsScalarFieldEnum)[keyof typeof E_booklet_access_code_redemptionsScalarFieldEnum]
 
 
 export const E_booklet_accessScalarFieldEnum = {

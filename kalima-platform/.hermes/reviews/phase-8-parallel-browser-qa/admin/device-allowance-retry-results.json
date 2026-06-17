@@ -1,0 +1,19 @@
+{
+  "startedAt": "2026-06-15T10:58:26.454Z",
+  "label": "add device allowance on seeded instance with allowedDevices",
+  "url": "/admin/e-booklet-instances/25/users/76/device-allowance",
+  "status": 200,
+  "ok": true,
+  "body": {
+    "success": true,
+    "data": {
+      "id": 3,
+      "booklet_instance_id": 25,
+      "user_id": 76,
+      "allowed_devices": 2,
+      "updated_by_admin_id": 67,
+      "reason": "Phase 8 QA camelCase allowance check",
+      "updated_at": "2026-06-15T10:58:26.432Z"
+    }
+  }
+}

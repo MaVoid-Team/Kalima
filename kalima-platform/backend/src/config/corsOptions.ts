@@ -9,7 +9,7 @@ const allowedOrigins: string[] = [
   "https://dev.kalima-edu.com",
   "http://localhost:3000",
   "http://localhost:5173",
-  "file://",
+  "http://127.0.0.1:5173",
 ];
 
 export const corsOptions: CorsOptions = {

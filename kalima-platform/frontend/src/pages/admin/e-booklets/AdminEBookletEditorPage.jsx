@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   BookOpenCheck,
@@ -45,6 +45,8 @@ const steps = [
   { id: "hotspots", labelKey: "admin.editor.steps.hotspots" },
   { id: "review", labelKey: "admin.editor.steps.review" },
 ];
+
+const teacherTemplateSteps = steps.filter((step) => step.id !== "basic");
 
 const hotspotIcons = {
   text: FileText,
@@ -234,6 +236,10 @@ export default function AdminEBookletEditorPage() {
   const { t } = useTranslation("eBooklets");
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isTeacherTemplateMode = searchParams.get("teacherTemplate") === "1";
+  const teacherTemplateVersionId = Number(searchParams.get("versionId") || 0);
+  const editorSteps = isTeacherTemplateMode ? teacherTemplateSteps : steps;
   const isEditing = Boolean(id);
   const pageRef = useRef(null);
   const dragRef = useRef(null);
@@ -241,7 +247,7 @@ export default function AdminEBookletEditorPage() {
   const audioChunksRef = useRef([]);
 
   const editor = useAdminEBookletEditor();
-  const [activeStep, setActiveStep] = useState("basic");
+  const [activeStep, setActiveStep] = useState(isTeacherTemplateMode ? "file" : "basic");
   const [templateId, setTemplateId] = useState(id ? Number(id) : null);
   const [templateForm, setTemplateForm] = useState(defaultTemplateForm);
   const [versions, setVersions] = useState([]);
@@ -255,7 +261,7 @@ export default function AdminEBookletEditorPage() {
   const [canvasExpanded, setCanvasExpanded] = useState(false);
   const [controlsMinimized, setControlsMinimized] = useState(false);
 
-  const activeStepIndex = steps.findIndex((step) => step.id === activeStep);
+  const activeStepIndex = editorSteps.findIndex((step) => step.id === activeStep);
   const pageCount = Math.max(
     1,
     parseNumber(selectedVersion?.page_count ?? versionForm.page_count, 1),
@@ -306,7 +312,7 @@ export default function AdminEBookletEditorPage() {
     const loadedVersions = Array.isArray(versionResponse?.data) ? versionResponse.data : [];
     setVersions(loadedVersions);
     if (loadedVersions.length > 0) {
-      const latest = loadedVersions[0];
+      const latest = loadedVersions.find((version) => Number(version.id) === teacherTemplateVersionId) || loadedVersions[0];
       setSelectedVersion(latest);
       setVersionForm({
         id: latest.id,
@@ -323,7 +329,7 @@ export default function AdminEBookletEditorPage() {
         document_filename: latest.base_document_file?.original_filename || "",
       });
     }
-  }, [editor.fetchTemplate, editor.fetchVersions, id]);
+  }, [editor.fetchTemplate, editor.fetchVersions, id, teacherTemplateVersionId]);
 
   const loadHotspots = useCallback(
     async (versionId) => {
@@ -551,6 +557,7 @@ export default function AdminEBookletEditorPage() {
   };
 
   const publishCurrentVersion = async () => {
+    if (isTeacherTemplateMode) return;
     const version = selectedVersion?.id ? selectedVersion : await saveVersion();
     if (!version?.id) return;
     const response = await editor.publishVersion(version.id);
@@ -576,12 +583,12 @@ export default function AdminEBookletEditorPage() {
       const version = await saveVersion();
       if (!version?.id && !selectedVersion?.id) return;
     }
-    const next = steps[Math.min(steps.length - 1, activeStepIndex + 1)];
+    const next = editorSteps[Math.min(editorSteps.length - 1, activeStepIndex + 1)];
     setActiveStep(next.id);
   };
 
   const goBack = () => {
-    const previous = steps[Math.max(0, activeStepIndex - 1)];
+    const previous = editorSteps[Math.max(0, activeStepIndex - 1)];
     setActiveStep(previous.id);
   };
 
@@ -1029,15 +1036,24 @@ export default function AdminEBookletEditorPage() {
           )}
           <Button
             variant="outline"
-            onClick={() => navigate("/admin/e-booklets")}
+            onClick={() => navigate(isTeacherTemplateMode ? "/admin/e-booklet-purchases" : "/admin/e-booklets")}
           >
             {t("common.close")}
           </Button>
         </div>
       </div>
 
+      {isTeacherTemplateMode && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {t("admin.editor.teacherTemplateNotice", {
+            defaultValue:
+              "Teacher-specific editing mode: changes apply only to this purchase's eBooklet version, not the global template.",
+          })}
+        </div>
+      )}
+
       <div className="grid gap-2 md:grid-cols-4">
-        {steps.map((step, index) => (
+        {editorSteps.map((step, index) => (
           <StepButton key={step.id} step={step} index={index} />
         ))}
       </div>
@@ -1173,19 +1189,21 @@ export default function AdminEBookletEditorPage() {
                   v{version.version_number} {statusLabel(version.status)}
                 </Button>
               ))}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSelectedVersion(null);
-                  setVersionForm(defaultVersionForm);
-                  setHotspots([]);
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                {t("admin.editor.file.newVersion")}
-              </Button>
+              {!isTeacherTemplateMode && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedVersion(null);
+                    setVersionForm(defaultVersionForm);
+                    setHotspots([]);
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                  {t("admin.editor.file.newVersion")}
+                </Button>
+              )}
             </div>
           )}
 
@@ -1515,10 +1533,12 @@ export default function AdminEBookletEditorPage() {
                 {t("admin.editor.review.description")}
               </p>
             </div>
-            <Button onClick={publishCurrentVersion} disabled={editor.loading || !selectedVersion?.id}>
-              <ShieldCheck className="h-4 w-4" />
-              {t("common.publishVersion")}
-            </Button>
+            {!isTeacherTemplateMode && (
+              <Button onClick={publishCurrentVersion} disabled={editor.loading || !selectedVersion?.id}>
+                <ShieldCheck className="h-4 w-4" />
+                {t("common.publishVersion")}
+              </Button>
+            )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-4">
@@ -1590,17 +1610,23 @@ export default function AdminEBookletEditorPage() {
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
             variant="outline"
-            onClick={activeStep === "file" ? saveVersion : saveBasicInfo}
+            onClick={activeStep === "file" || isTeacherTemplateMode ? saveVersion : saveBasicInfo}
             disabled={editor.loading}
           >
             <Save className="h-4 w-4" />
             {t("common.saveDraft")}
           </Button>
           {activeStep === "review" ? (
-            <Button onClick={publishCurrentVersion} disabled={editor.loading || !selectedVersion?.id}>
-              <ShieldCheck className="h-4 w-4" />
-              {t("common.publish")}
-            </Button>
+            isTeacherTemplateMode ? (
+              <Button onClick={() => navigate("/admin/e-booklet-purchases")} disabled={editor.loading}>
+                {t("common.done", { defaultValue: "Done" })}
+              </Button>
+            ) : (
+              <Button onClick={publishCurrentVersion} disabled={editor.loading || !selectedVersion?.id}>
+                <ShieldCheck className="h-4 w-4" />
+                {t("common.publish")}
+              </Button>
+            )
           ) : (
             <Button onClick={goNext} disabled={editor.loading}>
               {t("common.continue")}

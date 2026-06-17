@@ -18,6 +18,11 @@ const adminAuth = [
   requireRole([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator]),
 ];
 
+const adminManagerAuth = [
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+];
+
 const teacherAuth = [
   authenticateToken,
   requireRole([role_enum.Teacher], portal_enum.store),
@@ -54,8 +59,10 @@ const viewerLimiter = rateLimit({
 
 // Store APIs - separate from normal Market products.
 router.get("/e-booklet-store", eBookletController.listStoreTemplates);
-router.get("/e-booklet-store/instances/:instanceId", eBookletController.getStoreTemplate);
+router.get("/e-booklet-store/instances/:instanceId", eBookletController.getStoreInstance);
+router.get("/e-booklet-store/:templateId", eBookletController.getStoreTemplate);
 router.post("/e-booklet-checkout", ...studentAuth, uploadSingleImage("paymentScreenshot"), eBookletController.createPublicCheckout);
+router.get("/e-booklet-orders", ...studentAuth, eBookletController.listPublicOrders);
 
 // Admin APIs.
 router.post(
@@ -176,6 +183,11 @@ router.post(
   ...adminAuth,
   eBookletController.deliverPurchase,
 );
+router.post(
+  "/admin/e-booklet-purchases/:id/custom-template",
+  ...adminAuth,
+  eBookletController.preparePurchaseCustomTemplate,
+);
 router.get(
   "/admin/e-booklet-instances",
   ...adminAuth,
@@ -218,17 +230,117 @@ router.post(
 );
 router.get(
   "/admin/e-booklet-analytics",
-  ...adminAuth,
+  ...adminManagerAuth,
   eBookletController.adminAnalytics,
 );
 router.get(
   "/admin/e-booklet-analytics.csv",
-  ...adminAuth,
+  ...adminManagerAuth,
   eBookletController.exportAdminAnalyticsCsv,
+);
+router.get(
+  "/admin/e-booklet-terms",
+  ...adminManagerAuth,
+  eBookletController.listTerms,
+);
+router.post(
+  "/admin/e-booklet-terms",
+  ...adminManagerAuth,
+  eBookletController.createTerms,
+);
+router.patch(
+  "/admin/e-booklet-terms/:termId",
+  ...adminManagerAuth,
+  eBookletController.updateTerms,
+);
+router.post(
+  "/admin/e-booklet-terms/:termId/activate",
+  ...adminManagerAuth,
+  eBookletController.activateTerms,
+);
+router.get(
+  "/admin/e-booklet-milestones",
+  ...adminManagerAuth,
+  eBookletController.listMilestones,
+);
+router.post(
+  "/admin/e-booklet-milestones",
+  ...adminManagerAuth,
+  eBookletController.createMilestone,
+);
+router.patch(
+  "/admin/e-booklet-milestones/:milestoneId",
+  ...adminManagerAuth,
+  eBookletController.updateMilestone,
+);
+router.delete(
+  "/admin/e-booklet-milestones/:milestoneId",
+  ...adminManagerAuth,
+  eBookletController.deleteMilestone,
+);
+router.post(
+  "/admin/e-booklet-milestones/reorder",
+  ...adminManagerAuth,
+  eBookletController.reorderMilestones,
+);
+router.post(
+  "/admin/e-booklet-access-codes/free",
+  ...adminManagerAuth,
+  eBookletController.adminGenerateFreeCode,
+);
+router.get(
+  "/admin/e-booklet-progress",
+  ...adminManagerAuth,
+  eBookletController.listAdminProgress,
 );
 
 // Teacher APIs.
 router.get("/teacher/e-booklets", ...teacherAuth, eBookletController.listTeacherEBooklets);
+router.get(
+  "/teacher/e-booklet-terms/current",
+  ...teacherAuth,
+  eBookletController.getCurrentTerms,
+);
+router.post(
+  "/teacher/e-booklet-terms/accept-code-generation",
+  ...teacherAuth,
+  eBookletController.acceptCodeGenerationTerms,
+);
+router.post(
+  "/teacher/e-booklets/:instanceId/access-codes",
+  ...teacherAuth,
+  eBookletController.generateAccessCode,
+);
+router.get(
+  "/teacher/e-booklet-milestones",
+  ...teacherAuth,
+  eBookletController.listMilestones,
+);
+router.post(
+  "/teacher/e-booklet-milestones/evaluate",
+  ...teacherAuth,
+  eBookletController.evaluateMilestones,
+);
+router.get(
+  "/teacher/e-booklet-wallet",
+  ...teacherAuth,
+  eBookletController.getTeacherWallet,
+);
+router.post(
+  "/teacher/e-booklet-wallet/preview",
+  ...teacherAuth,
+  eBookletController.previewTeacherWallet,
+);
+router.post(
+  "/teacher/e-booklet-wallet/apply",
+  ...teacherAuth,
+  eBookletController.applyTeacherWallet,
+);
+router.post(
+  "/teacher/e-booklet-milestone-achievements/:achievementId/claim",
+  ...teacherAuth,
+  eBookletController.claimMilestoneReward,
+);
 router.get(
   "/teacher/e-booklets/:instanceId/invites",
   ...teacherAuth,
@@ -262,6 +374,12 @@ router.get(
 
 // Student APIs.
 router.get("/student/e-booklets", ...studentAuth, eBookletController.listStudentEBooklets);
+router.post(
+  "/e-booklet-access-codes/redeem",
+  inviteAcceptanceLimiter,
+  ...studentAuth,
+  eBookletController.redeemAccessCode,
+);
 router.get(
   "/e-booklet-invites/:token/open",
   inviteAcceptanceLimiter,
@@ -281,6 +399,12 @@ router.get(
   viewerLimiter,
   ...adminAuth,
   eBookletController.getAdminViewerMetadata,
+);
+router.get(
+  "/admin/e-booklet-viewer/:instanceId/document",
+  viewerLimiter,
+  ...adminAuth,
+  eBookletController.getAdminAuthorizedViewerDocument,
 );
 router.get(
   "/admin/e-booklet-viewer/:instanceId/pages/:pageNumber",
@@ -319,6 +443,12 @@ router.post(
   viewerLimiter,
   ...viewerAuth,
   eBookletController.bindViewerDevice,
+);
+router.get(
+  "/e-booklet-viewer/:instanceId/document",
+  viewerLimiter,
+  ...viewerAuth,
+  eBookletController.getAuthorizedViewerDocument,
 );
 router.get(
   "/e-booklet-viewer/:instanceId/pages/:pageNumber",

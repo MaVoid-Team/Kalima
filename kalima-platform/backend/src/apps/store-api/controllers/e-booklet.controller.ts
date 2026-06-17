@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { getEBookletService } from "../services/e-booklet.service";
+import { getEBookletDomainServices } from "../services/e-booklet-domain.service";
 import {
   AcceptEBookletInviteDto,
   CreateEBookletInviteDto,
@@ -25,6 +26,21 @@ function normalizeMultipartEBookletBody(body: any) {
   ["instance_id", "template_id", "template_version_id", "payment_method_id", "purchaseId", "paymentProofFileId"].forEach((key) => {
     if (next[key] !== undefined && next[key] !== null && next[key] !== "") next[key] = Number(next[key]);
   });
+  if (typeof next.items === "string") {
+    try {
+      next.items = JSON.parse(next.items);
+    } catch {
+      throw new BadRequestError("Invalid e-booklet checkout items payload.");
+    }
+  }
+  if (Array.isArray(next.items)) {
+    next.items = next.items.map((item: any) => ({
+      ...item,
+      instance_id: Number(item.instance_id),
+      template_id: Number(item.template_id),
+      template_version_id: Number(item.template_version_id),
+    }));
+  }
   ["terms_accepted", "termsAccepted"].forEach((key) => {
     if (next[key] !== undefined) next[key] = next[key] === true || next[key] === "true" || next[key] === "1";
   });
@@ -76,6 +92,26 @@ function currentUserId(req: Request): number {
   return userId;
 }
 
+function optionalNumber(raw: unknown): number | undefined {
+  if (raw === undefined || raw === null || raw === "") return undefined;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+function parseBoolean(raw: unknown): boolean {
+  return raw === true || raw === "true" || raw === "1" || raw === 1;
+}
+
+function sanitizeAccessCodeResponse(data: any) {
+  if (!data?.record) return data;
+  const { code_hash: _codeHash, ...safeRecord } = data.record;
+  return { ...data, record: safeRecord };
+}
+
+function domainServices() {
+  return getEBookletDomainServices();
+}
+
 function pagination(req: Request) {
   return {
     page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
@@ -94,12 +130,45 @@ function parseOptionalPositiveInt(raw: unknown, label: string, max?: number): nu
   return value;
 }
 
+function parseRequiredPositiveInt(raw: unknown, label: string, max?: number): number {
+  const value = parseOptionalPositiveInt(raw, label, max);
+  if (value === undefined) throw new BadRequestError(`Invalid ${label}`);
+  return value;
+}
+
+function parseAccessCodeKind(raw: unknown): "paid" | "free" {
+  const value = String(Array.isArray(raw) ? raw[0] : raw || "");
+  if (value !== "paid" && value !== "free") throw new BadRequestError("Invalid access code kind");
+  return value;
+}
+
 function parseOptionalIsoDate(raw: unknown, label: string): string | undefined {
   if (!raw) return undefined;
   const value = String(Array.isArray(raw) ? raw[0] : raw);
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) throw new BadRequestError(`Invalid ${label}`);
   return parsed.toISOString();
+}
+
+function parseOptionalFutureIsoDate(raw: unknown, label: string): string | undefined {
+  const value = parseOptionalIsoDate(raw, label);
+  if (!value) return undefined;
+  if (new Date(value).getTime() <= Date.now()) throw new BadRequestError(`${label} must be in the future`);
+  return value;
+}
+
+function parseRequiredFiniteMoney(raw: unknown, label: string, allowZero = false): number {
+  const value = Number(Array.isArray(raw) ? raw[0] : raw);
+  if (!Number.isFinite(value) || (allowZero ? value < 0 : value <= 0)) {
+    throw new BadRequestError(`Invalid ${label}`);
+  }
+  return value;
+}
+
+function parseStrictBoolean(raw: unknown, label: string): boolean {
+  if (raw === true || raw === "true" || raw === "1" || raw === 1) return true;
+  if (raw === false || raw === "false" || raw === "0" || raw === 0) return false;
+  throw new BadRequestError(`Invalid ${label}`);
 }
 
 function analyticsFilters(req: Request) {
@@ -176,7 +245,7 @@ export const eBookletController = {
 
   async listStoreTemplates(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await getEBookletService().listPublicInstances({
+      const result = await getEBookletService().listPublishedTemplates({
         search: req.query.search as string | undefined,
         categoryId: req.query.category_id
           ? parseInt(req.query.category_id as string, 10)
@@ -190,6 +259,17 @@ export const eBookletController = {
   },
 
   async getStoreTemplate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getPublishedTemplateById(
+        parseId(req.params.templateId, "template ID"),
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getStoreInstance(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await getEBookletService().getPublicInstance(
         parseId(req.params.instanceId, "instance ID"),
@@ -381,6 +461,18 @@ export const eBookletController = {
     }
   },
 
+  async listPublicOrders(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await getEBookletService().listPublicOrders(currentUserId(req), {
+        status: req.query.status as string | undefined,
+        ...pagination(req),
+      });
+      res.status(200).json({ success: true, ...result });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async listPurchases(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await getEBookletService().listPurchases({
@@ -437,6 +529,18 @@ export const eBookletController = {
       const data = await getEBookletService().deliverPurchase(
         parseId(req.params.id, "purchase ID"),
         dto,
+        currentUserId(req),
+      );
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async preparePurchaseCustomTemplate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().preparePurchaseCustomTemplateVersion(
+        parseId(req.params.id, "purchase ID"),
         currentUserId(req),
       );
       res.status(201).json({ success: true, data });
@@ -614,6 +718,243 @@ export const eBookletController = {
       res.type("text/csv");
       res.set("Content-Disposition", "attachment; filename=\"e-booklet-analytics.csv\"");
       res.status(200).send(csv);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getCurrentTerms(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().terms.getLatestActiveTerms(optionalNumber(req.query.template_id));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async acceptCodeGenerationTerms(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().terms.acceptLatestTerms(currentUserId(req), "code_generation", {
+        ipAddress: req.ip,
+        userAgent: req.get("user-agent"),
+      }, optionalNumber(req.body?.templateId ?? req.body?.template_id));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async createTerms(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().terms.createTerms(req.body, currentUserId(req));
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async listTerms(req: Request, res: Response, next: NextFunction) {
+    try {
+      const templateId = req.query.template_id === "null" ? null : optionalNumber(req.query.template_id);
+      const data = await domainServices().terms.listTerms({
+        templateId,
+        status: typeof req.query.status === "string" ? req.query.status : undefined,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async updateTerms(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().terms.updateTerms(parseId(req.params.termId, "term ID"), req.body);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async activateTerms(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().terms.activateTerms(parseId(req.params.termId, "term ID"), currentUserId(req));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async generateAccessCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const requestedKind = parseAccessCodeKind(req.body?.kind ?? "paid");
+      const data = await domainServices().accessCodes.generateCode({
+        bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
+        teacherId: currentUserId(req),
+        kind: requestedKind === "free" ? "paid" : requestedKind,
+        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+        maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
+      });
+      res.status(201).json({ success: true, data: sanitizeAccessCodeResponse(data) });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminGenerateFreeCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodes.generateCode({
+        bookletInstanceId: parseRequiredPositiveInt(req.body?.bookletInstanceId ?? req.body?.booklet_instance_id, "instance ID"),
+        teacherId: parseRequiredPositiveInt(req.body?.teacherId ?? req.body?.teacher_id, "teacher ID"),
+        kind: "free",
+        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+        maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
+        adminActorId: currentUserId(req),
+        ipAddress: req.ip,
+        userAgent: req.get("user-agent") ?? null,
+      });
+      res.status(201).json({ success: true, data: sanitizeAccessCodeResponse(data) });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async redeemAccessCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const code = String(req.body?.code || "").trim();
+      if (!code) throw new BadRequestError("E-booklet access code is required.");
+      const data = await domainServices().redemptions.redeemCode(code, currentUserId(req), {
+        termsAccepted: parseStrictBoolean(req.body?.termsAccepted ?? req.body?.terms_accepted, "terms acceptance"),
+        ipAddress: req.ip,
+        userAgent: req.get("user-agent"),
+        purchaseId: parseOptionalPositiveInt(req.body?.purchaseId ?? req.body?.purchase_id, "purchase ID"),
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async listMilestones(req: Request, res: Response, next: NextFunction) {
+    try {
+      const isAdminRoute = req.path.startsWith("/admin/");
+      const data = await domainServices().milestones.listMilestones(
+        optionalNumber(req.query.term_id),
+        isAdminRoute ? undefined : currentUserId(req),
+        isAdminRoute,
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async createMilestone(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().milestones.createMilestone(req.body, currentUserId(req));
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async updateMilestone(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().milestones.updateMilestone(parseId(req.params.milestoneId, "milestone ID"), req.body);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async deleteMilestone(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().milestones.deleteMilestone(parseId(req.params.milestoneId, "milestone ID"));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async reorderMilestones(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().milestones.reorderMilestones(parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"), req.body?.items ?? []);
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async listAdminProgress(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().milestones.listProgress(optionalNumber(req.query.term_id));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async evaluateMilestones(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().milestones.evaluateTeacherMilestones(currentUserId(req), optionalNumber(req.body?.termId ?? req.body?.term_id));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getTeacherWallet(req: Request, res: Response, next: NextFunction) {
+    try {
+      const [wallet, ledger] = await Promise.all([
+        domainServices().wallet.getWallet(currentUserId(req)),
+        domainServices().wallet.listLedger(currentUserId(req)),
+      ]);
+      res.status(200).json({ success: true, data: { wallet, ledger } });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async previewTeacherWallet(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().wallet.previewPurchase({
+        teacherId: currentUserId(req),
+        purchaseTotal: parseRequiredFiniteMoney(req.body?.purchaseTotal ?? req.body?.purchase_total, "purchase total", true),
+        requestedAmount: parseRequiredFiniteMoney(req.body?.requestedAmount ?? req.body?.requested_amount, "wallet credit amount"),
+        couponApplied: parseBoolean(req.body?.couponApplied ?? req.body?.coupon_applied),
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async claimMilestoneReward(req: Request, res: Response, next: NextFunction) {
+    try {
+      const termsAccepted = parseBoolean(req.body?.termsAccepted ?? req.body?.terms_accepted);
+      if (!termsAccepted) throw new BadRequestError("Reward claim terms must be accepted.");
+      const data = await domainServices().milestones.claimReward(currentUserId(req), parseId(req.params.achievementId, "achievement ID"), {
+        ipAddress: req.ip,
+        userAgent: req.get("user-agent"),
+        termsAccepted,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async applyTeacherWallet(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().wallet.applyToPurchase({
+        teacherId: currentUserId(req),
+        purchaseId: parseRequiredPositiveInt(req.body?.purchaseId ?? req.body?.purchase_id, "purchase ID"),
+        purchaseTotal: parseRequiredFiniteMoney(req.body?.purchaseTotal ?? req.body?.purchase_total, "purchase total", true),
+        requestedAmount: parseRequiredFiniteMoney(req.body?.requestedAmount ?? req.body?.requested_amount, "wallet credit amount"),
+        couponApplied: parseBoolean(req.body?.couponApplied ?? req.body?.coupon_applied),
+      });
+      res.status(200).json({ success: true, data });
     } catch (error) {
       next(error);
     }
@@ -822,6 +1163,41 @@ export const eBookletController = {
       );
       setPrivateNoStore(res);
       res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getAuthorizedViewerDocument(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { asset, absolutePath } = await getEBookletService().getAuthorizedViewerDocument(
+        parseId(req.params.instanceId, "instance ID"),
+        currentUserId(req),
+      );
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "application/pdf");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-document.pdf").replace(/"/g, "")}"`,
+      );
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getAdminAuthorizedViewerDocument(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { asset, absolutePath } = await getEBookletService().getAdminAuthorizedViewerDocument(
+        parseId(req.params.instanceId, "instance ID"),
+      );
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "application/pdf");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-document.pdf").replace(/"/g, "")}"`,
+      );
+      res.sendFile(absolutePath);
     } catch (error) {
       next(error);
     }
