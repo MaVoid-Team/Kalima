@@ -23,6 +23,7 @@ export default function Footer() {
         { label: t("footer.samples"), href: "/samples" },
         { label: t("footer.market"), href: "/market" },
         { label: t("footer.eBooklets"), href: "/e-booklets" },
+        { label: t("footer.privacyPolicy"), href: "/privacy-policy" },
       ],
     },
   ];

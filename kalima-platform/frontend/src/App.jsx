@@ -12,6 +12,7 @@ import CouponsPage from "./pages/admin/coupons/CouponsPage";
 
 // Lazy-loaded pages
 const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
+const PrivacyPolicyPage = lazy(() => import("./pages/privacy/PrivacyPolicyPage"));
 const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
 const SignupPage = lazy(() => import("./pages/auth/SignupPage"));
 const ForgotPasswordPage = lazy(
@@ -140,6 +141,7 @@ const router = createBrowserRouter(
       {/* Public Routes with MainLayout (Navbar & Footer) */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
 
         {/* E-booklet storefront is public to students/visitors; access is only required for owned viewer pages. */}
         <Route path="/e-booklets" element={<EBookletStorePage />} />
