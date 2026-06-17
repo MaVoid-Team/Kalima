@@ -20,6 +20,7 @@ import useAuth from "../hooks/auth/useAuth";
 import { useCart } from "../contexts/CartContext";
 import { useRole } from "@/hooks/useRole";
 import NotificationBell from "../components/notifications/NotificationBell";
+import { E_BOOKLET_ORDERS_ROUTE } from "@/pages/e-booklets/eBookletOrdersContract.mjs";
 
 
 export default function Navbar() {
@@ -111,10 +112,13 @@ export default function Navbar() {
   useEffect(() => {
     if (!open) return;
 
-    const routeValues = hasStoreAccess ? ["/samples", "/market", "/e-booklets"] : [];
+    const routeValues = hasStoreAccess ? ["/samples", "/market", "/e-booklets"] : ["/e-booklets"];
+    if (isAuthenticated && isTeacher && !hasAdminAccess) {
+      routeValues.push(E_BOOKLET_ORDERS_ROUTE);
+    }
     const current = routeValues.find((route) => location.pathname.startsWith(route));
     setCommandValue(current || "");
-  }, [open, location.pathname, hasStoreAccess]);
+  }, [open, location.pathname, hasStoreAccess, isAuthenticated, isTeacher, hasAdminAccess]);
 
 
   const toggleLanguage = () => {
@@ -213,6 +217,16 @@ export default function Navbar() {
                   <BookOpenCheck className="mr-2 h-4 w-4"></BookOpenCheck>
                   {t("navbar.eBooklets")}
                 </Button>
+                {isAuthenticated && isTeacher && !hasAdminAccess && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate(E_BOOKLET_ORDERS_ROUTE)}
+                    className="h-9 px-4"
+                  >
+                    <ShoppingBag className="mr-2 h-4 w-4"></ShoppingBag>
+                    {t("navbar.eBookletOrders")}
+                  </Button>
+                )}
 
                 {/* Language Toggle */}
                 <Button
@@ -532,6 +546,11 @@ export default function Navbar() {
             <CommandItem value="/e-booklets" onSelect={() => runCommand(() => navigate("/e-booklets"))}>
               {t("navbar.eBooklets")}
             </CommandItem>
+            {isAuthenticated && isTeacher && !hasAdminAccess && (
+              <CommandItem value={E_BOOKLET_ORDERS_ROUTE} onSelect={() => runCommand(() => navigate(E_BOOKLET_ORDERS_ROUTE))}>
+                {t("navbar.eBookletOrders")}
+              </CommandItem>
+            )}
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading={t("navbar.settings")}>

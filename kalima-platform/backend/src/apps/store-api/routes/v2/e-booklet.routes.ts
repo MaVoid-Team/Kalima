@@ -59,8 +59,10 @@ const viewerLimiter = rateLimit({
 
 // Store APIs - separate from normal Market products.
 router.get("/e-booklet-store", eBookletController.listStoreTemplates);
-router.get("/e-booklet-store/instances/:instanceId", eBookletController.getStoreTemplate);
-router.post("/e-booklet-checkout", ...studentAuth, uploadSingleImage("paymentScreenshot"), eBookletController.createPublicCheckout);
+router.get("/e-booklet-store/instances/:instanceId", eBookletController.getStoreInstance);
+router.get("/e-booklet-store/:templateId", eBookletController.getStoreTemplate);
+router.post("/e-booklet-checkout", ...teacherAuth, uploadSingleImage("paymentScreenshot"), eBookletController.createPublicCheckout);
+router.get("/e-booklet-orders", ...teacherAuth, eBookletController.listPublicOrders);
 
 // Admin APIs.
 router.post(
@@ -282,6 +284,21 @@ router.post(
   eBookletController.reorderMilestones,
 );
 router.post(
+  "/admin/e-booklet-access-codes",
+  ...adminManagerAuth,
+  eBookletController.adminGenerateAccessCode,
+);
+router.get(
+  "/admin/e-booklet-access-codes",
+  ...adminManagerAuth,
+  eBookletController.adminListAccessCodes,
+);
+router.post(
+  "/admin/e-booklet-access-codes/bulk",
+  ...adminManagerAuth,
+  eBookletController.adminGenerateAccessCodes,
+);
+router.post(
   "/admin/e-booklet-access-codes/free",
   ...adminManagerAuth,
   eBookletController.adminGenerateFreeCode,
@@ -308,6 +325,16 @@ router.post(
   "/teacher/e-booklets/:instanceId/access-codes",
   ...teacherAuth,
   eBookletController.generateAccessCode,
+);
+router.get(
+  "/teacher/e-booklets/:instanceId/access-codes",
+  ...teacherAuth,
+  eBookletController.listAccessCodes,
+);
+router.post(
+  "/teacher/e-booklets/:instanceId/access-codes/bulk",
+  ...teacherAuth,
+  eBookletController.generateAccessCodes,
 );
 router.get(
   "/teacher/e-booklet-milestones",
@@ -417,15 +444,15 @@ router.get(
   eBookletController.getAdminViewerPageHotspots,
 );
 router.get(
-  "/admin/e-booklet-viewer/hotspots/:hotspotId/content",
+  "/admin/e-booklet-viewer/:instanceId/hotspots/:hotspotId/content",
   viewerLimiter,
-  ...adminAuth,
+  ...adminManagerAuth,
   eBookletController.getAdminHotspotContent,
 );
 router.get(
-  "/admin/e-booklet-viewer/hotspots/:hotspotId/assets/:assetId",
+  "/admin/e-booklet-viewer/:instanceId/hotspots/:hotspotId/assets/:assetId",
   viewerLimiter,
-  ...adminAuth,
+  ...adminManagerAuth,
   eBookletController.getAdminAuthorizedHotspotAsset,
 );
 

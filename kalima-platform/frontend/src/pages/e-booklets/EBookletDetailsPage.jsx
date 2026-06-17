@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   BookOpenCheck,
@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useEBookletTemplate } from "@/hooks/useEBooklets";
+import { useEBookletCart, useEBookletTemplate } from "@/hooks/useEBooklets";
 import { useTranslation } from "react-i18next";
 
 const formatMoney = (amount, currency = "EGP", language = "en") => {
@@ -96,16 +96,39 @@ function NotFoundState({ t }) {
 
 export default function EBookletDetailsPage() {
   const { t, i18n } = useTranslation("eBooklets");
-  const { instanceId } = useParams();
-  const { template, loading, notFound } = useEBookletTemplate(instanceId);
+  const { templateId, instanceId } = useParams();
+  const lookupId = templateId || instanceId;
+  const legacyInstanceRoute = Boolean(instanceId);
+  const navigate = useNavigate();
+  const { template, loading, notFound } = useEBookletTemplate(lookupId, {
+    legacyInstance: legacyInstanceRoute,
+  });
+  const { addTemplate } = useEBookletCart();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [instanceId]);
+  }, [lookupId]);
+
+  useEffect(() => {
+    if (!legacyInstanceRoute || loading) return;
+    const canonicalTemplateId = template?.template_id || template?.templateId || template?.template?.id;
+    if (canonicalTemplateId) {
+      navigate(`/e-booklets/${canonicalTemplateId}`, { replace: true });
+      return;
+    }
+    if (notFound || template) {
+      navigate("/e-booklets", { replace: true });
+    }
+  }, [legacyInstanceRoute, loading, navigate, notFound, template]);
 
   if (loading) return <DetailSkeleton />;
+  if (legacyInstanceRoute) return <DetailSkeleton />;
   if (notFound || !template) return <NotFoundState t={t} />;
 
+  const handleAddToCart = () => {
+    addTemplate(template);
+    navigate("/e-booklet-cart");
+  };
 
   const activeVersion = template.activeVersion;
   const hotspotTypes = [
@@ -180,11 +203,15 @@ export default function EBookletDetailsPage() {
                   {formatMoney(template.price, template.currency, i18n.language)}
                 </div>
               </div>
-              <Button asChild size="lg" disabled={!activeVersion?.id} className="w-full active:scale-[0.98] md:w-auto">
-                <Link to="/e-booklet-code">
-                  <ShoppingBag className="h-4 w-4" />
-                  {t("details.redeemCode")}
-                </Link>
+              <Button
+                type="button"
+                size="lg"
+                onClick={handleAddToCart}
+                disabled={!activeVersion?.id}
+                className="w-full active:scale-[0.98] md:w-auto"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                {t("details.addToCart")}
               </Button>
             </div>
           </div>

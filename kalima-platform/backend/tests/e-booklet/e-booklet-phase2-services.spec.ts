@@ -9,7 +9,7 @@ function createDb(overrides: Record<string, unknown> = {}) {
     e_booklet_terms: { findFirst: jest.fn(), create: jest.fn(), update: jest.fn(), updateMany: jest.fn(), findMany: jest.fn(), findUnique: jest.fn() },
     e_booklet_teacher_terms_acceptances: { findFirst: jest.fn(), create: jest.fn() },
     e_booklet_instances: { findFirst: jest.fn() },
-    e_booklet_access_codes: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn(), updateMany: jest.fn(), findFirst: jest.fn() },
+    e_booklet_access_codes: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn(), updateMany: jest.fn(), findFirst: jest.fn(), findMany: jest.fn(), aggregate: jest.fn() },
     e_booklet_access_code_redemptions: { findFirst: jest.fn(), findMany: jest.fn(), create: jest.fn(), update: jest.fn(), count: jest.fn() },
     e_booklet_access: { findFirst: jest.fn(), create: jest.fn(), upsert: jest.fn() },
     e_booklet_milestones: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), findFirst: jest.fn() },
@@ -48,6 +48,34 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     await expect(service.acceptLatestTerms(9, "code_generation", { ipAddress: "127.0.0.1" })).resolves.toEqual({ id: 7, teacher_id: 9, term_id: 1, acceptance_type: "code_generation" });
     await expect(service.acceptLatestTerms(9, "code_generation")).resolves.toEqual({ id: 8, term_id: 1, acceptance_type: "code_generation" });
     expect(db.e_booklet_teacher_terms_acceptances.create).toHaveBeenCalledWith({ data: expect.objectContaining({ teacher_id: 9, term_id: 1, acceptance_type: "code_generation", terms_snapshot: "Generate terms", ip_address: "127.0.0.1" }) });
+  });
+
+  test("terms acceptance is idempotent when concurrent requests hit the unique index", async () => {
+    const db = createDb();
+    const existingAcceptance = { id: 11, teacher_id: 9, term_id: 1, acceptance_type: "code_generation" };
+    db.e_booklet_terms.findFirst.mockResolvedValue({
+      id: 1,
+      name: "Term 1",
+      status: "active",
+      active_guard: "global-active",
+      code_generation_terms: "Generate terms",
+    });
+    db.e_booklet_teacher_terms_acceptances.findFirst
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(existingAcceptance);
+    db.e_booklet_teacher_terms_acceptances.create.mockRejectedValue({ code: "P2002" });
+    const service = new EBookletTermsService(db);
+
+    await expect(service.acceptLatestTerms(9, "code_generation")).resolves.toEqual(existingAcceptance);
+    expect(db.e_booklet_teacher_terms_acceptances.create).toHaveBeenCalledTimes(1);
+    expect(db.e_booklet_teacher_terms_acceptances.findFirst).toHaveBeenNthCalledWith(2, {
+      where: {
+        teacher_id: 9,
+        term_id: 1,
+        acceptance_type: "code_generation",
+        milestone_achievement_id: null,
+      },
+    });
   });
 
   test("terms service falls back from template-specific lookup to active global terms", async () => {
@@ -103,6 +131,49 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     expect(db.e_booklet_audit_logs.create).not.toHaveBeenCalled();
     expect(db.e_booklet_instances.findFirst).toHaveBeenCalledWith({ where: { id: 10, teacher_id: 9, status: "active" }, include: { template: true } });
     expect(db.e_booklet_access_codes.create).toHaveBeenCalledWith({ data: expect.objectContaining({ booklet_instance_id: 10, teacher_id: 9, kind: "paid", max_redemptions: 1, term_id: 1, code_hint: expect.any(String) }) });
+  });
+
+  test("access code service enforces paid seat quota and bulk-generates codes after approval", async () => {
+    const db = createDb();
+    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", template_id: 99 });
+    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue({ id: 2, term_id: 1, acceptance_type: "code_generation" });
+    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, template_id: 99, status: "active", invite_quota: 3 });
+    db.e_booklet_access_codes.aggregate.mockResolvedValue({ _sum: { max_redemptions: 2 } });
+    db.e_booklet_access_codes.findUnique.mockResolvedValue(null);
+    db.e_booklet_access_codes.create.mockImplementation(async ({ data }: any) => ({ id: Math.floor(Math.random() * 10000), ...data }));
+    const service = new EBookletAccessCodeService(db);
+
+    await expect(service.generateCodes({ bookletInstanceId: 10, teacherId: 9, kind: "paid", termId: 1, count: 2 })).rejects.toThrow("Not enough available student seats");
+    await expect(service.generateCodes({ bookletInstanceId: 10, teacherId: 9, kind: "paid", termId: 1, count: 1 })).resolves.toMatchObject({ count: 1 });
+
+    expect(db.e_booklet_access_codes.aggregate).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ booklet_instance_id: 10, teacher_id: 9, kind: "paid", status: { in: ["active", "redeemed"] } }),
+      _sum: { max_redemptions: true },
+    }));
+    expect(db.e_booklet_access_codes.create).toHaveBeenCalledTimes(1);
+  });
+
+  test("access code service lists sanitized teacher code statuses without hashes", async () => {
+    const db = createDb();
+    db.e_booklet_access_codes.findMany.mockResolvedValue([{ id: 7, code_hash: "secret", code_hint: "ABCD", status: "active", kind: "paid" }]);
+    const service = new EBookletAccessCodeService(db);
+
+    await expect(service.listCodes({ teacherId: 9, bookletInstanceId: 10, status: "active" as any })).resolves.toEqual([{ id: 7, code_hint: "ABCD", status: "active", kind: "paid" }]);
+    expect(db.e_booklet_access_codes.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ teacher_id: 9, booklet_instance_id: 10, status: "active" }) }));
+  });
+
+  test("free shared access codes do not reserve paid student seats", async () => {
+    const db = createDb();
+    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", template_id: 99 });
+    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue({ id: 3, term_id: 1, term: { id: 1, template_id: 99 }, acceptance_type: "code_generation" });
+    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, template_id: 99, status: "active", invite_quota: 0 });
+    db.e_booklet_access_codes.create.mockResolvedValue({ id: 8, code_hint: "FREE", kind: "free", status: "active" });
+    const service = new EBookletAccessCodeService(db);
+
+    await service.generateCode({ bookletInstanceId: 10, teacherId: 9, kind: "free", termId: 1, maxRedemptions: 999999 });
+
+    expect(db.e_booklet_access_codes.aggregate).not.toHaveBeenCalled();
+    expect(db.e_booklet_access_codes.create).toHaveBeenCalledWith({ data: expect.objectContaining({ kind: "free", max_redemptions: 999999 }) });
   });
 
   test("access code service audits admin-generated free codes", async () => {

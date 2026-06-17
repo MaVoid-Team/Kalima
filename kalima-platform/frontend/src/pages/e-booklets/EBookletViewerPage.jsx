@@ -178,7 +178,7 @@ function HotspotMarker({ hotspot, active, onOpen, t }) {
   );
 }
 
-function AssetBlock({ block, hotspot, viewer, t }) {
+function AssetBlock({ block, hotspot, viewer, t, instanceId }) {
   const [assetUrl, setAssetUrl] = useState(null);
   const [assetLoading, setAssetLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -194,7 +194,7 @@ function AssetBlock({ block, hotspot, viewer, t }) {
     let createdUrl = null;
     setAssetLoading(true);
     viewer
-      .fetchHotspotAssetBlobUrl(hotspot.id, assetId)
+      .fetchHotspotAssetBlobUrl(hotspot.id, assetId, instanceId)
       .then((url) => {
         createdUrl = url;
         if (active) {
@@ -213,7 +213,7 @@ function AssetBlock({ block, hotspot, viewer, t }) {
       active = false;
       if (createdUrl) URL.revokeObjectURL(createdUrl);
     };
-  }, [assetId, hotspot.id, viewer.fetchHotspotAssetBlobUrl]);
+  }, [assetId, hotspot.id, instanceId, viewer.fetchHotspotAssetBlobUrl]);
 
   useEffect(() => {
     setExpanded(Boolean(shouldAutoExpand));
@@ -325,7 +325,7 @@ function QuestionAnswerBlock({ block, t }) {
   );
 }
 
-function ContentBlock({ block, hotspot, viewer, t }) {
+function ContentBlock({ block, hotspot, viewer, t, instanceId }) {
   if (block.type === "text") {
     return (
       <p className="whitespace-pre-wrap text-sm leading-6" style={{ fontFamily: block.font_family || undefined }}>
@@ -334,7 +334,7 @@ function ContentBlock({ block, hotspot, viewer, t }) {
     );
   }
   if (["image", "audio", "video", "file"].includes(block.type) && block.source !== "youtube") {
-    return <AssetBlock block={block} hotspot={hotspot} viewer={viewer} t={t} />;
+    return <AssetBlock block={block} hotspot={hotspot} viewer={viewer} t={t} instanceId={instanceId} />;
   }
   if (block.type === "video" && block.source === "youtube") {
     const embedUrl = getYouTubeEmbedUrl(block.youtube_url);
@@ -497,9 +497,9 @@ export default function EBookletViewerPage() {
 
   const openHotspot = useCallback(async (hotspot) => {
     setActiveHotspot(hotspot);
-    const response = await viewer.fetchHotspotContent(hotspot.id);
+    const response = await viewer.fetchHotspotContent(hotspot.id, instanceId);
     setHotspotContent({ ...hotspot, ...(response?.data || {}) });
-  }, [viewer]);
+  }, [instanceId, viewer]);
 
   const contentHotspot = hotspotContent || activeHotspot;
   const pageUrl = documentPageUrl || viewer.page?.url || viewer.page?.pageUrl || viewer.page?.assetUrl || null;
@@ -665,7 +665,7 @@ export default function EBookletViewerPage() {
                         {t("admin.editor.hotspots.blockNumber", { number: index + 1 })}
                       </div>
                     )}
-                    <ContentBlock block={block} hotspot={contentHotspot} viewer={viewer} t={t} />
+                    <ContentBlock block={block} hotspot={contentHotspot} viewer={viewer} t={t} instanceId={instanceId} />
                     {block.supplementary_text && (
                       <p className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground">{block.supplementary_text}</p>
                     )}

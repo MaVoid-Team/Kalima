@@ -304,20 +304,25 @@ export default function AdminEBookletPurchasesPage() {
                     </TableCell>
                     <TableCell>v{purchase.template_version?.version_number || 1}</TableCell>
                     <TableCell>
-                      <div className="flex justify-end gap-2">
-                        {purchase.status !== "paid" && purchase.status !== "ready" && (
+                      <div className="flex flex-wrap justify-end gap-2">
+                        {["pending", "awaiting_payment", "needs_branding_info", "customization_in_progress"].includes(purchase.status) && (
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleMarkPaid(purchase)}
+                            aria-label={t("admin.purchases.approveUnlock", { defaultValue: "Approve and unlock teacher management" })}
                           >
                             <CheckCircle2 className="h-4 w-4" />
+                            <span className="hidden xl:inline">
+                              {t("admin.purchases.approveUnlockShort", { defaultValue: "Approve / unlock" })}
+                            </span>
                           </Button>
                         )}
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => setSelectedPurchase(purchase)}
+                          aria-label={t("admin.purchases.managePurchase", { defaultValue: "Manage eBooklet purchase" })}
                         >
                           <BookOpenCheck className="h-4 w-4" />
                         </Button>

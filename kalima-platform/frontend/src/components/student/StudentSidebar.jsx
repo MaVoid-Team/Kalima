@@ -40,6 +40,7 @@ export default function StudentSidebar({ isMobileOpen, setIsMobileOpen }) {
     { name: t('nav.home'), href: '/', icon: Home, id: 'home' },
     { name: t('nav.profile'), href: '/student/profile', icon: User, id: 'profile' },
     { name: t('nav.eBookletStore', 'E-Booklets'), href: '/e-booklets', icon: ShoppingBag, id: 'e-booklet-store' },
+
     { name: t('nav.eBooklets', 'My E-Booklets'), href: '/student/e-booklets', icon: BookOpenCheck, id: 'e-booklets' },
     // { name: t('nav.orders'), href: '/orders', icon: ShoppingBag, id: 'orders' },
     { name: t('nav.settings'), href: '/student/settings', icon: Settings, id: 'settings' },

@@ -26,6 +26,21 @@ function normalizeMultipartEBookletBody(body: any) {
   ["instance_id", "template_id", "template_version_id", "payment_method_id", "purchaseId", "paymentProofFileId"].forEach((key) => {
     if (next[key] !== undefined && next[key] !== null && next[key] !== "") next[key] = Number(next[key]);
   });
+  if (typeof next.items === "string") {
+    try {
+      next.items = JSON.parse(next.items);
+    } catch {
+      throw new BadRequestError("Invalid e-booklet checkout items payload.");
+    }
+  }
+  if (Array.isArray(next.items)) {
+    next.items = next.items.map((item: any) => ({
+      ...item,
+      instance_id: Number(item.instance_id),
+      template_id: Number(item.template_id),
+      template_version_id: Number(item.template_version_id),
+    }));
+  }
   ["terms_accepted", "termsAccepted"].forEach((key) => {
     if (next[key] !== undefined) next[key] = next[key] === true || next[key] === "true" || next[key] === "1";
   });
@@ -230,7 +245,7 @@ export const eBookletController = {
 
   async listStoreTemplates(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await getEBookletService().listPublicInstances({
+      const result = await getEBookletService().listPublishedTemplates({
         search: req.query.search as string | undefined,
         categoryId: req.query.category_id
           ? parseInt(req.query.category_id as string, 10)
@@ -244,6 +259,17 @@ export const eBookletController = {
   },
 
   async getStoreTemplate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getPublishedTemplateById(
+        parseId(req.params.templateId, "template ID"),
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getStoreInstance(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await getEBookletService().getPublicInstance(
         parseId(req.params.instanceId, "instance ID"),
@@ -430,6 +456,18 @@ export const eBookletController = {
         currentUserId(req),
       );
       res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async listPublicOrders(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await getEBookletService().listPublicOrders(currentUserId(req), {
+        status: req.query.status as string | undefined,
+        ...pagination(req),
+      });
+      res.status(200).json({ success: true, ...result });
     } catch (error) {
       next(error);
     }
@@ -746,18 +784,105 @@ export const eBookletController = {
     }
   },
 
+  async listAccessCodes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const requestedKind = req.query.kind ? parseAccessCodeKind(req.query.kind) : undefined;
+      const data = await domainServices().accessCodes.listCodes({
+        bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
+        teacherId: currentUserId(req),
+        kind: requestedKind,
+        status: typeof req.query.status === "string" ? req.query.status : undefined,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async generateAccessCode(req: Request, res: Response, next: NextFunction) {
     try {
       const requestedKind = parseAccessCodeKind(req.body?.kind ?? "paid");
       const data = await domainServices().accessCodes.generateCode({
         bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
         teacherId: currentUserId(req),
-        kind: requestedKind === "free" ? "paid" : requestedKind,
+        kind: requestedKind,
         termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
         expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
         maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
       });
       res.status(201).json({ success: true, data: sanitizeAccessCodeResponse(data) });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async generateAccessCodes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const requestedKind = parseAccessCodeKind(req.body?.kind ?? "paid");
+      const data = await domainServices().accessCodes.generateCodes({
+        bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
+        teacherId: currentUserId(req),
+        kind: requestedKind,
+        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+        count: parseOptionalPositiveInt(req.body?.count ?? req.body?.quantity, "access code count", 100) ?? 1,
+        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+        maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
+      });
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminListAccessCodes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const requestedKind = req.query.kind ? parseAccessCodeKind(req.query.kind) : undefined;
+      const data = await domainServices().accessCodes.listCodes({
+        bookletInstanceId: parseRequiredPositiveInt(req.query.bookletInstanceId ?? req.query.booklet_instance_id, "instance ID"),
+        teacherId: parseRequiredPositiveInt(req.query.teacherId ?? req.query.teacher_id, "teacher ID"),
+        kind: requestedKind,
+        status: typeof req.query.status === "string" ? req.query.status : undefined,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminGenerateAccessCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodes.generateCode({
+        bookletInstanceId: parseRequiredPositiveInt(req.body?.bookletInstanceId ?? req.body?.booklet_instance_id, "instance ID"),
+        teacherId: parseRequiredPositiveInt(req.body?.teacherId ?? req.body?.teacher_id, "teacher ID"),
+        kind: parseAccessCodeKind(req.body?.kind ?? "paid"),
+        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+        maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
+        adminActorId: currentUserId(req),
+        ipAddress: req.ip,
+        userAgent: req.get("user-agent") ?? null,
+      });
+      res.status(201).json({ success: true, data: sanitizeAccessCodeResponse(data) });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminGenerateAccessCodes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodes.generateCodes({
+        bookletInstanceId: parseRequiredPositiveInt(req.body?.bookletInstanceId ?? req.body?.booklet_instance_id, "instance ID"),
+        teacherId: parseRequiredPositiveInt(req.body?.teacherId ?? req.body?.teacher_id, "teacher ID"),
+        kind: parseAccessCodeKind(req.body?.kind ?? "paid"),
+        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+        count: parseOptionalPositiveInt(req.body?.count ?? req.body?.quantity, "access code count", 100) ?? 1,
+        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+        maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
+        adminActorId: currentUserId(req),
+        ipAddress: req.ip,
+        userAgent: req.get("user-agent") ?? null,
+      });
+      res.status(201).json({ success: true, data });
     } catch (error) {
       next(error);
     }
@@ -1040,7 +1165,11 @@ export const eBookletController = {
 
   async approveStudentPurchaseLink(req: Request, res: Response, next: NextFunction) {
     try {
-      throw new BadRequestError("Direct student e-booklet purchase approval is disabled. Students must redeem a teacher-provided URL or access code.");
+      const data = await getEBookletService().approveStudentPurchaseLink(
+        parseId(req.params.purchaseId, "purchase ID"),
+        currentUserId(req),
+      );
+      res.status(200).json({ success: true, data });
     } catch (error) {
       next(error);
     }
@@ -1117,6 +1246,7 @@ export const eBookletController = {
   async getAdminHotspotContent(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await getEBookletService().getAdminHotspotContent(
+        parseId(req.params.instanceId, "instance ID"),
         parseId(req.params.hotspotId, "hotspot ID"),
       );
       setPrivateNoStore(res);
@@ -1183,6 +1313,7 @@ export const eBookletController = {
   async getAdminAuthorizedHotspotAsset(req: Request, res: Response, next: NextFunction) {
     try {
       const { asset, absolutePath } = await getEBookletService().getAdminAuthorizedHotspotAsset(
+        parseId(req.params.instanceId, "instance ID"),
         parseId(req.params.hotspotId, "hotspot ID"),
         parseId(req.params.assetId, "asset ID"),
       );

@@ -20,6 +20,7 @@ const mockDomainServices = {
   },
   accessCodes: {
     generateCode: jest.fn(),
+    generateCodes: jest.fn(),
     listCodes: jest.fn(),
   },
   redemptions: {
@@ -50,6 +51,8 @@ jest.mock("../../src/apps/store-api/services/e-booklet-domain.service", () => ({
 const mockService = {
   listPublicInstances: jest.fn(),
   getPublicInstance: jest.fn(),
+  listPublishedTemplates: jest.fn(),
+  getPublishedTemplateById: jest.fn(),
   createPublicCheckoutRequest: jest.fn(),
   createTemplate: jest.fn(),
   createPurchaseRequest: jest.fn(),
@@ -128,9 +131,9 @@ describe("e-booklet routes", () => {
     }
   });
 
-  test("serves e-booklet store as active teacher-specific instances", async () => {
-    mockService.listPublicInstances.mockResolvedValue({
-      data: [{ id: 10, display_title: "Grade 5 Arabic with Ms Sara", teacher: { id: 7, name: "Sara" }, remaining_seats: 4 }],
+  test("serves e-booklet store as published reusable teacher templates, not teacher instances", async () => {
+    mockService.listPublishedTemplates.mockResolvedValue({
+      data: [{ id: 10, title: "Grade 5 Arabic", slug: "grade-5-arabic", category: { id: 2, title: "Arabic" } }],
       total: 1,
       page: 1,
       limit: 20,
@@ -142,19 +145,34 @@ describe("e-booklet routes", () => {
       .expect((res) => {
         expect(res.body.success).toBe(true);
         expect(res.body.data).toEqual([
-          { id: 10, display_title: "Grade 5 Arabic with Ms Sara", teacher: { id: 7, name: "Sara" }, remaining_seats: 4 },
+          { id: 10, title: "Grade 5 Arabic", slug: "grade-5-arabic", category: { id: 2, title: "Arabic" } },
         ]);
       });
 
-    expect(mockService.listPublicInstances).toHaveBeenCalledWith({
+    expect(mockService.listPublishedTemplates).toHaveBeenCalledWith({
       categoryId: undefined,
       limit: 20,
       page: 1,
       search: undefined,
     });
+    expect(mockService.listPublicInstances).not.toHaveBeenCalled();
   });
 
-  test("serves e-booklet store detail by teacher instance id", async () => {
+  test("serves public e-booklet store detail by canonical template id", async () => {
+    mockService.getPublishedTemplateById.mockResolvedValue({ id: 10, title: "Grade 5 Arabic" });
+
+    await request(app)
+      .get("/api/v2/e-booklet-store/10")
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data).toEqual({ id: 10, title: "Grade 5 Arabic" });
+      });
+
+    expect(mockService.getPublishedTemplateById).toHaveBeenCalledWith(10);
+    expect(mockService.getPublicInstance).not.toHaveBeenCalled();
+  });
+
+  test("keeps legacy public e-booklet detail route by teacher instance id", async () => {
     mockService.getPublicInstance.mockResolvedValue({ id: 10, display_title: "Grade 5 Arabic with Ms Sara" });
 
     await request(app)
@@ -195,8 +213,8 @@ describe("e-booklet routes", () => {
     );
   });
 
-  test("public checkout requires auth but blocks direct student e-booklet checkout", async () => {
-    mockService.createPublicCheckoutRequest.mockRejectedValue(Object.assign(new Error("Direct student e-booklet checkout is disabled."), { statusCode: 403 }));
+  test("teacher checkout requires store teacher auth and creates a purchase request", async () => {
+    mockService.createPublicCheckoutRequest.mockResolvedValue({ purchase_id: 91 });
 
     await request(app)
       .post("/api/v2/e-booklet-checkout")
@@ -205,22 +223,22 @@ describe("e-booklet routes", () => {
 
     await request(app)
       .post("/api/v2/e-booklet-checkout")
-      .set("Authorization", `Bearer ${tokenFor("Teacher", 77, "store")}`)
+      .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
       .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0, terms_accepted: true })
       .expect(403);
 
     await request(app)
       .post("/api/v2/e-booklet-checkout")
-      .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 77, "store")}`)
       .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0, terms_accepted: true })
-      .expect(403)
+      .expect(201)
       .expect((res) => {
-        expect(res.body.message).toContain("Direct student e-booklet checkout is disabled");
+        expect(res.body.data).toEqual({ purchase_id: 91 });
       });
 
     expect(mockService.createPurchaseRequest).not.toHaveBeenCalled();
     expect(mockService.createPublicCheckoutRequest).toHaveBeenCalledWith(
-      55,
+      77,
       expect.objectContaining({ instance_id: 7, template_id: 3, template_version_id: 4, terms_accepted: true }),
       undefined,
     );
@@ -343,7 +361,7 @@ describe("e-booklet routes", () => {
   test("dispatches student invite acceptance to explicit Phase 1 access paths", async () => {
     mockService.acceptFreeInvite.mockResolvedValue({ id: 12, access_source: "free_invite" });
     mockService.acceptInvitePasscode.mockResolvedValue({ id: 13, access_source: "offline_passcode" });
-    mockService.createStudentPurchaseLink.mockRejectedValue(Object.assign(new Error("Direct student e-booklet purchase is disabled."), { statusCode: 403 }));
+    mockService.createStudentPurchaseLink.mockResolvedValue({ id: 14, purchase_id: 500 });
 
     await request(app)
       .post("/api/v2/e-booklet-invites/raw-token/accept")
@@ -364,7 +382,7 @@ describe("e-booklet routes", () => {
       .post("/api/v2/e-booklet-invites/raw-token/accept")
       .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
       .send({ accessPath: "online_purchase", purchaseId: 500, paymentProofFileId: 321, termsAccepted: true })
-      .expect(403);
+      .expect(200);
 
     expect(mockService.acceptInvite).not.toHaveBeenCalled();
     expect(mockService.acceptFreeInvite).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ termsAccepted: true, termsVersion: "v1" }));
@@ -500,22 +518,28 @@ describe("e-booklet routes", () => {
       .expect(200);
 
     await request(app)
-      .get("/api/v2/admin/e-booklet-viewer/hotspots/77/content")
+      .get("/api/v2/admin/e-booklet-viewer/10/hotspots/77/content")
       .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
       .expect(200);
+
+    await request(app)
+      .get("/api/v2/admin/e-booklet-viewer/10/hotspots/77/content")
+      .set("Authorization", `Bearer ${tokenFor("Moderator", 4)}`)
+      .expect(403);
 
     expect(mockService.getAdminViewerMetadata).toHaveBeenCalledWith(10, 1);
     expect(mockService.getAdminViewerPage).toHaveBeenCalledWith(10, 1, 1);
     expect(mockService.getAdminViewerPageHotspots).toHaveBeenCalledWith(10, 1);
-    expect(mockService.getAdminHotspotContent).toHaveBeenCalledWith(77);
+    expect(mockService.getAdminHotspotContent).toHaveBeenCalledWith(10, 77);
     expect(mockService.bindViewerDevice).not.toHaveBeenCalled();
   });
 
-  test("binds/lists viewer devices, exposes admin device reset/allowance routes, and blocks direct purchase approval", async () => {
+  test("binds/lists viewer devices and exposes admin device reset/allowance/approval routes", async () => {
     mockService.bindViewerDevice.mockResolvedValue({ id: 1, device_fingerprint: "dev-1" });
     mockService.listViewerDevices.mockResolvedValue([{ id: 1, device_fingerprint: "dev-1" }]);
     mockService.resetViewerDevices.mockResolvedValue({ count: 1 });
     mockService.addDeviceAllowance.mockResolvedValue({ allowed_devices: 2 });
+    mockService.approveStudentPurchaseLink.mockResolvedValue({ purchase_id: 500, access_id: 88 });
 
     await request(app)
       .post("/api/v2/e-booklet-viewer/10/devices/bind")
@@ -543,13 +567,13 @@ describe("e-booklet routes", () => {
     await request(app)
       .post("/api/v2/admin/e-booklet-student-purchases/500/approve")
       .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
-      .expect(400);
+      .expect(200);
 
     expect(mockService.bindViewerDevice).toHaveBeenCalledWith(10, 55, expect.objectContaining({ deviceFingerprint: "dev-1", deviceLabel: "iPad" }));
     expect(mockService.listViewerDevices).toHaveBeenCalledWith(10, 55);
     expect(mockService.resetViewerDevices).toHaveBeenCalledWith(10, 55, 1, "replacement");
     expect(mockService.addDeviceAllowance).toHaveBeenCalledWith(10, 55, 1, 2, "second tablet");
-    expect(mockService.approveStudentPurchaseLink).not.toHaveBeenCalled();
+    expect(mockService.approveStudentPurchaseLink).toHaveBeenCalledWith(500, 1);
   });
 
   test("serves authorized hotspot assets with private no-store headers", async () => {
@@ -616,8 +640,32 @@ describe("e-booklet routes", () => {
       .send({ kind: "free", termId: 1, maxRedemptions: 20 })
       .expect(201);
 
-    expect(mockDomainServices.accessCodes.generateCode).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, kind: "paid" }));
+    expect(mockDomainServices.accessCodes.generateCode).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, kind: "free" }));
     mockDomainServices.accessCodes.generateCode.mockClear();
+
+    await request(app)
+      .post("/api/v2/teacher/e-booklets/10/access-codes/bulk")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+      .send({ kind: "paid", termId: 1, quantity: 3 })
+      .expect(201);
+
+    expect(mockDomainServices.accessCodes.generateCodes).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, kind: "paid", count: 3 }));
+    mockDomainServices.accessCodes.generateCodes.mockClear();
+
+    await request(app)
+      .post("/api/v2/teacher/e-booklets/10/access-codes/bulk")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+      .send({ kind: "paid", termId: 1, count: 101 })
+      .expect(400)
+      .expect((res) => expect(res.body.message).toContain("Invalid access code count"));
+
+    await request(app)
+      .get("/api/v2/teacher/e-booklets/10/access-codes?status=active")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+      .expect(200);
+
+    expect(mockDomainServices.accessCodes.listCodes).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, bookletInstanceId: 10, status: "active" }));
+    mockDomainServices.accessCodes.listCodes.mockClear();
 
     await request(app)
       .post("/api/v2/teacher/e-booklets/10/access-codes")

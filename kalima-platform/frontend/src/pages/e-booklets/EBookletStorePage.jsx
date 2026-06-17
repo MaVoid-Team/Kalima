@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   BookOpenCheck,
@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useEBookletStore } from "@/hooks/useEBooklets";
+import { useEBookletCart, useEBookletStore } from "@/hooks/useEBooklets";
 import { useTranslation } from "react-i18next";
 
 const formatMoney = (amount, currency = "EGP", language = "en") => {
@@ -100,7 +100,7 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
       )}
     >
       <Link
-        to={`/e-booklets/instances/${template.instanceId || template.id}`}
+        to={`/e-booklets/${template.template_id || template.id}`}
         className={cn(
           "block aspect-[4/3] overflow-hidden bg-muted",
         )}
@@ -126,7 +126,7 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
         </div>
 
         <Link
-          to={`/e-booklets/instances/${template.instanceId || template.id}`}
+          to={`/e-booklets/${template.template_id || template.id}`}
           className={cn(
             "mt-4 line-clamp-2 font-bold tracking-tight text-foreground transition-colors group-hover:text-emerald-800",
             featured ? "text-2xl md:text-3xl" : "text-xl",
@@ -180,11 +180,14 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
               {formatMoney(template.price, template.currency, language)}
             </div>
           </div>
-          <Button asChild disabled={!template.activeVersion?.id} className="active:scale-[0.98]">
-            <Link to="/e-booklet-code">
-              <ShoppingBag className="h-4 w-4" />
-              {t("store.redeemCode")}
-            </Link>
+          <Button
+            type="button"
+            onClick={() => onAdd(template)}
+            disabled={!template.activeVersion?.id}
+            className="active:scale-[0.98]"
+          >
+            <ShoppingBag className="h-4 w-4" />
+            {t("store.add")}
           </Button>
         </div>
       </div>
@@ -213,7 +216,8 @@ function EmptyState({ onClearSearch, t }) {
 
 export default function EBookletStorePage() {
   const { t, i18n } = useTranslation("eBooklets");
-
+  const navigate = useNavigate();
+  const { addTemplate } = useEBookletCart();
   const [searchValue, setSearchValue] = useState("");
   const {
     templates,
@@ -233,6 +237,10 @@ export default function EBookletStorePage() {
     setSearch(searchValue.trim());
   };
 
+  const handleAddToCart = (template) => {
+    addTemplate(template);
+    navigate("/e-booklet-cart");
+  };
 
   const totalPages = Math.max(1, Math.ceil((pagination.total || 0) / pagination.limit));
 
@@ -342,7 +350,7 @@ export default function EBookletStorePage() {
                   key={template.id}
                   template={template}
                   featured={index === 0}
-                  onAdd={() => {}}
+                  onAdd={handleAddToCart}
                   t={t}
                   language={i18n.language}
                 />

@@ -56,7 +56,8 @@
     "hotspotCount": "{{count}} hotspots",
     "noDownload": "No download",
     "searchResultsFor": "Search results for",
-    "notEditedYet": "Not edited yet"
+    "notEditedYet": "Not edited yet",
+    "loading": "Loading..."
   },
   "statuses": {
     "all": "All statuses",
@@ -282,7 +283,7 @@
     },
     "instances": {
       "title": "Teacher E-Booklet Access",
-      "description": "List teachers, delivered e-booklet instances, student buyers, inline devices, and analytics.",
+      "description": "List teachers and delivered e-booklet instances. Open students in a dedicated page for buyer details, devices, and analytics.",
       "adminViewNote": "Admin View Mode: use normal viewer routes only when an existing impersonation/view-as pattern is available; this page does not create fake impersonation data.",
       "loading": "Loading e-booklet instances...",
       "empty": "No e-booklet instances returned by the backend.",
@@ -313,6 +314,13 @@
       "manageDevicesInline": "Manage devices",
       "hideDevicesInline": "Hide devices",
       "openFullDevicesPage": "Open full devices page"
+    },
+    "students": {
+      "title": "E-Booklet Students",
+      "description": "Review the students for this e-booklet instance, with access, analytics, and device actions in one clean page.",
+      "backToInstances": "Back to access list",
+      "studentCount": "{{count}} students",
+      "manageDevices": "Manage devices"
     },
     "devices": {
       "title": "E-Booklet Devices",
@@ -416,8 +424,7 @@
     "cardDescription": "Interactive PDF booklet delivered by admin with teacher branding and controlled student access.",
     "accessExpires": "Expires {{value}}",
     "noExpiry": "No expiry",
-    "add": "Add",
-    "redeemCode": "Redeem code"
+    "add": "Add"
   },
   "details": {
     "coverLabel": "Kalima E-Booklet",
@@ -446,8 +453,7 @@
     ],
     "hotspotContent": "Hotspot content",
     "hotspotDescription": "Hotspots are rendered from normalized template coordinates, so the teacher PDF can change while the interactive layer stays reusable.",
-    "antiDownload": "Downloading is blocked inside Kalima through private storage, authenticated page access, hidden viewer download controls, and watermarking. Screenshots and camera capture cannot be fully prevented by any web platform.",
-    "redeemCode": "Redeem code"
+    "antiDownload": "Downloading is blocked inside Kalima through private storage, authenticated page access, hidden viewer download controls, and watermarking. Screenshots and camera capture cannot be fully prevented by any web platform."
   },
   "cart": {
     "emptyTitle": "Your e-booklet cart is empty",
@@ -461,38 +467,36 @@
     "summary": "Request summary",
     "adminNotice": "Admin will confirm payment, upload the teacher-specific PDF, assign invite quota, then deliver the booklet.",
     "checkout": "Continue to checkout",
-    "keepBrowsing": "Keep browsing",
-    "directCheckoutDisabled": "Direct student checkout is disabled. Ask your teacher or admin for an e-booklet URL or access code.",
-    "redeemCode": "Redeem access code"
+    "keepBrowsing": "Keep browsing"
   },
   "checkout": {
     "emptyTitle": "Choose an e-booklet before checkout",
     "emptyDescription": "E-booklet checkout is separate from the Market cart and requires one selected template.",
     "activeVersionMissing": "This e-booklet does not have an active published version.",
-    "instanceMissing": "Selected e-booklet instance is missing.",
-    "termsRequired": "Accept the terms before continuing.",
-    "paymentRequired": "Choose a payment method, enter the number you paid from, and upload payment proof.",
     "fieldRequired": "This field is required.",
     "submitError": "Checkout could not be submitted. Please review the form and try again.",
     "successBadge": "Request created",
     "successTitle": "Your e-booklet request is pending admin delivery",
     "successDescription": "Kalima admin will confirm payment, collect or prepare the teacher-specific PDF, validate page count, set invite quota, and deliver the ready booklet to your account.",
-    "purchaseSubmittedTitle": "Purchase submitted for review",
-    "purchaseSubmittedDescription": "We received your payment proof. Your e-booklet access will appear in your student library after admin approval.",
-    "openStudentLibrary": "Open my e-booklets",
     "openTeacherPortal": "Open teacher portal",
     "badge": "E-booklet checkout",
+    "purchaseSubmittedTitle": "Purchase submitted for review",
+    "purchaseSubmittedDescription": "We received your payment proof. Track this teacher e-booklet purchase from your e-booklet orders while admin reviews delivery.",
+    "receiptReference": "Reference",
+    "referencePending": "Pending",
+    "receiptStatus": "Status",
+    "statusPendingReview": "pending_review",
+    "openEBookletOrders": "View e-booklet orders",
+    "teacherPurchaseTitle": "Complete your teacher e-booklet purchase",
+    "teacherPurchaseDescriptionPaid": "Upload payment proof so admin can review and deliver this teacher e-booklet purchase.",
+    "teacherPurchaseDescriptionFree": "Accept the terms to place this free teacher e-booklet order.",
+    "terms": "I accept the e-booklet purchase terms and understand student access is delivered separately through private URL and access code.",
+    "pendingApprovalNotice": "Paid teacher e-booklet purchases are reviewed by admin before delivery. Student access is issued separately through a private URL and access code.",
+    "freeAccessNotice": "This teacher e-booklet is free. Placing the order records the teacher purchase; student access is issued separately through a private URL and access code.",
+    "submitForReview": "Submit purchase for review",
+    "unlockFree": "Place free order",
     "title": "Branding and delivery details",
-    "studentTitle": "Complete your e-booklet purchase",
-    "studentDescriptionPaid": "Upload your payment proof so the admin can approve access to this teacher e-booklet instance.",
-    "studentDescriptionFree": "Accept the terms to unlock this free e-booklet instance.",
     "description": "This creates an admin-handled request. The booklet becomes usable only after admin payment confirmation and delivery.",
-    "paymentTitle": "Payment proof",
-    "paymentMethod": "Payment method",
-    "selectPaymentMethod": "Select payment method",
-    "numberTransferredFrom": "Number transferred from",
-    "numberTransferredFromPlaceholder": "Your wallet/mobile number",
-    "paymentScreenshot": "Payment proof screenshot",
     "fields": {
       "teacherName": "Teacher display name",
       "teacherNameHelper": "Shown in viewer watermarking and invite context.",
@@ -517,21 +521,15 @@
       "notesPlaceholder": "Payment will be sent manually. Please use the teacher name in the footer watermark."
     },
     "backToCart": "Back to cart",
-    "terms": "I accept the e-booklet access terms and understand access is tied to my student account.",
     "submitting": "Submitting...",
     "submit": "Submit request",
-    "submitForReview": "Submit purchase for review",
-    "unlockFree": "Get access",
     "selectedTemplate": "Selected template",
     "teacherPdfNotice": "The teacher-specific PDF is uploaded by admin after checkout. It must match the template page count before delivery.",
     "summary": {
-      "title": "Checkout summary",
       "template": "Template",
       "accessValue": "Invite quota set by admin",
       "deliveryValue": "Manual admin customization"
-    },
-    "pendingApprovalNotice": "Paid e-booklet purchases are reviewed by the admin before student access is activated.",
-    "freeAccessNotice": "This e-booklet is free. Access is activated immediately after you accept the terms."
+    }
   },
   "viewer": {
     "titleFallback": "E-Booklet",
@@ -593,11 +591,7 @@
       "paidSuccess": "Paid code accepted. Opening your e-booklet...",
       "freeAccessNoPaidProgressSuccess": "Free shared code accepted and booklet access opened. This entry does not count toward paid seats or milestone rewards.",
       "error": "This e-booklet code cannot be redeemed."
-    },
-    "teacherCodeTitle": "Use a teacher/admin code",
-    "teacherCodeDescription": "Students access e-booklets through a teacher/admin URL, shared code, or passcode.",
-    "directPurchaseDisabled": "Direct student purchase checkout is disabled.",
-    "openCodeRedemption": "Open code redemption"
+    }
   },
   "teacher": {
     "title": "My E-Booklets",
@@ -779,6 +773,43 @@
       "failedPasscodeSafe": "Wrong passcodes counted only, raw codes hidden: {{value}}",
       "operationalHealth": "Operational health",
       "expiryArchive": "Review expiry and archive queues"
+    }
+  },
+  "orders": {
+    "badge": "E-booklet orders",
+    "title": "My teacher e-booklet orders",
+    "description": "Track teacher e-booklet purchases from checkout through admin customization and delivery. Students redeem only through private URLs or access codes.",
+    "openLibrary": "Open teacher e-booklets",
+    "openStore": "Browse e-booklets",
+    "loadError": "Could not load e-booklet orders.",
+    "emptyTitle": "No e-booklet orders yet",
+    "emptyDescription": "Browse e-booklets and submit your first teacher-customized purchase request.",
+    "itemStatus": "Item status",
+    "manageAccess": "Manage access",
+    "count": "Showing {{count}} e-booklet orders",
+    "fallbackTitle": "E-booklet",
+    "submittedAt": "Submitted {{value}}",
+    "statuses": {
+      "pending": "Pending admin review",
+      "awaiting_payment": "Awaiting payment",
+      "paid": "Paid",
+      "needs_branding_info": "Needs branding info",
+      "customization_in_progress": "Customization in progress",
+      "ready": "Ready",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "unknown": "Pending"
+    },
+    "statusCopy": {
+      "pending": "Admin still needs to review this teacher purchase request.",
+      "awaiting_payment": "Payment details are still required or waiting for review.",
+      "paid": "Payment is confirmed. Admin customization can proceed.",
+      "needs_branding_info": "Admin needs your branding details before customization can continue.",
+      "customization_in_progress": "Admin is preparing your customized teacher e-booklet.",
+      "ready": "Delivered. You can manage student access for this e-booklet.",
+      "rejected": "This request was rejected. Contact admin or submit a new request with corrected details.",
+      "cancelled": "This request was cancelled.",
+      "unknown": "Waiting for the latest admin status."
     }
   }
 }

@@ -17,7 +17,8 @@
     "darkMode": "الوضع الداكن (الليلي)",
     "backToStore": "العودة للمتجر",
     "logout": "تسجيل الخروج",
-    "eBookletAnalytics": "تحليلات الكتيبات الإلكترونية"
+    "eBookletAnalytics": "تحليلات الكتيبات الإلكترونية",
+    "eBookletOrders": "طلبات البوكليت"
   },
   "settings": {
     "title": "إعدادات الحساب",
@@ -154,10 +155,6 @@
     "selectGender": "اختر الجنس",
     "male": "ذكر",
     "female": "أنثى",
-    "validation": {
-      "locationNameRequired": "اسم المكان مطلوب",
-      "urlInvalid": "يجب إدخال رابط صحيح"
-    },
     "teacherInfo": "معلومات التدريس",
     "subject": "المادة",
     "selectSubject": "اختر المادة",
@@ -194,9 +191,6 @@
     "cancel": "إلغاء",
     "update": "تحديث",
     "remove": "إزالة",
-    "delete": "حذف",
-    "save": "حفظ",
-    "notSpecified": "غير محدد",
-    "select": "اختر"
+    "delete": "حذف"
   }
 }
