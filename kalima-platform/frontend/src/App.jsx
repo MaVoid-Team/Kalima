@@ -1,8 +1,9 @@
-import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet, Navigate } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet } from "react-router-dom";
 import { useState, useEffect, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { Toaster } from 'sonner';
+import { E_BOOKLET_ORDERS_ALLOWED_ROLES } from "./pages/e-booklets/eBookletOrdersContract.mjs";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -12,8 +13,6 @@ import CouponsPage from "./pages/admin/coupons/CouponsPage";
 
 // Lazy-loaded pages
 const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
-const PrivacyPolicyPage = lazy(() => import("./pages/privacy/PrivacyPolicyPage"));
-const DeleteMyDataPage = lazy(() => import("./pages/privacy/DeleteMyDataPage"));
 const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
 const SignupPage = lazy(() => import("./pages/auth/SignupPage"));
 const ForgotPasswordPage = lazy(
@@ -43,6 +42,12 @@ const EBookletDetailsPage = lazy(
 );
 const EBookletCartPage = lazy(
   () => import("./pages/e-booklets/EBookletCartPage"),
+);
+const EBookletCheckoutPage = lazy(
+  () => import("./pages/e-booklets/EBookletCheckoutPage"),
+);
+const EBookletOrdersPage = lazy(
+  () => import("./pages/e-booklets/EBookletOrdersPage"),
 );
 const AcceptEBookletInvitePage = lazy(
   () => import("./pages/e-booklets/AcceptEBookletInvitePage"),
@@ -79,6 +84,7 @@ const AdminEBookletEditorPage = lazy(() => import("./pages/admin/e-booklets/Admi
 const AdminEBookletPurchasesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchasesPage"));
 const AdminEBookletInstancesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstancesPage"));
 const AdminEBookletDevicesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletDevicesPage"));
+const AdminEBookletInstanceStudentsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstanceStudentsPage"));
 const AdminEBookletAnalyticsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletAnalyticsPage"));
 const AdminEBookletTermsMilestonesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTermsMilestonesPage"));
 
@@ -142,12 +148,11 @@ const router = createBrowserRouter(
       {/* Public Routes with MainLayout (Navbar & Footer) */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-        <Route path="/delete-my-data" element={<DeleteMyDataPage />} />
 
         {/* E-booklet storefront is public to students/visitors; access is only required for owned viewer pages. */}
         <Route path="/e-booklets" element={<EBookletStorePage />} />
         <Route path="/e-booklets/instances/:instanceId" element={<EBookletDetailsPage />} />
+        <Route path="/e-booklets/:templateId" element={<EBookletDetailsPage />} />
 
         {/* Market and Product Routes - Restricted by store access */}
         <Route element={<RoleRoute requireStoreAccess={true} />}>
@@ -162,11 +167,12 @@ const router = createBrowserRouter(
           <Route path="/samples/:id/preview" element={<SamplePreview />} />
         </Route>
 
-        {/* E-booklet direct checkout is disabled; students access e-booklets via teacher/admin URL or code. */}
+        {/* E-booklet purchase flow: teachers buy from the public storefront; students only redeem private URLs/codes. */}
         <Route element={<ProtectedRoute requireAuth={true} />}>
-          <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin"]} />}>
+          <Route element={<RoleRoute requiredRole={E_BOOKLET_ORDERS_ALLOWED_ROLES} />}>
             <Route path="/e-booklet-cart" element={<EBookletCartPage />} />
-            <Route path="/e-booklet-checkout" element={<Navigate to="/e-booklet-code" replace />} />
+            <Route path="/e-booklet-checkout" element={<EBookletCheckoutPage />} />
+            <Route path="/e-booklet-orders" element={<EBookletOrdersPage />} />
           </Route>
         </Route>
 
@@ -212,6 +218,7 @@ const router = createBrowserRouter(
           <Route path="/admin/e-booklet-instances/:instanceId/view" element={<EBookletViewerPage />} />
           <Route path="/admin/e-booklet-analytics" element={<AdminEBookletAnalyticsPage />} />
           <Route path="/admin/e-booklet-terms-milestones" element={<AdminEBookletTermsMilestonesPage />} />
+          <Route path="/admin/e-booklet-instances/:instanceId/students" element={<AdminEBookletInstanceStudentsPage />} />
           <Route path="/admin/e-booklet-instances/:instanceId/devices" element={<AdminEBookletDevicesPage />} />
           <Route path="/admin/categories" element={<CategoriesPage />} />
           <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />

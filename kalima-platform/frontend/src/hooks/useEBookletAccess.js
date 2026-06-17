@@ -2,11 +2,13 @@ import { useCallback, useState } from "react";
 import i18n from "@/i18n";
 import api from "@/api/axios";
 import useApiMutation from "./useApiMutation";
+import { buildHotspotAssetEndpoint, buildHotspotContentEndpoint } from "@/utils/eBookletViewerEndpoints";
 
 export function useTeacherEBooklets() {
   const { mutate: fetchApi, loading } = useApiMutation();
   const [items, setItems] = useState([]);
   const [invites, setInvites] = useState([]);
+  const [accessCodes, setAccessCodes] = useState([]);
   const [students, setStudents] = useState([]);
   const [milestones, setMilestones] = useState([]);
   const [wallet, setWallet] = useState(null);
@@ -113,6 +115,29 @@ export function useTeacherEBooklets() {
     [fetchApi],
   );
 
+  const fetchAccessCodes = useCallback(async (instanceId, filters = {}) => {
+    const query = new URLSearchParams();
+    if (filters.status) query.set("status", filters.status);
+    if (filters.kind) query.set("kind", filters.kind);
+    const suffix = query.toString() ? `?${query.toString()}` : "";
+    const response = await fetchApi(
+      { endpoint: `/teacher/e-booklets/${instanceId}/access-codes${suffix}`, method: "get" },
+      false,
+    );
+    setAccessCodes(Array.isArray(response?.data) ? response.data : []);
+    return response;
+  }, [fetchApi]);
+
+  const createAccessCodes = useCallback(
+    (instanceId, data) => fetchApi({
+      endpoint: `/teacher/e-booklets/${instanceId}/access-codes/bulk`,
+      method: "post",
+      data,
+      defaultSuccessMessage: i18n.t("eBooklets:toasts.accessCodeCreated"),
+    }),
+    [fetchApi],
+  );
+
   const fetchTeacherMilestones = useCallback(async (termId) => {
     const suffix = termId ? `?term_id=${encodeURIComponent(termId)}` : "";
     const response = await fetchApi(
@@ -154,6 +179,7 @@ export function useTeacherEBooklets() {
   return {
     items,
     invites,
+    accessCodes,
     students,
     milestones,
     wallet,
@@ -169,6 +195,8 @@ export function useTeacherEBooklets() {
     fetchCurrentTerms,
     acceptCodeGenerationTerms,
     createAccessCode,
+    createAccessCodes,
+    fetchAccessCodes,
     fetchTeacherMilestones,
     evaluateTeacherMilestones,
     fetchTeacherWallet,
@@ -260,15 +288,17 @@ export function useEBookletViewer({ adminMode = false } = {}) {
   );
 
   const fetchHotspotContent = useCallback(
-    (hotspotId) =>
-      fetchApi(
+    (hotspotId, instanceId) => {
+      const endpoint = buildHotspotContentEndpoint({ adminMode, viewerBase, instanceId, hotspotId });
+      return fetchApi(
         {
-          endpoint: `${viewerBase}/hotspots/${hotspotId}/content`,
+          endpoint,
           method: "get",
         },
         false,
-      ),
-    [fetchApi, viewerBase],
+      );
+    },
+    [adminMode, fetchApi, viewerBase],
   );
 
   const bindDevice = useCallback(
@@ -292,13 +322,14 @@ export function useEBookletViewer({ adminMode = false } = {}) {
     return URL.createObjectURL(response.data);
   }, [viewerBase]);
 
-  const fetchHotspotAssetBlobUrl = useCallback(async (hotspotId, assetId) => {
+  const fetchHotspotAssetBlobUrl = useCallback(async (hotspotId, assetId, instanceId) => {
+    const endpoint = buildHotspotAssetEndpoint({ adminMode, viewerBase, instanceId, hotspotId, assetId });
     const response = await api.get(
-      `${viewerBase}/hotspots/${hotspotId}/assets/${assetId}`,
+      endpoint,
       { responseType: "blob" },
     );
     return URL.createObjectURL(response.data);
-  }, [viewerBase]);
+  }, [adminMode, viewerBase]);
 
   return {
     metadata,

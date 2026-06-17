@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import i18n from "@/i18n";
 import useApiMutation from "./useApiMutation";
 
 const E_BOOKLET_CART_KEY = "kalima:e-booklet-cart:v1";
@@ -39,7 +40,7 @@ export const normalizeEBookletTemplate = (template) => {
   return {
     ...template,
     template: sourceTemplate,
-    instanceId: template?.id,
+    instanceId: template?.instanceId ?? (template?.template_id && template?.id !== template?.template_id ? template?.id : undefined),
     template_id: template?.template_id || sourceTemplate?.id,
     template_version_id: template?.template_version_id || activeVersion?.id,
     activeVersion,
@@ -91,7 +92,7 @@ export const buildEBookletCartItem = (template) => {
   const normalized = normalizeEBookletTemplate(template);
 
   return {
-    id: normalized.instanceId,
+    id: normalized.instanceId || normalized.template_id,
     instance_id: normalized.instanceId,
     template_id: normalized.template_id,
     template_version_id: normalized.template_version_id || normalized.activeVersion?.id,
@@ -99,6 +100,8 @@ export const buildEBookletCartItem = (template) => {
     title: normalized.title,
     description: normalized.description,
     price: normalized.price,
+    unit_price: normalized.price,
+    quantity: 1,
     currency: normalized.currency,
     coverUrl: normalized.coverUrl,
     pageCount: normalized.pageCount,
@@ -120,11 +123,19 @@ export function useEBookletCart() {
     };
   }, []);
 
-  const replaceWithTemplate = useCallback((template) => {
-    const item = buildEBookletCartItem(template);
-    writeCart([item]);
-    setItems([item]);
-    return item;
+  const addTemplate = useCallback((template) => {
+    const nextItem = buildEBookletCartItem(template);
+    const currentItems = readCart();
+    const existingIndex = currentItems.findIndex(
+      (item) => String(item.template_id) === String(nextItem.template_id),
+    );
+    const nextItems =
+      existingIndex >= 0
+        ? currentItems.map((item, index) => (index === existingIndex ? nextItem : item))
+        : [...currentItems, nextItem];
+    writeCart(nextItems);
+    setItems(nextItems);
+    return nextItem;
   }, []);
 
   const removeItem = useCallback((templateId) => {
@@ -140,17 +151,24 @@ export function useEBookletCart() {
     setItems([]);
   }, []);
 
-  const total = useMemo(
+  const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + parseNumber(item.price, 0), 0),
     [items],
   );
+  const discount = 0;
+  const total = subtotal - discount;
+
+  const count = useMemo(() => items.length, [items]);
 
   return {
     items,
     item: items[0] || null,
+    count,
+    subtotal,
+    discount,
     total,
     currency: items[0]?.currency || "EGP",
-    replaceWithTemplate,
+    addTemplate,
     removeItem,
     clear,
   };
@@ -239,14 +257,15 @@ export function useEBookletStore(initialParams = {}) {
   };
 }
 
-export function useEBookletTemplate(instanceId) {
+export function useEBookletTemplate(templateId, options = {}) {
+  const { legacyInstance = false } = options;
   const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
   const [template, setTemplate] = useState(null);
   const [notFound, setNotFound] = useState(false);
-  const [initLoading, setInitLoading] = useState(Boolean(instanceId));
+  const [initLoading, setInitLoading] = useState(Boolean(templateId));
 
   useEffect(() => {
-    if (!instanceId) return undefined;
+    if (!templateId) return undefined;
     let active = true;
 
     const fetchTemplate = async () => {
@@ -255,7 +274,9 @@ export function useEBookletTemplate(instanceId) {
 
       try {
         const response = await fetchApi({
-          endpoint: `/e-booklet-store/instances/${instanceId}`,
+          endpoint: legacyInstance
+            ? `/e-booklet-store/instances/${templateId}`
+            : `/e-booklet-store/${templateId}`,
           method: "get",
         }, false);
 
@@ -268,7 +289,7 @@ export function useEBookletTemplate(instanceId) {
         }
       } catch (error) {
         if (!active) return;
-        console.error(`Failed to fetch e-booklet instance ${instanceId}:`, error);
+        console.error(`Failed to fetch e-booklet template ${templateId}:`, error);
         setTemplate(null);
         setNotFound(true);
       } finally {
@@ -280,7 +301,7 @@ export function useEBookletTemplate(instanceId) {
     return () => {
       active = false;
     };
-  }, [fetchApi, instanceId]);
+  }, [fetchApi, legacyInstance, templateId]);
 
   return {
     template,
@@ -289,4 +310,55 @@ export function useEBookletTemplate(instanceId) {
   };
 }
 
+export function useEBookletCheckout() {
+  const { mutate, loading, error } = useApiMutation();
 
+  const submitCheckout = useCallback(
+    async (payload) => {
+      return mutate({
+        endpoint: "/e-booklet-checkout",
+        method: "post",
+        data: payload,
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.requestSubmitted"),
+      });
+    },
+    [mutate],
+  );
+
+  return {
+    submitCheckout,
+    loading,
+    error,
+  };
+}
+
+export function useEBookletOrders() {
+  const { mutate: fetchApi, loading, error } = useApiMutation();
+  const [orders, setOrders] = useState([]);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20 });
+
+  const fetchOrders = useCallback(
+    async (params = {}) => {
+      const response = await fetchApi(
+        {
+          endpoint: "/e-booklet-orders",
+          method: "get",
+          params,
+        },
+        false,
+      );
+      const payload = Array.isArray(response?.data) ? response : (response?.data || response || {});
+      const data = Array.isArray(payload.data) ? payload.data : [];
+      setOrders(data);
+      setPagination({
+        total: payload.total ?? data.length,
+        page: payload.page ?? params.page ?? 1,
+        limit: payload.limit ?? params.limit ?? 20,
+      });
+      return payload;
+    },
+    [fetchApi],
+  );
+
+  return { orders, pagination, fetchOrders, loading, error };
+}

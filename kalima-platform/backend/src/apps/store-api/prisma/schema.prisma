@@ -438,7 +438,6 @@ model samples {
   title            String?               @db.VarChar(255)
   is_archived      Boolean?              @default(false)
   media_type       sample_media_type_enum
-  thumbnail_url    String?
   high_quality_url String?
   low_quality_url  String?
   original_name    String                @db.VarChar(255)
@@ -839,6 +838,7 @@ model images {
   product_gallery             product_gallery[]
   purchase_watermark          purchases[]       @relation("PurchaseWatermark")
   purchase_payment_screenshot purchases[]       @relation("PurchasePaymentScreenshot")
+  e_booklet_purchase_payment_screenshots e_booklet_purchases[] @relation("EBookletPurchasePaymentScreenshot")
   payment_methods             payment_methods[] // <-- Added opposite relation for payment_methods
 }
 
@@ -945,6 +945,7 @@ model e_booklet_purchases {
   currency            String                           @default("EGP") @db.VarChar(3)
   payment_method      String?                          @db.VarChar(100)
   payment_reference   String?                          @db.VarChar(255)
+  payment_screenshot_id Int?
   branding_json       Json?
   admin_notes         String?                          @db.Text
   created_at          DateTime?                        @default(now()) @db.Timestamp(6)
@@ -953,11 +954,13 @@ model e_booklet_purchases {
   teacher             users                            @relation("EBookletPurchaseTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   template            e_booklet_templates              @relation(fields: [template_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
   template_version    e_booklet_template_versions      @relation(fields: [template_version_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  payment_screenshot  images?                          @relation("EBookletPurchasePaymentScreenshot", fields: [payment_screenshot_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   instances           e_booklet_instances[]
   wallet_ledger_entries teacher_wallet_ledger[]        @relation("TeacherWalletLedgerEBookletPurchase")
 
   @@index([teacher_id, status], map: "ix_e_booklet_purchases_teacher_status")
   @@index([status, created_at], map: "ix_e_booklet_purchases_status_created")
+  @@index([payment_screenshot_id], map: "ix_e_booklet_purchases_payment_screenshot")
 }
 
 model e_booklet_terms {
@@ -1093,6 +1096,9 @@ model e_booklet_teacher_terms_acceptances {
 
   @@index([teacher_id, term_id, acceptance_type], map: "ix_e_booklet_terms_accept_teacher_term_type")
   @@index([milestone_achievement_id], map: "ix_e_booklet_terms_accept_achievement")
+  // Partial unique indexes for idempotency are defined in SQL migration:
+  // - ux_e_booklet_code_generation_terms_acceptance for one code-generation acceptance per teacher/term.
+  // - ux_e_booklet_reward_claim_terms_acceptance for one reward-claim acceptance per teacher/term/achievement.
 }
 
 model teacher_wallets {

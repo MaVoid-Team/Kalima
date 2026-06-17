@@ -265,16 +265,40 @@ export class EBookletCheckoutDto {
   contact_whatsapp?: string;
 }
 
-export class PublicEBookletCheckoutDto {
+export class PublicEBookletCheckoutItemDto {
+  @IsOptional()
   @IsInt()
   @Min(1)
-  instance_id!: number;
+  instance_id?: number;
 
   @IsInt()
+  @Min(1)
   template_id!: number;
 
   @IsInt()
+  @Min(1)
   template_version_id!: number;
+}
+
+export class PublicEBookletCheckoutDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  instance_id?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  template_id?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  template_version_id?: number;
+
+  @IsOptional()
+  @IsArray()
+  items?: PublicEBookletCheckoutItemDto[];
 
   @IsOptional()
   @IsInt()

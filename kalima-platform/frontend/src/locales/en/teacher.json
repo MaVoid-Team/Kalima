@@ -17,7 +17,8 @@
     "darkMode": "Dark mode",
     "backToStore": "Back to Store",
     "logout": "Logout",
-    "eBookletAnalytics": "E-Booklet Analytics"
+    "eBookletAnalytics": "E-Booklet Analytics",
+    "eBookletOrders": "E-Booklet Orders"
   },
   "settings": {
     "title": "Account Settings",
@@ -154,10 +155,6 @@
     "selectGender": "Select gender",
     "male": "Male",
     "female": "Female",
-    "validation": {
-      "locationNameRequired": "Location name is required",
-      "urlInvalid": "Must be a valid URL"
-    },
     "teacherInfo": "Teaching Information",
     "subject": "Subject",
     "selectSubject": "Select subject",

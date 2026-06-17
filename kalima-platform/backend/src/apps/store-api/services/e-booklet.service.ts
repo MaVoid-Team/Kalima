@@ -12,14 +12,23 @@ import { generateInviteToken, hashInviteToken } from "../utils/e-booklet-token";
 
 type EBookletDb = PrismaClient | any;
 
-const E_BOOKLET_UPLOAD_DIR = process.env.E_BOOKLET_UPLOAD_DIR
-  ? path.resolve(process.env.E_BOOKLET_UPLOAD_DIR)
-  : path.resolve(process.cwd(), "uploads/e-booklets/private");
+const E_BOOKLET_UPLOAD_DIR = path.resolve(
+  __dirname,
+  "../../../../uploads/e-booklets/private",
+);
 const PASSCODE_BLOCK_MESSAGE = "Invalid e-booklet invite passcode.";
 const PASSCODE_MAX_FAILURES = 5;
 const PASSCODE_WINDOW_MS = 10 * 60 * 1000;
 const PASSCODE_BLOCK_MS = 15 * 60 * 1000;
 const passcodeFailures = new Map<string, { count: number; firstFailureAt: number; blockedUntil?: number }>();
+
+function requireDeviceAdminReason(reason?: string) {
+  const normalized = typeof reason === "string" ? reason.trim() : "";
+  if (!normalized) {
+    throw new BadRequestError("A reason is required for device admin actions.");
+  }
+  return normalized;
+}
 
 const MIME_TO_FILE_TYPE: Record<string, string> = {
   "application/pdf": "pdf",
@@ -482,6 +491,24 @@ export class EBookletService {
     ]);
 
     return { data, total, page, limit };
+  }
+
+  async getPublishedTemplateById(id: number): Promise<unknown> {
+    const template = await this.db.e_booklet_templates.findFirst({
+      where: { id, status: "published" },
+      include: {
+        cover_file: true,
+        category: { select: { id: true, title: true } },
+        versions: {
+          where: { status: "active" },
+          orderBy: { version_number: "desc" },
+          take: 1,
+          include: { _count: { select: { hotspots: true } } },
+        },
+      },
+    });
+    if (!template) throw new NotFoundError("E-booklet template not found");
+    return template;
   }
 
   async getPublishedTemplateBySlug(slug: string): Promise<unknown> {
@@ -1096,44 +1123,152 @@ export class EBookletService {
   }
 
   async createPublicCheckoutRequest(
-    studentId: number,
+    teacherId: number,
     dto: any,
     paymentScreenshotFile?: Express.Multer.File,
   ): Promise<unknown> {
-    throw new ForbiddenError("Direct student e-booklet checkout is disabled. Students must redeem a teacher-provided URL or access code.");
-
-    if (!dto.instance_id) {
-      throw new BadRequestError("E-booklet instance is required for checkout.");
+    const checkoutItems = Array.isArray(dto.items) && dto.items.length > 0
+      ? dto.items
+      : dto.template_id
+        ? [{
+            instance_id: dto.instance_id,
+            template_id: dto.template_id,
+            template_version_id: dto.template_version_id,
+          }]
+        : [];
+    if (checkoutItems.length === 0) {
+      throw new BadRequestError("E-booklet template is required for checkout.");
     }
     if (!dto.terms_accepted) {
       throw new BadRequestError("Terms must be accepted before e-booklet checkout.");
     }
 
-    const instance = await this.db.e_booklet_instances.findFirst({
-      where: {
-        id: dto.instance_id,
-        status: "active",
-        access_expires_at: { gt: new Date() },
-      },
-      include: {
-        template: true,
-        template_version: true,
-      },
-    });
-    if (!instance) throw new NotFoundError("E-booklet instance not found");
-    if (Number(instance.template_id) !== Number(dto.template_id)) {
-      throw new BadRequestError("Checkout template does not match the selected e-booklet instance.");
-    }
-    if (Number(instance.template_version_id) !== Number(dto.template_version_id)) {
-      throw new BadRequestError("Checkout version does not match the selected e-booklet instance.");
+    const hasInstanceItems = checkoutItems.some((item: any) => Boolean(item.instance_id));
+    const hasTemplateOnlyItems = checkoutItems.some((item: any) => !item.instance_id);
+    if (hasInstanceItems && hasTemplateOnlyItems) {
+      throw new BadRequestError("E-booklet checkout items cannot mix template and instance purchases.");
     }
 
-    const price = Number(instance.student_marketing_price ?? 0);
-    const shareToken = generateInviteToken();
+    if (hasTemplateOnlyItems) {
+      const templatePurchases: any[] = [];
+      const seenTemplateIds = new Set<number>();
+      for (const item of checkoutItems) {
+        const templateId = Number(item.template_id);
+        const templateVersionId = Number(item.template_version_id);
+        if (!templateId || !templateVersionId || seenTemplateIds.has(templateId)) {
+          throw new BadRequestError("Each e-booklet checkout item must reference a unique template and active version.");
+        }
+        seenTemplateIds.add(templateId);
+
+        const template = await this.db.e_booklet_templates.findFirst({
+          where: { id: templateId, status: "published" },
+          include: {
+            versions: {
+              where: { id: templateVersionId, status: "active" },
+              take: 1,
+            },
+          },
+        });
+        if (!template || !Array.isArray((template as any).versions) || (template as any).versions.length === 0) {
+          throw new NotFoundError("E-booklet template version not found");
+        }
+        const price = Number((template as any).marketing_price ?? (template as any).price ?? 0);
+        templatePurchases.push({ template, templateId, templateVersionId, price });
+      }
+
+      const total = templatePurchases.reduce((sum, item) => sum + item.price, 0);
+      let paymentScreenshotId: number | null = null;
+      let paymentMethod: { phone_number: string | null } | null = null;
+
+      if (total > 0) {
+        if (!paymentScreenshotFile) {
+          throw new BadRequestError("Payment screenshot is required for paid e-booklet checkout.");
+        }
+        const { imageService } = await import("./image.service");
+        const { validatePaymentForCheckout } = await import("./checkout-validation.service");
+        const paymentScreenshot = await imageService.uploadImage(
+          paymentScreenshotFile,
+          { compress: true, quality: 80 },
+        );
+        paymentScreenshotId = paymentScreenshot.id;
+        paymentMethod = await validatePaymentForCheckout(this.db, {
+          total,
+          numberTransferredFrom: dto.numberTransferredFrom,
+          payment_method_id: dto.payment_method_id,
+        });
+      }
+
+      return this.serializableTransaction(async (tx: EBookletDb) => {
+        const createdPurchases: any[] = [];
+        for (const item of templatePurchases) {
+          const purchase = await tx.e_booklet_purchases.create({
+            data: {
+              teacher_id: teacherId,
+              template_id: item.templateId,
+              template_version_id: item.templateVersionId,
+              price: item.price,
+              marketing_price: item.price,
+              internal_price: 0,
+              currency: (item.template as any).currency || "EGP",
+              admin_notes: dto.notes,
+              status: "pending",
+              payment_method: total > 0 ? String(dto.payment_method_id ?? "") : null,
+              payment_reference: total > 0 ? (dto.numberTransferredFrom || paymentMethod?.phone_number || null) : null,
+              payment_screenshot_id: total > 0 ? paymentScreenshotId : null,
+            },
+          });
+          createdPurchases.push(purchase);
+        }
+
+        const firstPurchase = createdPurchases[0] || {};
+        return {
+          id: firstPurchase.id,
+          purchase_id: firstPurchase.id,
+          status: firstPurchase.status,
+          total,
+          currency: createdPurchases[0]?.currency || "EGP",
+          item_count: createdPurchases.length,
+          items: createdPurchases,
+          next_url: "/e-booklet-orders",
+        };
+      });
+    }
+
+    const instances: any[] = [];
+    const seenInstanceIds = new Set<number>();
+    for (const item of checkoutItems) {
+      const instanceId = Number(item.instance_id);
+      if (!instanceId || seenInstanceIds.has(instanceId)) {
+        throw new BadRequestError("Each e-booklet checkout item must reference a unique instance.");
+      }
+      seenInstanceIds.add(instanceId);
+
+      const instance = await this.db.e_booklet_instances.findFirst({
+        where: {
+          id: instanceId,
+          status: "active",
+          access_expires_at: { gt: new Date() },
+        },
+        include: {
+          template: true,
+          template_version: true,
+        },
+      });
+      if (!instance) throw new NotFoundError("E-booklet instance not found");
+      if (Number(instance.template_id) !== Number(item.template_id)) {
+        throw new BadRequestError("Checkout template does not match the selected e-booklet instance.");
+      }
+      if (Number(instance.template_version_id) !== Number(item.template_version_id)) {
+        throw new BadRequestError("Checkout version does not match the selected e-booklet instance.");
+      }
+      instances.push(instance);
+    }
+
+    const total = instances.reduce((sum, instance) => sum + Number(instance.student_marketing_price ?? 0), 0);
     let paymentScreenshotId: number | null = null;
     let paymentMethod: { phone_number: string | null } | null = null;
 
-    if (price > 0) {
+    if (total > 0) {
       if (!paymentScreenshotFile) {
         throw new BadRequestError("Payment screenshot is required for paid e-booklet checkout.");
       }
@@ -1145,104 +1280,66 @@ export class EBookletService {
       );
       paymentScreenshotId = paymentScreenshot.id;
       paymentMethod = await validatePaymentForCheckout(this.db, {
-        total: price,
+        total,
         numberTransferredFrom: dto.numberTransferredFrom,
         payment_method_id: dto.payment_method_id,
       });
     }
 
     return this.serializableTransaction(async (tx: EBookletDb) => {
-      await this.assertStudentSeatAvailable(tx, instance);
-      const purchase = await tx.purchases.create({
-        data: {
-          user_id: studentId,
-          payment_method_id: price > 0 ? (dto.payment_method_id ?? null) : null,
-          payment_screenshot_id: paymentScreenshotId,
-          status: price > 0 ? "pending" : "confirmed",
-          subtotal: price,
-          discount: 0,
-          total: price,
-          notes: dto.notes,
-          number_transferred_from: price > 0 ? (dto.numberTransferredFrom || null) : null,
-          payment_number: price > 0 ? (paymentMethod?.phone_number || null) : null,
-        },
-      });
-
-      const invite = await tx.e_booklet_invites.create({
-        data: {
-          booklet_instance_id: instance.id,
-          teacher_id: instance.teacher_id,
-          token_hash: hashInviteToken(shareToken),
-          share_token_ciphertext: encryptInviteShareToken(shareToken),
-          max_uses: 1,
-          expires_at: instance.access_expires_at,
-          status: "active",
-        },
-      });
-
-      const link = await tx.e_booklet_student_purchase_links.create({
-        data: {
-          purchase_id: purchase.id,
-          invite_id: invite.id,
-          booklet_instance_id: instance.id,
-          student_id: studentId,
-          marketing_price_snapshot: price,
-          terms_accepted_at: new Date(),
-          terms_version: dto.terms_version || "public-checkout-v1",
-        },
-      });
-
-      let access: any = null;
-      if (price === 0) {
-        access = await tx.e_booklet_access.create({
+      for (const instance of instances) {
+        await this.assertStudentSeatAvailable(tx, instance);
+      }
+      const createdPurchases: any[] = [];
+      for (const instance of instances) {
+        const price = Number(instance.student_marketing_price ?? 0);
+        const purchase = await tx.e_booklet_purchases.create({
           data: {
-            booklet_instance_id: instance.id,
-            user_id: studentId,
-            role: "student",
-            source_invite_id: invite.id,
-            access_source: "public_store_free_checkout",
-            terms_accepted_at: new Date(),
-            terms_version: dto.terms_version || "public-checkout-v1",
-            status: "active",
+            teacher_id: teacherId,
+            template_id: instance.template_id,
+            template_version_id: instance.template_version_id,
+            price,
+            marketing_price: price,
+            internal_price: Number(instance.internal_price ?? 0),
+            access_expires_at: instance.access_expires_at,
+            currency: instance.template?.currency || "EGP",
+            admin_notes: dto.notes,
+            status: total > 0 ? "pending" : "ready",
+            payment_method: total > 0 ? String(dto.payment_method_id ?? "") : null,
+            payment_reference: total > 0 ? (dto.numberTransferredFrom || paymentMethod?.phone_number || null) : null,
+            payment_screenshot_id: total > 0 ? paymentScreenshotId : null,
           },
         });
-        await tx.e_booklet_student_purchase_links.update({
-          where: { purchase_id: purchase.id },
-          data: { access_id: access.id, approved_at: new Date() },
+
+        await this.recordAnalyticsEvent(tx, {
+          event_type: "teacher_purchase_requested",
+          teacher_id: teacherId,
+          template_id: instance.template_id,
+          booklet_instance_id: instance.id,
+          purchase_id: purchase.id,
+          source: "public_store",
+          marketing_price_snapshot: price,
+          internal_price_snapshot: Number(instance.internal_price ?? 0),
         });
-        await tx.e_booklet_invites.update({
-          where: { id: invite.id },
-          data: { used_count: { increment: 1 } },
-        });
-        await tx.e_booklet_instances.update({
-          where: { id: instance.id },
-          data: { used_invites_count: { increment: 1 } },
+
+        createdPurchases.push({
+          ...purchase,
+          booklet_instance_id: instance.id,
+          total: price,
         });
       }
 
-      await this.recordAnalyticsEvent(tx, {
-        event_type: "student_purchase_requested",
-        teacher_id: instance.teacher_id,
-        student_id: studentId,
-        template_id: instance.template_id,
-        booklet_instance_id: instance.id,
-        invite_id: invite.id,
-        purchase_id: purchase.id,
-        source: "public_store",
-        marketing_price_snapshot: price,
-        internal_price_snapshot: Number(instance.internal_price ?? 0),
-      });
-
+      const firstPurchase = createdPurchases[0] || {};
       return {
-        id: purchase.id,
-        purchase_id: purchase.id,
-        status: purchase.status,
-        total: price,
-        currency: "EGP",
-        student_purchase_link_id: link.id,
-        booklet_instance_id: instance.id,
-        access_id: access?.id,
-        next_url: access ? `/student/e-booklets/${instance.id}` : undefined,
+        id: firstPurchase.id,
+        purchase_id: firstPurchase.id,
+        status: firstPurchase.status,
+        total,
+        currency: createdPurchases[0]?.currency || "EGP",
+        item_count: createdPurchases.length,
+        items: createdPurchases,
+        booklet_instance_id: firstPurchase.booklet_instance_id,
+        next_url: "/e-booklet-orders",
       };
     });
   }
@@ -1282,6 +1379,34 @@ export class EBookletService {
     });
 
     return purchase;
+  }
+
+  async listPublicOrders(
+    teacherId: number,
+    filters: { status?: string; page?: number; limit?: number } = {},
+  ): Promise<{ data: unknown[]; total: number; page: number; limit: number }> {
+    const page = filters.page ?? 1;
+    const limit = filters.limit ?? 20;
+    const skip = (page - 1) * limit;
+    const where: Record<string, unknown> = { teacher_id: teacherId };
+    if (filters.status) where.status = filters.status;
+
+    const [data, total] = await Promise.all([
+      this.db.e_booklet_purchases.findMany({
+        where,
+        include: {
+          template: true,
+          template_version: true,
+          instances: true,
+        },
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.e_booklet_purchases.count({ where }),
+    ]);
+
+    return { data, total, page, limit };
   }
 
   async listPurchases(filters: {
@@ -1439,13 +1564,73 @@ export class EBookletService {
   }
 
   async updatePurchaseStatus(id: number, status: string, adminNotes?: string) {
-    return this.db.e_booklet_purchases.update({
+    if (status !== "paid") {
+      return this.db.e_booklet_purchases.update({
+        where: { id },
+        data: {
+          status,
+          admin_notes: adminNotes,
+          updated_at: new Date(),
+        },
+      });
+    }
+
+    const purchase = await this.db.e_booklet_purchases.findUnique({
       where: { id },
-      data: {
-        status,
-        admin_notes: adminNotes,
-        updated_at: new Date(),
-      },
+      include: { instances: true },
+    });
+    if (!purchase) throw new NotFoundError("E-booklet purchase not found");
+
+    return this.transaction(async (tx: EBookletDb) => {
+      let instance = Array.isArray(purchase.instances) && purchase.instances.length > 0
+        ? purchase.instances[0]
+        : null;
+
+      if (!instance) {
+        instance = await tx.e_booklet_instances.create({
+          data: {
+            purchase_id: purchase.id,
+            teacher_id: purchase.teacher_id,
+            template_id: purchase.template_id,
+            template_version_id: purchase.template_version_id,
+            display_title: `Teacher e-booklet #${purchase.id}`,
+            branding_json: purchase.branding_json,
+            invite_quota: 0,
+            access_expires_at: purchase.access_expires_at ?? undefined,
+            student_marketing_price: purchase.marketing_price ?? purchase.price ?? 0,
+            internal_price: purchase.internal_price ?? 0,
+            status: "active",
+          },
+        });
+      }
+
+      const existingTeacherAccess = await tx.e_booklet_access.findFirst({
+        where: {
+          booklet_instance_id: instance.id,
+          user_id: purchase.teacher_id,
+          role: "teacher",
+          status: "active",
+        },
+      });
+      if (!existingTeacherAccess) {
+        await tx.e_booklet_access.create({
+          data: {
+            booklet_instance_id: instance.id,
+            user_id: purchase.teacher_id,
+            role: "teacher",
+            status: "active",
+          },
+        });
+      }
+
+      return tx.e_booklet_purchases.update({
+        where: { id: purchase.id },
+        data: {
+          status: "ready",
+          admin_notes: adminNotes,
+          updated_at: new Date(),
+        },
+      });
     });
   }
 
@@ -1544,15 +1729,115 @@ export class EBookletService {
       }),
       this.db.e_booklet_instances.count({ where }),
     ]);
+    const studentRowsByInstance = await this.getInstanceStudentRowsByInstanceId(
+      data.map((instance: any) => Number(instance.id)).filter((id: number) => Number.isInteger(id)),
+    );
     return {
       data: data.map(({ devices = [], ...instance }: any) => ({
         ...instance,
         used_devices_count: devices.filter((device: any) => device.status === "active").length,
+        students: studentRowsByInstance.get(Number(instance.id)) || [],
       })),
       total,
       page,
       limit,
     };
+  }
+
+  private async getInstanceStudentRowsByInstanceId(instanceIds: number[]) {
+    const uniqueInstanceIds = Array.from(new Set(instanceIds.filter((id) => Number.isInteger(id))));
+    const rowsByInstance = new Map<number, any[]>();
+    uniqueInstanceIds.forEach((id) => rowsByInstance.set(id, []));
+    if (uniqueInstanceIds.length === 0) return rowsByInstance;
+
+    const accessRows = await this.db.e_booklet_access.findMany({
+      where: { booklet_instance_id: { in: uniqueInstanceIds }, role: "student", status: "active" },
+      include: { user: { select: { id: true, name: true, email: true } } },
+      orderBy: { granted_at: "desc" },
+    });
+    if (!accessRows?.length) return rowsByInstance;
+
+    const studentIds = Array.from(new Set(accessRows
+      .map((row: any) => Number(row.user_id ?? row.user?.id))
+      .filter((id: number) => Number.isInteger(id))));
+    const [devices, allowances, analyticsEvents, inviteRedemptions, codeRedemptions] = await Promise.all([
+      this.db.e_booklet_devices.findMany({
+        where: { booklet_instance_id: { in: uniqueInstanceIds }, user_id: { in: studentIds } },
+        select: { id: true, booklet_instance_id: true, user_id: true, status: true, last_seen_at: true },
+      }),
+      this.db.e_booklet_device_allowances.findMany({
+        where: { booklet_instance_id: { in: uniqueInstanceIds }, user_id: { in: studentIds } },
+        select: { booklet_instance_id: true, user_id: true, allowed_devices: true },
+      }),
+      this.db.e_booklet_analytics_events.findMany({
+        where: { booklet_instance_id: { in: uniqueInstanceIds }, student_id: { in: studentIds } },
+        select: { booklet_instance_id: true, student_id: true, event_type: true, source: true, marketing_price_snapshot: true },
+      }),
+      this.db.e_booklet_invite_redemptions.findMany({
+        where: { booklet_instance_id: { in: uniqueInstanceIds }, student_id: { in: studentIds } },
+        select: { booklet_instance_id: true, student_id: true, invite_id: true, redeemed_at: true },
+      }),
+      this.db.e_booklet_access_code_redemptions?.findMany?.({
+        where: { booklet_instance_id: { in: uniqueInstanceIds }, student_id: { in: studentIds } },
+        select: { booklet_instance_id: true, student_id: true, access_code_id: true, purchase_id: true, counted_for_progress: true, redeemed_at: true },
+      }) ?? [],
+    ]);
+
+    const keyFor = (instanceId: number, userId: number) => `${instanceId}:${userId}`;
+    const rowInstanceId = (value: unknown) => {
+      const id = Number(value);
+      return Number.isInteger(id) ? id : uniqueInstanceIds[0];
+    };
+    const deviceSummaryByKey = new Map<string, { active_count: number; total_count: number; last_seen_at: Date | string | null }>();
+    (devices || []).forEach((device: any) => {
+      const key = keyFor(rowInstanceId(device.booklet_instance_id), Number(device.user_id));
+      const current = deviceSummaryByKey.get(key) || { active_count: 0, total_count: 0, last_seen_at: null };
+      current.total_count += 1;
+      if (device.status === "active") current.active_count += 1;
+      const nextLastSeen = device.last_seen_at ? new Date(device.last_seen_at) : null;
+      const currentLastSeen = current.last_seen_at ? new Date(current.last_seen_at) : null;
+      if (nextLastSeen && (!currentLastSeen || nextLastSeen > currentLastSeen)) current.last_seen_at = device.last_seen_at;
+      deviceSummaryByKey.set(key, current);
+    });
+
+    const allowanceByKey = new Map<string, number>();
+    (allowances || []).forEach((allowance: any) => allowanceByKey.set(keyFor(rowInstanceId(allowance.booklet_instance_id), Number(allowance.user_id)), Number(allowance.allowed_devices ?? 1)));
+
+    const analyticsByKey = new Map<string, Record<string, any>>();
+    (analyticsEvents || []).forEach((event: any) => {
+      const key = keyFor(rowInstanceId(event.booklet_instance_id), Number(event.student_id));
+      const current = analyticsByKey.get(key) || { invite_opened: 0, access_created: 0, viewer_opened: 0, page_viewed: 0, device_bound: 0, source: null, marketing_price_snapshot: null };
+      if (event.event_type) current[event.event_type] = Number(current[event.event_type] ?? 0) + 1;
+      if (!current.source && event.source) current.source = event.source;
+      if (current.marketing_price_snapshot === null && event.marketing_price_snapshot !== null && event.marketing_price_snapshot !== undefined) current.marketing_price_snapshot = this.sanitizeViewerAccess(event.marketing_price_snapshot);
+      analyticsByKey.set(key, current);
+    });
+
+    const purchaseReferenceByKey = new Map<string, Record<string, unknown>>();
+    (inviteRedemptions || []).forEach((redemption: any) => {
+      const key = keyFor(Number(redemption.booklet_instance_id), Number(redemption.student_id));
+      if (!purchaseReferenceByKey.has(key)) purchaseReferenceByKey.set(key, { source: "invite", invite_id: redemption.invite_id, purchase_id: null, redeemed_at: redemption.redeemed_at ?? null });
+    });
+    (codeRedemptions || []).forEach((redemption: any) => {
+      const key = keyFor(Number(redemption.booklet_instance_id), Number(redemption.student_id));
+      if (!purchaseReferenceByKey.has(key)) purchaseReferenceByKey.set(key, { source: "access_code", access_code_id: redemption.access_code_id, purchase_id: redemption.purchase_id ?? null, counted_for_progress: Boolean(redemption.counted_for_progress), redeemed_at: redemption.redeemed_at ?? null });
+    });
+
+    (accessRows || []).forEach((row: any) => {
+      const instanceId = Number(row.booklet_instance_id);
+      const userId = Number(row.user_id ?? row.user?.id);
+      const key = keyFor(instanceId, userId);
+      const devicesSummary = deviceSummaryByKey.get(key) || { active_count: 0, total_count: 0, last_seen_at: null };
+      const analyticsSummary = analyticsByKey.get(key) || { invite_opened: 0, access_created: 0, viewer_opened: 0, page_viewed: 0, device_bound: 0, source: row.access_source ?? null, marketing_price_snapshot: null };
+      rowsByInstance.get(instanceId)?.push(this.sanitizeViewerAccess({
+        ...row,
+        devices_summary: { ...devicesSummary, allowed_devices: allowanceByKey.get(key) ?? 1 },
+        analytics_summary: analyticsSummary,
+        purchase_reference: purchaseReferenceByKey.get(key) || null,
+      }));
+    });
+
+    return rowsByInstance;
   }
 
   async updateQuota(instanceId: number, inviteQuota: number): Promise<unknown> {
@@ -1687,101 +1972,7 @@ export class EBookletService {
     });
     if (!instance) throw new NotFoundError("Teacher e-booklet not found");
 
-    const accessRows = await this.db.e_booklet_access.findMany({
-      where: {
-        booklet_instance_id: instanceId,
-        role: "student",
-        status: "active",
-      },
-      include: { user: { select: { id: true, name: true, email: true } } },
-      orderBy: { granted_at: "desc" },
-    });
-    const studentIds = Array.from(new Set((accessRows || [])
-      .map((row: any) => Number(row.user_id ?? row.user?.id))
-      .filter((id: number) => Number.isInteger(id))));
-
-    if (studentIds.length === 0) return [];
-
-    const [devices, allowances, analyticsEvents] = await Promise.all([
-      this.db.e_booklet_devices.findMany({
-        where: { booklet_instance_id: instanceId, user_id: { in: studentIds } },
-        select: { id: true, user_id: true, status: true, last_seen_at: true },
-      }),
-      this.db.e_booklet_device_allowances.findMany({
-        where: { booklet_instance_id: instanceId, user_id: { in: studentIds } },
-        select: { user_id: true, allowed_devices: true },
-      }),
-      this.db.e_booklet_analytics_events.findMany({
-        where: { booklet_instance_id: instanceId, student_id: { in: studentIds } },
-        select: {
-          student_id: true,
-          event_type: true,
-          source: true,
-          marketing_price_snapshot: true,
-        },
-      }),
-    ]);
-
-    const deviceSummaryByUser = new Map<number, { active_count: number; total_count: number; last_seen_at: Date | string | null }>();
-    (devices || []).forEach((device: any) => {
-      const userId = Number(device.user_id);
-      const current = deviceSummaryByUser.get(userId) || { active_count: 0, total_count: 0, last_seen_at: null };
-      current.total_count += 1;
-      if (device.status === "active") current.active_count += 1;
-      const deviceLastSeen = device.last_seen_at ? new Date(device.last_seen_at) : null;
-      const currentLastSeen = current.last_seen_at ? new Date(current.last_seen_at) : null;
-      if (deviceLastSeen && (!currentLastSeen || deviceLastSeen > currentLastSeen)) {
-        current.last_seen_at = device.last_seen_at;
-      }
-      deviceSummaryByUser.set(userId, current);
-    });
-
-    const allowanceByUser = new Map<number, number>();
-    (allowances || []).forEach((allowance: any) => {
-      allowanceByUser.set(Number(allowance.user_id), Number(allowance.allowed_devices ?? 1));
-    });
-
-    const analyticsByUser = new Map<number, Record<string, any>>();
-    (analyticsEvents || []).forEach((event: any) => {
-      const userId = Number(event.student_id);
-      const current = analyticsByUser.get(userId) || {
-        invite_opened: 0,
-        access_created: 0,
-        viewer_opened: 0,
-        page_viewed: 0,
-        device_bound: 0,
-        source: null,
-        marketing_price_snapshot: null,
-      };
-      if (event.event_type) current[event.event_type] = Number(current[event.event_type] ?? 0) + 1;
-      if (!current.source && event.source) current.source = event.source;
-      if (current.marketing_price_snapshot === null && event.marketing_price_snapshot !== null && event.marketing_price_snapshot !== undefined) {
-        current.marketing_price_snapshot = this.sanitizeViewerAccess(event.marketing_price_snapshot);
-      }
-      analyticsByUser.set(userId, current);
-    });
-
-    return (accessRows || []).map((row: any) => {
-      const userId = Number(row.user_id ?? row.user?.id);
-      const devicesSummary = deviceSummaryByUser.get(userId) || { active_count: 0, total_count: 0, last_seen_at: null };
-      const analyticsSummary = analyticsByUser.get(userId) || {
-        invite_opened: 0,
-        access_created: 0,
-        viewer_opened: 0,
-        page_viewed: 0,
-        device_bound: 0,
-        source: row.access_source ?? null,
-        marketing_price_snapshot: null,
-      };
-      return this.sanitizeViewerAccess({
-        ...row,
-        devices_summary: {
-          ...devicesSummary,
-          allowed_devices: allowanceByUser.get(userId) ?? 1,
-        },
-        analytics_summary: analyticsSummary,
-      });
-    });
+    return (await this.getInstanceStudentRowsByInstanceId([instanceId])).get(instanceId) || [];
   }
 
   async revokeStudentAccess(
@@ -2026,12 +2217,13 @@ export class EBookletService {
     adminUserId: number,
     reason?: string,
   ) {
+    const normalizedReason = requireDeviceAdminReason(reason);
     const result = await this.db.e_booklet_devices.updateMany({
       where: { booklet_instance_id: instanceId, user_id: userId, status: "active" },
       data: {
         status: "reset",
         reset_by_admin_id: adminUserId,
-        reset_reason: reason,
+        reset_reason: normalizedReason,
         last_seen_at: new Date(),
       },
     });
@@ -2040,7 +2232,7 @@ export class EBookletService {
       action: "viewer_devices_reset",
       entity_type: "e_booklet_instance",
       entity_id: instanceId,
-      metadata_json: { user_id: userId, reason, reset_count: result?.count ?? 0 },
+      metadata_json: { user_id: userId, reason: normalizedReason, reset_count: result?.count ?? 0 },
     });
     return result;
   }
@@ -2055,6 +2247,7 @@ export class EBookletService {
     if (!Number.isInteger(allowedDevices) || allowedDevices < 1) {
       throw new BadRequestError("Allowed devices must be at least 1.");
     }
+    const normalizedReason = requireDeviceAdminReason(reason);
     const allowance = await this.db.e_booklet_device_allowances.upsert({
       where: {
         booklet_instance_id_user_id: {
@@ -2067,13 +2260,13 @@ export class EBookletService {
         user_id: userId,
         allowed_devices: allowedDevices,
         updated_by_admin_id: adminUserId,
-        reason,
+        reason: normalizedReason,
         updated_at: new Date(),
       },
       update: {
         allowed_devices: allowedDevices,
         updated_by_admin_id: adminUserId,
-        reason,
+        reason: normalizedReason,
         updated_at: new Date(),
       },
     });
@@ -2082,7 +2275,7 @@ export class EBookletService {
       action: "viewer_device_allowance_updated",
       entity_type: "e_booklet_instance",
       entity_id: instanceId,
-      metadata_json: { user_id: userId, allowed_devices: allowedDevices, reason },
+      metadata_json: { user_id: userId, allowed_devices: allowedDevices, reason: normalizedReason },
     });
     return allowance;
   }
@@ -2177,13 +2370,23 @@ export class EBookletService {
     return hotspots.map((hotspot: any) => this.normalizeHotspotRecord(hotspot));
   }
 
-  async getAdminHotspotContent(hotspotId: number) {
+  async getAdminHotspotContent(instanceId: number, hotspotId: number) {
     const hotspot = await this.db.e_booklet_hotspots.findUnique({
       where: { id: hotspotId },
-      include: { asset_file: true, template_version: { include: { instances: { take: 1 } } } },
+      include: {
+        asset_file: true,
+        template_version: {
+          include: {
+            instances: {
+              where: { id: instanceId },
+              take: 1,
+            },
+          },
+        },
+      },
     });
     if (!hotspot || !hotspot.template_version.instances.length) {
-      throw new NotFoundError("E-booklet hotspot not found.");
+      throw new NotFoundError("E-booklet hotspot not found for this instance.");
     }
     return {
       id: hotspot.id,
@@ -2212,10 +2415,19 @@ export class EBookletService {
     };
   }
 
-  async getAdminAuthorizedHotspotAsset(hotspotId: number, assetId: number) {
+  async getAdminAuthorizedHotspotAsset(instanceId: number, hotspotId: number, assetId: number) {
     const hotspot = await this.db.e_booklet_hotspots.findUnique({
       where: { id: hotspotId },
-      include: { template_version: { include: { instances: { take: 1 } } } },
+      include: {
+        template_version: {
+          include: {
+            instances: {
+              where: { id: instanceId },
+              take: 1,
+            },
+          },
+        },
+      },
     });
     const referencedAssetIds = new Set<number>();
     if (hotspot?.asset_file_id) referencedAssetIds.add(Number(hotspot.asset_file_id));
@@ -2828,8 +3040,6 @@ export class EBookletService {
     input: TermsInput,
     paymentScreenshotFile?: Express.Multer.File,
   ) {
-    throw new ForbiddenError("Direct student e-booklet purchase is disabled. Students must redeem a teacher-provided URL or access code.");
-
     try {
       this.requireStudentTerms(input);
       const invite = await this.findInviteByToken(rawToken);
