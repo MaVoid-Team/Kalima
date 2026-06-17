@@ -1889,6 +1889,15 @@ export class EBookletService {
   async listViewerDevices(instanceId: number, userId: number) {
     return this.db.e_booklet_devices.findMany({
       where: { booklet_instance_id: instanceId, user_id: userId, status: "active" },
+      select: {
+        id: true,
+        booklet_instance_id: true,
+        user_id: true,
+        device_label: true,
+        status: true,
+        first_seen_at: true,
+        last_seen_at: true,
+      },
       orderBy: { last_seen_at: "desc" },
     });
   }
