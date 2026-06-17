@@ -24,6 +24,7 @@ export default function Footer() {
         { label: t("footer.market"), href: "/market" },
         { label: t("footer.eBooklets"), href: "/e-booklets" },
         { label: t("footer.privacyPolicy"), href: "/privacy-policy" },
+        { label: t("footer.deleteMyData"), href: "/delete-my-data" },
       ],
     },
   ];

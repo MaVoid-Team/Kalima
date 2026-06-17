@@ -27,7 +27,8 @@ export const WHATSAPP_MESSAGES = {
         return lines.join('\n');
     },
 
-    GENERAL_QUERY: () => i18n.t('common:whatsapp.generalQuery', 'مرحباً، لدي استفسار بخصوص المنصة.')
+    GENERAL_QUERY: () => i18n.t('common:whatsapp.generalQuery', 'مرحباً، لدي استفسار بخصوص المنصة.'),
+    DATA_DELETION: () => i18n.t('landing:dataDeletion.whatsappMessage', 'Hello, I want to request deletion of my Kalima account and associated data.')
 };
 
 /**
@@ -70,6 +71,9 @@ export function useWhatsAppContact() {
                 break;
             case 'cart':
                 message = WHATSAPP_MESSAGES.CART_CHECKOUT(data.total, data.itemsCount);
+                break;
+            case 'dataDeletion':
+                message = WHATSAPP_MESSAGES.DATA_DELETION();
                 break;
             case 'footer':
             default:
