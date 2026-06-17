@@ -2140,7 +2140,6 @@ export class EBookletService {
         status: true,
         first_seen_at: true,
         last_seen_at: true,
-        created_at: true,
       },
       orderBy: { last_seen_at: "desc" },
     });
