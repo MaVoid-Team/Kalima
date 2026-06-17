@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpenCheck, Eye, RefreshCcw, Save, ShieldOff, Users } from "lucide-react";
+import { BookOpenCheck, Eye, HardDrive, RefreshCcw, Save, ShieldOff, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useAdminEBookletInstances } from "@/hooks/admin/useAdminEBooklets";
 import { useTranslation } from "react-i18next";
+import AdminEBookletStudentDevicePanel from "./AdminEBookletStudentDevicePanel";
 
 const numberValue = (value, fallback = 0) => {
   const parsed = Number(value);
@@ -22,6 +23,7 @@ export default function AdminEBookletInstancesPage() {
   const { t, i18n } = useTranslation("eBooklets");
   const { instances, pagination, status, loading, fetchInstances, setStatus, setPage, updateQuota, revokeTeacherAccess } = useAdminEBookletInstances();
   const [quotaDrafts, setQuotaDrafts] = useState({});
+  const [expandedDeviceKey, setExpandedDeviceKey] = useState(null);
 
   useEffect(() => { fetchInstances().catch(() => {}); }, [fetchInstances]);
   useEffect(() => {
@@ -81,16 +83,63 @@ export default function AdminEBookletInstancesPage() {
               {group.rows.map((instance) => {
                 const usedSeats = numberValue(instance.used_invites_count, instance._count?.access_records || 0);
                 const usedDevices = optionalNumberValue(instance.used_devices_count ?? instance.active_devices_count ?? instance.devices_count);
+                const students = Array.isArray(instance.students) ? instance.students : [];
                 return (
-                  <tr key={instance.id} className="border-b align-top">
-                    <td className="py-3"><div className="font-medium">{instance.display_title || instance.template?.title || t("common.eBooklet")}</div><div className="text-xs text-muted-foreground">{instance.template_version?.version_label || instance.template_version?.version_number || t("common.version")}</div></td>
-                    <td><Badge variant="outline">{t(`statuses.${instance.status}`, { defaultValue: instance.status })}</Badge></td>
-                    <td>{formatDate(instance.access_expires_at || instance.expires_at)}</td>
-                    <td><div className="flex max-w-[150px] items-center gap-2"><Input type="number" min="0" value={quotaDrafts[instance.id] ?? 0} onChange={(event) => setQuotaDrafts((current) => ({ ...current, [instance.id]: event.target.value }))} /><Button size="icon-sm" variant="outline" onClick={() => handleQuotaSave(instance.id)} title={t("common.save")}><Save className="h-4 w-4" /></Button></div></td>
-                    <td>{usedSeats}</td>
-                    <td>{usedDevices === null ? t("admin.instances.unavailable", { defaultValue: "Unavailable" }) : usedDevices}</td>
-                    <td><div className="flex flex-wrap gap-2"><Button asChild size="sm" variant="outline"><Link to={`/admin/e-booklet-instances/${instance.id}/students`}><Users className="h-4 w-4" />{t("admin.instances.showStudents")}</Link></Button><Button asChild size="sm" variant="outline"><Link to={`/admin/e-booklet-instances/${instance.id}/view`}><Eye className="h-4 w-4" />Admin View</Link></Button><Button size="sm" variant="outline" onClick={() => handleRevoke(instance.id)} disabled={instance.status !== "active"}><ShieldOff className="h-4 w-4" />{t("admin.instances.revoke")}</Button></div></td>
-                  </tr>
+                  <Fragment key={instance.id}>
+                    <tr className="border-b align-top">
+                      <td className="py-3"><div className="font-medium">{instance.display_title || instance.template?.title || t("common.eBooklet")}</div><div className="text-xs text-muted-foreground">{instance.template_version?.version_label || instance.template_version?.version_number || t("common.version")}</div></td>
+                      <td><Badge variant="outline">{t(`statuses.${instance.status}`, { defaultValue: instance.status })}</Badge></td>
+                      <td>{formatDate(instance.access_expires_at || instance.expires_at)}</td>
+                      <td><div className="flex max-w-[150px] items-center gap-2"><Input type="number" min="0" value={quotaDrafts[instance.id] ?? 0} onChange={(event) => setQuotaDrafts((current) => ({ ...current, [instance.id]: event.target.value }))} /><Button size="icon-sm" variant="outline" onClick={() => handleQuotaSave(instance.id)} title={t("common.save")}><Save className="h-4 w-4" /></Button></div></td>
+                      <td>{usedSeats}</td>
+                      <td>{usedDevices === null ? t("admin.instances.unavailable", { defaultValue: "Unavailable" }) : usedDevices}</td>
+                      <td><div className="flex flex-wrap gap-2"><Button asChild size="sm" variant="outline"><Link to={`/admin/e-booklet-instances/${instance.id}/students`}><Users className="h-4 w-4" />{t("admin.instances.showStudents")}</Link></Button><Button asChild size="sm" variant="outline"><Link to={`/admin/e-booklet-instances/${instance.id}/view`}><Eye className="h-4 w-4" />Admin View</Link></Button><Button size="sm" variant="outline" onClick={() => handleRevoke(instance.id)} disabled={instance.status !== "active"}><ShieldOff className="h-4 w-4" />{t("admin.instances.revoke")}</Button></div></td>
+                    </tr>
+                    <tr className="border-b bg-muted/30">
+                      <td colSpan={7} className="p-3">
+                        <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground"><Users className="h-4 w-4" />{t("admin.instances.nestedStudents", { defaultValue: "Students with access" })} <Badge variant="outline">{students.length}</Badge></div>
+                        {students.length === 0 ? (
+                          <div className="text-xs text-muted-foreground">{t("admin.instances.noStudents", { defaultValue: "No students have active access yet." })}</div>
+                        ) : (
+                          <div className="grid gap-2 md:grid-cols-2">
+                            {students.map((student) => {
+                              const studentUserId = student.user_id || student.user?.id;
+                              const devicePanelKey = `${instance.id}-${studentUserId}`;
+                              const devicesExpanded = expandedDeviceKey === devicePanelKey;
+                              return (
+                                <div key={student.id || devicePanelKey} className="rounded-md border bg-background p-3 text-xs">
+                                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                                    <div>
+                                      <div className="font-medium">{student.user?.name || student.user?.email || t("common.student", { defaultValue: "Student" })}</div>
+                                      <div className="text-muted-foreground">{student.user?.email || `ID ${studentUserId}`}</div>
+                                    </div>
+                                    <Button size="sm" variant="outline" onClick={() => setExpandedDeviceKey(devicesExpanded ? null : devicePanelKey)}>
+                                      <HardDrive className="h-4 w-4" />
+                                      {devicesExpanded ? t("admin.instances.hideDevicesInline") : t("admin.instances.manageDevicesInline")}
+                                    </Button>
+                                  </div>
+                                  <div className="mt-2 grid gap-1 sm:grid-cols-3">
+                                    <span>{t("admin.instances.devices", { defaultValue: "Devices" })}: {student.devices_summary?.active_count ?? 0}/{student.devices_summary?.allowed_devices ?? 1}</span>
+                                    <span>{t("admin.instances.viewerOpens", { defaultValue: "Viewer opens" })}: {student.analytics_summary?.viewer_opened ?? 0}</span>
+                                    <span>{t("admin.instances.source", { defaultValue: "Source" })}: {student.purchase_reference?.source || student.analytics_summary?.source || student.access_source || "—"}</span>
+                                  </div>
+                                  {devicesExpanded && (
+                                    <AdminEBookletStudentDevicePanel
+                                      instanceId={instance.id}
+                                      userId={studentUserId}
+                                      student={student}
+                                      expanded={devicesExpanded}
+                                      onSummaryRefresh={() => fetchInstances()}
+                                    />
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  </Fragment>
                 );
               })}
             </tbody></table></div>

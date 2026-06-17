@@ -784,18 +784,105 @@ export const eBookletController = {
     }
   },
 
+  async listAccessCodes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const requestedKind = req.query.kind ? parseAccessCodeKind(req.query.kind) : undefined;
+      const data = await domainServices().accessCodes.listCodes({
+        bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
+        teacherId: currentUserId(req),
+        kind: requestedKind,
+        status: typeof req.query.status === "string" ? req.query.status : undefined,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async generateAccessCode(req: Request, res: Response, next: NextFunction) {
     try {
       const requestedKind = parseAccessCodeKind(req.body?.kind ?? "paid");
       const data = await domainServices().accessCodes.generateCode({
         bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
         teacherId: currentUserId(req),
-        kind: requestedKind === "free" ? "paid" : requestedKind,
+        kind: requestedKind,
         termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
         expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
         maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
       });
       res.status(201).json({ success: true, data: sanitizeAccessCodeResponse(data) });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async generateAccessCodes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const requestedKind = parseAccessCodeKind(req.body?.kind ?? "paid");
+      const data = await domainServices().accessCodes.generateCodes({
+        bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
+        teacherId: currentUserId(req),
+        kind: requestedKind,
+        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+        count: parseOptionalPositiveInt(req.body?.count ?? req.body?.quantity, "access code count", 100) ?? 1,
+        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+        maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
+      });
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminListAccessCodes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const requestedKind = req.query.kind ? parseAccessCodeKind(req.query.kind) : undefined;
+      const data = await domainServices().accessCodes.listCodes({
+        bookletInstanceId: parseRequiredPositiveInt(req.query.bookletInstanceId ?? req.query.booklet_instance_id, "instance ID"),
+        teacherId: parseRequiredPositiveInt(req.query.teacherId ?? req.query.teacher_id, "teacher ID"),
+        kind: requestedKind,
+        status: typeof req.query.status === "string" ? req.query.status : undefined,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminGenerateAccessCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodes.generateCode({
+        bookletInstanceId: parseRequiredPositiveInt(req.body?.bookletInstanceId ?? req.body?.booklet_instance_id, "instance ID"),
+        teacherId: parseRequiredPositiveInt(req.body?.teacherId ?? req.body?.teacher_id, "teacher ID"),
+        kind: parseAccessCodeKind(req.body?.kind ?? "paid"),
+        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+        maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
+        adminActorId: currentUserId(req),
+        ipAddress: req.ip,
+        userAgent: req.get("user-agent") ?? null,
+      });
+      res.status(201).json({ success: true, data: sanitizeAccessCodeResponse(data) });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminGenerateAccessCodes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodes.generateCodes({
+        bookletInstanceId: parseRequiredPositiveInt(req.body?.bookletInstanceId ?? req.body?.booklet_instance_id, "instance ID"),
+        teacherId: parseRequiredPositiveInt(req.body?.teacherId ?? req.body?.teacher_id, "teacher ID"),
+        kind: parseAccessCodeKind(req.body?.kind ?? "paid"),
+        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+        count: parseOptionalPositiveInt(req.body?.count ?? req.body?.quantity, "access code count", 100) ?? 1,
+        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+        maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
+        adminActorId: currentUserId(req),
+        ipAddress: req.ip,
+        userAgent: req.get("user-agent") ?? null,
+      });
+      res.status(201).json({ success: true, data });
     } catch (error) {
       next(error);
     }

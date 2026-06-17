@@ -21,6 +21,7 @@ export default function TeacherInviteManagementPage() {
   const { instanceId } = useParams();
   const {
     items,
+    accessCodes,
     students,
     milestones,
     wallet,
@@ -32,11 +33,14 @@ export default function TeacherInviteManagementPage() {
     fetchCurrentTerms,
     acceptCodeGenerationTerms,
     createAccessCode,
+    createAccessCodes,
+    fetchAccessCodes,
     fetchTeacherMilestones,
     fetchTeacherWallet,
     claimMilestoneReward,
   } = useTeacherEBooklets();
   const [generatedCodes, setGeneratedCodes] = useState([]);
+  const [bulkCount, setBulkCount] = useState(5);
   const [pendingAction, setPendingAction] = useState(null);
   const [rewardTermsAchievement, setRewardTermsAchievement] = useState(null);
 
@@ -44,7 +48,8 @@ export default function TeacherInviteManagementPage() {
     fetchTeacherEBooklets().catch(() => {});
     fetchStudents(instanceId).catch(() => {});
     fetchTeacherWallet().catch(() => {});
-  }, [fetchStudents, fetchTeacherEBooklets, fetchTeacherWallet, instanceId]);
+    fetchAccessCodes(instanceId).catch(() => {});
+  }, [fetchAccessCodes, fetchStudents, fetchTeacherEBooklets, fetchTeacherWallet, instanceId]);
 
   const instance = useMemo(() => {
     return items
@@ -108,6 +113,7 @@ export default function TeacherInviteManagementPage() {
       notPaidProgress: kind === "free",
     };
     setGeneratedCodes((current) => [created, ...current]);
+    fetchAccessCodes(instanceId).catch(() => {});
     if (mode === "message" && whatsappMessage) await copyText(whatsappMessage, "toasts.accessMessageCopied");
     if (mode === "code" && code) await copyText(code, "toasts.accessCodeCopied");
   };
@@ -126,6 +132,27 @@ export default function TeacherInviteManagementPage() {
   const generatePaidMessageCode = () => requireTermsFor((acceptedTermId) => runCodeGeneration("paid", "message", acceptedTermId));
   const generatePaidCodeOnly = () => requireTermsFor((acceptedTermId) => runCodeGeneration("paid", "code", acceptedTermId));
   const generateFreeSharedCode = () => requireTermsFor((acceptedTermId) => runCodeGeneration("free", "code", acceptedTermId));
+  const generateBulkPaidCodes = () => requireTermsFor(async (acceptedTermId) => {
+    const count = Math.max(1, Number(bulkCount) || 1);
+    const response = await createAccessCodes(instanceId, { kind: "paid", termId: acceptedTermId, count, maxRedemptions: 1 });
+    const createdCodes = Array.isArray(response?.data?.codes) ? response.data.codes : [];
+    setGeneratedCodes((current) => [
+      ...createdCodes.map((entry, index) => {
+        const record = getRecord(entry);
+        return {
+          id: record.id || `bulk-paid-${Date.now()}-${index}`,
+          kind: "paid",
+          mode: "bulk",
+          code: getCode(entry),
+          whatsappMessage: getMessage(entry),
+          codeHint: record.code_hint,
+          createdAt: record.created_at || new Date().toISOString(),
+        };
+      }),
+      ...current,
+    ]);
+    fetchAccessCodes(instanceId).catch(() => {});
+  });
 
   const claimRewardAfterTerms = async () => {
     if (!rewardTermsAchievement) return;
@@ -200,6 +227,21 @@ export default function TeacherInviteManagementPage() {
               <Link2 className="h-4 w-4" />
               {t("teacher.invites.generateFreeSharedCode")}
             </Button>
+            <div className="grid grid-cols-[1fr_auto] gap-2" data-testid="bulk-access-code-controls">
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={bulkCount}
+                onChange={(event) => setBulkCount(event.target.value)}
+                className="rounded-md border bg-background px-3 py-2 text-sm"
+                aria-label={t("teacher.invites.bulkCount", { defaultValue: "Bulk code count" })}
+              />
+              <Button onClick={generateBulkPaidCodes} disabled={loading} variant="outline">
+                <Copy className="h-4 w-4" />
+                {t("teacher.invites.generateBulkPaidCodes", { defaultValue: "Bulk generate" })}
+              </Button>
+            </div>
           </div>
           <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-sm" data-testid="free-code-not-paid-progress-copy">
             {t("teacher.invites.notPaidProgress")}
@@ -234,6 +276,18 @@ export default function TeacherInviteManagementPage() {
                 </div>
               ))}
               {generatedCodes.length === 0 && <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">{t("teacher.invites.emptyGeneratedCodes")}</div>}
+            </div>
+            <div className="mt-5 border-t pt-4" data-testid="access-code-status-list">
+              <h3 className="text-sm font-semibold">{t("teacher.invites.codeStatusTitle", { defaultValue: "Code status" })}</h3>
+              <div className="mt-3 space-y-2">
+                {accessCodes.map((entry) => (
+                  <div key={entry.id} className="flex items-center justify-between gap-3 rounded-md border p-2 text-sm">
+                    <span>{entry.code_hint ? t("teacher.invites.codeHint", { value: entry.code_hint }) : entry.id}</span>
+                    <Badge variant="outline">{entry.status}</Badge>
+                  </div>
+                ))}
+                {accessCodes.length === 0 && <div className="text-sm text-muted-foreground">{t("teacher.invites.emptyCodeStatuses", { defaultValue: "No generated code statuses yet." })}</div>}
+              </div>
             </div>
           </div>
 

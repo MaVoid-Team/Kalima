@@ -4,12 +4,12 @@ Source spec: `docs/specs/e-booklet-teacher-store-private-student-access-spec.md`
 
 ## Status dashboard
 
-- Current status: Build Order 8 complete and verified through backend tests/builds, frontend build, and admin browser/API/DB smoke.
-- Current build order item: Build Order 9 — Teacher code/link management after approval
-- Active files: `backend/tests/e-booklet/e-booklet.service.spec.ts`, `backend/src/apps/store-api/services/e-booklet.service.ts`, `frontend/src/pages/admin/e-booklets/AdminEBookletPurchasesPage.jsx`, `docs/specs/e-booklet-teacher-store-private-student-access-tracker.md`, plus existing Build Order 3-8 files/source contracts.
-- Last verification command/result: 2026-06-17 Build Order 8 admin E2E passed: admin login at `/login`, `/admin/e-booklet-purchases` approve/unlock on purchase `40`, row changed `Pending` → `Ready`, API returned purchase `40` as `ready` with active instance `35`, DB confirmed active teacher access `40` role `teacher`.
-- Current blocker: None for Build Order 8.
-- Next action: Start Build Order 9: teacher/admin code-link generation and quota enforcement after approval.
+- Current status: Build Order 15 manual E2E complete and verified locally across teacher checkout with payment proof, admin approval, teacher code management, student redemption/viewer access, and admin device/analytics controls.
+- Current build order item: Build Order 16 — Review, cleanup, and production readiness
+- Active files: `docs/specs/e-booklet-teacher-store-private-student-access-tracker.md`, plus prior Build Order implementation/test files listed in git status.
+- Last verification command/result: 2026-06-17 Build Order 15 local browser/API smoke on `127.0.0.1:5001` + `127.0.0.1:5173`: paid checkout returned purchase `41` pending, admin `mark-paid` returned ready, teacher access returned instance `36`, teacher code generation returned HTTP 201 for single/bulk codes, student redemption redirected to `/student/e-booklets/36`, unauth document fetch returned HTTP 401, and admin device allowance/reset returned HTTP 200.
+- Current blocker: None for Build Order 15. Build Order 16 source/spec review remains pending.
+- Next action: Start Build Order 16: spec compliance, cleanup, privacy/auth review, DB/generated-client review, repo hygiene, and PR/commit prep.
 
 ## Stop/update rule
 
@@ -269,195 +269,242 @@ Legend:
 ## Build Order 9 — Teacher code/link management after approval
 
 ### Backend/API
-- [ ] Teacher can generate one code/link for an approved eBooklet.
-- [ ] Teacher can bulk-generate N codes/links for an approved eBooklet.
-- [ ] Admin can generate/control codes for approved teacher purchases.
-- [ ] Code status supports unused/redeemed/expired/revoked as applicable.
-- [ ] Quota/seat limits enforced.
-- [ ] Pending purchases cannot generate codes.
+- [x] Teacher can generate one code/link for an approved eBooklet.
+- [x] Teacher can bulk-generate N codes/links for an approved eBooklet.
+- [x] Admin can generate/control codes for approved teacher purchases.
+- [x] Code status supports unused/redeemed/expired/revoked as applicable.
+- [x] Quota/seat limits enforced.
+- [x] Pending purchases cannot generate codes.
 
 ### Frontend/UI
-- [ ] Teacher dashboard lists approved eBooklets.
-- [ ] Teacher can generate single code/link.
-- [ ] Teacher can bulk-generate codes by quantity.
-- [ ] Teacher can copy codes/links.
-- [ ] Teacher can view code redemption status.
-- [ ] Pending purchases show status in orders only or disabled management state.
+- [x] Teacher dashboard lists approved eBooklets.
+- [x] Teacher can generate single code/link.
+- [x] Teacher can bulk-generate codes by quantity.
+- [x] Teacher can copy codes/links.
+- [x] Teacher can view code redemption status.
+- [x] Pending purchases show status in orders only or disabled management state.
 
 ### Verification
-- [ ] Backend test: single code generation after approval.
-- [ ] Backend test: bulk code generation after approval.
-- [ ] Backend test: code generation blocked before approval.
-- [ ] Browser smoke: generate/copy code from teacher dashboard.
+- [x] Backend test: single code generation after approval.
+- [x] Backend test: bulk code generation after approval.
+- [x] Backend test: code generation blocked before approval.
+- [x] Browser smoke: generate/copy code from teacher dashboard.
+
+### Proof — 2026-06-17 local API/browser smoke
+- API smoke: local teacher token for user `8` generated free code(s), bulk quantity payload generated the requested count after backend accepted `count`/`quantity`, paid quota enforcement returned HTTP 400 when exhausted, and admin scoped access-code listing returned active records for the same teacher/instance.
+- Browser smoke: opened `/teacher/e-booklets/5/invites`, generated a free shared code after terms acceptance, saw `KLM-...` code + WhatsApp message + `Saved hint` status entry, and clicked `Copy code` without browser console errors.
 
 ---
 
 ## Build Order 10 — Private student redemption and dashboard access
 
 ### Backend/API
-- [ ] Token/code validation requires authentication before binding access.
-- [ ] Logged-out redemption preserves return URL/token/code.
-- [ ] Valid code/link creates permanent student access record.
-- [ ] Duplicate/expired/invalid code handling matches business rules.
-- [ ] Viewer access checks student access record.
+- [x] Token/code validation requires authentication before binding access.
+- [x] Logged-out redemption preserves return URL/token/code.
+- [x] Valid code/link creates permanent student access record.
+- [x] Duplicate/expired/invalid code handling matches business rules.
+- [x] Viewer access checks student access record.
 
 ### Frontend/UI
-- [ ] Redemption routes remain hidden from public nav/store.
-- [ ] Logged-out users are routed to login/signup then returned.
-- [ ] Redemption success CTA routes to `/student/e-booklets`.
-- [ ] Student dashboard lists redeemed eBooklets.
-- [ ] Viewer opens only for owned access.
+- [x] Redemption routes remain hidden from public nav/store.
+- [x] Logged-out users are routed to login/signup then returned.
+- [x] Redemption success CTA routes to `/student/e-booklets`.
+- [x] Student dashboard lists redeemed eBooklets.
+- [x] Viewer opens only for owned access.
 
 ### Verification
-- [ ] Test: logged-out redemption returns after login.
-- [ ] Test: valid code binds access.
-- [ ] Test: invalid/used/expired code is blocked.
-- [ ] Browser smoke: student sees redeemed eBooklet in dashboard.
+- [x] Test: logged-out redemption returns after login.
+- [x] Test: valid code binds access.
+- [x] Test: invalid/used/expired code is blocked.
+- [x] Browser smoke: student sees redeemed eBooklet in dashboard.
+
+Verification notes:
+- 2026-06-17: Existing backend tests cover authenticated redemption route, invalid/used code rejection, paid/free redemption service behavior, and viewer access ownership/expiry checks.
+- 2026-06-17 live API smoke generated a teacher free access code for instance `5`, redeemed it as student `55`, confirmed `/student/e-booklets` listed the access, and confirmed `/e-booklet-viewer/5/metadata` returned 200.
+- 2026-06-17 browser smoke on `127.0.0.1:5173/student/e-booklets` confirmed the redeemed eBooklet appears in the student dashboard and `Open` loads `/student/e-booklets/5` viewer content.
 
 ---
 
 ## Build Order 11 — Admin access page nested students and analytics
 
 ### Backend/API
-- [ ] Admin instances/access endpoint provides teacher → eBooklet grouping data.
-- [ ] Student list uses actual access records only.
-- [ ] Include student identity fields.
-- [ ] Include access status/source/granted date.
-- [ ] Include purchase/order reference when available.
-- [ ] Include analytics summary per student.
-- [ ] Include device summary per student.
-- [ ] Avoid requiring frontend N+1 calls for row summaries.
+- [x] Admin instances/access endpoint provides teacher → eBooklet grouping data.
+- [x] Student list uses actual access records only.
+- [x] Include student identity fields.
+- [x] Include access status/source/granted date.
+- [x] Include purchase/order reference when available.
+- [x] Include analytics summary per student.
+- [x] Include device summary per student.
+- [x] Avoid requiring frontend N+1 calls for row summaries.
 
 ### Frontend/UI
-- [ ] `/admin/e-booklet-instances` keeps teacher groups.
-- [ ] Each teacher group keeps eBooklet rows.
-- [ ] Each eBooklet row renders nested student rows.
-- [ ] Each student row shows analytics summary.
-- [ ] Each student row shows device summary.
-- [ ] Empty states exist for eBooklets with no students.
+- [x] `/admin/e-booklet-instances` keeps teacher groups.
+- [x] Each teacher group keeps eBooklet rows.
+- [x] Each eBooklet row renders nested student rows.
+- [x] Each student row shows analytics summary.
+- [x] Each student row shows device summary.
+- [x] Empty states exist for eBooklets with no students.
 
 ### Verification
-- [ ] Backend test: endpoint returns nested access records with summaries.
-- [ ] Frontend smoke: teacher → eBooklet → student rows render.
-- [ ] Confirm “students who bought” excludes anonymous opens and pending proofs.
+- [x] Backend test: endpoint returns nested access records with summaries.
+- [x] Frontend smoke: teacher → eBooklet → student rows render.
+- [x] Confirm “students who bought” excludes anonymous opens and pending proofs.
+
+### Proof — 2026-06-17 local API/browser smoke
+- Backend/API: `listInstances` now attaches `students` from active `e_booklet_access` rows only, with identity, status/source/granted date, analytics summary, device summary, and invite/access-code purchase references. Targeted backend eBooklet tests passed 123/123 and backend build passed.
+- Live API smoke: `/api/v2/admin/e-booklet-instances?status=active&limit=5` returned HTTP 200 with nested `students`; first non-empty instance had device, analytics, and purchase-reference fields.
+- Frontend/browser: `/admin/e-booklet-instances` rendered teacher groups, eBooklet rows, nested `Students with access` cards, empty states, and per-student Devices/Viewer opens/Source values.
 
 ---
 
 ## Build Order 12 — Embedded admin device management in student rows
 
 ### Shared component
-- [ ] Extract reusable admin student device panel from current devices page logic.
-- [ ] Use component inside nested student row.
-- [ ] Use same component or shared hook in existing devices page.
-- [ ] Preserve `/admin/e-booklet-instances/:instanceId/devices` fallback route.
+- [x] Extract reusable admin student device panel from current devices page logic.
+- [x] Use component inside nested student row.
+- [x] Use same component or shared hook in existing devices page.
+- [x] Preserve `/admin/e-booklet-instances/:instanceId/devices` fallback route.
 
 ### Device controls
-- [ ] Lazy-load full device list when a student row expands.
-- [ ] Show device label/status/last seen/bound date.
-- [ ] Allow setting allowed device count.
-- [ ] Allow adding allowance.
-- [ ] Allow resetting devices.
-- [ ] Require reason field where existing API requires it.
-- [ ] Refresh summary after actions.
-- [ ] Do not expose raw IP/user-agent in collapsed row.
+- [x] Lazy-load full device list when a student row expands.
+- [x] Show device label/status/last seen/bound date.
+- [x] Allow setting allowed device count.
+- [x] Allow adding allowance.
+- [x] Allow resetting devices.
+- [x] Require reason field where existing API requires it.
+- [x] Refresh summary after actions.
+- [x] Do not expose raw IP/user-agent in collapsed row.
 
 ### Verification
-- [ ] Test/smoke: expand student row and load devices.
-- [ ] Test/smoke: add allowance works.
-- [ ] Test/smoke: reset devices works.
-- [ ] Test/smoke: existing devices detail route still works.
+- [x] Test/smoke: expand student row and load devices.
+- [x] Test/smoke: add allowance works.
+- [x] Test/smoke: reset devices works.
+- [x] Test/smoke: existing devices detail route still works.
+
+### Proof — 2026-06-17 local source/build/browser smoke
+- Added `AdminEBookletStudentDevicePanel.jsx` and reused it in both nested admin access student rows and `/admin/e-booklet-instances/:instanceId/devices`.
+- Embedded panels lazy-load on expand, show label/status/last-seen/bound-date only, gate allowance/reset buttons behind a reason, and call the existing summary refresh after successful actions.
+- Source contract `node tests/e-booklet-build-order12-device-panel-source-check.mjs` verified shared reuse, lazy expansion, action wiring, and no raw `ip_address`/`user_agent` exposure in the panel/page.
+- Frontend build: `npm run build` passed.
+- Browser smoke: expanded student device panel on `/admin/e-booklet-instances`, saw device rows, typed a reason, reset devices for instance `21` user `65`, and saw summary refresh from `Devices: 2/2` to `Devices: 0/2`; full devices route `/admin/e-booklet-instances/21/devices?userId=65` rendered the shared panel.
 
 ---
 
 ## Build Order 13 — Translations, copy, and navigation
 
 ### Requirements
-- [ ] Add/update English eBooklet keys.
-- [ ] Add/update Arabic eBooklet keys.
-- [ ] Ensure Arabic layout remains RTL and readable.
-- [ ] Add dedicated eBooklet orders navigation/CTA where appropriate.
-- [ ] Do not expose private redemption links in public navigation.
-- [ ] Update empty-state and pending/approved/rejected copy.
+- [x] Add/update English eBooklet keys.
+- [x] Add/update Arabic eBooklet keys.
+- [x] Ensure Arabic layout remains RTL and readable.
+- [x] Add dedicated eBooklet orders navigation/CTA where appropriate.
+- [x] Do not expose private redemption links in public navigation.
+- [x] Update empty-state and pending/approved/rejected copy.
 
 ### Verification
-- [ ] Browser smoke in English.
-- [ ] Browser smoke in Arabic/RTL.
-- [ ] Public nav does not expose private student redemption.
+- [x] Browser smoke in English.
+- [x] Browser smoke in Arabic/RTL.
+- [x] Public nav does not expose private student redemption.
+
+### Proof — 2026-06-17
+- Added EN/AR `eBooklets.orders` keys for empty state, loading, order count, order item status, management CTA, pending/approved/confirmed/ready/rejected/cancelled/unknown labels, and status-specific guidance copy.
+- Added dedicated eBooklet orders navigation/CTA in the public navbar/command palette for authenticated non-admin users, teacher sidebar, student sidebar, and the orders page header.
+- Kept public redemption routes private/hidden from navigation; source contract verifies no public navbar links to `/e-booklet-invite` or `/e-booklet-code`.
+- Verification: `node tests/e-booklet-build-order13-copy-navigation-source-check.mjs && npm run build` passed.
+- Browser smoke: `/e-booklets` rendered in English; after toggling language, Arabic rendered with `document.documentElement.dir === "rtl"`; DOM check found no public private-redemption navigation links.
 
 ---
 
 ## Build Order 14 — Automated verification
 
 ### Backend
-- [ ] Run backend unit/integration tests for eBooklets.
-- [ ] Run backend build/typecheck.
-- [ ] Record commands and results here.
+- [x] Run backend unit/integration tests for eBooklets.
+- [x] Run backend build/typecheck.
+- [x] Record commands and results here.
 
 ### Frontend
-- [ ] Run frontend lint.
-- [ ] Run frontend build.
-- [ ] Run available frontend tests.
-- [ ] Record commands and results here.
+- [x] Run frontend lint.
+- [x] Run frontend build.
+- [x] Run available frontend tests.
+- [x] Record commands and results here.
 
 ### Commands/results log
-- [ ] Backend test command: — / Result: —
-- [ ] Backend build command: — / Result: —
-- [ ] Frontend lint command: — / Result: —
-- [ ] Frontend build command: — / Result: —
+- [x] Backend test command: `npm test -- --runInBand tests/e-booklet/e-booklet.routes.spec.ts tests/e-booklet/e-booklet.service.spec.ts tests/e-booklet/e-booklet-phase2-services.spec.ts` / Result: PASS, 3 suites, 123 tests.
+- [x] Backend build command: `npm run build` / Result: PASS.
+- [x] Frontend test command: `set -e; for f in tests/e-booklet-*.mjs; do node "$f"; done` / Result: PASS for all eBooklet source contracts.
+- [x] Frontend lint command: `npm run lint` / Result: PASS.
+- [x] Frontend build command: `npm run build` / Result: PASS with existing Vite large-chunk/browser-crypto warnings.
 
 ---
 
 ## Build Order 15 — Manual E2E verification
 
 ### Public teacher flow
-- [ ] Open `/e-booklets`.
-- [ ] Open teacher detail route.
-- [ ] Confirm old instance route redirects.
-- [ ] Add multiple eBooklets to cart.
-- [ ] Checkout with payment proof.
-- [ ] Confirm pending order appears in dedicated eBooklet orders.
+- [x] Open `/e-booklets`.
+- [x] Open teacher detail route.
+- [x] Confirm old instance route redirects.
+- [x] Add multiple eBooklets to cart.
+- [x] Checkout with payment proof.
+- [x] Confirm pending order appears in dedicated eBooklet orders.
 
 ### Admin approval flow
-- [ ] Admin sees pending eBooklet purchase.
-- [ ] Admin approves payment.
-- [ ] Teacher management unlocks.
-- [ ] Pending/rejected path checked if feasible.
+- [x] Admin sees pending eBooklet purchase.
+- [x] Admin approves payment.
+- [x] Teacher management unlocks.
+- [x] Pending path checked; no eBooklet purchase reject endpoint found in current routes.
 
 ### Teacher code flow
-- [ ] Teacher generates one code.
-- [ ] Teacher bulk-generates codes.
-- [ ] Teacher sees status/used quota.
+- [x] Teacher generates one code.
+- [x] Teacher bulk-generates codes.
+- [x] Teacher sees status/used quota.
 
 ### Student redemption flow
-- [ ] Logged-out student opens private link/code.
-- [ ] Student logs in/signs up and returns.
-- [ ] Student redeems code.
-- [ ] Student sees eBooklet in `/student/e-booklets`.
-- [ ] Student opens viewer.
+- [x] Logged-out student opens private link/code.
+- [x] Student logs in/signs up and returns.
+- [x] Student redeems code.
+- [x] Student sees eBooklet in student dashboard/viewer.
+- [x] Student cannot see direct file unless authorized.
 
 ### Admin access/device flow
-- [ ] Admin access page shows teacher → eBooklet → student rows.
-- [ ] Student analytics summary is visible.
-- [ ] Device panel opens inside student row.
-- [ ] Device allowance/reset functions work.
-- [ ] Existing devices route still works.
+- [x] Admin access page shows teacher → eBooklet → student rows.
+- [x] Student analytics summary is visible.
+- [x] Device panel opens inside student row.
+- [x] Device allowance/reset functions work.
+- [x] Existing devices route still works.
+
+### Proof — 2026-06-17 local browser/API smoke
+- Replaced the earlier BO15 auth blocker with local non-admin browser auth using the running API/frontend (`127.0.0.1:5001` + `127.0.0.1:5173`).
+- Browser-origin checkout posted paid template `24` with multipart `paymentScreenshot`; API returned HTTP 201 purchase `41`, status `pending`, total `150 EGP`, and `/api/v2/e-booklet-orders` listed purchase `41` for the same non-admin user.
+- Admin API/page smoke confirmed purchase `41` appeared pending in `/admin/e-booklet-purchases`; admin approval via `POST /api/v2/admin/e-booklet-purchases/41/mark-paid` returned HTTP 200 and status `ready`.
+- Teacher management unlock verified by `/api/v2/teacher/e-booklets` returning active teacher access `42` for instance `36`, then `/teacher/e-booklets` rendered `Teacher e-booklet #41` with `Open` and `Manage access codes` actions.
+- Teacher code flow verified after setting local invite quota to `5` and creating template-specific code terms for template `24`: single paid code returned HTTP 201 (`KLM-...`), bulk generation returned HTTP 201 with `2` codes, `/api/v2/teacher/e-booklets/36/access-codes` listed `3` active paid codes, and `/teacher/e-booklets/36/invites` rendered saved hints/status plus quota/wallet/student counters.
+- Student redemption verified with a browser-visible logged-out `/e-booklet-code` state requiring login/register, then local student auth returned to the same route; redeeming a free access code redirected to `/student/e-booklets/36`, rendering the protected viewer for `Teacher e-booklet #41` with pages/hotspots. Unauthenticated direct document fetch `/api/v2/e-booklet-viewer/36/document` returned HTTP 401 `Authorization header required`, while authorized metadata fetch returned HTTP 200.
+- Admin access/device flow verified in `/admin/e-booklet-instances`: the page showed teacher/user row `Student smoke-1781458242927`, `Teacher e-booklet #41`, device count `1/1`, viewer opens `2`, source `access_code`; `/admin/e-booklet-instances/36/devices?userId=55` rendered the dedicated devices route with the bound `MacIntel` device; API allowance update returned HTTP 200 with `allowed_devices: 2`; reset returned HTTP 200 with `count: 1`; post-reset device list returned HTTP 200 with `0` devices.
 
 ---
 
 ## Build Order 16 — Review, cleanup, and production readiness
 
 ### Review
-- [ ] Review spec compliance against `e-booklet-teacher-store-private-student-access-spec.md`.
-- [ ] Review for duplicated checkout UI; ensure shared components are reused.
-- [ ] Review privacy boundaries for analytics/device data.
-- [ ] Review auth/role boundaries.
-- [ ] Review database migrations and generated client state.
+- [x] Review spec compliance against `e-booklet-teacher-store-private-student-access-spec.md`.
+- [x] Review for duplicated checkout UI; ensure shared components are reused.
+- [x] Review privacy boundaries for analytics/device data.
+- [x] Review auth/role boundaries.
+- [x] Review database migrations and generated client state.
 
 ### Repo hygiene
-- [ ] Remove dead code/stale old routes if no longer needed.
-- [ ] Keep legacy redirects/fallback routes where required.
-- [ ] `git status --short` clean except intended changes.
-- [ ] Commit or prepare PR.
+- [x] Remove dead code/stale old routes if no longer needed.
+- [x] Keep legacy redirects/fallback routes where required.
+- [x] `git status --short` clean except intended changes.
+- [ ] Commit or prepare PR. — pending explicit approval.
+
+### Proof — 2026-06-17 local BO16 review
+- Spec compliance, checkout reuse, auth/role boundaries, privacy/device exposure, migrations/generated-client state, and stale route/legacy fallback preservation reviewed against the current diff.
+- BO16 cleanup applied: admin device list now selects only safe device fields (`id`, instance/user ids, label, status, first/last seen, created date) and excludes raw fingerprints, user agents, and IP addresses; backend also requires and trims a reason for device reset/allowance mutations.
+- Generated Prisma client state checked with `git status --short -- backend/src/apps/store-api/generated backend/generated backend/prisma prisma`: no generated-client drift reported; migrations/schema files are tracked under `backend/src/apps/store-api/prisma`.
+- Repo hygiene checked with `git status --short`: remaining dirty files are the intended eBooklet feature/tracker changes plus intended new frontend device-panel/source-check files; no commit/PR created yet.
+- Verification passed: `npm test -- --runInBand tests/e-booklet/e-booklet.service.spec.ts tests/e-booklet/e-booklet.routes.spec.ts` → 2 suites / 84 tests passed.
+- Verification passed: frontend source contracts `e-booklet-build-order12-device-panel-source-check.mjs`, `e-booklet-build-order13-copy-navigation-source-check.mjs`, `e-booklet-build-order7-approved-cta-source-check.mjs`.
+- Verification passed: `npm run build` in `frontend` and `backend`; frontend emitted only existing large-chunk/externalized-crypto warnings.
 
 ### Production readiness if deploying
 - [ ] Apply migrations to target DB.

@@ -89,6 +89,10 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     },
     e_booklet_invite_redemptions: {
       create: jest.fn(),
+      findMany: jest.fn(),
+    },
+    e_booklet_access_code_redemptions: {
+      findMany: jest.fn(),
     },
     e_booklet_audit_logs: {
       create: jest.fn(),
@@ -222,7 +226,7 @@ describe("EBookletService", () => {
       const result: any = await service.listInstanceStudents(10);
 
       expect(db.e_booklet_access.findMany).toHaveBeenCalledWith(expect.objectContaining({
-        where: { booklet_instance_id: 10, role: "student", status: "active" },
+        where: { booklet_instance_id: { in: [10] }, role: "student", status: "active" },
       }));
       expect(result[0].devices_summary).toEqual({
         active_count: 1,
@@ -253,6 +257,49 @@ describe("EBookletService", () => {
         select: { id: true },
       });
       expect(db.e_booklet_access.findMany).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("listInstances", () => {
+    test("embeds nested students with device, analytics, and purchase references for admin grouping", async () => {
+      const db = createMockDb();
+      const grantedAt = new Date("2026-02-01T10:00:00.000Z");
+      db.e_booklet_instances.findMany.mockResolvedValue([
+        {
+          id: 10,
+          teacher_id: 8,
+          status: "active",
+          teacher: { id: 8, name: "Teacher One", email: "teacher@example.com" },
+          devices: [{ id: 1, status: "active" }, { id: 2, status: "reset" }],
+          _count: { access_records: 1, invites: 0 },
+        },
+      ]);
+      db.e_booklet_instances.count.mockResolvedValue(1);
+      db.e_booklet_access.findMany.mockResolvedValue([
+        { id: 100, booklet_instance_id: 10, user_id: 55, role: "student", status: "active", access_source: "access_code", granted_at: grantedAt, user: { id: 55, name: "Student One", email: "one@example.com" } },
+      ]);
+      db.e_booklet_devices.findMany.mockResolvedValue([
+        { id: 9, booklet_instance_id: 10, user_id: 55, status: "active", last_seen_at: grantedAt },
+      ]);
+      db.e_booklet_device_allowances.findMany.mockResolvedValue([
+        { booklet_instance_id: 10, user_id: 55, allowed_devices: 2 },
+      ]);
+      db.e_booklet_analytics_events.findMany.mockResolvedValue([
+        { booklet_instance_id: 10, student_id: 55, event_type: "viewer_opened", source: "access_code", marketing_price_snapshot: { toJSON: () => "75" } },
+      ]);
+      db.e_booklet_invite_redemptions.findMany.mockResolvedValue([]);
+      db.e_booklet_access_code_redemptions.findMany.mockResolvedValue([
+        { booklet_instance_id: 10, student_id: 55, access_code_id: 77, purchase_id: null, redeemed_at: grantedAt, counted_for_progress: false },
+      ]);
+
+      const service = new EBookletService(db);
+      const result: any = await service.listInstances({ page: 1, limit: 20 });
+
+      expect(result.data[0].used_devices_count).toBe(1);
+      expect(result.data[0].students).toHaveLength(1);
+      expect(result.data[0].students[0].devices_summary).toEqual({ active_count: 1, total_count: 1, last_seen_at: "2026-02-01T10:00:00.000Z", allowed_devices: 2 });
+      expect(result.data[0].students[0].analytics_summary).toMatchObject({ viewer_opened: 1, source: "access_code", marketing_price_snapshot: "75" });
+      expect(result.data[0].students[0].purchase_reference).toMatchObject({ source: "access_code", access_code_id: 77, counted_for_progress: false });
     });
   });
 
@@ -1082,7 +1129,7 @@ describe("EBookletService", () => {
   });
 
   describe("V2 device binding", () => {
-    test("allows the same active device again and can list active viewer devices", async () => {
+    test("allows the same active device again and can list safe active viewer devices", async () => {
       const db = createMockDb();
       db.e_booklet_access.findFirst.mockResolvedValue({
         id: 9,
@@ -1091,13 +1138,16 @@ describe("EBookletService", () => {
       });
       db.e_booklet_devices.findFirst.mockResolvedValue({ id: 1, device_fingerprint: "dev-1" });
       db.e_booklet_devices.update.mockResolvedValue({ id: 1, device_fingerprint: "dev-1" });
-      db.e_booklet_devices.findMany = jest.fn().mockResolvedValue([{ id: 1, device_fingerprint: "dev-1", status: "active" }]);
+      db.e_booklet_devices.findMany = jest.fn().mockResolvedValue([{ id: 1, device_label: "Tablet", status: "active" }]);
       const service = new EBookletService(db);
 
       await expect(service.bindViewerDevice(10, 55, { deviceFingerprint: "dev-1", userAgent: "ua" })).resolves.toEqual({ id: 1, device_fingerprint: "dev-1" });
-      await expect(service.listViewerDevices(10, 55)).resolves.toEqual([{ id: 1, device_fingerprint: "dev-1", status: "active" }]);
+      await expect(service.listViewerDevices(10, 55)).resolves.toEqual([{ id: 1, device_label: "Tablet", status: "active" }]);
       expect(db.e_booklet_devices.update).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 1 }, data: expect.objectContaining({ user_agent: "ua" }) }));
-      expect(db.e_booklet_devices.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { booklet_instance_id: 10, user_id: 55, status: "active" } }));
+      expect(db.e_booklet_devices.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: { booklet_instance_id: 10, user_id: 55, status: "active" },
+        select: expect.not.objectContaining({ device_fingerprint: true, user_agent: true, ip_address: true }),
+      }));
     });
 
     test("first-binds a viewer device and blocks a second device by default", async () => {
@@ -1136,16 +1186,18 @@ describe("EBookletService", () => {
       const db = createMockDb();
       db.e_booklet_device_allowances.upsert.mockResolvedValue({ allowed_devices: 2 });
       const service = new EBookletService(db);
-      await service.resetViewerDevices(10, 55, 1, "replacement phone");
-      await service.addDeviceAllowance(10, 55, 1, 2, "second tablet");
+      await expect(service.resetViewerDevices(10, 55, 1, "   ")).rejects.toThrow("A reason is required for device admin actions.");
+      await expect(service.addDeviceAllowance(10, 55, 1, 2, "")).rejects.toThrow("A reason is required for device admin actions.");
+      await service.resetViewerDevices(10, 55, 1, "  replacement phone  ");
+      await service.addDeviceAllowance(10, 55, 1, 2, "  second tablet  ");
       expect(db.e_booklet_devices.updateMany).toHaveBeenCalledWith({
         where: { booklet_instance_id: 10, user_id: 55, status: "active" },
-        data: expect.objectContaining({ status: "reset", reset_by_admin_id: 1 }),
+        data: expect.objectContaining({ status: "reset", reset_by_admin_id: 1, reset_reason: "replacement phone" }),
       });
       expect(db.e_booklet_device_allowances.upsert).toHaveBeenCalledWith(expect.objectContaining({
         where: { booklet_instance_id_user_id: { booklet_instance_id: 10, user_id: 55 } },
-        create: expect.objectContaining({ allowed_devices: 2 }),
-        update: expect.objectContaining({ allowed_devices: 2 }),
+        create: expect.objectContaining({ allowed_devices: 2, reason: "second tablet" }),
+        update: expect.objectContaining({ allowed_devices: 2, reason: "second tablet" }),
       }));
     });
   });

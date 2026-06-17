@@ -56,7 +56,8 @@
     "hotspotCount": "{{count}} hotspots",
     "noDownload": "No download",
     "searchResultsFor": "Search results for",
-    "notEditedYet": "Not edited yet"
+    "notEditedYet": "Not edited yet",
+    "loading": "Loading..."
   },
   "statuses": {
     "all": "All statuses",
@@ -757,6 +758,39 @@
       "failedPasscodeSafe": "Wrong passcodes counted only, raw codes hidden: {{value}}",
       "operationalHealth": "Operational health",
       "expiryArchive": "Review expiry and archive queues"
+    }
+  },
+  "orders": {
+    "badge": "E-booklet orders",
+    "title": "My e-booklet orders",
+    "description": "Track pending requests, rejected requests, and delivered e-booklets without mixing them with Market orders.",
+    "openLibrary": "Open my e-booklets",
+    "openStore": "Browse e-booklets",
+    "loadError": "Could not load e-booklet orders.",
+    "emptyTitle": "No e-booklet orders yet",
+    "emptyDescription": "Browse e-booklets and submit your first teacher-customized purchase request.",
+    "itemStatus": "Item status",
+    "manageAccess": "Manage access",
+    "count": "Showing {{count}} e-booklet orders",
+    "fallbackTitle": "E-booklet",
+    "submittedAt": "Submitted {{value}}",
+    "statuses": {
+      "pending": "Pending admin review",
+      "approved": "Approved",
+      "confirmed": "Confirmed",
+      "ready": "Ready",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "unknown": "Pending"
+    },
+    "statusCopy": {
+      "pending": "Admin still needs to confirm payment and deliver the teacher PDF before access unlocks.",
+      "approved": "Payment is approved. Access unlocks when delivery creates the booklet instance.",
+      "confirmed": "Payment is confirmed. Access unlocks when admin delivery is ready.",
+      "ready": "Delivered. You can manage student access for this e-booklet.",
+      "rejected": "This request was rejected. Contact admin or submit a new request with corrected details.",
+      "cancelled": "This request was cancelled.",
+      "unknown": "Waiting for the latest admin status."
     }
   }
 }

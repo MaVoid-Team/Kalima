@@ -17,7 +17,8 @@
     "darkMode": "الوضع الداكن (الليلي)",
     "backToStore": "العودة للمتجر",
     "logout": "تسجيل الخروج",
-    "eBookletAnalytics": "تحليلات الكتيبات الإلكترونية"
+    "eBookletAnalytics": "تحليلات الكتيبات الإلكترونية",
+    "eBookletOrders": "طلبات البوكليت"
   },
   "settings": {
     "title": "إعدادات الحساب",

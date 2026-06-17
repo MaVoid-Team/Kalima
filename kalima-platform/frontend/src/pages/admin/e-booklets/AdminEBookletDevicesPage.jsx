@@ -1,22 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { HardDrive, RefreshCcw, RotateCcw, ShieldPlus, Users } from "lucide-react";
+import { HardDrive, RefreshCcw, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminEBookletDevices, useAdminEBookletInstances } from "@/hooks/admin/useAdminEBooklets";
 import { useTranslation } from "react-i18next";
+import AdminEBookletStudentDevicePanel from "./AdminEBookletStudentDevicePanel";
 
 export default function AdminEBookletDevicesPage() {
-  const { t, i18n } = useTranslation("eBooklets");
+  const { t } = useTranslation("eBooklets");
   const { instanceId: routeInstanceId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [instanceId, setInstanceId] = useState(routeInstanceId || searchParams.get("instanceId") || "");
   const [userId, setUserId] = useState(searchParams.get("userId") || "");
-  const [reason, setReason] = useState("");
-  const [allowedDevices, setAllowedDevices] = useState("2");
-  const { devices, students, loading, fetchDevices, fetchStudents, resetDevices, addDeviceAllowance } = useAdminEBookletDevices();
+  const { students, loading, fetchDevices, fetchStudents } = useAdminEBookletDevices();
   const { instances, loading: instancesLoading, fetchInstances } = useAdminEBookletInstances();
 
   useEffect(() => { fetchInstances({ limit: 100 }).catch(() => {}); }, [fetchInstances]);
@@ -42,14 +40,6 @@ export default function AdminEBookletDevicesPage() {
     setSearchParams({ instanceId, userId });
     fetchDevices(instanceId, userId).catch(() => {});
   };
-  const reset = async () => { await resetDevices(instanceId, userId, reason); setReason(""); fetchDevices(instanceId, userId); };
-  const allow = async () => { await addDeviceAllowance(instanceId, userId, allowedDevices, reason); fetchDevices(instanceId, userId); };
-  const formatDate = (value) => {
-    if (!value) return t("admin.devices.never");
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return t("admin.devices.never");
-    return new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium", timeStyle: "short" }).format(date);
-  };
 
   return (
     <div className="space-y-6" data-testid="admin-e-booklet-devices-page">
@@ -64,19 +54,20 @@ export default function AdminEBookletDevicesPage() {
         <Button className="self-end" onClick={runSearch} disabled={!instanceId || !userId || loading}><RefreshCcw className="h-4 w-4" />{t("common.refresh")}</Button>
       </section>
       <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900"><Users className="me-2 inline h-4 w-4" />{selectedStudent ? t("admin.devices.selectedStudent", { defaultValue: "Selected student access is loaded from this e-booklet instance." }) : t("admin.devices.studentSelectorHint", { defaultValue: "Choose an instance to load students with access, then select a student before resetting or allowing devices." })}</div>
-      <section className="grid gap-4 rounded-lg border bg-background p-4 lg:grid-cols-[1fr_240px_240px]">
-        <div className="space-y-2"><Label>{t("admin.devices.reason")}</Label><Input value={reason} onChange={(event) => setReason(event.target.value)} placeholder={t("admin.devices.reasonPlaceholder")} /></div>
-        <div className="space-y-2"><Label>{t("admin.devices.allowedDevices")}</Label><Input type="number" min="1" value={allowedDevices} onChange={(event) => setAllowedDevices(event.target.value)} /></div>
-        <div className="flex items-end gap-2"><Button variant="outline" onClick={allow} disabled={!instanceId || !userId || loading}><ShieldPlus className="h-4 w-4" />{t("admin.devices.allow")}</Button><Button variant="outline" onClick={reset} disabled={!instanceId || !userId || loading}><RotateCcw className="h-4 w-4" />{t("admin.devices.reset")}</Button></div>
-      </section>
-      <section className="rounded-lg border bg-background p-4">
-        <h2 className="font-semibold">{t("admin.devices.studentsDevices")}</h2>
-        {loading && <div className="mt-4 rounded-md border p-6 text-center text-sm text-muted-foreground">{t("admin.devices.loading")}</div>}
-        {!loading && devices.length === 0 && <div className="mt-4 rounded-md border p-6 text-center text-sm text-muted-foreground">{t("admin.devices.empty")}</div>}
-        <div className="mt-4 grid gap-3">
-          {devices.map((device) => <div key={device.id} className="rounded-md border p-3"><div className="flex flex-wrap items-center justify-between gap-2"><div className="font-medium">{device.device_label || t("admin.devices.unnamed")}</div><Badge variant="outline">{t(`statuses.${device.status}`, { defaultValue: device.status })}</Badge></div><div className="mt-2 grid gap-1 text-xs text-muted-foreground md:grid-cols-2"><div>{t("admin.devices.lastSeen", { value: formatDate(device.last_seen_at) })}</div><div>{t("admin.devices.bound", { value: formatDate(device.created_at) })}</div><div className="truncate">{device.user_agent}</div><div className="truncate">{device.ip_address}</div></div></div>)}
-        </div>
-      </section>
+      {selectedStudent ? (
+        <AdminEBookletStudentDevicePanel
+          instanceId={instanceId}
+          userId={userId}
+          student={selectedStudent}
+          expanded
+          showFullPageLink={false}
+        />
+      ) : (
+        <section className="rounded-lg border bg-background p-4">
+          <h2 className="font-semibold">{t("admin.devices.studentsDevices")}</h2>
+          <div className="mt-4 rounded-md border p-6 text-center text-sm text-muted-foreground">{t("admin.devices.empty")}</div>
+        </section>
+      )}
     </div>
   );
 }

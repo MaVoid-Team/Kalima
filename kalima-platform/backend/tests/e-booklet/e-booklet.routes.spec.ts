@@ -20,6 +20,7 @@ const mockDomainServices = {
   },
   accessCodes: {
     generateCode: jest.fn(),
+    generateCodes: jest.fn(),
     listCodes: jest.fn(),
   },
   redemptions: {
@@ -634,8 +635,32 @@ describe("e-booklet routes", () => {
       .send({ kind: "free", termId: 1, maxRedemptions: 20 })
       .expect(201);
 
-    expect(mockDomainServices.accessCodes.generateCode).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, kind: "paid" }));
+    expect(mockDomainServices.accessCodes.generateCode).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, kind: "free" }));
     mockDomainServices.accessCodes.generateCode.mockClear();
+
+    await request(app)
+      .post("/api/v2/teacher/e-booklets/10/access-codes/bulk")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+      .send({ kind: "paid", termId: 1, quantity: 3 })
+      .expect(201);
+
+    expect(mockDomainServices.accessCodes.generateCodes).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, kind: "paid", count: 3 }));
+    mockDomainServices.accessCodes.generateCodes.mockClear();
+
+    await request(app)
+      .post("/api/v2/teacher/e-booklets/10/access-codes/bulk")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+      .send({ kind: "paid", termId: 1, count: 101 })
+      .expect(400)
+      .expect((res) => expect(res.body.message).toContain("Invalid access code count"));
+
+    await request(app)
+      .get("/api/v2/teacher/e-booklets/10/access-codes?status=active")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+      .expect(200);
+
+    expect(mockDomainServices.accessCodes.listCodes).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, bookletInstanceId: 10, status: "active" }));
+    mockDomainServices.accessCodes.listCodes.mockClear();
 
     await request(app)
       .post("/api/v2/teacher/e-booklets/10/access-codes")

@@ -22,6 +22,14 @@ const PASSCODE_WINDOW_MS = 10 * 60 * 1000;
 const PASSCODE_BLOCK_MS = 15 * 60 * 1000;
 const passcodeFailures = new Map<string, { count: number; firstFailureAt: number; blockedUntil?: number }>();
 
+function requireDeviceAdminReason(reason?: string) {
+  const normalized = typeof reason === "string" ? reason.trim() : "";
+  if (!normalized) {
+    throw new BadRequestError("A reason is required for device admin actions.");
+  }
+  return normalized;
+}
+
 const MIME_TO_FILE_TYPE: Record<string, string> = {
   "application/pdf": "pdf",
   "application/msword": "file",
@@ -1773,15 +1781,115 @@ export class EBookletService {
       }),
       this.db.e_booklet_instances.count({ where }),
     ]);
+    const studentRowsByInstance = await this.getInstanceStudentRowsByInstanceId(
+      data.map((instance: any) => Number(instance.id)).filter((id: number) => Number.isInteger(id)),
+    );
     return {
       data: data.map(({ devices = [], ...instance }: any) => ({
         ...instance,
         used_devices_count: devices.filter((device: any) => device.status === "active").length,
+        students: studentRowsByInstance.get(Number(instance.id)) || [],
       })),
       total,
       page,
       limit,
     };
+  }
+
+  private async getInstanceStudentRowsByInstanceId(instanceIds: number[]) {
+    const uniqueInstanceIds = Array.from(new Set(instanceIds.filter((id) => Number.isInteger(id))));
+    const rowsByInstance = new Map<number, any[]>();
+    uniqueInstanceIds.forEach((id) => rowsByInstance.set(id, []));
+    if (uniqueInstanceIds.length === 0) return rowsByInstance;
+
+    const accessRows = await this.db.e_booklet_access.findMany({
+      where: { booklet_instance_id: { in: uniqueInstanceIds }, role: "student", status: "active" },
+      include: { user: { select: { id: true, name: true, email: true } } },
+      orderBy: { granted_at: "desc" },
+    });
+    if (!accessRows?.length) return rowsByInstance;
+
+    const studentIds = Array.from(new Set(accessRows
+      .map((row: any) => Number(row.user_id ?? row.user?.id))
+      .filter((id: number) => Number.isInteger(id))));
+    const [devices, allowances, analyticsEvents, inviteRedemptions, codeRedemptions] = await Promise.all([
+      this.db.e_booklet_devices.findMany({
+        where: { booklet_instance_id: { in: uniqueInstanceIds }, user_id: { in: studentIds } },
+        select: { id: true, booklet_instance_id: true, user_id: true, status: true, last_seen_at: true },
+      }),
+      this.db.e_booklet_device_allowances.findMany({
+        where: { booklet_instance_id: { in: uniqueInstanceIds }, user_id: { in: studentIds } },
+        select: { booklet_instance_id: true, user_id: true, allowed_devices: true },
+      }),
+      this.db.e_booklet_analytics_events.findMany({
+        where: { booklet_instance_id: { in: uniqueInstanceIds }, student_id: { in: studentIds } },
+        select: { booklet_instance_id: true, student_id: true, event_type: true, source: true, marketing_price_snapshot: true },
+      }),
+      this.db.e_booklet_invite_redemptions.findMany({
+        where: { booklet_instance_id: { in: uniqueInstanceIds }, student_id: { in: studentIds } },
+        select: { booklet_instance_id: true, student_id: true, invite_id: true, redeemed_at: true },
+      }),
+      this.db.e_booklet_access_code_redemptions?.findMany?.({
+        where: { booklet_instance_id: { in: uniqueInstanceIds }, student_id: { in: studentIds } },
+        select: { booklet_instance_id: true, student_id: true, access_code_id: true, purchase_id: true, counted_for_progress: true, redeemed_at: true },
+      }) ?? [],
+    ]);
+
+    const keyFor = (instanceId: number, userId: number) => `${instanceId}:${userId}`;
+    const rowInstanceId = (value: unknown) => {
+      const id = Number(value);
+      return Number.isInteger(id) ? id : uniqueInstanceIds[0];
+    };
+    const deviceSummaryByKey = new Map<string, { active_count: number; total_count: number; last_seen_at: Date | string | null }>();
+    (devices || []).forEach((device: any) => {
+      const key = keyFor(rowInstanceId(device.booklet_instance_id), Number(device.user_id));
+      const current = deviceSummaryByKey.get(key) || { active_count: 0, total_count: 0, last_seen_at: null };
+      current.total_count += 1;
+      if (device.status === "active") current.active_count += 1;
+      const nextLastSeen = device.last_seen_at ? new Date(device.last_seen_at) : null;
+      const currentLastSeen = current.last_seen_at ? new Date(current.last_seen_at) : null;
+      if (nextLastSeen && (!currentLastSeen || nextLastSeen > currentLastSeen)) current.last_seen_at = device.last_seen_at;
+      deviceSummaryByKey.set(key, current);
+    });
+
+    const allowanceByKey = new Map<string, number>();
+    (allowances || []).forEach((allowance: any) => allowanceByKey.set(keyFor(rowInstanceId(allowance.booklet_instance_id), Number(allowance.user_id)), Number(allowance.allowed_devices ?? 1)));
+
+    const analyticsByKey = new Map<string, Record<string, any>>();
+    (analyticsEvents || []).forEach((event: any) => {
+      const key = keyFor(rowInstanceId(event.booklet_instance_id), Number(event.student_id));
+      const current = analyticsByKey.get(key) || { invite_opened: 0, access_created: 0, viewer_opened: 0, page_viewed: 0, device_bound: 0, source: null, marketing_price_snapshot: null };
+      if (event.event_type) current[event.event_type] = Number(current[event.event_type] ?? 0) + 1;
+      if (!current.source && event.source) current.source = event.source;
+      if (current.marketing_price_snapshot === null && event.marketing_price_snapshot !== null && event.marketing_price_snapshot !== undefined) current.marketing_price_snapshot = this.sanitizeViewerAccess(event.marketing_price_snapshot);
+      analyticsByKey.set(key, current);
+    });
+
+    const purchaseReferenceByKey = new Map<string, Record<string, unknown>>();
+    (inviteRedemptions || []).forEach((redemption: any) => {
+      const key = keyFor(Number(redemption.booklet_instance_id), Number(redemption.student_id));
+      if (!purchaseReferenceByKey.has(key)) purchaseReferenceByKey.set(key, { source: "invite", invite_id: redemption.invite_id, purchase_id: null, redeemed_at: redemption.redeemed_at ?? null });
+    });
+    (codeRedemptions || []).forEach((redemption: any) => {
+      const key = keyFor(Number(redemption.booklet_instance_id), Number(redemption.student_id));
+      if (!purchaseReferenceByKey.has(key)) purchaseReferenceByKey.set(key, { source: "access_code", access_code_id: redemption.access_code_id, purchase_id: redemption.purchase_id ?? null, counted_for_progress: Boolean(redemption.counted_for_progress), redeemed_at: redemption.redeemed_at ?? null });
+    });
+
+    (accessRows || []).forEach((row: any) => {
+      const instanceId = Number(row.booklet_instance_id);
+      const userId = Number(row.user_id ?? row.user?.id);
+      const key = keyFor(instanceId, userId);
+      const devicesSummary = deviceSummaryByKey.get(key) || { active_count: 0, total_count: 0, last_seen_at: null };
+      const analyticsSummary = analyticsByKey.get(key) || { invite_opened: 0, access_created: 0, viewer_opened: 0, page_viewed: 0, device_bound: 0, source: row.access_source ?? null, marketing_price_snapshot: null };
+      rowsByInstance.get(instanceId)?.push(this.sanitizeViewerAccess({
+        ...row,
+        devices_summary: { ...devicesSummary, allowed_devices: allowanceByKey.get(key) ?? 1 },
+        analytics_summary: analyticsSummary,
+        purchase_reference: purchaseReferenceByKey.get(key) || null,
+      }));
+    });
+
+    return rowsByInstance;
   }
 
   async updateQuota(instanceId: number, inviteQuota: number): Promise<unknown> {
@@ -1916,101 +2024,7 @@ export class EBookletService {
     });
     if (!instance) throw new NotFoundError("Teacher e-booklet not found");
 
-    const accessRows = await this.db.e_booklet_access.findMany({
-      where: {
-        booklet_instance_id: instanceId,
-        role: "student",
-        status: "active",
-      },
-      include: { user: { select: { id: true, name: true, email: true } } },
-      orderBy: { granted_at: "desc" },
-    });
-    const studentIds = Array.from(new Set((accessRows || [])
-      .map((row: any) => Number(row.user_id ?? row.user?.id))
-      .filter((id: number) => Number.isInteger(id))));
-
-    if (studentIds.length === 0) return [];
-
-    const [devices, allowances, analyticsEvents] = await Promise.all([
-      this.db.e_booklet_devices.findMany({
-        where: { booklet_instance_id: instanceId, user_id: { in: studentIds } },
-        select: { id: true, user_id: true, status: true, last_seen_at: true },
-      }),
-      this.db.e_booklet_device_allowances.findMany({
-        where: { booklet_instance_id: instanceId, user_id: { in: studentIds } },
-        select: { user_id: true, allowed_devices: true },
-      }),
-      this.db.e_booklet_analytics_events.findMany({
-        where: { booklet_instance_id: instanceId, student_id: { in: studentIds } },
-        select: {
-          student_id: true,
-          event_type: true,
-          source: true,
-          marketing_price_snapshot: true,
-        },
-      }),
-    ]);
-
-    const deviceSummaryByUser = new Map<number, { active_count: number; total_count: number; last_seen_at: Date | string | null }>();
-    (devices || []).forEach((device: any) => {
-      const userId = Number(device.user_id);
-      const current = deviceSummaryByUser.get(userId) || { active_count: 0, total_count: 0, last_seen_at: null };
-      current.total_count += 1;
-      if (device.status === "active") current.active_count += 1;
-      const deviceLastSeen = device.last_seen_at ? new Date(device.last_seen_at) : null;
-      const currentLastSeen = current.last_seen_at ? new Date(current.last_seen_at) : null;
-      if (deviceLastSeen && (!currentLastSeen || deviceLastSeen > currentLastSeen)) {
-        current.last_seen_at = device.last_seen_at;
-      }
-      deviceSummaryByUser.set(userId, current);
-    });
-
-    const allowanceByUser = new Map<number, number>();
-    (allowances || []).forEach((allowance: any) => {
-      allowanceByUser.set(Number(allowance.user_id), Number(allowance.allowed_devices ?? 1));
-    });
-
-    const analyticsByUser = new Map<number, Record<string, any>>();
-    (analyticsEvents || []).forEach((event: any) => {
-      const userId = Number(event.student_id);
-      const current = analyticsByUser.get(userId) || {
-        invite_opened: 0,
-        access_created: 0,
-        viewer_opened: 0,
-        page_viewed: 0,
-        device_bound: 0,
-        source: null,
-        marketing_price_snapshot: null,
-      };
-      if (event.event_type) current[event.event_type] = Number(current[event.event_type] ?? 0) + 1;
-      if (!current.source && event.source) current.source = event.source;
-      if (current.marketing_price_snapshot === null && event.marketing_price_snapshot !== null && event.marketing_price_snapshot !== undefined) {
-        current.marketing_price_snapshot = this.sanitizeViewerAccess(event.marketing_price_snapshot);
-      }
-      analyticsByUser.set(userId, current);
-    });
-
-    return (accessRows || []).map((row: any) => {
-      const userId = Number(row.user_id ?? row.user?.id);
-      const devicesSummary = deviceSummaryByUser.get(userId) || { active_count: 0, total_count: 0, last_seen_at: null };
-      const analyticsSummary = analyticsByUser.get(userId) || {
-        invite_opened: 0,
-        access_created: 0,
-        viewer_opened: 0,
-        page_viewed: 0,
-        device_bound: 0,
-        source: row.access_source ?? null,
-        marketing_price_snapshot: null,
-      };
-      return this.sanitizeViewerAccess({
-        ...row,
-        devices_summary: {
-          ...devicesSummary,
-          allowed_devices: allowanceByUser.get(userId) ?? 1,
-        },
-        analytics_summary: analyticsSummary,
-      });
-    });
+    return (await this.getInstanceStudentRowsByInstanceId([instanceId])).get(instanceId) || [];
   }
 
   async revokeStudentAccess(
@@ -2118,6 +2132,16 @@ export class EBookletService {
   async listViewerDevices(instanceId: number, userId: number) {
     return this.db.e_booklet_devices.findMany({
       where: { booklet_instance_id: instanceId, user_id: userId, status: "active" },
+      select: {
+        id: true,
+        booklet_instance_id: true,
+        user_id: true,
+        device_label: true,
+        status: true,
+        first_seen_at: true,
+        last_seen_at: true,
+        created_at: true,
+      },
       orderBy: { last_seen_at: "desc" },
     });
   }
@@ -2246,12 +2270,13 @@ export class EBookletService {
     adminUserId: number,
     reason?: string,
   ) {
+    const normalizedReason = requireDeviceAdminReason(reason);
     const result = await this.db.e_booklet_devices.updateMany({
       where: { booklet_instance_id: instanceId, user_id: userId, status: "active" },
       data: {
         status: "reset",
         reset_by_admin_id: adminUserId,
-        reset_reason: reason,
+        reset_reason: normalizedReason,
         last_seen_at: new Date(),
       },
     });
@@ -2260,7 +2285,7 @@ export class EBookletService {
       action: "viewer_devices_reset",
       entity_type: "e_booklet_instance",
       entity_id: instanceId,
-      metadata_json: { user_id: userId, reason, reset_count: result?.count ?? 0 },
+      metadata_json: { user_id: userId, reason: normalizedReason, reset_count: result?.count ?? 0 },
     });
     return result;
   }
@@ -2275,6 +2300,7 @@ export class EBookletService {
     if (!Number.isInteger(allowedDevices) || allowedDevices < 1) {
       throw new BadRequestError("Allowed devices must be at least 1.");
     }
+    const normalizedReason = requireDeviceAdminReason(reason);
     const allowance = await this.db.e_booklet_device_allowances.upsert({
       where: {
         booklet_instance_id_user_id: {
@@ -2287,13 +2313,13 @@ export class EBookletService {
         user_id: userId,
         allowed_devices: allowedDevices,
         updated_by_admin_id: adminUserId,
-        reason,
+        reason: normalizedReason,
         updated_at: new Date(),
       },
       update: {
         allowed_devices: allowedDevices,
         updated_by_admin_id: adminUserId,
-        reason,
+        reason: normalizedReason,
         updated_at: new Date(),
       },
     });
@@ -2302,7 +2328,7 @@ export class EBookletService {
       action: "viewer_device_allowance_updated",
       entity_type: "e_booklet_instance",
       entity_id: instanceId,
-      metadata_json: { user_id: userId, allowed_devices: allowedDevices, reason },
+      metadata_json: { user_id: userId, allowed_devices: allowedDevices, reason: normalizedReason },
     });
     return allowance;
   }
