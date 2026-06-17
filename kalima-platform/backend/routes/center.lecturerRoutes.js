@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy center lecturer routes.
 const express = require("express");
 const clecturerController = require("../controllers/center.lecturerController"); // Adjust path if necessary
 

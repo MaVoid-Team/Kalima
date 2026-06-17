@@ -1,0 +1,194 @@
+{
+  "hero": {
+    "title": "Everything you need for your",
+    "titleHighlight": "educational journey.",
+    "subtitle": "Textbooks, notebooks, stationery, and educational resources for all academic levels.",
+    "booksIllustration": "Books Illustration",
+    "tagline": "Discover and purchase products and books from all sections.",
+    "searchPlaceholder": "Search for textbooks, templates, or stationery...",
+    "searchButton": "Search",
+    "popular": "Popular:",
+    "tags": {
+      "ipadPlanners": "iPad Planners",
+      "stemKits": "STEM Kits",
+      "math101": "Math 101",
+      "artSupplies": "Art Supplies"
+    },
+    "noResults": "No results found.",
+    "suggestions": "Suggestions"
+  },
+  "categories": {
+    "allSections": "All Sections",
+    "allSubSections": "All SubSections"
+  },
+  "sidebar": {
+    "allCategories": "All Categories"
+  },
+  "loading": {
+    "products": "Loading products..."
+  },
+  "search": {
+    "placeholder": "Search for products..."
+  },
+  "sections": {
+    "trending": {
+      "title": "Trending Now",
+      "viewAll": "View all"
+    },
+    "newArrivals": {
+      "title": "New Arrivals",
+      "viewAll": "View all"
+    },
+    "Designs": "Designs",
+    "Books": "Books",
+    "default": "Section",
+    "Courses": "Courses",
+    "Gifts": "Gifts",
+    "Printing": "Printing",
+    "Software": "Software"
+  },
+  "promo": {
+    "title": "Bulk Order Discount",
+    "description": "Get 20% off when you order supplies for your entire class.",
+    "cta": "Learn More"
+  },
+  "product": {
+    "newBadge": "NEW",
+    "discounts": "Discount",
+    "currency": "EGP",
+    "viewDetails": "View Details",
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "purchased": "PURCHASED",
+    "new": "NEW",
+    "off": "OFF",
+    "cart": "Cart",
+    "comingSoon": "Coming Soon"
+  },
+  "countdown": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s"
+  },
+  "products": {
+    "trending": {
+      "calculus": {
+        "title": "Advanced Calculus PDF",
+        "category": "Academic Resources"
+      },
+      "pens": {
+        "title": "Ergonomic Pen Set",
+        "category": "Stationery"
+      },
+      "notebook": {
+        "title": "Graphing Notebook",
+        "category": "Supplies"
+      },
+      "lamp": {
+        "title": "Study Lamp",
+        "category": "Accessories"
+      }
+    },
+    "newArrivals": {
+      "agenda": {
+        "title": "2024 Digital Agenda",
+        "category": "Digital Templates"
+      },
+      "chemistry": {
+        "title": "Chemistry Lab Kit",
+        "category": "Science Kits"
+      },
+      "books": {
+        "title": "Literature Classics Set",
+        "category": "Books"
+      },
+      "markers": {
+        "title": "Fine Tip Markers",
+        "category": "Art Supplies"
+      }
+    }
+  },
+  "emptyState": {
+    "title": "No items found",
+    "description": "Try adjusting your search or filter criteria"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
+  },
+  "common": {
+    "back": "Back"
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "digitalProducts": "Digital Products",
+    "samples": "Samples"
+  },
+  "errors": {
+    "loadingError": "Error loading data",
+    "fetchErrorLog": "Error fetching data:",
+    "addToCartFailed": "Failed to add to cart"
+  },
+  "success": {
+    "addedToCart": "Added to cart successfully!"
+  },
+  "empty": {
+    "noProducts": "No products found.",
+    "tryDifferentSearch": "Try a different search term."
+  },
+  "navigation": {
+    "goBack": "Go Back"
+  },
+  "samples": {
+    "heroTitle": "Explore Free Samples",
+    "heroSubtitle": "Download or preview high quality resources, templates, and document samples before you buy.",
+    "availableSamples": "Available Samples",
+    "count": "Samples",
+    "noSamples": "No samples found.",
+    "view": "Preview",
+    "download": "Download",
+    "hq": "HQ",
+    "lq": "LQ",
+    "noNestedSamples": "No samples available in this section yet.",
+    "addFromProduct": "You can add samples to this section from the Product details page.",
+    "mediaTypes": {
+      "pdf": "PDF",
+      "image": "Image",
+      "video": "Video",
+      "word": "Word",
+      "powerpoint": "PowerPoint",
+      "audio": "Audio",
+      "Video": "Video",
+      "Audio": "Audio",
+      "Image": "Image",
+      "Document": "Document"
+    }
+  },
+  "samplePage": {
+    "notFound": "Sample not found",
+    "backToMarket": "Back to Market",
+    "backToSample": "Sample Details",
+    "download": "Download",
+    "downloadFile": "Download File",
+    "previewUnavailable": "Preview unavailable for this file type",
+    "sampleInfo": "Sample Information",
+    "fileName": "File Name",
+    "fileSize": "File Size",
+    "fileType": "File Type",
+    "uploadDate": "Upload Date",
+    "productInfo": "Product Information",
+    "productName": "Product Name",
+    "productType": "Product Type",
+    "price": "Price",
+    "serial": "Serial",
+    "viewProduct": "View Product",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "fullPreview": "Full Preview",
+    "sampleDetails": "Sample Details"
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "header": {
+    "secureCheckout": "دفع آمن",
+    "marketName": "سوق كلمة",
+    "market_name": "سوق كلمة"
+  },
+  "steps": {
+    "information": "المعلومات",
+    "shipping": "الشحن",
+    "payment": "الدفع"
+  },
+  "contact": {
+    "title": "معلومات الاتصال",
+    "login": "تسجيل الدخول",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "you@example.com",
+    "newsOffers": "أرسل لي الأخبار والعروض"
+  },
+  "shipping": {
+    "title": "عنوان الشحن",
+    "countryLabel": "البلد / المنطقة",
+    "firstName": "الاسم الأول",
+    "lastName": "الاسم الأخير",
+    "addressLabel": "العنوان",
+    "apartmentPlaceholder": "شقة، جناح، إلخ (اختياري)",
+    "city": "المدينة",
+    "state": "المنطقة / المحافظة",
+    "zipCode": "الرمز البريدي"
+  },
+  "payment": {
+    "title": "الدفع",
+    "secureNotice": "معلومات الدفع الخاصة بك آمنة.",
+    "freeOrderNotice": "لا يلزم إدخال بيانات الدفع للطلبات المجانية.",
+    "creditCard": "بطاقة الائتمان",
+    "paypal": "باي بال",
+    "applePay": "أبل باي",
+    "cardNumber": "رقم البطاقة",
+    "cardPlaceholder": "0000 0000 0000 0000",
+    "expiration": "تاريخ الانتهاء (شهر/سنة)",
+    "expirationPlaceholder": "شهر / سنة",
+    "securityCode": "رمز الحماية",
+    "cvcPlaceholder": "CVC",
+    "nameOnCard": "الاسم على البطاقة",
+    "phone": "رقم الهاتف",
+    "invalidPhoneNumber": "يرجى إدخال رقم هاتف صالح",
+    "transferNumberRequired": "الرجاء إدخال رقم المحفظة المحول منها",
+    "screenshotRequired": "الرجاء رفع صورة التحويل",
+    "methodRequired": "الرجاء اختيار طريقة الدفع",
+    "transferNumber": "رقم المحفظة المحول منها",
+    "chooseMethod": "اختر طريقة الدفع",
+    "uploadScreenshotButton": "تحميل الصورة",
+    "removeScreenshot": "إزالة لقطة الشاشة",
+    "cancel": "إلغاء",
+    "preview": "معاينة",
+    "backToCart": "العودة إلى السلة",
+    "upload": "رفع",
+    "uploadHint": "PNG للصور، بحجم أقصى 5 ميجا",
+    "upload_hint": "PNG للصور، بحجم أقصى 5 ميجا",
+    "enterField": "أدخل {{field}}",
+    "notes": "ملاحظات (اختياري)",
+    "notesPlaceholder": "أي طلبات خاصة؟",
+    "notes_label": "تعليمات التسليم أو الطلبات الخاصة",
+    "notesLabel": "تعليمات التسليم أو الطلبات الخاصة",
+    "book_details": "تفاصيل الكتاب",
+    "name_on_book": "الاسم على الكتاب",
+    "number_on_book": "الرقم على الكتاب",
+    "series_name": "اسم السلسلة",
+    "teacher_name": "اسم المدرس",
+    "securePayment": "دفع آمن",
+    "secure_notice": "معلومات الدفع الخاصة بك آمنة.",
+    "encryptedCheckout": "دفع مشفر",
+    "error_loading": "خطأ في تحميل خيارات الدفع، يرجى المحاولة لاحقاً",
+    "errorLoading": "خطأ في تحميل خيارات الدفع، يرجى المحاولة لاحقاً",
+    "transferNumberPlaceholder": "أدخل رقم المحفظة",
+    "transfer_number_placeholder": "أدخل رقم المحفظة",
+    "transfer_number": "رقم المحفظة المحول منها",
+    "complete_purchase": "إتمام الشراء",
+    "completePurchase": "إتمام الشراء",
+    "screenshot": "صورة الإيصال",
+    "completeOrder": "أكمل طلبك",
+    "summaryDesc": "إتمام الشراء السريع — آمن وسهل",
+    "method": "اختر طريقة الدفع"
+  },
+  "orderSummary": {
+    "title": "ملخص الطلب",
+    "discountPlaceholder": "كود الخصم",
+    "apply": "تطبيق",
+    "subtotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "taxes": "الضرائب (تقديري)",
+    "discount": "الخصم",
+    "total": "الإجمالي",
+    "currency": "جنيه مصري",
+    "pay": "ادفع",
+    "qty": "الكمية"
+  },
+  "footer": {
+    "returnToCart": "العودة للسلة",
+    "copyright": "© 2023 سوق كلمة. جميع الحقوق محفوظة.",
+    "privacy": "سياسة الخصوصية",
+    "terms": "شروط الخدمة",
+    "refund": "سياسة الاسترداد"
+  },
+  "fastBuy": {
+    "checkoutSuccess": "تم الشراء بنجاح! إعادة التوجيه إلى السوق..."
+  },
+  "fastBuyClearDialog": {
+    "title": "هل تريد مغادرة إتمام الشراء السريع؟",
+    "description": "مغادرة هذه الصفحة ستؤدي إلى مسح سلة الشراء السريع الخاصة بك. يمكنك البقاء لإكمال الدفع، أو المغادرة والبدء من جديد لاحقًا.",
+    "cancel": "البقاء في صفحة الدفع",
+    "confirm": "المغادرة ومسح السلة"
+  },
+  "success": {
+    "title": "تم الطلب بنجاح!",
+    "description": "شكراً لشرائك. لقد تلقينا طلبك وسنقوم بمعالجته قريباً.",
+    "serial_label": "الرقم التسلسلي للطلب",
+    "copy": "نسخ الرقم التسلسلي",
+    "continue_shopping": "متابعة التسوق",
+    "view_orders": "عرض طلباتي",
+    "copied": "تم النسخ إلى الحافظة"
+  },
+  "failed": "فشل في إتمام الدفع، يرجى المحاولة مرة أخرى",
+  "receipt": {
+    "title": "إيصال الشراء",
+    "serial": "الرقم التسلسلي",
+    "status": "الحالة",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
+    "total": "الإجمالي",
+    "items": "العناصر",
+    "item": "العنصر",
+    "type": "النوع",
+    "price": "السعر",
+    "paidOn": "تم الدفع في",
+    "paymentMethod": "طريقة الدفع",
+    "print": "طباعة",
+    "unableToPrint": "تعذر طباعة الإيصال",
+    "popupBlocked": "الرجاء السماح للنوافذ المنبثقة لطباعة الإيصال",
+    "statuses": {
+      "pending": "قيد الانتظار",
+      "completed": "مكتمل",
+      "failed": "فشل",
+      "refunded": "تم الاسترداد",
+      "Pending": "قيد الانتظار",
+      "Completed": "مكتمل",
+      "Failed": "فشل",
+      "Refunded": "تم الاسترداد"
+    }
+  },
+  "wizard": {
+    "cart": "السلة",
+    "payment": "الدفع"
+  },
+  "cancel": "إلغاء",
+  "general": {
+    "go_back": "الرجوع"
+  },
+  "L.E": " ج.م"
+}

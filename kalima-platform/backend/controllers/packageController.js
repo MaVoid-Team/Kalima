@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy package management logic.
 const Package = require("../models/packageModel");
 const Lecturer = require("../models/lecturerModel");
 const AppError = require("../utils/appError");
@@ -8,11 +11,11 @@ exports.createPackage = catchAsync(async (req, res, next) => {
   //this handling will be removed after handling with joi
   if (!req.body.name || !req.body.type || !req.body.price || !req.body.points) {
     return next(
-      new AppError("Please provide name, type ,points and price", 400)
+      new AppError("Please provide name, type ,points and price", 400),
     );
   }
   let lecturers = req.body.points.map((point) =>
-    Lecturer.findById(point.lecturer)
+    Lecturer.findById(point.lecturer),
   );
   lecturers = await Promise.all(lecturers);
   if (lecturers.includes(null)) {
@@ -68,7 +71,7 @@ exports.updatePackage = catchAsync(async (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   );
   if (!updatedPackage) return next(new AppError("No package found", 404));
   res.status(200).json({
@@ -85,8 +88,8 @@ exports.managePackagePoints = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         "Please specify an operation: 'add', 'remove', or 'update'",
-        400
-      )
+        400,
+      ),
     );
   }
   let updatedPackage;
@@ -97,8 +100,8 @@ exports.managePackagePoints = catchAsync(async (req, res, next) => {
         return next(
           new AppError(
             "Adding points requires lecturerId and points values",
-            400
-          )
+            400,
+          ),
         );
       }
       const lecturer = await Lecturer.findById(lecturerId);
@@ -111,13 +114,13 @@ exports.managePackagePoints = catchAsync(async (req, res, next) => {
       });
       if (existingPackage) {
         return next(
-          new AppError("This lecturer already exists in the package", 400)
+          new AppError("This lecturer already exists in the package", 400),
         );
       }
       updatedPackage = await Package.findByIdAndUpdate(
         id,
         { $push: { points: { lecturer: lecturerId, points } } },
-        { new: true, runValidators: true }
+        { new: true, runValidators: true },
       );
       break;
 
@@ -129,7 +132,7 @@ exports.managePackagePoints = catchAsync(async (req, res, next) => {
       updatedPackage = await Package.findByIdAndUpdate(
         id,
         { $pull: { points: { lecturer: lecturerId } } },
-        { new: true }
+        { new: true },
       );
       break;
 
@@ -138,8 +141,8 @@ exports.managePackagePoints = catchAsync(async (req, res, next) => {
         return next(
           new AppError(
             "Updating points requires lecturerId and points values",
-            400
-          )
+            400,
+          ),
         );
       }
 
@@ -149,13 +152,16 @@ exports.managePackagePoints = catchAsync(async (req, res, next) => {
         {
           new: true,
           arrayFilters: [{ "elem.lecturer": lecturerId }],
-        }
+        },
       );
       break;
 
     default:
       return next(
-        new AppError("Invalid operation. Use 'add', 'remove', or 'update'", 400)
+        new AppError(
+          "Invalid operation. Use 'add', 'remove', or 'update'",
+          400,
+        ),
       );
   }
 

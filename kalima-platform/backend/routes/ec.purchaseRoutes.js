@@ -1,8 +1,13 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store purchase routes.
 const express = require("express");
 const ecPurchaseController = require("../controllers/ec.purchaseController");
 const verifyJWT = require("../middleware/verifyJWT");
 const authController = require("../controllers/authController");
-const { uploadPaymentScreenshotToDisk } = require("../utils/upload files/uploadFiles");
+const {
+  uploadPaymentScreenshotToDisk,
+} = require("../utils/upload files/uploadFiles");
 
 const router = express.Router();
 
@@ -12,11 +17,14 @@ router.use(verifyJWT);
 // Public routes (all authenticated users can access)
 router
   .route("/")
-  .get(authController.verifyRoles("Admin", "SubAdmin", "Moderator"), ecPurchaseController.getAllPurchases)
+  .get(
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    ecPurchaseController.getAllPurchases,
+  )
   .post(
     authController.verifyRoles("Parent", "Student", "Teacher"),
     uploadPaymentScreenshotToDisk,
-    ecPurchaseController.createPurchase
+    ecPurchaseController.createPurchase,
   );
 
 // Statistics route
@@ -24,14 +32,16 @@ router
   .route("/stats")
   .get(
     authController.verifyRoles("Admin"),
-    ecPurchaseController.getPurchaseStats
+    ecPurchaseController.getPurchaseStats,
   );
 
 // Product purchase stats route
-router.route("/product-purchase-stats").get(
-  authController.verifyRoles("Admin"),
-  ecPurchaseController.getProductPurchaseStats
-);
+router
+  .route("/product-purchase-stats")
+  .get(
+    authController.verifyRoles("Admin"),
+    ecPurchaseController.getProductPurchaseStats,
+  );
 
 router.route("/myPurchases").get(ecPurchaseController.getPurchasesByUser);
 // Search by serial number
@@ -44,7 +54,7 @@ router
   .route("/:id/confirm")
   .patch(
     authController.verifyRoles("Admin", "SubAdmin"),
-    ecPurchaseController.confirmPurchase
+    ecPurchaseController.confirmPurchase,
   );
 
 // router
@@ -61,11 +71,11 @@ router
   .patch(
     authController.verifyRoles("Admin", "SubAdmin"),
     uploadPaymentScreenshotToDisk,
-    ecPurchaseController.updatePurchase
+    ecPurchaseController.updatePurchase,
   )
   .delete(
     authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
-    ecPurchaseController.deletePurchase
+    ecPurchaseController.deletePurchase,
   );
 
 module.exports = router;

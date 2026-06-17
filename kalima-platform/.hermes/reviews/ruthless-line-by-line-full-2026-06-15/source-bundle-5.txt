@@ -1,0 +1,1017 @@
+
+===== FILE: kalima-platform/backend/src/apps/store-api/services/teacher-wallet.service.ts (174 lines) =====
+1|import { BadRequestError, ForbiddenError, NotFoundError } from "../../../libs/errors";
+2|
+3|export class TeacherWalletService {
+4|  constructor(private readonly db: any) {}
+5|
+6|  private transaction<T>(callback: (tx: any) => Promise<T>): Promise<T> {
+7|    if (typeof this.db.$transaction === "function") return this.db.$transaction(callback, { isolationLevel: "Serializable" });
+8|    return callback(this.db);
+9|  }
+10|
+11|  private number(value: any, label = "amount"): number {
+12|    const numberValue = value && typeof value.toNumber === "function" ? value.toNumber() : Number(value ?? 0);
+13|    if (!Number.isFinite(numberValue)) {
+14|      throw new BadRequestError(`Invalid ${label}.`);
+15|    }
+16|    return numberValue;
+17|  }
+18|
+19|  async getWallet(teacherId: number) {
+20|    return this.db.teacher_wallets.upsert({
+21|      where: { teacher_id: teacherId },
+22|      create: { teacher_id: teacherId, balance: 0 },
+23|      update: {},
+24|    });
+25|  }
+26|
+27|  async listLedger(teacherId: number) {
+28|    return this.db.teacher_wallet_ledger.findMany({
+29|      where: { teacher_id: teacherId },
+30|      orderBy: { created_at: "desc" },
+31|    });
+32|  }
+33|
+34|  async previewPurchase(input: {
+35|    teacherId: number;
+36|    purchaseTotal: number;
+37|    requestedAmount: number;
+38|    couponApplied?: boolean;
+39|  }) {
+40|    if (input.couponApplied) {
+41|      throw new BadRequestError("Wallet credit cannot be stacked with coupons.");
+42|    }
+43|    const wallet = await this.db.teacher_wallets.findUnique({ where: { teacher_id: input.teacherId } });
+44|    const balance = this.number(wallet?.balance, "wallet balance");
+45|    const requested = this.number(input.requestedAmount, "wallet credit amount");
+46|    const purchaseTotal = this.number(input.purchaseTotal, "purchase total");
+47|    if (balance < 0) throw new BadRequestError("Invalid wallet balance.");
+48|    if (purchaseTotal < 0) throw new BadRequestError("Invalid purchase total.");
+49|    if (requested <= 0) throw new BadRequestError("Wallet credit amount must be greater than zero.");
+50|    const walletCreditApplied = Math.min(balance, requested, purchaseTotal);
+51|    return {
+52|      balance,
+53|      walletCreditApplied,
+54|      finalTotal: purchaseTotal - walletCreditApplied,
+55|      canApply: Boolean(wallet?.id) && walletCreditApplied > 0,
+56|    };
+57|  }
+58|
+59|  async creditMilestone(input: {
+60|    teacherId: number;
+61|    amount: number;
+62|    milestoneAchievementId: number;
+63|    notes?: string | null;
+64|  }) {
+65|    const existingLedger = await this.db.teacher_wallet_ledger.findFirst({
+66|      where: {
+67|        teacher_id: input.teacherId,
+68|        milestone_achievement_id: input.milestoneAchievementId,
+69|        source: "milestone_reward",
+70|        type: "credit",
+71|      },
+72|    });
+73|    if (existingLedger) return { wallet: await this.getWallet(input.teacherId), ledger: existingLedger, alreadyCredited: true };
+74|
+75|    const amount = this.number(input.amount, "wallet credit amount");
+76|    if (amount <= 0) throw new BadRequestError("Wallet credit amount must be greater than zero.");
+77|    const wallet = await this.db.teacher_wallets.upsert({
+78|      where: { teacher_id: input.teacherId },
+79|      create: { teacher_id: input.teacherId, balance: amount },
+80|      update: { balance: { increment: amount } },
+81|    });
+82|    const balanceAfter = this.number(wallet.balance);
+83|    const ledger = await this.db.teacher_wallet_ledger.create({
+84|      data: {
+85|        wallet_id: wallet.id,
+86|        teacher_id: input.teacherId,
+87|        type: "credit",
+88|        source: "milestone_reward",
+89|        amount,
+90|        balance_after: balanceAfter,
+91|        milestone_achievement_id: input.milestoneAchievementId,
+92|        notes: input.notes ?? null,
+93|      },
+94|    });
+95|    return { wallet, ledger };
+96|  }
+97|
+98|  async applyToPurchase(input: {
+99|    teacherId: number;
+100|    purchaseId: number;
+101|    purchaseTotal: number;
+102|    requestedAmount: number;
+103|    couponApplied?: boolean;
+104|  }) {
+105|    if (input.couponApplied) {
+106|      throw new BadRequestError("Wallet credit cannot be stacked with coupons.");
+107|    }
+108|
+109|    return this.transaction(async (tx) => {
+110|      const purchase = await tx.e_booklet_purchases.findFirst({
+111|        where: { id: input.purchaseId, teacher_id: input.teacherId },
+112|      });
+113|      if (!purchase) throw new NotFoundError("E-booklet purchase not found.");
+114|
+115|      const existingDebit = await tx.teacher_wallet_ledger.findFirst({
+116|        where: {
+117|          teacher_id: input.teacherId,
+118|          e_booklet_purchase_id: input.purchaseId,
+119|          type: "debit",
+120|          source: "order_spend",
+121|        },
+122|      });
+123|      if (existingDebit) {
+124|        const alreadyApplied = Math.abs(this.number(existingDebit.amount));
+125|        return {
+126|          purchase,
+127|          walletCreditApplied: alreadyApplied,
+128|          finalTotal: Math.max(0, this.number(purchase.price) - alreadyApplied),
+129|          alreadyApplied: true,
+130|        };
+131|      }
+132|
+133|      const wallet = await tx.teacher_wallets.findUnique({ where: { teacher_id: input.teacherId } });
+134|      const balance = this.number(wallet?.balance, "wallet balance");
+135|      const requested = this.number(input.requestedAmount, "wallet credit amount");
+136|      const purchaseTotal = this.number(purchase.price, "purchase price");
+137|      if (balance < 0) throw new BadRequestError("Invalid wallet balance.");
+138|      if (purchaseTotal < 0) throw new BadRequestError("Invalid purchase price.");
+139|      if (requested <= 0) throw new BadRequestError("Wallet credit amount must be greater than zero.");
+140|      const walletCreditApplied = Math.min(balance, requested, purchaseTotal);
+141|      if (!wallet?.id || walletCreditApplied <= 0) throw new ForbiddenError("Teacher wallet has no available credit.");
+142|      const finalTotal = purchaseTotal - walletCreditApplied;
+143|      const balanceAfter = balance - walletCreditApplied;
+144|
+145|      const debit = await tx.teacher_wallets.updateMany({
+146|        where: { teacher_id: input.teacherId, balance: { gte: walletCreditApplied } },
+147|        data: { balance: { decrement: walletCreditApplied } },
+148|      });
+149|      if (debit.count !== 1) throw new ForbiddenError("Teacher wallet has no available credit.");
+150|
+151|      await tx.teacher_wallet_ledger.create({
+152|        data: {
+153|          wallet_id: wallet.id,
+154|          teacher_id: input.teacherId,
+155|          type: "debit",
+156|          source: "order_spend",
+157|          amount: -walletCreditApplied,
+158|          balance_after: balanceAfter,
+159|          e_booklet_purchase_id: input.purchaseId,
+160|          notes: "Wallet credit applied to e-booklet purchase",
+161|        },
+162|      });
+163|      const updatedPurchase = await tx.e_booklet_purchases.update({
+164|        where: { id: input.purchaseId },
+165|        data: {
+166|          price: finalTotal,
+167|          admin_notes: "Wallet credit applied: " + walletCreditApplied,
+168|        },
+169|      });
+170|
+171|      return { purchase: updatedPurchase, walletCreditApplied, finalTotal };
+172|    });
+173|  }
+174|}
+
+===== FILE: kalima-platform/backend/src/config/corsOptions.ts (24 lines) =====
+1|import { CorsOptions } from "cors";
+2|// import allowedOrigins from "./allowedOrigins";
+3|
+4|const allowedOrigins: string[] = [
+5|  "capacitor://localhost", // iOS
+6|  "http://localhost", // Android HTTP
+7|  "https://localhost", // Android HTTPS
+8|  "https://kalima-edu.com",
+9|  "https://dev.kalima-edu.com",
+10|  "http://localhost:3000",
+11|  "http://localhost:5173",
+12|  "http://127.0.0.1:5173",
+13|  "file://",
+14|];
+15|
+16|export const corsOptions: CorsOptions = {
+17|  origin: allowedOrigins,
+18|  credentials: true,
+19|  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+20|  allowedHeaders: ["Content-Type", "Authorization"],
+21|  optionsSuccessStatus: 204,
+22|};
+23|
+24|export default corsOptions;
+
+===== FILE: kalima-platform/backend/src/libs/auth/firebase.ts (42 lines) =====
+1|import admin from "firebase-admin";
+2|
+3|const projectId = process.env.FIREBASE_PROJECT_ID;
+4|const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+5|const normalizePrivateKey = (value?: string) => {
+6|  if (!value) return value;
+7|
+8|  let normalized = value.trim().replace(/\r/g, "");
+9|
+10|  if (
+11|    (normalized.startsWith('"') && normalized.endsWith('"')) ||
+12|    (normalized.startsWith("'") && normalized.endsWith("'"))
+13|  ) {
+14|    normalized = normalized.slice(1, -1);
+15|  }
+16|
+17|  return normalized.replace(/\\\\n/g, "\n").replace(/\\n/g, "\n");
+18|};
+19|
+20|const privateKey = normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
+21|
+22|if (!admin.apps.length) {
+23|  if (projectId && clientEmail && privateKey) {
+24|    admin.initializeApp({
+25|      credential: admin.credential.cert({
+26|        projectId,
+27|        clientEmail,
+28|        privateKey,
+29|      } as admin.ServiceAccount),
+30|    });
+31|  } else {
+32|    if (process.env.NODE_ENV === "production") {
+33|      throw new Error("Firebase service-account credentials are required in production.");
+34|    }
+35|    console.warn(
+36|      "Firebase service-account credentials not set — Firebase token verification will fail until configured.",
+37|    );
+38|    admin.initializeApp({ projectId: projectId || "kalima-a5325" });
+39|  }
+40|}
+41|
+42|export const firebaseAuth = admin.auth();
+
+===== FILE: kalima-platform/backend/tests/e-booklet/e-booklet-phase1-migration.spec.ts (42 lines) =====
+1|import fs from "fs";
+2|import path from "path";
+3|
+4|const migrationSql = fs.readFileSync(
+5|  path.join(__dirname, "../../src/apps/store-api/prisma/migrations/20260614180000_e_booklet_terms_milestones_wallet/migration.sql"),
+6|  "utf8",
+7|);
+8|
+9|describe("Phase 1 e-booklet migration DB invariants", () => {
+10|  test("active terms are protected by real partial unique indexes, not nullable service guards", () => {
+11|    expect(migrationSql).toContain(
+12|      'CREATE UNIQUE INDEX "ux_e_booklet_terms_one_active_global" ON "e_booklet_terms"((true)) WHERE "status" = \'active\' AND "template_id" IS NULL;',
+13|    );
+14|    expect(migrationSql).toContain(
+15|      'CREATE UNIQUE INDEX "ux_e_booklet_terms_one_active_per_template" ON "e_booklet_terms"("template_id") WHERE "status" = \'active\' AND "template_id" IS NOT NULL;',
+16|    );
+17|    expect(migrationSql).not.toContain('CREATE UNIQUE INDEX "e_booklet_terms_active_guard_key"');
+18|  });
+19|
+20|  test("paid code single redemption is protected by counted progress uniqueness", () => {
+21|    expect(migrationSql).toContain(
+22|      'CREATE UNIQUE INDEX "ux_e_booklet_paid_code_one_counted_redemption" ON "e_booklet_access_code_redemptions"("access_code_id") WHERE "counted_for_progress" = true;',
+23|    );
+24|    expect(migrationSql).not.toContain('CREATE UNIQUE INDEX "e_booklet_access_code_redemptions_paid_redemption_guard_key"');
+25|  });
+26|
+27|  test("milestone reward credit is protected by a DB uniqueness invariant", () => {
+28|    expect(migrationSql).toContain(
+29|      'CREATE UNIQUE INDEX "ux_teacher_wallet_ledger_one_milestone_reward_credit" ON "teacher_wallet_ledger"("milestone_achievement_id", "source", "type") WHERE "milestone_achievement_id" IS NOT NULL AND "source" = \'milestone_reward\' AND "type" = \'credit\';',
+30|    );
+31|  });
+32|
+33|  test("teacher terms acceptance uniqueness separates code generation null achievement and reward claims", () => {
+34|    expect(migrationSql).toContain(
+35|      'CREATE UNIQUE INDEX "ux_e_booklet_code_generation_terms_acceptance" ON "e_booklet_teacher_terms_acceptances"("teacher_id", "term_id", "acceptance_type") WHERE "acceptance_type" = \'code_generation\' AND "milestone_achievement_id" IS NULL;',
+36|    );
+37|    expect(migrationSql).toContain(
+38|      'CREATE UNIQUE INDEX "ux_e_booklet_reward_claim_terms_acceptance" ON "e_booklet_teacher_terms_acceptances"("teacher_id", "term_id", "acceptance_type", "milestone_achievement_id") WHERE "acceptance_type" = \'reward_claim\' AND "milestone_achievement_id" IS NOT NULL;',
+39|    );
+40|    expect(migrationSql).not.toContain('UNIQUE ("teacher_id", "term_id", "acceptance_type", "milestone_achievement_id")');
+41|  });
+42|});
+
+===== FILE: kalima-platform/backend/tests/e-booklet/e-booklet-phase2-services.spec.ts (513 lines) =====
+1|import { EBookletTermsService } from "../../src/apps/store-api/services/e-booklet-terms.service";
+2|import { EBookletAccessCodeService, hashEBookletAccessCode } from "../../src/apps/store-api/services/e-booklet-access-code.service";
+3|import { EBookletRedemptionService } from "../../src/apps/store-api/services/e-booklet-redemption.service";
+4|import { EBookletMilestoneService } from "../../src/apps/store-api/services/e-booklet-milestone.service";
+5|import { TeacherWalletService } from "../../src/apps/store-api/services/teacher-wallet.service";
+6|
+7|function createDb(overrides: Record<string, unknown> = {}) {
+8|  const db: any = {
+9|    e_booklet_terms: { findFirst: jest.fn(), create: jest.fn(), update: jest.fn(), updateMany: jest.fn(), findMany: jest.fn(), findUnique: jest.fn() },
+10|    e_booklet_teacher_terms_acceptances: { findFirst: jest.fn(), create: jest.fn() },
+11|    e_booklet_instances: { findFirst: jest.fn() },
+12|    e_booklet_access_codes: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn(), updateMany: jest.fn(), findFirst: jest.fn() },
+13|    e_booklet_access_code_redemptions: { findFirst: jest.fn(), findMany: jest.fn(), create: jest.fn(), update: jest.fn(), count: jest.fn() },
+14|    e_booklet_access: { findFirst: jest.fn(), create: jest.fn(), upsert: jest.fn() },
+15|    e_booklet_milestones: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), findFirst: jest.fn() },
+16|    e_booklet_milestone_achievements: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn(), updateMany: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
+17|    teacher_wallets: { findUnique: jest.fn(), upsert: jest.fn(), update: jest.fn(), updateMany: jest.fn() },
+18|    teacher_wallet_ledger: { create: jest.fn(), aggregate: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
+19|    purchases: { findFirst: jest.fn(), update: jest.fn() },
+20|    e_booklet_purchases: { findFirst: jest.fn(), update: jest.fn() },
+21|    purchase_items: { findMany: jest.fn() },
+22|    coupon_usages: { findFirst: jest.fn() },
+23|    users: { findUnique: jest.fn(), findMany: jest.fn() },
+24|    notifications: { create: jest.fn(), createMany: jest.fn() },
+25|    e_booklet_audit_logs: { create: jest.fn() },
+26|    ...overrides,
+27|  };
+28|  db.$transaction = jest.fn(async (callback: (tx: any) => Promise<unknown>) => callback(db));
+29|  return db;
+30|}
+31|
+32|describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services", () => {
+33|  beforeAll(() => {
+34|    process.env.E_BOOKLET_ACCESS_CODE_SECRET = "test-e-booklet-access-code-secret";
+35|  });
+36|
+37|  test("terms service uses real term fields and records code-generation acceptance", async () => {
+38|    const db = createDb();
+39|    db.e_booklet_terms.findFirst
+40|      .mockResolvedValueOnce({ id: 1, name: "Term 1", status: "active", active_guard: "global-active", code_generation_terms: "Generate terms", reward_claim_terms: "Reward terms" })
+41|      .mockResolvedValueOnce({ id: 1, name: "Term 1", status: "active", active_guard: "global-active", code_generation_terms: "Generate terms", reward_claim_terms: "Reward terms" })
+42|      .mockResolvedValueOnce({ id: 1, name: "Term 1", status: "active", active_guard: "global-active", code_generation_terms: "Generate terms", reward_claim_terms: "Reward terms" });
+43|    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 8, term_id: 1, acceptance_type: "code_generation" });
+44|    db.e_booklet_teacher_terms_acceptances.create.mockResolvedValue({ id: 7, teacher_id: 9, term_id: 1, acceptance_type: "code_generation" });
+45|    const service = new EBookletTermsService(db);
+46|
+47|    await expect(service.createTerms({ name: "Term 2", codeGenerationTerms: "Terms", rewardClaimTerms: "Reward", startsAt: new Date("2026-01-01T00:00:00.000Z"), status: "active" }, 1)).rejects.toThrow("already has an active terms version");
+48|    await expect(service.acceptLatestTerms(9, "code_generation", { ipAddress: "127.0.0.1" })).resolves.toEqual({ id: 7, teacher_id: 9, term_id: 1, acceptance_type: "code_generation" });
+49|    await expect(service.acceptLatestTerms(9, "code_generation")).resolves.toEqual({ id: 8, term_id: 1, acceptance_type: "code_generation" });
+50|    expect(db.e_booklet_teacher_terms_acceptances.create).toHaveBeenCalledWith({ data: expect.objectContaining({ teacher_id: 9, term_id: 1, acceptance_type: "code_generation", terms_snapshot: "Generate terms", ip_address: "127.0.0.1" }) });
+51|  });
+52|
+53|  test("terms service falls back from template-specific lookup to active global terms", async () => {
+54|    const db = createDb();
+55|    const globalTerm = { id: 5, name: "Global", status: "active", template_id: null, code_generation_terms: "Global code" };
+56|    db.e_booklet_terms.findFirst
+57|      .mockResolvedValueOnce(null)
+58|      .mockResolvedValueOnce(globalTerm)
+59|      .mockResolvedValueOnce(null)
+60|      .mockResolvedValueOnce(globalTerm);
+61|    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue(null);
+62|    db.e_booklet_teacher_terms_acceptances.create.mockResolvedValue({ id: 9, teacher_id: 4, term_id: 5, acceptance_type: "code_generation" });
+63|    const service = new EBookletTermsService(db);
+64|
+65|    await expect(service.getLatestActiveTerms(99)).resolves.toBe(globalTerm);
+66|    await expect(service.acceptLatestTerms(4, "code_generation", {}, 99)).resolves.toEqual(expect.objectContaining({ term_id: 5 }));
+67|    expect(db.e_booklet_terms.findFirst).toHaveBeenNthCalledWith(1, expect.objectContaining({ where: expect.objectContaining({ template_id: 99 }) }));
+68|    expect(db.e_booklet_terms.findFirst).toHaveBeenNthCalledWith(2, expect.objectContaining({ where: expect.objectContaining({ template_id: null }) }));
+69|    expect(db.e_booklet_teacher_terms_acceptances.create).toHaveBeenCalledWith({ data: expect.objectContaining({ teacher_id: 4, term_id: 5, acceptance_type: "code_generation", terms_snapshot: "Global code" }) });
+70|  });
+71|
+72|  test("terms service prefers template-specific active terms over global fallback", async () => {
+73|    const db = createDb();
+74|    const templateTerm = { id: 6, name: "Template", status: "active", template_id: 99 };
+75|    db.e_booklet_terms.findFirst.mockResolvedValue(templateTerm);
+76|    const service = new EBookletTermsService(db);
+77|
+78|    await expect(service.getLatestActiveTerms(99)).resolves.toBe(templateTerm);
+79|    expect(db.e_booklet_terms.findFirst).toHaveBeenCalledTimes(1);
+80|    expect(db.e_booklet_terms.findFirst).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ template_id: 99 }) }));
+81|  });
+82|
+83|  test("access code service uses real schema fields, template-scoped terms, and URL+code WhatsApp messages", async () => {
+84|    const db = createDb();
+85|    db.e_booklet_terms.findFirst
+86|      .mockResolvedValueOnce({ id: 1, status: "active", template_id: 99, active_guard: "template:99" })
+87|      .mockResolvedValueOnce({ id: 1, status: "active", template_id: 99, active_guard: "template:99" });
+88|    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 2, term_id: 1, acceptance_type: "code_generation" });
+89|    db.e_booklet_access_codes.findUnique.mockResolvedValue(null);
+90|    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, template_id: 99, status: "active" });
+91|    db.e_booklet_access_codes.create.mockImplementation(async ({ data }: any) => ({ id: 2, ...data }));
+92|    const service = new EBookletAccessCodeService(db);
+93|
+94|    await expect(service.generateCode({ bookletInstanceId: 10, teacherId: 9, kind: "paid", termId: 1 })).rejects.toThrow("Code-generation terms must be accepted");
+95|    const result: any = await service.generateCode({ bookletInstanceId: 10, teacherId: 9, kind: "paid", termId: 1 });
+96|
+97|    expect(result.code).toMatch(/^KLM-[A-Z0-9]{12}$/);
+98|    expect(result.redeemUrl).toMatch(/\/e-booklet-code$/);
+99|    expect(result.whatsappMessage).toContain(result.code);
+100|    expect(result.whatsappMessage).toContain(result.redeemUrl);
+101|    expect(result.record.code_hash).toBeUndefined();
+102|    expect(result.record.code_plaintext).toBeUndefined();
+103|    expect(db.e_booklet_audit_logs.create).not.toHaveBeenCalled();
+104|    expect(db.e_booklet_instances.findFirst).toHaveBeenCalledWith({ where: { id: 10, teacher_id: 9, status: "active" }, include: { template: true } });
+105|    expect(db.e_booklet_access_codes.create).toHaveBeenCalledWith({ data: expect.objectContaining({ booklet_instance_id: 10, teacher_id: 9, kind: "paid", max_redemptions: 1, term_id: 1, code_hint: expect.any(String) }) });
+106|  });
+107|
+108|  test("access code service audits admin-generated free codes", async () => {
+109|    const db = createDb();
+110|    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", template_id: 99 });
+111|    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue({ id: 2, term_id: 1, acceptance_type: "code_generation" });
+112|    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, template_id: 99, status: "active" });
+113|    db.e_booklet_access_codes.findUnique.mockResolvedValue(null);
+114|    db.e_booklet_access_codes.create.mockResolvedValue({ id: 44, kind: "free" });
+115|    const service = new EBookletAccessCodeService(db);
+116|
+117|    await service.generateCode({ bookletInstanceId: 10, teacherId: 9, kind: "free", termId: 1, adminActorId: 5, ipAddress: "127.0.0.1", userAgent: "jest" });
+118|
+119|    expect(db.e_booklet_audit_logs.create).toHaveBeenCalledWith({ data: expect.objectContaining({
+120|      actor_user_id: 5,
+121|      action: "admin_generate_free_access_code",
+122|      entity_type: "e_booklet_access_code",
+123|      entity_id: 44,
+124|      ip_address: "127.0.0.1",
+125|      user_agent: "jest",
+126|      metadata_json: expect.objectContaining({ teacher_id: 9, booklet_instance_id: 10, term_id: 1, kind: "free" }),
+127|    }) });
+128|  });
+129|
+130|  test("access code service rejects wrong-template terms for instance code generation", async () => {
+131|    const db = createDb();
+132|    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 2, status: "active", template_id: 88, active_guard: "template:88" });
+133|    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue({ id: 3, term_id: 2, acceptance_type: "code_generation" });
+134|    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, template_id: 99, status: "active" });
+135|    const service = new EBookletAccessCodeService(db);
+136|
+137|    await expect(service.generateCode({ bookletInstanceId: 10, teacherId: 9, kind: "paid", termId: 2 })).rejects.toThrow("Terms do not match this e-booklet template");
+138|    expect(db.e_booklet_access_codes.create).not.toHaveBeenCalled();
+139|  });
+140|
+141|  test("access code service includes current-window constraints when loading active terms", async () => {
+142|    const db = createDb();
+143|    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", template_id: 99, starts_at: new Date("2027-01-01T00:00:00.000Z"), ends_at: null });
+144|    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue({ id: 2, term_id: 1, acceptance_type: "code_generation" });
+145|    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, template_id: 99, status: "active" });
+146|    db.e_booklet_access_codes.findUnique.mockResolvedValue(null);
+147|    db.e_booklet_access_codes.create.mockResolvedValue({ id: 2, kind: "paid" });
+148|    const service = new EBookletAccessCodeService(db);
+149|
+150|    await service.generateCode({ bookletInstanceId: 10, teacherId: 9, kind: "paid", termId: 1 });
+151|
+152|    expect(db.e_booklet_terms.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+153|      where: expect.objectContaining({
+154|        id: 1,
+155|        status: "active",
+156|        starts_at: expect.objectContaining({ lte: expect.any(Date) }),
+157|        OR: [{ ends_at: null }, { ends_at: expect.objectContaining({ gt: expect.any(Date) }) }],
+158|      }),
+159|    }));
+160|  });
+161|
+162|  test("access code service rejects code generation for another teacher instance", async () => {
+163|    const db = createDb();
+164|    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", active_guard: "global-active" });
+165|    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue({ id: 2, term_id: 1, acceptance_type: "code_generation" });
+166|    db.e_booklet_instances.findFirst.mockResolvedValue(null);
+167|    const service = new EBookletAccessCodeService(db);
+168|
+169|    await expect(service.generateCode({ bookletInstanceId: 10, teacherId: 9, kind: "paid", termId: 1 })).rejects.toThrow("E-booklet instance not found");
+170|    expect(db.e_booklet_access_codes.create).not.toHaveBeenCalled();
+171|  });
+172|
+173|  test("paid redemption binds first student atomically, reopens same-student access, and rejects a different student after use", async () => {
+174|    const db = createDb();
+175|    const activeCode = { id: 3, booklet_instance_id: 10, teacher_id: 9, kind: "paid", max_redemptions: 1, redeemed_count: 0, status: "active", expires_at: null, bound_student_id: null, term_id: 1 };
+176|    const redeemedCode = { ...activeCode, redeemed_count: 1, status: "redeemed", bound_student_id: 55 };
+177|    db.e_booklet_access_codes.findUnique
+178|      .mockResolvedValueOnce(activeCode)
+179|      .mockResolvedValueOnce(redeemedCode)
+180|      .mockResolvedValueOnce(redeemedCode);
+181|    db.e_booklet_access_code_redemptions.findFirst
+182|      .mockResolvedValueOnce(null)
+183|      .mockResolvedValueOnce({ id: 30, student_id: 55, access_id: null, counted_for_progress: true })
+184|      .mockResolvedValueOnce(null);
+185|    db.e_booklet_access.upsert.mockResolvedValue({ id: 88, user_id: 55, booklet_instance_id: 10, access_source: "teacher_code" });
+186|    db.e_booklet_access_code_redemptions.create.mockResolvedValue({ id: 30, student_id: 55, access_id: 88, counted_for_progress: true });
+187|    db.e_booklet_access_codes.updateMany.mockResolvedValue({ count: 1 });
+188|    const service = new EBookletRedemptionService(db);
+189|
+190|    const first: any = await service.redeemCode("KLM-ABCDEFGH123", 55, { termsAccepted: true });
+191|    await expect(service.redeemCode("KLM-ABCDEFGH123", 55, { termsAccepted: true })).resolves.toEqual(expect.objectContaining({ id: 30, access_id: 88, accessId: 88, bookletInstanceId: 10, countedForProgress: true }));
+192|    await expect(service.redeemCode("KLM-ABCDEFGH123", 56, { termsAccepted: true })).rejects.toThrow("no longer active");
+193|    expect(first.access_id).toBe(88);
+194|    expect(db.e_booklet_access.upsert).toHaveBeenCalledTimes(2);
+195|    expect(db.e_booklet_access_code_redemptions.update).toHaveBeenCalledWith({ where: { id: 30 }, data: { access_id: 88 } });
+196|    expect(db.e_booklet_access_code_redemptions.create).toHaveBeenCalledWith({ data: expect.objectContaining({ paid_redemption_guard: "paid-code-3", counted_for_progress: true }) });
+197|    expect(db.e_booklet_access_codes.updateMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ id: 3, status: "active", bound_student_id: null }), data: expect.objectContaining({ bound_student_id: 55, redeemed_count: { increment: 1 }, status: "redeemed" }) }));
+198|    expect(db.$transaction).toHaveBeenCalledWith(expect.any(Function), { isolationLevel: "Serializable" });
+199|  });
+200|
+201|  test("free shared codes track logged-in entry, grant viewer access, but do not count toward milestones", async () => {
+202|    const db = createDb();
+203|    db.e_booklet_access_codes.findUnique.mockResolvedValue({ id: 4, booklet_instance_id: 10, teacher_id: 9, kind: "free", max_redemptions: 999999, redeemed_count: 0, status: "active", expires_at: null, bound_student_id: null, term_id: 1 });
+204|    db.e_booklet_access_code_redemptions.findFirst.mockResolvedValue(null);
+205|    db.e_booklet_access.upsert.mockResolvedValue({ id: 88, user_id: 55, booklet_instance_id: 10, access_source: "teacher_code" });
+206|    db.e_booklet_access_code_redemptions.create.mockResolvedValue({ id: 40, access_id: 88, student_id: 55, counted_for_progress: false });
+207|    db.e_booklet_access_codes.updateMany.mockResolvedValue({ count: 1 });
+208|    const service = new EBookletRedemptionService(db);
+209|
+210|    await expect(service.redeemCode("KLM-FREECODE123", 55, { termsAccepted: true })).resolves.toEqual(expect.objectContaining({ id: 40, access_id: 88, student_id: 55, counted_for_progress: false, bookletInstanceId: 10, accessId: 88 }));
+211|    expect(db.e_booklet_access.upsert).toHaveBeenCalledWith(expect.objectContaining({
+212|      where: { booklet_instance_id_user_id_role: { booklet_instance_id: 10, user_id: 55, role: "student" } },
+213|      create: expect.objectContaining({ booklet_instance_id: 10, user_id: 55, access_source: "teacher_code", status: "active" }),
+214|    }));
+215|    expect(db.e_booklet_access_code_redemptions.create).toHaveBeenCalledWith({ data: expect.objectContaining({ counted_for_progress: false, access_id: 88, paid_redemption_guard: null }) });
+216|  });
+217|
+218|  test("shared redemption checks the same student first and atomically reserves capacity", async () => {
+219|    const db = createDb();
+220|    const activeCode = { id: 4, booklet_instance_id: 10, teacher_id: 9, kind: "free", max_redemptions: 2, redeemed_count: 1, status: "active", expires_at: null, bound_student_id: null, term_id: 1 };
+221|    db.e_booklet_access_codes.findUnique.mockResolvedValue(activeCode);
+222|    db.e_booklet_access_code_redemptions.findFirst.mockResolvedValue({ id: 41, access_code_id: 4, student_id: 55, access_id: 88 });
+223|    const service = new EBookletRedemptionService(db);
+224|
+225|    await expect(service.redeemCode("KLM-FREECODE123", 55, { termsAccepted: true })).resolves.toEqual(expect.objectContaining({ id: 41, access_code_id: 4, student_id: 55, access_id: 88, bookletInstanceId: 10, accessId: 88 }));
+226|    expect(db.e_booklet_access_code_redemptions.findFirst).toHaveBeenCalledWith({ where: { access_code_id: 4, student_id: 55 } });
+227|    expect(db.e_booklet_access_codes.updateMany).not.toHaveBeenCalled();
+228|  });
+229|
+230|  test("shared redemption rejects when atomic capacity reservation fails", async () => {
+231|    const db = createDb();
+232|    db.e_booklet_access_codes.findUnique.mockResolvedValue({ id: 4, booklet_instance_id: 10, teacher_id: 9, kind: "free", max_redemptions: 2, redeemed_count: 2, status: "active", expires_at: null, bound_student_id: null, term_id: 1 });
+233|    db.e_booklet_access_code_redemptions.findFirst.mockResolvedValue(null);
+234|    db.e_booklet_access_codes.updateMany.mockResolvedValue({ count: 0 });
+235|    const service = new EBookletRedemptionService(db);
+236|
+237|    await expect(service.redeemCode("KLM-FREECODE123", 56, { termsAccepted: true })).rejects.toThrow("redemption limit");
+238|    expect(db.e_booklet_access_code_redemptions.create).not.toHaveBeenCalled();
+239|  });
+240|
+241|  test("concurrent same-student redemption returns the existing redemption after capacity race", async () => {
+242|    const db = createDb();
+243|    const activeCode = { id: 4, booklet_instance_id: 10, teacher_id: 9, kind: "free", max_redemptions: 1, redeemed_count: 0, status: "active", expires_at: null, bound_student_id: null, term_id: 1 };
+244|    const existing = { id: 42, access_code_id: 4, student_id: 55, access_id: 88 };
+245|    db.e_booklet_access_codes.findUnique.mockResolvedValue(activeCode);
+246|    db.e_booklet_access_code_redemptions.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(existing);
+247|    db.e_booklet_access_codes.updateMany.mockResolvedValue({ count: 0 });
+248|    const service = new EBookletRedemptionService(db);
+249|
+250|    await expect(service.redeemCode("KLM-FREECODE123", 55, { termsAccepted: true })).resolves.toEqual(expect.objectContaining({ ...existing, bookletInstanceId: 10, accessId: 88 }));
+251|    expect(db.e_booklet_access_code_redemptions.create).not.toHaveBeenCalled();
+252|  });
+253|
+254|  test("concurrent same-student redemption returns existing redemption after unique create race", async () => {
+255|    const db = createDb();
+256|    const activeCode = { id: 4, booklet_instance_id: 10, teacher_id: 9, kind: "free", max_redemptions: 10, redeemed_count: 0, status: "active", expires_at: null, bound_student_id: null, term_id: 1 };
+257|    const existing = { id: 43, access_code_id: 4, student_id: 55, access_id: 88 };
+258|    db.e_booklet_access_codes.findUnique.mockResolvedValue(activeCode);
+259|    db.e_booklet_access_code_redemptions.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce(existing);
+260|    db.e_booklet_access_codes.updateMany.mockResolvedValue({ count: 1 });
+261|    db.e_booklet_access.upsert.mockResolvedValue({ id: 88, user_id: 55 });
+262|    db.e_booklet_access_code_redemptions.create.mockRejectedValue({ code: "P2002" });
+263|    const service = new EBookletRedemptionService(db);
+264|
+265|    await expect(service.redeemCode("KLM-FREECODE123", 55, { termsAccepted: true })).resolves.toEqual(expect.objectContaining({ ...existing, bookletInstanceId: 10, accessId: 88 }));
+266|  });
+267|
+268|  test("updateTerms rejects activation attempts that bypass activation invariants", async () => {
+269|    const db = createDb();
+270|    db.e_booklet_terms.findUnique.mockResolvedValue({ id: 1, status: "draft", starts_at: new Date(), ends_at: null });
+271|    const service = new EBookletTermsService(db);
+272|
+273|    await expect(service.updateTerms(1, { status: "active" })).rejects.toThrow("Use the activate endpoint");
+274|    expect(db.e_booklet_terms.update).not.toHaveBeenCalled();
+275|  });
+276|
+277|  test("milestone service records earned achievements without wallet credit until reward claim", async () => {
+278|    const db = createDb();
+279|    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active" });
+280|    db.e_booklet_access_code_redemptions.count.mockResolvedValue(12);
+281|    db.e_booklet_milestones.findMany.mockResolvedValue([{ id: 1, term_id: 1, target_paid_redemptions: 10, milestone_price: 200, previous_price_snapshot: 150, reward_amount_snapshot: 75, active: true }]);
+282|    db.e_booklet_milestone_achievements.findUnique.mockResolvedValue(null);
+283|    db.e_booklet_milestone_achievements.create.mockResolvedValue({ id: 6, milestone_id: 1, term_id: 1, reward_amount: 75 });
+284|    const service = new EBookletMilestoneService(db);
+285|
+286|    const result: any = await service.evaluateTeacherMilestones(9);
+287|
+288|    expect(db.e_booklet_access_code_redemptions.count).toHaveBeenCalledWith({ where: { counted_for_progress: true, access_code: { teacher_id: 9, term_id: 1, kind: "paid" } } });
+289|    expect(result.awarded).toHaveLength(1);
+290|    expect(db.teacher_wallet_ledger.create).not.toHaveBeenCalled();
+291|  });
+292|
+293|  test("milestone evaluation uses only currently effective active terms", async () => {
+294|    const db = createDb();
+295|    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", starts_at: new Date("2027-01-01T00:00:00.000Z"), ends_at: null });
+296|    db.e_booklet_access_code_redemptions.count.mockResolvedValue(0);
+297|    db.e_booklet_milestones.findMany.mockResolvedValue([]);
+298|    const service = new EBookletMilestoneService(db);
+299|
+300|    await service.evaluateTeacherMilestones(9);
+301|
+302|    expect(db.e_booklet_terms.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+303|      where: expect.objectContaining({
+304|        status: "active",
+305|        starts_at: expect.objectContaining({ lte: expect.any(Date) }),
+306|        OR: [{ ends_at: null }, { ends_at: expect.objectContaining({ gt: expect.any(Date) }) }],
+307|      }),
+308|    }));
+309|  });
+310|
+311|  test("milestone service lists teacher-scoped progress and claimable achievement data", async () => {
+312|    const db = createDb();
+313|    const claimedAt = new Date("2026-06-01T00:00:00.000Z");
+314|    db.e_booklet_milestones.findMany.mockResolvedValue([
+315|      { id: 1, term_id: 1, title: "First", target_paid_redemptions: 5, reward_amount_snapshot: 50, active: true },
+316|      { id: 2, term_id: 1, title: "Second", target_paid_redemptions: 10, reward_amount_snapshot: 90, active: true },
+317|    ]);
+318|    db.e_booklet_milestone_achievements.findMany.mockResolvedValue([
+319|      { id: 11, teacher_id: 9, term_id: 1, milestone_id: 1, paid_redemptions_snapshot: 7, reward_amount: 50, claimed_at: claimedAt },
+320|    ]);
+321|    db.e_booklet_access_code_redemptions.count.mockResolvedValue(8);
+322|    const service = new EBookletMilestoneService(db);
+323|
+324|    const result: any = await service.listMilestones(1, 9);
+325|
+326|    expect(db.e_booklet_milestones.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { term_id: 1, active: true } }));
+327|    expect(db.e_booklet_milestone_achievements.findMany).toHaveBeenCalledWith({ where: { teacher_id: 9, term_id: 1 } });
+328|    expect(db.e_booklet_access_code_redemptions.count).toHaveBeenCalledWith({ where: { counted_for_progress: true, access_code: { teacher_id: 9, term_id: 1, kind: "paid" } } });
+329|    expect(result[0]).toEqual(expect.objectContaining({ progress_count: 8, paid_redemptions_snapshot: 7, achievement_id: 11, milestone_achievement_id: 11, claimed_at: claimedAt, reward_amount: 50 }));
+330|    expect(result[1]).toEqual(expect.objectContaining({ progress_count: 8, paid_redemptions_snapshot: 8, achievement: null, achievement_id: null, claimed_at: null, reward_amount: 90 }));
+331|  });
+332|
+333|  test("milestone service lets admin list inactive milestones without teacher progress enrichment", async () => {
+334|    const db = createDb();
+335|    db.e_booklet_milestones.findMany.mockResolvedValue([
+336|      { id: 1, term_id: 1, title: "Active", target_paid_redemptions: 5, active: true },
+337|      { id: 2, term_id: 1, title: "Inactive", target_paid_redemptions: 10, active: false },
+338|    ]);
+339|    const service = new EBookletMilestoneService(db);
+340|
+341|    const result: any = await service.listMilestones(1, undefined, true);
+342|
+343|    expect(db.e_booklet_milestones.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { term_id: 1 } }));
+344|    expect(db.e_booklet_milestone_achievements.findMany).not.toHaveBeenCalled();
+345|    expect(db.e_booklet_access_code_redemptions.count).not.toHaveBeenCalled();
+346|    expect(result).toHaveLength(2);
+347|    expect(result[1]).toEqual(expect.objectContaining({ active: false }));
+348|  });
+349|
+350|  test("milestone progress groups paid redemptions by teacher and excludes free shared entries", async () => {
+351|    const db = createDb();
+352|    db.e_booklet_milestone_achievements.findMany.mockResolvedValue([
+353|      { id: 11, teacher_id: 9, term_id: 1, milestone_id: 1, reward_amount: 50 },
+354|    ]);
+355|    db.e_booklet_access_code_redemptions.findMany.mockResolvedValue([
+356|      { id: 1, counted_for_progress: true, access_code: { teacher_id: 9, term_id: 1, teacher: { id: 9, name: "Teacher One", email: "teacher1@example.com" } } },
+357|      { id: 2, counted_for_progress: true, access_code: { teacher_id: 9, term_id: 1, teacher: { id: 9, name: "Teacher One", email: "teacher1@example.com" } } },
+358|      { id: 3, counted_for_progress: true, access_code: { teacher_id: 12, term_id: 1, teacher: { id: 12, name: "Teacher Two", email: "teacher2@example.com" } } },
+359|    ]);
+360|    const service = new EBookletMilestoneService(db);
+361|
+362|    const result: any = await service.listProgress(1);
+363|
+364|    expect(db.e_booklet_access_code_redemptions.findMany).toHaveBeenCalledWith(expect.objectContaining({
+365|      where: { counted_for_progress: true, access_code: { kind: "paid", term_id: 1 } },
+366|    }));
+367|    expect(result.paidRedemptions).toBe(3);
+368|    expect(result.teacherProgress).toEqual([
+369|      expect.objectContaining({ teacherId: 9, teacherName: "Teacher One", paidRedemptions: 2, achievements: [expect.objectContaining({ id: 11 })] }),
+370|      expect.objectContaining({ teacherId: 12, teacherName: "Teacher Two", paidRedemptions: 1, achievements: [] }),
+371|    ]);
+372|  });
+373|
+374|  test("milestone service persists notification recipients on create and update", async () => {
+375|    const db = createDb();
+376|    db.e_booklet_milestones.create.mockResolvedValue({ id: 1, notification_recipients: "teacher_and_admins" });
+377|    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1 });
+378|    db.e_booklet_milestones.update.mockResolvedValue({ id: 1, notification_recipients: "admins" });
+379|    const service = new EBookletMilestoneService(db);
+380|
+381|    await service.createMilestone({ termId: 1, title: "Milestone", targetPaidRedemptions: 10, milestonePrice: 200, rewardAmountSnapshot: 25, notificationRecipients: "teacher_and_admins" }, 1);
+382|    await service.updateMilestone(1, { notificationRecipients: "teacher" });
+383|
+384|    expect(db.e_booklet_milestones.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ notification_recipients: "teacher_and_admins" }) }));
+385|    expect(db.e_booklet_milestones.update).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 1 }, data: expect.objectContaining({ notification_recipients: "admins" }) }));
+386|  });
+387|
+388|  test("milestone service rejects invalid numeric create and update payloads", async () => {
+389|    const db = createDb();
+390|    const service = new EBookletMilestoneService(db);
+391|
+392|    await expect(service.createMilestone({ termId: 1, title: "Bad", targetPaidRedemptions: 0, milestonePrice: 200 })).rejects.toThrow("target paid redemptions");
+393|    await expect(service.createMilestone({ termId: 1, title: "Bad", targetPaidRedemptions: 10, milestonePrice: -1 })).rejects.toThrow("milestone price");
+394|    await expect(service.createMilestone({ termId: Number.NaN, title: "Bad", targetPaidRedemptions: 10, milestonePrice: 200 })).rejects.toThrow("term ID");
+395|    db.e_booklet_terms.findFirst.mockResolvedValueOnce(null);
+396|    await expect(service.createMilestone({ termId: 99, title: "Bad", targetPaidRedemptions: 10, milestonePrice: 200, rewardAmountSnapshot: 25 })).rejects.toThrow("E-booklet terms not found");
+397|    await expect(service.updateMilestone(1, { targetPaidRedemptions: -2 })).rejects.toThrow("target paid redemptions");
+398|    await expect(service.updateMilestone(1, { rewardAmountSnapshot: Number.NaN })).rejects.toThrow("reward amount");
+399|    expect(db.e_booklet_milestones.create).not.toHaveBeenCalled();
+400|    expect(db.e_booklet_milestones.update).not.toHaveBeenCalled();
+401|  });
+402|
+403|  test("claim reward requires explicit reward terms acceptance", async () => {
+404|    const db = createDb();
+405|    const service = new EBookletMilestoneService(db);
+406|
+407|    await expect(service.claimReward(9, 6, { termsAccepted: false })).rejects.toThrow("Reward claim terms must be accepted");
+408|    expect(db.e_booklet_milestone_achievements.findFirst).not.toHaveBeenCalled();
+409|    expect(db.teacher_wallet_ledger.create).not.toHaveBeenCalled();
+410|  });
+411|
+412|  test("claim reward accepts terms once and then credits wallet idempotently", async () => {
+413|    const db = createDb();
+414|    const achievement = { id: 6, teacher_id: 9, term_id: 1, reward_amount: 75, claimed_at: null, reward_terms_accepted_at: null };
+415|    db.e_booklet_milestone_achievements.findFirst
+416|      .mockResolvedValueOnce(achievement)
+417|      .mockResolvedValueOnce({ ...achievement, claimed_at: new Date(), reward_terms_accepted_at: new Date() })
+418|      .mockResolvedValueOnce({ ...achievement, claimed_at: new Date(), reward_terms_accepted_at: new Date() });
+419|    db.e_booklet_milestone_achievements.updateMany.mockResolvedValue({ count: 1 });
+420|    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, reward_claim_terms: "Reward claim terms v1" });
+421|    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue(null);
+422|    db.e_booklet_teacher_terms_acceptances.create.mockResolvedValue({ id: 71, acceptance_type: "reward_claim" });
+423|    db.e_booklet_milestone_achievements.update.mockResolvedValue({ ...achievement, claimed_at: new Date(), reward_terms_accepted_at: new Date() });
+424|    db.teacher_wallets.upsert.mockResolvedValue({ id: 11, teacher_id: 9, balance: 75 });
+425|    db.teacher_wallet_ledger.findFirst.mockResolvedValue(null);
+426|    db.teacher_wallet_ledger.create.mockResolvedValue({ id: 20, amount: 75, type: "credit", source: "milestone_reward" });
+427|    const service = new EBookletMilestoneService(db);
+428|
+429|    await expect(service.claimReward(9, 6, { termsAccepted: true })).resolves.toEqual(expect.objectContaining({ achievement: expect.any(Object), walletCredit: expect.any(Object) }));
+430|    await expect(service.claimReward(9, 6, { termsAccepted: true })).resolves.toEqual(expect.objectContaining({ claimed: true, alreadyClaimed: true }));
+431|    expect(db.teacher_wallet_ledger.create).toHaveBeenCalledTimes(1);
+432|    expect(db.e_booklet_teacher_terms_acceptances.create).toHaveBeenCalledWith({ data: expect.objectContaining({ acceptance_type: "reward_claim", terms_snapshot: "Reward claim terms v1" }) });
+433|    expect(db.e_booklet_milestone_achievements.updateMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 6, teacher_id: 9, claimed_at: null } }));
+434|    expect(db.$transaction).toHaveBeenCalledWith(expect.any(Function), { isolationLevel: "Serializable" });
+435|  });
+436|
+437|  test("concurrent reward claim loser returns already claimed without duplicate acceptance or wallet credit", async () => {
+438|    const db = createDb();
+439|    const achievement = { id: 6, teacher_id: 9, term_id: 1, reward_amount: 75, claimed_at: null, reward_terms_accepted_at: null };
+440|    const claimed = { ...achievement, claimed_at: new Date(), reward_terms_accepted_at: new Date() };
+441|    db.e_booklet_milestone_achievements.findFirst.mockResolvedValueOnce(achievement).mockResolvedValueOnce(claimed);
+442|    db.e_booklet_milestone_achievements.updateMany.mockResolvedValue({ count: 0 });
+443|    const service = new EBookletMilestoneService(db);
+444|
+445|    await expect(service.claimReward(9, 6, { termsAccepted: true })).resolves.toEqual({ claimed: true, alreadyClaimed: true, achievement: claimed });
+446|    expect(db.e_booklet_teacher_terms_acceptances.create).not.toHaveBeenCalled();
+447|    expect(db.teacher_wallet_ledger.create).not.toHaveBeenCalled();
+448|  });
+449|
+450|  test("reward claim ignores concurrent duplicate acceptance after winning atomic claim", async () => {
+451|    const db = createDb();
+452|    const achievement = { id: 6, teacher_id: 9, term_id: 1, reward_amount: 75, claimed_at: null, reward_terms_accepted_at: null };
+453|    const claimed = { ...achievement, claimed_at: new Date(), reward_terms_accepted_at: new Date() };
+454|    db.e_booklet_milestone_achievements.findFirst.mockResolvedValueOnce(achievement).mockResolvedValueOnce(claimed);
+455|    db.e_booklet_milestone_achievements.updateMany.mockResolvedValue({ count: 1 });
+456|    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue(null);
+457|    db.e_booklet_teacher_terms_acceptances.create.mockRejectedValue({ code: "P2002" });
+458|    db.teacher_wallets.upsert.mockResolvedValue({ id: 11, teacher_id: 9, balance: 75 });
+459|    db.teacher_wallet_ledger.findFirst.mockResolvedValue(null);
+460|    db.teacher_wallet_ledger.create.mockResolvedValue({ id: 20, amount: 75, type: "credit", source: "milestone_reward" });
+461|    const service = new EBookletMilestoneService(db);
+462|
+463|    await expect(service.claimReward(9, 6, { termsAccepted: true })).resolves.toEqual(expect.objectContaining({ walletCredit: expect.any(Object) }));
+464|    expect(db.teacher_wallet_ledger.create).toHaveBeenCalledTimes(1);
+465|  });
+466|
+467|  test("milestone reorder refuses to move milestones across terms", async () => {
+468|    const db = createDb();
+469|    db.e_booklet_milestones.findFirst.mockResolvedValue(null);
+470|    const service = new EBookletMilestoneService(db);
+471|
+472|    await expect(service.reorderMilestones(1, [{ id: 99, sortOrder: 1 }])).rejects.toThrow("Milestone not found");
+473|    expect(db.e_booklet_milestones.update).not.toHaveBeenCalled();
+474|  });
+475|
+476|  test("teacher wallet applies to e-booklet purchases using server purchase price and is idempotent per e-booklet purchase", async () => {
+477|    const db = createDb();
+478|    db.teacher_wallets.findUnique.mockResolvedValue({ id: 11, teacher_id: 9, balance: 100 });
+479|    db.e_booklet_purchases.findFirst.mockResolvedValue({ id: 500, teacher_id: 9, price: 200, status: "pending" });
+480|    db.teacher_wallet_ledger.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 22, amount: -40, e_booklet_purchase_id: 500 });
+481|    db.teacher_wallets.updateMany.mockResolvedValue({ count: 1 });
+482|    db.teacher_wallet_ledger.create.mockResolvedValue({ id: 22, amount: -40, type: "debit", source: "order_spend", balance_after: 60 });
+483|    db.e_booklet_purchases.update.mockResolvedValue({ id: 500, price: 160 });
+484|    const service = new TeacherWalletService(db);
+485|
+486|    await expect(service.applyToPurchase({ teacherId: 9, purchaseId: 500, purchaseTotal: 1, requestedAmount: 40, couponApplied: true })).rejects.toThrow("cannot be stacked with coupons");
+487|    await expect(service.applyToPurchase({ teacherId: 9, purchaseId: 500, purchaseTotal: 1, requestedAmount: 40 })).resolves.toEqual(expect.objectContaining({ walletCreditApplied: 40, finalTotal: 160 }));
+488|    await expect(service.applyToPurchase({ teacherId: 9, purchaseId: 500, purchaseTotal: 1, requestedAmount: 40 })).resolves.toEqual(expect.objectContaining({ alreadyApplied: true }));
+489|    expect(db.e_booklet_purchases.findFirst).toHaveBeenCalledWith({ where: { id: 500, teacher_id: 9 } });
+490|    expect(db.purchases.findFirst).not.toHaveBeenCalled();
+491|    expect(db.coupon_usages.findFirst).not.toHaveBeenCalled();
+492|    expect(db.teacher_wallets.updateMany).toHaveBeenCalledWith({ where: { teacher_id: 9, balance: { gte: 40 } }, data: { balance: { decrement: 40 } } });
+493|    expect(db.teacher_wallet_ledger.create).toHaveBeenCalledWith({ data: expect.objectContaining({ teacher_id: 9, wallet_id: 11, amount: -40, e_booklet_purchase_id: 500, type: "debit", source: "order_spend", balance_after: 60 }) });
+494|    expect(db.e_booklet_purchases.update).toHaveBeenCalledWith({ where: { id: 500 }, data: { price: 160, admin_notes: "Wallet credit applied: 40" } });
+495|    expect(db.$transaction).toHaveBeenCalled();
+496|  });
+497|
+498|  test("teacher wallet rejects unowned e-booklet purchases and failed atomic debit", async () => {
+499|    const db = createDb();
+500|    db.teacher_wallets.findUnique.mockResolvedValue({ id: 11, teacher_id: 9, balance: 100 });
+501|    db.e_booklet_purchases.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 500, teacher_id: 9, price: 200, status: "pending" });
+502|    db.teacher_wallets.updateMany.mockResolvedValue({ count: 0 });
+503|    const service = new TeacherWalletService(db);
+504|
+505|    await expect(service.applyToPurchase({ teacherId: 9, purchaseId: 999, purchaseTotal: 200, requestedAmount: 40 })).rejects.toThrow("E-booklet purchase not found");
+506|    await expect(service.applyToPurchase({ teacherId: 9, purchaseId: 500, purchaseTotal: 200, requestedAmount: 40 })).rejects.toThrow("available credit");
+507|    expect(db.e_booklet_purchases.update).not.toHaveBeenCalled();
+508|  });
+509|
+510|  test("hash lookup normalizes codes without persisting plaintext", () => {
+511|    expect(hashEBookletAccessCode(" klm-abc123 ")).toBe(hashEBookletAccessCode("KLM-ABC123"));
+512|  });
+513|});
+
+===== FILE: kalima-platform/backend/tests/e-booklet/e-booklet-phase4-notifications.spec.ts (210 lines) =====
+1|jest.mock("../../src/libs/redis/socketNotificationEmitter", () => ({
+2|  emitNotificationToUser: jest.fn(),
+3|  emitNotificationToUsers: jest.fn(),
+4|}));
+5|
+6|import { EBookletMilestoneService } from "../../src/apps/store-api/services/e-booklet-milestone.service";
+7|import { EBookletMilestoneNotificationService } from "../../src/apps/store-api/services/e-booklet-milestone-notification.service";
+8|import {
+9|  getEBookletMilestoneAdminEmailHtml,
+10|  getEBookletMilestoneAdminEmailSubject,
+11|  getEBookletMilestoneTeacherEmailHtml,
+12|  getEBookletMilestoneTeacherEmailSubject,
+13|} from "../../src/apps/store-api/emails/templates/e-booklet-milestone-achievement.template";
+14|import { notification_key_enum } from "../../src/apps/store-api/generated/prisma/client";
+15|import { emitNotificationToUser, emitNotificationToUsers } from "../../src/libs/redis/socketNotificationEmitter";
+16|
+17|function createDb(overrides: Record<string, unknown> = {}) {
+18|  const db: any = {
+19|    e_booklet_terms: { findFirst: jest.fn() },
+20|    e_booklet_access_code_redemptions: { count: jest.fn() },
+21|    e_booklet_milestones: { findMany: jest.fn() },
+22|    e_booklet_milestone_achievements: { findUnique: jest.fn(), create: jest.fn() },
+23|    notifications: { create: jest.fn(), createMany: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
+24|    users: { findUnique: jest.fn(), findMany: jest.fn() },
+25|    user_roles: { findMany: jest.fn() },
+26|    ...overrides,
+27|  };
+28|  db.$transaction = jest.fn(async (callback: (tx: any) => Promise<unknown>) => callback(db));
+29|  return db;
+30|}
+31|
+32|beforeEach(() => {
+33|  jest.clearAllMocks();
+34|});
+35|
+36|describe("Phase 4 e-booklet milestone notifications and emails", () => {
+37|  test("milestone evaluation creates teacher/admin notification rows, emits sockets, and sends milestone emails after achievement", async () => {
+38|    const db = createDb();
+39|    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, name: "June Term", status: "active" });
+40|    db.e_booklet_access_code_redemptions.count.mockResolvedValue(10);
+41|    db.e_booklet_milestones.findMany.mockResolvedValue([
+42|      { id: 2, term_id: 1, title: "10 paid readers", target_paid_redemptions: 10, milestone_price: 180, previous_price_snapshot: 220, reward_amount_snapshot: 40, active: true, notification_recipients: "teacher_and_admins" },
+43|    ]);
+44|    db.e_booklet_milestone_achievements.findUnique.mockResolvedValue(null);
+45|    db.e_booklet_milestone_achievements.create.mockResolvedValue({ id: 7, teacher_id: 9, term_id: 1, milestone_id: 2, reward_amount: 40, paid_redemptions_snapshot: 10 });
+46|    db.notifications.findFirst.mockResolvedValue(null);
+47|    db.notifications.create.mockResolvedValue({ id: 70, category: 8, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ACHIEVED, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/teacher/e-booklets/milestones/7", created_at: new Date("2026-06-14T00:00:00.000Z") });
+48|    db.users.findUnique.mockResolvedValue({ id: 9, name: "Teacher One", email: "teacher@example.com" });
+49|    db.users.findMany.mockResolvedValue([
+50|      { id: 1, name: "Admin", email: "admin@example.com" },
+51|      { id: 2, name: "Sub", email: "sub@example.com" },
+52|    ]);
+53|    const emailService = { sendEBookletMilestoneTeacherEmail: jest.fn().mockResolvedValue(true), sendEBookletMilestoneAdminEmail: jest.fn().mockResolvedValue(true) };
+54|    const notifier = new EBookletMilestoneNotificationService(db, emailService as any);
+55|    const service = new EBookletMilestoneService(db, { milestoneNotifier: notifier });
+56|    const io = {} as any;
+57|
+58|    const result: any = await service.evaluateTeacherMilestones(9, 1, { io });
+59|
+60|    expect(result.awarded).toHaveLength(1);
+61|    expect(db.notifications.create).toHaveBeenCalledWith({ data: expect.objectContaining({ user_id: 9, category: expect.any(Number), message_key: notification_key_enum.E_BOOKLET_MILESTONE_ACHIEVED, entity_type: "e_booklet_milestone_achievement", entity_id: 7 }) });
+62|    expect(db.notifications.createMany).toHaveBeenCalledWith({ data: expect.arrayContaining([
+63|      expect.objectContaining({ user_id: 1, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ADMIN_ALERT, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/admin/e-booklets/milestones/7" }),
+64|      expect.objectContaining({ user_id: 2, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ADMIN_ALERT, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/admin/e-booklets/milestones/7" }),
+65|    ]) });
+66|    expect(emitNotificationToUser).toHaveBeenCalledWith(io, 9, expect.objectContaining({ id: 70, entity_id: 7 }));
+67|    expect(emitNotificationToUsers).toHaveBeenCalledWith(io, [1, 2], expect.objectContaining({ entity_id: 7, target_link: "/admin/e-booklets/milestones/7" }));
+68|    expect(emailService.sendEBookletMilestoneTeacherEmail).toHaveBeenCalledWith("teacher@example.com", expect.objectContaining({ teacherName: "Teacher One", milestoneTitle: "10 paid readers", rewardAmount: 40, dashboardUrl: "/teacher/e-booklets/milestones/7" }));
+69|    expect(emailService.sendEBookletMilestoneAdminEmail).toHaveBeenCalledWith("admin@example.com", expect.objectContaining({ dashboardUrl: "/admin/e-booklets/milestones/7" }));
+70|    expect(emailService.sendEBookletMilestoneAdminEmail).toHaveBeenCalledTimes(2);
+71|  });
+72|
+73|  test("admin in-app notifications include admins without email and legacy null is_deleted rows", async () => {
+74|    const db = createDb();
+75|    db.notifications.findFirst.mockResolvedValue(null);
+76|    db.notifications.create.mockResolvedValue({ id: 70, category: 8, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ACHIEVED, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/teacher/e-booklets/milestones/7", created_at: null });
+77|    db.users.findUnique.mockResolvedValue({ id: 9, name: "Teacher One", email: "teacher@example.com" });
+78|    db.users.findMany.mockResolvedValue([
+79|      { id: 1, name: "Admin With Email", email: "admin@example.com" },
+80|      { id: 2, name: "Admin No Email", email: null },
+81|    ]);
+82|    const emailService = { sendEBookletMilestoneTeacherEmail: jest.fn().mockResolvedValue(true), sendEBookletMilestoneAdminEmail: jest.fn().mockResolvedValue(true) };
+83|    const notifier = new EBookletMilestoneNotificationService(db, emailService as any);
+84|
+85|    await notifier.notifyMilestoneAchievements([{ id: 7, teacher_id: 9, term_id: 1, milestone_id: 2, reward_amount: 40, paid_redemptions_snapshot: 10 }], { term: { id: 1, name: "June Term" }, milestones: [{ id: 2, title: "10 paid readers" }] });
+86|
+87|    expect(db.users.findMany).toHaveBeenCalledWith(expect.objectContaining({
+88|      where: expect.objectContaining({
+89|        user_roles: { some: { portal: "store", role: { in: ["Admin", "SubAdmin"] } } },
+90|        OR: [{ is_deleted: false }, { is_deleted: null }],
+91|      }),
+92|    }));
+93|    expect(JSON.stringify(db.users.findMany.mock.calls[0][0].where)).not.toContain("email");
+94|    expect(db.notifications.createMany).toHaveBeenCalledWith({ data: expect.arrayContaining([
+95|      expect.objectContaining({ user_id: 1 }),
+96|      expect.objectContaining({ user_id: 2 }),
+97|    ]) });
+98|    expect(emailService.sendEBookletMilestoneAdminEmail).toHaveBeenCalledTimes(1);
+99|    expect(emailService.sendEBookletMilestoneAdminEmail).toHaveBeenCalledWith("admin@example.com", expect.any(Object));
+100|  });
+101|
+102|  test("existing achievements are not re-notified during regular milestone evaluation", async () => {
+103|    const db = createDb();
+104|    const existing = { id: 7, teacher_id: 9, term_id: 1, milestone_id: 2, reward_amount: 40, paid_redemptions_snapshot: 10 };
+105|    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, name: "June Term", status: "active" });
+106|    db.e_booklet_access_code_redemptions.count.mockResolvedValue(10);
+107|    db.e_booklet_milestones.findMany.mockResolvedValue([{ id: 2, term_id: 1, title: "10 paid readers", target_paid_redemptions: 10, reward_amount_snapshot: 40, active: true, notification_recipients: "teacher_and_admins" }]);
+108|    db.e_booklet_milestone_achievements.findUnique.mockResolvedValue(existing);
+109|    const milestoneNotifier = { notifyMilestoneAchievements: jest.fn().mockResolvedValue(undefined) };
+110|    const service = new EBookletMilestoneService(db, { milestoneNotifier });
+111|
+112|    const result: any = await service.evaluateTeacherMilestones(9, 1);
+113|
+114|    expect(result.awarded).toHaveLength(0);
+115|    expect(db.e_booklet_milestone_achievements.create).not.toHaveBeenCalled();
+116|    expect(milestoneNotifier.notifyMilestoneAchievements).not.toHaveBeenCalled();
+117|  });
+118|
+119|  test("admin notification retry does not create duplicate admin notification rows", async () => {
+120|    const db = createDb();
+121|    db.notifications.findFirst.mockResolvedValue({ id: 70, category: 8, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ACHIEVED, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/teacher/e-booklets/milestones/7", created_at: null });
+122|    db.notifications.findMany
+123|      .mockResolvedValueOnce([])
+124|      .mockResolvedValueOnce([{ user_id: 1 }, { user_id: 2 }]);
+125|    db.users.findUnique.mockResolvedValue({ id: 9, name: "Teacher One", email: null });
+126|    db.users.findMany.mockResolvedValue([
+127|      { id: 1, name: "Admin", email: null },
+128|      { id: 2, name: "Sub", email: null },
+129|    ]);
+130|    const emailService = { sendEBookletMilestoneTeacherEmail: jest.fn().mockResolvedValue(true), sendEBookletMilestoneAdminEmail: jest.fn().mockResolvedValue(true) };
+131|    const notifier = new EBookletMilestoneNotificationService(db, emailService as any);
+132|    const achievement = { id: 7, teacher_id: 9, term_id: 1, milestone_id: 2, reward_amount: 40, paid_redemptions_snapshot: 10 };
+133|
+134|    await notifier.notifyMilestoneAchievements([achievement], { milestones: [{ id: 2, title: "10 paid readers" }] });
+135|    await notifier.notifyMilestoneAchievements([achievement], { milestones: [{ id: 2, title: "10 paid readers" }] });
+136|
+137|    expect(db.notifications.createMany).toHaveBeenCalledTimes(1);
+138|    expect(db.notifications.createMany).toHaveBeenCalledWith({ data: expect.arrayContaining([
+139|      expect.objectContaining({ user_id: 1, entity_id: 7 }),
+140|      expect.objectContaining({ user_id: 2, entity_id: 7 }),
+141|    ]) });
+142|  });
+143|
+144|  test("notification retry does not resend milestone emails or socket events when all notification rows already exist", async () => {
+145|    const db = createDb();
+146|    const teacherNotification = { id: 70, category: 8, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ACHIEVED, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/teacher/e-booklets/milestones/7", created_at: null };
+147|    db.notifications.findFirst.mockResolvedValue(teacherNotification);
+148|    db.notifications.findMany.mockResolvedValue([{ user_id: 1 }, { user_id: 2 }]);
+149|    db.users.findUnique.mockResolvedValue({ id: 9, name: "Teacher One", email: "teacher@example.com" });
+150|    db.users.findMany.mockResolvedValue([
+151|      { id: 1, name: "Admin", email: "admin@example.com" },
+152|      { id: 2, name: "Sub", email: "sub@example.com" },
+153|    ]);
+154|    const emailService = { sendEBookletMilestoneTeacherEmail: jest.fn().mockResolvedValue(true), sendEBookletMilestoneAdminEmail: jest.fn().mockResolvedValue(true) };
+155|    const notifier = new EBookletMilestoneNotificationService(db, emailService as any);
+156|    const achievement = { id: 7, teacher_id: 9, term_id: 1, milestone_id: 2, reward_amount: 40, paid_redemptions_snapshot: 10 };
+157|
+158|    await notifier.notifyMilestoneAchievements([achievement], { milestones: [{ id: 2, title: "10 paid readers" }], io: {} as any });
+159|
+160|    expect(db.notifications.create).not.toHaveBeenCalled();
+161|    expect(db.notifications.createMany).not.toHaveBeenCalled();
+162|    expect(emitNotificationToUser).not.toHaveBeenCalled();
+163|    expect(emitNotificationToUsers).not.toHaveBeenCalled();
+164|    expect(emailService.sendEBookletMilestoneTeacherEmail).not.toHaveBeenCalled();
+165|    expect(emailService.sendEBookletMilestoneAdminEmail).not.toHaveBeenCalled();
+166|  });
+167|
+168|  test("admins-only milestone policy suppresses teacher notification email and socket while notifying admins", async () => {
+169|    const db = createDb();
+170|    db.notifications.findMany.mockResolvedValue([]);
+171|    db.users.findUnique.mockResolvedValue({ id: 9, name: "Teacher One", email: "teacher@example.com" });
+172|    db.users.findMany.mockResolvedValue([{ id: 1, name: "Admin", email: "admin@example.com" }]);
+173|    const emailService = { sendEBookletMilestoneTeacherEmail: jest.fn().mockResolvedValue(true), sendEBookletMilestoneAdminEmail: jest.fn().mockResolvedValue(true) };
+174|    const notifier = new EBookletMilestoneNotificationService(db, emailService as any);
+175|    const io = {} as any;
+176|
+177|    await notifier.notifyMilestoneAchievements([{ id: 7, teacher_id: 9, term_id: 1, milestone_id: 2, reward_amount: 40, paid_redemptions_snapshot: 10, notification_recipients: "admins" }], { milestones: [{ id: 2, title: "10 paid readers" }], io });
+178|
+179|    expect(db.notifications.create).not.toHaveBeenCalled();
+180|    expect(emitNotificationToUser).not.toHaveBeenCalled();
+181|    expect(emailService.sendEBookletMilestoneTeacherEmail).not.toHaveBeenCalled();
+182|    expect(db.notifications.createMany).toHaveBeenCalledWith({ data: [expect.objectContaining({ user_id: 1, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ADMIN_ALERT })] });
+183|    expect(emitNotificationToUsers).toHaveBeenCalledWith(io, [1], expect.objectContaining({ entity_id: 7 }));
+184|    expect(emailService.sendEBookletMilestoneAdminEmail).toHaveBeenCalledWith("admin@example.com", expect.any(Object));
+185|  });
+186|
+187|  test("milestone email templates escape html content and reject unsafe href values", () => {
+188|    const data = { teacherName: "<img src=x onerror=alert(1)>", milestoneTitle: "<b>10 paid readers</b>", paidRedemptions: 10, rewardAmount: 40, termName: "June & <Term>", dashboardUrl: "javascript:alert(1)" };
+189|
+190|    const teacherHtml = getEBookletMilestoneTeacherEmailHtml(data);
+191|    const adminHtml = getEBookletMilestoneAdminEmailHtml(data);
+192|
+193|    expect(teacherHtml).not.toContain("<img");
+194|    expect(teacherHtml).not.toContain("<b>10 paid readers</b>");
+195|    expect(teacherHtml).not.toContain("javascript:alert");
+196|    expect(teacherHtml).toContain("&lt;img src=x onerror=alert(1)&gt;");
+197|    expect(teacherHtml).toContain("June &amp; &lt;Term&gt;");
+198|    expect(adminHtml).not.toContain("javascript:alert");
+199|  });
+200|
+201|  test("milestone email templates include teacher, milestone, reward, and admin context", () => {
+202|    const data = { teacherName: "Teacher One", milestoneTitle: "10 paid readers", paidRedemptions: 10, rewardAmount: 40, termName: "June Term", dashboardUrl: "https://kalima.example/teacher/e-booklets" };
+203|
+204|    expect(getEBookletMilestoneTeacherEmailSubject(data)).toContain("10 paid readers");
+205|    expect(getEBookletMilestoneTeacherEmailHtml(data)).toContain("Teacher One");
+206|    expect(getEBookletMilestoneTeacherEmailHtml(data)).toContain("40");
+207|    expect(getEBookletMilestoneAdminEmailSubject(data)).toContain("Teacher One");
+208|    expect(getEBookletMilestoneAdminEmailHtml(data)).toContain("10 paid readers");
+209|  });
+210|});

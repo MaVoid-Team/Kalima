@@ -1,0 +1,194 @@
+{
+  "hero": {
+    "title": "كل ما تحتاجه لرحلتك",
+    "titleHighlight": "التعليمية.",
+    "subtitle": "كتب دراسية، مذكرات، أدوات مكتبية، وموارد تعليمية لجميع المراحل الدراسية.",
+    "booksIllustration": "رسم توضيحي للكتب",
+    "tagline": "اكتشف واشتري المنتجات والكتب من جميع الأقسام.",
+    "searchPlaceholder": "ابحث عن كتب دراسية، قوالب، أو أدوات مكتبية...",
+    "searchButton": "بحث",
+    "popular": "الشائع:",
+    "tags": {
+      "ipadPlanners": "مخططات الآيباد",
+      "stemKits": "مجموعات STEM",
+      "math101": "رياضيات 101",
+      "artSupplies": "أدوات فنية"
+    },
+    "noResults": "لا توجد نتائج.",
+    "suggestions": "اقتراحات"
+  },
+  "categories": {
+    "allSections": "جميع الأقسام",
+    "allSubSections": "جميع الأقسام الفرعية"
+  },
+  "sidebar": {
+    "allCategories": "جميع الفئات"
+  },
+  "loading": {
+    "products": "جارٍ تحميل المنتجات..."
+  },
+  "search": {
+    "placeholder": "ابحث عن المنتجات..."
+  },
+  "sections": {
+    "trending": {
+      "title": "الأكثر رواجاً الآن",
+      "viewAll": "عرض الكل"
+    },
+    "newArrivals": {
+      "title": "وصل حديثاً",
+      "viewAll": "عرض الكل"
+    },
+    "Designs": "تصاميم",
+    "Books": "كتب",
+    "default": "قسم",
+    "Courses": "كورسات",
+    "Gifts": "هدايا",
+    "Printing": "طباعة",
+    "Software": "برمجيات"
+  },
+  "promo": {
+    "title": "خصم الطلبات الجماعية",
+    "description": "احصل على خصم 20% عند طلب مستلزمات للصف بأكمله.",
+    "cta": "اعرف المزيد"
+  },
+  "product": {
+    "newBadge": "جديد",
+    "discounts": "خصم",
+    "currency": "ج.م",
+    "viewDetails": "عرض التفاصيل",
+    "addToCart": "أضف للسلة",
+    "buyNow": "اشتر الآن",
+    "purchased": "تم الشراء",
+    "new": "جديد",
+    "off": "خصم",
+    "cart": "العربة",
+    "comingSoon": "قريباً"
+  },
+  "countdown": {
+    "days": "ي",
+    "hours": "س",
+    "minutes": "د",
+    "seconds": "ث"
+  },
+  "products": {
+    "trending": {
+      "calculus": {
+        "title": "كتاب حساب التفاضل والتكامل المتقدم ",
+        "category": "موارد أكاديمية"
+      },
+      "pens": {
+        "title": "طقم أقلام مريح",
+        "category": "أدوات مكتبية"
+      },
+      "notebook": {
+        "title": "دفتر رسوم بيانية",
+        "category": "مستلزمات"
+      },
+      "lamp": {
+        "title": "مصباح دراسة",
+        "category": "إكسسوارات"
+      }
+    },
+    "newArrivals": {
+      "agenda": {
+        "title": "أجندة رقمية 2024",
+        "category": "قوالب رقمية"
+      },
+      "chemistry": {
+        "title": "مجموعة مختبر الكيمياء",
+        "category": "مجموعات علمية"
+      },
+      "books": {
+        "title": "مجموعة الكلاسيكيات الأدبية",
+        "category": "كتب"
+      },
+      "markers": {
+        "title": "أقلام تحديد دقيقة",
+        "category": "مستلزمات فنية"
+      }
+    }
+  },
+  "emptyState": {
+    "title": "لا توجد عناصر",
+    "description": "حاول تعديل معايير البحث أو الفلتر"
+  },
+  "pagination": {
+    "previous": "السابق",
+    "prev": "السابق",
+    "next": "التالي",
+    "page": "صفحة",
+    "of": "من"
+  },
+  "common": {
+    "back": "رجوع"
+  },
+  "breadcrumbs": {
+    "home": "الرئيسية",
+    "digitalProducts": "المنتجات الرقمية",
+    "samples": "العينات"
+  },
+  "errors": {
+    "loadingError": "خطأ في تحميل البيانات",
+    "fetchErrorLog": "خطأ في جلب البيانات:",
+    "addToCartFailed": "فشل في الإضافة للسلة"
+  },
+  "success": {
+    "addedToCart": "تمت الإضافة للسلة بنجاح!"
+  },
+  "empty": {
+    "noProducts": "لا توجد منتجات.",
+    "tryDifferentSearch": "جرب مصطلح بحث مختلف."
+  },
+  "navigation": {
+    "goBack": "رجوع"
+  },
+  "samples": {
+    "heroTitle": "استكشف العينات المجانية",
+    "heroSubtitle": "قم بمعاينة وتنزيل موارد ونماذج عالية الجودة قبل الشراء.",
+    "availableSamples": "العينات المتاحة",
+    "count": "عينات",
+    "noSamples": "لا توجد عينات متاحة.",
+    "view": "معاينة",
+    "download": "تنزيل",
+    "hq": "جودة عالية",
+    "lq": "جودة منخفضة",
+    "noNestedSamples": "لا توجد عينات متاحة في هذا القسم بعد.",
+    "addFromProduct": "يمكنك إضافة عينات لهذا القسم من صفحة تفاصيل المنتج.",
+    "mediaTypes": {
+      "pdf": "PDF",
+      "image": "صورة",
+      "video": "فيديو",
+      "word": "ملف Word",
+      "powerpoint": "ملف PowerPoint",
+      "audio": "ملف صوتي",
+      "Video": "فيديو",
+      "Audio": "ملف صوتي",
+      "Image": "صورة",
+      "Document": "مستند"
+    }
+  },
+  "samplePage": {
+    "notFound": "العينة غير موجودة",
+    "backToMarket": "العودة إلى المتجر",
+    "backToSample": "تفاصيل العينة",
+    "download": "تنزيل",
+    "downloadFile": "تنزيل الملف",
+    "previewUnavailable": "المعاينة غير متاحة لهذا النوع من الملفات.",
+    "sampleInfo": "معلومات العينة",
+    "fileName": "اسم الملف",
+    "fileSize": "حجم الملف",
+    "fileType": "نوع الملف",
+    "uploadDate": "تاريخ الرفع",
+    "productInfo": "معلومات المنتج",
+    "productName": "اسم المنتج",
+    "productType": "نوع المنتج",
+    "price": "السعر",
+    "serial": "الرقم التسلسلي",
+    "viewProduct": "عرض المنتج",
+    "fullscreen": "ملء الشاشة",
+    "exitFullscreen": "خروج من ملء الشاشة",
+    "fullPreview": "معاينة كاملة",
+    "sampleDetails": "تفاصيل العينة"
+  }
+}

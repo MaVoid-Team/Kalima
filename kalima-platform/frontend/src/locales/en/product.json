@@ -1,0 +1,147 @@
+{
+  "breadcrumbs": {
+    "home": "Home",
+    "digitalProducts": "Digital Products",
+    "scienceKits": "Science Kits"
+  },
+  "loading": "Loading product...",
+  "notFound": "Product not found.",
+  "variants": {
+    "format": "Format",
+    "kitAccentColor": "Kit Accent Color"
+  },
+  "types": {
+    "Product": "Product",
+    "Book": "Book"
+  },
+  "formats": {
+    "physical": "Physical Kit",
+    "digital": "Digital Only",
+    "bundle": "Bundle (Physical + PDF)"
+  },
+  "actions": {
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "viewSample": "View Sample",
+    "follow": "Follow",
+    "contactWhatsApp": "Message",
+    "contactWhatsAppLong": "Message Admin on WhatsApp",
+    "contactWhatsAppShort": "Message",
+    "whatsappTemplate": "Hello, I am interested in the following product:\nProduct Name: {{title}}\n{{serial}}\nPrice: {{price}} {{currency}}\nURL: {{url}}\n\nCan you please provide more information?",
+    "pendingReview": "Your account is pending admin review. You can browse freely but cannot make purchases until your account is approved.",
+    "viewOptions": "View Options",
+    "backToMarket": "Back to Market"
+  },
+  "info": {
+    "sku": "SKU",
+    "inStock": "In Stock",
+    "readyToShip": "Ready to ship",
+    "save": "Save",
+    "totalPrice": "Total Price",
+    "view": "Product view",
+    "thumbnail": "Thumbnail",
+    "reviews": "reviews",
+    "createdBy": "Created by",
+    "currency": "EGP",
+    "serial": "Serial",
+    "requiredInfo": "Required Information for Purchase:",
+    "perks": "Product Features:"
+  },
+  "trustSignals": {
+    "secureTransaction": "Secure Transaction",
+    "educationVerified": "Education Verified",
+    "freeShipping": "Free Shipping over $100",
+    "thirtyDayReturns": "30-Day Returns"
+  },
+  "tabs": {
+    "description": "Description",
+    "specifications": "Specifications",
+    "reviews": "Reviews",
+    "resources": "Educator Resources"
+  },
+  "description": {
+    "whatsIncluded": "What's Included?",
+    "educatorNote": "Educator Note",
+    "educatorNoteText": "This kit is eligible for Title I funding. Please contact our support team for a formal quote to submit with your purchase order.",
+    "engagementText": "Engage your students with real-world scientific inquiry. The materials provided are durable, safe, and specifically curated to foster curiosity and critical thinking skills in young learners."
+  },
+  "specifications": {
+    "title": "Quick Specs",
+    "gradeLevel": "Grade Level",
+    "subject": "Subject",
+    "language": "Language",
+    "isbn": "ISBN",
+    "publicationDate": "Publication Date"
+  },
+  "reviews": {
+    "basedOn": "Based on {{count}} reviews",
+    "readAll": "Read all {{count}} reviews",
+    "seeAll": "See All",
+    "verifiedBuyer": "✓ Verified Buyer",
+    "weeksAgo": "{{count}} weeks ago",
+    "monthAgo": "{{count}} month ago",
+    "monthsAgo": "{{count}} months ago",
+    "title": "Reviews",
+    "rating": "Rating",
+    "reviewText": "Review",
+    "reviewPlaceholder": "Share your experience with this product...",
+    "submit": "Submit Review",
+    "submitReview": "Submit Review",
+    "updateReview": "Update Review",
+    "writeReview": "Write a Review",
+    "noReviews": "No reviews yet",
+    "beFirstToReview": "Be the first to review this product",
+    "yourReview": "Your Review",
+    "anonymousUser": "Anonymous User",
+    "deleteConfirm": "Are you sure you want to delete this review?",
+    "loginToReview": "Please log in to write reviews",
+    "loginAction": "Log in",
+    "reasons": {
+      "noConfirmedPurchase": "You can only review products you have purchased and that have been confirmed",
+      "notAuthenticated": "You must be logged in to write a review",
+      "alreadyReviewed": "You have already reviewed this product",
+      "cannotReview": "You cannot review this product"
+    },
+    "sampleReviews": [
+      {
+        "author": "Jennifer Smith",
+        "initials": "JS",
+        "rating": 5,
+        "timeAgo": "2 weeks ago",
+        "text": "Excellent kit! My 5th graders loved the volcano experiment. The materials are high quality and the instructions were very clear."
+      },
+      {
+        "author": "Mark K.",
+        "initials": "MK",
+        "rating": 5,
+        "timeAgo": "1 month ago",
+        "text": "Great value for the price. The digital resources are a nice bonus, though I wish the physical manual was spiral bound."
+      }
+    ]
+  },
+  "resources": {
+    "placeholder": "Additional educator resources and downloadable materials will be available here."
+  },
+  "badges": {
+    "bestSeller": "Best Seller",
+    "interactive": "Interactive",
+    "comingSoon": "Coming Soon"
+  },
+  "booklet": {
+    "selectFormat": "SELECT FORMAT",
+    "aboutResource": "About this Resource",
+    "curriculumAlignment": "Curriculum Alignment",
+    "fileDetails": "File Details",
+    "publisherInfo": "Publisher Info",
+    "saveToPlan": "Save to Plan"
+  },
+  "common": {
+    "cancel": "Cancel"
+  },
+  "countdown": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s"
+  }
+}
