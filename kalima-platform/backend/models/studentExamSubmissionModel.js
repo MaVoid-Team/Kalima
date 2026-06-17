@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy exam submission model.
 const mongoose = require("mongoose");
 
 const studentExamSubmissionSchema = new mongoose.Schema(
@@ -15,12 +18,12 @@ const studentExamSubmissionSchema = new mongoose.Schema(
     type: {
       type: String,
       required: true,
-      enum: ['exam', 'homework'],
-      default: 'exam'
+      enum: ["exam", "homework"],
+      default: "exam",
     },
     config: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "LecturerExamConfig"
+      ref: "LecturerExamConfig",
     },
     score: {
       type: Number,
@@ -49,16 +52,22 @@ const studentExamSubmissionSchema = new mongoose.Schema(
     verifiedAt: {
       type: Date,
       default: Date.now,
-    }
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Updated compound index to include type field for uniqueness
-studentExamSubmissionSchema.index({ student: 1, lecture: 1, type: 1 }, { unique: true });
+studentExamSubmissionSchema.index(
+  { student: 1, lecture: 1, type: 1 },
+  { unique: true },
+);
 studentExamSubmissionSchema.index({ lecture: 1, submittedAt: -1 });
 studentExamSubmissionSchema.index({ type: 1, passed: 1 });
 
-module.exports = mongoose.model("StudentExamSubmission", studentExamSubmissionSchema);
+module.exports = mongoose.model(
+  "StudentExamSubmission",
+  studentExamSubmissionSchema,
+);

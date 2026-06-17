@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared registration logic.
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel.js");
 const Parent = require("../models/parentModel.js");
@@ -306,14 +309,11 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       break;
     }
     case "student":
-      if (newUser.level === "") {
-        delete newUser.level;
-      }
-      if (newUser.level) {
-        const level = await Level.findById(newUser.level);
-        if (!level)
-          return next(new AppError("There is no level with this id", 404));
-      }
+      if (!newUser.level)
+        return next(new AppError("Level is required for student role", 400));
+      const level = await Level.findById(newUser.level);
+      if (!level)
+        return next(new AppError("There is no level with this id", 404));
       user = await Student.create(newUser);
       break;
     case "parent":

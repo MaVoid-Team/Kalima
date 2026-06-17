@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy admin dashboard routes.
 const adminDashboardController = require("../controllers/adminDashboardController");
 const express = require("express");
 const router = express.Router();

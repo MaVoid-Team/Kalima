@@ -1,0 +1,1284 @@
+
+===== FILE: kalima-platform/frontend/src/locales/en/eBooklets.json (731 lines) =====
+1|{
+2|  "common": {
+3|    "kalima": "Kalima",
+4|    "eBooklet": "E-Booklet",
+5|    "eBooklets": "E-Booklets",
+6|    "template": "Template",
+7|    "teacher": "Teacher",
+8|    "student": "Student",
+9|    "user": "User",
+10|    "active": "active",
+11|    "draft": "draft",
+12|    "untitled": "Untitled",
+13|    "notUploaded": "Not uploaded",
+14|    "notSaved": "Draft not saved",
+15|    "back": "Back",
+16|    "backToEBooklets": "Back to E-Booklets",
+17|    "backToMyEBooklets": "Back to My E-Booklets",
+18|    "browse": "Browse E-Booklets",
+19|    "close": "Close",
+20|    "refresh": "Refresh",
+21|    "clear": "Clear",
+22|    "clearSearch": "Clear search",
+23|    "previous": "Previous",
+24|    "next": "Next",
+25|    "continue": "Continue",
+26|    "save": "Save",
+27|    "saveDraft": "Save Draft",
+28|    "delete": "Delete",
+29|    "open": "Open",
+30|    "copy": "Copy",
+31|    "upload": "Upload",
+32|    "replace": "Replace",
+33|    "publish": "Publish",
+34|    "publishVersion": "Publish Version",
+35|    "inProgress": "In Progress",
+36|    "allStatuses": "All statuses",
+37|    "status": "Status",
+38|    "version": "Version",
+39|    "price": "Price",
+40|    "pages": "Pages",
+41|    "actions": "Actions",
+42|    "total": "Total",
+43|    "subtotal": "Subtotal",
+44|    "payment": "Payment",
+45|    "manual": "Manual",
+46|    "quantity": "Quantity",
+47|    "access": "Access",
+48|    "file": "File",
+49|    "private": "Private",
+50|    "invite": "Invite",
+51|    "delivery": "Delivery",
+52|    "page": "Page",
+53|    "pageOf": "Page {{page}} of {{total}}",
+54|    "pageCount": "{{count}} pages",
+55|    "pageCountOne": "{{count}} page",
+56|    "hotspotCount": "{{count}} hotspots",
+57|    "noDownload": "No download",
+58|    "searchResultsFor": "Search results for",
+59|    "notEditedYet": "Not edited yet"
+60|  },
+61|  "statuses": {
+62|    "all": "All statuses",
+63|    "draft": "Draft",
+64|    "published": "Published",
+65|    "archived": "Archived",
+66|    "pending": "Pending",
+67|    "awaiting_payment": "Awaiting payment",
+68|    "paid": "Paid",
+69|    "needs_branding_info": "Needs branding info",
+70|    "customization_in_progress": "Customization in progress",
+71|    "ready": "Ready",
+72|    "cancelled": "Cancelled",
+73|    "rejected": "Rejected",
+74|    "active": "Active",
+75|    "disabled": "Disabled",
+76|    "revoked": "Revoked"
+77|  },
+78|  "toasts": {
+79|    "templateUpdated": "E-booklet template updated",
+80|    "versionPublished": "E-booklet version published",
+81|    "templateSaved": "E-booklet template saved",
+82|    "versionSaved": "E-booklet version saved",
+83|    "versionUpdated": "E-booklet version updated",
+84|    "hotspotSaved": "Hotspot saved",
+85|    "hotspotUpdated": "Hotspot updated",
+86|    "hotspotRemoved": "Hotspot removed",
+87|    "fileStored": "File stored privately",
+88|    "purchaseUpdated": "E-booklet purchase updated",
+89|    "purchaseMarkedPaid": "E-booklet purchase marked paid",
+90|    "delivered": "E-booklet delivered to teacher",
+91|    "teacherDocumentStored": "Teacher document stored privately",
+92|    "requestSubmitted": "E-booklet request submitted",
+93|    "inviteCreated": "Invite link created",
+94|    "inviteDisabled": "Invite link disabled",
+95|    "studentRevoked": "Student access revoked",
+96|    "accessGranted": "E-booklet access granted",
+97|    "inviteCopied": "Invite link copied",
+98|    "coverUploaded": "Cover image uploaded.",
+99|    "pdfDetected": "Detected {{count}} pages from the uploaded PDF.",
+100|    "quotaUpdated": "Invite quota updated",
+101|    "teacherAccessRevoked": "Teacher access revoked",
+102|    "devicesReset": "Devices reset",
+103|    "deviceAllowanceUpdated": "Device allowance updated",
+104|    "termsAccepted": "Terms accepted",
+105|    "accessCodeCreated": "Access code created",
+106|    "accessCodeCopied": "Access code copied",
+107|    "accessMessageCopied": "WhatsApp message copied",
+108|    "rewardClaimed": "Wallet reward claimed",
+109|    "termSaved": "E-booklet term saved",
+110|    "termActivated": "E-booklet term activated",
+111|    "milestoneSaved": "E-booklet milestone saved",
+112|    "milestonesReordered": "E-booklet milestones reordered"
+113|  },
+114|  "admin": {
+115|    "templates": {
+116|      "title": "E-Booklet Templates",
+117|      "description": "Manage reusable e-booklet templates, versions, purchases, and hotspot structure.",
+118|      "create": "Create E-Booklet",
+119|      "searchPlaceholder": "Search templates",
+120|      "table": {
+121|        "template": "Template",
+122|        "version": "Version",
+123|        "purchases": "Purchases",
+124|        "lastEdited": "Last Edited"
+125|      },
+126|      "loading": "Loading e-booklet templates...",
+127|      "empty": "No e-booklet templates match the current filters.",
+128|      "noDescription": "No description yet",
+129|      "noVersion": "No version",
+130|      "totalTemplates": "{{count}} templates total"
+131|    },
+132|    "editor": {
+133|      "steps": {
+134|        "basic": "Basic Info",
+135|        "file": "Original File",
+136|        "hotspots": "Hotspots",
+137|        "review": "Review"
+138|      },
+139|      "titleCreate": "Create E-Booklet Template",
+140|      "titleEdit": "Edit E-Booklet Template",
+141|      "subtitle": "Hotspots are versioned on the template; teacher PDFs stay separate at delivery.",
+142|      "versionBadge": "Version {{version}}: {{status}}",
+143|      "basic": {
+144|        "title": "Store Listing",
+145|        "description": "This creates the reusable product template shown in the e-booklet store.",
+146|        "templateTitle": "Template title",
+147|        "templateTitlePlaceholder": "Grade 5 Arabic Reading Booklet Template",
+148|        "price": "Price",
+149|        "descriptionLabel": "Description",
+150|        "descriptionPlaceholder": "Describe the booklet, target grade, and included interactive content.",
+151|        "coverImage": "Cover image",
+152|        "coverUploaded": "Cover uploaded (asset #{{id}})",
+153|        "coverEmpty": "Upload a cover image. Private storage asset IDs are managed automatically.",
+154|        "status": "Template status"
+155|      },
+156|      "file": {
+157|        "title": "Original Sample File",
+158|        "description": "Upload the admin sample PDF. Page count and page size are detected automatically for hotspot alignment.",
+159|        "newVersion": "New version",
+160|        "originalDocument": "Original document",
+161|        "uploaded": "PDF uploaded (asset #{{id}})",
+162|        "empty": "Upload a PDF. Page count and page size are detected automatically.",
+163|        "detectedPdf": "Detected PDF",
+164|        "noPdf": "No PDF uploaded",
+165|        "dimensionsPending": "Width and height will appear after upload.",
+166|        "dimensions": "{{width}} x {{height}} pt",
+167|        "saveRequired": "Upload a PDF so page count and page size can be detected before saving.",
+168|        "uploadRequired": "Upload a PDF so page count and page size can be detected."
+169|      },
+170|      "hotspots": {
+171|        "title": "Hotspot Editor",
+172|        "description": "Click a page position, then save the hotspot content in the panel.",
+173|        "renderPending": "Upload and save a PDF to render the page before placing hotspots.",
+174|        "saveBeforePlacing": "Save the original file step before placing hotspots.",
+175|        "contentTitle": "Hotspot Content",
+176|        "pageSummary": "Page {{page}} has {{count}} hotspots.",
+177|        "xPercent": "X %",
+178|        "yPercent": "Y %",
+179|        "radiusPercent": "Radius %",
+180|        "widthPercent": "Width %",
+181|        "heightPercent": "Height %",
+182|        "shape": "Shape",
+183|        "shapes": {
+184|          "circle": "Circle",
+185|          "rectangle": "Rectangle",
+186|          "square": "Square",
+187|          "triangle": "Triangle",
+188|          "oval": "Oval"
+189|        },
+190|        "referenceNumber": "Reference: {{value}}",
+191|        "referenceInput": "Reference #",
+192|        "referenceAuto": "Auto",
+193|        "expandCanvas": "Expand",
+194|        "minimizeCanvas": "Minimize",
+195|        "minimizeControls": "Minimize hotspot controls",
+196|        "restoreControls": "Restore hotspot controls",
+197|        "contentBlocks": "Content blocks",
+198|        "addBlock": "Add block",
+199|        "blockNumber": "Block {{number}}",
+200|        "removeBlock": "Remove block {{number}}",
+201|        "trigger": "Trigger",
+202|        "triggerClick": "Click",
+203|        "triggerHover": "Hover",
+204|        "triggerBoth": "Both",
+205|        "type": "Type",
+206|        "types": {
+207|          "text": "Text note",
+208|          "image": "Image",
+209|          "video": "Video",
+210|          "audio": "Audio",
+211|          "file": "File upload",
+212|          "link": "Link URL",
+213|          "question_answer": "Q&A"
+214|        },
+215|        "titleLabel": "Title",
+216|        "titlePlaceholder": "Optional label",
+217|        "textBody": "Text body",
+218|        "textPlaceholder": "Student-facing text note",
+219|        "mediaAsset": "Media asset",
+220|        "mediaUploaded": "Media uploaded (asset #{{id}})",
+221|        "mediaEmpty": "Upload media for this hotspot.",
+222|        "stopRecording": "Stop recording",
+223|        "recordAudio": "Record audio",
+224|        "audioAutoplay": "Autoplay audio when opened",
+225|        "imageAutoExpand": "Auto-expand image",
+226|        "imageExpandOnClick": "Expand image on click",
+227|        "videoUploaded": "Uploaded video",
+228|        "videoYoutube": "YouTube URL",
+229|        "fontFamily": "Text font",
+230|        "questionPlaceholder": "Question prompt",
+231|        "answerPlaceholder": "Answer {{number}}",
+232|        "correctAnswer": "Correct",
+233|        "allHotspots": "All hotspots",
+234|        "sortedByCreated": "Sorted by creation time",
+235|        "recordingUnavailable": "Audio recording is not available in this browser.",
+236|        "hotspotFallback": "{{type}} hotspot",
+237|        "hotspotButton": "Hotspot {{reference}}: {{type}}",
+238|        "emptyPage": "No hotspots on this page."
+239|      },
+240|      "review": {
+241|        "title": "Review and Publish",
+242|        "description": "Publishing locks this version for new teacher purchases. Existing delivered instances keep their original version.",
+243|        "template": "Template",
+244|        "currentPageHotspots": "Current Page Hotspots",
+245|        "previewChecks": "Admin preview checks",
+246|        "privateOriginal": "Private original document asset: {{value}}",
+247|        "coverAsset": "Cover asset: {{value}}",
+248|        "templateVersion": "Template version: {{value}}",
+249|        "status": "Status: {{value}}"
+250|      },
+251|      "validation": {
+252|        "titleRequired": "Template title is required."
+253|      }
+254|    },
+255|    "purchases": {
+256|      "title": "E-Booklet Purchases",
+257|      "description": "Confirm payment, upload teacher-specific files, validate page counts, and deliver access.",
+258|      "table": {
+259|        "teacher": "Teacher",
+260|        "template": "Template"
+261|      },
+262|      "loading": "Loading e-booklet purchases...",
+263|      "empty": "No e-booklet purchases match this status.",
+264|      "delivery": "Delivery",
+265|      "teacherTitle": "Teacher-specific title",
+266|      "teacherPdf": "Teacher PDF",
+267|      "teacherPdfUploaded": "Teacher PDF uploaded (asset #{{id}})",
+268|      "teacherPdfEmpty": "Upload the teacher PDF. Page count and size are checked automatically.",
+269|      "detectedPages": "Detected pages",
+270|      "uploadPdf": "Upload PDF",
+271|      "templatePages": "template {{count}}",
+272|      "inviteQuota": "Invite quota",
+273|      "adminNotes": "Admin notes",
+274|      "adminNotesPlaceholder": "Payment reference or customization notes",
+275|      "deliver": "Deliver Booklet",
+276|      "selectPurchase": "Select a purchase to deliver.",
+277|      "validation": {
+278|        "detectRequired": "Upload a PDF so the page count and page size can be detected.",
+279|        "pageCountMismatch": "Page count mismatch. Template requires {{expected}} pages, but the uploaded PDF has {{actual}}.",
+280|        "pageSizeMismatch": "Page size mismatch. The uploaded PDF pages must match the template width and height so hotspots align."
+281|      }
+282|    },
+283|    "instances": {
+284|      "title": "Teacher E-Booklet Access",
+285|      "description": "List teachers, delivered e-booklet instances, invite quotas, seats, and devices.",
+286|      "adminViewNote": "Admin View Mode: use normal viewer routes only when an existing impersonation/view-as pattern is available; this page does not create fake impersonation data.",
+287|      "loading": "Loading e-booklet instances...",
+288|      "empty": "No e-booklet instances returned by the backend.",
+289|      "noExpiry": "No expiry",
+290|      "teacherMissing": "Teacher details unavailable",
+291|      "instanceCount": "{{count}} instances",
+292|      "pagination": "Page {{page}} — {{total}} total",
+293|      "expiry": "Expiry",
+294|      "devices": "Devices",
+295|      "revoke": "Revoke",
+296|      "revokeConfirm": "Revoke teacher access for this e-booklet instance?"
+297|    },
+298|    "devices": {
+299|      "title": "E-Booklet Devices",
+300|      "description": "Inspect student devices for an instance, reset with a reason, or grant additional device allowance.",
+301|      "backToInstances": "Back to access list",
+302|      "instanceId": "Instance ID",
+303|      "userId": "User ID",
+304|      "reason": "Reason",
+305|      "reasonPlaceholder": "Example: student replaced phone",
+306|      "allowedDevices": "Allowed devices",
+307|      "allow": "Allow",
+308|      "reset": "Reset",
+309|      "studentsDevices": "Student devices",
+310|      "loading": "Loading devices...",
+311|      "empty": "Enter an instance/user ID or no active devices were returned.",
+312|      "unnamed": "Unnamed device",
+313|      "never": "Never",
+314|      "lastSeen": "Last seen: {{value}}",
+315|      "bound": "Bound: {{value}}"
+316|    },
+317|    "analytics": {
+318|      "title": "E-Booklet Analytics",
+319|      "description": "Global e-booklet analytics with revenue estimates, margin, security, expiry/archive, and operational health.",
+320|      "exportCsv": "Export CSV",
+321|      "sourceBreakdown": "Source breakdown",
+322|      "deviceSecurityTitle": "Device and security",
+323|      "deviceSecurityCopy": "Monitor device-bound opens and access-created events without exposing raw IP or user-agent data.",
+324|      "redactionCopy": "Raw wrong passcodes and detailed per-student ledgers are intentionally hidden from this UI.",
+325|      "expiryArchiveTitle": "Expiry and archive",
+326|      "expiryArchiveCopy": "Use date/source/teacher/instance filters to review expiring or archived operational segments."
+327|    },
+328|    "termsMilestones": {
+329|      "title": "Terms & Milestones",
+330|      "description": "Manage active teacher terms, pricing milestones, rewards, notification recipients, and claim visibility.",
+331|      "activeTerms": "Active terms",
+332|      "milestoneCount": "Milestones",
+333|      "paidRedemptions": "Paid first accesses",
+334|      "termsTitle": "Terms",
+335|      "termsHelp": "Create active teacher terms used before code generation and reward claims.",
+336|      "termName": "Term",
+337|      "termWindow": "Window",
+338|      "openEnded": "Open ended",
+339|      "setActive": "Set active",
+340|      "emptyTerms": "No terms configured yet.",
+341|      "createTerm": "Create term",
+342|      "editTerm": "Edit term",
+343|      "startsAt": "Starts at",
+344|      "endsAt": "Ends at",
+345|      "descriptionLabel": "Description",
+346|      "codeGenerationTerms": "Code-generation terms / policy",
+347|      "rewardClaimTerms": "Reward-claim terms / policy",
+348|      "milestonesTitle": "Dynamic milestones",
+349|      "milestonesHelp": "Configure paid-redemption targets, tier prices, wallet rewards, and order for the selected term.",
+350|      "allTerms": "All terms",
+351|      "milestone": "Milestone",
+352|      "target": "Paid target",
+353|      "pricing": "Pricing tier",
+354|      "reward": "Reward",
+355|      "emptyMilestones": "No milestones configured for this scope.",
+356|      "createMilestone": "Create milestone",
+357|      "editMilestone": "Edit milestone",
+358|      "selectTerm": "Select term",
+359|      "sortOrder": "Sort order",
+360|      "previousPrice": "Previous tier price",
+361|      "milestonePrice": "Milestone price",
+362|      "rewardAmount": "Wallet reward amount",
+363|      "notificationRecipients": "Notification recipients",
+364|      "recipientAdmins": "Admins only",
+365|      "recipientTeacherAdmins": "Teacher and admins",
+366|      "rewardEnabled": "Reward enabled",
+367|      "progressTitle": "Achievement / claim status",
+368|      "achievementCount": "Achievements",
+369|      "claimedCount": "Claimed rewards",
+370|      "teacherId": "Teacher #{{id}}",
+371|      "claimed": "Claimed",
+372|      "unclaimed": "Unclaimed"
+373|    }
+374|  },
+375|  "store": {
+376|    "badge": "Invite-only interactive booklets",
+377|    "heroTitle": "E-booklets built for branded classroom delivery.",
+378|    "heroDescription": "Browse reusable booklet templates, request admin customization, and keep the final PDF private with watermarking, page-by-page access, and invite-controlled student entry.",
+379|    "accessModel": "Access model",
+380|    "templatePlusPdf": "Template plus teacher PDF",
+381|    "features": {
+382|      "text": "Text",
+383|      "image": "Image",
+384|      "video": "Video",
+385|      "audio": "Audio",
+386|      "private": "Private",
+387|      "quota": "Quota"
+388|    },
+389|    "title": "E-booklet store",
+390|    "description": "Separate catalog for interactive booklets. Normal Market product logic is not used here.",
+391|    "searchPlaceholder": "Search e-booklet templates",
+392|    "emptyTitle": "No e-booklets are published yet",
+393|    "emptyDescription": "Published e-booklet templates will appear here after the admin prepares the secure PDF version, cover, price, and hotspot content.",
+394|    "coverFallback": "Interactive booklet",
+395|    "cardDescription": "Interactive PDF booklet delivered by admin with teacher branding and controlled student access.",
+396|    "accessExpires": "Expires {{value}}",
+397|    "noExpiry": "No expiry",
+398|    "add": "Add"
+399|  },
+400|  "details": {
+401|    "coverLabel": "Kalima E-Booklet",
+402|    "secureTemplate": "Secure interactive template",
+403|    "notFoundTitle": "E-booklet not found",
+404|    "notFoundDescription": "The template may be unpublished, archived, or moved out of the public E-Booklet Store.",
+405|    "templateBadge": "E-Booklet Template",
+406|    "descriptionFallback": "A reusable interactive booklet template. After purchase, Kalima admin delivers a teacher-specific PDF while preserving the template hotspot layer.",
+407|    "stats": {
+408|      "pages": "Pages",
+409|      "hotspots": "Hotspots",
+410|      "version": "Version",
+411|      "access": "Access"
+412|    },
+413|    "templatePrice": "Template price",
+414|    "addToCart": "Add to e-booklet cart",
+415|    "includedTitle": "What is included",
+416|    "includedDescription": "The published template carries the reusable hotspot map. Admin delivery adds the teacher-specific PDF, branding, invite quota, and student access controls.",
+417|    "includedItems": [
+418|      "Reusable template version locked at purchase time",
+419|      "Teacher-specific PDF delivered after admin validation",
+420|      "Private page-by-page viewer with no public file URLs",
+421|      "Watermark-ready access for teachers and students",
+422|      "Multi-use invite link model with quota control",
+423|      "Hotspot content loaded only when opened"
+424|    ],
+425|    "hotspotContent": "Hotspot content",
+426|    "hotspotDescription": "Hotspots are rendered from normalized template coordinates, so the teacher PDF can change while the interactive layer stays reusable.",
+427|    "antiDownload": "Downloading is blocked inside Kalima through private storage, authenticated page access, hidden viewer download controls, and watermarking. Screenshots and camera capture cannot be fully prevented by any web platform."
+428|  },
+429|  "cart": {
+430|    "emptyTitle": "Your e-booklet cart is empty",
+431|    "emptyDescription": "Pick one published e-booklet template. Quantity stays fixed at one because every request is customized for one teacher account.",
+432|    "badge": "Separate e-booklet cart",
+433|    "title": "Review your e-booklet request",
+434|    "description": "This cart is isolated from normal Market products. Checkout creates an admin-handled e-booklet purchase request.",
+435|    "itemFallback": "Admin-customized PDF delivery with reusable interactive hotspots.",
+436|    "removeTitle": "Remove e-booklet",
+437|    "templatePrice": "Template price",
+438|    "summary": "Request summary",
+439|    "adminNotice": "Admin will confirm payment, upload the teacher-specific PDF, assign invite quota, then deliver the booklet.",
+440|    "checkout": "Continue to checkout",
+441|    "keepBrowsing": "Keep browsing"
+442|  },
+443|  "checkout": {
+444|    "emptyTitle": "Choose an e-booklet before checkout",
+445|    "emptyDescription": "E-booklet checkout is separate from the Market cart and requires one selected template.",
+446|    "activeVersionMissing": "This e-booklet does not have an active published version.",
+447|    "fieldRequired": "This field is required.",
+448|    "submitError": "Checkout could not be submitted. Please review the form and try again.",
+449|    "successBadge": "Request created",
+450|    "successTitle": "Your e-booklet request is pending admin delivery",
+451|    "successDescription": "Kalima admin will confirm payment, collect or prepare the teacher-specific PDF, validate page count, set invite quota, and deliver the ready booklet to your account.",
+452|    "openTeacherPortal": "Open teacher portal",
+453|    "badge": "E-booklet checkout",
+454|    "title": "Branding and delivery details",
+455|    "description": "This creates an admin-handled request. The booklet becomes usable only after admin payment confirmation and delivery.",
+456|    "fields": {
+457|      "teacherName": "Teacher display name",
+458|      "teacherNameHelper": "Shown in viewer watermarking and invite context.",
+459|      "teacherNamePlaceholder": "Mona Abdelrahman",
+460|      "schoolName": "School or center name",
+461|      "schoolNameHelper": "Optional context for admin delivery.",
+462|      "schoolNamePlaceholder": "Al Noor Learning Center",
+463|      "brandingName": "Branding name on booklet",
+464|      "brandingNameHelper": "The name that should appear on the customized PDF.",
+465|      "brandingNamePlaceholder": "Ms. Mona Arabic",
+466|      "bookletTitle": "Teacher-specific booklet title",
+467|      "bookletTitleHelper": "Used by admin when delivering the final instance.",
+468|      "bookletTitlePlaceholder": "Grade 5 Arabic Reading Practice",
+469|      "contactWhatsapp": "WhatsApp or contact number",
+470|      "contactWhatsappHelper": "Used for manual payment and delivery coordination.",
+471|      "contactWhatsappPlaceholder": "+20 100 482 6194",
+472|      "logoInstructions": "Logo instructions",
+473|      "logoInstructionsHelper": "Paste a logo link or describe what admin should use.",
+474|      "logoInstructionsPlaceholder": "Use my center logo from WhatsApp",
+475|      "notes": "Notes for admin",
+476|      "notesHelper": "Include payment reference, preferred watermark name, or delivery details.",
+477|      "notesPlaceholder": "Payment will be sent manually. Please use the teacher name in the footer watermark."
+478|    },
+479|    "backToCart": "Back to cart",
+480|    "submitting": "Submitting...",
+481|    "submit": "Submit request",
+482|    "selectedTemplate": "Selected template",
+483|    "teacherPdfNotice": "The teacher-specific PDF is uploaded by admin after checkout. It must match the template page count before delivery.",
+484|    "summary": {
+485|      "template": "Template",
+486|      "accessValue": "Invite quota set by admin",
+487|      "deliveryValue": "Manual admin customization"
+488|    }
+489|  },
+490|  "viewer": {
+491|    "titleFallback": "E-Booklet",
+492|    "watermark": "Kalima - {{teacher}} - {{user}} - {{date}}",
+493|    "hotspotsTitle": "Hotspots",
+494|    "hotspotsDescription": "Media loads only after a hotspot is opened.",
+495|    "emptyHotspots": "No hotspots on this page.",
+496|    "hotspotFallback": "Hotspot",
+497|    "noText": "No text content.",
+498|    "privateMedia": "Private media asset #{{id}} is available through the controlled hotspot endpoint.",
+499|    "noAsset": "No private asset is attached to this content.",
+500|    "loadingAsset": "Loading private asset...",
+501|    "assetUnavailable": "This private asset could not be loaded.",
+502|    "questionFallback": "Choose the correct answer.",
+503|    "answerFeedback": "Your answer has been checked.",
+504|    "unsupportedBlock": "Unsupported content block: {{type}}",
+505|    "pageFrameTitle": "E-booklet page {{page}}",
+506|    "deviceBlocked": "This device is not allowed to open this e-booklet.",
+507|    "securePageReady": "Secure page access prepared",
+508|    "securePagePending": "The secure page renderer is preparing this page.",
+509|    "renderMode": "Render mode: {{mode}}",
+510|    "pageTokenExpires": "Page token expires: {{value}}",
+511|    "fileProtected": "This file is shown inside the protected viewer instead of opening a separate download tab."
+512|  },
+513|  "inviteAccept": {
+514|    "accessGranted": "Access granted.",
+515|    "accepted": "Invite accepted.",
+516|    "error": "This e-booklet invite cannot be accepted.",
+517|    "title": "E-Booklet Invite",
+518|    "loading": "Validating invite and quota...",
+519|    "openMyEBooklets": "Open My E-Booklets",
+520|    "description": "Choose an access path. Login is required before passcode entry or purchase.",
+521|    "loginRequired": "Login or register as a student before accepting this e-booklet invite.",
+522|    "login": "Login",
+523|    "register": "Register",
+524|    "metadataUnavailable": "No public invite preview endpoint exists, so internal price is hidden. Effective price/expiry are validated by the backend when you continue.",
+525|    "offlineTitle": "Offline-paid passcode access",
+526|    "offlineDescription": "A passcode means your teacher/admin confirmed offline payment. It is not an online purchase.",
+527|    "passcode": "Passcode",
+528|    "passcodePlaceholder": "Enter the code from your teacher",
+529|    "unlockWithPasscode": "Unlock with passcode",
+530|    "purchaseTitle": "Online purchase",
+531|    "purchaseDescription": "For priced invites, request the online purchase path or use the offline-paid passcode path.",
+532|    "internalPriceHidden": "Internal price is hidden on this screen.",
+533|    "requestOnlinePurchase": "Request online purchase",
+534|    "acceptFree": "Continue if free",
+535|    "terms": "I accept the access terms and understand access is tied to my account and device.",
+536|    "termsRequired": "Accept the terms before continuing.",
+537|    "purchaseSubmitted": "Purchase request submitted. Access will appear after approval.",
+538|    "codeRedemption": {
+539|      "title": "Redeem E-Booklet Code",
+540|      "description": "Enter the code from your teacher. Paid codes unlock the e-booklet once and bind to your account; free shared codes also open access but do not count toward paid seats or milestones.",
+541|      "heading": "Enter access code",
+542|      "helper": "Login is required. A reused paid code opens only for the same student account that redeemed it first.",
+543|      "codeLabel": "Access code",
+544|      "codePlaceholder": "KLM-ABC123XYZ789",
+545|      "codeRequired": "Enter the e-booklet access code.",
+546|      "submit": "Redeem code",
+547|      "paidSuccess": "Paid code accepted. Opening your e-booklet...",
+548|      "freeAccessNoPaidProgressSuccess": "Free shared code accepted and booklet access opened. This entry does not count toward paid seats or milestone rewards.",
+549|      "error": "This e-booklet code cannot be redeemed."
+550|    }
+551|  },
+552|  "teacher": {
+553|    "title": "My E-Booklets",
+554|    "description": "Open delivered booklets, manage invite quota, and track student access.",
+555|    "loading": "Loading e-booklets...",
+556|    "emptyTitle": "No delivered e-booklets yet",
+557|    "emptyDescription": "Ready purchases appear here after admin customization and delivery.",
+558|    "templateLabel": "Template: {{value}}",
+559|    "invitesLeft": "Invites left",
+560|    "quota": "Quota",
+561|    "used": "Used",
+562|    "manageInvites": "Manage Invites",
+563|    "students": "Students",
+564|    "invites": {
+565|      "title": "Invite Management",
+566|      "description": "Multi-use invite links stop working when quota is exhausted or disabled.",
+567|      "totalQuota": "Invite quota",
+568|      "activeStudents": "Active students",
+569|      "usedSeats": "Used seats",
+570|      "usedDevices": "Used devices",
+571|      "remaining": "Remaining",
+572|      "notAvailable": "N/A",
+573|      "createTitle": "Create Invite Link",
+574|      "createDescription": "Leave per-link uses empty to use only the booklet quota. Add a passcode when you want students to enter a shared code before access.",
+575|      "maxUses": "Max uses, optional",
+576|      "maxUsesPlaceholder": "Example: 50",
+577|      "expiry": "Invite expiry, optional",
+578|      "generate": "Generate Invite Link",
+579|      "latest": "Latest invite link",
+580|      "latestPasscode": "Passcode: {{value}}",
+581|      "linksTitle": "Invite Links",
+582|      "uses": "Uses: {{used}}",
+583|      "usesWithMax": "Uses: {{used}} / {{max}}",
+584|      "inviteRemaining": "Link remaining uses: {{value}}",
+585|      "inviteExpiry": "Link expiry: {{value}}",
+586|      "instanceExpiry": "Booklet expiry: {{value}}",
+587|      "noExpiry": "No expiry",
+588|      "priceNotSet": "Price not set",
+589|      "freeAccess": "Free access",
+590|      "zeroPriceCopy": "Students can join this e-booklet at no extra charge.",
+591|      "requirePasscode": "Require passcode for this invite",
+592|      "passcode": "Passcode, optional",
+593|      "passcodePlaceholder": "Leave blank to generate",
+594|      "passcodeGenerateHint": "If blank, the backend generates a one-time displayed passcode.",
+595|      "passcodeHint": "Passcode hint, optional",
+596|      "passcodeHintPlaceholder": "Example: Ask your teacher in class",
+597|      "passcodeHintDisplay": "Passcode hint: {{value}}",
+598|      "passcodeRequired": "Passcode required — use the code shared by your teacher.",
+599|      "noPasscodeNeeded": "No passcode needed",
+600|      "shareMessage": "You're invited to open {{title}} on Kalima.\nLink: {{link}}\nPasscode: {{passcode}}\nAccess expires: {{expiry}}\nStudent price: {{price}}",
+601|      "copyLink": "Copy link",
+602|      "copyMessage": "Copy message",
+603|      "copyPasscode": "Copy passcode",
+604|      "whatsapp": "WhatsApp",
+605|      "disableInvite": "Disable invite",
+606|      "linkUnavailable": "The backend did not return a token or shareable link for this existing invite.",
+607|      "emptyLinks": "No invite links created yet.",
+608|      "studentsTitle": "Students",
+609|      "emptyStudents": "No students accepted this invite yet.",
+610|      "accessCodeTitle": "E-booklet access codes",
+611|      "accessCodeDescription": "Generate unique paid codes or shared free tracking codes. Terms are required before every code action.",
+612|      "createAccessCode": "Generate access code",
+613|      "createAccessCodeDescription": "Each paid click creates a new unique one-time code. Raw paid codes are shown only when created.",
+614|      "termsRequiredCopy": "Terms must be accepted before generating or copying any access code.",
+615|      "generatePaidMessageCode": "Create paid WhatsApp message",
+616|      "generatePaidCodeOnly": "Create paid code only",
+617|      "generateFreeSharedCode": "Create free shared access code",
+618|      "notPaidProgress": "Free shared codes open booklet access for logged-in students and track entry, but do not count toward paid seats or milestone rewards.",
+619|      "generatedCodesTitle": "Generated this session",
+620|      "paidUnique": "Paid unique",
+621|      "freeShared": "Free shared",
+622|      "codeHint": "Saved hint: {{value}}",
+623|      "copyCode": "Copy code",
+624|      "copyWhatsAppMessage": "Copy WhatsApp message",
+625|      "emptyGeneratedCodes": "No codes generated in this session yet.",
+626|      "noActiveTerms": "No active e-booklet terms are available.",
+627|      "termsModal": {
+628|        "title": "Accept code-generation terms",
+629|        "description": "Accept the active e-booklet terms before generating or copying a code.",
+630|        "accept": "Accept and generate"
+631|      }
+632|    },
+633|    "expiry": "Expiry",
+634|    "expiredBlocked": "Access expired. Ask admin to renew access.",
+635|    "deviceLocked": "Device lock: {{value}}",
+636|    "analytics": {
+637|      "title": "E-Booklet Analytics",
+638|      "description": "Teacher-scoped analytics for your own delivered e-booklet instances only.",
+639|      "instancesTitle": "Per-instance drilldown",
+640|      "instancesDescription": "Shows source/status, access created, seats, expiry, and device/access status without internal prices or raw security data."
+641|    },
+642|    "manageAccessCodes": "Manage access codes",
+643|    "milestones": {
+644|      "title": "Milestone progress",
+645|      "motivation": "Keep creating paid first accesses. Each milestone unlocks wallet credit for future Kalima purchases.",
+646|      "completed": "{{count}} / {{total}} completed",
+647|      "paidProgress": "Paid first accesses",
+648|      "nextRemaining": "Remaining to next milestone",
+649|      "allDone": "Done",
+650|      "claimableReward": "Claimable reward",
+651|      "untitled": "Milestone",
+652|      "achieved": "Achieved",
+653|      "target": "Target {{count}}",
+654|      "achievedCopy": "Completed for the active term.",
+655|      "remainingCopy": "{{count}} paid first accesses remaining.",
+656|      "reward": "Reward: {{value}}",
+657|      "empty": "No active milestones are configured yet.",
+658|      "claimCta": "Claim wallet credit",
+659|      "rewardTermsTitle": "Accept reward terms",
+660|      "rewardTermsDescription": "Claiming adds non-expiring wallet credit. It can be used on Kalima purchases and cannot stack with coupons.",
+661|      "activeTerm": "Active term",
+662|      "noActiveTerm": "No active term",
+663|      "termRange": "{{start}} – {{end}}",
+664|      "termRangeMissing": "Term dates are not set"
+665|    },
+666|    "wallet": {
+667|      "title": "Teacher wallet",
+668|      "balance": "Wallet: {{value}}",
+669|      "noStacking": "Wallet credit keeps leftover balance and cannot be combined with coupon or promo codes."
+670|    }
+671|  },
+672|  "student": {
+673|    "title": "My E-Booklets",
+674|    "description": "Booklets assigned by teachers appear here after invite acceptance.",
+675|    "loading": "Loading assigned e-booklets...",
+676|    "emptyTitle": "No assigned e-booklets yet",
+677|    "emptyDescription": "Ask your teacher for an e-booklet invite link or access code.",
+678|    "redeemCodeCta": "Redeem access code",
+679|    "teacherLabel": "Teacher: {{value}}",
+680|    "expiry": "Expiry",
+681|    "expiredBlocked": "This e-booklet has expired and cannot be opened.",
+682|    "deviceLocked": "Device lock: {{value}}"
+683|  },
+684|  "analytics": {
+685|    "loading": "Loading analytics...",
+686|    "drilldown": "Drill down",
+687|    "filtered": "Filtered",
+688|    "available": "Available",
+689|    "dateRanges": {
+690|      "7d": "Last 7 days",
+691|      "30d": "Last 30 days",
+692|      "all": "All time"
+693|    },
+694|    "sources": {
+695|      "all": "All sources",
+696|      "offline_passcode": "Offline passcode",
+697|      "online_purchase": "Online purchase",
+698|      "free_invite": "Free invite"
+699|    },
+700|    "filters": {
+701|      "dateRange": "Date range",
+702|      "teacher": "Teacher",
+703|      "teacherPlaceholder": "Teacher ID",
+704|      "template": "Template",
+705|      "templatePlaceholder": "Template filter pending backend support",
+706|      "instance": "Instance",
+707|      "instancePlaceholder": "Instance ID",
+708|      "allInstances": "All instances",
+709|      "source": "Source"
+710|    },
+711|    "metrics": {
+712|      "inviteOpens": "Invite opens",
+713|      "uniqueAnonymous": "Approx. unique anonymous visitors: {{value}}",
+714|      "loggedInStudents": "Logged-in students",
+715|      "accessCreated": "Access created from approved student entry",
+716|      "revenueEstimate": "Aggregated revenue estimate",
+717|      "teacherRevenueHelper": "Online {{online}} · offline {{offline}}",
+718|      "opensSeatsDevices": "Opens, seats, devices",
+719|      "seats": "Seats used: {{value}}",
+720|      "deviceAccess": "Device/access status",
+721|      "approvedOnlineRevenue": "Approved online revenue",
+722|      "estimatedOfflineRevenue": "Estimated offline access count: {{value}}",
+723|      "internalCostMargin": "Internal cost / margin",
+724|      "internalCost": "Internal cost: {{value}}",
+725|      "deviceSecurity": "Device / security",
+726|      "failedPasscodeSafe": "Wrong passcodes counted only, raw codes hidden: {{value}}",
+727|      "operationalHealth": "Operational health",
+728|      "expiryArchive": "Review expiry and archive queues"
+729|    }
+730|  }
+731|}
+
+===== FILE: kalima-platform/frontend/src/locales/en/student.json (182 lines) =====
+1|{
+2|  "validation": {
+3|    "password_min": "Password must be at least 8 characters",
+4|    "password_requirements": "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+5|    "confirm_password_required": "Please confirm your password",
+6|    "passwords_mismatch": "Passwords don't match",
+7|    "current_password_required": "Current password is required"
+8|  },
+9|  "layout": {
+10|    "openSidebar": "Open sidebar"
+11|  },
+12|  "portalTitle": "Student Portal",
+13|  "nav": {
+14|    "home": "Home",
+15|    "expandSidebar": "Expand sidebar",
+16|    "collapseSidebar": "Collapse sidebar",
+17|    "closeSidebar": "Close sidebar",
+18|    "profile": "My Profile",
+19|    "eBookletStore": "E-Booklets",
+20|    "eBooklets": "My E-Booklets",
+21|    "orders": "My Orders",
+22|    "settings": "Settings",
+23|    "themeToggle": "Toggle theme",
+24|    "lightMode": "Light mode",
+25|    "darkMode": "Dark mode",
+26|    "backToStore": "Back to Store",
+27|    "logout": "Logout"
+28|  },
+29|  "settings": {
+30|    "title": "Account Settings",
+31|    "description": "Manage your profile, security, and sessions",
+32|    "profile": {
+33|      "title": "Profile Information",
+34|      "name": "Full Name",
+35|      "email": "Email Address",
+36|      "phone": "Phone Number",
+37|      "secondaryPhone": "Secondary Phone",
+38|      "gender": "Gender",
+39|      "uploadAvatar": "Upload Avatar",
+40|      "avatarHint": "JPG, PNG or GIF. Max size 2MB.",
+41|      "editProfile": "Edit Profile",
+42|      "updateSuccess": "Profile updated successfully",
+43|      "validation": {
+44|        "nameRequired": "Name is required",
+45|        "emailInvalid": "Invalid email address",
+46|        "invalidPhone": "Invalid Egyptian phone number"
+47|      }
+48|    },
+49|    "password": {
+50|      "title": "Password Management",
+51|      "changePassword": "Change Password",
+52|      "setPassword": "Set Password",
+53|      "changeDescription": "Change your existing password",
+54|      "setDescription": "Set a password for local login",
+55|      "currentPassword": "Current Password",
+56|      "newPassword": "New Password",
+57|      "confirmPassword": "Confirm Password",
+58|      "currentPasswordPlaceholder": "Enter current password",
+59|      "newPasswordPlaceholder": "Enter new password",
+60|      "confirmPasswordPlaceholder": "Confirm new password",
+61|      "passwordMismatch": "Passwords do not match",
+62|      "confirmChangeTitle": "Change Password",
+63|      "confirmChange": "Are you sure you want to change your password? You will be logged out from all devices.",
+64|      "confirmSetTitle": "Set Password",
+65|      "confirmSet": "Are you sure you want to set a password? This will enable local login for your account."
+66|    },
+67|    "account": {
+68|      "title": "Account Security",
+69|      "linkedProviders": "Linked Providers",
+70|      "linkNewAccount": "Link New Account",
+71|      "linkDescription": "Link additional accounts to enable multiple login methods.",
+72|      "linkFirebase": "Link Google Account",
+73|      "setPasswordFirst": "Set password first",
+74|      "noLinkedProviders": "No linked accounts",
+75|      "connected": "Connected",
+76|      "unlink": "Unlink",
+77|      "confirmUnlinkTitle": "Unlink Account Provider",
+78|      "confirmUnlink": "Are you sure you want to unlink this provider? You will lose access to this login method.",
+79|      "unlinkWarning": "You will lose access to this login method and will need to use one of your remaining accounts to sign in.",
+80|      "providers": {
+81|        "local": "Email Account",
+82|        "google": "Google",
+83|        "facebook": "Facebook",
+84|        "github": "GitHub",
+85|        "firebase": "Firebase",
+86|        "email": "Email"
+87|      },
+88|      "dangerZone": "Danger Zone",
+89|      "deleteAccount": "Delete Account",
+90|      "deleteAccountDesc": "Permanently remove your account and all associated data. This action is irreversible.",
+91|      "deleteAccountBtn": "Delete Account",
+92|      "deleteConfirmationText": "Delete My Account",
+93|      "deleteTitle": "Delete Account",
+94|      "deleteWarning1": "This action cannot be undone.",
+95|      "deleteWarning2": "All your data, content, and progress will be permanently deleted.",
+96|      "deleteTypePrompt": "Please type",
+97|      "deleteToConfirm": "to confirm.",
+98|      "deleteConfirmButton": "Permanently Delete"
+99|    },
+100|    "email": {
+101|      "title": "Email Verification",
+102|      "verificationStatus": "Verification Status",
+103|      "verified": "Email Verified",
+104|      "notVerified": "Email Not Verified",
+105|      "pending": "Pending",
+106|      "verificationDescription": "Verify your email to secure your account and receive important notifications.",
+107|      "sendVerification": "Send Verification Email",
+108|      "resendVerification": "Resend Verification",
+109|      "securityInfo": "Security Information",
+110|      "cooldown": "Wait {{seconds}}s",
+111|      "benefits": {
+112|        "title": "Benefits of Verification",
+113|        "security": "Enhanced account security",
+114|        "recovery": "Password recovery access",
+115|        "notifications": "Important notifications"
+116|      },
+117|      "troubleshooting": {
+118|        "title": "Troubleshooting",
+119|        "spam": "Check spam folder",
+120|        "address": "Verify email address",
+121|        "contact": "Contact support if needed"
+122|      }
+123|    },
+124|    "session": {
+125|      "title": "Session Management",
+126|      "activeSessions": "Active Sessions",
+127|      "current": "Current",
+128|      "activeNow": "Active now",
+129|      "minutesAgo": "{{minutes}}m ago",
+130|      "hoursAgo": "{{hours}}h ago",
+131|      "daysAgo": "{{days}}d ago",
+132|      "sessionActions": "Session Actions",
+133|      "logoutCurrent": "Logout Current Device",
+134|      "logoutCurrentDescription": "Logout from this device",
+135|      "logoutAll": "Logout All Devices",
+136|      "logoutAllDescription": "Logout from all devices",
+137|      "logout": "Logout",
+138|      "confirmLogoutAllTitle": "Logout All Devices",
+139|      "confirmLogoutAll": "Are you sure you want to logout from all devices?",
+140|      "logoutWarning": "Logging out from all devices will require you to sign in again on each device.",
+141|      "logoutAllWarning1": "You will be logged out from all devices immediately.",
+142|      "logoutAllWarning2": "You will need to sign in again on each device to continue using your account.",
+143|      "logoutAllWarning3": "Any unsaved work will be lost."
+144|    },
+145|    "upload": {
+146|      "progress": "Upload Progress: {{progress}}%",
+147|      "cancelled": "Upload cancelled",
+148|      "error": "Upload failed",
+149|      "file": "File"
+150|    }
+151|  },
+152|  "profile": {
+153|    "title": "My Profile",
+154|    "description": "Manage your personal information",
+155|    "student": "Student",
+156|    "personalInfo": "Personal Information",
+157|    "name": "Full Name",
+158|    "phone": "Phone",
+159|    "secondaryPhone": "Secondary Phone",
+160|    "gender": "Gender",
+161|    "selectGender": "Select gender",
+162|    "male": "Male",
+163|    "female": "Female",
+164|    "studentInfo": "Academic Information",
+165|    "level": "Academic Level",
+166|    "selectLevel": "Select level",
+167|    "faction": "Section / Group",
+168|    "government": "Governorate",
+169|    "selectGovernment": "Select governorate",
+170|    "zone": "Zone",
+171|    "selectZone": "Select zone",
+172|    "parentPhone": "Parent Phone Number",
+173|    "save": "Save Changes",
+174|    "loading": "Loading...",
+175|    "idTooltip": "Share this ID with your parent so they can link your account in the Parent Portal."
+176|  },
+177|  "common": {
+178|    "loading": "Loading...",
+179|    "cancel": "Cancel",
+180|    "save": "Save"
+181|  }
+182|}
+
+===== FILE: kalima-platform/frontend/src/pages/admin/e-booklets/AdminEBookletTermsMilestonesPage.jsx (365 lines) =====
+1|import { useCallback, useEffect, useMemo, useState } from "react";
+2|import { CalendarRange, CheckCircle2, GripVertical, Medal, RefreshCcw, ShieldCheck } from "lucide-react";
+3|import { useTranslation } from "react-i18next";
+4|import { Badge } from "@/components/ui/badge";
+5|import { Button } from "@/components/ui/button";
+6|import { Checkbox } from "@/components/ui/checkbox";
+7|import { Input } from "@/components/ui/input";
+8|import { Label } from "@/components/ui/label";
+9|import { Textarea } from "@/components/ui/textarea";
+10|import {
+11|  Select,
+12|  SelectContent,
+13|  SelectItem,
+14|  SelectTrigger,
+15|  SelectValue,
+16|} from "@/components/ui/select";
+17|import {
+18|  Table,
+19|  TableBody,
+20|  TableCell,
+21|  TableHead,
+22|  TableHeader,
+23|  TableRow,
+24|} from "@/components/ui/table";
+25|import { useAdminEBookletTermsMilestones } from "@/hooks/admin/useAdminEBooklets";
+26|
+27|const emptyTermForm = {
+28|  name: "",
+29|  description: "",
+30|  startsAt: "",
+31|  endsAt: "",
+32|  status: "draft",
+33|  codeGenerationTerms: "",
+34|  rewardClaimTerms: "",
+35|};
+36|
+37|const emptyMilestoneForm = {
+38|  termId: "",
+39|  title: "",
+40|  description: "",
+41|  targetPaidRedemptions: "",
+42|  milestonePrice: "",
+43|  previousPriceSnapshot: "",
+44|  rewardAmountSnapshot: "",
+45|  sortOrder: "0",
+46|  active: true,
+47|  rewardEnabled: true,
+48|  notificationRecipients: "admins",
+49|};
+50|
+51|const toDateInput = (value) => (value ? String(value).slice(0, 10) : "");
+52|const money = (value, fallback = "—") => {
+53|  const numeric = Number(value);
+54|  if (!Number.isFinite(numeric)) return fallback;
+55|  return numeric.toLocaleString(undefined, { maximumFractionDigits: 2 });
+56|};
+57|
+58|export default function AdminEBookletTermsMilestonesPage() {
+59|  const { t, i18n } = useTranslation("eBooklets");
+60|  const {
+61|    terms,
+62|    milestones,
+63|    progress,
+64|    loading,
+65|    actionLoading,
+66|    fetchTerms,
+67|    fetchMilestones,
+68|    fetchProgress,
+69|    createTerm,
+70|    updateTerm,
+71|    activateTerm,
+72|    createMilestone,
+73|    updateMilestone,
+74|    reorderMilestones,
+75|  } = useAdminEBookletTermsMilestones();
+76|  const [selectedTermId, setSelectedTermId] = useState("all");
+77|  const [editingTermId, setEditingTermId] = useState(null);
+78|  const [editingMilestoneId, setEditingMilestoneId] = useState(null);
+79|  const [termForm, setTermForm] = useState(emptyTermForm);
+80|  const [milestoneForm, setMilestoneForm] = useState(emptyMilestoneForm);
+81|
+82|  const activeTerms = useMemo(() => terms.filter((term) => term.status === "active"), [terms]);
+83|  const selectedTerm = useMemo(
+84|    () => terms.find((term) => String(term.id) === String(selectedTermId)) || activeTerms[0] || terms[0],
+85|    [activeTerms, selectedTermId, terms],
+86|  );
+87|  const editingTerm = useMemo(() => terms.find((term) => Number(term.id) === Number(editingTermId)) || null, [editingTermId, terms]);
+88|  const scopedMilestones = useMemo(() => {
+89|    if (!selectedTerm || selectedTermId === "all") return milestones;
+90|    return milestones.filter((milestone) => Number(milestone.term_id) === Number(selectedTerm.id));
+91|  }, [milestones, selectedTerm, selectedTermId]);
+92|
+93|  const reload = useCallback(async () => {
+94|    await fetchTerms();
+95|    const termId = selectedTermId === "all" ? undefined : selectedTermId;
+96|    await Promise.all([fetchMilestones(termId), fetchProgress(termId)]);
+97|  }, [fetchMilestones, fetchProgress, fetchTerms, selectedTermId]);
+98|
+99|  useEffect(() => {
+100|    reload();
+101|  }, [reload]);
+102|
+103|  useEffect(() => {
+104|    if (!milestoneForm.termId && selectedTerm?.id) {
+105|      setMilestoneForm((current) => ({ ...current, termId: String(selectedTerm.id) }));
+106|    }
+107|  }, [milestoneForm.termId, selectedTerm?.id]);
+108|
+109|  const updateTermField = (field, value) => setTermForm((current) => ({ ...current, [field]: value }));
+110|  const updateMilestoneField = (field, value) => setMilestoneForm((current) => ({ ...current, [field]: value }));
+111|
+112|  const editTerm = (term) => {
+113|    setEditingTermId(term.id);
+114|    setTermForm({
+115|      name: term.name || "",
+116|      description: term.description || "",
+117|      startsAt: toDateInput(term.starts_at),
+118|      endsAt: toDateInput(term.ends_at),
+119|      status: term.status || "draft",
+120|      codeGenerationTerms: term.code_generation_terms || "",
+121|      rewardClaimTerms: term.reward_claim_terms || "",
+122|    });
+123|  };
+124|
+125|  const resetTermForm = () => {
+126|    setEditingTermId(null);
+127|    setTermForm(emptyTermForm);
+128|  };
+129|
+130|  const submitTerm = async (event) => {
+131|    event.preventDefault();
+132|    const payload = {
+133|      ...termForm,
+134|      startsAt: termForm.startsAt || new Date().toISOString(),
+135|      endsAt: termForm.endsAt || null,
+136|      templateId: null,
+137|    };
+138|    if (editingTermId && editingTerm?.status === "active") {
+139|      delete payload.status;
+140|      delete payload.startsAt;
+141|      delete payload.endsAt;
+142|      delete payload.codeGenerationTerms;
+143|      delete payload.rewardClaimTerms;
+144|    }
+145|    if (editingTermId) await updateTerm(editingTermId, payload);
+146|    else await createTerm(payload);
+147|    resetTermForm();
+148|    await reload();
+149|  };
+150|
+151|  const editMilestone = (milestone) => {
+152|    setEditingMilestoneId(milestone.id);
+153|    setMilestoneForm({
+154|      termId: String(milestone.term_id || selectedTerm?.id || ""),
+155|      title: milestone.title || "",
+156|      description: milestone.description || "",
+157|      targetPaidRedemptions: String(milestone.target_paid_redemptions ?? ""),
+158|      milestonePrice: String(milestone.milestone_price ?? ""),
+159|      previousPriceSnapshot: String(milestone.previous_price_snapshot ?? ""),
+160|      rewardAmountSnapshot: String(milestone.reward_amount_snapshot ?? ""),
+161|      sortOrder: String(milestone.sort_order ?? 0),
+162|      active: Boolean(milestone.active),
+163|      rewardEnabled: Number(milestone.reward_amount_snapshot ?? 0) > 0,
+164|      notificationRecipients: milestone.notification_recipients || "admins",
+165|    });
+166|  };
+167|
+168|  const resetMilestoneForm = () => {
+169|    setEditingMilestoneId(null);
+170|    setMilestoneForm({ ...emptyMilestoneForm, termId: selectedTerm?.id ? String(selectedTerm.id) : "" });
+171|  };
+172|
+173|  const submitMilestone = async (event) => {
+174|    event.preventDefault();
+175|    const payload = {
+176|      termId: Number(milestoneForm.termId || selectedTerm?.id),
+177|      title: milestoneForm.title,
+178|      description: milestoneForm.description || null,
+179|      targetPaidRedemptions: Number(milestoneForm.targetPaidRedemptions || 0),
+180|      milestonePrice: Number(milestoneForm.milestonePrice || 0),
+181|      previousPriceSnapshot: milestoneForm.previousPriceSnapshot === "" ? null : Number(milestoneForm.previousPriceSnapshot),
+182|      rewardAmountSnapshot: Number(milestoneForm.rewardAmountSnapshot || 0),
+183|      sortOrder: Number(milestoneForm.sortOrder || 0),
+184|      active: milestoneForm.active,
+185|      notificationRecipients: milestoneForm.notificationRecipients,
+186|    };
+187|    if (editingMilestoneId) await updateMilestone(editingMilestoneId, payload);
+188|    else await createMilestone(payload);
+189|    resetMilestoneForm();
+190|    await reload();
+191|  };
+192|
+193|  const moveMilestone = async (milestone, direction) => {
+194|    const sorted = [...scopedMilestones].sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0));
+195|    const index = sorted.findIndex((item) => item.id === milestone.id);
+196|    const targetIndex = index + direction;
+197|    if (index < 0 || targetIndex < 0 || targetIndex >= sorted.length) return;
+198|    const next = [...sorted];
+199|    [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+200|    await reorderMilestones(Number(milestone.term_id), next.map((item, idx) => ({ id: item.id, sortOrder: idx + 1 })));
+201|    await reload();
+202|  };
+203|
+204|  const activate = async (termId) => {
+205|    await activateTerm(termId);
+206|    await reload();
+207|  };
+208|
+209|  const formatDate = (value) => {
+210|    if (!value) return "—";
+211|    return new Intl.DateTimeFormat(i18n.language?.startsWith("ar") ? "ar-EG" : "en", {
+212|      year: "numeric",
+213|      month: "short",
+214|      day: "numeric",
+215|    }).format(new Date(value));
+216|  };
+217|
+218|  return (
+219|    <div className="space-y-6" data-testid="admin-e-booklet-terms-milestones-page">
+220|      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+221|        <div>
+222|          <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
+223|            <CalendarRange className="h-8 w-8 text-primary" />
+224|            {t("admin.termsMilestones.title")}
+225|          </h1>
+226|          <p className="mt-1 text-sm text-muted-foreground">{t("admin.termsMilestones.description")}</p>
+227|        </div>
+228|        <Button variant="outline" onClick={reload} disabled={loading}>
+229|          <RefreshCcw className="me-2 h-4 w-4" />
+230|          {t("common.refresh")}
+231|        </Button>
+232|      </div>
+233|
+234|      <div className="grid gap-4 rounded-lg border bg-background p-4 md:grid-cols-3">
+235|        <div>
+236|          <div className="text-sm text-muted-foreground">{t("admin.termsMilestones.activeTerms")}</div>
+237|          <div className="mt-1 text-2xl font-semibold">{activeTerms.length}</div>
+238|        </div>
+239|        <div>
+240|          <div className="text-sm text-muted-foreground">{t("admin.termsMilestones.milestoneCount")}</div>
+241|          <div className="mt-1 text-2xl font-semibold">{scopedMilestones.length}</div>
+242|        </div>
+243|        <div>
+244|          <div className="text-sm text-muted-foreground">{t("admin.termsMilestones.paidRedemptions")}</div>
+245|          <div className="mt-1 text-2xl font-semibold">{progress?.paidRedemptions ?? 0}</div>
+246|        </div>
+247|      </div>
+248|
+249|      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+250|        <div className="overflow-hidden rounded-lg border bg-background" data-testid="admin-e-booklet-terms-table">
+251|          <div className="border-b p-4">
+252|            <h2 className="font-semibold">{t("admin.termsMilestones.termsTitle")}</h2>
+253|            <p className="text-sm text-muted-foreground">{t("admin.termsMilestones.termsHelp")}</p>
+254|          </div>
+255|          <Table>
+256|            <TableHeader>
+257|              <TableRow>
+258|                <TableHead>{t("admin.termsMilestones.termName")}</TableHead>
+259|                <TableHead>{t("common.status")}</TableHead>
+260|                <TableHead>{t("admin.termsMilestones.termWindow")}</TableHead>
+261|                <TableHead className="text-end">{t("common.actions")}</TableHead>
+262|              </TableRow>
+263|            </TableHeader>
+264|            <TableBody>
+265|              {terms.map((term) => (
+266|                <TableRow key={term.id}>
+267|                  <TableCell>
+268|                    <div className="font-medium">{term.name}</div>
+269|                    <div className="line-clamp-2 max-w-md text-xs text-muted-foreground">{term.description || "—"}</div>
+270|                  </TableCell>
+271|                  <TableCell><Badge variant={term.status === "active" ? "default" : "outline"}>{term.status}</Badge></TableCell>
+272|                  <TableCell>{formatDate(term.starts_at)} — {term.ends_at ? formatDate(term.ends_at) : t("admin.termsMilestones.openEnded")}</TableCell>
+273|                  <TableCell>
+274|                    <div className="flex justify-end gap-2">
+275|                      <Button size="sm" variant="outline" onClick={() => editTerm(term)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
+276|                      {term.status !== "active" && (
+277|                        <Button size="sm" onClick={() => activate(term.id)} disabled={actionLoading} data-testid="admin-e-booklet-set-active-term">
+278|                          <ShieldCheck className="h-4 w-4" />
+279|                          {t("admin.termsMilestones.setActive")}
+280|                        </Button>
+281|                      )}
+282|                    </div>
+283|                  </TableCell>
+284|                </TableRow>
+285|              ))}
+286|              {terms.length === 0 && (
+287|                <TableRow><TableCell colSpan={4} className="h-20 text-center text-muted-foreground">{t("admin.termsMilestones.emptyTerms")}</TableCell></TableRow>
+288|              )}
+289|            </TableBody>
+290|          </Table>
+291|        </div>
+292|
+293|        <form className="space-y-4 rounded-lg border bg-background p-4" onSubmit={submitTerm} data-testid="admin-e-booklet-term-form">
+294|          <h2 className="font-semibold">{editingTermId ? t("admin.termsMilestones.editTerm") : t("admin.termsMilestones.createTerm")}</h2>
+295|          <div className="grid gap-3 md:grid-cols-2">
+296|            <div className="space-y-2"><Label>{t("admin.termsMilestones.termName")}</Label><Input required value={termForm.name} onChange={(e) => updateTermField("name", e.target.value)} /></div>
+297|            <div className="space-y-2"><Label>{t("common.status")}</Label><Select value={termForm.status} onValueChange={(value) => updateTermField("status", value)} disabled={editingTerm?.status === "active"}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="draft">{t("statuses.draft")}</SelectItem><SelectItem value="active">{t("statuses.active")}</SelectItem><SelectItem value="archived">{t("statuses.archived")}</SelectItem></SelectContent></Select></div>
+298|            <div className="space-y-2"><Label>{t("admin.termsMilestones.startsAt")}</Label><Input type="date" value={termForm.startsAt} onChange={(e) => updateTermField("startsAt", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+299|            <div className="space-y-2"><Label>{t("admin.termsMilestones.endsAt")}</Label><Input type="date" value={termForm.endsAt} onChange={(e) => updateTermField("endsAt", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+300|          </div>
+301|          <div className="space-y-2"><Label>{t("admin.termsMilestones.descriptionLabel")}</Label><Textarea value={termForm.description} onChange={(e) => updateTermField("description", e.target.value)} /></div>
+302|          <div className="space-y-2"><Label>{t("admin.termsMilestones.codeGenerationTerms")}</Label><Textarea required value={termForm.codeGenerationTerms} onChange={(e) => updateTermField("codeGenerationTerms", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+303|          <div className="space-y-2"><Label>{t("admin.termsMilestones.rewardClaimTerms")}</Label><Textarea required value={termForm.rewardClaimTerms} onChange={(e) => updateTermField("rewardClaimTerms", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+304|          <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={resetTermForm}>{t("common.clear")}</Button><Button type="submit" disabled={actionLoading}>{t("common.save")}</Button></div>
+305|        </form>
+306|      </section>
+307|
+308|      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+309|        <div className="space-y-4 rounded-lg border bg-background p-4">
+310|          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+311|            <div><h2 className="font-semibold">{t("admin.termsMilestones.milestonesTitle")}</h2><p className="text-sm text-muted-foreground">{t("admin.termsMilestones.milestonesHelp")}</p></div>
+312|            <Select value={selectedTermId} onValueChange={setSelectedTermId}><SelectTrigger className="w-full md:w-72"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">{t("admin.termsMilestones.allTerms")}</SelectItem>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select>
+313|          </div>
+314|          <div className="overflow-hidden rounded-lg border" data-testid="admin-e-booklet-milestones-table">
+315|            <Table>
+316|              <TableHeader><TableRow><TableHead>{t("admin.termsMilestones.milestone")}</TableHead><TableHead>{t("admin.termsMilestones.target")}</TableHead><TableHead>{t("admin.termsMilestones.pricing")}</TableHead><TableHead>{t("admin.termsMilestones.reward")}</TableHead><TableHead>{t("common.status")}</TableHead><TableHead className="text-end">{t("common.actions")}</TableHead></TableRow></TableHeader>
+317|              <TableBody>
+318|                {scopedMilestones.map((milestone) => (
+319|                  <TableRow key={milestone.id}>
+320|                    <TableCell><div className="font-medium">{milestone.title}</div><div className="text-xs text-muted-foreground">#{milestone.sort_order ?? 0} · {milestone.description || "—"}</div></TableCell>
+321|                    <TableCell>{milestone.target_paid_redemptions}</TableCell>
+322|                    <TableCell>{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</TableCell>
+323|                    <TableCell>{money(milestone.reward_amount_snapshot)}</TableCell>
+324|                    <TableCell><Badge variant={milestone.active ? "default" : "outline"}>{milestone.active ? t("common.active") : t("statuses.disabled")}</Badge></TableCell>
+325|                    <TableCell><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button><Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button></div></TableCell>
+326|                  </TableRow>
+327|                ))}
+328|                {scopedMilestones.length === 0 && (<TableRow><TableCell colSpan={6} className="h-20 text-center text-muted-foreground">{t("admin.termsMilestones.emptyMilestones")}</TableCell></TableRow>)}
+329|              </TableBody>
+330|            </Table>
+331|          </div>
+332|        </div>
+333|
+334|        <form className="space-y-4 rounded-lg border bg-background p-4" onSubmit={submitMilestone} data-testid="admin-e-booklet-milestone-form">
+335|          <h2 className="font-semibold">{editingMilestoneId ? t("admin.termsMilestones.editMilestone") : t("admin.termsMilestones.createMilestone")}</h2>
+336|          <div className="space-y-2"><Label>{t("admin.termsMilestones.termName")}</Label><Select value={milestoneForm.termId} onValueChange={(value) => updateMilestoneField("termId", value)}><SelectTrigger><SelectValue placeholder={t("admin.termsMilestones.selectTerm")} /></SelectTrigger><SelectContent>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select></div>
+337|          <div className="space-y-2"><Label>{t("admin.termsMilestones.milestone")}</Label><Input required value={milestoneForm.title} onChange={(e) => updateMilestoneField("title", e.target.value)} /></div>
+338|          <div className="space-y-2"><Label>{t("admin.termsMilestones.descriptionLabel")}</Label><Textarea value={milestoneForm.description} onChange={(e) => updateMilestoneField("description", e.target.value)} /></div>
+339|          <div className="grid gap-3 md:grid-cols-2"><div className="space-y-2"><Label>{t("admin.termsMilestones.target")}</Label><Input name="targetPaidRedemptions" type="number" min="1" value={milestoneForm.targetPaidRedemptions} onChange={(e) => updateMilestoneField("targetPaidRedemptions", e.target.value)} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.sortOrder")}</Label><Input type="number" value={milestoneForm.sortOrder} onChange={(e) => updateMilestoneField("sortOrder", e.target.value)} /></div></div>
+340|          <div className="grid gap-3 md:grid-cols-2"><div className="space-y-2"><Label>{t("admin.termsMilestones.previousPrice")}</Label><Input type="number" value={milestoneForm.previousPriceSnapshot} onChange={(e) => updateMilestoneField("previousPriceSnapshot", e.target.value)} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.milestonePrice")}</Label><Input name="milestonePrice" type="number" value={milestoneForm.milestonePrice} onChange={(e) => updateMilestoneField("milestonePrice", e.target.value)} /></div></div>
+341|          <div className="grid gap-3 md:grid-cols-2"><div className="space-y-2"><Label>{t("admin.termsMilestones.rewardAmount")}</Label><Input type="number" value={milestoneForm.rewardAmountSnapshot} onChange={(e) => updateMilestoneField("rewardAmountSnapshot", e.target.value)} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.notificationRecipients")}</Label><Select value={milestoneForm.notificationRecipients} onValueChange={(value) => updateMilestoneField("notificationRecipients", value)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="admins">{t("admin.termsMilestones.recipientAdmins")}</SelectItem><SelectItem value="teacher_and_admins">{t("admin.termsMilestones.recipientTeacherAdmins")}</SelectItem></SelectContent></Select></div></div>
+342|          <div className="flex flex-wrap gap-4 rounded-md border p-3"><label className="flex items-center gap-2 text-sm"><Checkbox checked={milestoneForm.active} onCheckedChange={(value) => updateMilestoneField("active", Boolean(value))} />{t("common.active")}</label></div>
+343|          <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={resetMilestoneForm}>{t("common.clear")}</Button><Button type="submit" disabled={actionLoading || !milestoneForm.termId}>{t("common.save")}</Button></div>
+344|        </form>
+345|      </section>
+346|
+347|      <section className="rounded-lg border bg-background p-4" data-testid="admin-e-booklet-progress-view">
+348|        <div className="mb-3 flex items-center gap-2"><Medal className="h-5 w-5 text-primary" /><h2 className="font-semibold">{t("admin.termsMilestones.progressTitle")}</h2></div>
+349|        <div className="grid gap-3 md:grid-cols-3">
+350|          <div className="rounded-md border p-3"><div className="text-sm text-muted-foreground">{t("admin.termsMilestones.paidRedemptions")}</div><div className="text-2xl font-semibold">{progress?.paidRedemptions ?? 0}</div></div>
+351|          <div className="rounded-md border p-3"><div className="text-sm text-muted-foreground">{t("admin.termsMilestones.achievementCount")}</div><div className="text-2xl font-semibold">{progress?.achievements?.length ?? 0}</div></div>
+352|          <div className="rounded-md border p-3"><div className="text-sm text-muted-foreground">{t("admin.termsMilestones.claimedCount")}</div><div className="text-2xl font-semibold">{(progress?.achievements || []).filter((item) => item.claimed_at).length}</div></div>
+353|        </div>
+354|        <div className="mt-4 space-y-2">
+355|          {(progress?.teacherProgress || []).slice(0, 8).map((row) => (
+356|            <div key={row.teacherId} className="flex flex-wrap items-center justify-between gap-2 rounded-md border p-3 text-sm">
+357|              <span>{t("admin.termsMilestones.teacherId", { id: row.teacherId })} · {t("admin.termsMilestones.paidRedemptions")}: {row.paidRedemptions}</span>
+358|              <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4" />{t("admin.termsMilestones.achievementCount")}: {(row.achievements || []).length}</span>
+359|            </div>
+360|          ))}
+361|        </div>
+362|      </section>
+363|    </div>
+364|  );
+365|}

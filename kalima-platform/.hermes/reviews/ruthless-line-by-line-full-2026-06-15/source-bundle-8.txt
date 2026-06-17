@@ -1,0 +1,1144 @@
+
+===== FILE: kalima-platform/frontend/src/App.jsx (305 lines) =====
+1|import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet } from "react-router-dom";
+2|import { useState, useEffect, Suspense, lazy } from "react";
+3|import { useTranslation } from "react-i18next";
+4|import LoadingSpinner from "@/components/ui/loading-spinner";
+5|import { Toaster } from 'sonner';
+6|
+7|import ErrorBoundary from "./components/ErrorBoundary";
+8|import ProtectedRoute from "./components/ProtectedRoute";
+9|import RoleRoute from "./components/RoleRoute"; // REPLACED AdminRoute
+10|import MainLayout from "./layouts/MainLayout";
+11|import CouponsPage from "./pages/admin/coupons/CouponsPage";
+12|
+13|// Lazy-loaded pages
+14|const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
+15|const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
+16|const SignupPage = lazy(() => import("./pages/auth/SignupPage"));
+17|const ForgotPasswordPage = lazy(
+18|  () => import("./pages/auth/ForgotPasswordPage"),
+19|);
+20|const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage"));
+21|const VerifyEmailPage = lazy(() => import("./pages/auth/VerifyEmailPage"));
+22|const MarketPage = lazy(() => import("./pages/market/MarketPage"));
+23|const WizardCheckoutPage = lazy(
+24|  () => import("./pages/checkout/WizardCheckoutPage"),
+25|);
+26|const CheckoutPage = lazy(() => import("./pages/checkout/CheckoutPage"));
+27|const FastBuyCheckoutPage = lazy(
+28|  () => import("./pages/checkout/FastBuyCheckoutPage"),
+29|);
+30|const ProductDetailsPage = lazy(
+31|  () => import("./pages/product/ProductDetailsPage"),
+32|);
+33|const BookletDetailsPage = lazy(
+34|  () => import("./pages/booklet/BookletDetailsPage"),
+35|);
+36|const EBookletStorePage = lazy(
+37|  () => import("./pages/e-booklets/EBookletStorePage"),
+38|);
+39|const EBookletDetailsPage = lazy(
+40|  () => import("./pages/e-booklets/EBookletDetailsPage"),
+41|);
+42|const EBookletCartPage = lazy(
+43|  () => import("./pages/e-booklets/EBookletCartPage"),
+44|);
+45|const EBookletCheckoutPage = lazy(
+46|  () => import("./pages/e-booklets/EBookletCheckoutPage"),
+47|);
+48|const AcceptEBookletInvitePage = lazy(
+49|  () => import("./pages/e-booklets/AcceptEBookletInvitePage"),
+50|);
+51|const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+52|const CartPage = lazy(() => import("./pages/cart/CartPage"));
+53|
+54|// Admin lazy-loaded pages
+55|const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
+56|const DashboardPage = lazy(() => import("./pages/admin/dashboard/DashboardPage"));
+57|const OrdersPage = lazy(() => import("./pages/admin/orders/OrdersPage"));
+58|const OrderDetailPage = lazy(
+59|  () => import("./pages/admin/orders/OrderDetailPage"),
+60|);
+61|const ProductsPage = lazy(() => import("./pages/admin/products/ProductsPage"));
+62|const CreateProductPage = lazy(() => import("./pages/admin/products/CreateProductPage"));
+63|const ProductDetailPage = lazy(() => import("./pages/admin/products/ProductDetailPage"));
+64|const EditProductPage = lazy(() => import("./pages/admin/products/EditProductPage"));
+65|const CategoriesPage = lazy(
+66|  () => import("./pages/admin/categories/CategoriesPage"),
+67|);
+68|const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
+69|const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
+70|const UserAppreciationPage = lazy(() => import("./pages/admin/users/UserAppreciationPage"));
+71|const AdminSamplesPage = lazy(() => import("./pages/admin/samples/AdminSamplesPage"));
+72|const AdminSampleSectionDetailPage = lazy(() => import("./pages/admin/samples/AdminSampleSectionDetailPage"));
+73|const SettingsPage = lazy(() => import("./pages/admin/settings/SettingsPage"))
+74|const PaymentMethodsPage = lazy(() => import("./pages/admin/payment-methods/PaymentMethodsPage"));
+75|const RequiredFieldsPage = lazy(() => import("./pages/admin/required-fields/RequiredFieldsPage"));
+76|const AnalyticsPage = lazy(() => import("./pages/admin/analytics/AnalyticsPage"));
+77|const EmployeePerformancePage = lazy(() => import("./pages/admin/employee-performance/EmployeePerformancePage"));
+78|const AdminEBookletTemplatesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTemplatesPage"));
+79|const AdminEBookletEditorPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletEditorPage"));
+80|const AdminEBookletPurchasesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchasesPage"));
+81|const AdminEBookletInstancesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstancesPage"));
+82|const AdminEBookletDevicesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletDevicesPage"));
+83|const AdminEBookletAnalyticsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletAnalyticsPage"));
+84|const AdminEBookletTermsMilestonesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTermsMilestonesPage"));
+85|
+86|// Public viewer (no layout)
+87|const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
+88|const SamplesDirectoryPage = lazy(() => import("./pages/sample/SamplesDirectoryPage"));
+89|const SamplePreview = lazy(() => import("./pages/sample/SamplePreviewPage"))
+90|const AppreciationPublicPage = lazy(() => import("./pages/appreciation/AppreciationPublicPage"));
+91|// User lazy-loaded pages
+92|const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
+93|const NotificationsPage = lazy(() => import("./pages/notifications/NotificationsPage"));
+94|const AdminNotificationsPage = lazy(() => import("./pages/admin/notifications/AdminNotificationsPage"));
+95|
+96|// Teacher lazy-loaded pages
+97|const TeacherLayout = lazy(() => import("./layouts/TeacherLayout"));
+98|const TeacherProfilePage = lazy(() => import("./pages/teacher/profile/TeacherProfilePage"));
+99|const TeacherSettingsPage = lazy(() => import("./pages/teacher/settings/TeacherSettingsPage"));
+100|const TeacherEBookletsPage = lazy(() => import("./pages/teacher/e-booklets/TeacherEBookletsPage"));
+101|const TeacherInviteManagementPage = lazy(() => import("./pages/teacher/e-booklets/TeacherInviteManagementPage"));
+102|const TeacherEBookletAnalyticsPage = lazy(() => import("./pages/teacher/e-booklets/TeacherEBookletAnalyticsPage"));
+103|const EBookletViewerPage = lazy(() => import("./pages/e-booklets/EBookletViewerPage"));
+104|
+105|// Student lazy-loaded pages
+106|const StudentLayout = lazy(() => import("./layouts/StudentLayout"));
+107|const StudentProfilePage = lazy(() => import("./pages/student/profile/StudentProfilePage"));
+108|const StudentSettingsPage = lazy(() => import("./pages/student/settings/StudentSettingsPage"));
+109|const StudentEBookletsPage = lazy(() => import("./pages/student/e-booklets/StudentEBookletsPage"));
+110|
+111|// Parent lazy-loaded pages
+112|const ParentLayout = lazy(() => import("./layouts/ParentLayout"));
+113|const ParentProfilePage = lazy(() => import("./pages/parent/profile/ParentProfilePage"));
+114|const ParentSettingsPage = lazy(() => import("./pages/parent/settings/ParentSettingsPage"));
+115|
+116|const PageLoader = () => (
+117|  <div className="flex min-h-screen items-center justify-center">
+118|    <LoadingSpinner className="h-8 w-8 text-primary" />
+119|  </div>
+120|);
+121|
+122|function Root() {
+123|  const { i18n } = useTranslation();
+124|
+125|  useEffect(() => {
+126|    document.documentElement.dir = i18n.dir();
+127|    document.documentElement.lang = i18n.language;
+128|  }, [i18n, i18n.language]);
+129|
+130|  return (
+131|    <ErrorBoundary>
+132|      <Suspense fallback={<PageLoader />}>
+133|        <Outlet />
+134|      </Suspense>
+135|    </ErrorBoundary>
+136|  );
+137|}
+138|
+139|const router = createBrowserRouter(
+140|  createRoutesFromElements(
+141|    <Route element={<Root />}>
+142|      <Route path="/appreciation/:token" element={<AppreciationPublicPage />} />
+143|      {/* Public Routes with MainLayout (Navbar & Footer) */}
+144|      <Route element={<MainLayout />}>
+145|        <Route path="/" element={<LandingPage />} />
+146|
+147|        {/* E-booklet storefront is public to students/visitors; access is only required for owned viewer pages. */}
+148|        <Route path="/e-booklets" element={<EBookletStorePage />} />
+149|        <Route path="/e-booklets/instances/:instanceId" element={<EBookletDetailsPage />} />
+150|
+151|        {/* Market and Product Routes - Restricted by store access */}
+152|        <Route element={<RoleRoute requireStoreAccess={true} />}>
+153|          <Route path="/market" element={<MarketPage />} />
+154|          <Route path="/product/:id" element={<ProductDetailsPage />} />
+155|          <Route path="/booklet/:id" element={<BookletDetailsPage />} />
+156|        </Route>
+157|        {/* Samples Routes - Restricted by store access */}
+158|        <Route element={<RoleRoute requireStoreAccess={true} />}>
+159|          <Route path="/samples" element={<SamplesDirectoryPage />} />
+160|          <Route path="/samples/:id" element={<SamplePage />} />
+161|          <Route path="/samples/:id/preview" element={<SamplePreview />} />
+162|        </Route>
+163|
+164|        {/* E-booklet purchase flow: authenticated users can buy from the public storefront without store portal access. */}
+165|        <Route element={<ProtectedRoute requireAuth={true} />}>
+166|          <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin"]} />}>
+167|            <Route path="/e-booklet-cart" element={<EBookletCartPage />} />
+168|            <Route path="/e-booklet-checkout" element={<EBookletCheckoutPage />} />
+169|          </Route>
+170|        </Route>
+171|
+172|        {/* Protected Store Routes (Auth Required) - Restricted by store access */}
+173|        <Route element={<RoleRoute requireStoreAccess={true} />}>
+174|          <Route element={<ProtectedRoute requireAuth={true} />}>
+175|            {/* Purchase flow blocked for Admins */}
+176|            <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin"]} />}>
+177|              <Route path="/cart" element={<WizardCheckoutPage />} />
+178|              <Route path="/checkout" element={<WizardCheckoutPage />} />
+179|              <Route
+180|                path="/fast-buy/checkout"
+181|                element={<FastBuyCheckoutPage />}
+182|              />
+183|            </Route>
+184|            <Route path="/orders" element={<MyOrdersPage />} />
+185|            <Route path="/notifications" element={<NotificationsPage />} />
+186|          </Route>
+187|
+188|        </Route>
+189|        <Route path="/e-booklet-invite/:token" element={<AcceptEBookletInvitePage />} />
+190|        <Route path="/e-booklet-code" element={<AcceptEBookletInvitePage mode="code" />} />
+191|
+192|        {/* 404 Fallback */}
+193|        <Route path="*" element={<NotFoundPage />} />
+194|      </Route>
+195|      {/* Admin Routes */}
+196|      <Route element={<RoleRoute requiredRole={["Admin", "SubAdmin"]} />}>
+197|        <Route element={<AdminLayout />}>
+198|          <Route path="/admin" element={<DashboardPage />} />
+199|          <Route path="/admin/dashboard" element={<DashboardPage />} />
+200|          <Route path="/admin/orders" element={<OrdersPage />} />
+201|          <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
+202|          <Route path="/admin/products" element={<ProductsPage />} />
+203|          <Route path="/admin/products/create" element={<CreateProductPage />} />
+204|          <Route path="/admin/products/:id" element={<ProductDetailPage />} />
+205|          <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
+206|          <Route path="/admin/e-booklets" element={<AdminEBookletTemplatesPage />} />
+207|          <Route path="/admin/e-booklets/create" element={<AdminEBookletEditorPage />} />
+208|          <Route path="/admin/e-booklets/:id/edit" element={<AdminEBookletEditorPage />} />
+209|          <Route path="/admin/e-booklet-purchases" element={<AdminEBookletPurchasesPage />} />
+210|          <Route path="/admin/e-booklet-instances" element={<AdminEBookletInstancesPage />} />
+211|          <Route path="/admin/e-booklet-instances/:instanceId/view" element={<EBookletViewerPage />} />
+212|          <Route path="/admin/e-booklet-analytics" element={<AdminEBookletAnalyticsPage />} />
+213|          <Route path="/admin/e-booklet-terms-milestones" element={<AdminEBookletTermsMilestonesPage />} />
+214|          <Route path="/admin/e-booklet-instances/:instanceId/devices" element={<AdminEBookletDevicesPage />} />
+215|          <Route path="/admin/categories" element={<CategoriesPage />} />
+216|          <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
+217|          <Route path="/admin/required-fields" element={<RequiredFieldsPage />} />
+218|          <Route path="/admin/users" element={<UsersPage />} />
+219|          <Route path="/admin/users/:id" element={<UserDetailPage />} />
+220|          <Route path="/admin/users/:id/appreciation" element={<UserAppreciationPage />} />
+221|          <Route path="/admin/samples" element={<AdminSamplesPage />} />
+222|          <Route path="/admin/samples/:id" element={<AdminSampleSectionDetailPage />} />
+223|          <Route path="/admin/coupons" element={<CouponsPage />} />
+224|          <Route path="/admin/settings" element={<SettingsPage />} />
+225|          <Route path="/admin/analytics" element={<AnalyticsPage />} />
+226|          <Route path="/admin/employee-performance" element={<EmployeePerformancePage />} />
+227|          <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
+228|        </Route>
+229|
+230|      </Route>
+231|
+232|      {/* Teacher Routes */}
+233|      <Route element={<RoleRoute requiredRole={["Teacher"]} />}>
+234|        <Route element={<TeacherLayout />}>
+235|          <Route path="/teacher/profile" element={<TeacherProfilePage />} />
+236|          <Route path="/teacher/settings" element={<TeacherSettingsPage />} />
+237|          <Route path="/teacher/e-booklets" element={<TeacherEBookletsPage />} />
+238|          <Route path="/teacher/e-booklet-analytics" element={<TeacherEBookletAnalyticsPage />} />
+239|          <Route path="/teacher/e-booklets/:instanceId" element={<EBookletViewerPage />} />
+240|          <Route path="/teacher/e-booklets/:instanceId/invites" element={<TeacherInviteManagementPage />} />
+241|        </Route>
+242|      </Route>
+243|
+244|      {/* Student Routes */}
+245|      <Route element={<RoleRoute requiredRole={["Student"]} />}>
+246|        <Route element={<StudentLayout />}>
+247|          <Route path="/student/profile" element={<StudentProfilePage />} />
+248|          <Route path="/student/settings" element={<StudentSettingsPage />} />
+249|          <Route path="/student/e-booklets" element={<StudentEBookletsPage />} />
+250|          <Route path="/student/e-booklets/:instanceId" element={<EBookletViewerPage />} />
+251|        </Route>
+252|      </Route>
+253|
+254|      {/* Parent Routes */}
+255|      <Route element={<RoleRoute requiredRole={["Parent"]} />}>
+256|        <Route element={<ParentLayout />}>
+257|          <Route path="/parent/profile" element={<ParentProfilePage />} />
+258|          <Route path="/parent/settings" element={<ParentSettingsPage />} />
+259|        </Route>
+260|      </Route>
+261|
+262|      {/* Guest-only routes with AuthLayout (No Navbar/Footer) */}
+263|      <Route element={<MainLayout />}>
+264|        <Route element={<ProtectedRoute requireAuth={false} />}>
+265|          <Route path="/login" element={<LoginPage />} />
+266|          <Route path="/signup" element={<SignupPage />} />
+267|          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+268|          <Route
+269|            path="/auth/reset-password"
+270|            element={<ResetPasswordPage />}
+271|          />
+272|          <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+273|        </Route>
+274|      </Route>
+275|    </Route>
+276|  )
+277|);
+278|
+279|function App() {
+280|  const [isMobile, setIsMobile] = useState(false);
+281|
+282|  useEffect(() => {
+283|    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+284|    checkMobile();
+285|    window.addEventListener('resize', checkMobile);
+286|    return () => window.removeEventListener('resize', checkMobile);
+287|  }, []);
+288|
+289|  return (
+290|    <>
+291|      <RouterProvider router={router} />
+292|      <Toaster
+293|        richColors
+294|        position={isMobile ? "top-center" : "bottom-right"}
+295|        toastOptions={{
+296|          className: "border border-border/40 bg-card/60 backdrop-blur-md shadow-2xl rounded-2xl p-4",
+297|          titleClassName: "font-black uppercase tracking-tight text-sm",
+298|          descriptionClassName: "font-medium opacity-80 text-xs"
+299|        }}
+300|      />
+301|    </>
+302|  );
+303|}
+304|
+305|export default App;
+
+===== FILE: kalima-platform/frontend/src/components/admin/Sidebar.jsx (196 lines) =====
+1|import { useEffect, useState } from 'react';
+2|import { Link, useLocation } from 'react-router-dom';
+3|import { useTranslation } from 'react-i18next';
+4|import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput, BarChart3, Activity, Bell, BookOpenCheck, PackageCheck, HardDrive, CalendarRange } from 'lucide-react';
+5|import useAuth from '@/hooks/auth/useAuth';
+6|import { useRole } from '@/hooks/useRole';
+7|
+8|const ADMIN_THEME_STORAGE_KEY = 'adminTheme';
+9|
+10|export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
+11|  const { t, i18n } = useTranslation(['admin', 'userManagement']);
+12|  const { logout } = useAuth();
+13|  const { isAdmin, isSubAdmin } = useRole();
+14|  const location = useLocation();
+15|  const [isCollapsed, setIsCollapsed] = useState(true);
+16|  const [theme, setTheme] = useState('light');
+17|
+18|  const isRtl = i18n.dir() === 'rtl';
+19|
+20|  useEffect(() => {
+21|    const savedTheme = localStorage.getItem(ADMIN_THEME_STORAGE_KEY);
+22|    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+23|    const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+24|
+25|    setTheme(initialTheme);
+26|    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
+27|
+28|    return () => {
+29|      setTheme('light');
+30|      document.documentElement.classList.remove('dark');
+31|    };
+32|  }, []);
+33|
+34|  const toggleTheme = () => {
+35|    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+36|    setTheme(nextTheme);
+37|    localStorage.setItem(ADMIN_THEME_STORAGE_KEY, nextTheme);
+38|    document.documentElement.classList.toggle('dark', nextTheme === 'dark');
+39|  };
+40|
+41|  // Using userManagement namespace explicitly for the users translation
+42|  const navigation = [
+43|    { name: t('nav.dashboard', 'Dashboard'), href: '/admin/dashboard', icon: Home, id: 'dashboard' },
+44|    { name: t('nav.analytics', 'Analytics'), href: '/admin/analytics', icon: BarChart3, id: 'analytics' },
+45|    { name: t('nav.employeePerformance', 'Employee Performance'), href: '/admin/employee-performance', icon: Activity, id: 'employee-performance' },
+46|    { name: t('nav.orders'), href: '/admin/orders', icon: ShoppingCart, id: 'orders' },
+47|    { name: t('nav.products'), href: '/admin/products', icon: Package, id: 'products' },
+48|    { name: t('nav.eBooklets', 'E-Booklets'), href: '/admin/e-booklets', icon: BookOpenCheck, id: 'e-booklets' },
+49|    { name: t('nav.eBookletPurchases', 'E-Booklet Purchases'), href: '/admin/e-booklet-purchases', icon: PackageCheck, id: 'e-booklet-purchases' },
+50|    { name: t('nav.eBookletInstances', 'E-Booklet Access'), href: '/admin/e-booklet-instances', icon: HardDrive, id: 'e-booklet-instances' },
+51|    { name: t('nav.eBookletAnalytics', 'E-Booklet Analytics'), href: '/admin/e-booklet-analytics', icon: BarChart3, id: 'e-booklet-analytics' },
+52|    { name: t('nav.eBookletTermsMilestones', 'Terms & Milestones'), href: '/admin/e-booklet-terms-milestones', icon: CalendarRange, id: 'e-booklet-terms-milestones', managerOnly: true },
+53|    { name: t('nav.samples'), href: '/admin/samples', icon: FileText, id: 'samples' },
+54|    { name: t('nav.coupons'), href: '/admin/coupons', icon: Ticket, id: 'coupons' },
+55|    { name: t('nav.categories'), href: '/admin/categories', icon: LayoutGrid, id: 'categories' },
+56|    { name: t('nav.requiredFields'), href: '/admin/required-fields', icon: FormInput, id: 'required-fields' },
+57|    { name: t('nav.paymentMethods', 'Payment Methods'), href: '/admin/payment-methods', icon: CreditCard, id: 'payment-methods' },
+58|    { name: t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users, id: 'users' },
+59|    { name: t('nav.notifications', 'Notifications'), href: '/admin/notifications', icon: Bell, id: 'notifications' },
+60|    { name: t('nav.settings'), href: '/admin/settings', icon: Settings, id: 'settings' },
+61|];
+62|
+63|
+64|  const toggleLanguage = () => {
+65|    const newLang = i18n.language === "ar" ? "en" : "ar";
+66|    i18n.changeLanguage(newLang);
+67|    document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
+68|    document.documentElement.lang = newLang;
+69|  };
+70|
+71|  // Calculate width class
+72|  const widthClass = isCollapsed ? "w-64 lg:w-20" : "w-64";
+73|
+74|  return (
+75|    <aside
+76|      className={`fixed inset-y-0 start-0 z-50 ${widthClass} transform bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${isMobileOpen ? "translate-x-0" : isRtl ? "translate-x-full" : "-translate-x-full"}`}
+77|    >
+78|      {/* Header + Toggles */}
+79|      <div
+80|        className={`flex h-16 items-center px-4 border-b border-sidebar-border ${isCollapsed ? "lg:justify-center justify-between" : "justify-between"}`}
+81|      >
+82|        <span
+83|          className={`text-lg font-bold truncate ${isCollapsed ? "lg:hidden" : ""}`}
+84|        >
+85|          {t("dashboardTitle")}
+86|        </span>
+87|
+88|        <div className="flex items-center gap-2">
+89|          {/* Desktop/Tablet Collapse Toggle */}
+90|          <button
+91|            onClick={() => setIsCollapsed(!isCollapsed)}
+92|            className="text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5 hidden lg:block"
+93|            title={isCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
+94|            data-testid="admin-sidebar-mobile-toggle-button"
+95|          >
+96|            {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
+97|          </button>
+98|
+99|          {/* Mobile Close Toggle */}
+100|          <button
+101|            className="lg:hidden text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5"
+102|            onClick={() => setIsMobileOpen(false)}
+103|            title={t('nav.closeSidebar')}
+104|            data-testid="admin-sidebar-mobile-close-button"
+105|          >
+106|            <X size={20} />
+107|          </button>
+108|        </div>
+109|      </div>
+110|
+111|      {/* Navigation Links */}
+112|      <nav className="flex-1 space-y-2 px-2 py-4 overflow-y-auto">
+113|        {navigation.filter((item) => !item.managerOnly || isAdmin || isSubAdmin).map((item) => {
+114|          const isActive = location.pathname.startsWith(item.href);
+115|          return (
+116|            <Link
+117|              key={item.href}
+118|              to={item.href}
+119|              title={isCollapsed ? item.name : undefined}
+120|              data-testid={`admin-sidebar-nav-${item.id}`}
+121|              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive
+122|                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+123|                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+124|                } ${isCollapsed ? "lg:justify-center" : ""}`}
+125|            >
+126|              <item.icon
+127|                className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}
+128|                aria-hidden="true"
+129|              />
+130|              <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
+131|                {item.name}
+132|              </span>
+133|            </Link>
+134|          );
+135|        })}
+136|      </nav>
+137|
+138|      {/* Bottom Actions */}
+139|      <div className="border-t border-sidebar-border p-4 space-y-2 mt-auto">
+140|        <button
+141|          onClick={toggleLanguage}
+142|          title={isCollapsed ? (i18n.language === 'ar' ? 'English' : 'العربية') : undefined}
+143|          className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
+144|          data-testid="admin-sidebar-language-toggle"
+145|        >
+146|          <Globe className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
+147|          <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{i18n.language === 'ar' ? 'English' : 'العربية'}</span>
+148|        </button>
+149|
+150|        <button
+151|          onClick={toggleTheme}
+152|          title={isCollapsed ? t('nav.themeToggle') : undefined}
+153|          className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
+154|          data-testid="admin-sidebar-theme-toggle"
+155|        >
+156|          {theme === 'dark' ? (
+157|            <Sun className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
+158|          ) : (
+159|            <Moon className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
+160|          )}
+161|          <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>
+162|            {theme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
+163|          </span>
+164|        </button>
+165|
+166|        <Link
+167|          to="/market"
+168|          title={isCollapsed ? t("nav.backToStore") : undefined}
+169|          className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? "lg:justify-center" : ""}`}
+170|          data-testid="admin-sidebar-back-store-link"
+171|        >
+172|          <Home
+173|            className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}
+174|          />
+175|          <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
+176|            {t("nav.backToStore")}
+177|          </span>
+178|        </Link>
+179|
+180|        <button
+181|          onClick={logout}
+182|          title={isCollapsed ? t("nav.logout") : undefined}
+183|          className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 ${isCollapsed ? "lg:justify-center" : ""}`}
+184|          data-testid="admin-sidebar-logout-button"
+185|        >
+186|          <LogOut
+187|            className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}
+188|          />
+189|          <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
+190|            {t("nav.logout")}
+191|          </span>
+192|        </button>
+193|      </div>
+194|    </aside>
+195|  );
+196|}
+
+===== FILE: kalima-platform/frontend/src/components/admin/users/CreateUserDialog.jsx (637 lines) =====
+1|import { useState } from 'react';
+2|import { useTranslation } from 'react-i18next';
+3|import { Plus } from 'lucide-react';
+4|import { useForm } from 'react-hook-form';
+5|import { zodResolver } from '@hookform/resolvers/zod';
+6|import * as z from 'zod';
+7|
+8|import {
+9|    Dialog,
+10|    DialogContent,
+11|    DialogDescription,
+12|    DialogFooter,
+13|    DialogHeader,
+14|    DialogTitle,
+15|    DialogTrigger,
+16|} from '@/components/ui/dialog';
+17|import {
+18|    Form,
+19|    FormControl,
+20|    FormField,
+21|    FormItem,
+22|    FormLabel,
+23|    FormMessage,
+24|} from '@/components/ui/form';
+25|import {
+26|    Select,
+27|    SelectContent,
+28|    SelectItem,
+29|    SelectTrigger,
+30|    SelectValue,
+31|} from '@/components/ui/select';
+32|import { Input } from '@/components/ui/input';
+33|import { PhoneInput, egyptPhoneSchema } from '@/components/ui/phone-input';
+34|import { Checkbox } from '@/components/ui/checkbox';
+35|import { Button } from '@/components/ui/button';
+36|import LoadingSpinner from '@/components/ui/loading-spinner';
+37|import { GENDERS } from '@/lib/adminConstants';
+38|import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
+39|import { useRole } from '@/hooks/useRole';
+40|import useLookups from '@/hooks/useLookups';
+41|
+42|export default function CreateUserDialog({ onSuccess }) {
+43|    const { t, i18n } = useTranslation('userManagement');
+44|    const { hasAdminAccess } = useRole();
+45|    const {
+46|        createAdminUser,
+47|        createSubAdminUser,
+48|        createModeratorUser,
+49|        createAssistantUser,
+50|        createTeacherUser,
+51|        createStudentUser,
+52|        createParentUser,
+53|        createLecturerUser,
+54|        actionLoading
+55|    } = useAdminUsers();
+56|
+57|    const [isOpen, setIsOpen] = useState(false);
+58|
+59|    const { governments, zones, getZonesByGovernment, subjects, levels } = useLookups();
+60|
+61|    const formSchema = z.object({
+62|        type: z.enum(['Admin', 'SubAdmin', 'Moderator', 'Assistant', 'Teacher', 'Student', 'Parent', 'Lecturer']),
+63|        name: z.string().min(1, { message: t('common:validation.required', 'Required') }),
+64|        email: z.string().email({ message: t('common:validation.email', 'Invalid email') }),
+65|        password: z.string().min(8, { message: t('common:validation.minLength', { min: 8, defaultValue: 'Min 8 chars' }) }),
+66|        confirm_password: z.string().min(8, { message: t('common:validation.minLength', { min: 8, defaultValue: 'Min 8 chars' }) }),
+67|        phone: egyptPhoneSchema(t).refine(val => val && val !== "+20", { message: t('common:validation.required', 'Required') }),
+68|        secondary_phone: z.union([egyptPhoneSchema(t), z.literal(""), z.literal("+20"), z.undefined(), z.null()]),
+69|        gender: z.enum(['male', 'female'], { message: t('common:validation.required', 'Required') }),
+70|        // Teacher-specific fields (validated conditionally)
+71|        government_id: z.string().optional(),
+72|        zone_id: z.string().optional(),
+73|        subject_id: z.string().optional(),
+74|        is_primary: z.boolean().default(false),
+75|        is_preparatory: z.boolean().default(false),
+76|        is_secondary: z.boolean().default(false),
+77|        // Additional properties
+78|        lecturer_user_id: z.string().optional(),
+79|        level_id: z.string().optional(),
+80|        parent_phone_number: z.union([egyptPhoneSchema(t), z.literal(""), z.literal("+20"), z.undefined(), z.null()]).optional(),
+81|        faction: z.string().optional(),
+82|    }).superRefine((data, ctx) => {
+83|        if (data.password !== data.confirm_password) {
+84|            ctx.addIssue({
+85|                code: z.ZodIssueCode.custom,
+86|                message: t('createDialog.passwordMismatch', 'Passwords do not match'),
+87|                path: ['confirm_password']
+88|            });
+89|        }
+90|
+91|        if (data.type === 'Teacher') {
+92|            if (!data.government_id || data.government_id.length === 0) {
+93|                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['government_id'] });
+94|            }
+95|            if (!data.zone_id || data.zone_id.length === 0) {
+96|                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['zone_id'] });
+97|            }
+98|            if (!data.subject_id || data.subject_id.length === 0) {
+99|                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['subject_id'] });
+100|            }
+101|        }
+102|
+103|        if (data.type === 'Assistant') {
+104|            if (!data.lecturer_user_id || data.lecturer_user_id.length === 0) {
+105|                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['lecturer_user_id'] });
+106|            }
+107|        }
+108|
+109|        if (data.type === 'Student') {
+110|            if (!data.level_id || data.level_id.length === 0) {
+111|                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['level_id'] });
+112|            }
+113|            if (!data.government_id || data.government_id.length === 0) {
+114|                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['government_id'] });
+115|            }
+116|            if (!data.zone_id || data.zone_id.length === 0) {
+117|                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['zone_id'] });
+118|            }
+119|            if (!data.parent_phone_number || data.parent_phone_number.length === 0) {
+120|                ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('common:validation.required', 'Required'), path: ['parent_phone_number'] });
+121|            }
+122|        }
+123|    });
+124|
+125|    const form = useForm({
+126|        resolver: zodResolver(formSchema),
+127|        defaultValues: {
+128|            type: 'Moderator',
+129|            name: '',
+130|            email: '',
+131|            password: '',
+132|            confirm_password: '',
+133|            phone: '',
+134|            secondary_phone: '',
+135|            gender: 'male',
+136|            government_id: '',
+137|            zone_id: '',
+138|            subject_id: '',
+139|            is_primary: false,
+140|            is_preparatory: false,
+141|            is_secondary: false,
+142|            lecturer_user_id: '',
+143|            level_id: '',
+144|            parent_phone_number: '',
+145|            faction: '',
+146|        },
+147|    });
+148|
+149|    const selectedType = form.watch('type');
+150|    const isTeacher = selectedType === 'Teacher';
+151|    const isAssistant = selectedType === 'Assistant';
+152|    const isStudent = selectedType === 'Student';
+153|    const isLecturer = selectedType === 'Lecturer';
+154|    const needsGovZone = isTeacher || isStudent;
+155|    const selectedGov = form.watch('government_id');
+156|
+157|    const handleGovChange = (value) => {
+158|        form.setValue('government_id', value);
+159|        form.setValue('zone_id', '');
+160|        getZonesByGovernment(value);
+161|    };
+162|
+163|    const onSubmit = async (values) => {
+164|        let success = false;
+165|        let payload = { ...values };
+166|
+167|        // Client-side only field; should not be sent to the API.
+168|        delete payload.confirm_password;
+169|
+170|        // Parse teacher-specific fields to integers for the API
+171|        if (values.type === 'Teacher') {
+172|            payload.government_id = parseInt(values.government_id);
+173|            payload.zone_id = parseInt(values.zone_id);
+174|            payload.subject_id = parseInt(values.subject_id);
+175|        } else if (values.type === 'Student') {
+176|            payload.government_id = parseInt(values.government_id);
+177|            payload.zone_id = parseInt(values.zone_id);
+178|            payload.level_id = parseInt(values.level_id);
+179|        } else if (values.type === 'Assistant') {
+180|            payload.lecturer_user_id = parseInt(values.lecturer_user_id);
+181|        }
+182|        
+183|        if (values.type !== 'Teacher') {
+184|            delete payload.subject_id;
+185|            delete payload.is_primary;
+186|            delete payload.is_preparatory;
+187|            delete payload.is_secondary;
+188|        }
+189|        if (values.type !== 'Teacher' && values.type !== 'Student') {
+190|            delete payload.government_id;
+191|            delete payload.zone_id;
+192|        }
+193|        if (values.type !== 'Student') {
+194|            delete payload.level_id;
+195|            delete payload.parent_phone_number;
+196|            delete payload.faction;
+197|        }
+198|        if (values.type !== 'Assistant') {
+199|            delete payload.lecturer_user_id;
+200|        }
+201|
+202|        switch (values.type) {
+203|            case 'Admin':
+204|                success = await createAdminUser(payload);
+205|                break;
+206|            case 'SubAdmin':
+207|                success = await createSubAdminUser(payload);
+208|                break;
+209|            case 'Moderator':
+210|                success = await createModeratorUser(payload);
+211|                break;
+212|            case 'Assistant':
+213|                success = await createAssistantUser(payload);
+214|                break;
+215|            case 'Teacher':
+216|                success = await createTeacherUser(payload);
+217|                break;
+218|            case 'Student':
+219|                success = await createStudentUser(payload);
+220|                break;
+221|            case 'Parent':
+222|                success = await createParentUser(payload);
+223|                break;
+224|            case 'Lecturer':
+225|                success = await createLecturerUser(payload);
+226|                break;
+227|        }
+228|
+229|        if (success) {
+230|            setIsOpen(false);
+231|            form.reset();
+232|            if (onSuccess) onSuccess();
+233|        }
+234|    };
+235|
+236|    return (
+237|        <Dialog open={isOpen} onOpenChange={(open) => {
+238|            setIsOpen(open);
+239|            if (!open) form.reset();
+240|        }}>
+241|            <DialogTrigger asChild>
+242|                <Button className="gap-2">
+243|                    <Plus className="h-4 w-4" />
+244|                    {t('actions.create')}
+245|                </Button>
+246|            </DialogTrigger>
+247|            <DialogContent className="sm:max-w-[500px] overflow-y-auto max-h-[90vh] custom-scrollbar">
+248|                <DialogHeader>
+249|                    <DialogTitle>{t('createDialog.title')}</DialogTitle>
+250|                    <DialogDescription>
+251|                        {t('createDialog.description')}
+252|                    </DialogDescription>
+253|                </DialogHeader>
+254|
+255|                <Form {...form}>
+256|                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+257|                        <FormField
+258|                            control={form.control}
+259|                            name="type"
+260|                            render={({ field }) => (
+261|                                <FormItem>
+262|                                    <FormLabel>{t('createDialog.type')}</FormLabel>
+263|                                    <Select dir={i18n.dir()} onValueChange={field.onChange} defaultValue={field.value}>
+264|                                        <FormControl>
+265|                                            <SelectTrigger>
+266|                                                <SelectValue placeholder="Select type" />
+267|                                            </SelectTrigger>
+268|                                        </FormControl>
+269|                                        <SelectContent>
+270|                                            {hasAdminAccess && <SelectItem value="Admin">{t('roles.Admin')}</SelectItem>}
+271|                                            {hasAdminAccess && <SelectItem value="SubAdmin">{t('roles.SubAdmin')}</SelectItem>}
+272|                                            <SelectItem value="Moderator">{t('roles.Moderator')}</SelectItem>
+273|                                            <SelectItem value="Assistant">{t('roles.Assistant', 'Assistant')}</SelectItem>
+274|                                            <SelectItem value="Teacher">{t('roles.Teacher')}</SelectItem>
+275|                                            <SelectItem value="Student">{t('roles.Student', 'Student')}</SelectItem>
+276|                                            <SelectItem value="Parent">{t('roles.Parent', 'Parent')}</SelectItem>
+277|                                            <SelectItem value="Lecturer">{t('roles.Lecturer', 'Lecturer')}</SelectItem>
+278|                                        </SelectContent>
+279|                                    </Select>
+280|                                    <FormMessage />
+281|                                </FormItem>
+282|                            )}
+283|                        />
+284|
+285|                        <FormField
+286|                            control={form.control}
+287|                            name="name"
+288|                            render={({ field }) => (
+289|                                <FormItem>
+290|                                    <FormLabel>{t('createDialog.name')}</FormLabel>
+291|                                    <FormControl>
+292|                                        <Input placeholder="John Doe" {...field} />
+293|                                    </FormControl>
+294|                                    <FormMessage />
+295|                                </FormItem>
+296|                            )}
+297|                        />
+298|
+299|                        <FormField
+300|                            control={form.control}
+301|                            name="email"
+302|                            render={({ field }) => (
+303|                                <FormItem>
+304|                                    <FormLabel>{t('createDialog.email')}</FormLabel>
+305|                                    <FormControl>
+306|                                        <Input type="email" placeholder="john@example.com" {...field} />
+307|                                    </FormControl>
+308|                                    <FormMessage />
+309|                                </FormItem>
+310|                            )}
+311|                        />
+312|
+313|                        <FormField
+314|                            control={form.control}
+315|                            name="password"
+316|                            render={({ field }) => (
+317|                                <FormItem>
+318|                                    <FormLabel>{t('createDialog.password')}</FormLabel>
+319|                                    <FormControl>
+320|                                        <Input type="password" autoComplete="new-password" {...field} />
+321|                                    </FormControl>
+322|                                    <FormMessage />
+323|                                </FormItem>
+324|                            )}
+325|                        />
+326|
+327|                        <FormField
+328|                            control={form.control}
+329|                            name="confirm_password"
+330|                            render={({ field }) => (
+331|                                <FormItem>
+332|                                    <FormLabel>{t('createDialog.confirmPassword', 'Confirm Password')}</FormLabel>
+333|                                    <FormControl>
+334|                                        <Input type="password" autoComplete="new-password" {...field} />
+335|                                    </FormControl>
+336|                                    <FormMessage />
+337|                                </FormItem>
+338|                            )}
+339|                        />
+340|
+341|                        <FormField
+342|                            control={form.control}
+343|                            name="phone"
+344|                            render={({ field }) => (
+345|                                <FormItem>
+346|                                    <FormLabel>{t('createDialog.phone')}</FormLabel>
+347|                                    <FormControl>
+348|                                        <PhoneInput dir="ltr" placeholder="010..." {...field} />
+349|                                    </FormControl>
+350|                                    <FormMessage />
+351|                                </FormItem>
+352|                            )}
+353|                        />
+354|
+355|                        <FormField
+356|                            control={form.control}
+357|                            name="secondary_phone"
+358|                            render={({ field }) => (
+359|                                <FormItem>
+360|                                    <FormLabel>{t('createDialog.secondaryPhone')}</FormLabel>
+361|                                    <FormControl>
+362|                                        <PhoneInput dir="ltr" {...field} value={field.value || ''} required={false} />
+363|                                    </FormControl>
+364|                                    <FormMessage />
+365|                                </FormItem>
+366|                            )}
+367|                        />
+368|
+369|                        <FormField
+370|                            control={form.control}
+371|                            name="gender"
+372|                            render={({ field }) => (
+373|                                <FormItem>
+374|                                    <FormLabel>{t('createDialog.gender')}</FormLabel>
+375|                                    <Select dir={i18n.dir()} onValueChange={field.onChange} defaultValue={field.value}>
+376|                                        <FormControl>
+377|                                            <SelectTrigger>
+378|                                                <SelectValue placeholder="Select gender" />
+379|                                            </SelectTrigger>
+380|                                        </FormControl>
+381|                                        <SelectContent>
+382|                                            {GENDERS.map(g => (
+383|                                                <SelectItem key={g} value={g}>{t(`createDialog.${g}`)}</SelectItem>
+384|                                            ))}
+385|                                        </SelectContent>
+386|                                    </Select>
+387|                                    <FormMessage />
+388|                                </FormItem>
+389|                            )}
+390|                        />
+391|
+392|                        {needsGovZone && (
+393|                            <div className="space-y-4 border-t pt-4">
+394|                                <FormLabel className="text-base font-semibold">{t('createDialog.locationFields', 'Location')}</FormLabel>
+395|                                <div className="grid grid-cols-2 gap-4">
+396|                                    <FormField
+397|                                        control={form.control}
+398|                                        name="government_id"
+399|                                        render={({ field }) => (
+400|                                            <FormItem>
+401|                                                <FormLabel>{t('createDialog.government')}</FormLabel>
+402|                                                <Select dir={i18n.dir()} onValueChange={handleGovChange} defaultValue={field.value}>
+403|                                                    <FormControl>
+404|                                                        <SelectTrigger>
+405|                                                            <SelectValue placeholder={t('createDialog.selectGovernment')} />
+406|                                                        </SelectTrigger>
+407|                                                    </FormControl>
+408|                                                    <SelectContent>
+409|                                                        {governments.map((gov) => (
+410|                                                            <SelectItem key={gov.id} value={String(gov.id)}>
+411|                                                                {gov.title}
+412|                                                            </SelectItem>
+413|                                                        ))}
+414|                                                    </SelectContent>
+415|                                                </Select>
+416|                                                <FormMessage />
+417|                                            </FormItem>
+418|                                        )}
+419|                                    />
+420|
+421|                                    <FormField
+422|                                        control={form.control}
+423|                                        name="zone_id"
+424|                                        render={({ field }) => (
+425|                                            <FormItem>
+426|                                                <FormLabel>{t('createDialog.zone')}</FormLabel>
+427|                                                <Select
+428|                                                    dir={i18n.dir()}
+429|                                                    onValueChange={field.onChange}
+430|                                                    defaultValue={field.value}
+431|                                                    disabled={!selectedGov || zones.length === 0}
+432|                                                >
+433|                                                    <FormControl>
+434|                                                        <SelectTrigger>
+435|                                                            <SelectValue placeholder={t('createDialog.selectZone')} />
+436|                                                        </SelectTrigger>
+437|                                                    </FormControl>
+438|                                                    <SelectContent>
+439|                                                        {zones.map((zone) => (
+440|                                                            <SelectItem key={zone.id} value={String(zone.id)}>
+441|                                                                {zone.title}
+442|                                                            </SelectItem>
+443|                                                        ))}
+444|                                                    </SelectContent>
+445|                                                </Select>
+446|                                                <FormMessage />
+447|                                            </FormItem>
+448|                                        )}
+449|                                    />
+450|                                </div>
+451|                            </div>
+452|                        )}
+453|
+454|                        {isTeacher && (
+455|                            <div className="space-y-4 border-t pt-4">
+456|                                <FormLabel className="text-base font-semibold">{t('createDialog.teacherFields')}</FormLabel>
+457|                                <FormField
+458|                                    control={form.control}
+459|                                    name="subject_id"
+460|                                    render={({ field }) => (
+461|                                        <FormItem>
+462|                                            <FormLabel>{t('createDialog.subject')}</FormLabel>
+463|                                            <Select dir={i18n.dir()} onValueChange={field.onChange} defaultValue={field.value}>
+464|                                                <FormControl>
+465|                                                    <SelectTrigger>
+466|                                                        <SelectValue placeholder={t('createDialog.selectSubject')} />
+467|                                                    </SelectTrigger>
+468|                                                </FormControl>
+469|                                                <SelectContent>
+470|                                                    {subjects.map((sub) => (
+471|                                                        <SelectItem key={sub.id} value={String(sub.id)}>
+472|                                                            {sub.title}
+473|                                                        </SelectItem>
+474|                                                    ))}
+475|                                                </SelectContent>
+476|                                            </Select>
+477|                                            <FormMessage />
+478|                                        </FormItem>
+479|                                    )}
+480|                                />
+481|
+482|                                <div className="space-y-2">
+483|                                    <FormLabel>{t('createDialog.teachingLevels')}</FormLabel>
+484|                                    <div className="flex flex-col space-y-2 rounded-md border p-4">
+485|                                        <FormField
+486|                                            control={form.control}
+487|                                            name="is_primary"
+488|                                            render={({ field }) => (
+489|                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+490|                                                    <FormControl>
+491|                                                        <Checkbox
+492|                                                            className={i18n.language === 'ar' ? 'scale-x-[-1]' : ''}
+493|                                                            checked={field.value}
+494|                                                            onCheckedChange={field.onChange}
+495|                                                        />
+496|                                                    </FormControl>
+497|                                                    <div className="space-y-1 leading-none">
+498|                                                        <FormLabel>{t('createDialog.primary')}</FormLabel>
+499|                                                    </div>
+500|                                                </FormItem>
+501|                                            )}
+502|                                        />
+503|                                        <FormField
+504|                                            control={form.control}
+505|                                            name="is_preparatory"
+506|                                            render={({ field }) => (
+507|                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+508|                                                    <FormControl>
+509|                                                        <Checkbox
+510|                                                            className={i18n.language === 'ar' ? 'scale-x-[-1]' : ''}
+511|                                                            checked={field.value}
+512|                                                            onCheckedChange={field.onChange}
+513|                                                        />
+514|                                                    </FormControl>
+515|                                                    <div className="space-y-1 leading-none">
+516|                                                        <FormLabel>{t('createDialog.preparatory')}</FormLabel>
+517|                                                    </div>
+518|                                                </FormItem>
+519|                                            )}
+520|                                        />
+521|                                        <FormField
+522|                                            control={form.control}
+523|                                            name="is_secondary"
+524|                                            render={({ field }) => (
+525|                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+526|                                                    <FormControl>
+527|                                                        <Checkbox
+528|                                                            className={i18n.language === 'ar' ? 'scale-x-[-1]' : ''}
+529|                                                            checked={field.value}
+530|                                                            onCheckedChange={field.onChange}
+531|                                                        />
+532|                                                    </FormControl>
+533|                                                    <div className="space-y-1 leading-none">
+534|                                                        <FormLabel>{t('createDialog.secondary')}</FormLabel>
+535|                                                    </div>
+536|                                                </FormItem>
+537|                                            )}
+538|                                        />
+539|                                    </div>
+540|                                </div>
+541|                            </div>
+542|                        )}
+543|
+544|                        {isStudent && (
+545|                            <div className="space-y-4 border-t pt-4">
+546|                                <FormLabel className="text-base font-semibold">{t('createDialog.studentFields', 'Student Details')}</FormLabel>
+547|                                <FormField
+548|                                    control={form.control}
+549|                                    name="level_id"
+550|                                    render={({ field }) => (
+551|                                        <FormItem>
+552|                                            <FormLabel>{t('createDialog.level', 'Level')}</FormLabel>
+553|                                            <Select dir={i18n.dir()} onValueChange={field.onChange} defaultValue={field.value}>
+554|                                                <FormControl>
+555|                                                    <SelectTrigger>
+556|                                                        <SelectValue placeholder={t('createDialog.selectLevel', 'Select level')} />
+557|                                                    </SelectTrigger>
+558|                                                </FormControl>
+559|                                                <SelectContent>
+560|                                                    {levels.map((lvl) => (
+561|                                                        <SelectItem key={lvl.id} value={String(lvl.id)}>
+562|                                                            {lvl.title}
+563|                                                        </SelectItem>
+564|                                                    ))}
+565|                                                </SelectContent>
+566|                                            </Select>
+567|                                            <FormMessage />
+568|                                        </FormItem>
+569|                                    )}
+570|                                />
+571|                                <FormField
+572|                                    control={form.control}
+573|                                    name="parent_phone_number"
+574|                                    render={({ field }) => (
+575|                                        <FormItem>
+576|                                            <FormLabel>{t('createDialog.parentPhone', 'Parent Phone')}</FormLabel>
+577|                                            <FormControl>
+578|                                                <PhoneInput dir="ltr" placeholder="010..." {...field} value={field.value || ''} />
+579|                                            </FormControl>
+580|                                            <FormMessage />
+581|                                        </FormItem>
+582|                                    )}
+583|                                />
+584|                                <FormField
+585|                                    control={form.control}
+586|                                    name="faction"
+587|                                    render={({ field }) => (
+588|                                        <FormItem>
+589|                                            <FormLabel>{t('createDialog.faction', 'Faction')}</FormLabel>
+590|                                            <FormControl>
+591|                                                <Input placeholder="Alpha, Beta..." {...field} />
+592|                                            </FormControl>
+593|                                            <FormMessage />
+594|                                        </FormItem>
+595|                                    )}
+596|                                />
+597|                            </div>
+598|                        )}
+599|
+600|                        {isAssistant && (
+601|                            <div className="space-y-4 border-t pt-4">
+602|                                <FormLabel className="text-base font-semibold">{t('createDialog.assistantFields', 'Assistant Details')}</FormLabel>
+603|                                <FormField
+604|                                    control={form.control}
+605|                                    name="lecturer_user_id"
+606|                                    render={({ field }) => (
+607|                                        <FormItem>
+608|                                            <FormLabel>{t('createDialog.lecturerId', 'Lecturer ID')}</FormLabel>
+609|                                            <FormControl>
+610|                                                <Input type="number" placeholder="1" {...field} />
+611|                                            </FormControl>
+612|                                            <FormMessage />
+613|                                        </FormItem>
+614|                                    )}
+615|                                />
+616|                            </div>
+617|                        )}
+618|
+619|                        <DialogFooter className="pt-4">
+620|                            <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={actionLoading} data-testid="admin-users-create-cancel-button">
+621|                                {t('actions.close')}
+622|                            </Button>
+623|                            <Button
+624|                                type="submit"
+625|                                disabled={actionLoading}
+626|                                className="min-w-[100px]"
+627|                                data-testid="admin-users-create-submit-button"
+628|                            >
+629|                                {actionLoading ? <LoadingSpinner className="h-4 w-4" /> : t('actions.confirm')}
+630|                            </Button>
+631|                        </DialogFooter>
+632|                    </form>
+633|                </Form>
+634|            </DialogContent>
+635|        </Dialog>
+636|    );
+637|}

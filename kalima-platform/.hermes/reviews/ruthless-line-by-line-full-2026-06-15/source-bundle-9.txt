@@ -1,0 +1,1693 @@
+
+===== FILE: kalima-platform/frontend/src/components/student/StudentSidebar.jsx (170 lines) =====
+1|import { useEffect, useState } from 'react';
+2|import { Link, useLocation } from 'react-router-dom';
+3|import { useTranslation } from 'react-i18next';
+4|import { ShoppingBag, User, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Settings, BookOpenCheck } from 'lucide-react';
+5|import useAuth from '@/hooks/auth/useAuth';
+6|
+7|const STUDENT_THEME_STORAGE_KEY = 'studentTheme';
+8|
+9|export default function StudentSidebar({ isMobileOpen, setIsMobileOpen }) {
+10|  const { t, i18n } = useTranslation('student');
+11|  const { logout } = useAuth();
+12|  const location = useLocation();
+13|  const [isCollapsed, setIsCollapsed] = useState(true);
+14|  const [theme, setTheme] = useState('light');
+15|
+16|  const isRtl = i18n.dir() === 'rtl';
+17|
+18|  useEffect(() => {
+19|    const savedTheme = localStorage.getItem(STUDENT_THEME_STORAGE_KEY);
+20|    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+21|    const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+22|
+23|    setTheme(initialTheme);
+24|    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
+25|
+26|    return () => {
+27|      setTheme('light');
+28|      document.documentElement.classList.remove('dark');
+29|    };
+30|  }, []);
+31|
+32|  const toggleTheme = () => {
+33|    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+34|    setTheme(nextTheme);
+35|    localStorage.setItem(STUDENT_THEME_STORAGE_KEY, nextTheme);
+36|    document.documentElement.classList.toggle('dark', nextTheme === 'dark');
+37|  };
+38|
+39|  const navigation = [
+40|    { name: t('nav.home'), href: '/', icon: Home, id: 'home' },
+41|    { name: t('nav.profile'), href: '/student/profile', icon: User, id: 'profile' },
+42|    { name: t('nav.eBookletStore', 'E-Booklets'), href: '/e-booklets', icon: ShoppingBag, id: 'e-booklet-store' },
+43|    { name: t('nav.eBooklets', 'My E-Booklets'), href: '/student/e-booklets', icon: BookOpenCheck, id: 'e-booklets' },
+44|    // { name: t('nav.orders'), href: '/orders', icon: ShoppingBag, id: 'orders' },
+45|    { name: t('nav.settings'), href: '/student/settings', icon: Settings, id: 'settings' },
+46|  ];
+47|
+48|  const toggleLanguage = () => {
+49|    const newLang = i18n.language === "ar" ? "en" : "ar";
+50|    i18n.changeLanguage(newLang);
+51|    document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
+52|    document.documentElement.lang = newLang;
+53|  };
+54|
+55|  // Calculate width class
+56|  const widthClass = isCollapsed ? "w-64 lg:w-20" : "w-64";
+57|
+58|  return (
+59|    <aside
+60|      className={`fixed inset-y-0 start-0 z-50 ${widthClass} transform bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${isMobileOpen ? "translate-x-0" : isRtl ? "translate-x-full" : "-translate-x-full"}`}
+61|    >
+62|      {/* Header + Toggles */}
+63|      <div
+64|        className={`flex h-16 items-center px-4 border-b border-sidebar-border ${isCollapsed ? "lg:justify-center justify-between" : "justify-between"}`}
+65|      >
+66|        <span
+67|          className={`text-lg font-bold truncate ${isCollapsed ? "lg:hidden" : ""}`}
+68|        >
+69|          {t("portalTitle")}
+70|        </span>
+71|
+72|        <div className="flex items-center gap-2">
+73|          {/* Desktop/Tablet Collapse Toggle */}
+74|          <button
+75|            onClick={() => setIsCollapsed(!isCollapsed)}
+76|            className="text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5 hidden lg:block"
+77|            title={isCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
+78|            data-testid="student-sidebar-mobile-toggle-button"
+79|          >
+80|            {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} className={isRtl ? "rotate-180" : ""} />}
+81|          </button>
+82|
+83|          {/* Mobile Close Toggle */}
+84|          <button
+85|            className="lg:hidden text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5"
+86|            onClick={() => setIsMobileOpen(false)}
+87|            title={t('nav.closeSidebar')}
+88|            data-testid="student-sidebar-mobile-close-button"
+89|          >
+90|            <X size={20} />
+91|          </button>
+92|        </div>
+93|      </div>
+94|
+95|      {/* Navigation Links */}
+96|      <nav className="flex-1 space-y-2 px-2 py-4 overflow-y-auto">
+97|        {navigation.map((item) => {
+98|          const isActive = item.href === '/' 
+99|            ? location.pathname === '/' 
+100|            : location.pathname.startsWith(item.href);
+101|          return (
+102|            <Link
+103|              key={item.href}
+104|              to={item.href}
+105|              title={isCollapsed ? item.name : undefined}
+106|              data-testid={`student-sidebar-nav-${item.id}`}
+107|              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive
+108|                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+109|                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+110|                } ${isCollapsed ? "lg:justify-center" : ""}`}
+111|            >
+112|              <item.icon
+113|                className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}
+114|                aria-hidden="true"
+115|              />
+116|              <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
+117|                {item.name}
+118|              </span>
+119|            </Link>
+120|          );
+121|        })}
+122|      </nav>
+123|
+124|      {/* Bottom Actions */}
+125|      <div className="border-t border-sidebar-border p-4 space-y-2 mt-auto">
+126|        <button
+127|          onClick={toggleLanguage}
+128|          title={isCollapsed ? (i18n.language === 'ar' ? 'English' : 'العربية') : undefined}
+129|          className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
+130|          data-testid="student-sidebar-language-toggle"
+131|        >
+132|          <Globe className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
+133|          <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{i18n.language === 'ar' ? 'English' : 'العربية'}</span>
+134|        </button>
+135|
+136|        <button
+137|          onClick={toggleTheme}
+138|          title={isCollapsed ? t('nav.themeToggle') : undefined}
+139|          className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
+140|          data-testid="student-sidebar-theme-toggle"
+141|        >
+142|          {theme === 'dark' ? (
+143|            <Sun className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
+144|          ) : (
+145|            <Moon className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
+146|          )}
+147|          <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>
+148|            {theme === 'dark' ? t('nav.lightMode') : t('nav.darkMode')}
+149|          </span>
+150|        </button>
+151|
+152|
+153|
+154|        <button
+155|          onClick={logout}
+156|          title={isCollapsed ? t("nav.logout") : undefined}
+157|          className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 ${isCollapsed ? "lg:justify-center" : ""}`}
+158|          data-testid="student-sidebar-logout-button"
+159|        >
+160|          <LogOut
+161|            className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? "lg:me-0" : ""}`}
+162|          />
+163|          <span className={`truncate ${isCollapsed ? "lg:hidden" : ""}`}>
+164|            {t("nav.logout")}
+165|          </span>
+166|        </button>
+167|      </div>
+168|    </aside>
+169|  );
+170|}
+
+===== FILE: kalima-platform/frontend/src/hooks/admin/useAdminEBooklets.js (597 lines) =====
+1|import { useCallback, useState } from "react";
+2|import axiosInstance from "@/api/axios";
+3|import i18n from "@/i18n";
+4|import useApiMutation from "../useApiMutation";
+5|
+6|const normalizeListResponse = (response) => ({
+7|  data: Array.isArray(response?.data) ? response.data : [],
+8|  total: Number(response?.total ?? 0),
+9|  page: Number(response?.page ?? 1),
+10|  limit: Number(response?.limit ?? 20),
+11|});
+12|
+13|const ANALYTICS_QUERY_KEYS = {
+14|  startDate: "start_date",
+15|  endDate: "end_date",
+16|  teacherId: "teacher_id",
+17|  instanceId: "instance_id",
+18|  studentId: "student_id",
+19|};
+20|
+21|const buildQueryString = (filters = {}) => {
+22|  const query = new URLSearchParams();
+23|  Object.entries(filters).forEach(([key, value]) => {
+24|    if (value !== undefined && value !== null && value !== "" && value !== "all") {
+25|      query.set(ANALYTICS_QUERY_KEYS[key] || key, String(value));
+26|    }
+27|  });
+28|  return query.toString();
+29|};
+30|
+31|export function useAdminEBookletAnalytics() {
+32|  const { mutate: fetchApi, loading } = useApiMutation();
+33|  const [analytics, setAnalytics] = useState({ events: {}, revenue: {} });
+34|
+35|  const fetchAnalytics = useCallback(async (filters = {}) => {
+36|    const query = buildQueryString(filters);
+37|    const response = await fetchApi(
+38|      {
+39|        endpoint: `/admin/e-booklet-analytics${query ? `?${query}` : ""}`,
+40|        method: "get",
+41|      },
+42|      false,
+43|    );
+44|    setAnalytics(response?.data || { events: {}, revenue: {} });
+45|    return response;
+46|  }, [fetchApi]);
+47|
+48|  const exportCsv = useCallback(async (filters = {}) => {
+49|    const query = buildQueryString(filters);
+50|    const response = await axiosInstance.get(
+51|      `/admin/e-booklet-analytics.csv${query ? `?${query}` : ""}`,
+52|      { responseType: "blob" },
+53|    );
+54|    const url = URL.createObjectURL(response.data);
+55|    const link = document.createElement("a");
+56|    link.href = url;
+57|    link.download = "e-booklet-analytics.csv";
+58|    document.body.appendChild(link);
+59|    link.click();
+60|    link.remove();
+61|    URL.revokeObjectURL(url);
+62|    return response;
+63|  }, []);
+64|
+65|  return { analytics, loading, fetchAnalytics, exportCsv };
+66|}
+67|
+68|export function useAdminEBookletTemplates() {
+69|  const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
+70|  const [templates, setTemplates] = useState([]);
+71|  const [pagination, setPagination] = useState({
+72|    total: 0,
+73|    page: 1,
+74|    limit: 12,
+75|  });
+76|  const [filters, setFilters] = useState({
+77|    search: "",
+78|    status: "all",
+79|  });
+80|  const [initLoading, setInitLoading] = useState(false);
+81|  const [actionLoading, setActionLoading] = useState(false);
+82|
+83|  const buildQuery = useCallback(
+84|    (overrides = {}) => {
+85|      const query = new URLSearchParams();
+86|      const nextFilters = { ...filters, ...overrides };
+87|      const nextPage = overrides.page ?? pagination.page;
+88|      const nextLimit = overrides.limit ?? pagination.limit;
+89|
+90|      query.set("page", String(nextPage));
+91|      query.set("limit", String(nextLimit));
+92|      if (nextFilters.search) query.set("search", nextFilters.search);
+93|      if (nextFilters.status && nextFilters.status !== "all") {
+94|        query.set("status", nextFilters.status);
+95|      }
+96|
+97|      return query.toString();
+98|    },
+99|    [filters, pagination.limit, pagination.page],
+100|  );
+101|
+102|  const fetchTemplates = useCallback(
+103|    async (overrides = {}) => {
+104|      setInitLoading(true);
+105|      try {
+106|        const response = await fetchApi(
+107|          {
+108|            endpoint: `/admin/e-booklet-templates?${buildQuery(overrides)}`,
+109|            method: "get",
+110|          },
+111|          false,
+112|        );
+113|        const normalized = normalizeListResponse(response);
+114|        setTemplates(normalized.data);
+115|        setPagination((current) => ({
+116|          ...current,
+117|          total: normalized.total,
+118|          page: normalized.page,
+119|          limit: normalized.limit,
+120|        }));
+121|        return response;
+122|      } finally {
+123|        setInitLoading(false);
+124|      }
+125|    },
+126|    [buildQuery, fetchApi],
+127|  );
+128|
+129|  const setSearch = useCallback((search) => {
+130|    setFilters((current) => ({ ...current, search }));
+131|    setPagination((current) => ({ ...current, page: 1 }));
+132|  }, []);
+133|
+134|  const setStatus = useCallback((status) => {
+135|    setFilters((current) => ({ ...current, status }));
+136|    setPagination((current) => ({ ...current, page: 1 }));
+137|  }, []);
+138|
+139|  const setPage = useCallback((page) => {
+140|    setPagination((current) => ({ ...current, page }));
+141|  }, []);
+142|
+143|  const runAction = useCallback(async (action) => {
+144|    setActionLoading(true);
+145|    try {
+146|      return await action();
+147|    } finally {
+148|      setActionLoading(false);
+149|    }
+150|  }, []);
+151|
+152|  const updateTemplate = useCallback(
+153|    (templateId, data) =>
+154|      runAction(() =>
+155|        fetchApi({
+156|          endpoint: `/admin/e-booklet-templates/${templateId}`,
+157|          method: "patch",
+158|          data,
+159|          defaultSuccessMessage: i18n.t("eBooklets:toasts.templateUpdated"),
+160|        }),
+161|      ),
+162|    [fetchApi, runAction],
+163|  );
+164|
+165|  const publishVersion = useCallback(
+166|    (versionId) =>
+167|      runAction(() =>
+168|        fetchApi({
+169|          endpoint: `/admin/e-booklet-template-versions/${versionId}/publish`,
+170|          method: "post",
+171|          defaultSuccessMessage: i18n.t("eBooklets:toasts.versionPublished"),
+172|        }),
+173|      ),
+174|    [fetchApi, runAction],
+175|  );
+176|
+177|  return {
+178|    templates,
+179|    pagination,
+180|    filters,
+181|    loading: apiLoading || initLoading,
+182|    actionLoading,
+183|    fetchTemplates,
+184|    setSearch,
+185|    setStatus,
+186|    setPage,
+187|    updateTemplate,
+188|    publishVersion,
+189|  };
+190|}
+191|
+192|export function useAdminEBookletEditor() {
+193|  const { mutate: fetchApi, loading } = useApiMutation();
+194|
+195|  const fetchTemplate = useCallback(
+196|    (templateId) =>
+197|      fetchApi(
+198|        {
+199|          endpoint: `/admin/e-booklet-templates/${templateId}`,
+200|          method: "get",
+201|        },
+202|        false,
+203|      ),
+204|    [fetchApi],
+205|  );
+206|
+207|  const fetchVersions = useCallback(
+208|    (templateId) =>
+209|      fetchApi(
+210|        {
+211|          endpoint: `/admin/e-booklet-templates/${templateId}/versions`,
+212|          method: "get",
+213|        },
+214|        false,
+215|      ),
+216|    [fetchApi],
+217|  );
+218|
+219|  const createTemplate = useCallback(
+220|    (data) =>
+221|      fetchApi({
+222|        endpoint: "/admin/e-booklet-templates",
+223|        method: "post",
+224|        data,
+225|        defaultSuccessMessage: i18n.t("eBooklets:toasts.templateSaved"),
+226|      }),
+227|    [fetchApi],
+228|  );
+229|
+230|  const updateTemplate = useCallback(
+231|    (templateId, data) =>
+232|      fetchApi({
+233|        endpoint: `/admin/e-booklet-templates/${templateId}`,
+234|        method: "patch",
+235|        data,
+236|        defaultSuccessMessage: i18n.t("eBooklets:toasts.templateUpdated"),
+237|      }),
+238|    [fetchApi],
+239|  );
+240|
+241|  const createVersion = useCallback(
+242|    (templateId, data) =>
+243|      fetchApi({
+244|        endpoint: `/admin/e-booklet-templates/${templateId}/versions`,
+245|        method: "post",
+246|        data,
+247|        defaultSuccessMessage: i18n.t("eBooklets:toasts.versionSaved"),
+248|      }),
+249|    [fetchApi],
+250|  );
+251|
+252|  const updateVersion = useCallback(
+253|    (versionId, data) =>
+254|      fetchApi({
+255|        endpoint: `/admin/e-booklet-template-versions/${versionId}`,
+256|        method: "patch",
+257|        data,
+258|        defaultSuccessMessage: i18n.t("eBooklets:toasts.versionUpdated"),
+259|      }),
+260|    [fetchApi],
+261|  );
+262|
+263|  const publishVersion = useCallback(
+264|    (versionId) =>
+265|      fetchApi({
+266|        endpoint: `/admin/e-booklet-template-versions/${versionId}/publish`,
+267|        method: "post",
+268|        defaultSuccessMessage: i18n.t("eBooklets:toasts.versionPublished"),
+269|      }),
+270|    [fetchApi],
+271|  );
+272|
+273|  const fetchHotspots = useCallback(
+274|    (versionId, pageNumber) => {
+275|      const query = pageNumber ? `?page_number=${pageNumber}` : "";
+276|      return fetchApi(
+277|        {
+278|          endpoint: `/admin/e-booklet-template-versions/${versionId}/hotspots${query}`,
+279|          method: "get",
+280|        },
+281|        false,
+282|      );
+283|    },
+284|    [fetchApi],
+285|  );
+286|
+287|  const createHotspot = useCallback(
+288|    (versionId, data) =>
+289|      fetchApi({
+290|        endpoint: `/admin/e-booklet-template-versions/${versionId}/hotspots`,
+291|        method: "post",
+292|        data: { ...data, template_version_id: versionId },
+293|        defaultSuccessMessage: i18n.t("eBooklets:toasts.hotspotSaved"),
+294|      }),
+295|    [fetchApi],
+296|  );
+297|
+298|  const updateHotspot = useCallback(
+299|    (hotspotId, data) =>
+300|      fetchApi({
+301|        endpoint: `/admin/e-booklet-hotspots/${hotspotId}`,
+302|        method: "patch",
+303|        data,
+304|        defaultSuccessMessage: i18n.t("eBooklets:toasts.hotspotUpdated"),
+305|      }),
+306|    [fetchApi],
+307|  );
+308|
+309|  const deleteHotspot = useCallback(
+310|    (hotspotId) =>
+311|      fetchApi({
+312|        endpoint: `/admin/e-booklet-hotspots/${hotspotId}`,
+313|        method: "delete",
+314|        defaultSuccessMessage: i18n.t("eBooklets:toasts.hotspotRemoved"),
+315|      }),
+316|    [fetchApi],
+317|  );
+318|
+319|  const uploadAsset = useCallback(
+320|    (kind, file, data = {}) => {
+321|      const formData = new FormData();
+322|      const fieldName = kind === "cover" ? "cover" : kind === "document" ? "document" : "media";
+323|      formData.append(fieldName, file);
+324|      Object.entries(data).forEach(([key, value]) => {
+325|        if (value !== undefined && value !== null && value !== "") {
+326|          formData.append(key, value);
+327|        }
+328|      });
+329|
+330|      return fetchApi({
+331|        endpoint: `/admin/e-booklet-files/${kind}`,
+332|        method: "post",
+333|        data: formData,
+334|        defaultSuccessMessage: i18n.t("eBooklets:toasts.fileStored"),
+335|      });
+336|    },
+337|    [fetchApi],
+338|  );
+339|
+340|  const fetchAssetBlobUrl = useCallback(async (assetId) => {
+341|    if (!assetId) return "";
+342|    const response = await axiosInstance.get(
+343|      `/admin/e-booklet-files/${assetId}/preview`,
+344|      { responseType: "blob" },
+345|    );
+346|    return URL.createObjectURL(response.data);
+347|  }, []);
+348|
+349|  return {
+350|    loading,
+351|    fetchTemplate,
+352|    fetchVersions,
+353|    createTemplate,
+354|    updateTemplate,
+355|    createVersion,
+356|    updateVersion,
+357|    publishVersion,
+358|    fetchHotspots,
+359|    createHotspot,
+360|    updateHotspot,
+361|    deleteHotspot,
+362|    uploadAsset,
+363|    fetchAssetBlobUrl,
+364|  };
+365|}
+366|
+367|export function useAdminEBookletPurchases() {
+368|  const { mutate: fetchApi, loading } = useApiMutation();
+369|  const [purchases, setPurchases] = useState([]);
+370|  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 12 });
+371|  const [status, setStatus] = useState("all");
+372|
+373|  const fetchPurchases = useCallback(
+374|    async (overrides = {}) => {
+375|      const query = new URLSearchParams();
+376|      query.set("page", String(overrides.page ?? pagination.page));
+377|      query.set("limit", String(overrides.limit ?? pagination.limit));
+378|      const nextStatus = overrides.status ?? status;
+379|      if (nextStatus && nextStatus !== "all") query.set("status", nextStatus);
+380|
+381|      const response = await fetchApi(
+382|        {
+383|          endpoint: `/admin/e-booklet-purchases?${query.toString()}`,
+384|          method: "get",
+385|        },
+386|        false,
+387|      );
+388|      const normalized = normalizeListResponse(response);
+389|      setPurchases(normalized.data);
+390|      setPagination((current) => ({
+391|        ...current,
+392|        total: normalized.total,
+393|        page: normalized.page,
+394|        limit: normalized.limit,
+395|      }));
+396|      return response;
+397|    },
+398|    [fetchApi, pagination.limit, pagination.page, status],
+399|  );
+400|
+401|  const setPage = useCallback((page) => {
+402|    setPagination((current) => ({ ...current, page }));
+403|  }, []);
+404|
+405|  const changeStatusFilter = useCallback((value) => {
+406|    setStatus(value);
+407|    setPagination((current) => ({ ...current, page: 1 }));
+408|  }, []);
+409|
+410|  const updatePurchaseStatus = useCallback(
+411|    (purchaseId, nextStatus, adminNotes) =>
+412|      fetchApi({
+413|        endpoint: `/admin/e-booklet-purchases/${purchaseId}/status`,
+414|        method: "patch",
+415|        data: { status: nextStatus, admin_notes: adminNotes },
+416|        defaultSuccessMessage: i18n.t("eBooklets:toasts.purchaseUpdated"),
+417|      }),
+418|    [fetchApi],
+419|  );
+420|
+421|  const markPaid = useCallback(
+422|    (purchaseId) =>
+423|      fetchApi({
+424|        endpoint: `/admin/e-booklet-purchases/${purchaseId}/mark-paid`,
+425|        method: "post",
+426|        defaultSuccessMessage: i18n.t("eBooklets:toasts.purchaseMarkedPaid"),
+427|      }),
+428|    [fetchApi],
+429|  );
+430|
+431|  const deliverPurchase = useCallback(
+432|    (purchaseId, data) =>
+433|      fetchApi({
+434|        endpoint: `/admin/e-booklet-purchases/${purchaseId}/deliver`,
+435|        method: "post",
+436|        data,
+437|        defaultSuccessMessage: i18n.t("eBooklets:toasts.delivered"),
+438|      }),
+439|    [fetchApi],
+440|  );
+441|
+442|  const uploadTeacherDocument = useCallback(
+443|    (file, data = {}) => {
+444|      const formData = new FormData();
+445|      formData.append("document", file);
+446|      Object.entries(data).forEach(([key, value]) => {
+447|        if (value !== undefined && value !== null && value !== "") {
+448|          formData.append(key, value);
+449|        }
+450|      });
+451|
+452|      return fetchApi({
+453|        endpoint: "/admin/e-booklet-files/document",
+454|        method: "post",
+455|        data: formData,
+456|        defaultSuccessMessage: i18n.t("eBooklets:toasts.teacherDocumentStored"),
+457|      });
+458|    },
+459|    [fetchApi],
+460|  );
+461|
+462|  return {
+463|    purchases,
+464|    pagination,
+465|    status,
+466|    loading,
+467|    setPage,
+468|    setStatus: changeStatusFilter,
+469|    fetchPurchases,
+470|    updatePurchaseStatus,
+471|    markPaid,
+472|    deliverPurchase,
+473|    uploadTeacherDocument,
+474|  };
+475|}
+476|
+477|
+478|export function useAdminEBookletInstances() {
+479|  const { mutate: fetchApi, loading } = useApiMutation();
+480|  const [instances, setInstances] = useState([]);
+481|  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20 });
+482|  const [status, setStatusState] = useState("all");
+483|
+484|  const fetchInstances = useCallback(async (overrides = {}) => {
+485|    const query = new URLSearchParams();
+486|    query.set("page", String(overrides.page ?? pagination.page));
+487|    query.set("limit", String(overrides.limit ?? pagination.limit));
+488|    const nextStatus = overrides.status ?? status;
+489|    if (nextStatus && nextStatus !== "all") query.set("status", nextStatus);
+490|    if (overrides.teacher_id) query.set("teacher_id", String(overrides.teacher_id));
+491|    const response = await fetchApi({ endpoint: `/admin/e-booklet-instances?${query.toString()}`, method: "get" }, false);
+492|    const normalized = normalizeListResponse(response);
+493|    setInstances(normalized.data);
+494|    setPagination((current) => ({ ...current, total: normalized.total, page: normalized.page, limit: normalized.limit }));
+495|    return response;
+496|  }, [fetchApi, pagination.limit, pagination.page, status]);
+497|
+498|  const setPage = useCallback((page) => setPagination((current) => ({ ...current, page })), []);
+499|  const setStatus = useCallback((value) => { setStatusState(value); setPagination((current) => ({ ...current, page: 1 })); }, []);
+500|  const updateQuota = useCallback((instanceId, invite_quota) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/update-quota`, method: "post", data: { invite_quota }, defaultSuccessMessage: i18n.t("eBooklets:toasts.quotaUpdated") }), [fetchApi]);
+501|  const revokeTeacherAccess = useCallback((instanceId) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/revoke-access`, method: "post", defaultSuccessMessage: i18n.t("eBooklets:toasts.teacherAccessRevoked") }), [fetchApi]);
+502|
+503|  return { instances, pagination, status, loading, fetchInstances, setPage, setStatus, updateQuota, revokeTeacherAccess };
+504|}
+505|
+506|export function useAdminEBookletTermsMilestones() {
+507|  const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
+508|  const [terms, setTerms] = useState([]);
+509|  const [milestones, setMilestones] = useState([]);
+510|  const [progress, setProgress] = useState({ paidRedemptions: 0, achievements: [] });
+511|  const [actionLoading, setActionLoading] = useState(false);
+512|
+513|  const runAction = useCallback(async (action) => {
+514|    setActionLoading(true);
+515|    try {
+516|      return await action();
+517|    } finally {
+518|      setActionLoading(false);
+519|    }
+520|  }, []);
+521|
+522|  const fetchTerms = useCallback(async (filters = {}) => {
+523|    const query = new URLSearchParams();
+524|    if (filters.status && filters.status !== "all") query.set("status", filters.status);
+525|    if (filters.templateId !== undefined) query.set("template_id", filters.templateId === null ? "null" : String(filters.templateId));
+526|    const response = await fetchApi({ endpoint: `/admin/e-booklet-terms${query.toString() ? `?${query.toString()}` : ""}`, method: "get" }, false);
+527|    setTerms(Array.isArray(response?.data) ? response.data : []);
+528|    return response;
+529|  }, [fetchApi]);
+530|
+531|  const fetchMilestones = useCallback(async (termId) => {
+532|    const query = termId ? `?term_id=${termId}` : "";
+533|    const response = await fetchApi({ endpoint: `/admin/e-booklet-milestones${query}`, method: "get" }, false);
+534|    setMilestones(Array.isArray(response?.data) ? response.data : []);
+535|    return response;
+536|  }, [fetchApi]);
+537|
+538|  const fetchProgress = useCallback(async (termId) => {
+539|    const query = termId ? `?term_id=${termId}` : "";
+540|    const response = await fetchApi({ endpoint: `/admin/e-booklet-progress${query}`, method: "get" }, false);
+541|    setProgress(response?.data || { paidRedemptions: 0, achievements: [] });
+542|    return response;
+543|  }, [fetchApi]);
+544|
+545|  const createTerm = useCallback((data) => runAction(() => fetchApi({ endpoint: "/admin/e-booklet-terms", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.termSaved") })), [fetchApi, runAction]);
+546|  const updateTerm = useCallback((termId, data) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-terms/${termId}`, method: "patch", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.termSaved") })), [fetchApi, runAction]);
+547|  const activateTerm = useCallback((termId) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-terms/${termId}/activate`, method: "post", defaultSuccessMessage: i18n.t("eBooklets:toasts.termActivated") })), [fetchApi, runAction]);
+548|  const createMilestone = useCallback((data) => runAction(() => fetchApi({ endpoint: "/admin/e-booklet-milestones", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneSaved") })), [fetchApi, runAction]);
+549|  const updateMilestone = useCallback((milestoneId, data) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-milestones/${milestoneId}`, method: "patch", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneSaved") })), [fetchApi, runAction]);
+550|  const reorderMilestones = useCallback((termId, items) => runAction(() => fetchApi({ endpoint: "/admin/e-booklet-milestones/reorder", method: "post", data: { termId, items }, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestonesReordered") })), [fetchApi, runAction]);
+551|
+552|  return {
+553|    terms,
+554|    milestones,
+555|    progress,
+556|    loading: apiLoading,
+557|    actionLoading,
+558|    fetchTerms,
+559|    fetchMilestones,
+560|    fetchProgress,
+561|    createTerm,
+562|    updateTerm,
+563|    activateTerm,
+564|    createMilestone,
+565|    updateMilestone,
+566|    reorderMilestones,
+567|  };
+568|}
+569|
+570|export function useAdminEBookletDevices() {
+571|  const { mutate: fetchApi, loading } = useApiMutation();
+572|  const [devices, setDevices] = useState([]);
+573|  const [students, setStudents] = useState([]);
+574|
+575|  const fetchDevices = useCallback(async (instanceId, userId) => {
+576|    if (!instanceId || !userId) { setDevices([]); return { data: [] }; }
+577|    const response = await fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/users/${userId}/devices`, method: "get" }, false);
+578|    setDevices(Array.isArray(response?.data) ? response.data : []);
+579|    return response;
+580|  }, [fetchApi]);
+581|
+582|  const fetchStudents = useCallback(async (instanceId) => {
+583|    if (!instanceId) { setStudents([]); return { data: [] }; }
+584|    const response = await fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/students`, method: "get" }, false);
+585|    setStudents(Array.isArray(response?.data) ? response.data : []);
+586|    return response;
+587|  }, [fetchApi]);
+588|
+589|  const resetDevices = useCallback((instanceId, userId, reason) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/users/${userId}/devices/reset`, method: "post", data: { reason }, defaultSuccessMessage: i18n.t("eBooklets:toasts.devicesReset") }), [fetchApi]);
+590|  const addDeviceAllowance = useCallback((instanceId, userId, allowedDevices, reason) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/users/${userId}/device-allowance`, method: "post", data: { allowedDevices: Number(allowedDevices), reason }, defaultSuccessMessage: i18n.t("eBooklets:toasts.deviceAllowanceUpdated") }), [fetchApi]);
+591|
+592|  const setDiscoveredStudents = useCallback((rows = []) => {
+593|    setStudents(Array.isArray(rows) ? rows : []);
+594|  }, []);
+595|
+596|  return { devices, students, loading, fetchDevices, fetchStudents, resetDevices, addDeviceAllowance, setDiscoveredStudents };
+597|}
+
+===== FILE: kalima-platform/frontend/src/hooks/useEBookletAccess.js (366 lines) =====
+1|import { useCallback, useState } from "react";
+2|import i18n from "@/i18n";
+3|import api from "@/api/axios";
+4|import useApiMutation from "./useApiMutation";
+5|
+6|export function useTeacherEBooklets() {
+7|  const { mutate: fetchApi, loading } = useApiMutation();
+8|  const [items, setItems] = useState([]);
+9|  const [invites, setInvites] = useState([]);
+10|  const [students, setStudents] = useState([]);
+11|  const [milestones, setMilestones] = useState([]);
+12|  const [wallet, setWallet] = useState(null);
+13|  const [walletLedger, setWalletLedger] = useState([]);
+14|  const [currentTerms, setCurrentTerms] = useState(null);
+15|
+16|  const fetchTeacherEBooklets = useCallback(async () => {
+17|    const response = await fetchApi(
+18|      { endpoint: "/teacher/e-booklets", method: "get" },
+19|      false,
+20|    );
+21|    setItems(Array.isArray(response?.data) ? response.data : []);
+22|    return response;
+23|  }, [fetchApi]);
+24|
+25|  const fetchInvites = useCallback(
+26|    async (instanceId) => {
+27|      const response = await fetchApi(
+28|        {
+29|          endpoint: `/teacher/e-booklets/${instanceId}/invites`,
+30|          method: "get",
+31|        },
+32|        false,
+33|      );
+34|      setInvites(Array.isArray(response?.data) ? response.data : []);
+35|      return response;
+36|    },
+37|    [fetchApi],
+38|  );
+39|
+40|  const createInvite = useCallback(
+41|    (instanceId, data) =>
+42|      fetchApi({
+43|        endpoint: `/teacher/e-booklets/${instanceId}/invites`,
+44|        method: "post",
+45|        data,
+46|        defaultSuccessMessage: i18n.t("eBooklets:toasts.inviteCreated"),
+47|      }),
+48|    [fetchApi],
+49|  );
+50|
+51|  const disableInvite = useCallback(
+52|    (inviteId) =>
+53|      fetchApi({
+54|        endpoint: `/teacher/e-booklet-invites/${inviteId}/disable`,
+55|        method: "patch",
+56|        defaultSuccessMessage: i18n.t("eBooklets:toasts.inviteDisabled"),
+57|      }),
+58|    [fetchApi],
+59|  );
+60|
+61|  const fetchStudents = useCallback(
+62|    async (instanceId) => {
+63|      const response = await fetchApi(
+64|        {
+65|          endpoint: `/teacher/e-booklets/${instanceId}/students`,
+66|          method: "get",
+67|        },
+68|        false,
+69|      );
+70|      setStudents(Array.isArray(response?.data) ? response.data : []);
+71|      return response;
+72|    },
+73|    [fetchApi],
+74|  );
+75|
+76|  const revokeStudent = useCallback(
+77|    (instanceId, studentId) =>
+78|      fetchApi({
+79|        endpoint: `/teacher/e-booklets/${instanceId}/students/${studentId}/revoke`,
+80|        method: "patch",
+81|        defaultSuccessMessage: i18n.t("eBooklets:toasts.studentRevoked"),
+82|      }),
+83|    [fetchApi],
+84|  );
+85|
+86|  const fetchCurrentTerms = useCallback(async (templateId) => {
+87|    const suffix = templateId ? `?template_id=${encodeURIComponent(templateId)}` : "";
+88|    const response = await fetchApi(
+89|      { endpoint: `/teacher/e-booklet-terms/current${suffix}`, method: "get" },
+90|      false,
+91|    );
+92|    setCurrentTerms(response?.data || null);
+93|    return response;
+94|  }, [fetchApi]);
+95|
+96|  const acceptCodeGenerationTerms = useCallback(
+97|    (templateId) => fetchApi({
+98|      endpoint: "/teacher/e-booklet-terms/accept-code-generation",
+99|      method: "post",
+100|      data: templateId ? { templateId } : {},
+101|      defaultSuccessMessage: i18n.t("eBooklets:toasts.termsAccepted"),
+102|    }),
+103|    [fetchApi],
+104|  );
+105|
+106|  const createAccessCode = useCallback(
+107|    (instanceId, data) => fetchApi({
+108|      endpoint: `/teacher/e-booklets/${instanceId}/access-codes`,
+109|      method: "post",
+110|      data,
+111|      defaultSuccessMessage: i18n.t("eBooklets:toasts.accessCodeCreated"),
+112|    }),
+113|    [fetchApi],
+114|  );
+115|
+116|  const fetchTeacherMilestones = useCallback(async (termId) => {
+117|    const suffix = termId ? `?term_id=${encodeURIComponent(termId)}` : "";
+118|    const response = await fetchApi(
+119|      { endpoint: `/teacher/e-booklet-milestones${suffix}`, method: "get" },
+120|      false,
+121|    );
+122|    setMilestones(Array.isArray(response?.data) ? response.data : []);
+123|    return response;
+124|  }, [fetchApi]);
+125|
+126|  const evaluateTeacherMilestones = useCallback(
+127|    (termId) => fetchApi(
+128|      { endpoint: "/teacher/e-booklet-milestones/evaluate", method: "post", data: termId ? { termId } : {} },
+129|      false,
+130|    ),
+131|    [fetchApi],
+132|  );
+133|
+134|  const fetchTeacherWallet = useCallback(async () => {
+135|    const response = await fetchApi(
+136|      { endpoint: "/teacher/e-booklet-wallet", method: "get" },
+137|      false,
+138|    );
+139|    setWallet(response?.data?.wallet || null);
+140|    setWalletLedger(Array.isArray(response?.data?.ledger) ? response.data.ledger : []);
+141|    return response;
+142|  }, [fetchApi]);
+143|
+144|  const claimMilestoneReward = useCallback(
+145|    (achievementId) => fetchApi({
+146|      endpoint: `/teacher/e-booklet-milestone-achievements/${achievementId}/claim`,
+147|      method: "post",
+148|      data: { termsAccepted: true },
+149|      defaultSuccessMessage: i18n.t("eBooklets:toasts.rewardClaimed"),
+150|    }),
+151|    [fetchApi],
+152|  );
+153|
+154|  return {
+155|    items,
+156|    invites,
+157|    students,
+158|    milestones,
+159|    wallet,
+160|    walletLedger,
+161|    currentTerms,
+162|    loading,
+163|    fetchTeacherEBooklets,
+164|    fetchInvites,
+165|    createInvite,
+166|    disableInvite,
+167|    fetchStudents,
+168|    revokeStudent,
+169|    fetchCurrentTerms,
+170|    acceptCodeGenerationTerms,
+171|    createAccessCode,
+172|    fetchTeacherMilestones,
+173|    evaluateTeacherMilestones,
+174|    fetchTeacherWallet,
+175|    claimMilestoneReward,
+176|  };
+177|}
+178|
+179|const ANALYTICS_QUERY_KEYS = {
+180|  startDate: "start_date",
+181|  endDate: "end_date",
+182|  teacherId: "teacher_id",
+183|  instanceId: "instance_id",
+184|  studentId: "student_id",
+185|};
+186|
+187|const buildAnalyticsQueryString = (filters = {}) => {
+188|  const query = new URLSearchParams();
+189|  Object.entries(filters).forEach(([key, value]) => {
+190|    if (value !== undefined && value !== null && value !== "" && value !== "all") {
+191|      query.set(ANALYTICS_QUERY_KEYS[key] || key, String(value));
+192|    }
+193|  });
+194|  return query.toString();
+195|};
+196|
+197|export function useTeacherEBookletAnalytics() {
+198|  const { mutate: fetchApi, loading } = useApiMutation();
+199|  const [analytics, setAnalytics] = useState({ events: {}, revenue: {} });
+200|
+201|  const fetchAnalytics = useCallback(async (filters = {}) => {
+202|    const query = buildAnalyticsQueryString(filters);
+203|    const suffix = query ? `?${query}` : "";
+204|    const response = await fetchApi(
+205|      { endpoint: `/teacher/e-booklet-analytics${suffix}`, method: "get" },
+206|      false,
+207|    );
+208|    setAnalytics(response?.data || { events: {}, revenue: {} });
+209|    return response;
+210|  }, [fetchApi]);
+211|
+212|  return { analytics, loading, fetchAnalytics };
+213|}
+214|
+215|export function useEBookletViewer({ adminMode = false } = {}) {
+216|  const { mutate: fetchApi, loading } = useApiMutation();
+217|  const [metadata, setMetadata] = useState(null);
+218|  const [page, setPage] = useState(null);
+219|  const [hotspots, setHotspots] = useState([]);
+220|  const viewerBase = adminMode ? "/admin/e-booklet-viewer" : "/e-booklet-viewer";
+221|
+222|  const fetchMetadata = useCallback(
+223|    async (instanceId) => {
+224|      const response = await fetchApi(
+225|        {
+226|          endpoint: `${viewerBase}/${instanceId}/metadata`,
+227|          method: "get",
+228|        },
+229|        false,
+230|      );
+231|      setMetadata(response?.data || null);
+232|      return response;
+233|    },
+234|    [fetchApi, viewerBase],
+235|  );
+236|
+237|  const fetchPage = useCallback(
+238|    async (instanceId, pageNumber) => {
+239|      const [pageResponse, hotspotsResponse] = await Promise.all([
+240|        fetchApi(
+241|          {
+242|            endpoint: `${viewerBase}/${instanceId}/pages/${pageNumber}`,
+243|            method: "get",
+244|          },
+245|          false,
+246|        ),
+247|        fetchApi(
+248|          {
+249|            endpoint: `${viewerBase}/${instanceId}/pages/${pageNumber}/hotspots`,
+250|            method: "get",
+251|          },
+252|          false,
+253|        ),
+254|      ]);
+255|      setPage(pageResponse?.data || null);
+256|      setHotspots(Array.isArray(hotspotsResponse?.data) ? hotspotsResponse.data : []);
+257|      return { page: pageResponse?.data, hotspots: hotspotsResponse?.data };
+258|    },
+259|    [fetchApi, viewerBase],
+260|  );
+261|
+262|  const fetchHotspotContent = useCallback(
+263|    (hotspotId) =>
+264|      fetchApi(
+265|        {
+266|          endpoint: `${viewerBase}/hotspots/${hotspotId}/content`,
+267|          method: "get",
+268|        },
+269|        false,
+270|      ),
+271|    [fetchApi, viewerBase],
+272|  );
+273|
+274|  const bindDevice = useCallback(
+275|    (instanceId, data) =>
+276|      fetchApi(
+277|        {
+278|          endpoint: `/e-booklet-viewer/${instanceId}/devices/bind`,
+279|          method: "post",
+280|          data,
+281|        },
+282|        false,
+283|      ),
+284|    [fetchApi],
+285|  );
+286|
+287|  const fetchHotspotAssetBlobUrl = useCallback(async (hotspotId, assetId) => {
+288|    const response = await api.get(
+289|      `${viewerBase}/hotspots/${hotspotId}/assets/${assetId}`,
+290|      { responseType: "blob" },
+291|    );
+292|    return URL.createObjectURL(response.data);
+293|  }, [viewerBase]);
+294|
+295|  return {
+296|    metadata,
+297|    page,
+298|    hotspots,
+299|    loading,
+300|    fetchMetadata,
+301|    fetchPage,
+302|    fetchHotspotContent,
+303|    bindDevice,
+304|    fetchHotspotAssetBlobUrl,
+305|  };
+306|}
+307|
+308|export function useStudentEBooklets() {
+309|  const { mutate: fetchApi, loading } = useApiMutation();
+310|  const [items, setItems] = useState([]);
+311|
+312|  const fetchStudentEBooklets = useCallback(async () => {
+313|    const response = await fetchApi(
+314|      { endpoint: "/student/e-booklets", method: "get" },
+315|      false,
+316|    );
+317|    setItems(Array.isArray(response?.data) ? response.data : []);
+318|    return response;
+319|  }, [fetchApi]);
+320|
+321|  const openInvite = useCallback(
+322|    (token) => fetchApi(
+323|      {
+324|        endpoint: `/e-booklet-invites/${token}/open`,
+325|        method: "get",
+326|      },
+327|      false,
+328|    ),
+329|    [fetchApi],
+330|  );
+331|
+332|  const acceptInvite = useCallback(
+333|    (token, data = {}) =>
+334|      fetchApi({
+335|        endpoint: `/e-booklet-invites/${token}/accept`,
+336|        method: "post",
+337|        data,
+338|        defaultSuccessMessage: i18n.t("eBooklets:toasts.accessGranted"),
+339|      }),
+340|    [fetchApi],
+341|  );
+342|
+343|  const redeemAccessCode = useCallback(
+344|    (code, termsVersion) =>
+345|      fetchApi({
+346|        endpoint: "/e-booklet-access-codes/redeem",
+347|        method: "post",
+348|        data: {
+349|          code,
+350|          termsAccepted: true,
+351|          termsVersion,
+352|        },
+353|        defaultSuccessMessage: i18n.t("eBooklets:toasts.accessGranted"),
+354|      }),
+355|    [fetchApi],
+356|  );
+357|
+358|  return {
+359|    items,
+360|    loading,
+361|    fetchStudentEBooklets,
+362|    openInvite,
+363|    acceptInvite,
+364|    redeemAccessCode,
+365|  };
+366|}
+
+===== FILE: kalima-platform/frontend/src/layouts/Navbar.jsx (552 lines) =====
+1|import { useState, useEffect, useRef } from "react";
+2|import { Menu, X, Globe, ShoppingCart, ShoppingBag, FileText, Home, User, BookOpenCheck } from "lucide-react";
+3|import { Link, useLocation, useNavigate } from "react-router-dom";
+4|import { useTranslation } from "react-i18next";
+5|import { motion, AnimatePresence } from "framer-motion";
+6|import { cn } from "@/lib/utils";
+7|import { Button } from "@/components/ui/button";
+8|import {
+9|  CommandDialog,
+10|  CommandEmpty,
+11|  CommandGroup,
+12|  CommandInput,
+13|  CommandItem,
+14|  CommandList,
+15|  CommandSeparator,
+16|} from "@/components/ui/command";
+17|import logo from "../assets/Logo.webp";
+18|import CartPreview from "../components/cart/CartPreview";
+19|import useAuth from "../hooks/auth/useAuth";
+20|import { useCart } from "../contexts/CartContext";
+21|import { useRole } from "@/hooks/useRole";
+22|import NotificationBell from "../components/notifications/NotificationBell";
+23|
+24|
+25|export default function Navbar() {
+26|  const location = useLocation();
+27|  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+28|  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+29|  const [isMenuOpen, setIsMenuOpen] = useState(false);
+30|  const [open, setOpen] = useState(false);
+31|  const { isAuthenticated, logout } = useAuth();
+32|  const { hasAdminAccess, isTeacher, isStudent, isParent, hasStoreAccess, isConfirmed } = useRole();
+33|  // Cart is only relevant for regular store users
+34|  const { cart, loading } = useCart();
+35|  const navigate = useNavigate();
+36|  const { t, i18n } = useTranslation("landing");
+37|  const [commandValue, setCommandValue] = useState("");
+38|  const [scrolled, setScrolled] = useState(false);
+39|  const [isMobile, setIsMobile] = useState(false);
+40|  const [showMobileNav, setShowMobileNav] = useState(true);
+41|  const lastScrollY = useRef(0);
+42|  const shouldShowBottomNav =
+43|    showMobileNav &&
+44|    !location.pathname.startsWith('/product/') &&
+45|    !location.pathname.startsWith('/e-booklet-cart') &&
+46|    !location.pathname.startsWith('/e-booklet-checkout');
+47|
+48|  useEffect(() => {
+49|    const handleScroll = () => {
+50|      const currentScrollY = window.scrollY;
+51|
+52|      // Update header transparency/style
+53|      setScrolled(currentScrollY > 50);
+54|
+55|      if (window.innerWidth < 768) {
+56|        // Only hide if we've scrolled down a bit (threshold of 80px)
+57|        // And if we are actually scrolling down
+58|        if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
+59|          setShowMobileNav(false);
+60|        }
+61|        // Show if we are scrolling up
+62|        else if (currentScrollY < lastScrollY.current) {
+63|          setShowMobileNav(true);
+64|        }
+65|      }
+66|
+67|      lastScrollY.current = currentScrollY;
+68|    };
+69|
+70|    const handleResize = () => {
+71|      setIsMobile(window.innerWidth < 768);
+72|    };
+73|
+74|    handleScroll();
+75|    handleResize();
+76|
+77|    window.addEventListener("scroll", handleScroll);
+78|    window.addEventListener("resize", handleResize);
+79|    return () => {
+80|      window.removeEventListener("scroll", handleScroll);
+81|      window.removeEventListener("resize", handleResize);
+82|    };
+83|  }, []);
+84|
+85|  useEffect(() => {
+86|    const down = (e) => {
+87|      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+88|        e.preventDefault();
+89|        setOpen((open) => !open);
+90|      }
+91|    };
+92|
+93|    document.addEventListener("keydown", down);
+94|    return () => document.removeEventListener("keydown", down);
+95|  }, []);
+96|
+97|  useEffect(() => {
+98|    if (isMenuOpen) {
+99|      document.body.style.overflow = "hidden";
+100|      document.documentElement.style.overflow = "hidden";
+101|    } else {
+102|      document.body.style.overflow = "unset";
+103|      document.documentElement.style.overflow = "unset";
+104|    }
+105|    return () => {
+106|      document.body.style.overflow = "unset";
+107|      document.documentElement.style.overflow = "unset";
+108|    };
+109|  }, [isMenuOpen]);
+110|
+111|  useEffect(() => {
+112|    if (!open) return;
+113|
+114|    const routeValues = hasStoreAccess ? ["/samples", "/market", "/e-booklets"] : [];
+115|    const current = routeValues.find((route) => location.pathname.startsWith(route));
+116|    setCommandValue(current || "");
+117|  }, [open, location.pathname, hasStoreAccess]);
+118|
+119|
+120|  const toggleLanguage = () => {
+121|    const newLang = i18n.language === "ar" ? "en" : "ar";
+122|    i18n.changeLanguage(newLang);
+123|  };
+124|
+125|  const toggleCartModal = () => {
+126|    // provider keeps cart up to date automatically
+127|    setIsCartModalOpen(!isCartModalOpen);
+128|  };
+129|
+130|  const handleViewFullCart = () => {
+131|    setIsCartModalOpen(false);
+132|    navigate("/cart"); // Pass cart items to the cart page
+133|  };
+134|
+135|  const runCommand = (command) => {
+136|    setOpen(false);
+137|    command();
+138|  };
+139|
+140|  return (
+141|    <>
+142|      <div className={cn(
+143|        "fixed inset-x-0 z-[100] flex justify-center pointer-events-none transition-all duration-700",
+144|        (scrolled && !isMobile) ? "top-4 px-4" : "top-0"
+145|      )}>
+146|        <motion.header
+147|          initial={false}
+148|          animate={{
+149|            width: (scrolled && !isMobile) ? "min(1200px, 95vw)" : "100%",
+150|            height: (scrolled && !isMobile) ? 64 : (isMobile ? 64 : 80),
+151|            borderRadius: (scrolled && !isMobile) ? 32 : 0,
+152|            backgroundColor: scrolled
+153|              ? "color-mix(in oklch, var(--background), transparent 30%)"
+154|              : "color-mix(in oklch, var(--background), transparent 100%)",
+155|            backdropFilter: scrolled ? "blur(24px)" : "blur(0px)",
+156|            border: (scrolled && !isMobile)
+157|              ? "1px solid color-mix(in oklch, var(--primary), transparent 80%)"
+158|              : "0px solid transparent",
+159|            borderBottom: (!scrolled || isMobile)
+160|              ? "1px solid color-mix(in oklch, var(--border), transparent 60%)"
+161|              : "1px solid color-mix(in oklch, var(--primary), transparent 80%)",
+162|          }}
+163|          transition={{ duration: 0.8, ease: [0.215, 0.61, 0.355, 1] }}
+164|          className={cn(
+165|            "pointer-events-auto relative flex items-center transition-all",
+166|            (scrolled && !isMobile) ? "shadow-[0_20px_50px_rgba(0,0,0,0.1)]" : "w-full"
+167|          )}
+168|        >
+169|          <div className={cn(
+170|            "h-full flex items-center justify-between transition-all duration-700 w-full relative",
+171|            (scrolled && !isMobile) ? "px-8 md:px-10" : "container md:px-6"
+172|          )}>
+173|            {/* Logo */}
+174|            <Link to="/" className="flex items-center gap-3 decoration-0 shrink-0">
+175|              <img
+176|                src={logo}
+177|                alt="Kalima Logo"
+178|                className="h-8 w-auto object-contain"
+179|              />
+180|              <span className="text-xl font-bold text-foreground tracking-tight">
+181|                {t("navbar.brand")}
+182|              </span>
+183|            </Link>
+184|
+185|            {/* Desktop Navigation & Actions */}
+186|            <div className="hidden md:flex items-center gap-4 lg:gap-8">
+187|              <div className="flex items-center gap-2 lg:gap-3">
+188|                {hasStoreAccess && (
+189|                  <Button
+190|                    variant="ghost"
+191|                    onClick={() => navigate("/samples")}
+192|                    className="h-9 px-4"
+193|                  >
+194|                    <FileText className="mr-2 h-4 w-4"></FileText>
+195|                    {t("navbar.samples")}
+196|                  </Button>
+197|                )}
+198|                {hasStoreAccess && (
+199|                  <Button
+200|                    variant="ghost"
+201|                    onClick={() => navigate("/market")}
+202|                    className="h-9 px-4"
+203|                  >
+204|                    <ShoppingCart className="mr-2 h-4 w-4"></ShoppingCart>
+205|                    {t("navbar.market")}
+206|                  </Button>
+207|                )}
+208|                {hasStoreAccess && (
+209|                  <Button
+210|                    variant="secondary"
+211|                    onClick={() => navigate("/e-booklets")}
+212|                    className="h-9 px-4"
+213|                  >
+214|                    <BookOpenCheck className="mr-2 h-4 w-4"></BookOpenCheck>
+215|                    {t("navbar.eBooklets")}
+216|                  </Button>
+217|                )}
+218|
+219|                {/* Language Toggle */}
+220|                <Button
+221|                  variant="ghost"
+222|                  size="icon"
+223|                  onClick={toggleLanguage}
+224|                  className="hover:bg-primary/10 hover:text-primary h-9 w-9"
+225|                  title={t("navbar.languageToggle")}
+226|                >
+227|                  <Globe className="h-5 w-5" />
+228|                </Button>
+229|
+230|                {/* Cart Button Desktop */}
+231|                {isAuthenticated && hasStoreAccess && !hasAdminAccess && (
+232|                  <Button
+233|                    variant="ghost"
+234|                    size="icon"
+235|                    onClick={toggleCartModal}
+236|                    className="relative hover:bg-primary/10 hover:text-primary h-9 w-9"
+237|                    title={t("navbar.cartToggle")}
+238|                    disabled={!isConfirmed}
+239|                  >
+240|                    <ShoppingBag className="h-5 w-5" />
+241|                    <span className={cn(
+242|                      "absolute -top-1 w-5 h-5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center z-10",
+243|                      i18n.language === 'ar' ? 'left-0' : 'right-0'
+244|                    )}>
+245|                      {loading ? "..." : cart.cart_items.length}
+246|                    </span>
+247|                  </Button>
+248|                )}
+249|
+250|                {/* Notifications Button Desktop */}
+251|                {isAuthenticated && (
+252|                  <NotificationBell />
+253|                )}
+254|
+255|
+256|                <div className="h-6 w-[1px] bg-border mx-2" />
+257|
+258|                {isAuthenticated ? (
+259|                  <div className="flex items-center gap-2">
+260|                    {hasAdminAccess && (
+261|                      <Button variant="default" size="sm" className="font-bold whitespace-nowrap" asChild>
+262|                        <Link to="/admin">{t("navbar.dashboard")}</Link>
+263|                      </Button>
+264|                    )}
+265|                    {!hasAdminAccess && isTeacher && (
+266|                      <Button variant="default" size="sm" className="font-bold whitespace-nowrap" asChild>
+267|                        <Link to="/teacher/profile">{t("navbar.teacherPortal")}</Link>
+268|                      </Button>
+269|                    )}
+270|                    {!hasAdminAccess && !isTeacher && isStudent && (
+271|                      <Button variant="default" size="sm" className="font-bold whitespace-nowrap" asChild>
+272|                        <Link to="/student/profile">{t("navbar.studentPortal")}</Link>
+273|                      </Button>
+274|                    )}
+275|                    {!hasAdminAccess && !isTeacher && !isStudent && isParent && (
+276|                      <Button variant="default" size="sm" className="font-bold whitespace-nowrap" asChild>
+277|                        <Link to="/parent/profile">{t("navbar.parentPortal")}</Link>
+278|                      </Button>
+279|                    )}
+280|                    {!hasAdminAccess && !isTeacher && !isStudent && !isParent && (
+281|                      <Button variant="ghost" size="sm" className="font-bold whitespace-nowrap" asChild>
+282|                        <Link to="/orders">{t("navbar.myOrders")}</Link>
+283|                      </Button>
+284|                    )}
+285|                    <Button
+286|                      variant="outline"
+287|                      size="sm"
+288|                      className="font-bold text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
+289|                      onClick={logout}
+290|                    >
+291|                      {t("navbar.logout", "Log out")}
+292|                    </Button>
+293|                  </div>
+294|                ) : (
+295|                  <div className="flex items-center gap-2">
+296|                    <Button
+297|                      variant="ghost"
+298|                      size="sm"
+299|                      className="font-bold hover:bg-primary/10 hover:text-primary"
+300|                      asChild
+301|                    >
+302|                      <Link to="/login" state={{ from: location }} replace>{t("navbar.login")}</Link>
+303|                    </Button>
+304|                    <Button
+305|                      variant="default"
+306|                      size="sm"
+307|                      className="font-bold px-4"
+308|                      asChild
+309|                    >
+310|                      <Link to="/signup" state={{ from: location }}>{t("navbar.signup")}</Link>
+311|                    </Button>
+312|                  </div>
+313|                )}
+314|              </div>
+315|            </div>
+316|
+317|            {/* Mobile Actions (Top) */}
+318|            <div className="flex items-center gap-1 md:hidden">
+319|              {/* Language Toggle Mobile */}
+320|              <Button
+321|                variant="ghost"
+322|                size="icon"
+323|                onClick={toggleLanguage}
+324|                className="hover:bg-primary/10 hover:text-primary h-9 w-9"
+325|              >
+326|                <Globe className="h-4 w-4" />
+327|              </Button>
+328|
+329|              {/* Cart Button Mobile */}
+330|              {isAuthenticated && hasStoreAccess && !hasAdminAccess && (
+331|                <Button
+332|                  variant="ghost"
+333|                  size="icon"
+334|                  onClick={toggleCartModal}
+335|                  className="relative hover:bg-primary/10 hover:text-primary h-9 w-9"
+336|                  title={t("navbar.cartToggle")}
+337|                  disabled={!isConfirmed}
+338|                >
+339|                  <ShoppingBag className="h-5 w-5" />
+340|                  <span className={cn(
+341|                    "absolute -top-1 w-5 h-5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center z-10",
+342|                    i18n.language === 'ar' ? 'left-0' : 'right-0'
+343|                  )}>
+344|                    {loading ? "..." : cart.cart_items.length}
+345|                  </span>
+346|                </Button>
+347|              )}
+348|
+349|              {/* Notifications Button Mobile */}
+350|              {isAuthenticated && (
+351|                <NotificationBell />
+352|              )}
+353|
+354|            </div>
+355|          </div>
+356|
+357|          <CartPreview
+358|            open={isCartModalOpen}
+359|            onOpenChange={setIsCartModalOpen}
+360|            cart={cart}
+361|            onViewFullCart={handleViewFullCart}
+362|          />
+363|        </motion.header>
+364|      </div>
+365|
+366|      {/* Mobile Bottom Navigation */}
+367|      <div className="md:hidden fixed bottom-6 inset-x-4 z-[70] flex justify-center pointer-events-none">
+368|        <AnimatePresence>
+369|          {shouldShowBottomNav && (
+370|            <motion.div
+371|              key="mobile-nav"
+372|              initial={{ y: 100, opacity: 0, scale: 0.8 }}
+373|              animate={{ y: 0, opacity: 1, scale: 1 }}
+374|              exit={{ y: 100, opacity: 0, scale: 0.8 }}
+375|              transition={{
+376|                type: "spring",
+377|                stiffness: 260,
+378|                damping: 20,
+379|                duration: 0.3
+380|              }}
+381|              className={cn(
+382|                "pointer-events-auto h-16 w-[calc(100%-2rem)] max-w-[420px] overflow-hidden",
+383|                "flex items-center justify-around px-2",
+384|                "rounded-full safe-area-pb transition-all duration-500",
+385|                "border border-white/20 dark:border-white/10",
+386|                "shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]"
+387|              )}
+388|              style={{
+389|                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))",
+390|                backdropFilter: "blur(20px) saturate(180%)",
+391|                WebkitBackdropFilter: "blur(20px) saturate(180%)",
+392|              }}
+393|            >
+394|              <Link to="/" className={cn(
+395|                "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+396|                location.pathname === "/" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+397|              )}>
+398|                {location.pathname === "/" && (
+399|                  <motion.div
+400|                    layoutId="nav-active-pill"
+401|                    className="absolute inset-0 bg-primary/10 rounded-full"
+402|                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+403|                  />
+404|                )}
+405|                <Home
+406|                  className={cn("h-6 w-6 transition-all relative z-10")}
+407|                  strokeWidth={location.pathname === "/" ? 2.5 : 2}
+408|                />
+409|              </Link>
+410|
+411|              {hasStoreAccess && (
+412|                <Link to="/samples" className={cn(
+413|                  "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+414|                  location.pathname.startsWith("/samples") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+415|                )}>
+416|                  {location.pathname.startsWith("/samples") && (
+417|                    <motion.div
+418|                      layoutId="nav-active-pill"
+419|                      className="absolute inset-0 bg-primary/10 rounded-full"
+420|                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+421|                    />
+422|                  )}
+423|                  <FileText
+424|                    className={cn("h-6 w-6 transition-all relative z-10")}
+425|                    strokeWidth={location.pathname.startsWith("/samples") ? 2.5 : 2}
+426|                  />
+427|                </Link>
+428|              )}
+429|
+430|              {hasStoreAccess && (
+431|                <Link to="/market" className={cn(
+432|                  "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+433|                  location.pathname === "/market" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+434|                )}>
+435|                  {location.pathname === "/market" && (
+436|                    <motion.div
+437|                      layoutId="nav-active-pill"
+438|                      className="absolute inset-0 bg-primary/10 rounded-full"
+439|                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+440|                    />
+441|                  )}
+442|                  <ShoppingBag
+443|                    className={cn("h-6 w-6 transition-all relative z-10")}
+444|                    strokeWidth={location.pathname === "/market" ? 2.5 : 2}
+445|                  />
+446|                </Link>
+447|              )}
+448|
+449|              {hasStoreAccess && (
+450|                <Link to="/e-booklets" className={cn(
+451|                  "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+452|                  location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+453|                )}>
+454|                  {(location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-")) && (
+455|                    <motion.div
+456|                      layoutId="nav-active-pill"
+457|                      className="absolute inset-0 bg-primary/10 rounded-full"
+458|                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+459|                    />
+460|                  )}
+461|                  <BookOpenCheck
+462|                    className={cn("h-6 w-6 transition-all relative z-10")}
+463|                    strokeWidth={location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-") ? 2.5 : 2}
+464|                  />
+465|                </Link>
+466|              )}
+467|
+468|              {isAuthenticated ? (
+469|                <Link
+470|                  to={
+471|                    hasAdminAccess ? "/admin" :
+472|                      isTeacher ? "/teacher/profile" :
+473|                        isStudent ? "/student/profile" :
+474|                          isParent ? "/parent/profile" : "/orders"
+475|                  }
+476|                  className={cn(
+477|                    "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+478|                    ["/admin", "/teacher", "/student", "/parent", "/orders"].some(p => location.pathname.startsWith(p)) ? "text-primary" : "text-muted-foreground hover:text-foreground"
+479|                  )}
+480|                >
+481|                  {["/admin", "/teacher", "/student", "/parent", "/orders"].some(p => location.pathname.startsWith(p)) && (
+482|                    <motion.div
+483|                      layoutId="nav-active-pill"
+484|                      className="absolute inset-0 bg-primary/10 rounded-full"
+485|                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+486|                    />
+487|                  )}
+488|                  <User
+489|                    className={cn("h-6 w-6 transition-all relative z-10")}
+490|                    strokeWidth={["/admin", "/teacher", "/student", "/parent", "/orders"].some(p => location.pathname.startsWith(p)) ? 2.5 : 2}
+491|                  />
+492|                </Link>
+493|              ) : (
+494|                <Link to="/login" className={cn(
+495|                  "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+496|                  location.pathname === "/login" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+497|                )}>
+498|                  {location.pathname === "/login" && (
+499|                    <motion.div
+500|                      layoutId="nav-active-pill"
+501|                      className="absolute inset-0 bg-primary/10 rounded-full"
+502|                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+503|                    />
+504|                  )}
+505|                  <User
+506|                    className={cn("h-6 w-6 transition-all relative z-10")}
+507|                    strokeWidth={location.pathname === "/login" ? 2.5 : 2}
+508|                  />
+509|                </Link>
+510|              )}
+511|            </motion.div>
+512|          )}
+513|        </AnimatePresence>
+514|      </div>
+515|
+516|
+517|      <CommandDialog
+518|        open={open}
+519|        onOpenChange={setOpen}
+520|        commandProps={{ value: commandValue, onValueChange: setCommandValue }}
+521|      >
+522|        <CommandInput placeholder={t("navbar.searchPlaceholder")} />
+523|        <CommandList>
+524|          <CommandEmpty>{t("navbar.noResults")}</CommandEmpty>
+525|          <CommandGroup heading={t("navbar.pages")}>
+526|            {hasStoreAccess && (
+527|              <CommandItem value="/samples" onSelect={() => runCommand(() => navigate("/samples"))}>
+528|                {t("navbar.samples")}
+529|              </CommandItem>
+530|            )}
+531|            {hasStoreAccess && (
+532|              <CommandItem value="/market" onSelect={() => runCommand(() => navigate("/market"))}>
+533|                {t("navbar.market")}
+534|              </CommandItem>
+535|            )}
+536|            {hasStoreAccess && (
+537|              <CommandItem value="/e-booklets" onSelect={() => runCommand(() => navigate("/e-booklets"))}>
+538|                {t("navbar.eBooklets")}
+539|              </CommandItem>
+540|            )}
+541|          </CommandGroup>
+542|          <CommandSeparator />
+543|          <CommandGroup heading={t("navbar.settings")}>
+544|            <CommandItem onSelect={() => runCommand(() => toggleLanguage())}>
+545|              {t("navbar.toggleLanguageAction")}
+546|            </CommandItem>
+547|          </CommandGroup>
+548|        </CommandList>
+549|      </CommandDialog>
+550|    </>
+551|  );
+552|}

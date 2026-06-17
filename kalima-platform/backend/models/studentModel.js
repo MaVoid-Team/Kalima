@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy student model.
 // Helper to convert Arabic numerals to English numerals
 // Helper to format Egyptian phone numbers to international format robustly
 function formatEgyptianPhoneNumber(number) {
@@ -42,7 +45,7 @@ const studentSchema = new mongoose.Schema(
     level: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Level",
-      required: false,
+      required: true,
     },
     hobbies: {
       required: false,

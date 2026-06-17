@@ -1,0 +1,152 @@
+import { Router } from "express";
+import { adminController } from "../../controllers/admin.controller";
+import { adminUserStatsController } from "../../controllers/admin-user-stats.controller";
+import { appreciationController } from "../../controllers/appreciation.controller";
+import { authenticateToken } from "../../../../libs/auth/middleware";
+import { requireRole } from "../../middleware/requireRole.middleware";
+import { role_enum } from "../../generated/prisma/client";
+import { makeExportHandler } from "../../export";
+
+const router = Router();
+
+// All admin routes require authentication + Admin or SubAdmin role
+const adminAuth = [
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator]),
+];
+
+const adminModeratorAuth = [
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator]),
+];
+
+// ============================================
+// USER MANAGEMENT
+// ============================================
+
+// ============================================
+// ACCOUNT REVIEW
+// ============================================
+
+router.get("/account-review-settings", ...adminAuth, adminController.getAccountReviewSettings);
+router.put("/account-review-settings", ...adminAuth, adminController.upsertAccountReviewSettings);
+
+// Create user (respects privilege matrix)
+router.post("/users", ...adminAuth, adminController.createUser);
+
+// Create specific user types
+router.post("/teachers", ...adminAuth, adminController.createTeacher);
+router.post("/students", ...adminAuth, adminController.createStudent);
+router.post("/parents", ...adminAuth, adminController.createParent);
+router.post("/lecturers", ...adminAuth, adminController.createLecturer);
+
+// Export users
+router.get("/users/export", ...adminAuth, makeExportHandler("users"));
+
+// List / search users
+router.get("/users", ...adminModeratorAuth, adminController.listUsers);
+
+// Created Accounts Statistics
+router.get(
+  "/users/stats/created-accounts",
+  ...adminAuth,
+  adminUserStatsController.getCreatedAccountsStats,
+);
+
+// Get single user with all roles
+router.get("/users/:userId", ...adminModeratorAuth, adminController.getUser);
+router.get(
+  "/users/:userId/appreciation-page",
+  ...adminModeratorAuth,
+  appreciationController.getAdminPage,
+);
+router.post(
+  "/users/:userId/appreciation-page",
+  ...adminModeratorAuth,
+  appreciationController.createAdminPage,
+);
+router.patch(
+  "/users/:userId/flag",
+  ...adminModeratorAuth,
+  adminController.updateUserFlag,
+);
+router.patch(
+  "/users/:userId/profile",
+  ...adminModeratorAuth,
+  adminController.updateUserProfile,
+);
+
+// Account review: approve / reject users (must be before :userId/roles to avoid conflict)
+router.post("/users/:userId/approve", ...adminAuth, adminController.approveUser);
+router.post("/users/:userId/reject", ...adminAuth, adminController.rejectUser);
+
+// ============================================
+// ROLE MANAGEMENT
+// ============================================
+
+// Get user roles
+router.get("/users/:userId/roles", ...adminAuth, adminController.getUserRoles);
+
+// Assign a new role to a user
+router.post("/users/:userId/roles", ...adminAuth, adminController.assignRole);
+
+// Replace all roles for a user
+router.put("/users/:userId/roles", ...adminAuth, adminController.setRoles);
+
+// Revoke a role from a user
+router.delete("/users/:userId/roles", ...adminAuth, adminController.revokeRole);
+
+// Delete a user
+router.delete("/users/:userId", ...adminAuth, adminController.deleteUser);
+
+// ============================================
+// REVIEWS MANAGEMENT
+// ============================================
+
+// Delete a product review
+import { reviewController } from "../../controllers/review.controller";
+router.delete(
+  "/reviews/:reviewId",
+  ...adminModeratorAuth,
+  reviewController.deleteReview,
+);
+
+import { whatsappController } from "../../controllers/whatsapp.controller";
+
+// ============================================
+// GENERAL SETTINGS
+// ============================================
+router.get("/general-settings", ...adminAuth, whatsappController.getGeneralSettings);
+router.put(
+  "/general-settings/whatsapp_receiving_number",
+  ...adminAuth,
+  whatsappController.updateReceivingNumber,
+);
+
+// ============================================
+// WHATSAPP
+// ============================================
+router.get("/whatsapp/status", ...adminAuth, whatsappController.getStatus);
+router.post("/whatsapp/send", ...adminAuth, whatsappController.sendMessage);
+router.post("/whatsapp/logout", ...adminAuth, whatsappController.logout);
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+// Send notification to user(s) or role (Admin, SubAdmin only)
+router.post(
+  "/notifications",
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+  adminController.sendNotification,
+);
+
+// List all notifications (Admin, SubAdmin, Moderator)
+router.get(
+  "/notifications",
+  ...adminAuth,
+  adminController.listNotifications,
+);
+
+export default router;

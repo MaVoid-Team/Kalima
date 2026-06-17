@@ -1,8 +1,13 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store book purchase routes.
 const express = require("express");
 const ecBookPurchaseController = require("../controllers/ec.bookpurchaseController");
 const verifyJWT = require("../middleware/verifyJWT");
 const authController = require("../controllers/authController");
-const { uploadPaymentScreenshotToDisk } = require("../utils/upload files/uploadFiles");
+const {
+  uploadPaymentScreenshotToDisk,
+} = require("../utils/upload files/uploadFiles");
 
 const router = express.Router();
 
@@ -15,7 +20,7 @@ router
   .post(
     authController.verifyRoles("Parent", "Student", "Teacher"),
     uploadPaymentScreenshotToDisk,
-    ecBookPurchaseController.createBookPurchase
+    ecBookPurchaseController.createBookPurchase,
   );
 
 // Statistics route
@@ -23,7 +28,7 @@ router
   .route("/stats")
   .get(
     authController.verifyRoles("Admin"),
-    ecBookPurchaseController.getBookPurchaseStats
+    ecBookPurchaseController.getBookPurchaseStats,
   );
 
 // Get current user's book purchases
@@ -36,7 +41,7 @@ router
   .route("/:id/confirm")
   .patch(
     authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
-    ecBookPurchaseController.confirmBookPurchase
+    ecBookPurchaseController.confirmBookPurchase,
   );
 
 // Individual book purchase routes
@@ -46,11 +51,11 @@ router
   .patch(
     authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
     uploadPaymentScreenshotToDisk,
-    ecBookPurchaseController.updateBookPurchase
+    ecBookPurchaseController.updateBookPurchase,
   )
   .delete(
     authController.verifyRoles("Admin", "SubAdmin"),
-    ecBookPurchaseController.deleteBookPurchase
+    ecBookPurchaseController.deleteBookPurchase,
   );
 
 module.exports = router;
