@@ -4,12 +4,12 @@ Source spec: `docs/specs/e-booklet-teacher-store-private-student-access-spec.md`
 
 ## Status dashboard
 
-- Current status: Build Order 8 backend + admin UI approval lifecycle implemented; browser/admin smoke still pending.
-- Current build order item: Build Order 8 — Admin approval unlocks teacher management
-- Active files: `backend/tests/e-booklet/e-booklet.service.spec.ts`, `backend/src/apps/store-api/services/e-booklet.service.ts`, `docs/specs/e-booklet-teacher-store-private-student-access-tracker.md`, plus existing Build Order 3-7 files/source contracts.
-- Last verification command/result: 2026-06-17 Build Order 8 regression/build checks passed: backend `npm test -- --runInBand tests/e-booklet/e-booklet.service.spec.ts` → PASS 60/60; backend `npm run build` → PASS; frontend `npm run build` → PASS.
-- Current blocker: Build Order 8 still needs browser/admin smoke for approving a real order in a seeded/login-capable environment.
-- Next action: Run browser/admin smoke: approve an eBooklet order and verify teacher management access appears.
+- Current status: Build Order 8 complete and verified through backend tests/builds, frontend build, and admin browser/API/DB smoke.
+- Current build order item: Build Order 9 — Teacher code/link management after approval
+- Active files: `backend/tests/e-booklet/e-booklet.service.spec.ts`, `backend/src/apps/store-api/services/e-booklet.service.ts`, `frontend/src/pages/admin/e-booklets/AdminEBookletPurchasesPage.jsx`, `docs/specs/e-booklet-teacher-store-private-student-access-tracker.md`, plus existing Build Order 3-8 files/source contracts.
+- Last verification command/result: 2026-06-17 Build Order 8 admin E2E passed: admin login at `/login`, `/admin/e-booklet-purchases` approve/unlock on purchase `40`, row changed `Pending` → `Ready`, API returned purchase `40` as `ready` with active instance `35`, DB confirmed active teacher access `40` role `teacher`.
+- Current blocker: None for Build Order 8.
+- Next action: Start Build Order 9: teacher/admin code-link generation and quota enforcement after approval.
 
 ## Stop/update rule
 
@@ -255,13 +255,14 @@ Legend:
 ### Verification
 - [x] Backend test: approval unlocks teacher management.
 - [x] Backend test: rejection does not unlock management.
-- [ ] Browser/admin smoke: approve an order and see access appear.
+- [x] Browser/admin smoke: approve an order and see access appear.
 
 ### Proof — 2026-06-17
 - Added RED/GREEN service regressions for admin approval, rejection, and approval retry/idempotency on teacher eBooklet checkout purchases.
 - Updated `updatePurchaseStatus("paid")` to fetch the eBooklet purchase, create a teacher-owned active instance when missing, create active teacher access when missing, and mark the purchase `ready`; non-approval statuses remain status-only and do not unlock management.
 - Tightened admin purchase UI so approvable rows use an explicit “Approve / unlock” action, approved/rejected states remain status-badge driven, and rejected/cancelled/ready rows no longer show the approval action.
 - Verification: backend `npm test -- --runInBand tests/e-booklet/e-booklet.service.spec.ts` → PASS 60/60; backend `npm run build` → PASS; frontend `npm run build` → PASS.
+- Admin smoke: logged in as `admin@gmail.com` at `/login`, opened `/admin/e-booklet-purchases`, approved purchase `40`, saw row change `Pending` → `Ready`, saw approve action disappear, API confirmed active instance `35`, and DB confirmed active teacher access `40` role `teacher`.
 
 ---
 
