@@ -62,6 +62,22 @@
     "termsOfService": "Terms of Service",
     "rights": "All rights reserved"
   },
+  "privacyPolicy": {
+    "eyebrow": "Privacy",
+    "title": "Privacy Policy",
+    "intro": "This policy explains how Kalima collects, uses, protects, and shares information when students, parents, teachers, and visitors use the Kalima website, store, e-booklets, and related services.",
+    "lastUpdated": "Last updated: {{date}}",
+    "sections": [
+      { "title": "Information we collect", "body": "We collect account details, contact information, role information, learning activity, purchases, payment status, support messages, device and browser data, and any files or information users choose to submit through the platform." },
+      { "title": "How we use information", "body": "We use information to create and secure accounts, provide educational content, process orders and e-booklet access, support teachers and students, send service notifications, improve platform quality, and comply with legal or operational requirements." },
+      { "title": "Payments and purchases", "body": "Payment and order information may be processed through trusted payment, banking, or manual proof-of-payment workflows. Kalima keeps the information needed to confirm payment status, deliver access, prevent abuse, and support refunds or disputes." },
+      { "title": "Sharing information", "body": "We do not sell personal information. We may share limited information with service providers that help operate hosting, payments, messaging, analytics, customer support, or security, and when required by law or necessary to protect users and the platform." },
+      { "title": "Security and access", "body": "We use technical and administrative safeguards to protect user information. Users are responsible for keeping login details private. Some e-booklet and learning access may be linked to account, role, purchase, invite code, or device controls." },
+      { "title": "User choices", "body": "Users may request help updating account information, accessing purchased content, or asking privacy questions through the official contact channels available on the platform. Some records may be retained when required for security, financial, legal, or operational reasons." },
+      { "title": "Children and education accounts", "body": "Kalima is an education platform used by students and families. Parents, guardians, teachers, and authorized school or platform administrators may help manage student access where applicable." },
+      { "title": "Updates to this policy", "body": "Kalima may update this policy as services, features, legal requirements, or operational practices change. The latest version will be published on this page." }
+    ]
+  },
   "welcome": {
     "badge": "Soar in the Sky of Creativity",
     "sparkleBadge": "Fresh Content",
