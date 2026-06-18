@@ -270,6 +270,7 @@
       "loading": "Loading e-booklet purchases...",
       "empty": "No e-booklet purchases match this status.",
       "delivery": "Delivery",
+      "openDelivery": "Open delivery details",
       "teacherTitle": "Teacher-specific title",
       "teacherPdf": "Teacher PDF",
       "teacherPdfUploaded": "Teacher PDF uploaded (asset #{{id}})",
