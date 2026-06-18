@@ -280,6 +280,7 @@ export default function AdminEBookletEditorPage() {
   const [selectedPage, setSelectedPage] = useState(1);
   const [hotspots, setHotspots] = useState([]);
   const [hotspotForm, setHotspotForm] = useState(defaultHotspotForm);
+  const [hasDraftHotspotPreview, setHasDraftHotspotPreview] = useState(false);
   const [recording, setRecording] = useState(false);
   const [documentPreviewUrl, setDocumentPreviewUrl] = useState("");
   const [canvasExpanded, setCanvasExpanded] = useState(false);
