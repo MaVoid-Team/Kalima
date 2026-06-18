@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CalendarRange, CheckCircle2, GripVertical, Medal, RefreshCcw, ShieldCheck } from "lucide-react";
+import { CalendarRange, CheckCircle2, GripVertical, Medal, RefreshCcw, ShieldCheck, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -71,6 +71,7 @@ export default function AdminEBookletTermsMilestonesPage() {
     activateTerm,
     createMilestone,
     updateMilestone,
+    deleteMilestone,
     reorderMilestones,
   } = useAdminEBookletTermsMilestones();
   const [selectedTermId, setSelectedTermId] = useState("all");
@@ -198,6 +199,14 @@ export default function AdminEBookletTermsMilestonesPage() {
     const next = [...sorted];
     [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
     await reorderMilestones(Number(milestone.term_id), next.map((item, idx) => ({ id: item.id, sortOrder: idx + 1 })));
+    await reload();
+  };
+
+  const removeMilestone = async (milestone) => {
+    const confirmed = window.confirm(t("admin.termsMilestones.deleteMilestoneConfirm", { defaultValue: "Delete this milestone? This cannot be undone." }));
+    if (!confirmed) return;
+    await deleteMilestone(milestone.id);
+    if (Number(editingMilestoneId) === Number(milestone.id)) resetMilestoneForm();
     await reload();
   };
 
@@ -351,7 +360,7 @@ export default function AdminEBookletTermsMilestonesPage() {
                     <TableCell className="whitespace-nowrap">{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</TableCell>
                     <TableCell className="whitespace-nowrap">{money(milestone.reward_amount_snapshot)}</TableCell>
                     <TableCell><Badge variant={milestone.active ? "default" : "outline"}>{milestone.active ? t("common.active") : t("statuses.disabled")}</Badge></TableCell>
-                    <TableCell className="whitespace-nowrap"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button><Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button></div></TableCell>
+                    <TableCell className="whitespace-nowrap"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button><Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button><Button size="sm" variant="destructive" onClick={() => removeMilestone(milestone)} disabled={actionLoading} data-testid="admin-e-booklet-delete-milestone"><Trash2 className="h-4 w-4" />{t("common.delete", { defaultValue: "Delete" })}</Button></div></TableCell>
                   </TableRow>
                 ))}
                 {scopedMilestones.length === 0 && (<TableRow><TableCell colSpan={6} className="h-20 text-center text-muted-foreground">{t("admin.termsMilestones.emptyMilestones")}</TableCell></TableRow>)}
@@ -376,6 +385,7 @@ export default function AdminEBookletTermsMilestonesPage() {
                       <Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button>
                       <Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button>
                       <Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
+                      <Button size="sm" variant="destructive" onClick={() => removeMilestone(milestone)} disabled={actionLoading} data-testid="admin-e-booklet-delete-milestone-mobile"><Trash2 className="h-4 w-4" />{t("common.delete", { defaultValue: "Delete" })}</Button>
                     </div>
                   </div>
                 </div>

@@ -473,6 +473,16 @@ export function useAdminEBookletPurchases() {
     [fetchApi],
   );
 
+  const approveStudentPurchase = useCallback(
+    (purchaseId) =>
+      fetchApi({
+        endpoint: `/admin/e-booklet-student-purchases/${purchaseId}/approve`,
+        method: "post",
+        defaultSuccessMessage: i18n.t("eBooklets:toasts.studentPurchaseApproved"),
+      }),
+    [fetchApi],
+  );
+
   const prepareCustomTemplate = useCallback(
     (purchaseId) =>
       fetchApi({
@@ -517,6 +527,7 @@ export function useAdminEBookletPurchases() {
     updatePurchaseStatus,
     markPaid,
     deliverPurchase,
+    approveStudentPurchase,
     prepareCustomTemplate,
     uploadTeacherDocument,
   };
@@ -547,8 +558,17 @@ export function useAdminEBookletInstances() {
   const setStatus = useCallback((value) => { setStatusState(value); setPagination((current) => ({ ...current, page: 1 })); }, []);
   const updateQuota = useCallback((instanceId, invite_quota) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/update-quota`, method: "post", data: { invite_quota }, defaultSuccessMessage: i18n.t("eBooklets:toasts.quotaUpdated") }), [fetchApi]);
   const revokeTeacherAccess = useCallback((instanceId) => fetchApi({ endpoint: `/admin/e-booklet-instances/${instanceId}/revoke-access`, method: "post", defaultSuccessMessage: i18n.t("eBooklets:toasts.teacherAccessRevoked") }), [fetchApi]);
+  const listAccessCodes = useCallback((filters = {}) => {
+    const query = new URLSearchParams();
+    if (filters.bookletInstanceId) query.set("bookletInstanceId", String(filters.bookletInstanceId));
+    if (filters.teacherId) query.set("teacherId", String(filters.teacherId));
+    if (filters.kind && filters.kind !== "all") query.set("kind", filters.kind);
+    if (filters.status && filters.status !== "all") query.set("status", filters.status);
+    return fetchApi({ endpoint: `/admin/e-booklet-access-codes?${query.toString()}`, method: "get" }, false);
+  }, [fetchApi]);
+  const generateAccessCodes = useCallback((data) => fetchApi({ endpoint: "/admin/e-booklet-access-codes/bulk", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.accessCodesGenerated") }), [fetchApi]);
 
-  return { instances, pagination, status, loading, fetchInstances, setPage, setStatus, updateQuota, revokeTeacherAccess };
+  return { instances, pagination, status, loading, fetchInstances, setPage, setStatus, updateQuota, revokeTeacherAccess, listAccessCodes, generateAccessCodes };
 }
 
 export function useAdminEBookletTermsMilestones() {
@@ -595,6 +615,7 @@ export function useAdminEBookletTermsMilestones() {
   const activateTerm = useCallback((termId) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-terms/${termId}/activate`, method: "post", defaultSuccessMessage: i18n.t("eBooklets:toasts.termActivated") })), [fetchApi, runAction]);
   const createMilestone = useCallback((data) => runAction(() => fetchApi({ endpoint: "/admin/e-booklet-milestones", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneSaved") })), [fetchApi, runAction]);
   const updateMilestone = useCallback((milestoneId, data) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-milestones/${milestoneId}`, method: "patch", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneSaved") })), [fetchApi, runAction]);
+  const deleteMilestone = useCallback((milestoneId) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-milestones/${milestoneId}`, method: "delete", defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneDeleted") })), [fetchApi, runAction]);
   const reorderMilestones = useCallback((termId, items) => runAction(() => fetchApi({ endpoint: "/admin/e-booklet-milestones/reorder", method: "post", data: { termId, items }, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestonesReordered") })), [fetchApi, runAction]);
 
   return {
@@ -611,6 +632,7 @@ export function useAdminEBookletTermsMilestones() {
     activateTerm,
     createMilestone,
     updateMilestone,
+    deleteMilestone,
     reorderMilestones,
   };
 }
