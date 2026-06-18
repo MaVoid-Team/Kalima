@@ -1,4 +1,4 @@
-import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet, Navigate, useParams } from "react-router-dom";
 import { useState, useEffect, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
@@ -81,6 +81,8 @@ const PaymentMethodsPage = lazy(() => import("./pages/admin/payment-methods/Paym
 const RequiredFieldsPage = lazy(() => import("./pages/admin/required-fields/RequiredFieldsPage"));
 const AnalyticsPage = lazy(() => import("./pages/admin/analytics/AnalyticsPage"));
 const EmployeePerformancePage = lazy(() => import("./pages/admin/employee-performance/EmployeePerformancePage"));
+const AdminEBookletsWorkspaceLayout = lazy(() => import("./pages/admin/e-booklets/AdminEBookletsWorkspaceLayout"));
+const AdminEBookletsOverviewPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletsOverviewPage"));
 const AdminEBookletTemplatesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTemplatesPage"));
 const AdminEBookletEditorPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletEditorPage"));
 const AdminEBookletPurchasesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchasesPage"));
@@ -89,6 +91,7 @@ const AdminEBookletInstancesPage = lazy(() => import("./pages/admin/e-booklets/A
 const AdminEBookletDevicesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletDevicesPage"));
 const AdminEBookletInstanceStudentsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstanceStudentsPage"));
 const AdminEBookletAnalyticsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletAnalyticsPage"));
+const AdminEBookletSettingsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletSettingsPage"));
 const AdminEBookletTermsMilestonesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTermsMilestonesPage"));
 
 // Public viewer (no layout)
@@ -143,6 +146,18 @@ function Root() {
       </Suspense>
     </ErrorBoundary>
   );
+}
+
+function LegacyEBookletRedirect({ type }) {
+  const { purchaseId, instanceId } = useParams();
+  const targets = {
+    purchaseDelivery: `/admin/e-booklets/orders/${purchaseId}/delivery`,
+    instanceView: `/admin/e-booklets/access/${instanceId}/view`,
+    instanceStudents: `/admin/e-booklets/access/${instanceId}/students`,
+    instanceDevices: `/admin/e-booklets/access/${instanceId}/devices`,
+  };
+
+  return <Navigate to={targets[type] || "/admin/e-booklets"} replace />;
 }
 
 const router = createBrowserRouter(
@@ -216,17 +231,29 @@ const router = createBrowserRouter(
           <Route path="/admin/products/create" element={<CreateProductPage />} />
           <Route path="/admin/products/:id" element={<ProductDetailPage />} />
           <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
-          <Route path="/admin/e-booklets" element={<AdminEBookletTemplatesPage />} />
           <Route path="/admin/e-booklets/create" element={<AdminEBookletEditorPage />} />
           <Route path="/admin/e-booklets/:id/edit" element={<AdminEBookletEditorPage />} />
-          <Route path="/admin/e-booklet-purchases" element={<AdminEBookletPurchasesPage />} />
-          <Route path="/admin/e-booklet-purchases/:purchaseId/delivery" element={<AdminEBookletPurchaseDeliveryPage />} />
-          <Route path="/admin/e-booklet-instances" element={<AdminEBookletInstancesPage />} />
-          <Route path="/admin/e-booklet-instances/:instanceId/view" element={<EBookletViewerPage />} />
-          <Route path="/admin/e-booklet-analytics" element={<AdminEBookletAnalyticsPage />} />
-          <Route path="/admin/e-booklet-terms-milestones" element={<AdminEBookletTermsMilestonesPage />} />
-          <Route path="/admin/e-booklet-instances/:instanceId/students" element={<AdminEBookletInstanceStudentsPage />} />
-          <Route path="/admin/e-booklet-instances/:instanceId/devices" element={<AdminEBookletDevicesPage />} />
+          <Route path="/admin/e-booklets" element={<AdminEBookletsWorkspaceLayout />}>
+            <Route index element={<AdminEBookletsOverviewPage />} />
+            <Route path="catalog" element={<AdminEBookletTemplatesPage />} />
+            <Route path="orders" element={<AdminEBookletPurchasesPage />} />
+            <Route path="orders/:purchaseId/delivery" element={<AdminEBookletPurchaseDeliveryPage />} />
+            <Route path="access" element={<AdminEBookletInstancesPage />} />
+            <Route path="access/:instanceId/view" element={<EBookletViewerPage />} />
+            <Route path="access/:instanceId/students" element={<AdminEBookletInstanceStudentsPage />} />
+            <Route path="access/:instanceId/devices" element={<AdminEBookletDevicesPage />} />
+            <Route path="analytics" element={<AdminEBookletAnalyticsPage />} />
+            <Route path="settings" element={<AdminEBookletSettingsPage />} />
+            <Route path="settings/terms-milestones" element={<AdminEBookletTermsMilestonesPage />} />
+          </Route>
+          <Route path="/admin/e-booklet-purchases" element={<Navigate to="/admin/e-booklets/orders" replace />} />
+          <Route path="/admin/e-booklet-purchases/:purchaseId/delivery" element={<LegacyEBookletRedirect type="purchaseDelivery" />} />
+          <Route path="/admin/e-booklet-instances" element={<Navigate to="/admin/e-booklets/access" replace />} />
+          <Route path="/admin/e-booklet-instances/:instanceId/view" element={<LegacyEBookletRedirect type="instanceView" />} />
+          <Route path="/admin/e-booklet-instances/:instanceId/students" element={<LegacyEBookletRedirect type="instanceStudents" />} />
+          <Route path="/admin/e-booklet-instances/:instanceId/devices" element={<LegacyEBookletRedirect type="instanceDevices" />} />
+          <Route path="/admin/e-booklet-analytics" element={<Navigate to="/admin/e-booklets/analytics" replace />} />
+          <Route path="/admin/e-booklet-terms-milestones" element={<Navigate to="/admin/e-booklets/settings/terms-milestones" replace />} />
           <Route path="/admin/categories" element={<CategoriesPage />} />
           <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
           <Route path="/admin/required-fields" element={<RequiredFieldsPage />} />

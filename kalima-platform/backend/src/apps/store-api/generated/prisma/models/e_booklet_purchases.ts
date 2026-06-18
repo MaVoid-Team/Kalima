@@ -36,6 +36,8 @@ export type E_booklet_purchasesAvgAggregateOutputType = {
   final_payable_price: runtime.Decimal | null
   marketing_price: runtime.Decimal | null
   internal_price: runtime.Decimal | null
+  payment_method_id: number | null
+  payment_screenshot_id: number | null
 }
 
 export type E_booklet_purchasesSumAggregateOutputType = {
@@ -48,6 +50,8 @@ export type E_booklet_purchasesSumAggregateOutputType = {
   final_payable_price: runtime.Decimal | null
   marketing_price: runtime.Decimal | null
   internal_price: runtime.Decimal | null
+  payment_method_id: number | null
+  payment_screenshot_id: number | null
 }
 
 export type E_booklet_purchasesMinAggregateOutputType = {
@@ -64,7 +68,9 @@ export type E_booklet_purchasesMinAggregateOutputType = {
   access_expires_at: Date | null
   currency: string | null
   payment_method: string | null
+  payment_method_id: number | null
   payment_reference: string | null
+  payment_screenshot_id: number | null
   admin_notes: string | null
   created_at: Date | null
   updated_at: Date | null
@@ -84,7 +90,9 @@ export type E_booklet_purchasesMaxAggregateOutputType = {
   access_expires_at: Date | null
   currency: string | null
   payment_method: string | null
+  payment_method_id: number | null
   payment_reference: string | null
+  payment_screenshot_id: number | null
   admin_notes: string | null
   created_at: Date | null
   updated_at: Date | null
@@ -104,7 +112,9 @@ export type E_booklet_purchasesCountAggregateOutputType = {
   access_expires_at: number
   currency: number
   payment_method: number
+  payment_method_id: number
   payment_reference: number
+  payment_screenshot_id: number
   branding_json: number
   admin_notes: number
   created_at: number
@@ -123,6 +133,8 @@ export type E_booklet_purchasesAvgAggregateInputType = {
   final_payable_price?: true
   marketing_price?: true
   internal_price?: true
+  payment_method_id?: true
+  payment_screenshot_id?: true
 }
 
 export type E_booklet_purchasesSumAggregateInputType = {
@@ -135,6 +147,8 @@ export type E_booklet_purchasesSumAggregateInputType = {
   final_payable_price?: true
   marketing_price?: true
   internal_price?: true
+  payment_method_id?: true
+  payment_screenshot_id?: true
 }
 
 export type E_booklet_purchasesMinAggregateInputType = {
@@ -151,7 +165,9 @@ export type E_booklet_purchasesMinAggregateInputType = {
   access_expires_at?: true
   currency?: true
   payment_method?: true
+  payment_method_id?: true
   payment_reference?: true
+  payment_screenshot_id?: true
   admin_notes?: true
   created_at?: true
   updated_at?: true
@@ -171,7 +187,9 @@ export type E_booklet_purchasesMaxAggregateInputType = {
   access_expires_at?: true
   currency?: true
   payment_method?: true
+  payment_method_id?: true
   payment_reference?: true
+  payment_screenshot_id?: true
   admin_notes?: true
   created_at?: true
   updated_at?: true
@@ -191,7 +209,9 @@ export type E_booklet_purchasesCountAggregateInputType = {
   access_expires_at?: true
   currency?: true
   payment_method?: true
+  payment_method_id?: true
   payment_reference?: true
+  payment_screenshot_id?: true
   branding_json?: true
   admin_notes?: true
   created_at?: true
@@ -299,7 +319,9 @@ export type E_booklet_purchasesGroupByOutputType = {
   access_expires_at: Date | null
   currency: string
   payment_method: string | null
+  payment_method_id: number | null
   payment_reference: string | null
+  payment_screenshot_id: number | null
   branding_json: runtime.JsonValue | null
   admin_notes: string | null
   created_at: Date | null
@@ -343,7 +365,9 @@ export type e_booklet_purchasesWhereInput = {
   access_expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_purchases"> | Date | string | null
   currency?: Prisma.StringFilter<"e_booklet_purchases"> | string
   payment_method?: Prisma.StringNullableFilter<"e_booklet_purchases"> | string | null
+  payment_method_id?: Prisma.IntNullableFilter<"e_booklet_purchases"> | number | null
   payment_reference?: Prisma.StringNullableFilter<"e_booklet_purchases"> | string | null
+  payment_screenshot_id?: Prisma.IntNullableFilter<"e_booklet_purchases"> | number | null
   branding_json?: Prisma.JsonNullableFilter<"e_booklet_purchases">
   admin_notes?: Prisma.StringNullableFilter<"e_booklet_purchases"> | string | null
   created_at?: Prisma.DateTimeNullableFilter<"e_booklet_purchases"> | Date | string | null
@@ -351,6 +375,9 @@ export type e_booklet_purchasesWhereInput = {
   teacher?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   template?: Prisma.XOR<Prisma.E_booklet_templatesScalarRelationFilter, Prisma.e_booklet_templatesWhereInput>
   template_version?: Prisma.XOR<Prisma.E_booklet_template_versionsScalarRelationFilter, Prisma.e_booklet_template_versionsWhereInput>
+  payment_screenshot?: Prisma.XOR<Prisma.ImagesNullableScalarRelationFilter, Prisma.imagesWhereInput> | null
+  payment_methods?: Prisma.XOR<Prisma.Payment_methodsNullableScalarRelationFilter, Prisma.payment_methodsWhereInput> | null
+  required_fields?: Prisma.E_booklet_purchase_required_fieldsListRelationFilter
   instances?: Prisma.E_booklet_instancesListRelationFilter
   wallet_ledger_entries?: Prisma.Teacher_wallet_ledgerListRelationFilter
 }
@@ -369,7 +396,9 @@ export type e_booklet_purchasesOrderByWithRelationInput = {
   access_expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   payment_method?: Prisma.SortOrderInput | Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrderInput | Prisma.SortOrder
   payment_reference?: Prisma.SortOrderInput | Prisma.SortOrder
+  payment_screenshot_id?: Prisma.SortOrderInput | Prisma.SortOrder
   branding_json?: Prisma.SortOrderInput | Prisma.SortOrder
   admin_notes?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -377,6 +406,9 @@ export type e_booklet_purchasesOrderByWithRelationInput = {
   teacher?: Prisma.usersOrderByWithRelationInput
   template?: Prisma.e_booklet_templatesOrderByWithRelationInput
   template_version?: Prisma.e_booklet_template_versionsOrderByWithRelationInput
+  payment_screenshot?: Prisma.imagesOrderByWithRelationInput
+  payment_methods?: Prisma.payment_methodsOrderByWithRelationInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsOrderByRelationAggregateInput
   instances?: Prisma.e_booklet_instancesOrderByRelationAggregateInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerOrderByRelationAggregateInput
 }
@@ -398,7 +430,9 @@ export type e_booklet_purchasesWhereUniqueInput = Prisma.AtLeast<{
   access_expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_purchases"> | Date | string | null
   currency?: Prisma.StringFilter<"e_booklet_purchases"> | string
   payment_method?: Prisma.StringNullableFilter<"e_booklet_purchases"> | string | null
+  payment_method_id?: Prisma.IntNullableFilter<"e_booklet_purchases"> | number | null
   payment_reference?: Prisma.StringNullableFilter<"e_booklet_purchases"> | string | null
+  payment_screenshot_id?: Prisma.IntNullableFilter<"e_booklet_purchases"> | number | null
   branding_json?: Prisma.JsonNullableFilter<"e_booklet_purchases">
   admin_notes?: Prisma.StringNullableFilter<"e_booklet_purchases"> | string | null
   created_at?: Prisma.DateTimeNullableFilter<"e_booklet_purchases"> | Date | string | null
@@ -406,6 +440,9 @@ export type e_booklet_purchasesWhereUniqueInput = Prisma.AtLeast<{
   teacher?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   template?: Prisma.XOR<Prisma.E_booklet_templatesScalarRelationFilter, Prisma.e_booklet_templatesWhereInput>
   template_version?: Prisma.XOR<Prisma.E_booklet_template_versionsScalarRelationFilter, Prisma.e_booklet_template_versionsWhereInput>
+  payment_screenshot?: Prisma.XOR<Prisma.ImagesNullableScalarRelationFilter, Prisma.imagesWhereInput> | null
+  payment_methods?: Prisma.XOR<Prisma.Payment_methodsNullableScalarRelationFilter, Prisma.payment_methodsWhereInput> | null
+  required_fields?: Prisma.E_booklet_purchase_required_fieldsListRelationFilter
   instances?: Prisma.E_booklet_instancesListRelationFilter
   wallet_ledger_entries?: Prisma.Teacher_wallet_ledgerListRelationFilter
 }, "id">
@@ -424,7 +461,9 @@ export type e_booklet_purchasesOrderByWithAggregationInput = {
   access_expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   payment_method?: Prisma.SortOrderInput | Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrderInput | Prisma.SortOrder
   payment_reference?: Prisma.SortOrderInput | Prisma.SortOrder
+  payment_screenshot_id?: Prisma.SortOrderInput | Prisma.SortOrder
   branding_json?: Prisma.SortOrderInput | Prisma.SortOrder
   admin_notes?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -453,7 +492,9 @@ export type e_booklet_purchasesScalarWhereWithAggregatesInput = {
   access_expires_at?: Prisma.DateTimeNullableWithAggregatesFilter<"e_booklet_purchases"> | Date | string | null
   currency?: Prisma.StringWithAggregatesFilter<"e_booklet_purchases"> | string
   payment_method?: Prisma.StringNullableWithAggregatesFilter<"e_booklet_purchases"> | string | null
+  payment_method_id?: Prisma.IntNullableWithAggregatesFilter<"e_booklet_purchases"> | number | null
   payment_reference?: Prisma.StringNullableWithAggregatesFilter<"e_booklet_purchases"> | string | null
+  payment_screenshot_id?: Prisma.IntNullableWithAggregatesFilter<"e_booklet_purchases"> | number | null
   branding_json?: Prisma.JsonNullableWithAggregatesFilter<"e_booklet_purchases">
   admin_notes?: Prisma.StringNullableWithAggregatesFilter<"e_booklet_purchases"> | string | null
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"e_booklet_purchases"> | Date | string | null
@@ -478,6 +519,9 @@ export type e_booklet_purchasesCreateInput = {
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_purchasesInput
   template: Prisma.e_booklet_templatesCreateNestedOneWithoutPurchasesInput
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutPurchasesInput
+  payment_screenshot?: Prisma.imagesCreateNestedOneWithoutE_booklet_purchase_payment_screenshotsInput
+  payment_methods?: Prisma.payment_methodsCreateNestedOneWithoutE_booklet_purchasesInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsCreateNestedManyWithoutPurchaseInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutPurchaseInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutE_booklet_purchaseInput
 }
@@ -496,11 +540,14 @@ export type e_booklet_purchasesUncheckedCreateInput = {
   access_expires_at?: Date | string | null
   currency?: string
   payment_method?: string | null
+  payment_method_id?: number | null
   payment_reference?: string | null
+  payment_screenshot_id?: number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedCreateNestedManyWithoutPurchaseInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutPurchaseInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutE_booklet_purchaseInput
 }
@@ -523,6 +570,9 @@ export type e_booklet_purchasesUpdateInput = {
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_purchasesNestedInput
   template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutPurchasesNestedInput
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutPurchasesNestedInput
+  payment_screenshot?: Prisma.imagesUpdateOneWithoutE_booklet_purchase_payment_screenshotsNestedInput
+  payment_methods?: Prisma.payment_methodsUpdateOneWithoutE_booklet_purchasesNestedInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUpdateManyWithoutPurchaseNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutPurchaseNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutE_booklet_purchaseNestedInput
 }
@@ -541,11 +591,14 @@ export type e_booklet_purchasesUncheckedUpdateInput = {
   access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedUpdateManyWithoutPurchaseNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutPurchaseNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutE_booklet_purchaseNestedInput
 }
@@ -564,7 +617,9 @@ export type e_booklet_purchasesCreateManyInput = {
   access_expires_at?: Date | string | null
   currency?: string
   payment_method?: string | null
+  payment_method_id?: number | null
   payment_reference?: string | null
+  payment_screenshot_id?: number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: string | null
   created_at?: Date | string | null
@@ -602,7 +657,9 @@ export type e_booklet_purchasesUncheckedUpdateManyInput = {
   access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -633,7 +690,9 @@ export type e_booklet_purchasesCountOrderByAggregateInput = {
   access_expires_at?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   payment_method?: Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrder
   payment_reference?: Prisma.SortOrder
+  payment_screenshot_id?: Prisma.SortOrder
   branding_json?: Prisma.SortOrder
   admin_notes?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -650,6 +709,8 @@ export type e_booklet_purchasesAvgOrderByAggregateInput = {
   final_payable_price?: Prisma.SortOrder
   marketing_price?: Prisma.SortOrder
   internal_price?: Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrder
+  payment_screenshot_id?: Prisma.SortOrder
 }
 
 export type e_booklet_purchasesMaxOrderByAggregateInput = {
@@ -666,7 +727,9 @@ export type e_booklet_purchasesMaxOrderByAggregateInput = {
   access_expires_at?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   payment_method?: Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrder
   payment_reference?: Prisma.SortOrder
+  payment_screenshot_id?: Prisma.SortOrder
   admin_notes?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -686,7 +749,9 @@ export type e_booklet_purchasesMinOrderByAggregateInput = {
   access_expires_at?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   payment_method?: Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrder
   payment_reference?: Prisma.SortOrder
+  payment_screenshot_id?: Prisma.SortOrder
   admin_notes?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -702,6 +767,8 @@ export type e_booklet_purchasesSumOrderByAggregateInput = {
   final_payable_price?: Prisma.SortOrder
   marketing_price?: Prisma.SortOrder
   internal_price?: Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrder
+  payment_screenshot_id?: Prisma.SortOrder
 }
 
 export type E_booklet_purchasesScalarRelationFilter = {
@@ -753,6 +820,90 @@ export type e_booklet_purchasesUncheckedUpdateManyWithoutTeacherNestedInput = {
   connect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
   update?: Prisma.e_booklet_purchasesUpdateWithWhereUniqueWithoutTeacherInput | Prisma.e_booklet_purchasesUpdateWithWhereUniqueWithoutTeacherInput[]
   updateMany?: Prisma.e_booklet_purchasesUpdateManyWithWhereWithoutTeacherInput | Prisma.e_booklet_purchasesUpdateManyWithWhereWithoutTeacherInput[]
+  deleteMany?: Prisma.e_booklet_purchasesScalarWhereInput | Prisma.e_booklet_purchasesScalarWhereInput[]
+}
+
+export type e_booklet_purchasesCreateNestedManyWithoutPayment_methodsInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_methodsInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_methodsInput> | Prisma.e_booklet_purchasesCreateWithoutPayment_methodsInput[] | Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_methodsInput[]
+  connectOrCreate?: Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_methodsInput | Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_methodsInput[]
+  createMany?: Prisma.e_booklet_purchasesCreateManyPayment_methodsInputEnvelope
+  connect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+}
+
+export type e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_methodsInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_methodsInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_methodsInput> | Prisma.e_booklet_purchasesCreateWithoutPayment_methodsInput[] | Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_methodsInput[]
+  connectOrCreate?: Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_methodsInput | Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_methodsInput[]
+  createMany?: Prisma.e_booklet_purchasesCreateManyPayment_methodsInputEnvelope
+  connect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+}
+
+export type e_booklet_purchasesUpdateManyWithoutPayment_methodsNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_methodsInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_methodsInput> | Prisma.e_booklet_purchasesCreateWithoutPayment_methodsInput[] | Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_methodsInput[]
+  connectOrCreate?: Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_methodsInput | Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_methodsInput[]
+  upsert?: Prisma.e_booklet_purchasesUpsertWithWhereUniqueWithoutPayment_methodsInput | Prisma.e_booklet_purchasesUpsertWithWhereUniqueWithoutPayment_methodsInput[]
+  createMany?: Prisma.e_booklet_purchasesCreateManyPayment_methodsInputEnvelope
+  set?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  disconnect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  delete?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  connect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  update?: Prisma.e_booklet_purchasesUpdateWithWhereUniqueWithoutPayment_methodsInput | Prisma.e_booklet_purchasesUpdateWithWhereUniqueWithoutPayment_methodsInput[]
+  updateMany?: Prisma.e_booklet_purchasesUpdateManyWithWhereWithoutPayment_methodsInput | Prisma.e_booklet_purchasesUpdateManyWithWhereWithoutPayment_methodsInput[]
+  deleteMany?: Prisma.e_booklet_purchasesScalarWhereInput | Prisma.e_booklet_purchasesScalarWhereInput[]
+}
+
+export type e_booklet_purchasesUncheckedUpdateManyWithoutPayment_methodsNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_methodsInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_methodsInput> | Prisma.e_booklet_purchasesCreateWithoutPayment_methodsInput[] | Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_methodsInput[]
+  connectOrCreate?: Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_methodsInput | Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_methodsInput[]
+  upsert?: Prisma.e_booklet_purchasesUpsertWithWhereUniqueWithoutPayment_methodsInput | Prisma.e_booklet_purchasesUpsertWithWhereUniqueWithoutPayment_methodsInput[]
+  createMany?: Prisma.e_booklet_purchasesCreateManyPayment_methodsInputEnvelope
+  set?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  disconnect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  delete?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  connect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  update?: Prisma.e_booklet_purchasesUpdateWithWhereUniqueWithoutPayment_methodsInput | Prisma.e_booklet_purchasesUpdateWithWhereUniqueWithoutPayment_methodsInput[]
+  updateMany?: Prisma.e_booklet_purchasesUpdateManyWithWhereWithoutPayment_methodsInput | Prisma.e_booklet_purchasesUpdateManyWithWhereWithoutPayment_methodsInput[]
+  deleteMany?: Prisma.e_booklet_purchasesScalarWhereInput | Prisma.e_booklet_purchasesScalarWhereInput[]
+}
+
+export type e_booklet_purchasesCreateNestedManyWithoutPayment_screenshotInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_screenshotInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_screenshotInput> | Prisma.e_booklet_purchasesCreateWithoutPayment_screenshotInput[] | Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_screenshotInput[]
+  connectOrCreate?: Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_screenshotInput | Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_screenshotInput[]
+  createMany?: Prisma.e_booklet_purchasesCreateManyPayment_screenshotInputEnvelope
+  connect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+}
+
+export type e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_screenshotInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_screenshotInput> | Prisma.e_booklet_purchasesCreateWithoutPayment_screenshotInput[] | Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_screenshotInput[]
+  connectOrCreate?: Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_screenshotInput | Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_screenshotInput[]
+  createMany?: Prisma.e_booklet_purchasesCreateManyPayment_screenshotInputEnvelope
+  connect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+}
+
+export type e_booklet_purchasesUpdateManyWithoutPayment_screenshotNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_screenshotInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_screenshotInput> | Prisma.e_booklet_purchasesCreateWithoutPayment_screenshotInput[] | Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_screenshotInput[]
+  connectOrCreate?: Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_screenshotInput | Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_screenshotInput[]
+  upsert?: Prisma.e_booklet_purchasesUpsertWithWhereUniqueWithoutPayment_screenshotInput | Prisma.e_booklet_purchasesUpsertWithWhereUniqueWithoutPayment_screenshotInput[]
+  createMany?: Prisma.e_booklet_purchasesCreateManyPayment_screenshotInputEnvelope
+  set?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  disconnect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  delete?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  connect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  update?: Prisma.e_booklet_purchasesUpdateWithWhereUniqueWithoutPayment_screenshotInput | Prisma.e_booklet_purchasesUpdateWithWhereUniqueWithoutPayment_screenshotInput[]
+  updateMany?: Prisma.e_booklet_purchasesUpdateManyWithWhereWithoutPayment_screenshotInput | Prisma.e_booklet_purchasesUpdateManyWithWhereWithoutPayment_screenshotInput[]
+  deleteMany?: Prisma.e_booklet_purchasesScalarWhereInput | Prisma.e_booklet_purchasesScalarWhereInput[]
+}
+
+export type e_booklet_purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_screenshotInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_screenshotInput> | Prisma.e_booklet_purchasesCreateWithoutPayment_screenshotInput[] | Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_screenshotInput[]
+  connectOrCreate?: Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_screenshotInput | Prisma.e_booklet_purchasesCreateOrConnectWithoutPayment_screenshotInput[]
+  upsert?: Prisma.e_booklet_purchasesUpsertWithWhereUniqueWithoutPayment_screenshotInput | Prisma.e_booklet_purchasesUpsertWithWhereUniqueWithoutPayment_screenshotInput[]
+  createMany?: Prisma.e_booklet_purchasesCreateManyPayment_screenshotInputEnvelope
+  set?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  disconnect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  delete?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  connect?: Prisma.e_booklet_purchasesWhereUniqueInput | Prisma.e_booklet_purchasesWhereUniqueInput[]
+  update?: Prisma.e_booklet_purchasesUpdateWithWhereUniqueWithoutPayment_screenshotInput | Prisma.e_booklet_purchasesUpdateWithWhereUniqueWithoutPayment_screenshotInput[]
+  updateMany?: Prisma.e_booklet_purchasesUpdateManyWithWhereWithoutPayment_screenshotInput | Prisma.e_booklet_purchasesUpdateManyWithWhereWithoutPayment_screenshotInput[]
   deleteMany?: Prisma.e_booklet_purchasesScalarWhereInput | Prisma.e_booklet_purchasesScalarWhereInput[]
 }
 
@@ -844,6 +995,20 @@ export type Enume_booklet_purchase_status_enumFieldUpdateOperationsInput = {
   set?: $Enums.e_booklet_purchase_status_enum
 }
 
+export type e_booklet_purchasesCreateNestedOneWithoutRequired_fieldsInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutRequired_fieldsInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutRequired_fieldsInput>
+  connectOrCreate?: Prisma.e_booklet_purchasesCreateOrConnectWithoutRequired_fieldsInput
+  connect?: Prisma.e_booklet_purchasesWhereUniqueInput
+}
+
+export type e_booklet_purchasesUpdateOneRequiredWithoutRequired_fieldsNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutRequired_fieldsInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutRequired_fieldsInput>
+  connectOrCreate?: Prisma.e_booklet_purchasesCreateOrConnectWithoutRequired_fieldsInput
+  upsert?: Prisma.e_booklet_purchasesUpsertWithoutRequired_fieldsInput
+  connect?: Prisma.e_booklet_purchasesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_purchasesUpdateToOneWithWhereWithoutRequired_fieldsInput, Prisma.e_booklet_purchasesUpdateWithoutRequired_fieldsInput>, Prisma.e_booklet_purchasesUncheckedUpdateWithoutRequired_fieldsInput>
+}
+
 export type e_booklet_purchasesCreateNestedOneWithoutInstancesInput = {
   create?: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutInstancesInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutInstancesInput>
   connectOrCreate?: Prisma.e_booklet_purchasesCreateOrConnectWithoutInstancesInput
@@ -891,6 +1056,9 @@ export type e_booklet_purchasesCreateWithoutTeacherInput = {
   updated_at?: Date | string | null
   template: Prisma.e_booklet_templatesCreateNestedOneWithoutPurchasesInput
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutPurchasesInput
+  payment_screenshot?: Prisma.imagesCreateNestedOneWithoutE_booklet_purchase_payment_screenshotsInput
+  payment_methods?: Prisma.payment_methodsCreateNestedOneWithoutE_booklet_purchasesInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsCreateNestedManyWithoutPurchaseInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutPurchaseInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutE_booklet_purchaseInput
 }
@@ -908,11 +1076,14 @@ export type e_booklet_purchasesUncheckedCreateWithoutTeacherInput = {
   access_expires_at?: Date | string | null
   currency?: string
   payment_method?: string | null
+  payment_method_id?: number | null
   payment_reference?: string | null
+  payment_screenshot_id?: number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedCreateNestedManyWithoutPurchaseInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutPurchaseInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutE_booklet_purchaseInput
 }
@@ -960,11 +1131,163 @@ export type e_booklet_purchasesScalarWhereInput = {
   access_expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_purchases"> | Date | string | null
   currency?: Prisma.StringFilter<"e_booklet_purchases"> | string
   payment_method?: Prisma.StringNullableFilter<"e_booklet_purchases"> | string | null
+  payment_method_id?: Prisma.IntNullableFilter<"e_booklet_purchases"> | number | null
   payment_reference?: Prisma.StringNullableFilter<"e_booklet_purchases"> | string | null
+  payment_screenshot_id?: Prisma.IntNullableFilter<"e_booklet_purchases"> | number | null
   branding_json?: Prisma.JsonNullableFilter<"e_booklet_purchases">
   admin_notes?: Prisma.StringNullableFilter<"e_booklet_purchases"> | string | null
   created_at?: Prisma.DateTimeNullableFilter<"e_booklet_purchases"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"e_booklet_purchases"> | Date | string | null
+}
+
+export type e_booklet_purchasesCreateWithoutPayment_methodsInput = {
+  status?: $Enums.e_booklet_purchase_status_enum
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Date | string | null
+  currency?: string
+  payment_method?: string | null
+  payment_reference?: string | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  teacher: Prisma.usersCreateNestedOneWithoutE_booklet_purchasesInput
+  template: Prisma.e_booklet_templatesCreateNestedOneWithoutPurchasesInput
+  template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutPurchasesInput
+  payment_screenshot?: Prisma.imagesCreateNestedOneWithoutE_booklet_purchase_payment_screenshotsInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsCreateNestedManyWithoutPurchaseInput
+  instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutPurchaseInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutE_booklet_purchaseInput
+}
+
+export type e_booklet_purchasesUncheckedCreateWithoutPayment_methodsInput = {
+  id?: number
+  teacher_id: number
+  template_id: number
+  template_version_id: number
+  status?: $Enums.e_booklet_purchase_status_enum
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Date | string | null
+  currency?: string
+  payment_method?: string | null
+  payment_reference?: string | null
+  payment_screenshot_id?: number | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedCreateNestedManyWithoutPurchaseInput
+  instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutPurchaseInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutE_booklet_purchaseInput
+}
+
+export type e_booklet_purchasesCreateOrConnectWithoutPayment_methodsInput = {
+  where: Prisma.e_booklet_purchasesWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_methodsInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_methodsInput>
+}
+
+export type e_booklet_purchasesCreateManyPayment_methodsInputEnvelope = {
+  data: Prisma.e_booklet_purchasesCreateManyPayment_methodsInput | Prisma.e_booklet_purchasesCreateManyPayment_methodsInput[]
+  skipDuplicates?: boolean
+}
+
+export type e_booklet_purchasesUpsertWithWhereUniqueWithoutPayment_methodsInput = {
+  where: Prisma.e_booklet_purchasesWhereUniqueInput
+  update: Prisma.XOR<Prisma.e_booklet_purchasesUpdateWithoutPayment_methodsInput, Prisma.e_booklet_purchasesUncheckedUpdateWithoutPayment_methodsInput>
+  create: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_methodsInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_methodsInput>
+}
+
+export type e_booklet_purchasesUpdateWithWhereUniqueWithoutPayment_methodsInput = {
+  where: Prisma.e_booklet_purchasesWhereUniqueInput
+  data: Prisma.XOR<Prisma.e_booklet_purchasesUpdateWithoutPayment_methodsInput, Prisma.e_booklet_purchasesUncheckedUpdateWithoutPayment_methodsInput>
+}
+
+export type e_booklet_purchasesUpdateManyWithWhereWithoutPayment_methodsInput = {
+  where: Prisma.e_booklet_purchasesScalarWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_purchasesUpdateManyMutationInput, Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_methodsInput>
+}
+
+export type e_booklet_purchasesCreateWithoutPayment_screenshotInput = {
+  status?: $Enums.e_booklet_purchase_status_enum
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Date | string | null
+  currency?: string
+  payment_method?: string | null
+  payment_reference?: string | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  teacher: Prisma.usersCreateNestedOneWithoutE_booklet_purchasesInput
+  template: Prisma.e_booklet_templatesCreateNestedOneWithoutPurchasesInput
+  template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutPurchasesInput
+  payment_methods?: Prisma.payment_methodsCreateNestedOneWithoutE_booklet_purchasesInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsCreateNestedManyWithoutPurchaseInput
+  instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutPurchaseInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutE_booklet_purchaseInput
+}
+
+export type e_booklet_purchasesUncheckedCreateWithoutPayment_screenshotInput = {
+  id?: number
+  teacher_id: number
+  template_id: number
+  template_version_id: number
+  status?: $Enums.e_booklet_purchase_status_enum
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Date | string | null
+  currency?: string
+  payment_method?: string | null
+  payment_method_id?: number | null
+  payment_reference?: string | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedCreateNestedManyWithoutPurchaseInput
+  instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutPurchaseInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutE_booklet_purchaseInput
+}
+
+export type e_booklet_purchasesCreateOrConnectWithoutPayment_screenshotInput = {
+  where: Prisma.e_booklet_purchasesWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_screenshotInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_screenshotInput>
+}
+
+export type e_booklet_purchasesCreateManyPayment_screenshotInputEnvelope = {
+  data: Prisma.e_booklet_purchasesCreateManyPayment_screenshotInput | Prisma.e_booklet_purchasesCreateManyPayment_screenshotInput[]
+  skipDuplicates?: boolean
+}
+
+export type e_booklet_purchasesUpsertWithWhereUniqueWithoutPayment_screenshotInput = {
+  where: Prisma.e_booklet_purchasesWhereUniqueInput
+  update: Prisma.XOR<Prisma.e_booklet_purchasesUpdateWithoutPayment_screenshotInput, Prisma.e_booklet_purchasesUncheckedUpdateWithoutPayment_screenshotInput>
+  create: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutPayment_screenshotInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutPayment_screenshotInput>
+}
+
+export type e_booklet_purchasesUpdateWithWhereUniqueWithoutPayment_screenshotInput = {
+  where: Prisma.e_booklet_purchasesWhereUniqueInput
+  data: Prisma.XOR<Prisma.e_booklet_purchasesUpdateWithoutPayment_screenshotInput, Prisma.e_booklet_purchasesUncheckedUpdateWithoutPayment_screenshotInput>
+}
+
+export type e_booklet_purchasesUpdateManyWithWhereWithoutPayment_screenshotInput = {
+  where: Prisma.e_booklet_purchasesScalarWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_purchasesUpdateManyMutationInput, Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_screenshotInput>
 }
 
 export type e_booklet_purchasesCreateWithoutTemplateInput = {
@@ -984,6 +1307,9 @@ export type e_booklet_purchasesCreateWithoutTemplateInput = {
   updated_at?: Date | string | null
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_purchasesInput
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutPurchasesInput
+  payment_screenshot?: Prisma.imagesCreateNestedOneWithoutE_booklet_purchase_payment_screenshotsInput
+  payment_methods?: Prisma.payment_methodsCreateNestedOneWithoutE_booklet_purchasesInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsCreateNestedManyWithoutPurchaseInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutPurchaseInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutE_booklet_purchaseInput
 }
@@ -1001,11 +1327,14 @@ export type e_booklet_purchasesUncheckedCreateWithoutTemplateInput = {
   access_expires_at?: Date | string | null
   currency?: string
   payment_method?: string | null
+  payment_method_id?: number | null
   payment_reference?: string | null
+  payment_screenshot_id?: number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedCreateNestedManyWithoutPurchaseInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutPurchaseInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutE_booklet_purchaseInput
 }
@@ -1053,6 +1382,9 @@ export type e_booklet_purchasesCreateWithoutTemplate_versionInput = {
   updated_at?: Date | string | null
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_purchasesInput
   template: Prisma.e_booklet_templatesCreateNestedOneWithoutPurchasesInput
+  payment_screenshot?: Prisma.imagesCreateNestedOneWithoutE_booklet_purchase_payment_screenshotsInput
+  payment_methods?: Prisma.payment_methodsCreateNestedOneWithoutE_booklet_purchasesInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsCreateNestedManyWithoutPurchaseInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutPurchaseInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutE_booklet_purchaseInput
 }
@@ -1070,11 +1402,14 @@ export type e_booklet_purchasesUncheckedCreateWithoutTemplate_versionInput = {
   access_expires_at?: Date | string | null
   currency?: string
   payment_method?: string | null
+  payment_method_id?: number | null
   payment_reference?: string | null
+  payment_screenshot_id?: number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedCreateNestedManyWithoutPurchaseInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutPurchaseInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutE_booklet_purchaseInput
 }
@@ -1105,6 +1440,120 @@ export type e_booklet_purchasesUpdateManyWithWhereWithoutTemplate_versionInput =
   data: Prisma.XOR<Prisma.e_booklet_purchasesUpdateManyMutationInput, Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionInput>
 }
 
+export type e_booklet_purchasesCreateWithoutRequired_fieldsInput = {
+  status?: $Enums.e_booklet_purchase_status_enum
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Date | string | null
+  currency?: string
+  payment_method?: string | null
+  payment_reference?: string | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  teacher: Prisma.usersCreateNestedOneWithoutE_booklet_purchasesInput
+  template: Prisma.e_booklet_templatesCreateNestedOneWithoutPurchasesInput
+  template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutPurchasesInput
+  payment_screenshot?: Prisma.imagesCreateNestedOneWithoutE_booklet_purchase_payment_screenshotsInput
+  payment_methods?: Prisma.payment_methodsCreateNestedOneWithoutE_booklet_purchasesInput
+  instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutPurchaseInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutE_booklet_purchaseInput
+}
+
+export type e_booklet_purchasesUncheckedCreateWithoutRequired_fieldsInput = {
+  id?: number
+  teacher_id: number
+  template_id: number
+  template_version_id: number
+  status?: $Enums.e_booklet_purchase_status_enum
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Date | string | null
+  currency?: string
+  payment_method?: string | null
+  payment_method_id?: number | null
+  payment_reference?: string | null
+  payment_screenshot_id?: number | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutPurchaseInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutE_booklet_purchaseInput
+}
+
+export type e_booklet_purchasesCreateOrConnectWithoutRequired_fieldsInput = {
+  where: Prisma.e_booklet_purchasesWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutRequired_fieldsInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutRequired_fieldsInput>
+}
+
+export type e_booklet_purchasesUpsertWithoutRequired_fieldsInput = {
+  update: Prisma.XOR<Prisma.e_booklet_purchasesUpdateWithoutRequired_fieldsInput, Prisma.e_booklet_purchasesUncheckedUpdateWithoutRequired_fieldsInput>
+  create: Prisma.XOR<Prisma.e_booklet_purchasesCreateWithoutRequired_fieldsInput, Prisma.e_booklet_purchasesUncheckedCreateWithoutRequired_fieldsInput>
+  where?: Prisma.e_booklet_purchasesWhereInput
+}
+
+export type e_booklet_purchasesUpdateToOneWithWhereWithoutRequired_fieldsInput = {
+  where?: Prisma.e_booklet_purchasesWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_purchasesUpdateWithoutRequired_fieldsInput, Prisma.e_booklet_purchasesUncheckedUpdateWithoutRequired_fieldsInput>
+}
+
+export type e_booklet_purchasesUpdateWithoutRequired_fieldsInput = {
+  status?: Prisma.Enume_booklet_purchase_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_purchase_status_enum
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_purchasesNestedInput
+  template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutPurchasesNestedInput
+  template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutPurchasesNestedInput
+  payment_screenshot?: Prisma.imagesUpdateOneWithoutE_booklet_purchase_payment_screenshotsNestedInput
+  payment_methods?: Prisma.payment_methodsUpdateOneWithoutE_booklet_purchasesNestedInput
+  instances?: Prisma.e_booklet_instancesUpdateManyWithoutPurchaseNestedInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutE_booklet_purchaseNestedInput
+}
+
+export type e_booklet_purchasesUncheckedUpdateWithoutRequired_fieldsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.Enume_booklet_purchase_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_purchase_status_enum
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutPurchaseNestedInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutE_booklet_purchaseNestedInput
+}
+
 export type e_booklet_purchasesCreateWithoutInstancesInput = {
   status?: $Enums.e_booklet_purchase_status_enum
   price?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1123,6 +1572,9 @@ export type e_booklet_purchasesCreateWithoutInstancesInput = {
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_purchasesInput
   template: Prisma.e_booklet_templatesCreateNestedOneWithoutPurchasesInput
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutPurchasesInput
+  payment_screenshot?: Prisma.imagesCreateNestedOneWithoutE_booklet_purchase_payment_screenshotsInput
+  payment_methods?: Prisma.payment_methodsCreateNestedOneWithoutE_booklet_purchasesInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsCreateNestedManyWithoutPurchaseInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutE_booklet_purchaseInput
 }
 
@@ -1140,11 +1592,14 @@ export type e_booklet_purchasesUncheckedCreateWithoutInstancesInput = {
   access_expires_at?: Date | string | null
   currency?: string
   payment_method?: string | null
+  payment_method_id?: number | null
   payment_reference?: string | null
+  payment_screenshot_id?: number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedCreateNestedManyWithoutPurchaseInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutE_booklet_purchaseInput
 }
 
@@ -1182,6 +1637,9 @@ export type e_booklet_purchasesUpdateWithoutInstancesInput = {
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_purchasesNestedInput
   template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutPurchasesNestedInput
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutPurchasesNestedInput
+  payment_screenshot?: Prisma.imagesUpdateOneWithoutE_booklet_purchase_payment_screenshotsNestedInput
+  payment_methods?: Prisma.payment_methodsUpdateOneWithoutE_booklet_purchasesNestedInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUpdateManyWithoutPurchaseNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutE_booklet_purchaseNestedInput
 }
 
@@ -1199,11 +1657,14 @@ export type e_booklet_purchasesUncheckedUpdateWithoutInstancesInput = {
   access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedUpdateManyWithoutPurchaseNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutE_booklet_purchaseNestedInput
 }
 
@@ -1225,6 +1686,9 @@ export type e_booklet_purchasesCreateWithoutWallet_ledger_entriesInput = {
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_purchasesInput
   template: Prisma.e_booklet_templatesCreateNestedOneWithoutPurchasesInput
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutPurchasesInput
+  payment_screenshot?: Prisma.imagesCreateNestedOneWithoutE_booklet_purchase_payment_screenshotsInput
+  payment_methods?: Prisma.payment_methodsCreateNestedOneWithoutE_booklet_purchasesInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsCreateNestedManyWithoutPurchaseInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutPurchaseInput
 }
 
@@ -1242,11 +1706,14 @@ export type e_booklet_purchasesUncheckedCreateWithoutWallet_ledger_entriesInput 
   access_expires_at?: Date | string | null
   currency?: string
   payment_method?: string | null
+  payment_method_id?: number | null
   payment_reference?: string | null
+  payment_screenshot_id?: number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedCreateNestedManyWithoutPurchaseInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutPurchaseInput
 }
 
@@ -1284,6 +1751,9 @@ export type e_booklet_purchasesUpdateWithoutWallet_ledger_entriesInput = {
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_purchasesNestedInput
   template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutPurchasesNestedInput
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutPurchasesNestedInput
+  payment_screenshot?: Prisma.imagesUpdateOneWithoutE_booklet_purchase_payment_screenshotsNestedInput
+  payment_methods?: Prisma.payment_methodsUpdateOneWithoutE_booklet_purchasesNestedInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUpdateManyWithoutPurchaseNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutPurchaseNestedInput
 }
 
@@ -1301,11 +1771,14 @@ export type e_booklet_purchasesUncheckedUpdateWithoutWallet_ledger_entriesInput 
   access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedUpdateManyWithoutPurchaseNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutPurchaseNestedInput
 }
 
@@ -1322,7 +1795,9 @@ export type e_booklet_purchasesCreateManyTeacherInput = {
   access_expires_at?: Date | string | null
   currency?: string
   payment_method?: string | null
+  payment_method_id?: number | null
   payment_reference?: string | null
+  payment_screenshot_id?: number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: string | null
   created_at?: Date | string | null
@@ -1346,6 +1821,9 @@ export type e_booklet_purchasesUpdateWithoutTeacherInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutPurchasesNestedInput
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutPurchasesNestedInput
+  payment_screenshot?: Prisma.imagesUpdateOneWithoutE_booklet_purchase_payment_screenshotsNestedInput
+  payment_methods?: Prisma.payment_methodsUpdateOneWithoutE_booklet_purchasesNestedInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUpdateManyWithoutPurchaseNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutPurchaseNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutE_booklet_purchaseNestedInput
 }
@@ -1363,11 +1841,14 @@ export type e_booklet_purchasesUncheckedUpdateWithoutTeacherInput = {
   access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedUpdateManyWithoutPurchaseNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutPurchaseNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutE_booklet_purchaseNestedInput
 }
@@ -1385,6 +1866,194 @@ export type e_booklet_purchasesUncheckedUpdateManyWithoutTeacherInput = {
   access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type e_booklet_purchasesCreateManyPayment_methodsInput = {
+  id?: number
+  teacher_id: number
+  template_id: number
+  template_version_id: number
+  status?: $Enums.e_booklet_purchase_status_enum
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Date | string | null
+  currency?: string
+  payment_method?: string | null
+  payment_reference?: string | null
+  payment_screenshot_id?: number | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+}
+
+export type e_booklet_purchasesUpdateWithoutPayment_methodsInput = {
+  status?: Prisma.Enume_booklet_purchase_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_purchase_status_enum
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_purchasesNestedInput
+  template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutPurchasesNestedInput
+  template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutPurchasesNestedInput
+  payment_screenshot?: Prisma.imagesUpdateOneWithoutE_booklet_purchase_payment_screenshotsNestedInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUpdateManyWithoutPurchaseNestedInput
+  instances?: Prisma.e_booklet_instancesUpdateManyWithoutPurchaseNestedInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutE_booklet_purchaseNestedInput
+}
+
+export type e_booklet_purchasesUncheckedUpdateWithoutPayment_methodsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.Enume_booklet_purchase_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_purchase_status_enum
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedUpdateManyWithoutPurchaseNestedInput
+  instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutPurchaseNestedInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutE_booklet_purchaseNestedInput
+}
+
+export type e_booklet_purchasesUncheckedUpdateManyWithoutPayment_methodsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.Enume_booklet_purchase_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_purchase_status_enum
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type e_booklet_purchasesCreateManyPayment_screenshotInput = {
+  id?: number
+  teacher_id: number
+  template_id: number
+  template_version_id: number
+  status?: $Enums.e_booklet_purchase_status_enum
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Date | string | null
+  currency?: string
+  payment_method?: string | null
+  payment_method_id?: number | null
+  payment_reference?: string | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+}
+
+export type e_booklet_purchasesUpdateWithoutPayment_screenshotInput = {
+  status?: Prisma.Enume_booklet_purchase_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_purchase_status_enum
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_purchasesNestedInput
+  template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutPurchasesNestedInput
+  template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutPurchasesNestedInput
+  payment_methods?: Prisma.payment_methodsUpdateOneWithoutE_booklet_purchasesNestedInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUpdateManyWithoutPurchaseNestedInput
+  instances?: Prisma.e_booklet_instancesUpdateManyWithoutPurchaseNestedInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutE_booklet_purchaseNestedInput
+}
+
+export type e_booklet_purchasesUncheckedUpdateWithoutPayment_screenshotInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.Enume_booklet_purchase_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_purchase_status_enum
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedUpdateManyWithoutPurchaseNestedInput
+  instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutPurchaseNestedInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutE_booklet_purchaseNestedInput
+}
+
+export type e_booklet_purchasesUncheckedUpdateManyWithoutPayment_screenshotInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.Enume_booklet_purchase_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_purchase_status_enum
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  wallet_credit_applied?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  final_payable_price?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  internal_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1405,7 +2074,9 @@ export type e_booklet_purchasesCreateManyTemplateInput = {
   access_expires_at?: Date | string | null
   currency?: string
   payment_method?: string | null
+  payment_method_id?: number | null
   payment_reference?: string | null
+  payment_screenshot_id?: number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: string | null
   created_at?: Date | string | null
@@ -1429,6 +2100,9 @@ export type e_booklet_purchasesUpdateWithoutTemplateInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_purchasesNestedInput
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutPurchasesNestedInput
+  payment_screenshot?: Prisma.imagesUpdateOneWithoutE_booklet_purchase_payment_screenshotsNestedInput
+  payment_methods?: Prisma.payment_methodsUpdateOneWithoutE_booklet_purchasesNestedInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUpdateManyWithoutPurchaseNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutPurchaseNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutE_booklet_purchaseNestedInput
 }
@@ -1446,11 +2120,14 @@ export type e_booklet_purchasesUncheckedUpdateWithoutTemplateInput = {
   access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedUpdateManyWithoutPurchaseNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutPurchaseNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutE_booklet_purchaseNestedInput
 }
@@ -1468,7 +2145,9 @@ export type e_booklet_purchasesUncheckedUpdateManyWithoutTemplateInput = {
   access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1488,7 +2167,9 @@ export type e_booklet_purchasesCreateManyTemplate_versionInput = {
   access_expires_at?: Date | string | null
   currency?: string
   payment_method?: string | null
+  payment_method_id?: number | null
   payment_reference?: string | null
+  payment_screenshot_id?: number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: string | null
   created_at?: Date | string | null
@@ -1512,6 +2193,9 @@ export type e_booklet_purchasesUpdateWithoutTemplate_versionInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_purchasesNestedInput
   template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutPurchasesNestedInput
+  payment_screenshot?: Prisma.imagesUpdateOneWithoutE_booklet_purchase_payment_screenshotsNestedInput
+  payment_methods?: Prisma.payment_methodsUpdateOneWithoutE_booklet_purchasesNestedInput
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUpdateManyWithoutPurchaseNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutPurchaseNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutE_booklet_purchaseNestedInput
 }
@@ -1529,11 +2213,14 @@ export type e_booklet_purchasesUncheckedUpdateWithoutTemplate_versionInput = {
   access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  required_fields?: Prisma.e_booklet_purchase_required_fieldsUncheckedUpdateManyWithoutPurchaseNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutPurchaseNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutE_booklet_purchaseNestedInput
 }
@@ -1551,7 +2238,9 @@ export type e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionInput =
   access_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   payment_method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   payment_reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_screenshot_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   branding_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   admin_notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1564,11 +2253,13 @@ export type e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionInput =
  */
 
 export type E_booklet_purchasesCountOutputType = {
+  required_fields: number
   instances: number
   wallet_ledger_entries: number
 }
 
 export type E_booklet_purchasesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  required_fields?: boolean | E_booklet_purchasesCountOutputTypeCountRequired_fieldsArgs
   instances?: boolean | E_booklet_purchasesCountOutputTypeCountInstancesArgs
   wallet_ledger_entries?: boolean | E_booklet_purchasesCountOutputTypeCountWallet_ledger_entriesArgs
 }
@@ -1581,6 +2272,13 @@ export type E_booklet_purchasesCountOutputTypeDefaultArgs<ExtArgs extends runtim
    * Select specific fields to fetch from the E_booklet_purchasesCountOutputType
    */
   select?: Prisma.E_booklet_purchasesCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * E_booklet_purchasesCountOutputType without action
+ */
+export type E_booklet_purchasesCountOutputTypeCountRequired_fieldsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_purchase_required_fieldsWhereInput
 }
 
 /**
@@ -1612,7 +2310,9 @@ export type e_booklet_purchasesSelect<ExtArgs extends runtime.Types.Extensions.I
   access_expires_at?: boolean
   currency?: boolean
   payment_method?: boolean
+  payment_method_id?: boolean
   payment_reference?: boolean
+  payment_screenshot_id?: boolean
   branding_json?: boolean
   admin_notes?: boolean
   created_at?: boolean
@@ -1620,6 +2320,9 @@ export type e_booklet_purchasesSelect<ExtArgs extends runtime.Types.Extensions.I
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   template?: boolean | Prisma.e_booklet_templatesDefaultArgs<ExtArgs>
   template_version?: boolean | Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>
+  payment_screenshot?: boolean | Prisma.e_booklet_purchases$payment_screenshotArgs<ExtArgs>
+  payment_methods?: boolean | Prisma.e_booklet_purchases$payment_methodsArgs<ExtArgs>
+  required_fields?: boolean | Prisma.e_booklet_purchases$required_fieldsArgs<ExtArgs>
   instances?: boolean | Prisma.e_booklet_purchases$instancesArgs<ExtArgs>
   wallet_ledger_entries?: boolean | Prisma.e_booklet_purchases$wallet_ledger_entriesArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_purchasesCountOutputTypeDefaultArgs<ExtArgs>
@@ -1639,7 +2342,9 @@ export type e_booklet_purchasesSelectCreateManyAndReturn<ExtArgs extends runtime
   access_expires_at?: boolean
   currency?: boolean
   payment_method?: boolean
+  payment_method_id?: boolean
   payment_reference?: boolean
+  payment_screenshot_id?: boolean
   branding_json?: boolean
   admin_notes?: boolean
   created_at?: boolean
@@ -1647,6 +2352,8 @@ export type e_booklet_purchasesSelectCreateManyAndReturn<ExtArgs extends runtime
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   template?: boolean | Prisma.e_booklet_templatesDefaultArgs<ExtArgs>
   template_version?: boolean | Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>
+  payment_screenshot?: boolean | Prisma.e_booklet_purchases$payment_screenshotArgs<ExtArgs>
+  payment_methods?: boolean | Prisma.e_booklet_purchases$payment_methodsArgs<ExtArgs>
 }, ExtArgs["result"]["e_booklet_purchases"]>
 
 export type e_booklet_purchasesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1663,7 +2370,9 @@ export type e_booklet_purchasesSelectUpdateManyAndReturn<ExtArgs extends runtime
   access_expires_at?: boolean
   currency?: boolean
   payment_method?: boolean
+  payment_method_id?: boolean
   payment_reference?: boolean
+  payment_screenshot_id?: boolean
   branding_json?: boolean
   admin_notes?: boolean
   created_at?: boolean
@@ -1671,6 +2380,8 @@ export type e_booklet_purchasesSelectUpdateManyAndReturn<ExtArgs extends runtime
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   template?: boolean | Prisma.e_booklet_templatesDefaultArgs<ExtArgs>
   template_version?: boolean | Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>
+  payment_screenshot?: boolean | Prisma.e_booklet_purchases$payment_screenshotArgs<ExtArgs>
+  payment_methods?: boolean | Prisma.e_booklet_purchases$payment_methodsArgs<ExtArgs>
 }, ExtArgs["result"]["e_booklet_purchases"]>
 
 export type e_booklet_purchasesSelectScalar = {
@@ -1687,18 +2398,23 @@ export type e_booklet_purchasesSelectScalar = {
   access_expires_at?: boolean
   currency?: boolean
   payment_method?: boolean
+  payment_method_id?: boolean
   payment_reference?: boolean
+  payment_screenshot_id?: boolean
   branding_json?: boolean
   admin_notes?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type e_booklet_purchasesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "teacher_id" | "template_id" | "template_version_id" | "status" | "price" | "wallet_credit_applied" | "final_payable_price" | "marketing_price" | "internal_price" | "access_expires_at" | "currency" | "payment_method" | "payment_reference" | "branding_json" | "admin_notes" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_purchases"]>
+export type e_booklet_purchasesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "teacher_id" | "template_id" | "template_version_id" | "status" | "price" | "wallet_credit_applied" | "final_payable_price" | "marketing_price" | "internal_price" | "access_expires_at" | "currency" | "payment_method" | "payment_method_id" | "payment_reference" | "payment_screenshot_id" | "branding_json" | "admin_notes" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_purchases"]>
 export type e_booklet_purchasesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   template?: boolean | Prisma.e_booklet_templatesDefaultArgs<ExtArgs>
   template_version?: boolean | Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>
+  payment_screenshot?: boolean | Prisma.e_booklet_purchases$payment_screenshotArgs<ExtArgs>
+  payment_methods?: boolean | Prisma.e_booklet_purchases$payment_methodsArgs<ExtArgs>
+  required_fields?: boolean | Prisma.e_booklet_purchases$required_fieldsArgs<ExtArgs>
   instances?: boolean | Prisma.e_booklet_purchases$instancesArgs<ExtArgs>
   wallet_ledger_entries?: boolean | Prisma.e_booklet_purchases$wallet_ledger_entriesArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_purchasesCountOutputTypeDefaultArgs<ExtArgs>
@@ -1707,11 +2423,15 @@ export type e_booklet_purchasesIncludeCreateManyAndReturn<ExtArgs extends runtim
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   template?: boolean | Prisma.e_booklet_templatesDefaultArgs<ExtArgs>
   template_version?: boolean | Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>
+  payment_screenshot?: boolean | Prisma.e_booklet_purchases$payment_screenshotArgs<ExtArgs>
+  payment_methods?: boolean | Prisma.e_booklet_purchases$payment_methodsArgs<ExtArgs>
 }
 export type e_booklet_purchasesIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   template?: boolean | Prisma.e_booklet_templatesDefaultArgs<ExtArgs>
   template_version?: boolean | Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>
+  payment_screenshot?: boolean | Prisma.e_booklet_purchases$payment_screenshotArgs<ExtArgs>
+  payment_methods?: boolean | Prisma.e_booklet_purchases$payment_methodsArgs<ExtArgs>
 }
 
 export type $e_booklet_purchasesPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1720,6 +2440,9 @@ export type $e_booklet_purchasesPayload<ExtArgs extends runtime.Types.Extensions
     teacher: Prisma.$usersPayload<ExtArgs>
     template: Prisma.$e_booklet_templatesPayload<ExtArgs>
     template_version: Prisma.$e_booklet_template_versionsPayload<ExtArgs>
+    payment_screenshot: Prisma.$imagesPayload<ExtArgs> | null
+    payment_methods: Prisma.$payment_methodsPayload<ExtArgs> | null
+    required_fields: Prisma.$e_booklet_purchase_required_fieldsPayload<ExtArgs>[]
     instances: Prisma.$e_booklet_instancesPayload<ExtArgs>[]
     wallet_ledger_entries: Prisma.$teacher_wallet_ledgerPayload<ExtArgs>[]
   }
@@ -1737,7 +2460,9 @@ export type $e_booklet_purchasesPayload<ExtArgs extends runtime.Types.Extensions
     access_expires_at: Date | null
     currency: string
     payment_method: string | null
+    payment_method_id: number | null
     payment_reference: string | null
+    payment_screenshot_id: number | null
     branding_json: runtime.JsonValue | null
     admin_notes: string | null
     created_at: Date | null
@@ -2139,6 +2864,9 @@ export interface Prisma__e_booklet_purchasesClient<T, Null = never, ExtArgs exte
   teacher<T extends Prisma.usersDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.usersDefaultArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   template<T extends Prisma.e_booklet_templatesDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_templatesDefaultArgs<ExtArgs>>): Prisma.Prisma__e_booklet_templatesClient<runtime.Types.Result.GetResult<Prisma.$e_booklet_templatesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   template_version<T extends Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>>): Prisma.Prisma__e_booklet_template_versionsClient<runtime.Types.Result.GetResult<Prisma.$e_booklet_template_versionsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  payment_screenshot<T extends Prisma.e_booklet_purchases$payment_screenshotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_purchases$payment_screenshotArgs<ExtArgs>>): Prisma.Prisma__imagesClient<runtime.Types.Result.GetResult<Prisma.$imagesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  payment_methods<T extends Prisma.e_booklet_purchases$payment_methodsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_purchases$payment_methodsArgs<ExtArgs>>): Prisma.Prisma__payment_methodsClient<runtime.Types.Result.GetResult<Prisma.$payment_methodsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  required_fields<T extends Prisma.e_booklet_purchases$required_fieldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_purchases$required_fieldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_purchase_required_fieldsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   instances<T extends Prisma.e_booklet_purchases$instancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_purchases$instancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_instancesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   wallet_ledger_entries<T extends Prisma.e_booklet_purchases$wallet_ledger_entriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_purchases$wallet_ledger_entriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$teacher_wallet_ledgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2183,7 +2911,9 @@ export interface e_booklet_purchasesFieldRefs {
   readonly access_expires_at: Prisma.FieldRef<"e_booklet_purchases", 'DateTime'>
   readonly currency: Prisma.FieldRef<"e_booklet_purchases", 'String'>
   readonly payment_method: Prisma.FieldRef<"e_booklet_purchases", 'String'>
+  readonly payment_method_id: Prisma.FieldRef<"e_booklet_purchases", 'Int'>
   readonly payment_reference: Prisma.FieldRef<"e_booklet_purchases", 'String'>
+  readonly payment_screenshot_id: Prisma.FieldRef<"e_booklet_purchases", 'Int'>
   readonly branding_json: Prisma.FieldRef<"e_booklet_purchases", 'Json'>
   readonly admin_notes: Prisma.FieldRef<"e_booklet_purchases", 'String'>
   readonly created_at: Prisma.FieldRef<"e_booklet_purchases", 'DateTime'>
@@ -2590,6 +3320,68 @@ export type e_booklet_purchasesDeleteManyArgs<ExtArgs extends runtime.Types.Exte
    * Limit how many e_booklet_purchases to delete.
    */
   limit?: number
+}
+
+/**
+ * e_booklet_purchases.payment_screenshot
+ */
+export type e_booklet_purchases$payment_screenshotArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the images
+   */
+  select?: Prisma.imagesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the images
+   */
+  omit?: Prisma.imagesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.imagesInclude<ExtArgs> | null
+  where?: Prisma.imagesWhereInput
+}
+
+/**
+ * e_booklet_purchases.payment_methods
+ */
+export type e_booklet_purchases$payment_methodsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the payment_methods
+   */
+  select?: Prisma.payment_methodsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the payment_methods
+   */
+  omit?: Prisma.payment_methodsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.payment_methodsInclude<ExtArgs> | null
+  where?: Prisma.payment_methodsWhereInput
+}
+
+/**
+ * e_booklet_purchases.required_fields
+ */
+export type e_booklet_purchases$required_fieldsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_purchase_required_fields
+   */
+  select?: Prisma.e_booklet_purchase_required_fieldsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_purchase_required_fields
+   */
+  omit?: Prisma.e_booklet_purchase_required_fieldsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_purchase_required_fieldsInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_purchase_required_fieldsWhereInput
+  orderBy?: Prisma.e_booklet_purchase_required_fieldsOrderByWithRelationInput | Prisma.e_booklet_purchase_required_fieldsOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_purchase_required_fieldsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_purchase_required_fieldsScalarFieldEnum | Prisma.E_booklet_purchase_required_fieldsScalarFieldEnum[]
 }
 
 /**

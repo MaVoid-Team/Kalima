@@ -13,8 +13,8 @@ import { generateInviteToken, hashInviteToken } from "../utils/e-booklet-token";
 type EBookletDb = PrismaClient | any;
 
 const E_BOOKLET_UPLOAD_DIR = path.resolve(
-  __dirname,
-  "../../../../uploads/e-booklets/private",
+  process.env.E_BOOKLET_UPLOAD_DIR || process.cwd(),
+  process.env.E_BOOKLET_UPLOAD_DIR ? "" : "uploads/e-booklets/private",
 );
 const PASSCODE_BLOCK_MESSAGE = "Invalid e-booklet invite passcode.";
 const PASSCODE_MAX_FAILURES = 5;
@@ -1888,7 +1888,7 @@ export class EBookletService {
 
       await tx.e_booklet_purchases.update({
         where: { id: purchase.id },
-        data: { status: "ready", updated_at: new Date() },
+        data: { status: "delivered", updated_at: new Date() },
       });
 
       await tx.e_booklet_audit_logs.create({

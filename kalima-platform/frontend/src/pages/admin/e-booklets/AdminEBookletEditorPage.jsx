@@ -78,6 +78,7 @@ const createDefaultBlock = (type = "text") => ({
   id: `block-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
   type,
   text_content: "",
+  supplementary_text: "",
   asset_file_id: "",
   url: "",
   source: type === "video" ? "uploaded" : undefined,
@@ -140,6 +141,7 @@ const defaultHotspotForm = {
   type: "text",
   title: "",
   text_content: "",
+  supplementary_text: "",
   asset_file_id: "",
   trigger_type: "click",
   display_behavior: defaultDisplayBehavior,
@@ -211,6 +213,9 @@ const buildContentJsonPayload = (form) => ({
     const payload = { type: block.type };
     if (["text", "question_answer"].includes(block.type) && block.text_content?.trim()) {
       payload.text_content = block.text_content.trim();
+    }
+    if (!["text", "question_answer"].includes(block.type) && block.supplementary_text?.trim()) {
+      payload.supplementary_text = block.supplementary_text.trim();
     }
     if (block.type === "text") payload.font_family = block.font_family || textFontOptions[0];
     if (["image", "audio", "file"].includes(block.type) && block.asset_file_id) {
@@ -1248,6 +1253,15 @@ export default function AdminEBookletEditorPage() {
               </div>
             ))}
           </div>
+        )}
+
+        {!(["text", "question_answer"].includes(block.type)) && (
+          <Textarea
+            value={block.supplementary_text || ""}
+            onChange={(event) => updateContentBlock(index, "supplementary_text", event.target.value)}
+            className="min-h-20"
+            placeholder={t("admin.editor.hotspots.supplementaryTextPlaceholder")}
+          />
         )}
       </div>
     );

@@ -232,6 +232,7 @@ export type imagesWhereInput = {
   product_gallery?: Prisma.Product_galleryListRelationFilter
   purchase_watermark?: Prisma.PurchasesListRelationFilter
   purchase_payment_screenshot?: Prisma.PurchasesListRelationFilter
+  e_booklet_purchase_payment_screenshots?: Prisma.E_booklet_purchasesListRelationFilter
   payment_methods?: Prisma.Payment_methodsListRelationFilter
 }
 
@@ -246,6 +247,7 @@ export type imagesOrderByWithRelationInput = {
   product_gallery?: Prisma.product_galleryOrderByRelationAggregateInput
   purchase_watermark?: Prisma.purchasesOrderByRelationAggregateInput
   purchase_payment_screenshot?: Prisma.purchasesOrderByRelationAggregateInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesOrderByRelationAggregateInput
   payment_methods?: Prisma.payment_methodsOrderByRelationAggregateInput
 }
 
@@ -263,6 +265,7 @@ export type imagesWhereUniqueInput = Prisma.AtLeast<{
   product_gallery?: Prisma.Product_galleryListRelationFilter
   purchase_watermark?: Prisma.PurchasesListRelationFilter
   purchase_payment_screenshot?: Prisma.PurchasesListRelationFilter
+  e_booklet_purchase_payment_screenshots?: Prisma.E_booklet_purchasesListRelationFilter
   payment_methods?: Prisma.Payment_methodsListRelationFilter
 }, "id">
 
@@ -302,6 +305,7 @@ export type imagesCreateInput = {
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutImagesInput
   purchase_watermark?: Prisma.purchasesCreateNestedManyWithoutWatermarkInput
   purchase_payment_screenshot?: Prisma.purchasesCreateNestedManyWithoutPayment_screenshotInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesCreateNestedManyWithoutPayment_screenshotInput
   payment_methods?: Prisma.payment_methodsCreateNestedManyWithoutImagesInput
 }
 
@@ -316,6 +320,7 @@ export type imagesUncheckedCreateInput = {
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutImagesInput
   purchase_watermark?: Prisma.purchasesUncheckedCreateNestedManyWithoutWatermarkInput
   purchase_payment_screenshot?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
   payment_methods?: Prisma.payment_methodsUncheckedCreateNestedManyWithoutImagesInput
 }
 
@@ -329,6 +334,7 @@ export type imagesUpdateInput = {
   product_gallery?: Prisma.product_galleryUpdateManyWithoutImagesNestedInput
   purchase_watermark?: Prisma.purchasesUpdateManyWithoutWatermarkNestedInput
   purchase_payment_screenshot?: Prisma.purchasesUpdateManyWithoutPayment_screenshotNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUpdateManyWithoutPayment_screenshotNestedInput
   payment_methods?: Prisma.payment_methodsUpdateManyWithoutImagesNestedInput
 }
 
@@ -343,6 +349,7 @@ export type imagesUncheckedUpdateInput = {
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutImagesNestedInput
   purchase_watermark?: Prisma.purchasesUncheckedUpdateManyWithoutWatermarkNestedInput
   purchase_payment_screenshot?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
   payment_methods?: Prisma.payment_methodsUncheckedUpdateManyWithoutImagesNestedInput
 }
 
@@ -487,6 +494,22 @@ export type Enumimage_mime_type_enumFieldUpdateOperationsInput = {
   set?: $Enums.image_mime_type_enum
 }
 
+export type imagesCreateNestedOneWithoutE_booklet_purchase_payment_screenshotsInput = {
+  create?: Prisma.XOR<Prisma.imagesCreateWithoutE_booklet_purchase_payment_screenshotsInput, Prisma.imagesUncheckedCreateWithoutE_booklet_purchase_payment_screenshotsInput>
+  connectOrCreate?: Prisma.imagesCreateOrConnectWithoutE_booklet_purchase_payment_screenshotsInput
+  connect?: Prisma.imagesWhereUniqueInput
+}
+
+export type imagesUpdateOneWithoutE_booklet_purchase_payment_screenshotsNestedInput = {
+  create?: Prisma.XOR<Prisma.imagesCreateWithoutE_booklet_purchase_payment_screenshotsInput, Prisma.imagesUncheckedCreateWithoutE_booklet_purchase_payment_screenshotsInput>
+  connectOrCreate?: Prisma.imagesCreateOrConnectWithoutE_booklet_purchase_payment_screenshotsInput
+  upsert?: Prisma.imagesUpsertWithoutE_booklet_purchase_payment_screenshotsInput
+  disconnect?: Prisma.imagesWhereInput | boolean
+  delete?: Prisma.imagesWhereInput | boolean
+  connect?: Prisma.imagesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.imagesUpdateToOneWithWhereWithoutE_booklet_purchase_payment_screenshotsInput, Prisma.imagesUpdateWithoutE_booklet_purchase_payment_screenshotsInput>, Prisma.imagesUncheckedUpdateWithoutE_booklet_purchase_payment_screenshotsInput>
+}
+
 export type imagesCreateNestedOneWithoutProduct_galleryInput = {
   create?: Prisma.XOR<Prisma.imagesCreateWithoutProduct_galleryInput, Prisma.imagesUncheckedCreateWithoutProduct_galleryInput>
   connectOrCreate?: Prisma.imagesCreateOrConnectWithoutProduct_galleryInput
@@ -510,6 +533,7 @@ export type imagesCreateWithoutProduct_thumbnailInput = {
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutImagesInput
   purchase_watermark?: Prisma.purchasesCreateNestedManyWithoutWatermarkInput
   purchase_payment_screenshot?: Prisma.purchasesCreateNestedManyWithoutPayment_screenshotInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesCreateNestedManyWithoutPayment_screenshotInput
   payment_methods?: Prisma.payment_methodsCreateNestedManyWithoutImagesInput
 }
 
@@ -523,6 +547,7 @@ export type imagesUncheckedCreateWithoutProduct_thumbnailInput = {
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutImagesInput
   purchase_watermark?: Prisma.purchasesUncheckedCreateNestedManyWithoutWatermarkInput
   purchase_payment_screenshot?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
   payment_methods?: Prisma.payment_methodsUncheckedCreateNestedManyWithoutImagesInput
 }
 
@@ -551,6 +576,7 @@ export type imagesUpdateWithoutProduct_thumbnailInput = {
   product_gallery?: Prisma.product_galleryUpdateManyWithoutImagesNestedInput
   purchase_watermark?: Prisma.purchasesUpdateManyWithoutWatermarkNestedInput
   purchase_payment_screenshot?: Prisma.purchasesUpdateManyWithoutPayment_screenshotNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUpdateManyWithoutPayment_screenshotNestedInput
   payment_methods?: Prisma.payment_methodsUpdateManyWithoutImagesNestedInput
 }
 
@@ -564,6 +590,7 @@ export type imagesUncheckedUpdateWithoutProduct_thumbnailInput = {
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutImagesNestedInput
   purchase_watermark?: Prisma.purchasesUncheckedUpdateManyWithoutWatermarkNestedInput
   purchase_payment_screenshot?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
   payment_methods?: Prisma.payment_methodsUncheckedUpdateManyWithoutImagesNestedInput
 }
 
@@ -576,6 +603,7 @@ export type imagesCreateWithoutPurchase_payment_screenshotInput = {
   product_thumbnail?: Prisma.productsCreateNestedManyWithoutThumbnail_imageInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutImagesInput
   purchase_watermark?: Prisma.purchasesCreateNestedManyWithoutWatermarkInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesCreateNestedManyWithoutPayment_screenshotInput
   payment_methods?: Prisma.payment_methodsCreateNestedManyWithoutImagesInput
 }
 
@@ -589,6 +617,7 @@ export type imagesUncheckedCreateWithoutPurchase_payment_screenshotInput = {
   product_thumbnail?: Prisma.productsUncheckedCreateNestedManyWithoutThumbnail_imageInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutImagesInput
   purchase_watermark?: Prisma.purchasesUncheckedCreateNestedManyWithoutWatermarkInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
   payment_methods?: Prisma.payment_methodsUncheckedCreateNestedManyWithoutImagesInput
 }
 
@@ -606,6 +635,7 @@ export type imagesCreateWithoutPurchase_watermarkInput = {
   product_thumbnail?: Prisma.productsCreateNestedManyWithoutThumbnail_imageInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutImagesInput
   purchase_payment_screenshot?: Prisma.purchasesCreateNestedManyWithoutPayment_screenshotInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesCreateNestedManyWithoutPayment_screenshotInput
   payment_methods?: Prisma.payment_methodsCreateNestedManyWithoutImagesInput
 }
 
@@ -619,6 +649,7 @@ export type imagesUncheckedCreateWithoutPurchase_watermarkInput = {
   product_thumbnail?: Prisma.productsUncheckedCreateNestedManyWithoutThumbnail_imageInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutImagesInput
   purchase_payment_screenshot?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
   payment_methods?: Prisma.payment_methodsUncheckedCreateNestedManyWithoutImagesInput
 }
 
@@ -647,6 +678,7 @@ export type imagesUpdateWithoutPurchase_payment_screenshotInput = {
   product_thumbnail?: Prisma.productsUpdateManyWithoutThumbnail_imageNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutImagesNestedInput
   purchase_watermark?: Prisma.purchasesUpdateManyWithoutWatermarkNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUpdateManyWithoutPayment_screenshotNestedInput
   payment_methods?: Prisma.payment_methodsUpdateManyWithoutImagesNestedInput
 }
 
@@ -660,6 +692,7 @@ export type imagesUncheckedUpdateWithoutPurchase_payment_screenshotInput = {
   product_thumbnail?: Prisma.productsUncheckedUpdateManyWithoutThumbnail_imageNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutImagesNestedInput
   purchase_watermark?: Prisma.purchasesUncheckedUpdateManyWithoutWatermarkNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
   payment_methods?: Prisma.payment_methodsUncheckedUpdateManyWithoutImagesNestedInput
 }
 
@@ -683,6 +716,7 @@ export type imagesUpdateWithoutPurchase_watermarkInput = {
   product_thumbnail?: Prisma.productsUpdateManyWithoutThumbnail_imageNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutImagesNestedInput
   purchase_payment_screenshot?: Prisma.purchasesUpdateManyWithoutPayment_screenshotNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUpdateManyWithoutPayment_screenshotNestedInput
   payment_methods?: Prisma.payment_methodsUpdateManyWithoutImagesNestedInput
 }
 
@@ -696,6 +730,7 @@ export type imagesUncheckedUpdateWithoutPurchase_watermarkInput = {
   product_thumbnail?: Prisma.productsUncheckedUpdateManyWithoutThumbnail_imageNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutImagesNestedInput
   purchase_payment_screenshot?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
   payment_methods?: Prisma.payment_methodsUncheckedUpdateManyWithoutImagesNestedInput
 }
 
@@ -709,6 +744,7 @@ export type imagesCreateWithoutPayment_methodsInput = {
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutImagesInput
   purchase_watermark?: Prisma.purchasesCreateNestedManyWithoutWatermarkInput
   purchase_payment_screenshot?: Prisma.purchasesCreateNestedManyWithoutPayment_screenshotInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesCreateNestedManyWithoutPayment_screenshotInput
 }
 
 export type imagesUncheckedCreateWithoutPayment_methodsInput = {
@@ -722,6 +758,7 @@ export type imagesUncheckedCreateWithoutPayment_methodsInput = {
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutImagesInput
   purchase_watermark?: Prisma.purchasesUncheckedCreateNestedManyWithoutWatermarkInput
   purchase_payment_screenshot?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
 }
 
 export type imagesCreateOrConnectWithoutPayment_methodsInput = {
@@ -750,6 +787,7 @@ export type imagesUpdateWithoutPayment_methodsInput = {
   product_gallery?: Prisma.product_galleryUpdateManyWithoutImagesNestedInput
   purchase_watermark?: Prisma.purchasesUpdateManyWithoutWatermarkNestedInput
   purchase_payment_screenshot?: Prisma.purchasesUpdateManyWithoutPayment_screenshotNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUpdateManyWithoutPayment_screenshotNestedInput
 }
 
 export type imagesUncheckedUpdateWithoutPayment_methodsInput = {
@@ -763,6 +801,77 @@ export type imagesUncheckedUpdateWithoutPayment_methodsInput = {
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutImagesNestedInput
   purchase_watermark?: Prisma.purchasesUncheckedUpdateManyWithoutWatermarkNestedInput
   purchase_payment_screenshot?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
+}
+
+export type imagesCreateWithoutE_booklet_purchase_payment_screenshotsInput = {
+  url: string
+  original_name: string
+  mime_type: $Enums.image_mime_type_enum
+  size: number
+  created_at?: Date | string | null
+  product_thumbnail?: Prisma.productsCreateNestedManyWithoutThumbnail_imageInput
+  product_gallery?: Prisma.product_galleryCreateNestedManyWithoutImagesInput
+  purchase_watermark?: Prisma.purchasesCreateNestedManyWithoutWatermarkInput
+  purchase_payment_screenshot?: Prisma.purchasesCreateNestedManyWithoutPayment_screenshotInput
+  payment_methods?: Prisma.payment_methodsCreateNestedManyWithoutImagesInput
+}
+
+export type imagesUncheckedCreateWithoutE_booklet_purchase_payment_screenshotsInput = {
+  id?: number
+  url: string
+  original_name: string
+  mime_type: $Enums.image_mime_type_enum
+  size: number
+  created_at?: Date | string | null
+  product_thumbnail?: Prisma.productsUncheckedCreateNestedManyWithoutThumbnail_imageInput
+  product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutImagesInput
+  purchase_watermark?: Prisma.purchasesUncheckedCreateNestedManyWithoutWatermarkInput
+  purchase_payment_screenshot?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
+  payment_methods?: Prisma.payment_methodsUncheckedCreateNestedManyWithoutImagesInput
+}
+
+export type imagesCreateOrConnectWithoutE_booklet_purchase_payment_screenshotsInput = {
+  where: Prisma.imagesWhereUniqueInput
+  create: Prisma.XOR<Prisma.imagesCreateWithoutE_booklet_purchase_payment_screenshotsInput, Prisma.imagesUncheckedCreateWithoutE_booklet_purchase_payment_screenshotsInput>
+}
+
+export type imagesUpsertWithoutE_booklet_purchase_payment_screenshotsInput = {
+  update: Prisma.XOR<Prisma.imagesUpdateWithoutE_booklet_purchase_payment_screenshotsInput, Prisma.imagesUncheckedUpdateWithoutE_booklet_purchase_payment_screenshotsInput>
+  create: Prisma.XOR<Prisma.imagesCreateWithoutE_booklet_purchase_payment_screenshotsInput, Prisma.imagesUncheckedCreateWithoutE_booklet_purchase_payment_screenshotsInput>
+  where?: Prisma.imagesWhereInput
+}
+
+export type imagesUpdateToOneWithWhereWithoutE_booklet_purchase_payment_screenshotsInput = {
+  where?: Prisma.imagesWhereInput
+  data: Prisma.XOR<Prisma.imagesUpdateWithoutE_booklet_purchase_payment_screenshotsInput, Prisma.imagesUncheckedUpdateWithoutE_booklet_purchase_payment_screenshotsInput>
+}
+
+export type imagesUpdateWithoutE_booklet_purchase_payment_screenshotsInput = {
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  original_name?: Prisma.StringFieldUpdateOperationsInput | string
+  mime_type?: Prisma.Enumimage_mime_type_enumFieldUpdateOperationsInput | $Enums.image_mime_type_enum
+  size?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  product_thumbnail?: Prisma.productsUpdateManyWithoutThumbnail_imageNestedInput
+  product_gallery?: Prisma.product_galleryUpdateManyWithoutImagesNestedInput
+  purchase_watermark?: Prisma.purchasesUpdateManyWithoutWatermarkNestedInput
+  purchase_payment_screenshot?: Prisma.purchasesUpdateManyWithoutPayment_screenshotNestedInput
+  payment_methods?: Prisma.payment_methodsUpdateManyWithoutImagesNestedInput
+}
+
+export type imagesUncheckedUpdateWithoutE_booklet_purchase_payment_screenshotsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  url?: Prisma.StringFieldUpdateOperationsInput | string
+  original_name?: Prisma.StringFieldUpdateOperationsInput | string
+  mime_type?: Prisma.Enumimage_mime_type_enumFieldUpdateOperationsInput | $Enums.image_mime_type_enum
+  size?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  product_thumbnail?: Prisma.productsUncheckedUpdateManyWithoutThumbnail_imageNestedInput
+  product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutImagesNestedInput
+  purchase_watermark?: Prisma.purchasesUncheckedUpdateManyWithoutWatermarkNestedInput
+  purchase_payment_screenshot?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
+  payment_methods?: Prisma.payment_methodsUncheckedUpdateManyWithoutImagesNestedInput
 }
 
 export type imagesCreateWithoutProduct_galleryInput = {
@@ -774,6 +883,7 @@ export type imagesCreateWithoutProduct_galleryInput = {
   product_thumbnail?: Prisma.productsCreateNestedManyWithoutThumbnail_imageInput
   purchase_watermark?: Prisma.purchasesCreateNestedManyWithoutWatermarkInput
   purchase_payment_screenshot?: Prisma.purchasesCreateNestedManyWithoutPayment_screenshotInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesCreateNestedManyWithoutPayment_screenshotInput
   payment_methods?: Prisma.payment_methodsCreateNestedManyWithoutImagesInput
 }
 
@@ -787,6 +897,7 @@ export type imagesUncheckedCreateWithoutProduct_galleryInput = {
   product_thumbnail?: Prisma.productsUncheckedCreateNestedManyWithoutThumbnail_imageInput
   purchase_watermark?: Prisma.purchasesUncheckedCreateNestedManyWithoutWatermarkInput
   purchase_payment_screenshot?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_screenshotInput
   payment_methods?: Prisma.payment_methodsUncheckedCreateNestedManyWithoutImagesInput
 }
 
@@ -815,6 +926,7 @@ export type imagesUpdateWithoutProduct_galleryInput = {
   product_thumbnail?: Prisma.productsUpdateManyWithoutThumbnail_imageNestedInput
   purchase_watermark?: Prisma.purchasesUpdateManyWithoutWatermarkNestedInput
   purchase_payment_screenshot?: Prisma.purchasesUpdateManyWithoutPayment_screenshotNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUpdateManyWithoutPayment_screenshotNestedInput
   payment_methods?: Prisma.payment_methodsUpdateManyWithoutImagesNestedInput
 }
 
@@ -828,6 +940,7 @@ export type imagesUncheckedUpdateWithoutProduct_galleryInput = {
   product_thumbnail?: Prisma.productsUncheckedUpdateManyWithoutThumbnail_imageNestedInput
   purchase_watermark?: Prisma.purchasesUncheckedUpdateManyWithoutWatermarkNestedInput
   purchase_payment_screenshot?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
+  e_booklet_purchase_payment_screenshots?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_screenshotNestedInput
   payment_methods?: Prisma.payment_methodsUncheckedUpdateManyWithoutImagesNestedInput
 }
 
@@ -841,6 +954,7 @@ export type ImagesCountOutputType = {
   product_gallery: number
   purchase_watermark: number
   purchase_payment_screenshot: number
+  e_booklet_purchase_payment_screenshots: number
   payment_methods: number
 }
 
@@ -849,6 +963,7 @@ export type ImagesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   product_gallery?: boolean | ImagesCountOutputTypeCountProduct_galleryArgs
   purchase_watermark?: boolean | ImagesCountOutputTypeCountPurchase_watermarkArgs
   purchase_payment_screenshot?: boolean | ImagesCountOutputTypeCountPurchase_payment_screenshotArgs
+  e_booklet_purchase_payment_screenshots?: boolean | ImagesCountOutputTypeCountE_booklet_purchase_payment_screenshotsArgs
   payment_methods?: boolean | ImagesCountOutputTypeCountPayment_methodsArgs
 }
 
@@ -893,6 +1008,13 @@ export type ImagesCountOutputTypeCountPurchase_payment_screenshotArgs<ExtArgs ex
 /**
  * ImagesCountOutputType without action
  */
+export type ImagesCountOutputTypeCountE_booklet_purchase_payment_screenshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_purchasesWhereInput
+}
+
+/**
+ * ImagesCountOutputType without action
+ */
 export type ImagesCountOutputTypeCountPayment_methodsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.payment_methodsWhereInput
 }
@@ -909,6 +1031,7 @@ export type imagesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   product_gallery?: boolean | Prisma.images$product_galleryArgs<ExtArgs>
   purchase_watermark?: boolean | Prisma.images$purchase_watermarkArgs<ExtArgs>
   purchase_payment_screenshot?: boolean | Prisma.images$purchase_payment_screenshotArgs<ExtArgs>
+  e_booklet_purchase_payment_screenshots?: boolean | Prisma.images$e_booklet_purchase_payment_screenshotsArgs<ExtArgs>
   payment_methods?: boolean | Prisma.images$payment_methodsArgs<ExtArgs>
   _count?: boolean | Prisma.ImagesCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["images"]>
@@ -946,6 +1069,7 @@ export type imagesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   product_gallery?: boolean | Prisma.images$product_galleryArgs<ExtArgs>
   purchase_watermark?: boolean | Prisma.images$purchase_watermarkArgs<ExtArgs>
   purchase_payment_screenshot?: boolean | Prisma.images$purchase_payment_screenshotArgs<ExtArgs>
+  e_booklet_purchase_payment_screenshots?: boolean | Prisma.images$e_booklet_purchase_payment_screenshotsArgs<ExtArgs>
   payment_methods?: boolean | Prisma.images$payment_methodsArgs<ExtArgs>
   _count?: boolean | Prisma.ImagesCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -959,6 +1083,7 @@ export type $imagesPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     product_gallery: Prisma.$product_galleryPayload<ExtArgs>[]
     purchase_watermark: Prisma.$purchasesPayload<ExtArgs>[]
     purchase_payment_screenshot: Prisma.$purchasesPayload<ExtArgs>[]
+    e_booklet_purchase_payment_screenshots: Prisma.$e_booklet_purchasesPayload<ExtArgs>[]
     payment_methods: Prisma.$payment_methodsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1366,6 +1491,7 @@ export interface Prisma__imagesClient<T, Null = never, ExtArgs extends runtime.T
   product_gallery<T extends Prisma.images$product_galleryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.images$product_galleryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$product_galleryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   purchase_watermark<T extends Prisma.images$purchase_watermarkArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.images$purchase_watermarkArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchasesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   purchase_payment_screenshot<T extends Prisma.images$purchase_payment_screenshotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.images$purchase_payment_screenshotArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchasesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  e_booklet_purchase_payment_screenshots<T extends Prisma.images$e_booklet_purchase_payment_screenshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.images$e_booklet_purchase_payment_screenshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_purchasesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payment_methods<T extends Prisma.images$payment_methodsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.images$payment_methodsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$payment_methodsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1892,6 +2018,30 @@ export type images$purchase_payment_screenshotArgs<ExtArgs extends runtime.Types
   take?: number
   skip?: number
   distinct?: Prisma.PurchasesScalarFieldEnum | Prisma.PurchasesScalarFieldEnum[]
+}
+
+/**
+ * images.e_booklet_purchase_payment_screenshots
+ */
+export type images$e_booklet_purchase_payment_screenshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_purchases
+   */
+  select?: Prisma.e_booklet_purchasesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_purchases
+   */
+  omit?: Prisma.e_booklet_purchasesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_purchasesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_purchasesWhereInput
+  orderBy?: Prisma.e_booklet_purchasesOrderByWithRelationInput | Prisma.e_booklet_purchasesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_purchasesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_purchasesScalarFieldEnum | Prisma.E_booklet_purchasesScalarFieldEnum[]
 }
 
 /**

@@ -77,7 +77,7 @@ export default function AdminEBookletStudentDevicePanel({
         <div className="flex flex-wrap gap-2">
           {showFullPageLink && (
             <Button asChild size="sm" variant="outline">
-              <Link to={`/admin/e-booklet-instances/${instanceId}/devices?userId=${resolvedUserId}`}>
+              <Link to={`/admin/e-booklets/access/${instanceId}/devices?userId=${resolvedUserId}`}>
                 <ExternalLink className="h-4 w-4" />{t("admin.instances.openFullDevicesPage")}
               </Link>
             </Button>
