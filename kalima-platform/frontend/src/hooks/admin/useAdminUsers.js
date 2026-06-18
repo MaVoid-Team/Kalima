@@ -16,10 +16,12 @@ export const useAdminUsers = () => {
     const fetchUsers = useCallback(async (params = {}) => {
         setLoading(true);
         try {
-            const { page = 1, limit = 20, search, role } = params;
+            const { page = 1, limit = 20, search, role, portal, confirmed } = params;
             const query = new URLSearchParams({ page, limit });
             if (search) query.set('search', search);
             if (role) query.set('role', role);
+            if (portal) query.set('portal', portal);
+            if (confirmed !== undefined) query.set('confirmed', confirmed);
 
             const response = await axiosInstance.get(`/admin/users?${query.toString()}`);
             const data = response.data?.data;

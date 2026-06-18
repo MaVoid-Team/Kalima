@@ -416,7 +416,7 @@ export const adminController = {
   // ============================================
 
   /**
-   * GET /admin/users?page=1&limit=20&search=john&role=Teacher&portal=store
+   * GET /admin/users?page=1&limit=20&search=john&role=Teacher&portal=store&confirmed=true
    */
   async listUsers(
     req: Request,
@@ -433,6 +433,9 @@ export const adminController = {
       const search = req.query.search as string | undefined;
       const role = req.query.role as string | undefined;
       const portal = req.query.portal as string | undefined;
+      const confirmed = req.query.confirmed
+        ? req.query.confirmed === "true"
+        : undefined;
 
       // Validate role/portal enums if provided
       if (role && !VALID_ROLES.includes(role as role_enum)) {
@@ -456,6 +459,7 @@ export const adminController = {
         search,
         role: role as role_enum | undefined,
         portal: portal as portal_enum | undefined,
+        confirmed,
         isDeleted,
         includeFlag: canViewOrEditUserFlag((req as any).user),
       });
