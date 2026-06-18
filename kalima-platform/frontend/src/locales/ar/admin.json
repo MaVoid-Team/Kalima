@@ -1177,5 +1177,46 @@
     "name": "الاسم",
     "phone": "الهاتف",
     "role": "الدور"
+  },
+  "impersonation": {
+    "title": "انتحال الحساب",
+    "description": "أداة خاصة بالمدير للتبديل إلى أي حساب مستخدم لأغراض الدعم والتحقق.",
+    "cardTitle": "اختر مستخدمًا",
+    "cardDescription": "ابحث في كل المستخدمين. يمنع الخادم انتحال الحساب المتداخل أو انتحال حسابك الحالي.",
+    "filters": {
+      "searchPlaceholder": "ابحث بالاسم أو البريد الإلكتروني أو الهاتف",
+      "allRoles": "كل الأدوار",
+      "allPortals": "كل البوابات",
+      "allStatuses": "كل الحالات",
+      "apply": "تطبيق",
+      "clear": "مسح"
+    },
+    "portals": {
+      "store": "المتجر",
+      "academy": "الأكاديمية"
+    },
+    "status": {
+      "active": "نشط",
+      "unconfirmed": "غير مؤكد"
+    },
+    "table": {
+      "user": "المستخدم",
+      "email": "البريد الإلكتروني",
+      "roles": "الأدوار",
+      "status": "الحالة",
+      "action": "الإجراء",
+      "unnamedUser": "مستخدم بدون اسم",
+      "userId": "المعرّف: {{id}}"
+    },
+    "actions": {
+      "impersonate": "انتحال الحساب",
+      "starting": "جارٍ البدء…",
+      "currentUser": "المستخدم الحالي"
+    },
+    "empty": "لم يتم العثور على مستخدمين.",
+    "paginationSummary": "الصفحة {{page}} من {{totalPages}}",
+    "messages": {
+      "started": "تم بدء انتحال الحساب"
+    }
   }
 }

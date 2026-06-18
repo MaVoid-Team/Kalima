@@ -1165,5 +1165,46 @@
     "name": "Name",
     "phone": "Phone",
     "role": "Role"
+  },
+  "impersonation": {
+    "title": "Impersonation",
+    "description": "Admin-only tool to switch into any user account for support and verification.",
+    "cardTitle": "Select a user",
+    "cardDescription": "Search all users. The backend blocks nested and self impersonation.",
+    "filters": {
+      "searchPlaceholder": "Search by name, email, or phone",
+      "allRoles": "All roles",
+      "allPortals": "All portals",
+      "allStatuses": "All statuses",
+      "apply": "Apply",
+      "clear": "Clear"
+    },
+    "portals": {
+      "store": "Store",
+      "academy": "Academy"
+    },
+    "status": {
+      "active": "Active",
+      "unconfirmed": "Unconfirmed"
+    },
+    "table": {
+      "user": "User",
+      "email": "Email",
+      "roles": "Roles",
+      "status": "Status",
+      "action": "Action",
+      "unnamedUser": "Unnamed user",
+      "userId": "ID: {{id}}"
+    },
+    "actions": {
+      "impersonate": "Impersonate",
+      "starting": "Starting…",
+      "currentUser": "Current user"
+    },
+    "empty": "No users found.",
+    "paginationSummary": "Page {{page}} of {{totalPages}}",
+    "messages": {
+      "started": "Impersonation started"
+    }
   }
 }
