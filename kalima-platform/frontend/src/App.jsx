@@ -153,10 +153,12 @@ const router = createBrowserRouter(
       <Route element={<MainLayout />}>
         <Route path="/" element={<LandingPage />} />
 
-        {/* E-booklet storefront is public to students/visitors; access is only required for owned viewer pages. */}
-        <Route path="/e-booklets" element={<EBookletStorePage />} />
-        <Route path="/e-booklets/instances/:instanceId" element={<EBookletDetailsPage />} />
-        <Route path="/e-booklets/:templateId" element={<EBookletDetailsPage />} />
+        {/* E-booklet storefront is public to visitors/teachers; students redeem private URLs/codes only. */}
+        <Route element={<RoleRoute excludedRole={["Student"]} />}>
+          <Route path="/e-booklets" element={<EBookletStorePage />} />
+          <Route path="/e-booklets/instances/:instanceId" element={<EBookletDetailsPage />} />
+          <Route path="/e-booklets/:templateId" element={<EBookletDetailsPage />} />
+        </Route>
 
         {/* Market and Product Routes - Restricted by store access */}
         <Route element={<RoleRoute requireStoreAccess={true} />}>
