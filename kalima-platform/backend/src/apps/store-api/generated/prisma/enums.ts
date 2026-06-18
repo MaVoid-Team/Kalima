@@ -185,6 +185,7 @@ export const e_booklet_purchase_status_enum = {
   needs_branding_info: 'needs_branding_info',
   customization_in_progress: 'customization_in_progress',
   ready: 'ready',
+  delivered: 'delivered',
   cancelled: 'cancelled',
   rejected: 'rejected'
 } as const

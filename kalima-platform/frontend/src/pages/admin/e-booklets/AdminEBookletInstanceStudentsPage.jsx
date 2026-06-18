@@ -41,7 +41,7 @@ export default function AdminEBookletInstanceStudentsPage() {
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <Button asChild variant="ghost" size="sm" className="-ms-2 mb-2">
-            <Link to="/admin/e-booklet-instances"><ArrowLeft className="h-4 w-4" />{t("admin.students.backToInstances")}</Link>
+            <Link to="/admin/e-booklets/access"><ArrowLeft className="h-4 w-4" />{t("admin.students.backToInstances")}</Link>
           </Button>
           <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight"><Users className="h-8 w-8 text-primary" />{t("admin.students.title")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("admin.students.description")}</p>
@@ -124,7 +124,7 @@ export default function AdminEBookletInstanceStudentsPage() {
                       </td>
                       <td className="p-3">
                         <Button asChild size="sm" variant="outline">
-                          <Link to={`/admin/e-booklet-instances/${instanceId}/devices?userId=${userId}`}><HardDrive className="h-4 w-4" />{t("admin.students.manageDevices")}</Link>
+                          <Link to={`/admin/e-booklets/access/${instanceId}/devices?userId=${userId}`}><HardDrive className="h-4 w-4" />{t("admin.students.manageDevices")}</Link>
                         </Button>
                       </td>
                     </tr>

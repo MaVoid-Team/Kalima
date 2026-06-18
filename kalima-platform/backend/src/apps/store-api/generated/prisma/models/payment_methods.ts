@@ -254,6 +254,8 @@ export type payment_methodsWhereInput = {
   is_deleted?: Prisma.BoolNullableFilter<"payment_methods"> | boolean | null
   images?: Prisma.XOR<Prisma.ImagesNullableScalarRelationFilter, Prisma.imagesWhereInput> | null
   purchases?: Prisma.PurchasesListRelationFilter
+  e_booklet_purchases?: Prisma.E_booklet_purchasesListRelationFilter
+  e_booklet_template_payment_methods?: Prisma.E_booklet_template_payment_methodsListRelationFilter
 }
 
 export type payment_methodsOrderByWithRelationInput = {
@@ -268,6 +270,8 @@ export type payment_methodsOrderByWithRelationInput = {
   is_deleted?: Prisma.SortOrderInput | Prisma.SortOrder
   images?: Prisma.imagesOrderByWithRelationInput
   purchases?: Prisma.purchasesOrderByRelationAggregateInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesOrderByRelationAggregateInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsOrderByRelationAggregateInput
 }
 
 export type payment_methodsWhereUniqueInput = Prisma.AtLeast<{
@@ -285,6 +289,8 @@ export type payment_methodsWhereUniqueInput = Prisma.AtLeast<{
   is_deleted?: Prisma.BoolNullableFilter<"payment_methods"> | boolean | null
   images?: Prisma.XOR<Prisma.ImagesNullableScalarRelationFilter, Prisma.imagesWhereInput> | null
   purchases?: Prisma.PurchasesListRelationFilter
+  e_booklet_purchases?: Prisma.E_booklet_purchasesListRelationFilter
+  e_booklet_template_payment_methods?: Prisma.E_booklet_template_payment_methodsListRelationFilter
 }, "id">
 
 export type payment_methodsOrderByWithAggregationInput = {
@@ -329,6 +335,8 @@ export type payment_methodsCreateInput = {
   is_deleted?: boolean | null
   images?: Prisma.imagesCreateNestedOneWithoutPayment_methodsInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutPayment_methodInput
 }
 
 export type payment_methodsUncheckedCreateInput = {
@@ -342,6 +350,8 @@ export type payment_methodsUncheckedCreateInput = {
   deleted_at?: Date | string | null
   is_deleted?: boolean | null
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutPayment_methodInput
 }
 
 export type payment_methodsUpdateInput = {
@@ -354,6 +364,8 @@ export type payment_methodsUpdateInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   images?: Prisma.imagesUpdateOneWithoutPayment_methodsNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutPayment_methodNestedInput
 }
 
 export type payment_methodsUncheckedUpdateInput = {
@@ -367,6 +379,8 @@ export type payment_methodsUncheckedUpdateInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutPayment_methodNestedInput
 }
 
 export type payment_methodsCreateManyInput = {
@@ -464,6 +478,11 @@ export type payment_methodsOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type Payment_methodsScalarRelationFilter = {
+  is?: Prisma.payment_methodsWhereInput
+  isNot?: Prisma.payment_methodsWhereInput
+}
+
 export type payment_methodsCreateNestedOneWithoutPurchasesInput = {
   create?: Prisma.XOR<Prisma.payment_methodsCreateWithoutPurchasesInput, Prisma.payment_methodsUncheckedCreateWithoutPurchasesInput>
   connectOrCreate?: Prisma.payment_methodsCreateOrConnectWithoutPurchasesInput
@@ -522,6 +541,36 @@ export type payment_methodsUncheckedUpdateManyWithoutImagesNestedInput = {
   deleteMany?: Prisma.payment_methodsScalarWhereInput | Prisma.payment_methodsScalarWhereInput[]
 }
 
+export type payment_methodsCreateNestedOneWithoutE_booklet_purchasesInput = {
+  create?: Prisma.XOR<Prisma.payment_methodsCreateWithoutE_booklet_purchasesInput, Prisma.payment_methodsUncheckedCreateWithoutE_booklet_purchasesInput>
+  connectOrCreate?: Prisma.payment_methodsCreateOrConnectWithoutE_booklet_purchasesInput
+  connect?: Prisma.payment_methodsWhereUniqueInput
+}
+
+export type payment_methodsUpdateOneWithoutE_booklet_purchasesNestedInput = {
+  create?: Prisma.XOR<Prisma.payment_methodsCreateWithoutE_booklet_purchasesInput, Prisma.payment_methodsUncheckedCreateWithoutE_booklet_purchasesInput>
+  connectOrCreate?: Prisma.payment_methodsCreateOrConnectWithoutE_booklet_purchasesInput
+  upsert?: Prisma.payment_methodsUpsertWithoutE_booklet_purchasesInput
+  disconnect?: Prisma.payment_methodsWhereInput | boolean
+  delete?: Prisma.payment_methodsWhereInput | boolean
+  connect?: Prisma.payment_methodsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.payment_methodsUpdateToOneWithWhereWithoutE_booklet_purchasesInput, Prisma.payment_methodsUpdateWithoutE_booklet_purchasesInput>, Prisma.payment_methodsUncheckedUpdateWithoutE_booklet_purchasesInput>
+}
+
+export type payment_methodsCreateNestedOneWithoutE_booklet_template_payment_methodsInput = {
+  create?: Prisma.XOR<Prisma.payment_methodsCreateWithoutE_booklet_template_payment_methodsInput, Prisma.payment_methodsUncheckedCreateWithoutE_booklet_template_payment_methodsInput>
+  connectOrCreate?: Prisma.payment_methodsCreateOrConnectWithoutE_booklet_template_payment_methodsInput
+  connect?: Prisma.payment_methodsWhereUniqueInput
+}
+
+export type payment_methodsUpdateOneRequiredWithoutE_booklet_template_payment_methodsNestedInput = {
+  create?: Prisma.XOR<Prisma.payment_methodsCreateWithoutE_booklet_template_payment_methodsInput, Prisma.payment_methodsUncheckedCreateWithoutE_booklet_template_payment_methodsInput>
+  connectOrCreate?: Prisma.payment_methodsCreateOrConnectWithoutE_booklet_template_payment_methodsInput
+  upsert?: Prisma.payment_methodsUpsertWithoutE_booklet_template_payment_methodsInput
+  connect?: Prisma.payment_methodsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.payment_methodsUpdateToOneWithWhereWithoutE_booklet_template_payment_methodsInput, Prisma.payment_methodsUpdateWithoutE_booklet_template_payment_methodsInput>, Prisma.payment_methodsUncheckedUpdateWithoutE_booklet_template_payment_methodsInput>
+}
+
 export type payment_methodsCreateWithoutPurchasesInput = {
   name: string
   phone_number: string
@@ -531,6 +580,8 @@ export type payment_methodsCreateWithoutPurchasesInput = {
   deleted_at?: Date | string | null
   is_deleted?: boolean | null
   images?: Prisma.imagesCreateNestedOneWithoutPayment_methodsInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutPayment_methodInput
 }
 
 export type payment_methodsUncheckedCreateWithoutPurchasesInput = {
@@ -543,6 +594,8 @@ export type payment_methodsUncheckedCreateWithoutPurchasesInput = {
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
   is_deleted?: boolean | null
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutPayment_methodInput
 }
 
 export type payment_methodsCreateOrConnectWithoutPurchasesInput = {
@@ -570,6 +623,8 @@ export type payment_methodsUpdateWithoutPurchasesInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   images?: Prisma.imagesUpdateOneWithoutPayment_methodsNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutPayment_methodNestedInput
 }
 
 export type payment_methodsUncheckedUpdateWithoutPurchasesInput = {
@@ -582,6 +637,8 @@ export type payment_methodsUncheckedUpdateWithoutPurchasesInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutPayment_methodNestedInput
 }
 
 export type payment_methodsCreateWithoutImagesInput = {
@@ -593,6 +650,8 @@ export type payment_methodsCreateWithoutImagesInput = {
   deleted_at?: Date | string | null
   is_deleted?: boolean | null
   purchases?: Prisma.purchasesCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutPayment_methodInput
 }
 
 export type payment_methodsUncheckedCreateWithoutImagesInput = {
@@ -605,6 +664,8 @@ export type payment_methodsUncheckedCreateWithoutImagesInput = {
   deleted_at?: Date | string | null
   is_deleted?: boolean | null
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutPayment_methodInput
 }
 
 export type payment_methodsCreateOrConnectWithoutImagesInput = {
@@ -648,6 +709,146 @@ export type payment_methodsScalarWhereInput = {
   is_deleted?: Prisma.BoolNullableFilter<"payment_methods"> | boolean | null
 }
 
+export type payment_methodsCreateWithoutE_booklet_purchasesInput = {
+  name: string
+  phone_number: string
+  status?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  images?: Prisma.imagesCreateNestedOneWithoutPayment_methodsInput
+  purchases?: Prisma.purchasesCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutPayment_methodInput
+}
+
+export type payment_methodsUncheckedCreateWithoutE_booklet_purchasesInput = {
+  id?: number
+  name: string
+  phone_number: string
+  status?: boolean | null
+  image_id?: number | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutPayment_methodInput
+}
+
+export type payment_methodsCreateOrConnectWithoutE_booklet_purchasesInput = {
+  where: Prisma.payment_methodsWhereUniqueInput
+  create: Prisma.XOR<Prisma.payment_methodsCreateWithoutE_booklet_purchasesInput, Prisma.payment_methodsUncheckedCreateWithoutE_booklet_purchasesInput>
+}
+
+export type payment_methodsUpsertWithoutE_booklet_purchasesInput = {
+  update: Prisma.XOR<Prisma.payment_methodsUpdateWithoutE_booklet_purchasesInput, Prisma.payment_methodsUncheckedUpdateWithoutE_booklet_purchasesInput>
+  create: Prisma.XOR<Prisma.payment_methodsCreateWithoutE_booklet_purchasesInput, Prisma.payment_methodsUncheckedCreateWithoutE_booklet_purchasesInput>
+  where?: Prisma.payment_methodsWhereInput
+}
+
+export type payment_methodsUpdateToOneWithWhereWithoutE_booklet_purchasesInput = {
+  where?: Prisma.payment_methodsWhereInput
+  data: Prisma.XOR<Prisma.payment_methodsUpdateWithoutE_booklet_purchasesInput, Prisma.payment_methodsUncheckedUpdateWithoutE_booklet_purchasesInput>
+}
+
+export type payment_methodsUpdateWithoutE_booklet_purchasesInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  images?: Prisma.imagesUpdateOneWithoutPayment_methodsNestedInput
+  purchases?: Prisma.purchasesUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutPayment_methodNestedInput
+}
+
+export type payment_methodsUncheckedUpdateWithoutE_booklet_purchasesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  image_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  purchases?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutPayment_methodNestedInput
+}
+
+export type payment_methodsCreateWithoutE_booklet_template_payment_methodsInput = {
+  name: string
+  phone_number: string
+  status?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  images?: Prisma.imagesCreateNestedOneWithoutPayment_methodsInput
+  purchases?: Prisma.purchasesCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutPayment_methodsInput
+}
+
+export type payment_methodsUncheckedCreateWithoutE_booklet_template_payment_methodsInput = {
+  id?: number
+  name: string
+  phone_number: string
+  status?: boolean | null
+  image_id?: number | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutPayment_methodsInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutPayment_methodsInput
+}
+
+export type payment_methodsCreateOrConnectWithoutE_booklet_template_payment_methodsInput = {
+  where: Prisma.payment_methodsWhereUniqueInput
+  create: Prisma.XOR<Prisma.payment_methodsCreateWithoutE_booklet_template_payment_methodsInput, Prisma.payment_methodsUncheckedCreateWithoutE_booklet_template_payment_methodsInput>
+}
+
+export type payment_methodsUpsertWithoutE_booklet_template_payment_methodsInput = {
+  update: Prisma.XOR<Prisma.payment_methodsUpdateWithoutE_booklet_template_payment_methodsInput, Prisma.payment_methodsUncheckedUpdateWithoutE_booklet_template_payment_methodsInput>
+  create: Prisma.XOR<Prisma.payment_methodsCreateWithoutE_booklet_template_payment_methodsInput, Prisma.payment_methodsUncheckedCreateWithoutE_booklet_template_payment_methodsInput>
+  where?: Prisma.payment_methodsWhereInput
+}
+
+export type payment_methodsUpdateToOneWithWhereWithoutE_booklet_template_payment_methodsInput = {
+  where?: Prisma.payment_methodsWhereInput
+  data: Prisma.XOR<Prisma.payment_methodsUpdateWithoutE_booklet_template_payment_methodsInput, Prisma.payment_methodsUncheckedUpdateWithoutE_booklet_template_payment_methodsInput>
+}
+
+export type payment_methodsUpdateWithoutE_booklet_template_payment_methodsInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  images?: Prisma.imagesUpdateOneWithoutPayment_methodsNestedInput
+  purchases?: Prisma.purchasesUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutPayment_methodsNestedInput
+}
+
+export type payment_methodsUncheckedUpdateWithoutE_booklet_template_payment_methodsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone_number?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  image_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  purchases?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_methodsNestedInput
+}
+
 export type payment_methodsCreateManyImagesInput = {
   id?: number
   name: string
@@ -668,6 +869,8 @@ export type payment_methodsUpdateWithoutImagesInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchases?: Prisma.purchasesUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutPayment_methodNestedInput
 }
 
 export type payment_methodsUncheckedUpdateWithoutImagesInput = {
@@ -680,6 +883,8 @@ export type payment_methodsUncheckedUpdateWithoutImagesInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutPayment_methodsNestedInput
+  e_booklet_template_payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutPayment_methodNestedInput
 }
 
 export type payment_methodsUncheckedUpdateManyWithoutImagesInput = {
@@ -700,10 +905,14 @@ export type payment_methodsUncheckedUpdateManyWithoutImagesInput = {
 
 export type Payment_methodsCountOutputType = {
   purchases: number
+  e_booklet_purchases: number
+  e_booklet_template_payment_methods: number
 }
 
 export type Payment_methodsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   purchases?: boolean | Payment_methodsCountOutputTypeCountPurchasesArgs
+  e_booklet_purchases?: boolean | Payment_methodsCountOutputTypeCountE_booklet_purchasesArgs
+  e_booklet_template_payment_methods?: boolean | Payment_methodsCountOutputTypeCountE_booklet_template_payment_methodsArgs
 }
 
 /**
@@ -723,6 +932,20 @@ export type Payment_methodsCountOutputTypeCountPurchasesArgs<ExtArgs extends run
   where?: Prisma.purchasesWhereInput
 }
 
+/**
+ * Payment_methodsCountOutputType without action
+ */
+export type Payment_methodsCountOutputTypeCountE_booklet_purchasesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_purchasesWhereInput
+}
+
+/**
+ * Payment_methodsCountOutputType without action
+ */
+export type Payment_methodsCountOutputTypeCountE_booklet_template_payment_methodsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_template_payment_methodsWhereInput
+}
+
 
 export type payment_methodsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -736,6 +959,8 @@ export type payment_methodsSelect<ExtArgs extends runtime.Types.Extensions.Inter
   is_deleted?: boolean
   images?: boolean | Prisma.payment_methods$imagesArgs<ExtArgs>
   purchases?: boolean | Prisma.payment_methods$purchasesArgs<ExtArgs>
+  e_booklet_purchases?: boolean | Prisma.payment_methods$e_booklet_purchasesArgs<ExtArgs>
+  e_booklet_template_payment_methods?: boolean | Prisma.payment_methods$e_booklet_template_payment_methodsArgs<ExtArgs>
   _count?: boolean | Prisma.Payment_methodsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["payment_methods"]>
 
@@ -781,6 +1006,8 @@ export type payment_methodsOmit<ExtArgs extends runtime.Types.Extensions.Interna
 export type payment_methodsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | Prisma.payment_methods$imagesArgs<ExtArgs>
   purchases?: boolean | Prisma.payment_methods$purchasesArgs<ExtArgs>
+  e_booklet_purchases?: boolean | Prisma.payment_methods$e_booklet_purchasesArgs<ExtArgs>
+  e_booklet_template_payment_methods?: boolean | Prisma.payment_methods$e_booklet_template_payment_methodsArgs<ExtArgs>
   _count?: boolean | Prisma.Payment_methodsCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type payment_methodsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -795,6 +1022,8 @@ export type $payment_methodsPayload<ExtArgs extends runtime.Types.Extensions.Int
   objects: {
     images: Prisma.$imagesPayload<ExtArgs> | null
     purchases: Prisma.$purchasesPayload<ExtArgs>[]
+    e_booklet_purchases: Prisma.$e_booklet_purchasesPayload<ExtArgs>[]
+    e_booklet_template_payment_methods: Prisma.$e_booklet_template_payment_methodsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1202,6 +1431,8 @@ export interface Prisma__payment_methodsClient<T, Null = never, ExtArgs extends 
   readonly [Symbol.toStringTag]: "PrismaPromise"
   images<T extends Prisma.payment_methods$imagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.payment_methods$imagesArgs<ExtArgs>>): Prisma.Prisma__imagesClient<runtime.Types.Result.GetResult<Prisma.$imagesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   purchases<T extends Prisma.payment_methods$purchasesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.payment_methods$purchasesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchasesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  e_booklet_purchases<T extends Prisma.payment_methods$e_booklet_purchasesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.payment_methods$e_booklet_purchasesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_purchasesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  e_booklet_template_payment_methods<T extends Prisma.payment_methods$e_booklet_template_payment_methodsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.payment_methods$e_booklet_template_payment_methodsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_template_payment_methodsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1685,6 +1916,54 @@ export type payment_methods$purchasesArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.PurchasesScalarFieldEnum | Prisma.PurchasesScalarFieldEnum[]
+}
+
+/**
+ * payment_methods.e_booklet_purchases
+ */
+export type payment_methods$e_booklet_purchasesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_purchases
+   */
+  select?: Prisma.e_booklet_purchasesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_purchases
+   */
+  omit?: Prisma.e_booklet_purchasesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_purchasesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_purchasesWhereInput
+  orderBy?: Prisma.e_booklet_purchasesOrderByWithRelationInput | Prisma.e_booklet_purchasesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_purchasesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_purchasesScalarFieldEnum | Prisma.E_booklet_purchasesScalarFieldEnum[]
+}
+
+/**
+ * payment_methods.e_booklet_template_payment_methods
+ */
+export type payment_methods$e_booklet_template_payment_methodsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_template_payment_methods
+   */
+  select?: Prisma.e_booklet_template_payment_methodsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_template_payment_methods
+   */
+  omit?: Prisma.e_booklet_template_payment_methodsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_template_payment_methodsInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_template_payment_methodsWhereInput
+  orderBy?: Prisma.e_booklet_template_payment_methodsOrderByWithRelationInput | Prisma.e_booklet_template_payment_methodsOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_template_payment_methodsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_template_payment_methodsScalarFieldEnum | Prisma.E_booklet_template_payment_methodsScalarFieldEnum[]
 }
 
 /**

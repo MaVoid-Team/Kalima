@@ -34,7 +34,7 @@ export default function AdminEBookletPurchaseDeliveryPage() {
     <div className="space-y-6" data-testid="admin-e-booklet-purchase-delivery-page">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <Button type="button" variant="ghost" className="mb-2 -ml-3" onClick={() => navigate("/admin/e-booklet-purchases")}>
+          <Button type="button" variant="ghost" className="mb-2 -ml-3" onClick={() => navigate("/admin/e-booklets/orders")}>
             <ChevronLeft className="h-4 w-4" />
             {t("common.back", { defaultValue: "Back" })}
           </Button>

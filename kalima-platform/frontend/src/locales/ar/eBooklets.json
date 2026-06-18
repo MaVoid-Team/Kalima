@@ -229,6 +229,7 @@
         "titlePlaceholder": "تسمية اختيارية",
         "textBody": "نص المحتوى",
         "textPlaceholder": "ملاحظة نصية تظهر للطالب",
+        "supplementaryTextPlaceholder": "كلمات أو تعليمات تظهر مع هذه الوسائط للطالب",
         "mediaAsset": "أصل وسائط",
         "mediaUploaded": "تم رفع الوسائط (أصل #{{id}})",
         "mediaEmpty": "ارفع وسائط لهذه النقطة.",

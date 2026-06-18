@@ -296,7 +296,7 @@ function QuestionAnswerBlock({ block, t }) {
   const answers = Array.isArray(block.answers) ? block.answers : [];
   return (
     <div className="space-y-3">
-      <p className="whitespace-pre-wrap text-sm font-medium">{block.question || block.prompt || t("viewer.questionFallback")}</p>
+      <p className="whitespace-pre-wrap text-sm font-medium">{block.question || block.prompt || block.text_content || t("viewer.questionFallback")}</p>
       <div className="space-y-2">
         {answers.map((answer, index) => {
           const isSelected = selectedIndex === index;
@@ -486,7 +486,7 @@ export default function EBookletViewerPage() {
     user: user?.name || user?.email || t("common.user"),
     date: today,
   });
-  const backHref = adminMode ? "/admin/e-booklet-instances" : isStudent ? "/student/e-booklets" : "/teacher/e-booklets";
+  const backHref = adminMode ? "/admin/e-booklets/access" : isStudent ? "/student/e-booklets" : "/teacher/e-booklets";
 
   const pageStyle = useMemo(
     () => ({

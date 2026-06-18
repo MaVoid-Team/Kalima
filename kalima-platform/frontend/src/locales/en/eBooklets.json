@@ -229,6 +229,7 @@
         "titlePlaceholder": "Optional label",
         "textBody": "Text body",
         "textPlaceholder": "Student-facing text note",
+        "supplementaryTextPlaceholder": "Words/instructions shown with this media to the student",
         "mediaAsset": "Media asset",
         "mediaUploaded": "Media uploaded (asset #{{id}})",
         "mediaEmpty": "Upload media for this hotspot.",

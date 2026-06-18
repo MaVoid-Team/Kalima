@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   BookOpenCheck,
   CheckCircle2,
@@ -54,6 +54,7 @@ const prettyStatus = (status) => status.replaceAll("_", " ");
 export default function AdminEBookletPurchasesPage() {
   const { t } = useTranslation("eBooklets");
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     purchases,
     pagination,
@@ -66,10 +67,18 @@ export default function AdminEBookletPurchasesPage() {
     approveStudentPurchase,
   } = useAdminEBookletPurchases();
   const [studentPurchaseId, setStudentPurchaseId] = useState("");
+  const requestedStatus = searchParams.get("status");
+  const effectiveStatus = purchaseStatuses.includes(requestedStatus) ? requestedStatus : status;
+
+  useEffect(() => {
+    if (effectiveStatus !== status) {
+      setStatus(effectiveStatus);
+    }
+  }, [effectiveStatus, setStatus, status]);
 
   const load = useCallback(() => {
-    fetchPurchases();
-  }, [fetchPurchases]);
+    fetchPurchases({ status: effectiveStatus });
+  }, [effectiveStatus, fetchPurchases]);
 
   useEffect(() => {
     load();
@@ -106,7 +115,16 @@ export default function AdminEBookletPurchasesPage() {
             {t("admin.purchases.description")}
           </p>
         </div>
-        <Select value={status} onValueChange={setStatus}>
+        <Select
+          value={effectiveStatus}
+          onValueChange={(value) => {
+            setStatus(value);
+            const next = new URLSearchParams(searchParams);
+            if (value && value !== "all") next.set("status", value);
+            else next.delete("status");
+            setSearchParams(next, { replace: true });
+          }}
+        >
           <SelectTrigger className="w-full md:w-64">
             <SelectValue />
           </SelectTrigger>

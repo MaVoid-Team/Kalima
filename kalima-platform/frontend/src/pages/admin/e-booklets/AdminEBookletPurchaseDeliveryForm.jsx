@@ -147,8 +147,9 @@ export default function AdminEBookletPurchaseDeliveryForm({
     );
   }
 
+  const isDelivered = String(purchase.status) === "delivered";
   const canDeliver = ["paid", "ready"].includes(String(purchase.status));
-  const deliverDisabled = loading || !canDeliver || Boolean(deliveryForm.validation_message) || !deliveryForm.custom_document_file_id || !deliveryForm.access_expires_at;
+  const deliverDisabled = loading || isDelivered || !canDeliver || Boolean(deliveryForm.validation_message) || !deliveryForm.custom_document_file_id || !deliveryForm.access_expires_at;
 
   return (
     <section className="space-y-4 rounded-lg border bg-background p-4" data-testid="admin-e-booklet-purchases-delivery-section">
@@ -257,20 +258,29 @@ export default function AdminEBookletPurchaseDeliveryForm({
           <PencilLine className="h-4 w-4" />
           {t("admin.purchases.editTeacherTemplate", { defaultValue: "Edit this teacher's eBooklet template" })}
         </Button>
-        <Button variant="outline" onClick={() => handleStatus("customization_in_progress")} disabled={loading}>
-          {t("common.inProgress")}
-        </Button>
-        {!canDeliver && (
-          <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            {t("admin.purchases.approvePaymentBeforeDelivery")}
+        {!isDelivered && (
+          <Button variant="outline" onClick={() => handleStatus("customization_in_progress")} disabled={loading}>
+            {t("common.inProgress")}
+          </Button>
+        )}
+        {isDelivered && (
+          <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800 sm:col-span-2">
+            {t("admin.purchases.alreadyDelivered", { defaultValue: "This e-booklet has already been delivered." })}
           </div>
         )}
-        <Button
-          onClick={handleDeliver}
-          disabled={deliverDisabled}
-        >
-          {t("admin.purchases.deliver")}
-        </Button>
+        {!isDelivered && !canDeliver && (
+          <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            {t("admin.purchases.approvePaymentBeforeDelivery", { defaultValue: "Approve the payment before delivering this e-booklet." })}
+          </div>
+        )}
+        {!isDelivered && (
+          <Button
+            onClick={handleDeliver}
+            disabled={deliverDisabled}
+          >
+            {t("admin.purchases.deliver")}
+          </Button>
+        )}
       </div>
     </section>
   );

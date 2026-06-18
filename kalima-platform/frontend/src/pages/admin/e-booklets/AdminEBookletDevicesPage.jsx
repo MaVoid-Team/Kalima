@@ -44,7 +44,7 @@ export default function AdminEBookletDevicesPage() {
   return (
     <div className="space-y-6" data-testid="admin-e-booklet-devices-page">
       <div>
-        <Button asChild variant="ghost" size="sm" className="-ms-2 mb-2"><Link to="/admin/e-booklet-instances">{t("admin.devices.backToInstances")}</Link></Button>
+        <Button asChild variant="ghost" size="sm" className="-ms-2 mb-2"><Link to="/admin/e-booklets/access">{t("admin.devices.backToInstances")}</Link></Button>
         <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight"><HardDrive className="h-8 w-8 text-primary" />{t("admin.devices.title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("admin.devices.description")}</p>
       </div>

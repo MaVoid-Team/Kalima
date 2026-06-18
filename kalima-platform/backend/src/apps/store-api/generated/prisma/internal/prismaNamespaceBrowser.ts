@@ -96,6 +96,9 @@ export const ModelName = {
   e_booklet_template_versions: 'e_booklet_template_versions',
   e_booklet_hotspots: 'e_booklet_hotspots',
   e_booklet_purchases: 'e_booklet_purchases',
+  e_booklet_template_payment_methods: 'e_booklet_template_payment_methods',
+  e_booklet_template_required_fields: 'e_booklet_template_required_fields',
+  e_booklet_purchase_required_fields: 'e_booklet_purchase_required_fields',
   e_booklet_terms: 'e_booklet_terms',
   e_booklet_instances: 'e_booklet_instances',
   e_booklet_milestones: 'e_booklet_milestones',
@@ -771,7 +774,9 @@ export const E_booklet_purchasesScalarFieldEnum = {
   access_expires_at: 'access_expires_at',
   currency: 'currency',
   payment_method: 'payment_method',
+  payment_method_id: 'payment_method_id',
   payment_reference: 'payment_reference',
+  payment_screenshot_id: 'payment_screenshot_id',
   branding_json: 'branding_json',
   admin_notes: 'admin_notes',
   created_at: 'created_at',
@@ -779,6 +784,39 @@ export const E_booklet_purchasesScalarFieldEnum = {
 } as const
 
 export type E_booklet_purchasesScalarFieldEnum = (typeof E_booklet_purchasesScalarFieldEnum)[keyof typeof E_booklet_purchasesScalarFieldEnum]
+
+
+export const E_booklet_template_payment_methodsScalarFieldEnum = {
+  id: 'id',
+  template_id: 'template_id',
+  payment_method_id: 'payment_method_id',
+  created_at: 'created_at'
+} as const
+
+export type E_booklet_template_payment_methodsScalarFieldEnum = (typeof E_booklet_template_payment_methodsScalarFieldEnum)[keyof typeof E_booklet_template_payment_methodsScalarFieldEnum]
+
+
+export const E_booklet_template_required_fieldsScalarFieldEnum = {
+  id: 'id',
+  template_id: 'template_id',
+  field_definition_id: 'field_definition_id',
+  is_required: 'is_required',
+  active: 'active'
+} as const
+
+export type E_booklet_template_required_fieldsScalarFieldEnum = (typeof E_booklet_template_required_fieldsScalarFieldEnum)[keyof typeof E_booklet_template_required_fieldsScalarFieldEnum]
+
+
+export const E_booklet_purchase_required_fieldsScalarFieldEnum = {
+  id: 'id',
+  purchase_id: 'purchase_id',
+  field_definition_id: 'field_definition_id',
+  value: 'value',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_purchase_required_fieldsScalarFieldEnum = (typeof E_booklet_purchase_required_fieldsScalarFieldEnum)[keyof typeof E_booklet_purchase_required_fieldsScalarFieldEnum]
 
 
 export const E_booklet_termsScalarFieldEnum = {

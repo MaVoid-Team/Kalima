@@ -58,6 +58,7 @@ export enum EBookletPurchaseStatusDto {
   needs_branding_info = "needs_branding_info",
   customization_in_progress = "customization_in_progress",
   ready = "ready",
+  delivered = "delivered",
   cancelled = "cancelled",
   rejected = "rejected",
 }
