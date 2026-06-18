@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, UserCheck } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,8 +25,14 @@ function getUserRoles(user) {
     return user?.role ? [user.role] : [];
 }
 
+function getRoleTranslationKey(role) {
+    const normalizedRole = String(role || '').toLowerCase();
+    return ROLE_OPTIONS.find((option) => option.toLowerCase() === normalizedRole) || role;
+}
+
 export default function AdminImpersonationPage() {
     const navigate = useNavigate();
+    const { t } = useTranslation('admin');
     const { user: currentUser } = useAuth();
     const { users, loading, pagination, fetchUsers } = useAdminUsers();
     const [search, setSearch] = useState('');
@@ -70,7 +77,7 @@ export default function AdminImpersonationPage() {
         setStartingUserId(targetUserId);
         try {
             const result = await startImpersonation(targetUserId);
-            toast.success('Impersonation started');
+            toast.success(t('impersonation.messages.started'));
             window.dispatchEvent(new Event('auth-session-changed'));
             navigate(result.redirectTo, { replace: true });
             window.location.reload();
@@ -82,16 +89,16 @@ export default function AdminImpersonationPage() {
     return (
         <div className="space-y-6" data-testid="admin-impersonation-page">
             <div>
-                <h1 className="text-2xl font-semibold tracking-tight">Impersonation</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">{t('impersonation.title')}</h1>
                 <p className="text-sm text-muted-foreground">
-                    Admin-only tool to switch into any user account for support and verification.
+                    {t('impersonation.description')}
                 </p>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Select a user</CardTitle>
-                    <CardDescription>Search all users. The backend blocks nested and self impersonation.</CardDescription>
+                    <CardTitle>{t('impersonation.cardTitle')}</CardTitle>
+                    <CardDescription>{t('impersonation.cardDescription')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <form onSubmit={handleSearch} className="grid gap-2 md:grid-cols-[minmax(220px,1fr)_repeat(3,minmax(150px,180px))_auto_auto]">
@@ -100,44 +107,44 @@ export default function AdminImpersonationPage() {
                             <Input
                                 value={search}
                                 onChange={(event) => setSearch(event.target.value)}
-                                placeholder="Search by name, email, or phone"
+                                placeholder={t('impersonation.filters.searchPlaceholder')}
                                 className="ps-9"
                                 data-testid="impersonation-search-input"
                             />
                         </div>
                         <Select value={roleFilter} onValueChange={setRoleFilter}>
                             <SelectTrigger className="w-full" data-testid="impersonation-role-filter">
-                                <SelectValue placeholder="All roles" />
+                                <SelectValue placeholder={t('impersonation.filters.allRoles')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All roles</SelectItem>
-                                {ROLE_OPTIONS.map((role) => <SelectItem key={role} value={role}>{role}</SelectItem>)}
+                                <SelectItem value="all">{t('impersonation.filters.allRoles')}</SelectItem>
+                                {ROLE_OPTIONS.map((role) => <SelectItem key={role} value={role}>{t(`roles.${role}`, { defaultValue: role })}</SelectItem>)}
                             </SelectContent>
                         </Select>
                         <Select value={portalFilter} onValueChange={setPortalFilter}>
                             <SelectTrigger className="w-full" data-testid="impersonation-portal-filter">
-                                <SelectValue placeholder="All portals" />
+                                <SelectValue placeholder={t('impersonation.filters.allPortals')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All portals</SelectItem>
-                                {PORTAL_OPTIONS.map((portal) => <SelectItem key={portal} value={portal}>{portal}</SelectItem>)}
+                                <SelectItem value="all">{t('impersonation.filters.allPortals')}</SelectItem>
+                                {PORTAL_OPTIONS.map((portal) => <SelectItem key={portal} value={portal}>{t(`impersonation.portals.${portal}`)}</SelectItem>)}
                             </SelectContent>
                         </Select>
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
                             <SelectTrigger className="w-full" data-testid="impersonation-status-filter">
-                                <SelectValue placeholder="All statuses" />
+                                <SelectValue placeholder={t('impersonation.filters.allStatuses')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All statuses</SelectItem>
-                                <SelectItem value="active">Active</SelectItem>
-                                <SelectItem value="unconfirmed">Unconfirmed</SelectItem>
+                                <SelectItem value="all">{t('impersonation.filters.allStatuses')}</SelectItem>
+                                <SelectItem value="active">{t('impersonation.status.active')}</SelectItem>
+                                <SelectItem value="unconfirmed">{t('impersonation.status.unconfirmed')}</SelectItem>
                             </SelectContent>
                         </Select>
                         <Button type="submit" disabled={loading} data-testid="impersonation-search-button">
-                            Apply
+                            {t('impersonation.filters.apply')}
                         </Button>
                         <Button type="button" variant="outline" disabled={loading} onClick={handleClearFilters} data-testid="impersonation-clear-filters-button">
-                            Clear
+                            {t('impersonation.filters.clear')}
                         </Button>
                     </form>
 
@@ -148,11 +155,11 @@ export default function AdminImpersonationPage() {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>User</TableHead>
-                                        <TableHead>Email</TableHead>
-                                        <TableHead>Roles</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-end">Action</TableHead>
+                                        <TableHead>{t('impersonation.table.user')}</TableHead>
+                                        <TableHead>{t('impersonation.table.email')}</TableHead>
+                                        <TableHead>{t('impersonation.table.roles')}</TableHead>
+                                        <TableHead>{t('impersonation.table.status')}</TableHead>
+                                        <TableHead className="text-end">{t('impersonation.table.action')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -162,17 +169,17 @@ export default function AdminImpersonationPage() {
                                         return (
                                             <TableRow key={target.id} data-testid={`impersonation-user-row-${target.id}`}>
                                                 <TableCell>
-                                                    <div className="font-medium">{target.name || 'Unnamed user'}</div>
-                                                    <div className="text-xs text-muted-foreground">ID: {target.id}</div>
+                                                    <div className="font-medium">{target.name || t('impersonation.table.unnamedUser')}</div>
+                                                    <div className="text-xs text-muted-foreground">{t('impersonation.table.userId', { id: target.id })}</div>
                                                 </TableCell>
                                                 <TableCell>{target.email || '—'}</TableCell>
                                                 <TableCell>
                                                     <div className="flex flex-wrap gap-1">
-                                                        {roles.length > 0 ? roles.map((role) => <Badge key={role} variant="secondary">{role}</Badge>) : <span className="text-muted-foreground">—</span>}
+                                                        {roles.length > 0 ? roles.map((role) => <Badge key={role} variant="secondary">{t(`roles.${getRoleTranslationKey(role)}`, { defaultValue: role })}</Badge>) : <span className="text-muted-foreground">—</span>}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {target.confirmed === false ? <Badge variant="outline">Unconfirmed</Badge> : <Badge variant="secondary">Active</Badge>}
+                                                    {target.confirmed === false ? <Badge variant="outline">{t('impersonation.status.unconfirmed')}</Badge> : <Badge variant="secondary">{t('impersonation.status.active')}</Badge>}
                                                 </TableCell>
                                                 <TableCell className="text-end">
                                                     <Button
@@ -183,7 +190,7 @@ export default function AdminImpersonationPage() {
                                                         data-testid={`start-impersonation-${target.id}`}
                                                     >
                                                         <UserCheck className="me-2 h-4 w-4" />
-                                                        {startingUserId === target.id ? 'Starting…' : isSelf ? 'Current user' : 'Impersonate'}
+                                                        {startingUserId === target.id ? t('impersonation.actions.starting') : isSelf ? t('impersonation.actions.currentUser') : t('impersonation.actions.impersonate')}
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
@@ -191,7 +198,7 @@ export default function AdminImpersonationPage() {
                                     })}
                                     {!loading && filteredUsers.length === 0 && (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">No users found.</TableCell>
+                                            <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">{t('impersonation.empty')}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
@@ -201,9 +208,9 @@ export default function AdminImpersonationPage() {
 
                     {pagination.totalPages > 1 && (
                         <div className="flex items-center justify-end gap-2">
-                            <Button type="button" variant="outline" disabled={pagination.page <= 1 || loading} onClick={() => handlePageChange(pagination.page - 1)}>Previous</Button>
-                            <span className="text-sm text-muted-foreground">Page {pagination.page} of {pagination.totalPages}</span>
-                            <Button type="button" variant="outline" disabled={pagination.page >= pagination.totalPages || loading} onClick={() => handlePageChange(pagination.page + 1)}>Next</Button>
+                            <Button type="button" variant="outline" disabled={pagination.page <= 1 || loading} onClick={() => handlePageChange(pagination.page - 1)}>{t('common.pagination.previous')}</Button>
+                            <span className="text-sm text-muted-foreground">{t('impersonation.paginationSummary', { page: pagination.page, totalPages: pagination.totalPages })}</span>
+                            <Button type="button" variant="outline" disabled={pagination.page >= pagination.totalPages || loading} onClick={() => handlePageChange(pagination.page + 1)}>{t('common.pagination.next')}</Button>
                         </div>
                     )}
                 </CardContent>
