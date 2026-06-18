@@ -18,10 +18,45 @@ const TERMS_VERSION = "public-checkout-v1";
 
 const normalizePaymentMethods = (payload) => {
   if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data?.data)) return payload.data.data;
   if (Array.isArray(payload?.data)) return payload.data;
   if (Array.isArray(payload?.payment_methods)) return payload.payment_methods;
   if (Array.isArray(payload?.methods)) return payload.methods;
   return [];
+};
+
+const normalizeTemplatePaymentMethods = (items) => {
+  const methods = [];
+  const seen = new Set();
+  for (const cartItem of items || []) {
+    for (const relation of cartItem.payment_methods || []) {
+      const method = relation.payment_method || relation;
+      if (!method?.id || seen.has(method.id) || method.status === false || method.is_deleted === true) continue;
+      seen.add(method.id);
+      methods.push(method);
+    }
+  }
+  return methods;
+};
+
+const normalizeTemplateRequiredFields = (items) => {
+  const fields = [];
+  const seen = new Set();
+  for (const cartItem of items || []) {
+    for (const relation of cartItem.required_fields || []) {
+      const definition = relation.required_field_definitions || relation.field_definition || relation;
+      const id = relation.field_definition_id || definition?.id;
+      if (!id || seen.has(id) || relation.active === false || definition?.active === false || definition?.is_deleted === true) continue;
+      seen.add(id);
+      fields.push({
+        field_definition_id: Number(id),
+        label: definition?.label || relation.label || `Field ${id}`,
+        field_type: definition?.field_type || relation.field_type || "text",
+        is_required: relation.is_required !== false,
+      });
+    }
+  }
+  return fields;
 };
 
 const toCheckoutItem = (item) => ({
@@ -62,6 +97,7 @@ export default function EBookletCheckoutPage() {
   const [numberTransferredFrom, setNumberTransferredFrom] = useState("");
   const [paymentScreenshot, setPaymentScreenshot] = useState(null);
   const [notes, setNotes] = useState("");
+  const [requiredFieldValues, setRequiredFieldValues] = useState({});
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [submittedPurchase, setSubmittedPurchase] = useState(null);
   const [formError, setFormError] = useState(null);
@@ -69,11 +105,15 @@ export default function EBookletCheckoutPage() {
 
   const isPaid = Number(total || 0) > 0;
 
+  const templatePaymentMethods = useMemo(() => normalizeTemplatePaymentMethods(items), [items]);
+  const checkoutRequiredFields = useMemo(() => normalizeTemplateRequiredFields(items), [items]);
+
   const getPaymentMethods = useCallback(async () => {
     if (!isPaid) return [];
+    if (templatePaymentMethods.length > 0) return templatePaymentMethods;
     const response = await api.get("/payment-methods");
     return normalizePaymentMethods(response?.data);
-  }, [isPaid]);
+  }, [isPaid, templatePaymentMethods]);
 
   const checkoutItems = useMemo(() => items.map(toCheckoutItem), [items]);
   const checkoutPricing = useMemo(() => ({
@@ -99,6 +139,11 @@ export default function EBookletCheckoutPage() {
       setFormError(t("checkout.paymentRequired", { defaultValue: "Choose a payment method, enter the number you paid from, and upload payment proof." }));
       return false;
     }
+    const missingField = checkoutRequiredFields.find((field) => field.is_required !== false && !String(requiredFieldValues[field.field_definition_id] || "").trim());
+    if (missingField) {
+      setFormError(`${missingField.label} is required.`);
+      return false;
+    }
     return true;
   };
 
@@ -114,6 +159,14 @@ export default function EBookletCheckoutPage() {
           template_id: cartItem.template_id,
           template_version_id: cartItem.template_version_id,
         };
+        const values = (cartItem.required_fields || [])
+          .map((relation) => {
+            const fieldId = Number(relation.field_definition_id || relation.required_field_definitions?.id || relation.id);
+            const value = String(requiredFieldValues[fieldId] || "").trim();
+            return fieldId && value ? { field_definition_id: fieldId, value } : null;
+          })
+          .filter(Boolean);
+        if (values.length > 0) payload.required_field_values = values;
         if (cartItem.instance_id) payload.instance_id = cartItem.instance_id;
         return payload;
       })));
@@ -226,6 +279,45 @@ export default function EBookletCheckoutPage() {
               setValidationErrors={setHasValidationErrors}
               isFreeOrder={!isPaid}
             />
+
+            {checkoutRequiredFields.length > 0 && (
+              <section className="rounded-[1.25rem] border bg-white p-5 shadow-sm">
+                <h2 className="text-lg font-black uppercase tracking-tight text-slate-950">
+                  {t("checkout.requiredFieldsTitle", { defaultValue: "Required information" })}
+                </h2>
+                <div className="mt-4 grid gap-4">
+                  {checkoutRequiredFields.map((field) => {
+                    const value = requiredFieldValues[field.field_definition_id] || "";
+                    const commonProps = {
+                      id: `ebooklet-required-field-${field.field_definition_id}`,
+                      value,
+                      required: field.is_required !== false,
+                      onChange: (event) => setRequiredFieldValues((current) => ({
+                        ...current,
+                        [field.field_definition_id]: event.target.value,
+                      })),
+                      className: "w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-red-500",
+                    };
+                    return (
+                      <label key={field.field_definition_id} className="grid gap-2 text-sm font-semibold text-slate-800">
+                        <span>
+                          {field.label}
+                          {field.is_required !== false && <span className="text-red-600"> *</span>}
+                        </span>
+                        {field.field_type === "textarea" || field.field_type === "notes" ? (
+                          <textarea {...commonProps} rows={3} />
+                        ) : (
+                          <input
+                            {...commonProps}
+                            type={field.field_type === "email" ? "email" : field.field_type === "number" ? "number" : "text"}
+                          />
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             <label className="flex items-start gap-2 rounded-md border p-3 text-sm">
               <input type="checkbox" className="mt-1" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />

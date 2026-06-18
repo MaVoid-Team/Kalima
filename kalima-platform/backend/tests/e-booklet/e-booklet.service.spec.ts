@@ -59,6 +59,9 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
       findMany: jest.fn(),
       count: jest.fn(),
     },
+    payment_methods: {
+      findFirst: jest.fn().mockResolvedValue({ id: 1, phone_number: "01000000000", name: "Wallet" }),
+    },
     e_booklet_purchases: {
       create: jest.fn(),
       findMany: jest.fn(),
@@ -355,6 +358,8 @@ describe("EBookletService", () => {
         price: 120,
         marketing_price: 150,
         internal_price: 70,
+        status: "paid",
+        instances: [],
       });
       db.e_booklet_template_versions.findUnique.mockResolvedValue({ id: 4, page_count: 2, page_dimensions_json: null });
       db.e_booklet_instances.create.mockResolvedValue({ id: 10 });
@@ -403,6 +408,76 @@ describe("EBookletService", () => {
       }));
       expect(db.e_booklet_invites.create.mock.calls[0][0].data.passcode_hash).not.toBe("123456");
       expect(db.e_booklet_invites.create.mock.calls[0][0].data.passcode_ciphertext).not.toBe("123456");
+    });
+
+    test("blocks purchase delivery before payment approval", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.findUnique.mockResolvedValue({
+        id: 2,
+        teacher_id: 9,
+        template_id: 3,
+        template_version_id: 4,
+        branding_json: {},
+        price: 120,
+        marketing_price: 150,
+        internal_price: 70,
+        status: "pending",
+        instances: [],
+      });
+
+      const service = new EBookletService(db);
+      await expect(service.deliverPurchase(2, {
+        custom_document_file_id: 99,
+        display_title: "Delivered",
+        invite_quota: 5,
+        page_count: 2,
+        access_expires_at: "2026-12-31T00:00:00.000Z",
+      }, 1)).rejects.toThrow("Payment must be approved before delivering the e-booklet.");
+      expect(db.e_booklet_instances.create).not.toHaveBeenCalled();
+      expect(db.e_booklet_instances.update).not.toHaveBeenCalled();
+    });
+
+    test("delivery reuses the paid approval instance instead of creating a duplicate", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.findUnique.mockResolvedValue({
+        id: 2,
+        teacher_id: 9,
+        template_id: 3,
+        template_version_id: 4,
+        branding_json: { name: "Teacher" },
+        price: 120,
+        marketing_price: 150,
+        internal_price: 70,
+        status: "ready",
+        instances: [{ id: 10, purchase_id: 2, teacher_id: 9, status: "active" }],
+      });
+      db.e_booklet_template_versions.findUnique.mockResolvedValue({ id: 4, page_count: 2, page_dimensions_json: null });
+      db.e_booklet_instances.update.mockResolvedValue({ id: 10, purchase_id: 2, teacher_id: 9, status: "active" });
+      db.e_booklet_access.findFirst.mockResolvedValue({ id: 11, booklet_instance_id: 10, user_id: 9, role: "teacher" });
+
+      const service = new EBookletService(db);
+      await service.deliverPurchase(2, {
+        custom_document_file_id: 99,
+        display_title: "Delivered",
+        invite_quota: 5,
+        page_count: 2,
+        access_expires_at: "2026-12-31T00:00:00.000Z",
+        student_marketing_price: 160,
+        internal_price: 80,
+      }, 1);
+
+      expect(db.e_booklet_instances.create).not.toHaveBeenCalled();
+      expect(db.e_booklet_instances.update).toHaveBeenCalledWith(expect.objectContaining({
+        where: { id: 10 },
+        data: expect.objectContaining({
+          custom_document_file_id: 99,
+          display_title: "Delivered",
+          access_expires_at: new Date("2026-12-31T00:00:00.000Z"),
+          student_marketing_price: 160,
+          internal_price: 80,
+        }),
+      }));
+      expect(db.e_booklet_access.create).not.toHaveBeenCalled();
     });
 
     test("teacher invite list returns copyable passcode from encrypted storage without exposing hashes", async () => {
@@ -1287,6 +1362,8 @@ describe("EBookletService", () => {
         price: 120,
         marketing_price: 150,
         internal_price: 70,
+        status: "paid",
+        instances: [],
       });
       db.e_booklet_instances.updateMany.mockResolvedValue({ count: 2 });
       const service = new EBookletService(db);

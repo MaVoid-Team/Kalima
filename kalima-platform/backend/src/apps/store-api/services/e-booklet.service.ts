@@ -360,6 +360,146 @@ export class EBookletService {
       .replace(/^-+|-+$/g, "");
     return base || `e-booklet-${Date.now()}`;
   }
+  private templateCheckoutInclude() {
+    return {
+      payment_methods: {
+        include: {
+          payment_method: { include: { images: true } },
+        },
+      },
+      required_fields: {
+        where: { active: true },
+        include: { required_field_definitions: true },
+        orderBy: { id: "asc" },
+      },
+    };
+  }
+
+  private normalizeIds(values: unknown): number[] {
+    if (!Array.isArray(values)) return [];
+    return Array.from(new Set(values.map((value) => Number(value)).filter((value) => Number.isInteger(value) && value > 0)));
+  }
+
+  private normalizeTemplateRequiredFields(values: unknown): Array<{ field_definition_id: number; is_required: boolean }> {
+    if (!Array.isArray(values)) return [];
+    const seen = new Set<number>();
+    return values
+      .map((value: any) => ({
+        field_definition_id: Number(value?.field_definition_id ?? value?.id),
+        is_required: value?.is_required !== false,
+      }))
+      .filter((value) => {
+        if (!Number.isInteger(value.field_definition_id) || value.field_definition_id <= 0 || seen.has(value.field_definition_id)) {
+          return false;
+        }
+        seen.add(value.field_definition_id);
+        return true;
+      });
+  }
+
+  private async replaceTemplateCheckoutConfig(tx: EBookletDb, templateId: number, dto: any) {
+    if (Array.isArray(dto.payment_method_ids)) {
+      const paymentMethodIds = this.normalizeIds(dto.payment_method_ids);
+      if (paymentMethodIds.length > 0) {
+        const activeCount = await tx.payment_methods.count({
+          where: { id: { in: paymentMethodIds }, status: true, is_deleted: false },
+        });
+        if (activeCount !== paymentMethodIds.length) {
+          throw new BadRequestError("One or more selected payment methods are inactive or invalid.");
+        }
+      }
+      await tx.e_booklet_template_payment_methods.deleteMany({ where: { template_id: templateId } });
+      if (paymentMethodIds.length > 0) {
+        await tx.e_booklet_template_payment_methods.createMany({
+          data: paymentMethodIds.map((payment_method_id) => ({ template_id: templateId, payment_method_id })),
+          skipDuplicates: true,
+        });
+      }
+    }
+
+    if (Array.isArray(dto.required_fields)) {
+      const requiredFields = this.normalizeTemplateRequiredFields(dto.required_fields);
+      if (requiredFields.length > 0) {
+        const activeCount = await tx.required_field_definitions.count({
+          where: { id: { in: requiredFields.map((field) => field.field_definition_id) }, active: true, is_deleted: false },
+        });
+        if (activeCount !== requiredFields.length) {
+          throw new BadRequestError("One or more selected required fields are inactive or invalid.");
+        }
+      }
+      await tx.e_booklet_template_required_fields.deleteMany({ where: { template_id: templateId } });
+      if (requiredFields.length > 0) {
+        await tx.e_booklet_template_required_fields.createMany({
+          data: requiredFields.map((field) => ({
+            template_id: templateId,
+            field_definition_id: field.field_definition_id,
+            is_required: field.is_required,
+            active: true,
+          })),
+          skipDuplicates: true,
+        });
+      }
+    }
+  }
+
+  private async validateEBookletRequiredFields(template: any, submittedValues: unknown) {
+    const configuredFields = Array.isArray(template?.required_fields) ? template.required_fields : [];
+    const normalizedValues = Array.isArray(submittedValues) ? submittedValues : [];
+    const valuesByFieldId = new Map<number, string>();
+
+    for (const value of normalizedValues as any[]) {
+      const fieldId = Number(value?.field_definition_id ?? value?.id);
+      if (!Number.isInteger(fieldId) || fieldId <= 0) continue;
+      valuesByFieldId.set(fieldId, String(value?.value ?? "").trim());
+    }
+
+    const requiredMissing = configuredFields.find((field: any) => {
+      if (field?.is_required === false) return false;
+      const definition = field?.required_field_definitions;
+      if (definition && (definition.active === false || definition.is_deleted === true)) return false;
+      const fieldId = Number(field?.field_definition_id);
+      return !valuesByFieldId.get(fieldId);
+    });
+
+    if (requiredMissing) {
+      const label = requiredMissing?.required_field_definitions?.label || "Required field";
+      throw new BadRequestError(`${label} is required for this e-booklet purchase.`);
+    }
+
+    return configuredFields
+      .map((field: any) => {
+        const fieldId = Number(field.field_definition_id);
+        const value = valuesByFieldId.get(fieldId);
+        if (!value) return null;
+        return { field_definition_id: fieldId, value };
+      })
+      .filter(Boolean);
+  }
+
+  private async validateEBookletPaymentMethod(templatePurchases: any[], paymentMethodId: unknown) {
+    const id = Number(paymentMethodId);
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestError("Payment method is required for paid e-booklet checkout.");
+    }
+
+    const configuredIds = new Set<number>();
+    for (const item of templatePurchases) {
+      for (const relation of (item.template?.payment_methods || [])) {
+        configuredIds.add(Number(relation.payment_method_id));
+      }
+    }
+    if (configuredIds.size > 0 && !configuredIds.has(id)) {
+      throw new BadRequestError("Selected payment method is not available for this e-booklet.");
+    }
+
+    const paymentMethod = await this.db.payment_methods.findFirst({
+      where: { id, status: true, is_deleted: false },
+      select: { id: true, phone_number: true, name: true },
+    });
+    if (!paymentMethod) throw new BadRequestError("Selected payment method is inactive or invalid.");
+    return paymentMethod;
+  }
+
 
   async createFileAsset(
     file: Express.Multer.File | undefined,
@@ -476,6 +616,7 @@ export class EBookletService {
         include: {
           cover_file: true,
           category: { select: { id: true, title: true } },
+          ...this.templateCheckoutInclude(),
           versions: {
             where: { status: "active" },
             orderBy: { version_number: "desc" },
@@ -499,6 +640,7 @@ export class EBookletService {
       include: {
         cover_file: true,
         category: { select: { id: true, title: true } },
+        ...this.templateCheckoutInclude(),
         versions: {
           where: { status: "active" },
           orderBy: { version_number: "desc" },
@@ -517,6 +659,7 @@ export class EBookletService {
       include: {
         cover_file: true,
         category: { select: { id: true, title: true } },
+        ...this.templateCheckoutInclude(),
         versions: {
           where: { status: "active" },
           orderBy: { version_number: "desc" },
@@ -554,6 +697,7 @@ export class EBookletService {
         include: {
           cover_file: true,
           category: { select: { id: true, title: true } },
+          ...this.templateCheckoutInclude(),
           versions: { orderBy: { version_number: "desc" }, take: 1 },
           _count: { select: { purchases: true } },
         },
@@ -569,23 +713,30 @@ export class EBookletService {
 
   async createTemplate(dto: any, adminUserId: number): Promise<unknown> {
     const slug = dto.slug || this.buildSlug(dto.title);
-    return this.db.e_booklet_templates.create({
-      data: {
-        title: dto.title,
-        slug,
-        description: dto.description,
-        cover_file_id: dto.cover_file_id,
-        price: dto.price,
-        marketing_price: dto.marketing_price ?? 0,
-        currency: dto.currency || "EGP",
-        category_id: dto.category_id,
-        status: dto.status || "draft",
-        created_by: adminUserId,
-      },
-      include: {
-        cover_file: true,
-        category: { select: { id: true, title: true } },
-      },
+    return this.transaction(async (tx: EBookletDb) => {
+      const template = await tx.e_booklet_templates.create({
+        data: {
+          title: dto.title,
+          slug,
+          description: dto.description,
+          cover_file_id: dto.cover_file_id,
+          price: dto.price,
+          marketing_price: dto.marketing_price ?? 0,
+          currency: dto.currency || "EGP",
+          category_id: dto.category_id,
+          status: dto.status || "draft",
+          created_by: adminUserId,
+        },
+      });
+      await this.replaceTemplateCheckoutConfig(tx, template.id, dto);
+      return tx.e_booklet_templates.findUnique({
+        where: { id: template.id },
+        include: {
+          cover_file: true,
+          category: { select: { id: true, title: true } },
+          ...this.templateCheckoutInclude(),
+        },
+      });
     });
   }
 
@@ -594,6 +745,8 @@ export class EBookletService {
       where: { id },
       include: {
         cover_file: true,
+        category: { select: { id: true, title: true } },
+        ...this.templateCheckoutInclude(),
         versions: { orderBy: { version_number: "desc" } },
       },
     });
@@ -620,19 +773,31 @@ export class EBookletService {
   }
 
   async updateTemplate(id: number, dto: any): Promise<unknown> {
-    return this.db.e_booklet_templates.update({
-      where: { id },
-      data: {
-        title: dto.title,
-        description: dto.description,
-        cover_file_id: dto.cover_file_id,
-        price: dto.price,
-        marketing_price: dto.marketing_price,
-        currency: dto.currency,
-        category_id: dto.category_id,
-        status: dto.status,
-        updated_at: new Date(),
-      },
+    return this.transaction(async (tx: EBookletDb) => {
+      await tx.e_booklet_templates.update({
+        where: { id },
+        data: {
+          title: dto.title,
+          description: dto.description,
+          cover_file_id: dto.cover_file_id,
+          price: dto.price,
+          marketing_price: dto.marketing_price,
+          currency: dto.currency,
+          category_id: dto.category_id,
+          status: dto.status,
+          updated_at: new Date(),
+        },
+      });
+      await this.replaceTemplateCheckoutConfig(tx, id, dto);
+      return tx.e_booklet_templates.findUnique({
+        where: { id },
+        include: {
+          cover_file: true,
+          category: { select: { id: true, title: true } },
+          ...this.templateCheckoutInclude(),
+          versions: { orderBy: { version_number: "desc" } },
+        },
+      });
     });
   }
 
@@ -1163,6 +1328,7 @@ export class EBookletService {
         const template = await this.db.e_booklet_templates.findFirst({
           where: { id: templateId, status: "published" },
           include: {
+            ...this.templateCheckoutInclude(),
             versions: {
               where: { id: templateVersionId, status: "active" },
               take: 1,
@@ -1173,12 +1339,16 @@ export class EBookletService {
           throw new NotFoundError("E-booklet template version not found");
         }
         const price = Number((template as any).marketing_price ?? (template as any).price ?? 0);
-        templatePurchases.push({ template, templateId, templateVersionId, price });
+        const requiredFieldValues = await this.validateEBookletRequiredFields(
+          template,
+          item.required_field_values ?? dto.required_field_values,
+        );
+        templatePurchases.push({ template, templateId, templateVersionId, price, requiredFieldValues });
       }
 
       const total = templatePurchases.reduce((sum, item) => sum + item.price, 0);
       let paymentScreenshotId: number | null = null;
-      let paymentMethod: { phone_number: string | null } | null = null;
+      let paymentMethod: { id: number; phone_number: string | null; name?: string | null } | null = null;
 
       if (total > 0) {
         if (!paymentScreenshotFile) {
@@ -1191,11 +1361,12 @@ export class EBookletService {
           { compress: true, quality: 80 },
         );
         paymentScreenshotId = paymentScreenshot.id;
-        paymentMethod = await validatePaymentForCheckout(this.db, {
+        await validatePaymentForCheckout(this.db, {
           total,
           numberTransferredFrom: dto.numberTransferredFrom,
           payment_method_id: dto.payment_method_id,
         });
+        paymentMethod = await this.validateEBookletPaymentMethod(templatePurchases, dto.payment_method_id);
       }
 
       return this.serializableTransaction(async (tx: EBookletDb) => {
@@ -1212,11 +1383,23 @@ export class EBookletService {
               currency: (item.template as any).currency || "EGP",
               admin_notes: dto.notes,
               status: "pending",
-              payment_method: total > 0 ? String(dto.payment_method_id ?? "") : null,
+              payment_method: total > 0 ? (paymentMethod?.name || String(dto.payment_method_id ?? "")) : null,
+              payment_method_id: total > 0 ? paymentMethod?.id : null,
               payment_reference: total > 0 ? (dto.numberTransferredFrom || paymentMethod?.phone_number || null) : null,
               payment_screenshot_id: total > 0 ? paymentScreenshotId : null,
             },
           });
+
+          if (item.requiredFieldValues.length > 0) {
+            await tx.e_booklet_purchase_required_fields.createMany({
+              data: item.requiredFieldValues.map((field: any) => ({
+                purchase_id: purchase.id,
+                field_definition_id: field.field_definition_id,
+                value: field.value,
+              })),
+              skipDuplicates: true,
+            });
+          }
           createdPurchases.push(purchase);
         }
 
@@ -1306,6 +1489,7 @@ export class EBookletService {
             admin_notes: dto.notes,
             status: total > 0 ? "pending" : "ready",
             payment_method: total > 0 ? String(dto.payment_method_id ?? "") : null,
+            payment_method_id: total > 0 ? Number(dto.payment_method_id) : null,
             payment_reference: total > 0 ? (dto.numberTransferredFrom || paymentMethod?.phone_number || null) : null,
             payment_screenshot_id: total > 0 ? paymentScreenshotId : null,
           },
@@ -1637,8 +1821,12 @@ export class EBookletService {
   async deliverPurchase(purchaseId: number, dto: any, adminUserId: number) {
     const purchase = await this.db.e_booklet_purchases.findUnique({
       where: { id: purchaseId },
+      include: { instances: true },
     });
     if (!purchase) throw new NotFoundError("E-booklet purchase not found");
+    if (!["paid", "ready"].includes(String(purchase.status))) {
+      throw new BadRequestError("Payment must be approved before delivering the e-booklet.");
+    }
     if (!dto.access_expires_at) {
       throw new BadRequestError("Access expiry is required for delivered e-booklets.");
     }
@@ -1655,31 +1843,48 @@ export class EBookletService {
     });
 
     return this.transaction(async (tx: EBookletDb) => {
-      const instance = await tx.e_booklet_instances.create({
-        data: {
-          purchase_id: purchase.id,
-          teacher_id: purchase.teacher_id,
-          template_id: purchase.template_id,
-          template_version_id: purchase.template_version_id,
-          custom_document_file_id: dto.custom_document_file_id,
-          display_title: dto.display_title,
-          branding_json: purchase.branding_json,
-          invite_quota: dto.invite_quota,
-          access_expires_at: dto.access_expires_at ? new Date(dto.access_expires_at) : undefined,
-          student_marketing_price: marketingPrice,
-          internal_price: internalPrice,
-          status: "active",
-        },
-      });
+      const existingInstance = Array.isArray(purchase.instances) && purchase.instances.length > 0
+        ? purchase.instances[0]
+        : null;
+      const instanceData = {
+        purchase_id: purchase.id,
+        teacher_id: purchase.teacher_id,
+        template_id: purchase.template_id,
+        template_version_id: purchase.template_version_id,
+        custom_document_file_id: dto.custom_document_file_id,
+        display_title: dto.display_title,
+        branding_json: purchase.branding_json,
+        invite_quota: dto.invite_quota,
+        access_expires_at: dto.access_expires_at ? new Date(dto.access_expires_at) : undefined,
+        student_marketing_price: marketingPrice,
+        internal_price: internalPrice,
+        status: "active",
+      };
+      const instance = existingInstance
+        ? await tx.e_booklet_instances.update({
+            where: { id: existingInstance.id },
+            data: { ...instanceData, updated_at: new Date() },
+          })
+        : await tx.e_booklet_instances.create({ data: instanceData });
 
-      await tx.e_booklet_access.create({
-        data: {
+      const existingTeacherAccess = await tx.e_booklet_access.findFirst({
+        where: {
           booklet_instance_id: instance.id,
           user_id: purchase.teacher_id,
           role: "teacher",
           status: "active",
         },
       });
+      if (!existingTeacherAccess) {
+        await tx.e_booklet_access.create({
+          data: {
+            booklet_instance_id: instance.id,
+            user_id: purchase.teacher_id,
+            role: "teacher",
+            status: "active",
+          },
+        });
+      }
 
       await tx.e_booklet_purchases.update({
         where: { id: purchase.id },

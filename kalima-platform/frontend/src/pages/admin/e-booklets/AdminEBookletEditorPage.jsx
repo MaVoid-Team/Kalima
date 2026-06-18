@@ -36,7 +36,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useAdminEBookletEditor } from "@/hooks/admin/useAdminEBooklets";
+import { useAdminPaymentMethods } from "@/hooks/admin/useAdminPaymentMethods";
+import useAdminRequiredFields from "@/hooks/admin/useAdminRequiredFields";
 import { useTranslation } from "react-i18next";
 
 const steps = [
@@ -110,6 +113,8 @@ const defaultTemplateForm = {
   currency: "EGP",
   status: "draft",
   cover_file_id: "",
+  payment_method_ids: [],
+  required_fields: [],
 };
 
 const defaultVersionForm = {
@@ -264,6 +269,8 @@ export default function AdminEBookletEditorPage() {
   const audioChunksRef = useRef([]);
 
   const editor = useAdminEBookletEditor();
+  const paymentMethodsManager = useAdminPaymentMethods();
+  const requiredFieldsManager = useAdminRequiredFields();
   const [activeStep, setActiveStep] = useState(isTeacherTemplateMode ? "file" : "basic");
   const [templateId, setTemplateId] = useState(id ? Number(id) : null);
   const [templateForm, setTemplateForm] = useState(defaultTemplateForm);
@@ -306,6 +313,11 @@ export default function AdminEBookletEditorPage() {
   );
 
   const primaryBlock = getPrimaryBlock(hotspotForm);
+  const activePaymentMethods = useMemo(
+    () => (paymentMethodsManager.paymentMethods || []).filter((method) => method?.status !== false && method?.is_deleted !== true),
+    [paymentMethodsManager.paymentMethods],
+  );
+  const fieldDefinitions = requiredFieldsManager.state?.fields || [];
 
   const loadTemplate = useCallback(async () => {
     if (!id) return;
@@ -323,6 +335,15 @@ export default function AdminEBookletEditorPage() {
         currency: template.currency || "EGP",
         status: template.status || "draft",
         cover_file_id: template.cover_file_id ? String(template.cover_file_id) : "",
+        payment_method_ids: Array.isArray(template.payment_methods)
+          ? template.payment_methods.map((item) => Number(item.payment_method_id)).filter(Boolean)
+          : [],
+        required_fields: Array.isArray(template.required_fields)
+          ? template.required_fields.map((item) => ({
+              field_definition_id: Number(item.field_definition_id),
+              is_required: item.is_required !== false,
+            })).filter((item) => item.field_definition_id)
+          : [],
       });
     }
 
@@ -362,6 +383,12 @@ export default function AdminEBookletEditorPage() {
   }, [loadTemplate]);
 
   useEffect(() => {
+    if (isTeacherTemplateMode) return;
+    paymentMethodsManager.fetchPaymentMethods().catch(() => {});
+    requiredFieldsManager.fetchAllFields({ active: true }).catch(() => {});
+  }, [isTeacherTemplateMode]);
+
+  useEffect(() => {
     if (selectedVersion?.id) {
       loadHotspots(selectedVersion.id).catch(() => {});
     }
@@ -398,6 +425,43 @@ export default function AdminEBookletEditorPage() {
 
   const updateTemplateField = (field, value) => {
     setTemplateForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const toggleTemplatePaymentMethod = (methodId, checked) => {
+    const idNumber = Number(methodId);
+    setTemplateForm((current) => {
+      const ids = new Set(current.payment_method_ids || []);
+      if (checked) ids.add(idNumber);
+      else ids.delete(idNumber);
+      return { ...current, payment_method_ids: Array.from(ids) };
+    });
+  };
+
+  const toggleTemplateRequiredField = (fieldId, checked) => {
+    const idNumber = Number(fieldId);
+    setTemplateForm((current) => {
+      const fields = current.required_fields || [];
+      if (!checked) {
+        return { ...current, required_fields: fields.filter((field) => Number(field.field_definition_id) !== idNumber) };
+      }
+      if (fields.some((field) => Number(field.field_definition_id) === idNumber)) return current;
+      return {
+        ...current,
+        required_fields: [...fields, { field_definition_id: idNumber, is_required: true }],
+      };
+    });
+  };
+
+  const updateTemplateRequiredFieldFlag = (fieldId, checked) => {
+    const idNumber = Number(fieldId);
+    setTemplateForm((current) => ({
+      ...current,
+      required_fields: (current.required_fields || []).map((field) =>
+        Number(field.field_definition_id) === idNumber
+          ? { ...field, is_required: Boolean(checked) }
+          : field,
+      ),
+    }));
   };
 
   const updateHotspotField = (field, value) => {
@@ -538,6 +602,11 @@ export default function AdminEBookletEditorPage() {
       cover_file_id: templateForm.cover_file_id
         ? Number(templateForm.cover_file_id)
         : undefined,
+      payment_method_ids: templateForm.payment_method_ids.map(Number).filter(Boolean),
+      required_fields: templateForm.required_fields.map((field) => ({
+        field_definition_id: Number(field.field_definition_id),
+        is_required: field.is_required !== false,
+      })).filter((field) => field.field_definition_id),
     };
 
     const response = templateId
@@ -1278,6 +1347,67 @@ export default function AdminEBookletEditorPage() {
                     data-testid="ebooklet-cover-upload-input"
                   />
                 </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-3 rounded-lg border p-4">
+              <div>
+                <h3 className="font-semibold">Payment methods</h3>
+                <p className="text-sm text-muted-foreground">Select the payment methods available on e-booklet checkout.</p>
+              </div>
+              <div className="space-y-2">
+                {activePaymentMethods.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No active payment methods found.</p>
+                ) : activePaymentMethods.map((method) => {
+                  const checked = (templateForm.payment_method_ids || []).map(Number).includes(Number(method.id));
+                  return (
+                    <label key={method.id} className="flex items-center gap-3 rounded-md border p-3 text-sm">
+                      <Checkbox
+                        checked={checked}
+                        onCheckedChange={(value) => toggleTemplatePaymentMethod(method.id, value === true)}
+                      />
+                      <span className="font-medium">{method.name}</span>
+                      {method.phone_number && <span className="text-muted-foreground">{method.phone_number}</span>}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-3 rounded-lg border p-4">
+              <div>
+                <h3 className="font-semibold">Required checkout fields</h3>
+                <p className="text-sm text-muted-foreground">Attach global required fields to this e-booklet product.</p>
+              </div>
+              <div className="space-y-2">
+                {fieldDefinitions.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No active required fields found.</p>
+                ) : fieldDefinitions.map((field) => {
+                  const attached = (templateForm.required_fields || []).find((item) => Number(item.field_definition_id) === Number(field.id));
+                  return (
+                    <div key={field.id} className="rounded-md border p-3 text-sm">
+                      <label className="flex items-center gap-3">
+                        <Checkbox
+                          checked={Boolean(attached)}
+                          onCheckedChange={(value) => toggleTemplateRequiredField(field.id, value === true)}
+                        />
+                        <span className="font-medium">{field.label}</span>
+                        <span className="text-xs uppercase text-muted-foreground">{field.field_type}</span>
+                      </label>
+                      {attached && (
+                        <label className="mt-2 flex items-center gap-2 ps-7 text-xs text-muted-foreground">
+                          <Checkbox
+                            checked={attached.is_required !== false}
+                            onCheckedChange={(value) => updateTemplateRequiredFieldFlag(field.id, value === true)}
+                          />
+                          Require a value during checkout
+                        </label>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

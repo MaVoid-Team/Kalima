@@ -107,7 +107,7 @@ export default function AdminEBookletPurchaseDeliveryForm({
   };
 
   const handleDeliver = async () => {
-    if (!purchase) return;
+    if (!purchase || !canDeliver) return;
     if (deliveryForm.validation_message || !deliveryForm.custom_document_file_id || !deliveryForm.access_expires_at) return;
     await deliverPurchase(purchase.id, {
       custom_document_file_id: Number(deliveryForm.custom_document_file_id),
@@ -146,6 +146,9 @@ export default function AdminEBookletPurchaseDeliveryForm({
       </div>
     );
   }
+
+  const canDeliver = ["paid", "ready"].includes(String(purchase.status));
+  const deliverDisabled = loading || !canDeliver || Boolean(deliveryForm.validation_message) || !deliveryForm.custom_document_file_id || !deliveryForm.access_expires_at;
 
   return (
     <section className="space-y-4 rounded-lg border bg-background p-4" data-testid="admin-e-booklet-purchases-delivery-section">
@@ -257,9 +260,14 @@ export default function AdminEBookletPurchaseDeliveryForm({
         <Button variant="outline" onClick={() => handleStatus("customization_in_progress")} disabled={loading}>
           {t("common.inProgress")}
         </Button>
+        {!canDeliver && (
+          <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            {t("admin.purchases.approvePaymentBeforeDelivery", { defaultValue: "Approve the payment before delivering this e-booklet." })}
+          </div>
+        )}
         <Button
           onClick={handleDeliver}
-          disabled={loading || Boolean(deliveryForm.validation_message) || !deliveryForm.custom_document_file_id || !deliveryForm.access_expires_at}
+          disabled={deliverDisabled}
         >
           {t("admin.purchases.deliver")}
         </Button>
