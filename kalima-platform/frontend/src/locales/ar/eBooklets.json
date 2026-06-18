@@ -72,6 +72,7 @@
     "needs_branding_info": "يحتاج بيانات العلامة",
     "customization_in_progress": "التخصيص قيد التنفيذ",
     "ready": "جاهز",
+    "delivered": "تم التسليم",
     "cancelled": "ملغي",
     "rejected": "مرفوض",
     "active": "نشط",
@@ -113,7 +114,12 @@
     "termActivated": "تم تفعيل شروط البوكليت الإلكتروني",
     "milestoneSaved": "تم حفظ مرحلة البوكليت الإلكتروني",
     "milestonesReordered": "تم إعادة ترتيب المراحل",
-    "teacherTemplateReady": "قالب المعلم المخصص جاهز للتعديل."
+    "teacherTemplateReady": "قالب المعلم المخصص جاهز للتعديل.",
+    "hotspotConfigurationCopied": "تم نسخ إعدادات نقطة التفاعل",
+    "hotspotConfigurationApplied": "تم تطبيق إعدادات نقطة التفاعل",
+    "accessCodesGenerated": "تم إنشاء أكواد الوصول",
+    "studentPurchaseApproved": "تم اعتماد شراء الطالب",
+    "milestoneDeleted": "تم حذف مرحلة البوكليت الإلكتروني"
   },
   "admin": {
     "templates": {
@@ -195,13 +201,13 @@
         "referenceNumber": "المرجع: {{value}}",
         "referenceInput": "رقم المرجع",
         "referenceAuto": "تلقائي",
-        "draftPreview": "معاينة نقطة تفاعل غير محفوظة",
-        "draftPreviewShort": "جديد",
         "expandCanvas": "توسيع",
         "minimizeCanvas": "تصغير",
         "minimizeControls": "تصغير عناصر تحكم نقاط التفاعل",
         "restoreControls": "استعادة عناصر التحكم",
         "contentBlocks": "كتل المحتوى",
+        "copyConfiguration": "نسخ الإعدادات",
+        "applyConfiguration": "تطبيق الإعدادات",
         "addBlock": "إضافة كتلة",
         "blockNumber": "كتلة {{number}}",
         "removeBlock": "إزالة كتلة {{number}}",
@@ -242,6 +248,8 @@
         "recordingUnavailable": "تسجيل الصوت غير متاح في هذا المتصفح.",
         "hotspotFallback": "نقطة تفاعل {{type}}",
         "hotspotButton": "نقطة تفاعل {{reference}}: {{type}}",
+        "draftPreview": "معاينة نقطة تفاعل غير محفوظة",
+        "draftPreviewShort": "جديد",
         "emptyPage": "لا توجد نقاط تفاعل في هذه الصفحة."
       },
       "review": {
@@ -270,8 +278,6 @@
       "loading": "جاري تحميل مشتريات البوكليتات الإلكترونية...",
       "empty": "لا توجد مشتريات بوكليتات إلكترونية تطابق هذه الحالة.",
       "delivery": "التسليم",
-      "openDelivery": "فتح تفاصيل التسليم",
-      "approvePaymentBeforeDelivery": "اعتمد الدفع قبل تسليم هذا البوكليت الإلكتروني.",
       "teacherTitle": "عنوان خاص بالمعلم",
       "teacherPdf": "ملف PDF للمعلم",
       "teacherPdfUploaded": "تم رفع PDF المعلم (أصل #{{id}})",
