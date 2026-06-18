@@ -271,6 +271,7 @@
       "empty": "لا توجد مشتريات بوكليتات إلكترونية تطابق هذه الحالة.",
       "delivery": "التسليم",
       "openDelivery": "فتح تفاصيل التسليم",
+      "approvePaymentBeforeDelivery": "اعتمد الدفع قبل تسليم هذا البوكليت الإلكتروني.",
       "teacherTitle": "عنوان خاص بالمعلم",
       "teacherPdf": "ملف PDF للمعلم",
       "teacherPdfUploaded": "تم رفع PDF المعلم (أصل #{{id}})",
