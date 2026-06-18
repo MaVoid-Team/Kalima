@@ -98,6 +98,11 @@ const defaultInteractionJson = {
   image: { autoExpand: false, expandOnClick: true },
 };
 
+const defaultDisplayBehavior = { opens: "popover", opacity_percent: 100 };
+const resizeHandles = ["nw", "ne", "sw", "se"];
+const MIN_HOTSPOT_SIZE_PERCENT = 0.5;
+const MAX_HOTSPOT_SIZE_PERCENT = 100;
+
 const defaultTemplateForm = {
   title: "",
   description: "",
@@ -131,6 +136,7 @@ const defaultHotspotForm = {
   text_content: "",
   asset_file_id: "",
   trigger_type: "click",
+  display_behavior: defaultDisplayBehavior,
   content_json: { version: 2, blocks: [createDefaultBlock("text")] },
   interaction_json: defaultInteractionJson,
 };
@@ -181,6 +187,17 @@ const normalizeInteractionForForm = (hotspot) => ({
     expandOnClick: hotspot?.interaction_json?.image?.expandOnClick !== false,
   },
 });
+
+const normalizeDisplayBehaviorForForm = (hotspot) => ({
+  ...defaultDisplayBehavior,
+  ...(hotspot?.display_behavior || {}),
+  opacity_percent: Math.min(100, Math.max(0, parseNumber(hotspot?.display_behavior?.opacity_percent, 100))),
+});
+
+const clampHotspotSize = (value) => Math.min(
+  MAX_HOTSPOT_SIZE_PERCENT,
+  Math.max(MIN_HOTSPOT_SIZE_PERCENT, parseNumber(value, MIN_HOTSPOT_SIZE_PERCENT)),
+);
 
 const buildContentJsonPayload = (form) => ({
   version: 2,
@@ -385,6 +402,27 @@ export default function AdminEBookletEditorPage() {
 
   const updateHotspotField = (field, value) => {
     setHotspotForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const updateHotspotDisplayField = (field, value) => {
+    const nextDisplayBehavior = {
+      ...defaultDisplayBehavior,
+      ...(hotspotForm.display_behavior || {}),
+      [field]: value,
+    };
+    setHotspotForm((current) => ({
+      ...current,
+      display_behavior: nextDisplayBehavior,
+    }));
+    if (hotspotForm.id) {
+      setHotspots((hotspotItems) =>
+        hotspotItems.map((hotspot) =>
+          hotspot.id === hotspotForm.id
+            ? { ...hotspot, display_behavior: nextDisplayBehavior }
+            : hotspot,
+        ),
+      );
+    }
   };
 
   const updatePrimaryBlock = (field, value) => {
@@ -681,6 +719,7 @@ export default function AdminEBookletEditorPage() {
       text_content: hotspot.text_content || firstBlock.text_content || "",
       asset_file_id: hotspot.asset_file_id ? String(hotspot.asset_file_id) : firstBlock.asset_file_id || "",
       trigger_type: hotspot.trigger_type || "click",
+      display_behavior: normalizeDisplayBehaviorForForm(hotspot),
       content_json: contentJson,
       interaction_json: normalizeInteractionForForm(hotspot),
     });
@@ -708,7 +747,11 @@ export default function AdminEBookletEditorPage() {
       text_content: primaryPayloadBlock.text_content || undefined,
       asset_file_id: primaryPayloadBlock.asset_file_id || undefined,
       trigger_type: hotspotForm.trigger_type,
-      display_behavior: { opens: "popover" },
+      display_behavior: {
+        ...defaultDisplayBehavior,
+        ...(hotspotForm.display_behavior || {}),
+        opacity_percent: Math.min(100, Math.max(0, parseNumber(hotspotForm.display_behavior?.opacity_percent, 100))),
+      },
       content_json: contentJson,
       interaction_json: hotspotForm.interaction_json || defaultInteractionJson,
     };
@@ -774,7 +817,42 @@ export default function AdminEBookletEditorPage() {
     event.preventDefault();
     event.currentTarget.setPointerCapture?.(event.pointerId);
     selectHotspot(hotspot);
-    dragRef.current = { hotspotId: hotspot.id, x_percent: hotspot.x_percent, y_percent: hotspot.y_percent };
+    dragRef.current = {
+      mode: "move",
+      hotspotId: hotspot.id,
+      x_percent: hotspot.x_percent,
+      y_percent: hotspot.y_percent,
+    };
+  };
+
+  const startHotspotResize = (event, hotspot, handle) => {
+    if (!pageRef.current || !activeVersionId) return;
+    event.stopPropagation();
+    event.preventDefault();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    selectHotspot(hotspot);
+
+    const centerX = parseNumber(hotspot.x_percent, 50);
+    const centerY = parseNumber(hotspot.y_percent, 50);
+    const width = clampHotspotSize(hotspot.width_percent || hotspot.radius_percent || 5);
+    const height = clampHotspotSize(hotspot.height_percent || hotspot.radius_percent || 5);
+    const isLeft = handle.includes("w");
+    const isTop = handle.includes("n");
+    const fixedX = centerX + (isLeft ? width / 2 : -width / 2);
+    const fixedY = centerY + (isTop ? height / 2 : -height / 2);
+
+    dragRef.current = {
+      mode: "resize",
+      hotspotId: hotspot.id,
+      handle,
+      shape: hotspot.shape || "circle",
+      fixedX,
+      fixedY,
+      width_percent: width,
+      height_percent: height,
+      x_percent: centerX,
+      y_percent: centerY,
+    };
   };
 
   const handleHotspotDragMove = (event) => {
@@ -782,6 +860,56 @@ export default function AdminEBookletEditorPage() {
     const rect = pageRef.current.getBoundingClientRect();
     const x = Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100));
     const y = Math.min(100, Math.max(0, ((event.clientY - rect.top) / rect.height) * 100));
+
+    if (dragRef.current.mode === "resize") {
+      const isFixedLeft = dragRef.current.handle.includes("e");
+      const isFixedTop = dragRef.current.handle.includes("s");
+      let width = clampHotspotSize(Math.abs(x - dragRef.current.fixedX));
+      let height = clampHotspotSize(Math.abs(y - dragRef.current.fixedY));
+
+      if (!["rectangle", "oval"].includes(dragRef.current.shape)) {
+        const size = Math.max(width, height);
+        width = size;
+        height = size;
+      }
+
+      const nextX = Math.min(100, Math.max(0, dragRef.current.fixedX + (isFixedLeft ? width / 2 : -width / 2)));
+      const nextY = Math.min(100, Math.max(0, dragRef.current.fixedY + (isFixedTop ? height / 2 : -height / 2)));
+      const nextState = {
+        ...dragRef.current,
+        x_percent: Number(nextX.toFixed(2)),
+        y_percent: Number(nextY.toFixed(2)),
+        width_percent: Number(width.toFixed(2)),
+        height_percent: Number(height.toFixed(2)),
+      };
+      dragRef.current = nextState;
+      setHotspots((current) =>
+        current.map((hotspot) =>
+          hotspot.id === nextState.hotspotId
+            ? {
+                ...hotspot,
+                x_percent: nextState.x_percent,
+                y_percent: nextState.y_percent,
+                width_percent: nextState.width_percent,
+                height_percent: nextState.height_percent,
+              }
+            : hotspot,
+        ),
+      );
+      setHotspotForm((current) =>
+        current.id === nextState.hotspotId
+          ? {
+              ...current,
+              x_percent: nextState.x_percent,
+              y_percent: nextState.y_percent,
+              width_percent: nextState.width_percent,
+              height_percent: nextState.height_percent,
+            }
+          : current,
+      );
+      return;
+    }
+
     const nextX = Number(x.toFixed(2));
     const nextY = Number(y.toFixed(2));
     dragRef.current = { ...dragRef.current, x_percent: nextX, y_percent: nextY };
@@ -804,10 +932,15 @@ export default function AdminEBookletEditorPage() {
     if (!dragState) return;
     dragRef.current = null;
     if (dragState.hotspotId) {
-      await editor.updateHotspot(dragState.hotspotId, {
+      const payload = {
         x_percent: parseNumber(dragState.x_percent, 50),
         y_percent: parseNumber(dragState.y_percent, 50),
-      });
+      };
+      if (dragState.mode === "resize") {
+        payload.width_percent = parseNumber(dragState.width_percent, 5);
+        payload.height_percent = parseNumber(dragState.height_percent, 5);
+      }
+      await editor.updateHotspot(dragState.hotspotId, payload);
     }
   };
 
@@ -1323,8 +1456,13 @@ export default function AdminEBookletEditorPage() {
                 <div className="absolute inset-0 bg-transparent" />
                 {pageHotspots.map((hotspot) => {
                   const Icon = hotspotIcons[hotspot.type] || CircleDot;
-                  const width = Math.max(16, Number(hotspot.width_percent || hotspot.radius_percent || 5) * 8);
-                  const height = Math.max(16, Number(hotspot.height_percent || hotspot.radius_percent || 5) * 8);
+                  const shape = hotspot.shape || "circle";
+                  const width = clampHotspotSize(hotspot.width_percent || hotspot.radius_percent || 5);
+                  const height = clampHotspotSize(hotspot.height_percent || hotspot.radius_percent || 5);
+                  const renderedWidth = shape === "circle" || shape === "square" ? Math.max(width, height) : width;
+                  const renderedHeight = shape === "circle" || shape === "square" ? Math.max(width, height) : height;
+                  const opacity = Math.min(1, Math.max(0, parseNumber(hotspot.display_behavior?.opacity_percent, 100) / 100));
+                  const isSelected = hotspotForm.id === hotspot.id;
                   return (
                     <button
                       type="button"
@@ -1338,10 +1476,13 @@ export default function AdminEBookletEditorPage() {
                       style={{
                         left: `${hotspot.x_percent}%`,
                         top: `${hotspot.y_percent}%`,
-                        width: hotspot.shape === "circle" ? Math.max(width, height) : width,
-                        height: hotspot.shape === "circle" ? Math.max(width, height) : height,
+                        width: `${renderedWidth}%`,
+                        height: `${renderedHeight}%`,
+                        minWidth: 16,
+                        minHeight: 16,
+                        opacity,
                         transform: "translate(-50%, -50%)",
-                        ...getHotspotShapeStyle(hotspot.shape || "circle"),
+                        ...getHotspotShapeStyle(shape),
                       }}
                       title={
                         hotspot.title ||
@@ -1358,6 +1499,22 @@ export default function AdminEBookletEditorPage() {
                         {hotspot.reference_number || hotspot.id}
                       </span>
                       <Icon className="h-3.5 w-3.5" />
+                      {isSelected && resizeHandles.map((handle) => {
+                        const positionClass = {
+                          nw: "-left-1.5 -top-1.5 cursor-nwse-resize",
+                          ne: "-right-1.5 -top-1.5 cursor-nesw-resize",
+                          sw: "-bottom-1.5 -left-1.5 cursor-nesw-resize",
+                          se: "-bottom-1.5 -right-1.5 cursor-nwse-resize",
+                        }[handle];
+                        return (
+                          <span
+                            key={handle}
+                            role="presentation"
+                            className={`absolute h-3 w-3 rounded-sm border border-primary bg-background shadow ${positionClass}`}
+                            onPointerDown={(event) => startHotspotResize(event, hotspot, handle)}
+                          />
+                        );
+                      })}
                     </button>
                   );
                 })}
@@ -1423,6 +1580,20 @@ export default function AdminEBookletEditorPage() {
                   <div className="space-y-2">
                     <Label>{t("admin.editor.hotspots.referenceInput")}</Label>
                     <Input type="number" min="1" value={hotspotForm.reference_number} onChange={(event) => updateHotspotField("reference_number", event.target.value)} placeholder={t("admin.editor.hotspots.referenceAuto")} />
+                  </div>
+                  <div className="col-span-2 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <Label>{t("admin.editor.hotspots.opacityPercent")}</Label>
+                      <span className="text-xs text-muted-foreground">{parseNumber(hotspotForm.display_behavior?.opacity_percent, 100)}%</span>
+                    </div>
+                    <Input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={hotspotForm.display_behavior?.opacity_percent ?? 100}
+                      onChange={(event) => updateHotspotDisplayField("opacity_percent", Number(event.target.value))}
+                    />
                   </div>
                 </div>
 
