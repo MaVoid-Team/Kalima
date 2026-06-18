@@ -186,7 +186,7 @@ export default function AdminEBookletPurchasesPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => navigate(`/admin/e-booklet-purchases/${purchase.id}/delivery`)}
-                          aria-label={t("admin.purchases.openDelivery", { defaultValue: "Open delivery details" })}
+                          aria-label={t("admin.purchases.openDelivery")}
                         >
                           <BookOpenCheck className="h-4 w-4" />
                         </Button>
