@@ -61,7 +61,8 @@
     "legal": "قانوني",
     "privacyPolicy": "سياسة الخصوصية",
     "termsOfService": "شروط الاستخدام",
-    "rights": "جميع الحقوق محفوظة"
+    "rights": "جميع الحقوق محفوظة",
+    "deleteMyData": "حذف بياناتي"
   },
   "welcome": {
     "badge": "تحلق في سماء الإبداع",
