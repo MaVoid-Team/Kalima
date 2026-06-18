@@ -137,7 +137,7 @@ export default function EBookletOrdersPage() {
                             {t("orders.itemStatus")}: {t(`orders.statuses.${linkStatus}`)}
                           </p>
                         </div>
-                        {(["approved", "ready", "confirmed"].includes(linkStatus) || ["ready", "confirmed"].includes(orderStatus)) && (
+                        {(linkStatus === "ready" || orderStatus === "ready") && (
                           <Button asChild size="sm">
                             <Link to={getManagementPath(link)}>{t("orders.manageAccess")}</Link>
                           </Button>

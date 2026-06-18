@@ -3,7 +3,7 @@ import { useState, useEffect, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { Toaster } from 'sonner';
-import { E_BOOKLET_ORDERS_ALLOWED_ROLES } from "./pages/e-booklets/eBookletOrdersContract.mjs";
+import { E_BOOKLET_ORDERS_ALLOWED_ROLES, E_BOOKLET_ORDERS_ROUTE } from "./pages/e-booklets/eBookletOrdersContract.mjs";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -82,6 +82,7 @@ const EmployeePerformancePage = lazy(() => import("./pages/admin/employee-perfor
 const AdminEBookletTemplatesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTemplatesPage"));
 const AdminEBookletEditorPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletEditorPage"));
 const AdminEBookletPurchasesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchasesPage"));
+const AdminEBookletPurchaseDeliveryPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchaseDeliveryPage"));
 const AdminEBookletInstancesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstancesPage"));
 const AdminEBookletDevicesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletDevicesPage"));
 const AdminEBookletInstanceStudentsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstanceStudentsPage"));
@@ -172,7 +173,7 @@ const router = createBrowserRouter(
           <Route element={<RoleRoute requiredRole={E_BOOKLET_ORDERS_ALLOWED_ROLES} />}>
             <Route path="/e-booklet-cart" element={<EBookletCartPage />} />
             <Route path="/e-booklet-checkout" element={<EBookletCheckoutPage />} />
-            <Route path="/e-booklet-orders" element={<EBookletOrdersPage />} />
+            <Route path={E_BOOKLET_ORDERS_ROUTE} element={<EBookletOrdersPage />} />
           </Route>
         </Route>
 
@@ -214,6 +215,7 @@ const router = createBrowserRouter(
           <Route path="/admin/e-booklets/create" element={<AdminEBookletEditorPage />} />
           <Route path="/admin/e-booklets/:id/edit" element={<AdminEBookletEditorPage />} />
           <Route path="/admin/e-booklet-purchases" element={<AdminEBookletPurchasesPage />} />
+          <Route path="/admin/e-booklet-purchases/:purchaseId/delivery" element={<AdminEBookletPurchaseDeliveryPage />} />
           <Route path="/admin/e-booklet-instances" element={<AdminEBookletInstancesPage />} />
           <Route path="/admin/e-booklet-instances/:instanceId/view" element={<EBookletViewerPage />} />
           <Route path="/admin/e-booklet-analytics" element={<AdminEBookletAnalyticsPage />} />

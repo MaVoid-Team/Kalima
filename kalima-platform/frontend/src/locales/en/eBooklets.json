@@ -57,7 +57,9 @@
     "noDownload": "No download",
     "searchResultsFor": "Search results for",
     "notEditedYet": "Not edited yet",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "done": "Done",
+    "edit": "Edit"
   },
   "statuses": {
     "all": "All statuses",
@@ -110,7 +112,8 @@
     "termSaved": "E-booklet term saved",
     "termActivated": "E-booklet term activated",
     "milestoneSaved": "E-booklet milestone saved",
-    "milestonesReordered": "E-booklet milestones reordered"
+    "milestonesReordered": "E-booklet milestones reordered",
+    "teacherTemplateReady": "Teacher-specific eBooklet template is ready to edit."
   },
   "admin": {
     "templates": {
@@ -252,7 +255,8 @@
       },
       "validation": {
         "titleRequired": "Template title is required."
-      }
+      },
+      "teacherTemplateNotice": "Teacher-specific editing mode: changes apply only to this purchase"
     },
     "purchases": {
       "title": "E-Booklet Purchases",
@@ -280,7 +284,14 @@
         "detectRequired": "Upload a PDF so the page count and page size can be detected.",
         "pageCountMismatch": "Page count mismatch. Template requires {{expected}} pages, but the uploaded PDF has {{actual}}.",
         "pageSizeMismatch": "Page size mismatch. The uploaded PDF pages must match the template width and height so hotspots align."
-      }
+      },
+      "approveUnlock": "Approve and unlock teacher management",
+      "approveUnlockShort": "Approve / unlock",
+      "managePurchase": "Manage eBooklet purchase",
+      "accessExpiresAt": "Student access expires",
+      "studentMarketingPrice": "Student store price",
+      "internalPrice": "Internal teacher cost",
+      "editTeacherTemplate": "Edit this teacher"
     },
     "instances": {
       "title": "Teacher E-Booklet Access",
@@ -314,7 +325,15 @@
       "analyticsPages": "Pages {{count}}",
       "manageDevicesInline": "Manage devices",
       "hideDevicesInline": "Hide devices",
-      "openFullDevicesPage": "Open full devices page"
+      "openFullDevicesPage": "Open full devices page",
+      "studentSeatQuota": "Student seat quota",
+      "usedStudentSeats": "Used student seats",
+      "unavailable": "Unavailable",
+      "nestedStudents": "Students with access",
+      "noStudents": "No students have active access yet.",
+      "viewerOpens": "Viewer opens",
+      "source": "Source",
+      "adminView": "Admin View"
     },
     "students": {
       "title": "E-Booklet Students",
@@ -342,7 +361,15 @@
       "lastSeen": "Last seen: {{value}}",
       "bound": "Bound: {{value}}",
       "inlineTitle": "Devices for {{name}}",
-      "emptyInline": "No active devices for this student yet."
+      "emptyInline": "No active devices for this student yet.",
+      "selectInstance": "Select an instance",
+      "student": "Student",
+      "selectStudent": "Select a student",
+      "manualUserId": "Manual student ID fallback",
+      "selectedStudent": "Selected student access is loaded from this e-booklet instance.",
+      "studentSelectorHint": "Choose an instance to load students with access, then select a student before resetting or allowing devices.",
+      "inlineHint": "Manage device allowance and resets without exposing raw device metadata.",
+      "reasonRequired": "A reason is required before allowance or reset actions."
     },
     "analytics": {
       "title": "E-Booklet Analytics",
@@ -425,7 +452,8 @@
     "cardDescription": "Interactive PDF booklet delivered by admin with teacher branding and controlled student access.",
     "accessExpires": "Expires {{value}}",
     "noExpiry": "No expiry",
-    "add": "Add"
+    "add": "Add",
+    "seatsRemaining": "{{count}} seats"
   },
   "details": {
     "coverLabel": "Kalima E-Booklet",
@@ -468,7 +496,8 @@
     "summary": "Request summary",
     "adminNotice": "Admin will confirm payment, upload the teacher-specific PDF, assign invite quota, then deliver the booklet.",
     "checkout": "Continue to checkout",
-    "keepBrowsing": "Keep browsing"
+    "keepBrowsing": "Keep browsing",
+    "clear": "Clear cart"
   },
   "checkout": {
     "emptyTitle": "Choose an e-booklet before checkout",
@@ -530,7 +559,10 @@
       "template": "Template",
       "accessValue": "Invite quota set by admin",
       "deliveryValue": "Manual admin customization"
-    }
+    },
+    "templateMissing": "Selected e-booklet template is missing.",
+    "termsRequired": "Accept the terms before continuing.",
+    "paymentRequired": "Choose a payment method, enter the number you paid from, and upload payment proof."
   },
   "viewer": {
     "titleFallback": "E-Booklet",
@@ -592,7 +624,14 @@
       "paidSuccess": "Paid code accepted. Opening your e-booklet...",
       "freeAccessNoPaidProgressSuccess": "Free shared code accepted and booklet access opened. This entry does not count toward paid seats or milestone rewards.",
       "error": "This e-booklet code cannot be redeemed."
-    }
+    },
+    "paymentRequired": "Choose a payment method, enter the number you paid from, and upload the payment proof.",
+    "paymentMethod": "Payment method",
+    "selectPaymentMethod": "Select payment method",
+    "numberTransferredFrom": "Number transferred from",
+    "numberTransferredFromPlaceholder": "Your wallet/mobile number",
+    "paymentScreenshot": "Payment proof screenshot",
+    "notesPlaceholder": "Optional notes for the admin"
   },
   "teacher": {
     "title": "My E-Booklets",
@@ -673,7 +712,11 @@
         "title": "Accept code-generation terms",
         "description": "Accept the active e-booklet terms before generating or copying a code.",
         "accept": "Accept and generate"
-      }
+      },
+      "bulkCount": "Bulk code count",
+      "generateBulkPaidCodes": "Bulk generate",
+      "codeStatusTitle": "Code status",
+      "emptyCodeStatuses": "No generated code statuses yet."
     },
     "expiry": "Expiry",
     "expiredBlocked": "Access expired. Ask admin to renew access.",

@@ -540,7 +540,7 @@ export default function EBookletViewerPage() {
               {adminMode && (
                 <Badge variant="secondary" className="gap-1">
                   <Eye className="h-3 w-3" />
-                  Admin View Mode
+                  {t("admin.instances.adminView")}
                 </Badge>
               )}
               <Badge variant="outline" className="gap-1">
@@ -639,7 +639,11 @@ export default function EBookletViewerPage() {
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="font-medium">#{getReference(hotspot)} {getHotspotLabel(hotspot, t)}</div>
-                  <Badge variant="outline">{hotspot.shape || "circle"}</Badge>
+                  <Badge variant="outline">
+                    {t(`admin.editor.hotspots.shapes.${hotspot.shape || "circle"}`, {
+                      defaultValue: hotspot.shape || t("admin.editor.hotspots.shapes.circle"),
+                    })}
+                  </Badge>
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {t(`admin.editor.hotspots.types.${hotspot.type}`, { defaultValue: hotspot.type })}
