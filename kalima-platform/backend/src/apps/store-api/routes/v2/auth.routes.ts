@@ -106,6 +106,9 @@ const adminModeratorAuth = [
   requireRole([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator]),
 ];
 
+router.post("/admin/impersonation/start", adminSubAdminAuth, authController.startImpersonation);
+router.post("/admin/impersonation/stop", authenticateToken, authController.stopImpersonation);
+
 router.post("/admin/create-admin", adminAuth, authController.createAdmin);
 router.post("/admin/create-subadmin", adminAuth, authController.createSubAdmin);
 router.post(

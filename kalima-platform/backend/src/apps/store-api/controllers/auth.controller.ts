@@ -24,6 +24,7 @@ import {
   ResendVerificationEmailDto,
   LinkFirebaseAccountDto,
   UnlinkProviderDto,
+  StartImpersonationDto,
 } from "../dtos/auth.dto";
 import {
   CreateAdminDto,
@@ -486,6 +487,50 @@ export const authController = {
       }
 
       const result = await authService.deleteAccount(userId);
+      res.status(200).json({ success: true, ...result });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // ============================================
+  // IMPERSONATION
+  // ============================================
+
+  async startImpersonation(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const creator = (req as any).user as CreatorContext;
+      if (!creator) {
+        throw new UnauthorizedError();
+      }
+
+      const dto = await validateDto(StartImpersonationDto, req.body);
+      const result = await authService.startImpersonation(
+        creator,
+        dto.targetUserId,
+      );
+      res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async stopImpersonation(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const creator = (req as any).user as CreatorContext;
+      if (!creator) {
+        throw new UnauthorizedError();
+      }
+
+      const result = await authService.stopImpersonation(creator);
       res.status(200).json({ success: true, ...result });
     } catch (error) {
       next(error);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput, BarChart3, Activity, Bell, BookOpenCheck, PackageCheck, HardDrive, CalendarRange } from 'lucide-react';
+import { ShoppingCart, Users, UserCog, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput, BarChart3, Activity, Bell, BookOpenCheck, PackageCheck, HardDrive, CalendarRange } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 import { useRole } from '@/hooks/useRole';
 
@@ -56,6 +56,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
     { name: t('nav.requiredFields'), href: '/admin/required-fields', icon: FormInput, id: 'required-fields' },
     { name: t('nav.paymentMethods', 'Payment Methods'), href: '/admin/payment-methods', icon: CreditCard, id: 'payment-methods' },
     { name: t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users, id: 'users' },
+    { name: t('nav.impersonation', 'Impersonation'), href: '/admin/impersonation', icon: UserCog, id: 'impersonation' },
     { name: t('nav.notifications', 'Notifications'), href: '/admin/notifications', icon: Bell, id: 'notifications' },
     { name: t('nav.settings'), href: '/admin/settings', icon: Settings, id: 'settings' },
 ];
