@@ -391,6 +391,7 @@ export default function AdminEBookletEditorPage() {
 
   useEffect(() => {
     if (selectedVersion?.id) {
+      setHasDraftHotspotPreview(false);
       loadHotspots(selectedVersion.id).catch(() => {});
     }
   }, [loadHotspots, selectedVersion?.id]);
@@ -761,6 +762,7 @@ export default function AdminEBookletEditorPage() {
     const rect = pageRef.current.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
+    setHasDraftHotspotPreview(true);
     setHotspotForm({
       ...defaultHotspotForm,
       page_number: selectedPage,
@@ -772,6 +774,7 @@ export default function AdminEBookletEditorPage() {
   };
 
   const selectHotspot = (hotspot) => {
+    setHasDraftHotspotPreview(false);
     const contentJson = normalizeContentForForm(hotspot);
     const firstBlock = contentJson.blocks[0] || createDefaultBlock(hotspot.type || "text");
     setHotspotForm({
@@ -832,6 +835,7 @@ export default function AdminEBookletEditorPage() {
       await editor.createHotspot(version.id, payload);
     }
     await loadHotspots(version.id);
+    setHasDraftHotspotPreview(false);
     setHotspotForm({
       ...defaultHotspotForm,
       page_number: selectedPage,
@@ -844,6 +848,7 @@ export default function AdminEBookletEditorPage() {
     if (!hotspotForm.id || !activeVersionId) return;
     await editor.deleteHotspot(hotspotForm.id);
     await loadHotspots(activeVersionId);
+    setHasDraftHotspotPreview(false);
     setHotspotForm({
       ...defaultHotspotForm,
       page_number: selectedPage,
@@ -1649,6 +1654,39 @@ export default function AdminEBookletEditorPage() {
                     </button>
                   );
                 })}
+                {hasDraftHotspotPreview && !hotspotForm.id && Number(hotspotForm.page_number) === Number(selectedPage) && (() => {
+                  const DraftIcon = hotspotIcons[hotspotForm.type] || CircleDot;
+                  const shape = hotspotForm.shape || "circle";
+                  const width = clampHotspotSize(hotspotForm.width_percent || hotspotForm.radius_percent || 5);
+                  const height = clampHotspotSize(hotspotForm.height_percent || hotspotForm.radius_percent || 5);
+                  const renderedWidth = shape === "circle" || shape === "square" ? Math.max(width, height) : width;
+                  const renderedHeight = shape === "circle" || shape === "square" ? Math.max(width, height) : height;
+                  const opacity = Math.min(1, Math.max(0, parseNumber(hotspotForm.display_behavior?.opacity_percent, 100) / 100));
+                  return (
+                    <div
+                      className="pointer-events-none absolute flex animate-pulse items-center justify-center border-2 border-dashed border-primary bg-primary/35 text-primary-foreground shadow-lg ring-4 ring-primary/20"
+                      data-testid="admin-e-booklet-draft-hotspot-preview"
+                      style={{
+                        left: `${hotspotForm.x_percent}%`,
+                        top: `${hotspotForm.y_percent}%`,
+                        width: `${renderedWidth}%`,
+                        height: `${renderedHeight}%`,
+                        minWidth: 16,
+                        minHeight: 16,
+                        opacity,
+                        transform: "translate(-50%, -50%)",
+                        ...getHotspotShapeStyle(shape),
+                      }}
+                      title={t("admin.editor.hotspots.draftPreview")}
+                      aria-label={t("admin.editor.hotspots.draftPreview")}
+                    >
+                      <span className="absolute -right-2 -top-2 rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground shadow">
+                        {t("admin.editor.hotspots.draftPreviewShort")}
+                      </span>
+                      <DraftIcon className="h-3.5 w-3.5" />
+                    </div>
+                  );
+                })()}
                 {!activeVersionId && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/85 text-center text-sm text-muted-foreground">
                     {t("admin.editor.hotspots.saveBeforePlacing")}
