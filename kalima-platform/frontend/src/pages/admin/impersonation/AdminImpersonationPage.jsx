@@ -6,11 +6,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
 import useAuth from '@/hooks/auth/useAuth';
 import { startImpersonation } from '@/services/impersonationService';
+
+const ROLE_OPTIONS = ['Admin', 'SubAdmin', 'Teacher', 'Student', 'Parent', 'Lecturer', 'Moderator', 'Assistant'];
+const PORTAL_OPTIONS = ['store', 'academy'];
 
 function getUserRoles(user) {
     const roles = user?.roles || user?.user_roles || [];
@@ -25,6 +29,9 @@ export default function AdminImpersonationPage() {
     const { user: currentUser } = useAuth();
     const { users, loading, pagination, fetchUsers } = useAdminUsers();
     const [search, setSearch] = useState('');
+    const [roleFilter, setRoleFilter] = useState('all');
+    const [portalFilter, setPortalFilter] = useState('all');
+    const [statusFilter, setStatusFilter] = useState('all');
     const [startingUserId, setStartingUserId] = useState(null);
 
     useEffect(() => {
@@ -33,13 +40,30 @@ export default function AdminImpersonationPage() {
 
     const filteredUsers = useMemo(() => users, [users]);
 
+    const buildUserFilters = (page = 1, limit = pagination.limit || 50) => ({
+        page,
+        limit,
+        search: search.trim() || undefined,
+        role: roleFilter === 'all' ? undefined : roleFilter,
+        portal: portalFilter === 'all' ? undefined : portalFilter,
+        confirmed: statusFilter === 'all' ? undefined : statusFilter === 'active',
+    });
+
     const handleSearch = (event) => {
         event.preventDefault();
-        fetchUsers({ page: 1, limit: 50, search: search.trim() || undefined });
+        fetchUsers(buildUserFilters(1, pagination.limit || 50));
+    };
+
+    const handleClearFilters = () => {
+        setSearch('');
+        setRoleFilter('all');
+        setPortalFilter('all');
+        setStatusFilter('all');
+        fetchUsers({ page: 1, limit: pagination.limit || 50 });
     };
 
     const handlePageChange = (page) => {
-        fetchUsers({ page, limit: pagination.limit || 50, search: search.trim() || undefined });
+        fetchUsers(buildUserFilters(page, pagination.limit || 50));
     };
 
     const handleStart = async (targetUserId) => {
@@ -70,8 +94,8 @@ export default function AdminImpersonationPage() {
                     <CardDescription>Search all users. The backend blocks nested and self impersonation.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <form onSubmit={handleSearch} className="flex flex-col gap-2 sm:flex-row">
-                        <div className="relative flex-1">
+                    <form onSubmit={handleSearch} className="grid gap-2 md:grid-cols-[minmax(220px,1fr)_repeat(3,minmax(150px,180px))_auto_auto]">
+                        <div className="relative">
                             <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Input
                                 value={search}
@@ -81,8 +105,39 @@ export default function AdminImpersonationPage() {
                                 data-testid="impersonation-search-input"
                             />
                         </div>
+                        <Select value={roleFilter} onValueChange={setRoleFilter}>
+                            <SelectTrigger className="w-full" data-testid="impersonation-role-filter">
+                                <SelectValue placeholder="All roles" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All roles</SelectItem>
+                                {ROLE_OPTIONS.map((role) => <SelectItem key={role} value={role}>{role}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                        <Select value={portalFilter} onValueChange={setPortalFilter}>
+                            <SelectTrigger className="w-full" data-testid="impersonation-portal-filter">
+                                <SelectValue placeholder="All portals" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All portals</SelectItem>
+                                {PORTAL_OPTIONS.map((portal) => <SelectItem key={portal} value={portal}>{portal}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <SelectTrigger className="w-full" data-testid="impersonation-status-filter">
+                                <SelectValue placeholder="All statuses" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All statuses</SelectItem>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="unconfirmed">Unconfirmed</SelectItem>
+                            </SelectContent>
+                        </Select>
                         <Button type="submit" disabled={loading} data-testid="impersonation-search-button">
-                            Search
+                            Apply
+                        </Button>
+                        <Button type="button" variant="outline" disabled={loading} onClick={handleClearFilters} data-testid="impersonation-clear-filters-button">
+                            Clear
                         </Button>
                     </form>
 

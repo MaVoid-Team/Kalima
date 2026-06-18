@@ -1079,6 +1079,7 @@ class UserManagementService {
       search?: string;
       role?: role_enum;
       portal?: portal_enum;
+      confirmed?: boolean;
       isDeleted?: boolean;
       includeFlag?: boolean;
     } = {},
@@ -1091,6 +1092,10 @@ class UserManagementService {
 
     if (options.isDeleted !== undefined) {
       where.is_deleted = options.isDeleted;
+    }
+
+    if (options.confirmed !== undefined) {
+      where.confirmed = options.confirmed;
     }
 
     // Text search on name, email, phone
