@@ -180,6 +180,7 @@
         "radiusPercent": "نصف القطر %",
         "widthPercent": "العرض %",
         "heightPercent": "الارتفاع %",
+        "opacityPercent": "الظهور %",
         "shape": "الشكل",
         "shapes": {
           "circle": "دائرة",
