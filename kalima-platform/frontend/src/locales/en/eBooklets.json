@@ -180,6 +180,7 @@
         "radiusPercent": "Radius %",
         "widthPercent": "Width %",
         "heightPercent": "Height %",
+        "opacityPercent": "Visibility %",
         "shape": "Shape",
         "shapes": {
           "circle": "Circle",
