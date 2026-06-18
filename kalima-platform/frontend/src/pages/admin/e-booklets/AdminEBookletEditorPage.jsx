@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   BookOpenCheck,
   CircleDot,
+  Copy,
   FileAudio,
   FileImage,
   FileText,
@@ -233,6 +234,32 @@ const buildContentJsonPayload = (form) => ({
 
 const getPrimaryBlock = (form) => form.content_json?.blocks?.[0] || createDefaultBlock(form.type);
 
+const cloneContentJsonForForm = (contentJson, fallbackType = "text") => ({
+  version: 2,
+  blocks: (contentJson?.blocks?.length ? contentJson.blocks : [createDefaultBlock(fallbackType)]).map((block, index) => {
+    const clonedDefault = createDefaultBlock(block?.type || fallbackType);
+    return {
+      ...coerceBlockForForm(block, index === 0 ? fallbackType : "text"),
+      id: clonedDefault.id,
+    };
+  }),
+});
+
+const createHotspotConfigurationSnapshot = (form) => {
+  const contentJson = cloneContentJsonForForm(form.content_json, form.type || "text");
+  const primarySnapshotBlock = contentJson.blocks[0] || createDefaultBlock(form.type || "text");
+  return {
+    shape: form.shape || defaultHotspotForm.shape,
+    width_percent: parseNumber(form.width_percent, defaultHotspotForm.width_percent),
+    height_percent: parseNumber(form.height_percent, defaultHotspotForm.height_percent),
+    radius_percent: parseNumber(form.radius_percent, defaultHotspotForm.radius_percent),
+    display_behavior: normalizeDisplayBehaviorForForm(form),
+    type: primarySnapshotBlock.type || form.type || defaultHotspotForm.type,
+    content_json: contentJson,
+    interaction_json: normalizeInteractionForForm(form),
+  };
+};
+
 const getHotspotShapeStyle = (shape) => {
   if (shape === "rectangle") return { borderRadius: "0.375rem" };
   if (shape === "square") return { borderRadius: "0.25rem" };
@@ -280,6 +307,7 @@ export default function AdminEBookletEditorPage() {
   const [selectedPage, setSelectedPage] = useState(1);
   const [hotspots, setHotspots] = useState([]);
   const [hotspotForm, setHotspotForm] = useState(defaultHotspotForm);
+  const [copiedHotspotConfiguration, setCopiedHotspotConfiguration] = useState(null);
   const [hasDraftHotspotPreview, setHasDraftHotspotPreview] = useState(false);
   const [recording, setRecording] = useState(false);
   const [documentPreviewUrl, setDocumentPreviewUrl] = useState("");
@@ -318,7 +346,7 @@ export default function AdminEBookletEditorPage() {
     () => (paymentMethodsManager.paymentMethods || []).filter((method) => method?.status !== false && method?.is_deleted !== true),
     [paymentMethodsManager.paymentMethods],
   );
-  const fieldDefinitions = requiredFieldsManager.fields || [];
+  const fieldDefinitions = requiredFieldsManager.state?.fields || [];
 
   const loadTemplate = useCallback(async () => {
     if (!id) return;
@@ -391,7 +419,6 @@ export default function AdminEBookletEditorPage() {
 
   useEffect(() => {
     if (selectedVersion?.id) {
-      setHasDraftHotspotPreview(false);
       loadHotspots(selectedVersion.id).catch(() => {});
     }
   }, [loadHotspots, selectedVersion?.id]);
@@ -589,6 +616,29 @@ export default function AdminEBookletEditorPage() {
     }));
   };
 
+  const copyHotspotConfiguration = () => {
+    setCopiedHotspotConfiguration(createHotspotConfigurationSnapshot(hotspotForm));
+    toast.success(t("toasts.hotspotConfigurationCopied"));
+  };
+
+  const applyCopiedHotspotConfiguration = () => {
+    if (!copiedHotspotConfiguration) return;
+    const contentJson = cloneContentJsonForForm(copiedHotspotConfiguration.content_json, copiedHotspotConfiguration.type);
+    const primaryCopiedBlock = contentJson.blocks[0] || createDefaultBlock(copiedHotspotConfiguration.type || "text");
+    setHotspotForm((current) => ({
+      ...current,
+      shape: copiedHotspotConfiguration.shape,
+      width_percent: copiedHotspotConfiguration.width_percent,
+      height_percent: copiedHotspotConfiguration.height_percent,
+      radius_percent: copiedHotspotConfiguration.radius_percent,
+      display_behavior: normalizeDisplayBehaviorForForm(copiedHotspotConfiguration),
+      type: primaryCopiedBlock.type || copiedHotspotConfiguration.type || current.type,
+      content_json: contentJson,
+      interaction_json: normalizeInteractionForForm(copiedHotspotConfiguration),
+    }));
+    toast.success(t("toasts.hotspotConfigurationApplied"));
+  };
+
   const saveBasicInfo = async () => {
     if (!templateForm.title.trim()) {
       toast.error(t("admin.editor.validation.titleRequired"));
@@ -680,7 +730,7 @@ export default function AdminEBookletEditorPage() {
         ),
       );
     }
-    navigate("/admin/e-booklets");
+    navigate("/admin/e-booklets/catalog");
   };
 
   const goNext = async () => {
@@ -763,14 +813,23 @@ export default function AdminEBookletEditorPage() {
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
     setHasDraftHotspotPreview(true);
-    setHotspotForm({
+    setHotspotForm((current) => ({
       ...defaultHotspotForm,
+      ...(copiedHotspotConfiguration
+        ? createHotspotConfigurationSnapshot(copiedHotspotConfiguration)
+        : {
+            shape: current.id ? defaultHotspotForm.shape : current.shape || defaultHotspotForm.shape,
+            width_percent: current.id ? defaultHotspotForm.width_percent : current.width_percent || defaultHotspotForm.width_percent,
+            height_percent: current.id ? defaultHotspotForm.height_percent : current.height_percent || defaultHotspotForm.height_percent,
+            radius_percent: current.id ? defaultHotspotForm.radius_percent : current.radius_percent || defaultHotspotForm.radius_percent,
+            display_behavior: current.id ? defaultDisplayBehavior : normalizeDisplayBehaviorForForm(current),
+            content_json: { version: 2, blocks: [createDefaultBlock("text")] },
+            interaction_json: defaultInteractionJson,
+          }),
       page_number: selectedPage,
       x_percent: Number(x.toFixed(2)),
       y_percent: Number(y.toFixed(2)),
-      content_json: { version: 2, blocks: [createDefaultBlock("text")] },
-      interaction_json: defaultInteractionJson,
-    });
+    }));
   };
 
   const selectHotspot = (hotspot) => {
@@ -1244,7 +1303,7 @@ export default function AdminEBookletEditorPage() {
           )}
           <Button
             variant="outline"
-            onClick={() => navigate(isTeacherTemplateMode ? "/admin/e-booklet-purchases" : "/admin/e-booklets")}
+            onClick={() => navigate(isTeacherTemplateMode ? "/admin/e-booklets/orders" : "/admin/e-booklets/catalog")}
           >
             {t("common.close")}
           </Button>
@@ -1661,26 +1720,25 @@ export default function AdminEBookletEditorPage() {
                   const height = clampHotspotSize(hotspotForm.height_percent || hotspotForm.radius_percent || 5);
                   const renderedWidth = shape === "circle" || shape === "square" ? Math.max(width, height) : width;
                   const renderedHeight = shape === "circle" || shape === "square" ? Math.max(width, height) : height;
-                  const opacity = Math.min(1, Math.max(0, parseNumber(hotspotForm.display_behavior?.opacity_percent, 100) / 100));
+                  const opacity = Math.min(1, Math.max(0.35, parseNumber(hotspotForm.display_behavior?.opacity_percent, 100) / 100));
                   return (
                     <div
-                      className="pointer-events-none absolute flex animate-pulse items-center justify-center border-2 border-dashed border-primary bg-primary/35 text-primary-foreground shadow-lg ring-4 ring-primary/20"
-                      data-testid="admin-e-booklet-draft-hotspot-preview"
+                      className="pointer-events-none absolute flex animate-pulse items-center justify-center border-2 border-dashed border-primary bg-primary/25 text-primary shadow-lg ring-4 ring-primary/20"
                       style={{
                         left: `${hotspotForm.x_percent}%`,
                         top: `${hotspotForm.y_percent}%`,
                         width: `${renderedWidth}%`,
                         height: `${renderedHeight}%`,
-                        minWidth: 16,
-                        minHeight: 16,
+                        minWidth: 18,
+                        minHeight: 18,
                         opacity,
                         transform: "translate(-50%, -50%)",
                         ...getHotspotShapeStyle(shape),
                       }}
-                      title={t("admin.editor.hotspots.draftPreview")}
+                      data-testid="admin-e-booklet-draft-hotspot-preview"
                       aria-label={t("admin.editor.hotspots.draftPreview")}
                     >
-                      <span className="absolute -right-2 -top-2 rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground shadow">
+                      <span className="absolute -right-2 -top-2 rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow">
                         {t("admin.editor.hotspots.draftPreviewShort")}
                       </span>
                       <DraftIcon className="h-3.5 w-3.5" />
@@ -1830,6 +1888,14 @@ export default function AdminEBookletEditorPage() {
             )}
 
             <div className="grid grid-cols-2 gap-2">
+              <Button type="button" variant="outline" onClick={copyHotspotConfiguration} disabled={editor.loading}>
+                <Copy className="h-4 w-4" />
+                {t("admin.editor.hotspots.copyConfiguration")}
+              </Button>
+              <Button type="button" variant="outline" onClick={applyCopiedHotspotConfiguration} disabled={editor.loading || !copiedHotspotConfiguration}>
+                <Copy className="h-4 w-4" />
+                {t("admin.editor.hotspots.applyConfiguration")}
+              </Button>
               <Button onClick={saveHotspot} disabled={editor.loading || !activeVersionId}>
                 <Save className="h-4 w-4" />
                 {t("common.save")}
@@ -1958,7 +2024,7 @@ export default function AdminEBookletEditorPage() {
           </Button>
           {activeStep === "review" ? (
             isTeacherTemplateMode ? (
-              <Button onClick={() => navigate("/admin/e-booklet-purchases")} disabled={editor.loading}>
+              <Button onClick={() => navigate("/admin/e-booklets/orders")} disabled={editor.loading}>
                 {t("common.done", { defaultValue: "Done" })}
               </Button>
             ) : (
