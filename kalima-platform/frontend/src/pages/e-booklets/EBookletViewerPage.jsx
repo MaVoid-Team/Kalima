@@ -133,11 +133,13 @@ function HotspotMarker({ hotspot, active, onOpen, t }) {
     : clamp(hotspot.height_percent || hotspot.radius_percent * 2, 4, 2, 35);
   const left = clamp(hotspot.x_percent, 50, 0, 100);
   const top = clamp(hotspot.y_percent, 50, 0, 100);
+  const opacity = clamp(hotspot.display_behavior?.opacity_percent, 100, 0, 100) / 100;
   const baseStyle = {
     left: `${left}%`,
     top: `${top}%`,
     width: `${width}%`,
     height: `${height}%`,
+    opacity,
     transform: "translate(-50%, -50%)",
   };
 
