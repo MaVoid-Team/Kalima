@@ -429,6 +429,18 @@ export function useAdminEBookletPurchases() {
     setPagination((current) => ({ ...current, page: 1 }));
   }, []);
 
+  const fetchPurchase = useCallback(
+    (purchaseId) =>
+      fetchApi(
+        {
+          endpoint: `/admin/e-booklet-purchases/${purchaseId}`,
+          method: "get",
+        },
+        false,
+      ),
+    [fetchApi],
+  );
+
   const updatePurchaseStatus = useCallback(
     (purchaseId, nextStatus, adminNotes) =>
       fetchApi({
@@ -501,6 +513,7 @@ export function useAdminEBookletPurchases() {
     setPage,
     setStatus: changeStatusFilter,
     fetchPurchases,
+    fetchPurchase,
     updatePurchaseStatus,
     markPaid,
     deliverPurchase,

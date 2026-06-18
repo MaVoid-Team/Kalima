@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   BookOpenCheck,
@@ -6,13 +6,8 @@ import {
   ChevronLeft,
   ChevronRight,
   PackageCheck,
-  PencilLine,
-  Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -53,26 +48,6 @@ const statusTone = {
 };
 
 const prettyStatus = (status) => status.replaceAll("_", " ");
-const asNumber = (value, fallback = 0) => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
-};
-
-const normalizeAsset = (response) => response?.data || response || null;
-
-const dimensionsDiffer = (expected = [], uploaded = []) => {
-  if (!expected?.length || !uploaded?.length) return false;
-  if (expected.length !== uploaded.length) return true;
-  return expected.some((dimension, index) => {
-    const uploadedDimension = uploaded[index];
-    return (
-      !uploadedDimension ||
-      Number(dimension.width) !== Number(uploadedDimension.width) ||
-      Number(dimension.height) !== Number(uploadedDimension.height)
-    );
-  });
-};
-
 export default function AdminEBookletPurchasesPage() {
   const { t } = useTranslation("eBooklets");
   const navigate = useNavigate();
@@ -84,26 +59,8 @@ export default function AdminEBookletPurchasesPage() {
     setPage,
     setStatus,
     fetchPurchases,
-    updatePurchaseStatus,
     markPaid,
-    deliverPurchase,
-    prepareCustomTemplate,
-    uploadTeacherDocument,
   } = useAdminEBookletPurchases();
-  const [selectedPurchase, setSelectedPurchase] = useState(null);
-  const [deliveryForm, setDeliveryForm] = useState({
-    custom_document_file_id: "",
-    display_title: "",
-    invite_quota: "30",
-    access_expires_at: "",
-    student_marketing_price: "",
-    internal_price: "",
-    page_count: "",
-    page_dimensions: [],
-    document_filename: "",
-    validation_message: "",
-    admin_notes: "",
-  });
 
   const load = useCallback(() => {
     fetchPurchases();
@@ -119,102 +76,9 @@ export default function AdminEBookletPurchasesPage() {
     [t],
   );
 
-  const activePurchase = useMemo(
-    () => selectedPurchase || purchases[0] || null,
-    [purchases, selectedPurchase],
-  );
-
-  useEffect(() => {
-    if (!activePurchase) return;
-    const templateVersion = activePurchase.template_version;
-    setDeliveryForm((current) => ({
-      ...current,
-      display_title:
-        activePurchase.branding_json?.bookletTitle ||
-        activePurchase.template?.title ||
-        current.display_title,
-      access_expires_at: current.access_expires_at,
-      student_marketing_price: String(activePurchase.marketing_price ?? activePurchase.price ?? current.student_marketing_price ?? ""),
-      internal_price: String(activePurchase.internal_price ?? current.internal_price ?? ""),
-      page_count: "",
-      page_dimensions: [],
-      document_filename: "",
-      validation_message: "",
-    }));
-  }, [activePurchase]);
-
-  const handleDocumentUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file || !activePurchase) return;
-    const response = await uploadTeacherDocument(file, {
-      owner_type: "booklet",
-      owner_id: activePurchase.id,
-    });
-    const asset = normalizeAsset(response);
-    const assetId = asset?.id;
-    const metadata = asset?.metadata;
-    if (assetId) {
-      const expectedPageCount = Number(activePurchase.template_version?.page_count || 0);
-      const expectedDimensions = Array.isArray(activePurchase.template_version?.page_dimensions_json)
-        ? activePurchase.template_version.page_dimensions_json
-        : [];
-      let validationMessage = "";
-      if (!metadata?.page_count || !metadata?.page_dimensions?.length) {
-        validationMessage = t("admin.purchases.validation.detectRequired");
-      } else if (expectedPageCount && metadata.page_count !== expectedPageCount) {
-        validationMessage = t("admin.purchases.validation.pageCountMismatch", {
-          expected: expectedPageCount,
-          actual: metadata.page_count,
-        });
-      } else if (dimensionsDiffer(expectedDimensions, metadata.page_dimensions)) {
-        validationMessage = t("admin.purchases.validation.pageSizeMismatch");
-      }
-      setDeliveryForm((current) => ({
-        ...current,
-        custom_document_file_id: String(assetId),
-        page_count: metadata?.page_count ? String(metadata.page_count) : "",
-        page_dimensions: metadata?.page_dimensions || [],
-        document_filename: file.name,
-        validation_message: validationMessage,
-      }));
-    }
-  };
-
-  const handleDeliver = async () => {
-    if (!activePurchase) return;
-    if (deliveryForm.validation_message || !deliveryForm.custom_document_file_id || !deliveryForm.access_expires_at) return;
-    await deliverPurchase(activePurchase.id, {
-      custom_document_file_id: Number(deliveryForm.custom_document_file_id),
-      display_title: deliveryForm.display_title,
-      invite_quota: asNumber(deliveryForm.invite_quota, 0),
-      access_expires_at: deliveryForm.access_expires_at,
-      student_marketing_price: asNumber(deliveryForm.student_marketing_price, 0),
-      internal_price: asNumber(deliveryForm.internal_price, 0),
-      page_count: asNumber(deliveryForm.page_count, 0),
-      page_dimensions: deliveryForm.page_dimensions,
-    });
-    fetchPurchases();
-  };
-
   const handleMarkPaid = async (purchase) => {
     await markPaid(purchase.id);
     fetchPurchases();
-  };
-
-  const handleStatus = async (purchase, nextStatus) => {
-    await updatePurchaseStatus(purchase.id, nextStatus, deliveryForm.admin_notes);
-    fetchPurchases();
-  };
-
-  const handleEditTeacherTemplate = async () => {
-    if (!activePurchase) return;
-    const response = await prepareCustomTemplate(activePurchase.id);
-    const custom = response?.data;
-    const templateId = custom?.template_id || activePurchase.template_id;
-    const versionId = custom?.template_version_id;
-    if (templateId && versionId) {
-      navigate(`/admin/e-booklets/${templateId}/edit?teacherTemplate=1&purchaseId=${activePurchase.id}&versionId=${versionId}`);
-    }
   };
 
   return (
@@ -275,7 +139,7 @@ export default function AdminEBookletPurchasesPage() {
                 purchases.map((purchase) => (
                   <TableRow
                     key={purchase.id}
-                    className={activePurchase?.id === purchase.id ? "bg-muted/40" : ""}
+                    className=""
                   >
                     <TableCell>
                       <div className="font-medium">
@@ -321,8 +185,8 @@ export default function AdminEBookletPurchasesPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setSelectedPurchase(purchase)}
-                          aria-label={t("admin.purchases.managePurchase", { defaultValue: "Manage eBooklet purchase" })}
+                          onClick={() => navigate(`/admin/e-booklet-purchases/${purchase.id}/delivery`)}
+                          aria-label={t("admin.purchases.openDelivery", { defaultValue: "Open delivery details" })}
                         >
                           <BookOpenCheck className="h-4 w-4" />
                         </Button>
@@ -334,180 +198,6 @@ export default function AdminEBookletPurchasesPage() {
           </Table>
         </div>
 
-        <aside className="space-y-4 rounded-lg border bg-background p-4" data-testid="admin-e-booklet-purchases-delivery-section">
-          {activePurchase ? (
-            <>
-              <div>
-                <h2 className="text-lg font-semibold">{t("admin.purchases.delivery")}</h2>
-                <p className="text-sm text-muted-foreground">
-                  {activePurchase.teacher?.name || t("common.teacher")} - {activePurchase.template?.title}
-                </p>
-              </div>
-
-              <div className="grid gap-3">
-                <div className="space-y-2">
-                  <Label>{t("admin.purchases.teacherTitle")}</Label>
-                  <Input
-                    value={deliveryForm.display_title}
-                    onChange={(event) =>
-                      setDeliveryForm((current) => ({
-                        ...current,
-                        display_title: event.target.value,
-                      }))
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("admin.purchases.teacherPdf")}</Label>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div className="min-h-9 flex-1 rounded-md border bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
-                      {deliveryForm.custom_document_file_id
-                        ? deliveryForm.document_filename ||
-                          t("admin.purchases.teacherPdfUploaded", {
-                            id: deliveryForm.custom_document_file_id,
-                          })
-                        : t("admin.purchases.teacherPdfEmpty")}
-                    </div>
-                    <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-3 text-sm font-medium hover:bg-accent">
-                      <Upload className="h-4 w-4" />
-                      {deliveryForm.custom_document_file_id
-                        ? t("common.replace")
-                        : t("common.upload")}
-                      <input
-                        type="file"
-                        accept=".pdf,application/pdf"
-                        className="hidden"
-                        onChange={handleDocumentUpload}
-                        data-testid="ebooklet-teacher-document-upload-input"
-                      />
-                    </label>
-                  </div>
-                  {deliveryForm.validation_message && (
-                    <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                      {deliveryForm.validation_message}
-                    </div>
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <Label>{t("admin.purchases.detectedPages")}</Label>
-                    <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
-                      {deliveryForm.page_count || t("admin.purchases.uploadPdf")}
-                      <span className="text-muted-foreground">
-                        {" / "}
-                        {t("admin.purchases.templatePages", {
-                          count: activePurchase.template_version?.page_count || 0,
-                        })}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{t("admin.purchases.inviteQuota", { defaultValue: "Student seat quota" })}</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={deliveryForm.invite_quota}
-                      onChange={(event) =>
-                        setDeliveryForm((current) => ({
-                          ...current,
-                          invite_quota: event.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <Label>{t("admin.purchases.accessExpiresAt", { defaultValue: "Student access expires" })}</Label>
-                    <Input
-                      type="date"
-                      value={deliveryForm.access_expires_at}
-                      onChange={(event) =>
-                        setDeliveryForm((current) => ({
-                          ...current,
-                          access_expires_at: event.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>{t("admin.purchases.studentMarketingPrice", { defaultValue: "Student store price" })}</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={deliveryForm.student_marketing_price}
-                      onChange={(event) =>
-                        setDeliveryForm((current) => ({
-                          ...current,
-                          student_marketing_price: event.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("admin.purchases.internalPrice", { defaultValue: "Internal teacher cost" })}</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={deliveryForm.internal_price}
-                    onChange={(event) =>
-                      setDeliveryForm((current) => ({
-                        ...current,
-                        internal_price: event.target.value,
-                      }))
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("admin.purchases.adminNotes")}</Label>
-                  <Textarea
-                    value={deliveryForm.admin_notes}
-                    onChange={(event) =>
-                      setDeliveryForm((current) => ({
-                        ...current,
-                        admin_notes: event.target.value,
-                      }))
-                    }
-                    placeholder={t("admin.purchases.adminNotesPlaceholder")}
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleEditTeacherTemplate}
-                  disabled={loading}
-                  className="sm:col-span-2"
-                >
-                  <PencilLine className="h-4 w-4" />
-                  {t("admin.purchases.editTeacherTemplate", {
-                    defaultValue: "Edit this teacher's eBooklet template",
-                  })}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleStatus(activePurchase, "customization_in_progress")}
-                  disabled={loading}
-                >
-                  {t("common.inProgress")}
-                </Button>
-                <Button
-                  onClick={handleDeliver}
-                  disabled={loading || Boolean(deliveryForm.validation_message) || !deliveryForm.custom_document_file_id || !deliveryForm.access_expires_at}
-                >
-                  {t("admin.purchases.deliver")}
-                </Button>
-              </div>
-            </>
-          ) : (
-            <div className="py-12 text-center text-sm text-muted-foreground">
-              {t("admin.purchases.selectPurchase")}
-            </div>
-          )}
-        </aside>
       </div>
 
       <div className="flex items-center justify-end gap-2">

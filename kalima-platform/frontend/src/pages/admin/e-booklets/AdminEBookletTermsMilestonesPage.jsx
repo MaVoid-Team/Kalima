@@ -246,13 +246,14 @@ export default function AdminEBookletTermsMilestonesPage() {
         </div>
       </div>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+      <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
         <div className="overflow-hidden rounded-lg border bg-background" data-testid="admin-e-booklet-terms-table">
           <div className="border-b p-4">
             <h2 className="font-semibold">{t("admin.termsMilestones.termsTitle")}</h2>
             <p className="text-sm text-muted-foreground">{t("admin.termsMilestones.termsHelp")}</p>
           </div>
-          <Table>
+          <div className="hidden overflow-x-auto md:block">
+          <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow>
                 <TableHead>{t("admin.termsMilestones.termName")}</TableHead>
@@ -265,7 +266,7 @@ export default function AdminEBookletTermsMilestonesPage() {
               {terms.map((term) => (
                 <TableRow key={term.id}>
                   <TableCell>
-                    <div className="font-medium">{term.name}</div>
+                    <div className="max-w-md break-words font-medium">{term.name}</div>
                     <div className="line-clamp-2 max-w-md text-xs text-muted-foreground">{term.description || "—"}</div>
                   </TableCell>
                   <TableCell><Badge variant={term.status === "active" ? "default" : "outline"}>{term.status}</Badge></TableCell>
@@ -288,6 +289,33 @@ export default function AdminEBookletTermsMilestonesPage() {
               )}
             </TableBody>
           </Table>
+          </div>
+          <div className="divide-y md:hidden">
+            {terms.map((term) => (
+              <div key={term.id} className="space-y-3 p-4">
+                <div className="min-w-0">
+                  <div className="break-words font-medium">{term.name}</div>
+                  <div className="mt-1 break-words text-xs text-muted-foreground">{term.description || "—"}</div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 text-sm">
+                  <Badge variant={term.status === "active" ? "default" : "outline"}>{term.status}</Badge>
+                  <span className="break-words text-muted-foreground">{formatDate(term.starts_at)} — {term.ends_at ? formatDate(term.ends_at) : t("admin.termsMilestones.openEnded")}</span>
+                </div>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Button size="sm" variant="outline" onClick={() => editTerm(term)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
+                  {term.status !== "active" && (
+                    <Button size="sm" onClick={() => activate(term.id)} disabled={actionLoading} data-testid="admin-e-booklet-set-active-term">
+                      <ShieldCheck className="h-4 w-4" />
+                      {t("admin.termsMilestones.setActive")}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+            {terms.length === 0 && (
+              <div className="p-5 text-center text-sm text-muted-foreground">{t("admin.termsMilestones.emptyTerms")}</div>
+            )}
+          </div>
         </div>
 
         <form className="space-y-4 rounded-lg border bg-background p-4" onSubmit={submitTerm} data-testid="admin-e-booklet-term-form">
@@ -305,19 +333,20 @@ export default function AdminEBookletTermsMilestonesPage() {
         </form>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+      <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
         <div className="space-y-4 rounded-lg border bg-background p-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div><h2 className="font-semibold">{t("admin.termsMilestones.milestonesTitle")}</h2><p className="text-sm text-muted-foreground">{t("admin.termsMilestones.milestonesHelp")}</p></div>
-            <Select value={selectedTermId} onValueChange={setSelectedTermId}><SelectTrigger className="w-full md:w-72"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">{t("admin.termsMilestones.allTerms")}</SelectItem>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select>
+            <Select value={selectedTermId} onValueChange={setSelectedTermId}><SelectTrigger className="w-full min-w-0 md:w-72"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">{t("admin.termsMilestones.allTerms")}</SelectItem>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select>
           </div>
           <div className="overflow-hidden rounded-lg border" data-testid="admin-e-booklet-milestones-table">
-            <Table>
+            <div className="hidden overflow-x-auto md:block">
+            <Table className="min-w-[960px]">
               <TableHeader><TableRow><TableHead>{t("admin.termsMilestones.milestone")}</TableHead><TableHead>{t("admin.termsMilestones.target")}</TableHead><TableHead>{t("admin.termsMilestones.pricing")}</TableHead><TableHead>{t("admin.termsMilestones.reward")}</TableHead><TableHead>{t("common.status")}</TableHead><TableHead className="text-end">{t("common.actions")}</TableHead></TableRow></TableHeader>
               <TableBody>
                 {scopedMilestones.map((milestone) => (
                   <TableRow key={milestone.id}>
-                    <TableCell><div className="font-medium">{milestone.title}</div><div className="text-xs text-muted-foreground">#{milestone.sort_order ?? 0} · {milestone.description || "—"}</div></TableCell>
+                    <TableCell><div className="max-w-md break-words font-medium">{milestone.title}</div><div className="max-w-md break-words text-xs text-muted-foreground">#{milestone.sort_order ?? 0} · {milestone.description || "—"}</div></TableCell>
                     <TableCell>{milestone.target_paid_redemptions}</TableCell>
                     <TableCell>{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</TableCell>
                     <TableCell>{money(milestone.reward_amount_snapshot)}</TableCell>
@@ -328,12 +357,37 @@ export default function AdminEBookletTermsMilestonesPage() {
                 {scopedMilestones.length === 0 && (<TableRow><TableCell colSpan={6} className="h-20 text-center text-muted-foreground">{t("admin.termsMilestones.emptyMilestones")}</TableCell></TableRow>)}
               </TableBody>
             </Table>
+            </div>
+            <div className="divide-y md:hidden">
+              {scopedMilestones.map((milestone) => (
+                <div key={milestone.id} className="space-y-3 p-3">
+                  <div>
+                    <div className="break-words font-medium">{milestone.title}</div>
+                    <div className="mt-1 break-words text-xs text-muted-foreground">#{milestone.sort_order ?? 0} · {milestone.description || "—"}</div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.target")}</span>{milestone.target_paid_redemptions}</div>
+                    <div><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.reward")}</span>{money(milestone.reward_amount_snapshot)}</div>
+                    <div className="col-span-2"><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.pricing")}</span>{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</div>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <Badge variant={milestone.active ? "default" : "outline"}>{milestone.active ? t("common.active") : t("statuses.disabled")}</Badge>
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button>
+                      <Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button>
+                      <Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {scopedMilestones.length === 0 && <div className="p-5 text-center text-sm text-muted-foreground">{t("admin.termsMilestones.emptyMilestones")}</div>}
+            </div>
           </div>
         </div>
 
         <form className="space-y-4 rounded-lg border bg-background p-4" onSubmit={submitMilestone} data-testid="admin-e-booklet-milestone-form">
           <h2 className="font-semibold">{editingMilestoneId ? t("admin.termsMilestones.editMilestone") : t("admin.termsMilestones.createMilestone")}</h2>
-          <div className="space-y-2"><Label>{t("admin.termsMilestones.termName")}</Label><Select value={milestoneForm.termId} onValueChange={(value) => updateMilestoneField("termId", value)}><SelectTrigger><SelectValue placeholder={t("admin.termsMilestones.selectTerm")} /></SelectTrigger><SelectContent>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select></div>
+          <div className="space-y-2"><Label>{t("admin.termsMilestones.termName")}</Label><Select value={milestoneForm.termId} onValueChange={(value) => updateMilestoneField("termId", value)}><SelectTrigger className="w-full min-w-0"><SelectValue placeholder={t("admin.termsMilestones.selectTerm")} /></SelectTrigger><SelectContent>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select></div>
           <div className="space-y-2"><Label>{t("admin.termsMilestones.milestone")}</Label><Input required value={milestoneForm.title} onChange={(e) => updateMilestoneField("title", e.target.value)} /></div>
           <div className="space-y-2"><Label>{t("admin.termsMilestones.descriptionLabel")}</Label><Textarea value={milestoneForm.description} onChange={(e) => updateMilestoneField("description", e.target.value)} /></div>
           <div className="grid gap-3 md:grid-cols-2"><div className="space-y-2"><Label>{t("admin.termsMilestones.target")}</Label><Input name="targetPaidRedemptions" type="number" min="1" value={milestoneForm.targetPaidRedemptions} onChange={(e) => updateMilestoneField("targetPaidRedemptions", e.target.value)} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.sortOrder")}</Label><Input type="number" value={milestoneForm.sortOrder} onChange={(e) => updateMilestoneField("sortOrder", e.target.value)} /></div></div>
