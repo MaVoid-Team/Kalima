@@ -195,6 +195,8 @@
         "referenceNumber": "المرجع: {{value}}",
         "referenceInput": "رقم المرجع",
         "referenceAuto": "تلقائي",
+        "draftPreview": "معاينة نقطة تفاعل غير محفوظة",
+        "draftPreviewShort": "جديد",
         "expandCanvas": "توسيع",
         "minimizeCanvas": "تصغير",
         "minimizeControls": "تصغير عناصر تحكم نقاط التفاعل",
