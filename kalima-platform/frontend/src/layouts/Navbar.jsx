@@ -45,6 +45,7 @@ export default function Navbar() {
     !location.pathname.startsWith('/product/') &&
     !location.pathname.startsWith('/e-booklet-cart') &&
     !location.pathname.startsWith('/e-booklet-checkout');
+  const canSeeEBookletStore = !isAuthenticated || !isStudent;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -112,13 +113,16 @@ export default function Navbar() {
   useEffect(() => {
     if (!open) return;
 
-    const routeValues = hasStoreAccess ? ["/samples", "/market", "/e-booklets"] : ["/e-booklets"];
+    const routeValues = hasStoreAccess ? ["/samples", "/market"] : [];
+    if (canSeeEBookletStore) {
+      routeValues.push("/e-booklets");
+    }
     if (isAuthenticated && isTeacher && !hasAdminAccess) {
       routeValues.push(E_BOOKLET_ORDERS_ROUTE);
     }
     const current = routeValues.find((route) => location.pathname.startsWith(route));
     setCommandValue(current || "");
-  }, [open, location.pathname, hasStoreAccess, isAuthenticated, isTeacher, hasAdminAccess]);
+  }, [open, location.pathname, hasStoreAccess, canSeeEBookletStore, isAuthenticated, isTeacher, hasAdminAccess]);
 
 
   const toggleLanguage = () => {
@@ -209,14 +213,16 @@ export default function Navbar() {
                     {t("navbar.market")}
                   </Button>
                 )}
-                <Button
-                  variant="secondary"
-                  onClick={() => navigate("/e-booklets")}
-                  className="h-9 px-4"
-                >
-                  <BookOpenCheck className="mr-2 h-4 w-4"></BookOpenCheck>
-                  {t("navbar.eBooklets")}
-                </Button>
+                {canSeeEBookletStore && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => navigate("/e-booklets")}
+                    className="h-9 px-4"
+                  >
+                    <BookOpenCheck className="mr-2 h-4 w-4"></BookOpenCheck>
+                    {t("navbar.eBooklets")}
+                  </Button>
+                )}
                 {isAuthenticated && isTeacher && !hasAdminAccess && (
                   <Button
                     variant="ghost"
@@ -458,22 +464,24 @@ export default function Navbar() {
                 </Link>
               )}
 
-              <Link to="/e-booklets" className={cn(
-                "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
-                location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-") ? "text-primary" : "text-muted-foreground hover:text-foreground"
-              )}>
-                {(location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-")) && (
-                  <motion.div
-                    layoutId="nav-active-pill"
-                    className="absolute inset-0 bg-primary/10 rounded-full"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              {canSeeEBookletStore && (
+                <Link to="/e-booklets" className={cn(
+                  "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
+                  location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}>
+                  {(location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-")) && (
+                    <motion.div
+                      layoutId="nav-active-pill"
+                      className="absolute inset-0 bg-primary/10 rounded-full"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <BookOpenCheck
+                    className={cn("h-6 w-6 transition-all relative z-10")}
+                    strokeWidth={location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-") ? 2.5 : 2}
                   />
-                )}
-                <BookOpenCheck
-                  className={cn("h-6 w-6 transition-all relative z-10")}
-                  strokeWidth={location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-") ? 2.5 : 2}
-                />
-              </Link>
+                </Link>
+              )}
 
               {isAuthenticated ? (
                 <Link
@@ -543,9 +551,11 @@ export default function Navbar() {
                 {t("navbar.market")}
               </CommandItem>
             )}
-            <CommandItem value="/e-booklets" onSelect={() => runCommand(() => navigate("/e-booklets"))}>
-              {t("navbar.eBooklets")}
-            </CommandItem>
+            {canSeeEBookletStore && (
+              <CommandItem value="/e-booklets" onSelect={() => runCommand(() => navigate("/e-booklets"))}>
+                {t("navbar.eBooklets")}
+              </CommandItem>
+            )}
             {isAuthenticated && isTeacher && !hasAdminAccess && (
               <CommandItem value={E_BOOKLET_ORDERS_ROUTE} onSelect={() => runCommand(() => navigate(E_BOOKLET_ORDERS_ROUTE))}>
                 {t("navbar.eBookletOrders")}
