@@ -271,6 +271,7 @@
       "empty": "No e-booklet purchases match this status.",
       "delivery": "Delivery",
       "openDelivery": "Open delivery details",
+      "approvePaymentBeforeDelivery": "Approve the payment before delivering this e-booklet.",
       "teacherTitle": "Teacher-specific title",
       "teacherPdf": "Teacher PDF",
       "teacherPdfUploaded": "Teacher PDF uploaded (asset #{{id}})",
