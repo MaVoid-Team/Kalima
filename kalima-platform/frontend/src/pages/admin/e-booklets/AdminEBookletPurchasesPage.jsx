@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   BookOpenCheck,
@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -35,12 +36,14 @@ const purchaseStatuses = [
   "needs_branding_info",
   "customization_in_progress",
   "ready",
+  "delivered",
   "cancelled",
   "rejected",
 ];
 
 const statusTone = {
   ready: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  delivered: "border-green-200 bg-green-50 text-green-700",
   paid: "border-sky-200 bg-sky-50 text-sky-700",
   customization_in_progress: "border-amber-200 bg-amber-50 text-amber-700",
   rejected: "border-red-200 bg-red-50 text-red-700",
@@ -60,7 +63,9 @@ export default function AdminEBookletPurchasesPage() {
     setStatus,
     fetchPurchases,
     markPaid,
+    approveStudentPurchase,
   } = useAdminEBookletPurchases();
+  const [studentPurchaseId, setStudentPurchaseId] = useState("");
 
   const load = useCallback(() => {
     fetchPurchases();
@@ -78,6 +83,14 @@ export default function AdminEBookletPurchasesPage() {
 
   const handleMarkPaid = async (purchase) => {
     await markPaid(purchase.id);
+    fetchPurchases();
+  };
+
+  const handleApproveStudentPurchase = async (event) => {
+    event.preventDefault();
+    if (!studentPurchaseId) return;
+    await approveStudentPurchase(Number(studentPurchaseId));
+    setStudentPurchaseId("");
     fetchPurchases();
   };
 
@@ -106,6 +119,17 @@ export default function AdminEBookletPurchasesPage() {
           </SelectContent>
         </Select>
       </div>
+
+      <form className="flex flex-col gap-2 rounded-lg border bg-background p-4 sm:flex-row sm:items-end" onSubmit={handleApproveStudentPurchase} data-testid="admin-e-booklet-approve-student-purchase">
+        <div className="min-w-0 flex-1 space-y-1">
+          <label className="text-sm font-medium">{t("admin.purchases.studentPurchaseApproval", { defaultValue: "Approve student purchase by purchase ID" })}</label>
+          <Input type="number" min="1" value={studentPurchaseId} onChange={(event) => setStudentPurchaseId(event.target.value)} placeholder={t("admin.purchases.studentPurchaseIdPlaceholder", { defaultValue: "Student purchase ID" })} />
+        </div>
+        <Button type="submit" disabled={!studentPurchaseId}>
+          <CheckCircle2 className="h-4 w-4" />
+          {t("admin.purchases.approveStudentPurchase", { defaultValue: "Approve student purchase" })}
+        </Button>
+      </form>
 
       <div className="space-y-5">
         <div className="w-full overflow-x-auto rounded-lg border bg-background" data-testid="admin-e-booklet-purchases-table-card">
@@ -185,8 +209,8 @@ export default function AdminEBookletPurchasesPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => navigate(`/admin/e-booklet-purchases/${purchase.id}/delivery`)}
-                          aria-label={t("admin.purchases.openDelivery")}
+                          onClick={() => navigate(`/admin/e-booklets/orders/${purchase.id}/delivery`)}
+                          aria-label={t("admin.purchases.openDelivery", { defaultValue: "Open delivery details" })}
                         >
                           <BookOpenCheck className="h-4 w-4" />
                         </Button>

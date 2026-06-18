@@ -72,6 +72,7 @@
     "needs_branding_info": "Needs branding info",
     "customization_in_progress": "Customization in progress",
     "ready": "Ready",
+    "delivered": "Delivered",
     "cancelled": "Cancelled",
     "rejected": "Rejected",
     "active": "Active",
@@ -113,7 +114,12 @@
     "termActivated": "E-booklet term activated",
     "milestoneSaved": "E-booklet milestone saved",
     "milestonesReordered": "E-booklet milestones reordered",
-    "teacherTemplateReady": "Teacher-specific eBooklet template is ready to edit."
+    "teacherTemplateReady": "Teacher-specific eBooklet template is ready to edit.",
+    "hotspotConfigurationCopied": "Hotspot configuration copied",
+    "hotspotConfigurationApplied": "Hotspot configuration applied",
+    "accessCodesGenerated": "Access codes generated",
+    "studentPurchaseApproved": "Student purchase approved",
+    "milestoneDeleted": "E-booklet milestone deleted"
   },
   "admin": {
     "templates": {
@@ -195,13 +201,13 @@
         "referenceNumber": "Reference: {{value}}",
         "referenceInput": "Reference #",
         "referenceAuto": "Auto",
-        "draftPreview": "Unsaved hotspot preview",
-        "draftPreviewShort": "New",
         "expandCanvas": "Expand",
         "minimizeCanvas": "Minimize",
         "minimizeControls": "Minimize hotspot controls",
         "restoreControls": "Restore hotspot controls",
         "contentBlocks": "Content blocks",
+        "copyConfiguration": "Copy config",
+        "applyConfiguration": "Apply config",
         "addBlock": "Add block",
         "blockNumber": "Block {{number}}",
         "removeBlock": "Remove block {{number}}",
@@ -242,6 +248,8 @@
         "recordingUnavailable": "Audio recording is not available in this browser.",
         "hotspotFallback": "{{type}} hotspot",
         "hotspotButton": "Hotspot {{reference}}: {{type}}",
+        "draftPreview": "Unsaved hotspot preview",
+        "draftPreviewShort": "New",
         "emptyPage": "No hotspots on this page."
       },
       "review": {
@@ -270,8 +278,6 @@
       "loading": "Loading e-booklet purchases...",
       "empty": "No e-booklet purchases match this status.",
       "delivery": "Delivery",
-      "openDelivery": "Open delivery details",
-      "approvePaymentBeforeDelivery": "Approve the payment before delivering this e-booklet.",
       "teacherTitle": "Teacher-specific title",
       "teacherPdf": "Teacher PDF",
       "teacherPdfUploaded": "Teacher PDF uploaded (asset #{{id}})",
