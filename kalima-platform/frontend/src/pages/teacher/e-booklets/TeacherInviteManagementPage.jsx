@@ -206,8 +206,8 @@ export default function TeacherInviteManagementPage() {
         </div>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[420px_minmax(0,1fr)]">
-        <section className="space-y-4 rounded-lg border bg-background p-4">
+      <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+        <section className="min-w-0 space-y-4 rounded-lg border bg-background p-4">
           <div>
             <h2 className="font-semibold">{t("teacher.invites.createAccessCode")}</h2>
             <p className="text-sm text-muted-foreground">{t("teacher.invites.createAccessCodeDescription")}</p>
@@ -217,29 +217,29 @@ export default function TeacherInviteManagementPage() {
             {t("teacher.invites.termsRequiredCopy")}
           </div>
           <div className="grid gap-2">
-            <Button onClick={generatePaidMessageCode} disabled={loading} className="w-full">
+            <Button onClick={generatePaidMessageCode} disabled={loading} className="h-auto min-h-10 w-full whitespace-normal break-words text-center leading-snug">
               <MessageCircle className="h-4 w-4" />
               {t("teacher.invites.generatePaidMessageCode")}
             </Button>
-            <Button onClick={generatePaidCodeOnly} disabled={loading} variant="outline" className="w-full">
+            <Button onClick={generatePaidCodeOnly} disabled={loading} variant="outline" className="h-auto min-h-10 w-full whitespace-normal break-words text-center leading-snug">
               <Copy className="h-4 w-4" />
               {t("teacher.invites.generatePaidCodeOnly")}
             </Button>
-            <Button onClick={generateFreeSharedCode} disabled={loading} variant="secondary" className="w-full">
+            <Button onClick={generateFreeSharedCode} disabled={loading} variant="secondary" className="h-auto min-h-10 w-full whitespace-normal break-words text-center leading-snug">
               <Link2 className="h-4 w-4" />
               {t("teacher.invites.generateFreeSharedCode")}
             </Button>
-            <div className="grid grid-cols-[1fr_auto] gap-2" data-testid="bulk-access-code-controls">
+            <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]" data-testid="bulk-access-code-controls">
               <input
                 type="number"
                 min="1"
                 max="100"
                 value={bulkCount}
                 onChange={(event) => setBulkCount(event.target.value)}
-                className="rounded-md border bg-background px-3 py-2 text-sm"
+                className="min-w-0 rounded-md border bg-background px-3 py-2 text-sm"
                 aria-label={t("teacher.invites.bulkCount", { defaultValue: "Bulk code count" })}
               />
-              <Button onClick={generateBulkPaidCodes} disabled={loading} variant="outline">
+              <Button onClick={generateBulkPaidCodes} disabled={loading} variant="outline" className="h-auto min-h-10 whitespace-normal break-words text-center leading-snug">
                 <Copy className="h-4 w-4" />
                 {t("teacher.invites.generateBulkPaidCodes", { defaultValue: "Bulk generate" })}
               </Button>
@@ -257,8 +257,8 @@ export default function TeacherInviteManagementPage() {
           )}
         </section>
 
-        <section className="grid gap-5 lg:grid-cols-2">
-          <div className="rounded-lg border bg-background p-4">
+        <section className="grid min-w-0 gap-5 lg:grid-cols-2">
+          <div className="min-w-0 rounded-lg border bg-background p-4">
             <h2 className="font-semibold">{t("teacher.invites.generatedCodesTitle")}</h2>
             <div className="mt-4 space-y-3">
               {generatedCodes.map((entry) => (
@@ -283,9 +283,9 @@ export default function TeacherInviteManagementPage() {
               <h3 className="text-sm font-semibold">{t("teacher.invites.codeStatusTitle", { defaultValue: "Code status" })}</h3>
               <div className="mt-3 space-y-2">
                 {accessCodes.map((entry) => (
-                  <div key={entry.id} className="flex items-center justify-between gap-3 rounded-md border p-2 text-sm">
-                    <span>{entry.code_hint ? t("teacher.invites.codeHint", { value: entry.code_hint }) : entry.id}</span>
-                    <Badge variant="outline">{entry.status}</Badge>
+                  <div key={entry.id} className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-md border p-2 text-sm">
+                    <span className="min-w-0 break-all">{entry.code_hint ? t("teacher.invites.codeHint", { value: entry.code_hint }) : entry.id}</span>
+                    <Badge variant="outline" className="shrink-0">{entry.status}</Badge>
                   </div>
                 ))}
                 {accessCodes.length === 0 && <div className="text-sm text-muted-foreground">{t("teacher.invites.emptyCodeStatuses", { defaultValue: "No generated code statuses yet." })}</div>}
@@ -293,7 +293,7 @@ export default function TeacherInviteManagementPage() {
             </div>
           </div>
 
-          <div className="rounded-lg border bg-background p-4">
+          <div className="min-w-0 rounded-lg border bg-background p-4">
             <h2 className="font-semibold">{t("teacher.invites.studentsTitle")}</h2>
             <div className="mt-4 space-y-3">
               {students.map((studentAccess) => (

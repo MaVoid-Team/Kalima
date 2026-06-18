@@ -466,6 +466,8 @@ model required_field_definitions {
   product_required_fields       product_required_fields[]
   purchase_item_required_fields purchase_item_required_fields[]
   cart_item_required_fields     cart_item_required_fields[] // <-- Added missing opposite relation
+  e_booklet_template_required_fields e_booklet_template_required_fields[]
+  e_booklet_purchase_required_fields e_booklet_purchase_required_fields[]
 }
 
 model carts {
@@ -607,6 +609,8 @@ model payment_methods {
   is_deleted   Boolean?    @default(false)
   images       images?     @relation(fields: [image_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   purchases    purchases[]
+  e_booklet_purchases e_booklet_purchases[]
+  e_booklet_template_payment_methods e_booklet_template_payment_methods[]
 }
 
 enum auth_provider_enum {
@@ -865,6 +869,8 @@ model e_booklet_templates {
   purchases     e_booklet_purchases[]
   instances     e_booklet_instances[]
   terms         e_booklet_terms[]
+  payment_methods e_booklet_template_payment_methods[]
+  required_fields e_booklet_template_required_fields[]
 
   @@index([status], map: "ix_e_booklet_templates_status")
   @@index([category_id], map: "ix_e_booklet_templates_category")
@@ -945,6 +951,7 @@ model e_booklet_purchases {
   access_expires_at   DateTime?                        @db.Timestamp(6)
   currency            String                           @default("EGP") @db.VarChar(3)
   payment_method      String?                          @db.VarChar(100)
+  payment_method_id   Int?
   payment_reference   String?                          @db.VarChar(255)
   payment_screenshot_id Int?
   branding_json       Json?
@@ -956,12 +963,58 @@ model e_booklet_purchases {
   template            e_booklet_templates              @relation(fields: [template_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
   template_version    e_booklet_template_versions      @relation(fields: [template_version_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
   payment_screenshot  images?                          @relation("EBookletPurchasePaymentScreenshot", fields: [payment_screenshot_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  payment_methods     payment_methods?                 @relation(fields: [payment_method_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  required_fields     e_booklet_purchase_required_fields[]
   instances           e_booklet_instances[]
   wallet_ledger_entries teacher_wallet_ledger[]        @relation("TeacherWalletLedgerEBookletPurchase")
 
   @@index([teacher_id, status], map: "ix_e_booklet_purchases_teacher_status")
   @@index([status, created_at], map: "ix_e_booklet_purchases_status_created")
+  @@index([payment_method_id], map: "ix_e_booklet_purchases_payment_method")
   @@index([payment_screenshot_id], map: "ix_e_booklet_purchases_payment_screenshot")
+}
+
+model e_booklet_template_payment_methods {
+  id                Int                 @id @default(autoincrement())
+  template_id       Int
+  payment_method_id Int
+  created_at        DateTime?           @default(now()) @db.Timestamp(6)
+
+  template          e_booklet_templates @relation(fields: [template_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  payment_method    payment_methods     @relation(fields: [payment_method_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([template_id, payment_method_id])
+  @@index([template_id], map: "ix_e_booklet_template_payment_methods_template")
+  @@index([payment_method_id], map: "ix_e_booklet_template_payment_methods_method")
+}
+
+model e_booklet_template_required_fields {
+  id                         Int                        @id @default(autoincrement())
+  template_id                Int
+  field_definition_id        Int
+  is_required                Boolean?                   @default(true)
+  active                     Boolean?                   @default(true)
+
+  template                   e_booklet_templates        @relation(fields: [template_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  required_field_definitions required_field_definitions @relation(fields: [field_definition_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([template_id, field_definition_id])
+  @@index([template_id, is_required, active], map: "ix_e_booklet_template_required_fields_active")
+}
+
+model e_booklet_purchase_required_fields {
+  id                         Int                        @id @default(autoincrement())
+  purchase_id                Int
+  field_definition_id        Int
+  value                      String                     @db.Text
+  created_at                 DateTime?                  @default(now()) @db.Timestamp(6)
+  updated_at                 DateTime?                  @db.Timestamp(6)
+
+  purchase                   e_booklet_purchases        @relation(fields: [purchase_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  required_field_definitions required_field_definitions @relation(fields: [field_definition_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([purchase_id, field_definition_id])
+  @@index([purchase_id], map: "ix_e_booklet_purchase_required_fields_purchase")
 }
 
 model e_booklet_terms {

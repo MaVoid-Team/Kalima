@@ -247,7 +247,7 @@ export default function AdminEBookletTermsMilestonesPage() {
       </div>
 
       <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
-        <div className="overflow-hidden rounded-lg border bg-background" data-testid="admin-e-booklet-terms-table">
+        <div className="min-w-0 overflow-hidden rounded-lg border bg-background" data-testid="admin-e-booklet-terms-table">
           <div className="border-b p-4">
             <h2 className="font-semibold">{t("admin.termsMilestones.termsTitle")}</h2>
             <p className="text-sm text-muted-foreground">{t("admin.termsMilestones.termsHelp")}</p>
@@ -265,12 +265,12 @@ export default function AdminEBookletTermsMilestonesPage() {
             <TableBody>
               {terms.map((term) => (
                 <TableRow key={term.id}>
-                  <TableCell>
+                  <TableCell className="max-w-[34rem] whitespace-normal">
                     <div className="max-w-md break-words font-medium">{term.name}</div>
                     <div className="line-clamp-2 max-w-md text-xs text-muted-foreground">{term.description || "—"}</div>
                   </TableCell>
                   <TableCell><Badge variant={term.status === "active" ? "default" : "outline"}>{term.status}</Badge></TableCell>
-                  <TableCell>{formatDate(term.starts_at)} — {term.ends_at ? formatDate(term.ends_at) : t("admin.termsMilestones.openEnded")}</TableCell>
+                  <TableCell className="whitespace-normal">{formatDate(term.starts_at)} — {term.ends_at ? formatDate(term.ends_at) : t("admin.termsMilestones.openEnded")}</TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-2">
                       <Button size="sm" variant="outline" onClick={() => editTerm(term)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
@@ -318,7 +318,7 @@ export default function AdminEBookletTermsMilestonesPage() {
           </div>
         </div>
 
-        <form className="space-y-4 rounded-lg border bg-background p-4" onSubmit={submitTerm} data-testid="admin-e-booklet-term-form">
+        <form className="min-w-0 space-y-4 rounded-lg border bg-background p-4" onSubmit={submitTerm} data-testid="admin-e-booklet-term-form">
           <h2 className="font-semibold">{editingTermId ? t("admin.termsMilestones.editTerm") : t("admin.termsMilestones.createTerm")}</h2>
           <div className="grid gap-3 md:grid-cols-2">
             <div className="space-y-2"><Label>{t("admin.termsMilestones.termName")}</Label><Input required value={termForm.name} onChange={(e) => updateTermField("name", e.target.value)} /></div>
@@ -334,10 +334,10 @@ export default function AdminEBookletTermsMilestonesPage() {
       </section>
 
       <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
-        <div className="space-y-4 rounded-lg border bg-background p-4">
+        <div className="min-w-0 space-y-4 rounded-lg border bg-background p-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div><h2 className="font-semibold">{t("admin.termsMilestones.milestonesTitle")}</h2><p className="text-sm text-muted-foreground">{t("admin.termsMilestones.milestonesHelp")}</p></div>
-            <Select value={selectedTermId} onValueChange={setSelectedTermId}><SelectTrigger className="w-full min-w-0 md:w-72"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">{t("admin.termsMilestones.allTerms")}</SelectItem>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select>
+            <Select value={selectedTermId} onValueChange={setSelectedTermId}><SelectTrigger className="w-full min-w-0 max-w-full overflow-hidden md:w-72 [&_[data-slot=select-value]]:truncate"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">{t("admin.termsMilestones.allTerms")}</SelectItem>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select>
           </div>
           <div className="overflow-hidden rounded-lg border" data-testid="admin-e-booklet-milestones-table">
             <div className="hidden overflow-x-auto md:block">
@@ -346,12 +346,12 @@ export default function AdminEBookletTermsMilestonesPage() {
               <TableBody>
                 {scopedMilestones.map((milestone) => (
                   <TableRow key={milestone.id}>
-                    <TableCell><div className="max-w-md break-words font-medium">{milestone.title}</div><div className="max-w-md break-words text-xs text-muted-foreground">#{milestone.sort_order ?? 0} · {milestone.description || "—"}</div></TableCell>
-                    <TableCell>{milestone.target_paid_redemptions}</TableCell>
-                    <TableCell>{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</TableCell>
-                    <TableCell>{money(milestone.reward_amount_snapshot)}</TableCell>
+                    <TableCell className="w-[42%] max-w-[34rem] whitespace-normal"><div className="break-words font-medium">{milestone.title}</div><div className="line-clamp-2 break-words text-xs text-muted-foreground">#{milestone.sort_order ?? 0} · {milestone.description || "—"}</div></TableCell>
+                    <TableCell className="whitespace-nowrap">{milestone.target_paid_redemptions}</TableCell>
+                    <TableCell className="whitespace-nowrap">{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</TableCell>
+                    <TableCell className="whitespace-nowrap">{money(milestone.reward_amount_snapshot)}</TableCell>
                     <TableCell><Badge variant={milestone.active ? "default" : "outline"}>{milestone.active ? t("common.active") : t("statuses.disabled")}</Badge></TableCell>
-                    <TableCell><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button><Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button></div></TableCell>
+                    <TableCell className="whitespace-nowrap"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button><Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button></div></TableCell>
                   </TableRow>
                 ))}
                 {scopedMilestones.length === 0 && (<TableRow><TableCell colSpan={6} className="h-20 text-center text-muted-foreground">{t("admin.termsMilestones.emptyMilestones")}</TableCell></TableRow>)}
@@ -385,9 +385,9 @@ export default function AdminEBookletTermsMilestonesPage() {
           </div>
         </div>
 
-        <form className="space-y-4 rounded-lg border bg-background p-4" onSubmit={submitMilestone} data-testid="admin-e-booklet-milestone-form">
+        <form className="min-w-0 space-y-4 rounded-lg border bg-background p-4" onSubmit={submitMilestone} data-testid="admin-e-booklet-milestone-form">
           <h2 className="font-semibold">{editingMilestoneId ? t("admin.termsMilestones.editMilestone") : t("admin.termsMilestones.createMilestone")}</h2>
-          <div className="space-y-2"><Label>{t("admin.termsMilestones.termName")}</Label><Select value={milestoneForm.termId} onValueChange={(value) => updateMilestoneField("termId", value)}><SelectTrigger className="w-full min-w-0"><SelectValue placeholder={t("admin.termsMilestones.selectTerm")} /></SelectTrigger><SelectContent>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select></div>
+          <div className="min-w-0 space-y-2"><Label>{t("admin.termsMilestones.termName")}</Label><Select value={milestoneForm.termId} onValueChange={(value) => updateMilestoneField("termId", value)}><SelectTrigger className="w-full min-w-0 max-w-full overflow-hidden [&_[data-slot=select-value]]:truncate"><SelectValue placeholder={t("admin.termsMilestones.selectTerm")} /></SelectTrigger><SelectContent>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select></div>
           <div className="space-y-2"><Label>{t("admin.termsMilestones.milestone")}</Label><Input required value={milestoneForm.title} onChange={(e) => updateMilestoneField("title", e.target.value)} /></div>
           <div className="space-y-2"><Label>{t("admin.termsMilestones.descriptionLabel")}</Label><Textarea value={milestoneForm.description} onChange={(e) => updateMilestoneField("description", e.target.value)} /></div>
           <div className="grid gap-3 md:grid-cols-2"><div className="space-y-2"><Label>{t("admin.termsMilestones.target")}</Label><Input name="targetPaidRedemptions" type="number" min="1" value={milestoneForm.targetPaidRedemptions} onChange={(e) => updateMilestoneField("targetPaidRedemptions", e.target.value)} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.sortOrder")}</Label><Input type="number" value={milestoneForm.sortOrder} onChange={(e) => updateMilestoneField("sortOrder", e.target.value)} /></div></div>

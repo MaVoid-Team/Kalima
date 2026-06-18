@@ -103,6 +103,14 @@ export class CreateEBookletTemplateDto {
   @IsOptional()
   @IsArray()
   tags?: string[];
+
+  @IsOptional()
+  @IsArray()
+  payment_method_ids?: number[];
+
+  @IsOptional()
+  @IsArray()
+  required_fields?: Array<{ field_definition_id: number; is_required?: boolean }>;
 }
 
 export class UpdateEBookletTemplateDto {
@@ -140,6 +148,14 @@ export class UpdateEBookletTemplateDto {
   @IsOptional()
   @IsEnum(EBookletTemplateStatusDto)
   status?: EBookletTemplateStatusDto;
+
+  @IsOptional()
+  @IsArray()
+  payment_method_ids?: number[];
+
+  @IsOptional()
+  @IsArray()
+  required_fields?: Array<{ field_definition_id: number; is_required?: boolean }>;
 }
 
 export class UpsertEBookletHotspotDto {
@@ -278,6 +294,10 @@ export class PublicEBookletCheckoutItemDto {
   @IsInt()
   @Min(1)
   template_version_id!: number;
+
+  @IsOptional()
+  @IsArray()
+  required_field_values?: Array<{ field_definition_id: number; value: string }>;
 }
 
 export class PublicEBookletCheckoutDto {
@@ -314,6 +334,10 @@ export class PublicEBookletCheckoutDto {
   @IsString()
   @MaxLength(500)
   notes?: string;
+
+  @IsOptional()
+  @IsArray()
+  required_field_values?: Array<{ field_definition_id: number; value: string }>;
 
   @IsBoolean()
   terms_accepted!: boolean;

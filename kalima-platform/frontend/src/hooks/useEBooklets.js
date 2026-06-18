@@ -67,6 +67,8 @@ export const normalizeEBookletTemplate = (template) => {
     seatsRemaining: template?.seats_remaining ?? template?.remaining_seats,
     studentLimit: template?.student_limit,
     accessExpiresAt: template?.access_expires_at,
+    payment_methods: sourceTemplate?.payment_methods || template?.payment_methods || [],
+    required_fields: sourceTemplate?.required_fields || template?.required_fields || [],
   };
 };
 
@@ -106,6 +108,8 @@ export const buildEBookletCartItem = (template) => {
     coverUrl: normalized.coverUrl,
     pageCount: normalized.pageCount,
     hotspotCount: normalized.hotspotCount,
+    payment_methods: normalized.payment_methods || [],
+    required_fields: normalized.required_fields || [],
   };
 };
 
