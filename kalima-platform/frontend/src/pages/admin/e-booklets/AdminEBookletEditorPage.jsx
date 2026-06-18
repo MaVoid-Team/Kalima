@@ -318,7 +318,7 @@ export default function AdminEBookletEditorPage() {
     () => (paymentMethodsManager.paymentMethods || []).filter((method) => method?.status !== false && method?.is_deleted !== true),
     [paymentMethodsManager.paymentMethods],
   );
-  const fieldDefinitions = requiredFieldsManager.state?.fields || [];
+  const fieldDefinitions = requiredFieldsManager.fields || [];
 
   const loadTemplate = useCallback(async () => {
     if (!id) return;
