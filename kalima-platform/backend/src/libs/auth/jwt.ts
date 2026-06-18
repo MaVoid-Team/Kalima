@@ -19,9 +19,17 @@ const REFRESH_TOKEN_EXPIRES_DAYS = Number(
   process.env.REFRESH_TOKEN_EXPIRES_DAYS ?? 30,
 );
 
+export interface ImpersonationClaims {
+  actorUserId: number;
+  actorRoles: Array<{ portal: string; role: string }>;
+  targetUserId: number;
+  startedAt: string;
+}
+
 export interface AccessTokenPayload {
   userId: number;
   roles?: Array<{ portal: string; role: string }>;
+  impersonation?: ImpersonationClaims;
 }
 
 export function signAccessToken(payload: AccessTokenPayload): string {

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { Toaster } from 'sonner';
 import { E_BOOKLET_ORDERS_ALLOWED_ROLES, E_BOOKLET_ORDERS_ROUTE } from "./pages/e-booklets/eBookletOrdersContract.mjs";
+import ImpersonationBanner from "./components/auth/ImpersonationBanner";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -70,6 +71,7 @@ const CategoriesPage = lazy(
   () => import("./pages/admin/categories/CategoriesPage"),
 );
 const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
+const AdminImpersonationPage = lazy(() => import("./pages/admin/impersonation/AdminImpersonationPage"));
 const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
 const UserAppreciationPage = lazy(() => import("./pages/admin/users/UserAppreciationPage"));
 const AdminSamplesPage = lazy(() => import("./pages/admin/samples/AdminSamplesPage"));
@@ -135,6 +137,7 @@ function Root() {
 
   return (
     <ErrorBoundary>
+      <ImpersonationBanner />
       <Suspense fallback={<PageLoader />}>
         <Outlet />
       </Suspense>
@@ -226,6 +229,7 @@ const router = createBrowserRouter(
           <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
           <Route path="/admin/required-fields" element={<RequiredFieldsPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
+          <Route path="/admin/impersonation" element={<AdminImpersonationPage />} />
           <Route path="/admin/users/:id" element={<UserDetailPage />} />
           <Route path="/admin/users/:id/appreciation" element={<UserAppreciationPage />} />
           <Route path="/admin/samples" element={<AdminSamplesPage />} />

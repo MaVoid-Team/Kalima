@@ -14,9 +14,28 @@ export interface AuthTokens {
   refreshTokenExpiresAt: Date;
 }
 
+export interface ImpersonationSessionData {
+  actorUser: BaseUserData;
+  targetUser: BaseUserData;
+  startedAt: string;
+}
+
+export interface ImpersonationResponse {
+  tokens: AuthTokens;
+  user: BaseUserData;
+  portalAccess: PortalAccess;
+  impersonation: ImpersonationSessionData;
+}
+
 export interface AccessTokenPayload {
   userId: number;
   roles: UserRole[];
+  impersonation?: {
+    actorUserId: number;
+    actorRoles: UserRole[];
+    targetUserId: number;
+    startedAt: string;
+  };
 }
 
 export interface RefreshTokenPayload {
@@ -177,4 +196,10 @@ export interface PasswordResetToken {
 export interface CreatorContext {
   userId: number;
   roles: UserRole[];
+  impersonation?: {
+    actorUserId: number;
+    actorRoles: UserRole[];
+    targetUserId: number;
+    startedAt: string;
+  };
 }

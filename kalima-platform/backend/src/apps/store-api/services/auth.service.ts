@@ -36,6 +36,7 @@ import {
   FirebaseUserData,
   LinkedProvider,
   LinkProviderResponse,
+  ImpersonationResponse,
 } from "../interfaces/auth.interface";
 import {
   role_enum,
@@ -47,6 +48,7 @@ import fs from "fs";
 import { userManagementService } from "./user-management.service";
 import {
   UnauthorizedError,
+  ForbiddenError,
   NotFoundError,
   BadRequestError,
   ConflictError,
@@ -366,6 +368,69 @@ class AuthService {
 
   async logoutAllDevices(userId: number): Promise<void> {
     await revokeAllRefreshTokensForUser(userId);
+  }
+
+  async startImpersonation(
+    actor: CreatorContext,
+    targetUserId: number,
+  ): Promise<ImpersonationResponse> {
+    if (actor.impersonation) {
+      throw new ForbiddenError("Nested impersonation is not allowed");
+    }
+
+    const actorRoles = actor.roles ?? [];
+    const canImpersonate = actorRoles.some((role) => {
+      const roleName = String(role.role);
+      return roleName === role_enum.Admin || roleName === role_enum.SubAdmin;
+    });
+
+    if (!canImpersonate) {
+      throw new ForbiddenError("Only admins can impersonate users");
+    }
+
+    if (actor.userId === targetUserId) {
+      throw new BadRequestError("You cannot impersonate your own account");
+    }
+
+    const [actorUser, targetUser] = await Promise.all([
+      this.userService.findUserById(actor.userId),
+      this.userService.findUserById(targetUserId),
+    ]);
+
+    if (!actorUser) {
+      throw new UnauthorizedError("Admin account not found");
+    }
+
+    if (!targetUser) {
+      throw new NotFoundError("User not found");
+    }
+
+    const startedAt = new Date().toISOString();
+    const tokens = await this.issueTokens(targetUser.id, {
+      actorUserId: actor.userId,
+      actorRoles: actorRoles.map((r) => ({ portal: r.portal, role: r.role })),
+      targetUserId: targetUser.id,
+      startedAt,
+    });
+
+    return {
+      user: this.userService.mapToBaseUserData(targetUser),
+      tokens,
+      portalAccess: this.calculatePortalAccess(targetUser.user_roles),
+      impersonation: {
+        actorUser: this.userService.mapToBaseUserData(actorUser),
+        targetUser: this.userService.mapToBaseUserData(targetUser),
+        startedAt,
+      },
+    };
+  }
+
+  async stopImpersonation(actor: CreatorContext): Promise<{ message: string }> {
+    if (!actor.impersonation) {
+      throw new BadRequestError("No active impersonation session");
+    }
+
+    return { message: "Impersonation stopped" };
   }
 
   // ============================================
@@ -800,7 +865,15 @@ class AuthService {
     };
   }
 
-  private async issueTokens(userId: number): Promise<AuthTokens> {
+  private async issueTokens(
+    userId: number,
+    impersonation?: {
+      actorUserId: number;
+      actorRoles: Array<{ portal: string; role: string }>;
+      targetUserId: number;
+      startedAt: string;
+    },
+  ): Promise<AuthTokens> {
     const user = await this.userService.findUserById(userId);
     const roleRows = user?.user_roles ?? [];
 
@@ -810,6 +883,7 @@ class AuthService {
         portal: r.portal,
         role: r.role,
       })),
+      ...(impersonation ? { impersonation } : {}),
     });
 
     const refresh = await generateRefreshToken(userId);

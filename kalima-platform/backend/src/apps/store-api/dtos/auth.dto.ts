@@ -243,6 +243,12 @@ export class LogoutDto {
   refreshToken: string;
 }
 
+export class StartImpersonationDto {
+  @IsInt()
+  @IsPositive()
+  targetUserId: number;
+}
+
 // ============================================
 // PASSWORD DTOs
 // ============================================
