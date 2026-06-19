@@ -478,7 +478,7 @@ export default function EBookletViewerPage() {
     let active = true;
     let createdUrl = null;
     setDocumentPageUrl(null);
-    viewer.fetchViewerDocumentBlobUrl(instanceId)
+    viewer.fetchViewerDocumentBlobUrl(instanceId, pageNumber)
       .then((url) => {
         createdUrl = url;
         if (active) {
@@ -494,7 +494,7 @@ export default function EBookletViewerPage() {
       active = false;
       if (createdUrl) URL.revokeObjectURL(createdUrl);
     };
-  }, [instanceId, viewer.fetchViewerDocumentBlobUrl, viewer.page?.documentAssetId, viewer.page?.renderMode]);
+  }, [instanceId, pageNumber, viewer.fetchViewerDocumentBlobUrl, viewer.page?.documentAssetId, viewer.page?.renderMode]);
 
   useEffect(() => {
     const preventContextMenu = (event) => event.preventDefault();
@@ -621,7 +621,7 @@ export default function EBookletViewerPage() {
               {pageUrl ? (
                 <iframe
                   title={t("viewer.pageFrameTitle", { page: pageNumber })}
-                  src={`${pageUrl}#page=${pageNumber}&toolbar=0&navpanes=0&scrollbar=0`}
+                  src={`${pageUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                   className="absolute inset-0 h-full w-full border-0"
                 />
               ) : serverPage ? (

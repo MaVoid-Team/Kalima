@@ -212,8 +212,11 @@
         "referenceAuto": "تلقائي",
         "expandCanvas": "توسيع",
         "minimizeCanvas": "تصغير",
+        "zoomLevel": "مستوى تكبير PDF",
         "minimizeControls": "تصغير عناصر تحكم نقاط التفاعل",
         "restoreControls": "استعادة عناصر التحكم",
+        "hideSettings": "إخفاء الإعدادات",
+        "showSettings": "إظهار الإعدادات",
         "contentBlocks": "كتل المحتوى",
         "copyConfiguration": "نسخ الإعدادات",
         "applyConfiguration": "تطبيق الإعدادات",
@@ -262,7 +265,12 @@
         "hotspotButton": "نقطة تفاعل {{reference}}: {{type}}",
         "draftPreview": "معاينة نقطة تفاعل غير محفوظة",
         "draftPreviewShort": "جديد",
-        "emptyPage": "لا توجد نقاط تفاعل في هذه الصفحة."
+        "autosaving": "جارٍ الحفظ...",
+        "autosaved": "تم حفظ كل التغييرات",
+        "autosaveIdle": "الحفظ التلقائي مفعّل",
+        "emptyPage": "لا توجد نقاط تفاعل في هذه الصفحة.",
+        "collapsePage": "طي الصفحة {{page}}",
+        "expandPage": "توسيع الصفحة {{page}}"
       },
       "review": {
         "title": "مراجعة ونشر",

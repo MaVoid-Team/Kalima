@@ -307,24 +307,24 @@ export function useAdminEBookletEditor() {
   );
 
   const createHotspot = useCallback(
-    (versionId, data) =>
+    (versionId, data, options = {}) =>
       fetchApi({
         endpoint: `/admin/e-booklet-template-versions/${versionId}/hotspots`,
         method: "post",
         data: { ...data, template_version_id: versionId },
         defaultSuccessMessage: i18n.t("eBooklets:toasts.hotspotSaved"),
-      }),
+      }, options.showToast !== false),
     [fetchApi],
   );
 
   const updateHotspot = useCallback(
-    (hotspotId, data) =>
+    (hotspotId, data, options = {}) =>
       fetchApi({
         endpoint: `/admin/e-booklet-hotspots/${hotspotId}`,
         method: "patch",
         data,
         defaultSuccessMessage: i18n.t("eBooklets:toasts.hotspotUpdated"),
-      }),
+      }, options.showToast !== false),
     [fetchApi],
   );
 
@@ -359,13 +359,22 @@ export function useAdminEBookletEditor() {
     [fetchApi],
   );
 
-  const fetchAssetBlobUrl = useCallback(async (assetId) => {
+  const fetchAssetBlobUrl = useCallback(async (assetId, params) => {
     if (!assetId) return "";
     const response = await axiosInstance.get(
       `/admin/e-booklet-files/${assetId}/preview`,
-      { responseType: "blob" },
+      { responseType: "blob", params },
     );
     return URL.createObjectURL(response.data);
+  }, []);
+
+  const fetchAssetArrayBuffer = useCallback(async (assetId, params) => {
+    if (!assetId) return null;
+    const response = await axiosInstance.get(
+      `/admin/e-booklet-files/${assetId}/preview`,
+      { responseType: "arraybuffer", params },
+    );
+    return response.data;
   }, []);
 
   return {
@@ -383,6 +392,7 @@ export function useAdminEBookletEditor() {
     deleteHotspot,
     uploadAsset,
     fetchAssetBlobUrl,
+    fetchAssetArrayBuffer,
   };
 }
 

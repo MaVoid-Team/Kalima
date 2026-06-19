@@ -14,7 +14,7 @@ export default function useAdminRequiredFields() {
   });
 
   const fetchAllFields = useCallback(
-    async ({ active } = {}) => {
+    async ({ active, page, limit, search } = {}) => {
       setFetching(true);
       setState((prev) => ({ ...prev, loading: true }));
       try {
@@ -22,6 +22,9 @@ export default function useAdminRequiredFields() {
         if (active !== undefined && active !== 'all') {
           query.append('active', active);
         }
+        if (page) query.append('page', page);
+        if (limit) query.append('limit', limit);
+        if (search) query.append('search', search);
 
         const res = await apiMutate({
           endpoint: `/required-fields/definitions${query.toString() ? `?${query.toString()}` : ''}`,

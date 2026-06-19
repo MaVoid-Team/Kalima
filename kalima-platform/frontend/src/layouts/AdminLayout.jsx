@@ -27,24 +27,15 @@ export default function AdminLayout() {
 
             {/* Main Column */}
             <div className="flex flex-1 flex-col min-w-0">
-                {/* Header */}
-                <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-4 sm:px-6 lg:px-8">
-                    <button
-                        type="button"
-                        className="text-muted-foreground border-border px-2 focus:outline-none lg:hidden -ml-2"
-                        onClick={() => setIsMobileOpen(true)}
-                        data-testid="admin-layout-mobile-sidebar-button"
-                    >
-                        <span className="sr-only">Open sidebar</span>
-                        <Menu className="h-6 w-6" aria-hidden="true" />
-                    </button>
-
-                    <div className="flex flex-1 justify-between px-4">
-                        <div className="flex flex-1">
-                            {/* Potential breadcrumb or something */}
-                        </div>
-                    </div>
-                </header>
+                <button
+                    type="button"
+                    className="fixed bottom-4 start-4 z-30 rounded-full border border-border bg-background p-3 text-muted-foreground shadow-lg focus:outline-none lg:hidden"
+                    onClick={() => setIsMobileOpen(true)}
+                    data-testid="admin-layout-mobile-sidebar-button"
+                >
+                    <span className="sr-only">Open sidebar</span>
+                    <Menu className="h-6 w-6" aria-hidden="true" />
+                </button>
 
                 {/* Main Content Area */}
                 <main className="flex-1 p-4 sm:p-12 lg:p-16" data-testid="admin-layout-main-content">

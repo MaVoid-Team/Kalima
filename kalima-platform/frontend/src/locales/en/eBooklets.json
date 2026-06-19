@@ -212,8 +212,11 @@
         "referenceAuto": "Auto",
         "expandCanvas": "Expand",
         "minimizeCanvas": "Minimize",
+        "zoomLevel": "PDF zoom level",
         "minimizeControls": "Minimize hotspot controls",
         "restoreControls": "Restore hotspot controls",
+        "hideSettings": "Hide settings",
+        "showSettings": "Show settings",
         "contentBlocks": "Content blocks",
         "copyConfiguration": "Copy config",
         "applyConfiguration": "Apply config",
@@ -262,7 +265,12 @@
         "hotspotButton": "Hotspot {{reference}}: {{type}}",
         "draftPreview": "Unsaved hotspot preview",
         "draftPreviewShort": "New",
-        "emptyPage": "No hotspots on this page."
+        "autosaving": "Saving...",
+        "autosaved": "All changes saved",
+        "autosaveIdle": "Autosave on",
+        "emptyPage": "No hotspots on this page.",
+        "collapsePage": "Collapse page {{page}}",
+        "expandPage": "Expand page {{page}}"
       },
       "review": {
         "title": "Review and Publish",

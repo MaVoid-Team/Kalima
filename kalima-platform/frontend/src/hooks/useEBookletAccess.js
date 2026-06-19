@@ -314,10 +314,11 @@ export function useEBookletViewer({ adminMode = false } = {}) {
     [fetchApi],
   );
 
-  const fetchViewerDocumentBlobUrl = useCallback(async (instanceId) => {
+  const fetchViewerDocumentBlobUrl = useCallback(async (instanceId, pageNumber) => {
+    const params = pageNumber ? { page: pageNumber } : undefined;
     const response = await api.get(
       `${viewerBase}/${instanceId}/document`,
-      { responseType: "blob" },
+      { responseType: "blob", params },
     );
     return URL.createObjectURL(response.data);
   }, [viewerBase]);
