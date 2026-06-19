@@ -1,5 +1,10 @@
 const bcrypt = require("bcrypt");
+const path = require("path");
+const dotenv = require("dotenv");
 const { Pool } = require("pg");
+
+dotenv.config({ path: path.resolve(__dirname, "..", ".env.local") });
+dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
 const databaseUrl = process.env.DATABASE_URL || "postgresql://postgres:postgres@127.0.0.1:55432/postgres?schema=kalima";
 const email = (process.env.LOCAL_ADMIN_EMAIL || "admin@kalima.local").toLowerCase();

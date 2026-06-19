@@ -8,6 +8,7 @@
     "dev:local": "node scripts/dev-local-backend.js",
     "dev:legacy": "cross-env NODE_OPTIONS=--no-warnings=DEP0040 nodemon server.js",
     "dev:all": "concurrently \"npm:dev\" \"npm:dev:legacy\"",
+    "db:dev:configure": "node scripts/configure-cloud-dev-db.js",
     "db:local": "node scripts/start-local-postgres.js",
     "db:local:setup": "node scripts/setup-local-db.js",
     "build": "tsc",
