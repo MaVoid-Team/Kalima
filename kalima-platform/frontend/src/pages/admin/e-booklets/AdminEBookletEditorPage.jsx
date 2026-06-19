@@ -78,6 +78,13 @@ const COLOR_BG_MAP = {
   amber: "bg-amber-600",
   violet: "bg-violet-600",
 };
+const COLOR_RGB_MAP = {
+  red: "220 38 38",
+  blue: "37 99 235",
+  green: "22 163 74",
+  amber: "217 119 6",
+  violet: "124 58 237",
+};
 const COLOR_CLASS_MAP = {
   red: "bg-red-600 text-white ring-red-600/30",
   blue: "bg-blue-600 text-white ring-blue-600/30",
@@ -104,6 +111,13 @@ const getHotspotColorClasses = (hotspot) => {
     ? hotspot.display_behavior.color
     : DEFAULT_HOTSPOT_COLOR;
   return COLOR_CLASS_MAP[color];
+};
+
+const getHotspotColorRgb = (hotspot) => {
+  const color = hotspotColors.includes(hotspot?.display_behavior?.color)
+    ? hotspot.display_behavior.color
+    : DEFAULT_HOTSPOT_COLOR;
+  return COLOR_RGB_MAP[color];
 };
 
 const createDefaultBlock = (type = "text") => ({
@@ -135,7 +149,7 @@ const defaultInteractionJson = {
   image: { autoExpand: false, expandOnClick: true },
 };
 
-const defaultDisplayBehavior = { opens: "popover", opacity_percent: 100, color: DEFAULT_HOTSPOT_COLOR };
+const defaultDisplayBehavior = { opens: "popover", opacity_percent: 100, glow_percent: 100, color: DEFAULT_HOTSPOT_COLOR };
 const resizeHandles = ["nw", "ne", "sw", "se"];
 const MIN_HOTSPOT_SIZE_PERCENT = 0.5;
 const MAX_HOTSPOT_SIZE_PERCENT = 100;
@@ -186,6 +200,8 @@ const parseNumber = (value, fallback = 0) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const clampPercent = (value, fallback = 100) => Math.min(100, Math.max(0, parseNumber(value, fallback)));
+
 const normalizeAsset = (response) => response?.data || response || null;
 const normalizeAssetId = (response) => normalizeAsset(response)?.id || "";
 const normalizeMetadata = (response) => normalizeAsset(response)?.metadata || null;
@@ -231,11 +247,27 @@ const normalizeInteractionForForm = (hotspot) => ({
 const normalizeDisplayBehaviorForForm = (hotspot) => ({
   ...defaultDisplayBehavior,
   ...(hotspot?.display_behavior || {}),
-  opacity_percent: Math.min(100, Math.max(0, parseNumber(hotspot?.display_behavior?.opacity_percent, 100))),
+  opacity_percent: clampPercent(hotspot?.display_behavior?.opacity_percent, 100),
+  glow_percent: clampPercent(hotspot?.display_behavior?.glow_percent, 100),
   color: hotspotColors.includes(hotspot?.display_behavior?.color)
     ? hotspot.display_behavior.color
     : DEFAULT_HOTSPOT_COLOR,
 });
+
+const getHotspotGlowPercent = (hotspot) => clampPercent(hotspot?.display_behavior?.glow_percent, 100);
+
+const getHotspotGlowClasses = (hotspot) => (
+  getHotspotGlowPercent(hotspot) > 0 ? "shadow-lg ring-4" : "shadow-md"
+);
+
+const getHotspotGlowStyle = (hotspot) => {
+  const glow = getHotspotGlowPercent(hotspot);
+  if (glow <= 0) return {};
+  const blur = 8 + Math.round((glow / 100) * 18);
+  const spread = Math.round((glow / 100) * 4);
+  const alpha = 0.18 + (glow / 100) * 0.22;
+  return { boxShadow: `0 0 ${blur}px ${spread}px rgb(${getHotspotColorRgb(hotspot)} / ${alpha})` };
+};
 
 const clampHotspotSize = (value) => Math.min(
   MAX_HOTSPOT_SIZE_PERCENT,
@@ -383,6 +415,17 @@ export default function AdminEBookletEditorPage() {
       .sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0)),
     [hotspots],
   );
+
+  const hotspotsByPage = useMemo(() => {
+    const groups = new Map();
+    sortedHotspots.forEach((hotspot) => {
+      const pageNumber = Number(hotspot.page_number) || 1;
+      groups.set(pageNumber, [...(groups.get(pageNumber) || []), hotspot]);
+    });
+    return [...groups.entries()]
+      .sort(([pageA], [pageB]) => pageA - pageB)
+      .map(([pageNumber, pageHotspotItems]) => ({ pageNumber, hotspots: pageHotspotItems }));
+  }, [sortedHotspots]);
 
   const primaryBlock = getPrimaryBlock(hotspotForm);
   const activePaymentMethods = useMemo(
@@ -961,7 +1004,8 @@ export default function AdminEBookletEditorPage() {
       display_behavior: {
         ...defaultDisplayBehavior,
         ...(hotspotForm.display_behavior || {}),
-        opacity_percent: Math.min(100, Math.max(0, parseNumber(hotspotForm.display_behavior?.opacity_percent, 100))),
+        opacity_percent: clampPercent(hotspotForm.display_behavior?.opacity_percent, 100),
+        glow_percent: clampPercent(hotspotForm.display_behavior?.glow_percent, 100),
         color: hotspotForm.display_behavior?.color || DEFAULT_HOTSPOT_COLOR,
       },
       content_json: contentJson,
@@ -1694,9 +1738,9 @@ export default function AdminEBookletEditorPage() {
       )}
 
       {activeStep === "hotspots" && (
-        <section className={`grid gap-5 ${canvasExpanded ? "lg:grid-cols-[minmax(0,1fr)_360px]" : "lg:grid-cols-[minmax(0,1fr)_360px_320px]"}`}>
-          <div className="space-y-4 rounded-lg border bg-background p-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <section className={`grid gap-5 md:h-[calc(100vh-220px)] md:min-h-0 md:overflow-hidden ${canvasExpanded ? "md:grid-cols-[minmax(0,1fr)_360px]" : "md:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_360px_320px]"}`}>
+          <div className="flex flex-col overflow-hidden rounded-lg border bg-background p-4 md:min-h-0">
+            <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-lg font-semibold">{t("admin.editor.hotspots.title")}</h2>
                 <p className="text-sm text-muted-foreground">
@@ -1732,7 +1776,8 @@ export default function AdminEBookletEditorPage() {
               </div>
             </div>
 
-            <div className="mx-auto w-full max-w-[720px]">
+            <div className="mt-4 min-h-0 w-full flex-1 overflow-auto">
+              <div className="mx-auto w-full max-w-[720px]">
               <div
                 ref={pageRef}
                 onClick={handlePageClick}
@@ -1775,7 +1820,7 @@ export default function AdminEBookletEditorPage() {
                         event.stopPropagation();
                         selectHotspot(hotspot);
                       }}
-                      className={`absolute flex cursor-grab items-center justify-center border-2 border-white shadow-md active:cursor-grabbing ${getHotspotColorClasses(hotspot)}`}
+                      className={`absolute flex cursor-grab items-center justify-center border-2 border-white active:cursor-grabbing ${getHotspotGlowClasses(hotspot)} ${getHotspotColorClasses(hotspot)}`}
                       style={{
                         left: `${hotspot.x_percent}%`,
                         top: `${hotspot.y_percent}%`,
@@ -1786,6 +1831,7 @@ export default function AdminEBookletEditorPage() {
                         opacity,
                         transform: "translate(-50%, -50%)",
                         ...getHotspotShapeStyle(shape),
+                        ...getHotspotGlowStyle(hotspot),
                       }}
                       title={
                         hotspot.title ||
@@ -1829,6 +1875,7 @@ export default function AdminEBookletEditorPage() {
                   const renderedWidth = shape === "circle" || shape === "square" ? Math.max(width, height) : width;
                   const renderedHeight = shape === "circle" || shape === "square" ? Math.max(width, height) : height;
                   const opacity = Math.min(1, Math.max(0.35, parseNumber(hotspotForm.display_behavior?.opacity_percent, 100) / 100));
+                  const draftGlowStyle = getHotspotGlowStyle({ display_behavior: hotspotForm.display_behavior });
                   return (
                     <div
                       className="pointer-events-none absolute flex animate-pulse items-center justify-center border-2 border-dashed border-primary bg-primary/25 text-primary shadow-lg ring-4 ring-primary/20"
@@ -1842,6 +1889,7 @@ export default function AdminEBookletEditorPage() {
                         opacity,
                         transform: "translate(-50%, -50%)",
                         ...getHotspotShapeStyle(shape),
+                        ...draftGlowStyle,
                       }}
                       data-testid="admin-e-booklet-draft-hotspot-preview"
                       aria-label={t("admin.editor.hotspots.draftPreview")}
@@ -1859,11 +1907,12 @@ export default function AdminEBookletEditorPage() {
                   </div>
                 )}
               </div>
+              </div>
             </div>
           </div>
 
-          <aside className="space-y-4 rounded-lg border bg-background p-4">
-            <div className="flex items-start justify-between gap-2">
+          <aside className="flex flex-col overflow-hidden rounded-lg border bg-background p-4 md:min-h-0">
+            <div className="flex shrink-0 items-start justify-between gap-2">
               <div>
                 <h3 className="font-semibold">{t("admin.editor.hotspots.contentTitle")}</h3>
                 <p className="text-xs text-muted-foreground">
@@ -1890,7 +1939,7 @@ export default function AdminEBookletEditorPage() {
             </div>
 
             {!controlsMinimized && (
-              <>
+              <div className="mt-4 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label>{t("admin.editor.hotspots.xPercent")}</Label>
@@ -1928,6 +1977,20 @@ export default function AdminEBookletEditorPage() {
                       step="1"
                       value={hotspotForm.display_behavior?.opacity_percent ?? 100}
                       onChange={(event) => updateHotspotDisplayField("opacity_percent", Number(event.target.value))}
+                    />
+                  </div>
+                  <div className="col-span-2 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <Label>{t("admin.editor.hotspots.glowPercent")}</Label>
+                      <span className="text-xs text-muted-foreground">{parseNumber(hotspotForm.display_behavior?.glow_percent, 100)}%</span>
+                    </div>
+                    <Input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={hotspotForm.display_behavior?.glow_percent ?? 100}
+                      onChange={(event) => updateHotspotDisplayField("glow_percent", Number(event.target.value))}
                     />
                   </div>
                 </div>
@@ -2021,10 +2084,10 @@ export default function AdminEBookletEditorPage() {
                     {recording ? t("admin.editor.hotspots.stopRecording") : t("admin.editor.hotspots.recordAudio")}
                   </Button>
                 )}
-              </>
+              </div>
             )}
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="mt-4 grid shrink-0 grid-cols-2 gap-2">
               <Button type="button" variant="outline" onClick={copyHotspotConfiguration} disabled={editor.loading}>
                 <Copy className="h-4 w-4" />
                 {t("admin.editor.hotspots.copyConfiguration")}
@@ -2045,20 +2108,28 @@ export default function AdminEBookletEditorPage() {
           </aside>
 
           {!canvasExpanded && (
-            <aside className="space-y-3 rounded-lg border bg-background p-4">
-              <div>
+            <aside className="flex flex-col overflow-hidden rounded-lg border bg-background p-4 md:col-span-2 md:min-h-0 xl:col-span-1">
+              <div className="shrink-0">
                 <h3 className="font-semibold">{t("admin.editor.hotspots.allHotspots")}</h3>
                 <p className="text-xs text-muted-foreground">{t("admin.editor.hotspots.sortedByCreated")}</p>
               </div>
-              <div className="max-h-[680px] overflow-y-auto rounded-md border">
-                {sortedHotspots.map((hotspot) => (
-                  <button key={hotspot.id} type="button" onClick={() => { setSelectedPage(Number(hotspot.page_number)); selectHotspot(hotspot); }} className="flex w-full items-start justify-between gap-3 border-b px-3 py-3 text-start text-sm last:border-b-0 hover:bg-muted/50">
-                    <span className="min-w-0">
-                      <span className="block truncate font-medium">#{hotspot.reference_number || hotspot.id} {hotspot.title || t("common.untitled")}</span>
-                      <span className="block text-xs text-muted-foreground">{t("common.page")} {hotspot.page_number} · {t(`admin.editor.hotspots.types.${hotspot.type}`, { defaultValue: hotspot.type })}</span>
-                    </span>
-                    <span className="shrink-0 text-xs text-muted-foreground">{Number(hotspot.x_percent).toFixed(1)}, {Number(hotspot.y_percent).toFixed(1)}</span>
-                  </button>
+              <div className="mt-3 min-h-0 flex-1 overflow-y-auto rounded-md border">
+                {hotspotsByPage.map(({ pageNumber, hotspots: pageHotspotItems }) => (
+                  <div key={pageNumber} className="border-b last:border-b-0">
+                    <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-muted/80 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground backdrop-blur">
+                      <span>{t("common.page")} {pageNumber}</span>
+                      <span>{pageHotspotItems.length}</span>
+                    </div>
+                    {pageHotspotItems.map((hotspot) => (
+                      <button key={hotspot.id} type="button" onClick={() => { setSelectedPage(Number(hotspot.page_number)); selectHotspot(hotspot); }} className="flex w-full items-start justify-between gap-3 border-b px-3 py-3 text-start text-sm last:border-b-0 hover:bg-muted/50">
+                        <span className="min-w-0">
+                          <span className="block truncate font-medium">#{hotspot.reference_number || hotspot.id} {hotspot.title || t("common.untitled")}</span>
+                          <span className="block text-xs text-muted-foreground">{t(`admin.editor.hotspots.types.${hotspot.type}`, { defaultValue: hotspot.type })}</span>
+                        </span>
+                        <span className="shrink-0 text-xs text-muted-foreground">{Number(hotspot.x_percent).toFixed(1)}, {Number(hotspot.y_percent).toFixed(1)}</span>
+                      </button>
+                    ))}
+                  </div>
                 ))}
                 {sortedHotspots.length === 0 && <div className="px-3 py-5 text-center text-sm text-muted-foreground">{t("admin.editor.hotspots.emptyPage")}</div>}
               </div>
