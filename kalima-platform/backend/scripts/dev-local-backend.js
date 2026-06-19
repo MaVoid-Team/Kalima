@@ -1,10 +1,24 @@
 const net = require("net");
+const path = require("path");
 const { spawn } = require("child_process");
+const dotenv = require("dotenv");
 
-const databaseUrl = process.env.DATABASE_URL || "postgresql://postgres:postgres@127.0.0.1:55432/postgres?schema=kalima";
+dotenv.config({ path: path.resolve(__dirname, "..", ".env.local") });
+dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
-const canConnect = (port = 55432) => new Promise((resolve) => {
-  const socket = net.createConnection({ host: "127.0.0.1", port });
+const defaultDatabaseUrl = "postgresql://postgres:postgres@127.0.0.1:55432/postgres?schema=kalima";
+const databaseUrl = process.env.DATABASE_URL || defaultDatabaseUrl;
+
+const getDatabaseEndpoint = () => {
+  const url = new URL(databaseUrl);
+  return {
+    host: url.hostname,
+    port: Number(url.port || 5432),
+  };
+};
+
+const canConnect = ({ host, port }) => new Promise((resolve) => {
+  const socket = net.createConnection({ host, port });
   socket.once("connect", () => {
     socket.destroy();
     resolve(true);
@@ -13,9 +27,11 @@ const canConnect = (port = 55432) => new Promise((resolve) => {
 });
 
 async function main() {
-  if (!(await canConnect())) {
-    console.error("Local Postgres is not running on 127.0.0.1:55432.");
-    console.error("Start it first with: npm run db:local");
+  const endpoint = getDatabaseEndpoint();
+  if (!(await canConnect(endpoint))) {
+    console.error(`Cannot reach Postgres at ${endpoint.host}:${endpoint.port}.`);
+    console.error("For the shared cloud dev DB, run: npm run db:dev:configure");
+    console.error("For embedded local Postgres, run: npm run db:local");
     process.exit(1);
   }
 
