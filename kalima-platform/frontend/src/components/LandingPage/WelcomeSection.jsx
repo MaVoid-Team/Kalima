@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { BookOpen, BriefcaseBusiness, CirclePlay, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useRole } from "@/hooks/useRole";
 
 const HERO_IMAGE_DESKTOP = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?fm=webp&q=50&w=800&auto=format&fit=crop";
 const HERO_IMAGE_MOBILE = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?fm=webp&q=30&w=300&auto=format&fit=crop";
@@ -28,6 +29,7 @@ const highlightChild = {
 
 export default function WelcomeSection() {
   const { t, i18n } = useTranslation("landing");
+  const { isStudent } = useRole();
 
   const highlights = [
     {
@@ -86,9 +88,11 @@ export default function WelcomeSection() {
               <Button asChild size="lg" className="w-full sm:w-auto" data-testid="landing-page-hero-start-learning-button">
                 <Link to="/">{t("landingPage.hero.startLearning")}</Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto" data-testid="landing-page-hero-market-button">
-                <Link to="/market"><ShoppingBag className="me-2 h-4 w-4" />{t("landingPage.hero.openMarket")}</Link>
-              </Button>
+              {!isStudent && (
+                <Button asChild variant="outline" size="lg" className="w-full sm:w-auto" data-testid="landing-page-hero-market-button">
+                  <Link to="/market"><ShoppingBag className="me-2 h-4 w-4" />{t("landingPage.hero.openMarket")}</Link>
+                </Button>
+              )}
             </motion.div>
           </div>
 

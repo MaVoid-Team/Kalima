@@ -167,14 +167,14 @@ export default function EBookletCartPage() {
             {t("cart.adminNotice")}
           </div>
 
-          <Button
-            type="button"
-            size="lg"
-            onClick={() => navigate("/e-booklet-checkout")}
-            className="mt-6 w-full active:scale-[0.98]"
-          >
-            {t("cart.checkout")}
-            <ArrowRight className="h-4 w-4" />
+          <div className="mt-6 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+            {t("cart.directCheckoutDisabled")}
+          </div>
+          <Button asChild size="lg" className="mt-3 w-full active:scale-[0.98]">
+            <Link to="/e-booklet-code">
+              {t("cart.redeemCode")}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </Button>
           <Button asChild variant="ghost" className="mt-2 w-full">
             <Link to="/e-booklets">{t("cart.keepBrowsing")}</Link>

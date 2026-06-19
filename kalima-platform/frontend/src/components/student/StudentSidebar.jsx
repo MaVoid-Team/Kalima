@@ -39,8 +39,6 @@ export default function StudentSidebar({ isMobileOpen, setIsMobileOpen }) {
   const navigation = [
     { name: t('nav.home'), href: '/', icon: Home, id: 'home' },
     { name: t('nav.profile'), href: '/student/profile', icon: User, id: 'profile' },
-    { name: t('nav.eBookletStore', 'E-Booklets'), href: '/e-booklets', icon: ShoppingBag, id: 'e-booklet-store' },
-    { name: t('nav.eBookletOrders', 'E-Booklet Orders'), href: '/e-booklet-orders', icon: ShoppingBag, id: 'e-booklet-orders' },
     { name: t('nav.eBooklets', 'My E-Booklets'), href: '/student/e-booklets', icon: BookOpenCheck, id: 'e-booklets' },
     // { name: t('nav.orders'), href: '/orders', icon: ShoppingBag, id: 'orders' },
     { name: t('nav.settings'), href: '/student/settings', icon: Settings, id: 'settings' },

@@ -243,6 +243,24 @@ export const eBookletController = {
     }
   },
 
+  async previewPublicCoverAsset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { asset, absolutePath } =
+        await getEBookletService().getPublicCoverFileAsset(
+          parseId(req.params.assetId, "cover asset ID"),
+        );
+      res.set("Cache-Control", "public, max-age=300");
+      res.type(asset.mime_type || "image/*");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-cover").replace(/"/g, "")}"`,
+      );
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async listStoreTemplates(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await getEBookletService().listPublishedTemplates({
@@ -1165,11 +1183,7 @@ export const eBookletController = {
 
   async approveStudentPurchaseLink(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await getEBookletService().approveStudentPurchaseLink(
-        parseId(req.params.purchaseId, "purchase ID"),
-        currentUserId(req),
-      );
-      res.status(200).json({ success: true, data });
+      throw new BadRequestError("Direct student e-booklet purchase approval is disabled. Students must redeem a teacher-provided URL or access code.");
     } catch (error) {
       next(error);
     }

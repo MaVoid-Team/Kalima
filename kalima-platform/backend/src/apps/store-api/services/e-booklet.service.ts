@@ -589,6 +589,32 @@ export class EBookletService {
     return { asset, absolutePath };
   }
 
+  async getPublicCoverFileAsset(
+    assetId: number,
+  ): Promise<{ asset: any; absolutePath: string }> {
+    const now = new Date();
+    const instance = await this.db.e_booklet_instances.findFirst({
+      where: {
+        status: "active",
+        access_expires_at: { gt: now },
+        template: {
+          status: "published",
+          cover_file_id: assetId,
+        },
+      },
+      include: {
+        template: { include: { cover_file: true } },
+      },
+    });
+    const asset = instance?.template?.cover_file;
+    if (!asset || asset.file_type !== "image") throw new NotFoundError("E-booklet cover asset not found");
+
+    const filename = path.basename(asset.storage_key || "");
+    const absolutePath = path.join(E_BOOKLET_UPLOAD_DIR, filename);
+    await fsPromises.access(absolutePath);
+    return { asset, absolutePath };
+  }
+
   async listPublishedTemplates(filters: {
     search?: string;
     categoryId?: number;
@@ -1165,11 +1191,36 @@ export class EBookletService {
     }
   }
 
+  private buildPublicCoverUrl(assetId?: number | null): string | null {
+    if (!assetId) return null;
+    return `/api/v2/e-booklet-store/covers/${assetId}`;
+  }
+
+  private decoratePublicCover(template: any): void {
+    if (!template) return;
+    const coverAssetId = Number(template.cover_file_id ?? template.cover_file?.id ?? 0);
+    const coverUrl = this.buildPublicCoverUrl(coverAssetId);
+    if (!coverUrl) return;
+
+    template.cover_url = coverUrl;
+    if (template.cover_file) {
+      template.cover_file = {
+        id: template.cover_file.id,
+        file_type: template.cover_file.file_type,
+        mime_type: template.cover_file.mime_type,
+        original_filename: template.cover_file.original_filename,
+        size_bytes: template.cover_file.size_bytes,
+        url: coverUrl,
+      };
+    }
+  }
+
   private serializePublicInstance(instance: any): Record<string, unknown> {
     const usedSeats = this.getIncludedActiveSeatCount(instance);
     const pendingSeats = this.getIncludedPendingSeatCount(instance);
     const inviteQuota = Number(instance.invite_quota ?? 0);
     const serialized = this.sanitizeViewerAccess({ ...instance }) as any;
+    this.decoratePublicCover(serialized.template);
     delete serialized.internal_price;
     delete serialized.access_records;
     delete serialized.student_purchase_links;
@@ -3245,6 +3296,8 @@ export class EBookletService {
     input: TermsInput,
     paymentScreenshotFile?: Express.Multer.File,
   ) {
+    throw new ForbiddenError("Direct student e-booklet purchase is disabled. Students must redeem a teacher-provided URL or access code.");
+
     try {
       this.requireStudentTerms(input);
       const invite = await this.findInviteByToken(rawToken);
