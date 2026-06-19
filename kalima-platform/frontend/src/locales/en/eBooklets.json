@@ -190,6 +190,14 @@
         "widthPercent": "Width %",
         "heightPercent": "Height %",
         "opacityPercent": "Visibility %",
+        "color": "Color",
+        "colors": {
+          "red": "Red",
+          "blue": "Blue",
+          "green": "Green",
+          "amber": "Amber",
+          "violet": "Violet"
+        },
         "shape": "Shape",
         "shapes": {
           "circle": "Circle",
@@ -244,6 +252,8 @@
         "questionPlaceholder": "Question prompt",
         "answerPlaceholder": "Answer {{number}}",
         "correctAnswer": "Correct",
+        "addAnswer": "Add answer",
+        "removeAnswer": "Remove answer {{number}}",
         "allHotspots": "All hotspots",
         "sortedByCreated": "Sorted by creation time",
         "recordingUnavailable": "Audio recording is not available in this browser.",

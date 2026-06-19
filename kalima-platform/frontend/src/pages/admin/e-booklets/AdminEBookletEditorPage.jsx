@@ -71,8 +71,41 @@ const shapeIcons = {
 };
 
 const hotspotShapes = ["circle", "rectangle", "square", "triangle", "oval"];
+const hotspotColors = ["red", "blue", "green", "amber", "violet"];
+const COLOR_BG_MAP = {
+  red: "bg-red-600",
+  blue: "bg-blue-600",
+  green: "bg-green-600",
+  amber: "bg-amber-600",
+  violet: "bg-violet-600",
+};
+const COLOR_CLASS_MAP = {
+  red: "bg-red-600 text-white ring-red-600/30",
+  blue: "bg-blue-600 text-white ring-blue-600/30",
+  green: "bg-green-600 text-white ring-green-600/30",
+  amber: "bg-amber-600 text-white ring-amber-600/30",
+  violet: "bg-violet-600 text-white ring-violet-600/30",
+};
+const HOTSPOT_COLOR_STORAGE_KEY = "kalima_hotspot_color";
+const DEFAULT_HOTSPOT_COLOR = "blue";
 const contentBlockTypes = ["text", "image", "video", "audio", "file", "link", "question_answer"];
 const textFontOptions = ["Inter", "Arial", "Georgia", "Times New Roman", "Courier New"];
+
+const getStoredHotspotColor = () => {
+  try {
+    const color = window.localStorage.getItem(HOTSPOT_COLOR_STORAGE_KEY);
+    return hotspotColors.includes(color) ? color : DEFAULT_HOTSPOT_COLOR;
+  } catch {
+    return DEFAULT_HOTSPOT_COLOR;
+  }
+};
+
+const getHotspotColorClasses = (hotspot) => {
+  const color = hotspotColors.includes(hotspot?.display_behavior?.color)
+    ? hotspot.display_behavior.color
+    : DEFAULT_HOTSPOT_COLOR;
+  return COLOR_CLASS_MAP[color];
+};
 
 const createDefaultBlock = (type = "text") => ({
   id: `block-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -103,7 +136,7 @@ const defaultInteractionJson = {
   image: { autoExpand: false, expandOnClick: true },
 };
 
-const defaultDisplayBehavior = { opens: "popover", opacity_percent: 100 };
+const defaultDisplayBehavior = { opens: "popover", opacity_percent: 100, color: DEFAULT_HOTSPOT_COLOR };
 const resizeHandles = ["nw", "ne", "sw", "se"];
 const MIN_HOTSPOT_SIZE_PERCENT = 0.5;
 const MAX_HOTSPOT_SIZE_PERCENT = 100;
@@ -200,6 +233,9 @@ const normalizeDisplayBehaviorForForm = (hotspot) => ({
   ...defaultDisplayBehavior,
   ...(hotspot?.display_behavior || {}),
   opacity_percent: Math.min(100, Math.max(0, parseNumber(hotspot?.display_behavior?.opacity_percent, 100))),
+  color: hotspotColors.includes(hotspot?.display_behavior?.color)
+    ? hotspot.display_behavior.color
+    : DEFAULT_HOTSPOT_COLOR,
 });
 
 const clampHotspotSize = (value) => Math.min(
@@ -311,7 +347,10 @@ export default function AdminEBookletEditorPage() {
   const [versionForm, setVersionForm] = useState(defaultVersionForm);
   const [selectedPage, setSelectedPage] = useState(1);
   const [hotspots, setHotspots] = useState([]);
-  const [hotspotForm, setHotspotForm] = useState(defaultHotspotForm);
+  const [hotspotForm, setHotspotForm] = useState(() => ({
+    ...defaultHotspotForm,
+    display_behavior: { ...defaultHotspotForm.display_behavior, color: getStoredHotspotColor() },
+  }));
   const [copiedHotspotConfiguration, setCopiedHotspotConfiguration] = useState(null);
   const [hasDraftHotspotPreview, setHasDraftHotspotPreview] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -608,6 +647,40 @@ export default function AdminEBookletEditorPage() {
     });
   };
 
+  const addAnswer = (blockIndex) => {
+    setHotspotForm((current) => {
+      const blocks = current.content_json?.blocks?.length ? current.content_json.blocks : [createDefaultBlock("question_answer")];
+      return {
+        ...current,
+        content_json: {
+          version: 2,
+          blocks: blocks.map((block, index) =>
+            index === blockIndex
+              ? { ...block, answers: [...(block.answers || []), { text: "", isCorrect: false }] }
+              : block,
+          ),
+        },
+      };
+    });
+  };
+
+  const removeAnswer = (blockIndex, answerIndex) => {
+    setHotspotForm((current) => {
+      const blocks = current.content_json?.blocks?.length ? current.content_json.blocks : [createDefaultBlock("question_answer")];
+      return {
+        ...current,
+        content_json: {
+          version: 2,
+          blocks: blocks.map((block, index) =>
+            index === blockIndex
+              ? { ...block, answers: (block.answers || []).filter((_, i) => i !== answerIndex) }
+              : block,
+          ),
+        },
+      };
+    });
+  };
+
   const updateInteractionField = (group, field, value) => {
     setHotspotForm((current) => ({
       ...current,
@@ -827,7 +900,9 @@ export default function AdminEBookletEditorPage() {
             width_percent: current.id ? defaultHotspotForm.width_percent : current.width_percent || defaultHotspotForm.width_percent,
             height_percent: current.id ? defaultHotspotForm.height_percent : current.height_percent || defaultHotspotForm.height_percent,
             radius_percent: current.id ? defaultHotspotForm.radius_percent : current.radius_percent || defaultHotspotForm.radius_percent,
-            display_behavior: current.id ? defaultDisplayBehavior : normalizeDisplayBehaviorForForm(current),
+            display_behavior: current.id
+              ? { ...defaultDisplayBehavior, color: getStoredHotspotColor() }
+              : normalizeDisplayBehaviorForForm(current),
             content_json: { version: 2, blocks: [createDefaultBlock("text")] },
             interaction_json: defaultInteractionJson,
           }),
@@ -888,6 +963,7 @@ export default function AdminEBookletEditorPage() {
         ...defaultDisplayBehavior,
         ...(hotspotForm.display_behavior || {}),
         opacity_percent: Math.min(100, Math.max(0, parseNumber(hotspotForm.display_behavior?.opacity_percent, 100))),
+        color: hotspotForm.display_behavior?.color || DEFAULT_HOTSPOT_COLOR,
       },
       content_json: contentJson,
       interaction_json: hotspotForm.interaction_json || defaultInteractionJson,
@@ -902,6 +978,7 @@ export default function AdminEBookletEditorPage() {
     setHasDraftHotspotPreview(false);
     setHotspotForm({
       ...defaultHotspotForm,
+      display_behavior: { ...defaultHotspotForm.display_behavior, color: getStoredHotspotColor() },
       page_number: selectedPage,
       content_json: { version: 2, blocks: [createDefaultBlock("text")] },
       interaction_json: defaultInteractionJson,
@@ -915,6 +992,7 @@ export default function AdminEBookletEditorPage() {
     setHasDraftHotspotPreview(false);
     setHotspotForm({
       ...defaultHotspotForm,
+      display_behavior: { ...defaultHotspotForm.display_behavior, color: getStoredHotspotColor() },
       page_number: selectedPage,
       content_json: { version: 2, blocks: [createDefaultBlock("text")] },
       interaction_json: defaultInteractionJson,
@@ -1235,7 +1313,7 @@ export default function AdminEBookletEditorPage() {
               placeholder={t("admin.editor.hotspots.questionPlaceholder")}
             />
             {(block.answers || []).map((answer, answerIndex) => (
-              <div key={answerIndex} className="grid grid-cols-[1fr_auto] gap-2">
+              <div key={answerIndex} className="grid grid-cols-[1fr_auto_auto] gap-2">
                 <Input
                   value={answer.text || ""}
                   onChange={(event) => updateAnswer(index, answerIndex, "text", event.target.value)}
@@ -1250,8 +1328,25 @@ export default function AdminEBookletEditorPage() {
                   />
                   {t("admin.editor.hotspots.correctAnswer")}
                 </label>
+                {(block.answers || []).length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeAnswer(index, answerIndex)}
+                    aria-label={t("admin.editor.hotspots.removeAnswer", { number: answerIndex + 1 })}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                )}
               </div>
             ))}
+            {(block.answers || []).length < 10 && (
+              <Button type="button" variant="ghost" size="sm" onClick={() => addAnswer(index)}>
+                <Plus className="h-3.5 w-3.5 mr-1" />
+                {t("admin.editor.hotspots.addAnswer")}
+              </Button>
+            )}
           </div>
         )}
 
@@ -1681,7 +1776,7 @@ export default function AdminEBookletEditorPage() {
                         event.stopPropagation();
                         selectHotspot(hotspot);
                       }}
-                      className="absolute flex cursor-grab items-center justify-center border-2 border-white bg-primary text-primary-foreground shadow-md active:cursor-grabbing"
+                      className={`absolute flex cursor-grab items-center justify-center border-2 border-white shadow-md active:cursor-grabbing ${getHotspotColorClasses(hotspot)}`}
                       style={{
                         left: `${hotspot.x_percent}%`,
                         top: `${hotspot.y_percent}%`,
@@ -1835,6 +1930,31 @@ export default function AdminEBookletEditorPage() {
                       value={hotspotForm.display_behavior?.opacity_percent ?? 100}
                       onChange={(event) => updateHotspotDisplayField("opacity_percent", Number(event.target.value))}
                     />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t("admin.editor.hotspots.color")}</Label>
+                  <div className="grid grid-cols-5 gap-2">
+                    {hotspotColors.map((color) => {
+                      const selected = (hotspotForm.display_behavior?.color || DEFAULT_HOTSPOT_COLOR) === color;
+                      return (
+                        <Button
+                          key={color}
+                          type="button"
+                          variant={selected ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => {
+                            updateHotspotDisplayField("color", color);
+                            try { window.localStorage.setItem(HOTSPOT_COLOR_STORAGE_KEY, color); } catch { /* noop */ }
+                          }}
+                          className={selected ? COLOR_CLASS_MAP[color] : ""}
+                          aria-label={t(`admin.editor.hotspots.colors.${color}`)}
+                        >
+                          <span className={`h-4 w-4 rounded-full ${COLOR_BG_MAP[color]}`} />
+                        </Button>
+                      );
+                    })}
                   </div>
                 </div>
 

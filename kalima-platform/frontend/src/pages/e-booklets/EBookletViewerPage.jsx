@@ -35,6 +35,21 @@ const HOTSPOT_TYPES = {
   question_answer: { icon: HelpCircle, className: "bg-fuchsia-600" },
 };
 
+const VIEWER_COLOR_CLASS_MAP = {
+  red: "bg-red-600",
+  blue: "bg-blue-600",
+  green: "bg-green-600",
+  amber: "bg-amber-600",
+  violet: "bg-violet-600",
+};
+const DEFAULT_HOTSPOT_COLOR = "blue";
+
+const getHotspotColorClass = (hotspot) => {
+  const color = hotspot?.display_behavior?.color;
+  if (!color) return VIEWER_COLOR_CLASS_MAP[DEFAULT_HOTSPOT_COLOR];
+  return VIEWER_COLOR_CLASS_MAP[color] || null;
+};
+
 const getDimensions = (metadata, pageNumber) => {
   const dimensions =
     metadata?.booklet_instance?.template_version?.page_dimensions_json || [];
@@ -124,6 +139,7 @@ const buildDeviceFingerprint = async () => {
 function HotspotMarker({ hotspot, active, onOpen, t }) {
   const typeMeta = HOTSPOT_TYPES[hotspot.type] || HOTSPOT_TYPES.text;
   const Icon = typeMeta.icon;
+  const colorClass = getHotspotColorClass(hotspot) || typeMeta.className;
   const shape = hotspot.shape || "circle";
   const width = shape === "circle" || shape === "oval"
     ? clamp(hotspot.width_percent || hotspot.radius_percent * 2, 4, 2, 35)
@@ -156,7 +172,7 @@ function HotspotMarker({ hotspot, active, onOpen, t }) {
           className={`absolute inset-0 ${active ? "opacity-95" : "opacity-80"}`}
           style={{ clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)" }}
         >
-          <span className={`block h-full w-full ${typeMeta.className}`} />
+          <span className={`block h-full w-full ${colorClass}`} />
         </span>
         <span className="relative z-10 flex h-7 min-w-7 items-center justify-center rounded-full border border-white bg-black/55 px-1 text-xs font-bold text-white shadow">
           {getReference(hotspot)}
@@ -170,7 +186,7 @@ function HotspotMarker({ hotspot, active, onOpen, t }) {
     <button
       type="button"
       onClick={() => onOpen(hotspot)}
-      className={`absolute flex items-center justify-center border-2 border-white text-white shadow-lg transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${roundedClass} ${typeMeta.className} ${active ? "ring-4 ring-primary/30" : ""}`}
+      className={`absolute flex items-center justify-center border-2 border-white text-white shadow-lg transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${roundedClass} ${colorClass} ${active ? "ring-4 ring-primary/30" : ""}`}
       style={baseStyle}
       aria-label={getHotspotLabel(hotspot, t)}
     >

@@ -190,6 +190,14 @@
         "widthPercent": "العرض %",
         "heightPercent": "الارتفاع %",
         "opacityPercent": "الظهور %",
+        "color": "اللون",
+        "colors": {
+          "red": "أحمر",
+          "blue": "أزرق",
+          "green": "أخضر",
+          "amber": "كهرماني",
+          "violet": "بنفسجي"
+        },
         "shape": "الشكل",
         "shapes": {
           "circle": "دائرة",
@@ -244,6 +252,8 @@
         "questionPlaceholder": "نص السؤال",
         "answerPlaceholder": "الإجابة {{number}}",
         "correctAnswer": "صحيح",
+        "addAnswer": "إضافة إجابة",
+        "removeAnswer": "حذف الإجابة {{number}}",
         "allHotspots": "كل نقاط التفاعل",
         "sortedByCreated": "مرتبة حسب وقت الإنشاء",
         "recordingUnavailable": "تسجيل الصوت غير متاح في هذا المتصفح.",
