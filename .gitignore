@@ -1,128 +1,162 @@
-# # Logs
-# logs
-# *.log
-# npm-debug.log*
-# yarn-debug.log*
-# lerna-debug.log*
-# .pnpm-debug.log*
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
 
-# # Diagnostic reports
-# report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# # Runtime data
-# pids
-# *.pid
-# *.seed
-# *.pid.lock
-# kalima-platform/backend/.local-postgres/
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+kalima-platform/backend/.local-postgres/
 
-# # Dependency directories
-# node_modules/
-# frontend/node_modules/
-# jspm_packages/
-# bower_components/
-# backend/upload/
-# # Build output
-# build/
-# **/build/
-# dist/
-# frontend/dist/
+# Dependency directories
+node_modules/
+**/node_modules/
+jspm_packages/
+bower_components/
 
-# # Capacitor
-# android/
-# frontend/android/
+# Build output
+build/
+**/build/
+dist/
+**/dist/
+dist-ssr/
+**/dist-ssr/
 
-# # Vite
-# frontend/.vite/
+# Capacitor / native builds
+android/
+kalima-platform/android/
+kalima-platform/frontend/android/
 
-# # Cache and temp folders
-# .cache/
-# frontend/.cache/
-# .parcel-cache/
-# .temp/
-# .nyc_output/
-# .rpt2_cache/
-# .rts2_cache_cjs/
-# .rts2_cache_es/
-# .rts2_cache_umd/
-# .docusaurus/
-# .serverless/
-# .fusebox/
-# .dynamodb/
+# Vite
+.vite/
+**/.vite/
 
-# uploads/
-# # Config files
-# .env
-# .env.*
-# .pnpm-debug.log*
-# .lock-wscript
-# .eslintcache
-# .stylelintcache
-# .node_repl_history
-# .yarn-integrity
-# .yarn/cache/
-# .yarn/unplugged/
-# .yarn/build-state.yml
-# .yarn/install-state.gz
-# .pnp.*
-# .pnp.js
+# Cache and temp folders
+.cache/
+**/.cache/
+.parcel-cache/
+.temp/
+.nyc_output/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.docusaurus/
+.serverless/
+.fusebox/
+.dynamodb/
 
-# # Framework specific
-# .next/
-# out/
-# .nuxt/
-# .vuepress/dist/
-# .docusaurus/
-# .serverless/
-# public/ # (only if needed)
+# Uploads and generated local files
+uploads/
+**/uploads/
+kalima-platform/backend/upload/
+kalima-platform/backend/uploads/
+kalima-platform/backend/src/uploads/
 
-# # Testing
-# coverage/
+# Config and secrets
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+*.local
+**/*.local
+.pnpm-debug.log*
+.lock-wscript
+.eslintcache
+.stylelintcache
+.node_repl_history
+.yarn-integrity
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+.pnp.js
 
-# # Other
-# .vscode-test
-# .DS_Store
-# *.tgz
-# # Added by code-review-graph
-# .code-review-graph/
+# Framework specific
+.next/
+out/
+.nuxt/
+.vuepress/dist/
+.docusaurus/
+.serverless/
+public/ # (only if needed)
 
-# # Local agent/planning/working artifacts — keep inside the repo but never push
-# kalima-platform/.local-workdocs/
-# kalima-platform/CONTEXT.md
-# .codegraph/
+# Testing
+coverage/
+**/coverage/
 
-# # macOS metadata
-# .DS_Store
-# **/.DS_Store
+# Editor directories and files
+.vscode-test
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# # AI/model/evaluation local artifacts — do not commit generated weights, caches, or harness output
-# *.gguf
-# *.ggml
-# *.safetensors
-# *.ckpt
-# *.pt
-# *.pth
-# *.onnx
-# *.tflite
-# *.mlmodel
-# *.mlpackage
-# *.h5
-# *.keras
-# ai-models/
-# model-artifacts/
-# model-cache/
-# models-cache/
-# checkpoints/
-# weights/
-# loras/
-# adapters/
-# hf-cache/
-# .hf-cache/
-# .huggingface/
-# .fallow/
-# harness-artifacts/
-# harness-results/
-# eval-artifacts/
-# eval-results/
-# benchmark-results/
-# artifacts/last-harness*.txt
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
+# Archives
+*.tgz
+
+# Prisma / generated backend artifacts
+kalima-platform/backend/migration_lock.toml
+kalima-platform/backend/generated/prisma/
+kalima-platform/backend/baileys_auth/
+
+# Added by code-review-graph
+.code-review-graph/
+
+# Local agent/planning/working artifacts — keep inside the repo but never push
+kalima-platform/.local-workdocs/
+kalima-platform/CONTEXT.md
+.codegraph/
+
+# AI/model/evaluation local artifacts — do not commit generated weights, caches, or harness output
+*.gguf
+*.ggml
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.mlmodel
+*.mlpackage
+*.h5
+*.keras
+ai-models/
+model-artifacts/
+model-cache/
+models-cache/
+checkpoints/
+weights/
+loras/
+adapters/
+hf-cache/
+.hf-cache/
+.huggingface/
+.fallow/
+harness-artifacts/
+harness-results/
+eval-artifacts/
+eval-results/
+benchmark-results/
+artifacts/last-harness*.txt
