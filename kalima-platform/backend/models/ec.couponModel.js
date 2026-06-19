@@ -15,7 +15,6 @@ const couponSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      index: true,
       uppercase: true,
       validate: {
         validator: function (v) {
@@ -62,7 +61,6 @@ const couponSchema = new mongoose.Schema(
 // Index for active coupons
 couponSchema.index({ isActive: 1 });
 couponSchema.index({ expirationDate: 1 });
-couponSchema.index({ couponCode: 1 });
 
 // Virtual for checking if coupon is expired
 couponSchema.virtual("isExpired").get(function () {

@@ -179,7 +179,6 @@ const cartPurchaseSchema = new mongoose.Schema(
 // Indexes for common queries
 cartPurchaseSchema.index({ createdBy: 1 });
 cartPurchaseSchema.index({ confirmed: 1 });
-cartPurchaseSchema.index({ purchaseSerial: 1 });
 cartPurchaseSchema.index({ createdAt: -1 });
 
 // Virtual to get formatted creation date
