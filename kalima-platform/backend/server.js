@@ -1,5 +1,9 @@
 require("reflect-metadata");
-require("dotenv").config();
+const path = require("path");
+const dotenv = require("dotenv");
+
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+dotenv.config({ path: path.resolve(process.cwd(), "..", ".env") });
 
 const parentRoutes = require("./routes/parentRoutes");
 const mongoSanitize = require("express-mongo-sanitize");
@@ -13,7 +17,6 @@ const mongoose = require("mongoose");
 const corsOptions = require("./config/corsOptions.js");
 const cookieParser = require("cookie-parser");
 const auditLogger = require("./middleware/auditLogger");
-const path = require("path");
 const multer = require("multer");
 
 const containerRouter = require("./routes/containerRoutes");
@@ -307,7 +310,6 @@ mongoose.connection.on("error", (err) => {
 });
 
 app.use(errorHandler);
-
 
 
 

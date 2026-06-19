@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import "dotenv/config";
+import "./config/loadEnv";
 import { closeRedis } from "./libs/redis/client";
 import { baileysClient } from "./libs/whatsapp/client";
 import path from "path";
