@@ -1,7 +1,7 @@
-trnode_modules
-# Keep environment variables out of version control
-.env
-migration_lock.toml
-/generated/prisma
+node_modules
+# # Keep environment variables out of version control
+# .env
+# migration_lock.toml
+# /generated/prisma
 
-baileys_auth/
+# baileys_auth/
