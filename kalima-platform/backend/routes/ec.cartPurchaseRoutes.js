@@ -63,6 +63,20 @@ router.get(
 );
 
 router
+  .route("/User-purchase-history/")
+  .get(
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    cartPurchaseController.getUsersPurchaseHistory,
+  );
+
+router
+  .route("/User-purchase-history/:userId")
+  .get(
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    cartPurchaseController.getUsersPurchaseHistoryInDetailById,
+  );
+
+router
   .route("/:id")
   .get(
     authController.verifyRoles("Admin", "SubAdmin", "Moderator"),

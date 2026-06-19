@@ -1,0 +1,825 @@
+
+===== FILE: kalima-platform/backend/tests/e-booklet/e-booklet.routes.spec.ts (823 lines) =====
+1|import express from "express";
+2|import request from "supertest";
+3|import jwt from "jsonwebtoken";
+4|
+5|process.env.DATABASE_URL =
+6|  process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/postgres?schema=test";
+7|process.env.JWT_SECRET = process.env.JWT_SECRET || "test-secret";
+8|
+9|const mockDomainServices = {
+10|  terms: {
+11|    getLatestActiveTerms: jest.fn(),
+12|    acceptLatestTerms: jest.fn(),
+13|    createTerms: jest.fn(),
+14|    listTerms: jest.fn(),
+15|    updateTerms: jest.fn(),
+16|    activateTerms: jest.fn(),
+17|  },
+18|  accessCodes: {
+19|    generateCode: jest.fn(),
+20|    listCodes: jest.fn(),
+21|  },
+22|  redemptions: {
+23|    redeemCode: jest.fn(),
+24|  },
+25|  milestones: {
+26|    listMilestones: jest.fn(),
+27|    createMilestone: jest.fn(),
+28|    updateMilestone: jest.fn(),
+29|    deleteMilestone: jest.fn(),
+30|    reorderMilestones: jest.fn(),
+31|    listProgress: jest.fn(),
+32|    claimReward: jest.fn(),
+33|    evaluateTeacherMilestones: jest.fn(),
+34|  },
+35|  wallet: {
+36|    getWallet: jest.fn(),
+37|    listLedger: jest.fn(),
+38|    previewPurchase: jest.fn(),
+39|    applyToPurchase: jest.fn(),
+40|  },
+41|};
+42|
+43|jest.mock("../../src/apps/store-api/services/e-booklet-domain.service", () => ({
+44|  getEBookletDomainServices: () => mockDomainServices,
+45|}), { virtual: true });
+46|
+47|const mockService = {
+48|  listPublicInstances: jest.fn(),
+49|  getPublicInstance: jest.fn(),
+50|  createPublicCheckoutRequest: jest.fn(),
+51|  createTemplate: jest.fn(),
+52|  createPurchaseRequest: jest.fn(),
+53|  listTemplateVersions: jest.fn(),
+54|  listVersionHotspots: jest.fn(),
+55|  listUserEBooklets: jest.fn(),
+56|  createInvite: jest.fn(),
+57|  acceptInvite: jest.fn(),
+58|  acceptFreeInvite: jest.fn(),
+59|  acceptInvitePasscode: jest.fn(),
+60|  createStudentPurchaseLink: jest.fn(),
+61|  getViewerPage: jest.fn(),
+62|  getAdminViewerMetadata: jest.fn(),
+63|  getAdminViewerPage: jest.fn(),
+64|  getAdminViewerPageHotspots: jest.fn(),
+65|  getAdminHotspotContent: jest.fn(),
+66|  getAdminAuthorizedHotspotAsset: jest.fn(),
+67|  bindViewerDevice: jest.fn(),
+68|  listViewerDevices: jest.fn(),
+69|  resetViewerDevices: jest.fn(),
+70|  addDeviceAllowance: jest.fn(),
+71|  approveStudentPurchaseLink: jest.fn(),
+72|  getAuthorizedHotspotAsset: jest.fn(),
+73|  createFileAsset: jest.fn(),
+74|  recordInviteOpen: jest.fn(),
+75|  getTeacherAnalytics: jest.fn(),
+76|  getAdminAnalytics: jest.fn(),
+77|  exportAdminAnalyticsCsv: jest.fn(),
+78|};
+79|
+80|jest.mock("../../src/apps/store-api/services/e-booklet.service", () => ({
+81|  getEBookletService: () => mockService,
+82|}));
+83|
+84|function createApp() {
+85|  const eBookletRoutes =
+86|    require("../../src/apps/store-api/routes/v2/e-booklet.routes").default;
+87|  const app = express();
+88|  app.use(express.json());
+89|  app.use("/api/v2", eBookletRoutes);
+90|  app.use((err: any, _req: any, res: any, _next: any) => {
+91|    res.status(err.statusCode || 500).json({
+92|      success: false,
+93|      message: err.message,
+94|    });
+95|  });
+96|  return app;
+97|}
+98|
+99|function tokenFor(
+100|  role: "Admin" | "SubAdmin" | "Moderator" | "Teacher" | "Student",
+101|  userId = 1,
+102|  portal = "store",
+103|) {
+104|  return jwt.sign(
+105|    {
+106|      userId,
+107|      roles: [{ role, portal }],
+108|    },
+109|    process.env.JWT_SECRET as string,
+110|    { expiresIn: "1h" },
+111|  );
+112|}
+113|
+114|describe("e-booklet routes", () => {
+115|  const app = createApp();
+116|
+117|  beforeEach(() => {
+118|    jest.clearAllMocks();
+119|    for (const serviceGroup of Object.values(mockDomainServices)) {
+120|      for (const fn of Object.values(serviceGroup)) {
+121|        (fn as jest.Mock).mockReset();
+122|      }
+123|    }
+124|  });
+125|
+126|  test("serves e-booklet store as active teacher-specific instances", async () => {
+127|    mockService.listPublicInstances.mockResolvedValue({
+128|      data: [{ id: 10, display_title: "Grade 5 Arabic with Ms Sara", teacher: { id: 7, name: "Sara" }, remaining_seats: 4 }],
+129|      total: 1,
+130|      page: 1,
+131|      limit: 20,
+132|    });
+133|
+134|    await request(app)
+135|      .get("/api/v2/e-booklet-store")
+136|      .expect(200)
+137|      .expect((res) => {
+138|        expect(res.body.success).toBe(true);
+139|        expect(res.body.data).toEqual([
+140|          { id: 10, display_title: "Grade 5 Arabic with Ms Sara", teacher: { id: 7, name: "Sara" }, remaining_seats: 4 },
+141|        ]);
+142|      });
+143|
+144|    expect(mockService.listPublicInstances).toHaveBeenCalledWith({
+145|      categoryId: undefined,
+146|      limit: 20,
+147|      page: 1,
+148|      search: undefined,
+149|    });
+150|  });
+151|
+152|  test("serves e-booklet store detail by teacher instance id", async () => {
+153|    mockService.getPublicInstance.mockResolvedValue({ id: 10, display_title: "Grade 5 Arabic with Ms Sara" });
+154|
+155|    await request(app)
+156|      .get("/api/v2/e-booklet-store/instances/10")
+157|      .expect(200)
+158|      .expect((res) => {
+159|        expect(res.body.data).toEqual({ id: 10, display_title: "Grade 5 Arabic with Ms Sara" });
+160|      });
+161|
+162|    expect(mockService.getPublicInstance).toHaveBeenCalledWith(10);
+163|  });
+164|
+165|  test("blocks non-admin users from admin e-booklet template creation", async () => {
+166|    await request(app)
+167|      .post("/api/v2/admin/e-booklet-templates")
+168|      .set("Authorization", `Bearer ${tokenFor("Teacher", 2)}`)
+169|      .send({ title: "Teacher should not create", price: 100 })
+170|      .expect(403);
+171|
+172|    expect(mockService.createTemplate).not.toHaveBeenCalled();
+173|  });
+174|
+175|  test("allows admin users to create e-booklet templates", async () => {
+176|    mockService.createTemplate.mockResolvedValue({ id: 44, title: "Template" });
+177|
+178|    await request(app)
+179|      .post("/api/v2/admin/e-booklet-templates")
+180|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+181|      .send({ title: "Template", description: "Reusable", price: 150 })
+182|      .expect(201)
+183|      .expect((res) => {
+184|        expect(res.body.data).toEqual({ id: 44, title: "Template" });
+185|      });
+186|
+187|    expect(mockService.createTemplate).toHaveBeenCalledWith(
+188|      expect.objectContaining({ title: "Template", price: 150 }),
+189|      1,
+190|    );
+191|  });
+192|
+193|  test("public checkout requires auth and creates an instance-scoped purchase request", async () => {
+194|    mockService.createPublicCheckoutRequest.mockResolvedValue({ purchase_id: 91 });
+195|
+196|    await request(app)
+197|      .post("/api/v2/e-booklet-checkout")
+198|      .send({ template_id: 3, template_version_id: 4, branding_json: {} })
+199|      .expect(401);
+200|
+201|    await request(app)
+202|      .post("/api/v2/e-booklet-checkout")
+203|      .set("Authorization", `Bearer ${tokenFor("Teacher", 77, "store")}`)
+204|      .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0, terms_accepted: true })
+205|      .expect(403);
+206|
+207|    await request(app)
+208|      .post("/api/v2/e-booklet-checkout")
+209|      .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
+210|      .send({ instance_id: 7, template_id: 3, template_version_id: 4, branding_json: {}, price: 0, terms_accepted: true })
+211|      .expect(201)
+212|      .expect((res) => {
+213|        expect(res.body.data).toEqual({ purchase_id: 91 });
+214|      });
+215|
+216|    expect(mockService.createPurchaseRequest).not.toHaveBeenCalled();
+217|    expect(mockService.createPublicCheckoutRequest).toHaveBeenCalledWith(
+218|      55,
+219|      expect.objectContaining({ instance_id: 7, template_id: 3, template_version_id: 4, terms_accepted: true }),
+220|      undefined,
+221|    );
+222|  });
+223|
+224|  test("rejects non-PDF main e-booklet document uploads while hotspot media still accepts safe attachments", async () => {
+225|    mockService.createFileAsset.mockResolvedValue({ id: 77 });
+226|
+227|    await request(app)
+228|      .post("/api/v2/admin/e-booklet-files/document")
+229|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+230|      .attach("document", Buffer.from("docx"), {
+231|        filename: "main.docx",
+232|        contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+233|      })
+234|      .expect(400)
+235|      .expect((res) => {
+236|        expect(res.body.message).toContain("Allowed: PDF only");
+237|      });
+238|
+239|    await request(app)
+240|      .post("/api/v2/admin/e-booklet-files/hotspot-media")
+241|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+242|      .field("file_type", "image")
+243|      .attach("media", Buffer.from("png"), {
+244|        filename: "worksheet.png",
+245|        contentType: "image/png",
+246|      })
+247|      .expect(201);
+248|
+249|    await request(app)
+250|      .post("/api/v2/admin/e-booklet-files/hotspot-media")
+251|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+252|      .field("file_type", "file")
+253|      .attach("media", Buffer.from("docx"), {
+254|        filename: "worksheet.docx",
+255|        contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+256|      })
+257|      .expect(201);
+258|
+259|    expect(mockService.createFileAsset).toHaveBeenCalledTimes(2);
+260|    expect(mockService.createFileAsset).toHaveBeenLastCalledWith(
+261|      expect.any(Object),
+262|      expect.objectContaining({ fileType: "file" }),
+263|    );
+264|  });
+265|
+266|  test("allows admin users to list template versions for the editor", async () => {
+267|    mockService.listTemplateVersions.mockResolvedValue([
+268|      { id: 5, version_number: 2, status: "draft" },
+269|    ]);
+270|
+271|    await request(app)
+272|      .get("/api/v2/admin/e-booklet-templates/44/versions")
+273|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+274|      .expect(200)
+275|      .expect((res) => {
+276|        expect(res.body.data).toEqual([
+277|          { id: 5, version_number: 2, status: "draft" },
+278|        ]);
+279|      });
+280|
+281|    expect(mockService.listTemplateVersions).toHaveBeenCalledWith(44);
+282|  });
+283|
+284|  test("allows admin users to reload saved hotspots by version and page", async () => {
+285|    mockService.listVersionHotspots.mockResolvedValue([
+286|      { id: 9, page_number: 3, type: "audio" },
+287|    ]);
+288|
+289|    await request(app)
+290|      .get("/api/v2/admin/e-booklet-template-versions/5/hotspots?page_number=3")
+291|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+292|      .expect(200)
+293|      .expect((res) => {
+294|        expect(res.body.data).toEqual([
+295|          { id: 9, page_number: 3, type: "audio" },
+296|        ]);
+297|      });
+298|
+299|    expect(mockService.listVersionHotspots).toHaveBeenCalledWith(5, 3);
+300|  });
+301|
+302|  test("allows teachers to create invite links for their own e-booklet instances", async () => {
+303|    mockService.createInvite.mockResolvedValue({
+304|      invite: { id: 8, booklet_instance_id: 10 },
+305|      token: "raw-token",
+306|    });
+307|
+308|    await request(app)
+309|      .post("/api/v2/teacher/e-booklets/10/invites")
+310|      .set("Authorization", `Bearer ${tokenFor("Teacher", 2)}`)
+311|      .send({ max_uses: 5 })
+312|      .expect(201)
+313|      .expect((res) => {
+314|        expect(res.body.data.token).toBe("raw-token");
+315|      });
+316|
+317|    expect(mockService.createInvite).toHaveBeenCalledWith(10, 2, {
+318|      max_uses: 5,
+319|    });
+320|  });
+321|
+322|  test("rejects empty legacy invite acceptance bodies instead of bypassing access rules", async () => {
+323|    await request(app)
+324|      .post("/api/v2/e-booklet-invites/raw-token/accept")
+325|      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+326|      .send({})
+327|      .expect(400)
+328|      .expect((res) => {
+329|        expect(res.body.message).toContain("Invite accessPath is required");
+330|      });
+331|
+332|    expect(mockService.acceptInvite).not.toHaveBeenCalled();
+333|    expect(mockService.acceptFreeInvite).not.toHaveBeenCalled();
+334|    expect(mockService.acceptInvitePasscode).not.toHaveBeenCalled();
+335|    expect(mockService.createStudentPurchaseLink).not.toHaveBeenCalled();
+336|  });
+337|
+338|  test("dispatches student invite acceptance to explicit Phase 1 access paths", async () => {
+339|    mockService.acceptFreeInvite.mockResolvedValue({ id: 12, access_source: "free_invite" });
+340|    mockService.acceptInvitePasscode.mockResolvedValue({ id: 13, access_source: "offline_passcode" });
+341|    mockService.createStudentPurchaseLink.mockResolvedValue({ id: 14, purchase_id: 500 });
+342|
+343|    await request(app)
+344|      .post("/api/v2/e-booklet-invites/raw-token/accept")
+345|      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+346|      .send({ accessPath: "free", termsAccepted: true, termsVersion: "v1" })
+347|      .expect(200)
+348|      .expect((res) => {
+349|        expect(res.body.data.access_source).toBe("free_invite");
+350|      });
+351|
+352|    await request(app)
+353|      .post("/api/v2/e-booklet-invites/raw-token/accept")
+354|      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+355|      .send({ accessPath: "offline_passcode", passcode: "123456", termsAccepted: true })
+356|      .expect(200);
+357|
+358|    await request(app)
+359|      .post("/api/v2/e-booklet-invites/raw-token/accept")
+360|      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+361|      .send({ accessPath: "online_purchase", purchaseId: 500, paymentProofFileId: 321, termsAccepted: true })
+362|      .expect(200);
+363|
+364|    expect(mockService.acceptInvite).not.toHaveBeenCalled();
+365|    expect(mockService.acceptFreeInvite).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ termsAccepted: true, termsVersion: "v1" }));
+366|    expect(mockService.acceptInvitePasscode).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ passcode: "123456", termsAccepted: true }), expect.objectContaining({ ipAddress: expect.any(String) }));
+367|    expect(mockService.createStudentPurchaseLink).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ purchaseId: 500, termsAccepted: true }), undefined);
+368|  });
+369|
+370|  test("allows academy student accounts to accept e-booklet invites and list granted booklets", async () => {
+371|    mockService.acceptInvitePasscode.mockResolvedValue({ id: 13, access_source: "offline_passcode" });
+372|    mockService.listUserEBooklets.mockResolvedValue([{ id: 13 }]);
+373|
+374|    await request(app)
+375|      .post("/api/v2/e-booklet-invites/raw-token/accept")
+376|      .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
+377|      .send({ accessPath: "offline_passcode", passcode: "123456", termsAccepted: true })
+378|      .expect(200);
+379|
+380|    await request(app)
+381|      .get("/api/v2/student/e-booklets")
+382|      .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
+383|      .expect(200)
+384|      .expect((res) => {
+385|        expect(res.body.data).toEqual([{ id: 13 }]);
+386|      });
+387|
+388|    expect(mockService.acceptInvitePasscode).toHaveBeenCalledWith("raw-token", 55, expect.objectContaining({ passcode: "123456", termsAccepted: true }), expect.objectContaining({ ipAddress: expect.any(String) }));
+389|    expect(mockService.listUserEBooklets).toHaveBeenCalledWith(55, "student");
+390|  });
+391|
+392|  test("records anonymous invite opens and exposes scoped analytics APIs", async () => {
+393|    mockService.recordInviteOpen.mockResolvedValue({ invite_id: 2, has_passcode: true });
+394|    mockService.getTeacherAnalytics.mockResolvedValue({ events: { invite_opened: 3 }, revenue: { offlineEstimated: 150 } });
+395|    mockService.getAdminAnalytics.mockResolvedValue({ events: { access_created: 2 }, revenue: { marketing: 300, internal: 120 } });
+396|    mockService.exportAdminAnalyticsCsv.mockResolvedValue("id,event_type\n1,access_created");
+397|
+398|    await request(app)
+399|      .get("/api/v2/e-booklet-invites/raw-token/open?source=whatsapp")
+400|      .set("x-e-booklet-session", "anon-1")
+401|      .expect(200);
+402|    await request(app)
+403|      .get("/api/v2/teacher/e-booklet-analytics?instance_id=10")
+404|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+405|      .expect(200);
+406|    await request(app)
+407|      .get("/api/v2/admin/e-booklet-analytics?teacher_id=9")
+408|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+409|      .expect(200);
+410|    await request(app)
+411|      .get("/api/v2/admin/e-booklet-analytics.csv")
+412|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+413|      .expect(200)
+414|      .expect("Content-Type", /text\/csv/);
+415|
+416|    expect(mockService.recordInviteOpen).toHaveBeenCalledWith("raw-token", expect.objectContaining({ anonymousSessionId: "anon-1", source: "whatsapp" }));
+417|    expect(mockService.getTeacherAnalytics).toHaveBeenCalledWith(9, expect.objectContaining({ instanceId: 10 }));
+418|    expect(mockService.getAdminAnalytics).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9 }));
+419|    expect(mockService.exportAdminAnalyticsCsv).toHaveBeenCalled();
+420|  });
+421|
+422|  test("marks viewer page responses as private no-store", async () => {
+423|    mockService.getViewerPage.mockResolvedValue({
+424|      pageNumber: 1,
+425|      pageAccessToken: "short-lived-token",
+426|    });
+427|
+428|    await request(app)
+429|      .get("/api/v2/e-booklet-viewer/10/pages/1")
+430|      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+431|      .expect(200)
+432|      .expect("Cache-Control", "private, no-store")
+433|      .expect("Pragma", "no-cache")
+434|      .expect("Expires", "0")
+435|      .expect((res) => {
+436|        expect(res.body.data.pageAccessToken).toBe("short-lived-token");
+437|      });
+438|
+439|    expect(mockService.getViewerPage).toHaveBeenCalledWith(10, 1, 55);
+440|  });
+441|
+442|  test("serves admin view mode without student access or device binding", async () => {
+443|    mockService.getAdminViewerMetadata.mockResolvedValue({ admin_view_mode: true, booklet_instance_id: 10 });
+444|    mockService.getAdminViewerPage.mockResolvedValue({ pageNumber: 1, adminViewMode: true });
+445|    mockService.getAdminViewerPageHotspots.mockResolvedValue([{ id: 77, title: "Intro" }]);
+446|    mockService.getAdminHotspotContent.mockResolvedValue({ id: 77, title: "Intro" });
+447|
+448|    await request(app)
+449|      .get("/api/v2/admin/e-booklet-viewer/10/metadata")
+450|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+451|      .expect(200)
+452|      .expect("Cache-Control", "private, no-store");
+453|
+454|    await request(app)
+455|      .get("/api/v2/admin/e-booklet-viewer/10/pages/1")
+456|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+457|      .expect(200)
+458|      .expect("Cache-Control", "private, no-store");
+459|
+460|    await request(app)
+461|      .get("/api/v2/admin/e-booklet-viewer/10/pages/1/hotspots")
+462|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+463|      .expect(200);
+464|
+465|    await request(app)
+466|      .get("/api/v2/admin/e-booklet-viewer/hotspots/77/content")
+467|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+468|      .expect(200);
+469|
+470|    expect(mockService.getAdminViewerMetadata).toHaveBeenCalledWith(10, 1);
+471|    expect(mockService.getAdminViewerPage).toHaveBeenCalledWith(10, 1, 1);
+472|    expect(mockService.getAdminViewerPageHotspots).toHaveBeenCalledWith(10, 1);
+473|    expect(mockService.getAdminHotspotContent).toHaveBeenCalledWith(77);
+474|    expect(mockService.bindViewerDevice).not.toHaveBeenCalled();
+475|  });
+476|
+477|  test("binds/lists viewer devices and exposes admin device reset/allowance/approval routes", async () => {
+478|    mockService.bindViewerDevice.mockResolvedValue({ id: 1, device_fingerprint: "dev-1" });
+479|    mockService.listViewerDevices.mockResolvedValue([{ id: 1, device_fingerprint: "dev-1" }]);
+480|    mockService.resetViewerDevices.mockResolvedValue({ count: 1 });
+481|    mockService.addDeviceAllowance.mockResolvedValue({ allowed_devices: 2 });
+482|    mockService.approveStudentPurchaseLink.mockResolvedValue({ purchase_id: 500, access_id: 88 });
+483|
+484|    await request(app)
+485|      .post("/api/v2/e-booklet-viewer/10/devices/bind")
+486|      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+487|      .send({ deviceFingerprint: "dev-1", deviceLabel: "iPad" })
+488|      .expect(200);
+489|
+490|    await request(app)
+491|      .get("/api/v2/admin/e-booklet-instances/10/users/55/devices")
+492|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+493|      .expect(200);
+494|
+495|    await request(app)
+496|      .post("/api/v2/admin/e-booklet-instances/10/users/55/devices/reset")
+497|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+498|      .send({ reason: "replacement" })
+499|      .expect(200);
+500|
+501|    await request(app)
+502|      .post("/api/v2/admin/e-booklet-instances/10/users/55/device-allowance")
+503|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+504|      .send({ allowedDevices: 2, reason: "second tablet" })
+505|      .expect(200);
+506|
+507|    await request(app)
+508|      .post("/api/v2/admin/e-booklet-student-purchases/500/approve")
+509|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+510|      .expect(200);
+511|
+512|    expect(mockService.bindViewerDevice).toHaveBeenCalledWith(10, 55, expect.objectContaining({ deviceFingerprint: "dev-1", deviceLabel: "iPad" }));
+513|    expect(mockService.listViewerDevices).toHaveBeenCalledWith(10, 55);
+514|    expect(mockService.resetViewerDevices).toHaveBeenCalledWith(10, 55, 1, "replacement");
+515|    expect(mockService.addDeviceAllowance).toHaveBeenCalledWith(10, 55, 1, 2, "second tablet");
+516|    expect(mockService.approveStudentPurchaseLink).toHaveBeenCalledWith(500, 1);
+517|  });
+518|
+519|  test("serves authorized hotspot assets with private no-store headers", async () => {
+520|    mockService.getAuthorizedHotspotAsset.mockResolvedValue({
+521|      asset: {
+522|        id: 123,
+523|        mime_type: "audio/mpeg",
+524|        original_filename: "audio.mp3",
+525|        size_bytes: 1024,
+526|      },
+527|      absolutePath: __filename,
+528|      cacheControl: "private, no-store",
+529|    });
+530|
+531|    await request(app)
+532|      .get("/api/v2/e-booklet-viewer/hotspots/77/assets/123")
+533|      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+534|      .expect(200)
+535|      .expect("Cache-Control", "private, no-store")
+536|      .expect("Pragma", "no-cache")
+537|      .expect("Expires", "0")
+538|      .expect("Content-Type", /audio\/mpeg/);
+539|
+540|    expect(mockService.getAuthorizedHotspotAsset).toHaveBeenCalledWith(77, 123, 55);
+541|  });
+542|
+543|  test("teacher reward claim requires explicit reward terms acceptance", async () => {
+544|    await request(app)
+545|      .post("/api/v2/teacher/e-booklet-milestone-achievements/99/claim")
+546|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+547|      .send({})
+548|      .expect(400)
+549|      .expect((res) => expect(res.body.message).toContain("Reward claim terms must be accepted"));
+550|
+551|    expect(mockDomainServices.milestones.claimReward).not.toHaveBeenCalled();
+552|  });
+553|
+554|  test("access-code routes reject invalid generation payloads before services", async () => {
+555|    await request(app)
+556|      .post("/api/v2/admin/e-booklet-access-codes/free")
+557|      .set("Authorization", `Bearer ${tokenFor("Moderator", 4)}`)
+558|      .send({ bookletInstanceId: 10, teacherId: 9, termId: 1 })
+559|      .expect(403);
+560|
+561|    await request(app)
+562|      .post("/api/v2/admin/e-booklet-access-codes/free")
+563|      .set("Authorization", `Bearer ${tokenFor("SubAdmin", 5)}`)
+564|      .send({ bookletInstanceId: 10, teacherId: 9, termId: 1 })
+565|      .expect(201);
+566|
+567|    expect(mockDomainServices.accessCodes.generateCode).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, kind: "free" }));
+568|    mockDomainServices.accessCodes.generateCode.mockClear();
+569|
+570|    await request(app)
+571|      .post("/api/v2/teacher/e-booklets/10/access-codes")
+572|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+573|      .send({ kind: "trial", termId: 1 })
+574|      .expect(400)
+575|      .expect((res) => expect(res.body.message).toContain("Invalid access code kind"));
+576|
+577|    await request(app)
+578|      .post("/api/v2/teacher/e-booklets/10/access-codes")
+579|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+580|      .send({ kind: "paid", termId: "not-a-number" })
+581|      .expect(400)
+582|      .expect((res) => expect(res.body.message).toContain("Invalid term ID"));
+583|
+584|    await request(app)
+585|      .post("/api/v2/admin/e-booklet-access-codes/free")
+586|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+587|      .send({ bookletInstanceId: "x", teacherId: 9, termId: 1, maxRedemptions: 10 })
+588|      .expect(400)
+589|      .expect((res) => expect(res.body.message).toContain("Invalid instance ID"));
+590|
+591|    await request(app)
+592|      .post("/api/v2/admin/e-booklet-access-codes/free")
+593|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+594|      .send({ bookletInstanceId: 10, teacherId: 9, termId: 1, maxRedemptions: 0 })
+595|      .expect(400)
+596|      .expect((res) => expect(res.body.message).toContain("Invalid max redemptions"));
+597|
+598|    expect(mockDomainServices.accessCodes.generateCode).not.toHaveBeenCalled();
+599|  });
+600|
+601|  test("Phase 3 exposes terms, code, redemption, milestone, and wallet route contracts", async () => {
+602|    mockDomainServices.terms.getLatestActiveTerms.mockResolvedValue({ id: 1, name: "Term", status: "active" });
+603|    mockDomainServices.terms.acceptLatestTerms.mockResolvedValue({ id: 11, acceptance_type: "code_generation" });
+604|    mockDomainServices.terms.createTerms.mockResolvedValue({ id: 2, name: "New term" });
+605|    mockDomainServices.terms.listTerms.mockResolvedValue([{ id: 1, name: "Term", status: "active" }]);
+606|    mockDomainServices.terms.updateTerms.mockResolvedValue({ id: 1, name: "Updated term", status: "draft" });
+607|    mockDomainServices.terms.activateTerms.mockResolvedValue({ id: 1, name: "Updated term", status: "active" });
+608|    mockDomainServices.accessCodes.generateCode.mockResolvedValue({ code: "KLM-ABC123XYZ789", whatsappMessage: "كود الدخول للبوكليت الإلكتروني: KLM-ABC123XYZ789", record: { id: 7, kind: "paid", code_hash: "hash" } });
+609|    mockDomainServices.redemptions.redeemCode.mockResolvedValue({ id: 8, access_id: 88, counted_for_progress: true });
+610|    mockDomainServices.milestones.listMilestones.mockResolvedValue([{ id: 3, target_paid_redemptions: 10 }]);
+611|    mockDomainServices.milestones.createMilestone.mockResolvedValue({ id: 4, target_paid_redemptions: 20 });
+612|    mockDomainServices.milestones.updateMilestone.mockResolvedValue({ id: 4, title: "Updated milestone" });
+613|    mockDomainServices.milestones.deleteMilestone.mockResolvedValue({ id: 4, active: false });
+614|    mockDomainServices.milestones.reorderMilestones.mockResolvedValue([{ id: 4, sort_order: 1 }]);
+615|    mockDomainServices.milestones.listProgress.mockResolvedValue({ termId: 1, paidRedemptions: 12, achievements: [] });
+616|    mockDomainServices.milestones.claimReward.mockResolvedValue({ id: 99, claimed_at: new Date() });
+617|    mockDomainServices.milestones.evaluateTeacherMilestones.mockResolvedValue({ termId: 1, paidFirstAccessCount: 12, awarded: [] });
+618|    mockDomainServices.wallet.getWallet.mockResolvedValue({ id: 5, balance: 100 });
+619|    mockDomainServices.wallet.listLedger.mockResolvedValue([{ id: 6, amount: 100 }]);
+620|    mockDomainServices.wallet.previewPurchase.mockResolvedValue({ balance: 100, walletCreditApplied: 40, finalTotal: 160, canApply: true });
+621|    mockDomainServices.wallet.applyToPurchase.mockResolvedValue({ purchase: { id: 500, total: 160 }, walletCreditApplied: 40, finalTotal: 160 });
+622|
+623|    await request(app)
+624|      .get("/api/v2/admin/e-booklet-terms?status=active")
+625|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+626|      .expect(200)
+627|      .expect((res) => expect(res.body.data[0].name).toBe("Term"));
+628|
+629|    await request(app)
+630|      .post("/api/v2/admin/e-booklet-terms")
+631|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+632|      .send({ name: "New term", startsAt: "2026-06-14T00:00:00.000Z" })
+633|      .expect(201);
+634|
+635|    await request(app)
+636|      .patch("/api/v2/admin/e-booklet-terms/1")
+637|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+638|      .send({ name: "Updated term" })
+639|      .expect(200)
+640|      .expect((res) => expect(res.body.data.name).toBe("Updated term"));
+641|
+642|    await request(app)
+643|      .post("/api/v2/admin/e-booklet-terms/1/activate")
+644|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+645|      .expect(200)
+646|      .expect((res) => expect(res.body.data.status).toBe("active"));
+647|
+648|    await request(app)
+649|      .get("/api/v2/teacher/e-booklet-terms/current")
+650|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+651|      .expect(200)
+652|      .expect((res) => expect(res.body.data.name).toBe("Term"));
+653|
+654|    await request(app)
+655|      .post("/api/v2/teacher/e-booklet-terms/accept-code-generation")
+656|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+657|      .send({})
+658|      .expect(200);
+659|
+660|    await request(app)
+661|      .post("/api/v2/teacher/e-booklets/10/access-codes")
+662|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+663|      .send({ kind: "paid", termId: 1 })
+664|      .expect(201)
+665|      .expect((res) => {
+666|        expect(res.body.data.code).toBe("KLM-ABC123XYZ789");
+667|        expect(res.body.data.record.code_hash).toBeUndefined();
+668|      });
+669|
+670|    await request(app)
+671|      .post("/api/v2/e-booklet-access-codes/redeem")
+672|      .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
+673|      .send({ code: "KLM-ABC123XYZ789", termsAccepted: true })
+674|      .expect(200);
+675|
+676|    await request(app)
+677|      .get("/api/v2/teacher/e-booklet-milestones")
+678|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+679|      .expect(200);
+680|
+681|    await request(app)
+682|      .get("/api/v2/admin/e-booklet-milestones?term_id=1")
+683|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+684|      .expect(200)
+685|      .expect((res) => expect(res.body.data[0].target_paid_redemptions).toBe(10));
+686|
+687|    await request(app)
+688|      .get("/api/v2/admin/e-booklet-milestones?term_id=1")
+689|      .set("Authorization", `Bearer ${tokenFor("Moderator", 2)}`)
+690|      .expect(403);
+691|
+692|    await request(app)
+693|      .post("/api/v2/admin/e-booklet-milestones")
+694|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+695|      .send({ termId: 1, title: "20 paid", targetPaidRedemptions: 20, milestonePrice: 200 })
+696|      .expect(201);
+697|
+698|    await request(app)
+699|      .patch("/api/v2/admin/e-booklet-milestones/4")
+700|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+701|      .send({ title: "Updated milestone" })
+702|      .expect(200);
+703|
+704|    await request(app)
+705|      .post("/api/v2/admin/e-booklet-milestones/reorder")
+706|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+707|      .send({ termId: 1, items: [{ id: 4, sortOrder: 1 }] })
+708|      .expect(200);
+709|
+710|    await request(app)
+711|      .delete("/api/v2/admin/e-booklet-milestones/4")
+712|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+713|      .expect(200);
+714|
+715|    await request(app)
+716|      .post("/api/v2/admin/e-booklet-access-codes/free")
+717|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+718|      .send({ bookletInstanceId: 10, teacherId: 9, termId: 1, maxRedemptions: 999999 })
+719|      .expect(201);
+720|
+721|    await request(app)
+722|      .get("/api/v2/admin/e-booklet-progress?term_id=1")
+723|      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+724|      .expect(200);
+725|
+726|    await request(app)
+727|      .post("/api/v2/teacher/e-booklet-milestones/evaluate")
+728|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+729|      .send({ termId: 1 })
+730|      .expect(200);
+731|
+732|    await request(app)
+733|      .get("/api/v2/teacher/e-booklet-wallet")
+734|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+735|      .expect(200);
+736|
+737|    await request(app)
+738|      .post("/api/v2/teacher/e-booklet-wallet/preview")
+739|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+740|      .send({ purchaseTotal: 200, requestedAmount: 40 })
+741|      .expect(200);
+742|
+743|    await request(app)
+744|      .post("/api/v2/teacher/e-booklet-wallet/preview")
+745|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+746|      .send({ purchaseTotal: 200, requestedAmount: 40, couponApplied: "false" })
+747|      .expect(200);
+748|
+749|    await request(app)
+750|      .post("/api/v2/teacher/e-booklet-milestone-achievements/99/claim")
+751|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+752|      .send({ termsAccepted: true })
+753|      .expect(200);
+754|
+755|    await request(app)
+756|      .post("/api/v2/teacher/e-booklet-wallet/apply")
+757|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+758|      .send({ purchaseId: 500, purchaseTotal: 200, requestedAmount: 40 })
+759|      .expect(200);
+760|
+761|    expect(mockDomainServices.terms.listTerms).toHaveBeenCalledWith({ templateId: undefined, status: "active" });
+762|    expect(mockDomainServices.terms.createTerms).toHaveBeenCalledWith(expect.objectContaining({ name: "New term" }), 1);
+763|    expect(mockDomainServices.terms.updateTerms).toHaveBeenCalledWith(1, expect.objectContaining({ name: "Updated term" }));
+764|    expect(mockDomainServices.terms.activateTerms).toHaveBeenCalledWith(1, 1);
+765|    expect(mockDomainServices.terms.getLatestActiveTerms).toHaveBeenCalledWith(undefined);
+766|    expect(mockDomainServices.terms.acceptLatestTerms).toHaveBeenCalledWith(9, "code_generation", expect.objectContaining({ ipAddress: expect.any(String) }), undefined);
+767|    expect(mockDomainServices.accessCodes.generateCode).toHaveBeenCalledWith(expect.objectContaining({ bookletInstanceId: 10, teacherId: 9, kind: "paid", termId: 1 }));
+768|    expect(mockDomainServices.redemptions.redeemCode).toHaveBeenCalledWith("KLM-ABC123XYZ789", 55, expect.objectContaining({ termsAccepted: true }));
+769|    expect(mockDomainServices.milestones.listMilestones).toHaveBeenCalledWith(undefined, 9, false);
+770|    expect(mockDomainServices.milestones.listMilestones).toHaveBeenCalledWith(1, undefined, true);
+771|    expect(mockDomainServices.milestones.createMilestone).toHaveBeenCalledWith(expect.objectContaining({ termId: 1, targetPaidRedemptions: 20 }), 1);
+772|    expect(mockDomainServices.milestones.updateMilestone).toHaveBeenCalledWith(4, expect.objectContaining({ title: "Updated milestone" }));
+773|    expect(mockDomainServices.milestones.reorderMilestones).toHaveBeenCalledWith(1, [{ id: 4, sortOrder: 1 }]);
+774|    expect(mockDomainServices.milestones.deleteMilestone).toHaveBeenCalledWith(4);
+775|    expect(mockDomainServices.milestones.listProgress).toHaveBeenCalledWith(1);
+776|    expect(mockDomainServices.accessCodes.generateCode).toHaveBeenCalledWith(expect.objectContaining({ bookletInstanceId: 10, teacherId: 9, kind: "free", termId: 1, maxRedemptions: 999999 }));
+777|    expect(mockDomainServices.milestones.evaluateTeacherMilestones).toHaveBeenCalledWith(9, 1);
+778|    expect(mockDomainServices.milestones.claimReward).toHaveBeenCalledWith(9, 99, expect.objectContaining({ ipAddress: expect.any(String) }));
+779|    expect(mockDomainServices.wallet.getWallet).toHaveBeenCalledWith(9);
+780|    expect(mockDomainServices.wallet.listLedger).toHaveBeenCalledWith(9);
+781|    expect(mockDomainServices.wallet.previewPurchase).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, purchaseTotal: 200, requestedAmount: 40 }));
+782|    expect(mockDomainServices.wallet.previewPurchase).toHaveBeenCalledWith(expect.objectContaining({ couponApplied: false }));
+783|    expect(mockDomainServices.wallet.applyToPurchase).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, purchaseId: 500, purchaseTotal: 200, requestedAmount: 40 }));
+784|  });
+785|
+786|  test("rejects Phase 3 invalid terms/code/reuse/no-stacking flows", async () => {
+787|    mockDomainServices.terms.getLatestActiveTerms.mockRejectedValue(Object.assign(new Error("Active e-booklet terms not found."), { statusCode: 404 }));
+788|    mockDomainServices.redemptions.redeemCode
+789|      .mockRejectedValueOnce(Object.assign(new Error("Invalid e-booklet access code."), { statusCode: 404 }))
+790|      .mockRejectedValueOnce(Object.assign(new Error("This e-booklet access code has already been redeemed."), { statusCode: 403 }));
+791|    mockDomainServices.wallet.previewPurchase.mockRejectedValue(Object.assign(new Error("Wallet credit cannot be stacked with coupons."), { statusCode: 400 }));
+792|    mockDomainServices.wallet.applyToPurchase.mockRejectedValue(Object.assign(new Error("Wallet credit cannot be stacked with coupons."), { statusCode: 400 }));
+793|
+794|    await request(app)
+795|      .get("/api/v2/teacher/e-booklet-terms/current")
+796|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+797|      .expect(404);
+798|
+799|    await request(app)
+800|      .post("/api/v2/e-booklet-access-codes/redeem")
+801|      .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
+802|      .send({ code: "BAD-CODE", termsAccepted: true })
+803|      .expect(404);
+804|
+805|    await request(app)
+806|      .post("/api/v2/e-booklet-access-codes/redeem")
+807|      .set("Authorization", `Bearer ${tokenFor("Student", 56, "academy")}`)
+808|      .send({ code: "KLM-REUSED", termsAccepted: true })
+809|      .expect(403);
+810|
+811|    await request(app)
+812|      .post("/api/v2/teacher/e-booklet-wallet/preview")
+813|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+814|      .send({ purchaseTotal: 200, requestedAmount: 40, couponApplied: true })
+815|      .expect(400);
+816|
+817|    await request(app)
+818|      .post("/api/v2/teacher/e-booklet-wallet/apply")
+819|      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+820|      .send({ purchaseId: 500, purchaseTotal: 200, requestedAmount: 40, couponApplied: true })
+821|      .expect(400);
+822|  });
+823|});

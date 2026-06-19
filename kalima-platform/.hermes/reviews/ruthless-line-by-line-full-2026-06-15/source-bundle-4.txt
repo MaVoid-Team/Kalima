@@ -1,0 +1,1661 @@
+
+===== FILE: kalima-platform/backend/src/apps/store-api/routes/v2/e-booklet.routes.ts (459 lines) =====
+1|import { Router } from "express";
+2|import rateLimit from "express-rate-limit";
+3|import { eBookletController } from "../../controllers/e-booklet.controller";
+4|import { authenticateToken } from "../../../../libs/auth/middleware";
+5|import { requireRole } from "../../middleware/requireRole.middleware";
+6|import { uploadSingleImage } from "../../middleware/upload.middleware";
+7|import { role_enum, portal_enum } from "../../generated/prisma/client";
+8|import {
+9|  uploadEBookletCover,
+10|  uploadEBookletDocument,
+11|  uploadEBookletHotspotMedia,
+12|} from "../../middleware/e-booklet-upload.middleware";
+13|
+14|const router = Router();
+15|
+16|const adminAuth = [
+17|  authenticateToken,
+18|  requireRole([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator]),
+19|];
+20|
+21|const adminManagerAuth = [
+22|  authenticateToken,
+23|  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+24|];
+25|
+26|const teacherAuth = [
+27|  authenticateToken,
+28|  requireRole([role_enum.Teacher], portal_enum.store),
+29|];
+30|
+31|const studentAuth = [
+32|  authenticateToken,
+33|  requireRole([role_enum.Student]),
+34|];
+35|
+36|const viewerAuth = [authenticateToken];
+37|
+38|const inviteAcceptanceLimiter = rateLimit({
+39|  windowMs: 15 * 60 * 1000,
+40|  limit: 30,
+41|  standardHeaders: true,
+42|  legacyHeaders: false,
+43|  message: {
+44|    success: false,
+45|    message: "Too many e-booklet invite attempts. Please try again later.",
+46|  },
+47|});
+48|
+49|const viewerLimiter = rateLimit({
+50|  windowMs: 60 * 1000,
+51|  limit: 180,
+52|  standardHeaders: true,
+53|  legacyHeaders: false,
+54|  message: {
+55|    success: false,
+56|    message: "Too many e-booklet viewer requests. Please slow down.",
+57|  },
+58|});
+59|
+60|// Store APIs - separate from normal Market products.
+61|router.get("/e-booklet-store", eBookletController.listStoreTemplates);
+62|router.get("/e-booklet-store/instances/:instanceId", eBookletController.getStoreTemplate);
+63|router.post("/e-booklet-checkout", ...studentAuth, uploadSingleImage("paymentScreenshot"), eBookletController.createPublicCheckout);
+64|
+65|// Admin APIs.
+66|router.post(
+67|  "/admin/e-booklet-files/document",
+68|  ...adminAuth,
+69|  uploadEBookletDocument,
+70|  eBookletController.uploadFileAsset,
+71|);
+72|router.post(
+73|  "/admin/e-booklet-files/cover",
+74|  ...adminAuth,
+75|  uploadEBookletCover,
+76|  eBookletController.uploadFileAsset,
+77|);
+78|router.post(
+79|  "/admin/e-booklet-files/hotspot-media",
+80|  ...adminAuth,
+81|  uploadEBookletHotspotMedia,
+82|  eBookletController.uploadFileAsset,
+83|);
+84|router.get(
+85|  "/admin/e-booklet-files/:assetId/preview",
+86|  ...adminAuth,
+87|  eBookletController.previewAdminFileAsset,
+88|);
+89|router.get(
+90|  "/admin/e-booklet-templates",
+91|  ...adminAuth,
+92|  eBookletController.listAdminTemplates,
+93|);
+94|router.post(
+95|  "/admin/e-booklet-templates",
+96|  ...adminAuth,
+97|  eBookletController.createTemplate,
+98|);
+99|router.get(
+100|  "/admin/e-booklet-templates/:id",
+101|  ...adminAuth,
+102|  eBookletController.getAdminTemplate,
+103|);
+104|router.patch(
+105|  "/admin/e-booklet-templates/:id",
+106|  ...adminAuth,
+107|  eBookletController.updateTemplate,
+108|);
+109|router.delete(
+110|  "/admin/e-booklet-templates/:id",
+111|  ...adminAuth,
+112|  eBookletController.updateTemplate,
+113|);
+114|router.post(
+115|  "/admin/e-booklet-templates/:id/versions",
+116|  ...adminAuth,
+117|  eBookletController.createVersion,
+118|);
+119|router.get(
+120|  "/admin/e-booklet-templates/:id/versions",
+121|  ...adminAuth,
+122|  eBookletController.listTemplateVersions,
+123|);
+124|router.patch(
+125|  "/admin/e-booklet-template-versions/:versionId",
+126|  ...adminAuth,
+127|  eBookletController.updateVersion,
+128|);
+129|router.get(
+130|  "/admin/e-booklet-template-versions/:versionId/hotspots",
+131|  ...adminAuth,
+132|  eBookletController.listVersionHotspots,
+133|);
+134|router.post(
+135|  "/admin/e-booklet-template-versions/:versionId/publish",
+136|  ...adminAuth,
+137|  eBookletController.publishVersion,
+138|);
+139|router.post(
+140|  "/admin/e-booklet-template-versions/:versionId/hotspots",
+141|  ...adminAuth,
+142|  eBookletController.createHotspot,
+143|);
+144|router.patch(
+145|  "/admin/e-booklet-hotspots/:hotspotId",
+146|  ...adminAuth,
+147|  eBookletController.updateHotspot,
+148|);
+149|router.delete(
+150|  "/admin/e-booklet-hotspots/:hotspotId",
+151|  ...adminAuth,
+152|  eBookletController.deleteHotspot,
+153|);
+154|router.get(
+155|  "/admin/e-booklet-purchases",
+156|  ...adminAuth,
+157|  eBookletController.listPurchases,
+158|);
+159|router.post(
+160|  "/admin/e-booklet-purchases",
+161|  ...adminAuth,
+162|  eBookletController.createPurchaseDeal,
+163|);
+164|router.get(
+165|  "/admin/e-booklet-purchases/:id",
+166|  ...adminAuth,
+167|  eBookletController.getPurchase,
+168|);
+169|router.patch(
+170|  "/admin/e-booklet-purchases/:id/status",
+171|  ...adminAuth,
+172|  eBookletController.updatePurchaseStatus,
+173|);
+174|router.post(
+175|  "/admin/e-booklet-purchases/:id/mark-paid",
+176|  ...adminAuth,
+177|  eBookletController.markPurchasePaid,
+178|);
+179|router.post(
+180|  "/admin/e-booklet-purchases/:id/deliver",
+181|  ...adminAuth,
+182|  eBookletController.deliverPurchase,
+183|);
+184|router.get(
+185|  "/admin/e-booklet-instances",
+186|  ...adminAuth,
+187|  eBookletController.listInstances,
+188|);
+189|router.post(
+190|  "/admin/e-booklet-instances/:id/update-quota",
+191|  ...adminAuth,
+192|  eBookletController.updateQuota,
+193|);
+194|router.post(
+195|  "/admin/e-booklet-instances/:id/revoke-access",
+196|  ...adminAuth,
+197|  eBookletController.revokeTeacherAccess,
+198|);
+199|router.get(
+200|  "/admin/e-booklet-instances/:instanceId/students",
+201|  ...adminAuth,
+202|  eBookletController.listInstanceStudents,
+203|);
+204|router.get(
+205|  "/admin/e-booklet-instances/:instanceId/users/:userId/devices",
+206|  ...adminAuth,
+207|  eBookletController.listViewerDevices,
+208|);
+209|router.post(
+210|  "/admin/e-booklet-instances/:instanceId/users/:userId/devices/reset",
+211|  ...adminAuth,
+212|  eBookletController.resetViewerDevices,
+213|);
+214|router.post(
+215|  "/admin/e-booklet-instances/:instanceId/users/:userId/device-allowance",
+216|  ...adminAuth,
+217|  eBookletController.addDeviceAllowance,
+218|);
+219|router.post(
+220|  "/admin/e-booklet-student-purchases/:purchaseId/approve",
+221|  ...adminAuth,
+222|  eBookletController.approveStudentPurchaseLink,
+223|);
+224|router.get(
+225|  "/admin/e-booklet-analytics",
+226|  ...adminAuth,
+227|  eBookletController.adminAnalytics,
+228|);
+229|router.get(
+230|  "/admin/e-booklet-analytics.csv",
+231|  ...adminAuth,
+232|  eBookletController.exportAdminAnalyticsCsv,
+233|);
+234|router.get(
+235|  "/admin/e-booklet-terms",
+236|  ...adminManagerAuth,
+237|  eBookletController.listTerms,
+238|);
+239|router.post(
+240|  "/admin/e-booklet-terms",
+241|  ...adminManagerAuth,
+242|  eBookletController.createTerms,
+243|);
+244|router.patch(
+245|  "/admin/e-booklet-terms/:termId",
+246|  ...adminManagerAuth,
+247|  eBookletController.updateTerms,
+248|);
+249|router.post(
+250|  "/admin/e-booklet-terms/:termId/activate",
+251|  ...adminManagerAuth,
+252|  eBookletController.activateTerms,
+253|);
+254|router.get(
+255|  "/admin/e-booklet-milestones",
+256|  ...adminManagerAuth,
+257|  eBookletController.listMilestones,
+258|);
+259|router.post(
+260|  "/admin/e-booklet-milestones",
+261|  ...adminManagerAuth,
+262|  eBookletController.createMilestone,
+263|);
+264|router.patch(
+265|  "/admin/e-booklet-milestones/:milestoneId",
+266|  ...adminManagerAuth,
+267|  eBookletController.updateMilestone,
+268|);
+269|router.delete(
+270|  "/admin/e-booklet-milestones/:milestoneId",
+271|  ...adminManagerAuth,
+272|  eBookletController.deleteMilestone,
+273|);
+274|router.post(
+275|  "/admin/e-booklet-milestones/reorder",
+276|  ...adminManagerAuth,
+277|  eBookletController.reorderMilestones,
+278|);
+279|router.post(
+280|  "/admin/e-booklet-access-codes/free",
+281|  ...adminManagerAuth,
+282|  eBookletController.adminGenerateFreeCode,
+283|);
+284|router.get(
+285|  "/admin/e-booklet-progress",
+286|  ...adminManagerAuth,
+287|  eBookletController.listAdminProgress,
+288|);
+289|
+290|// Teacher APIs.
+291|router.get("/teacher/e-booklets", ...teacherAuth, eBookletController.listTeacherEBooklets);
+292|router.get(
+293|  "/teacher/e-booklet-terms/current",
+294|  ...teacherAuth,
+295|  eBookletController.getCurrentTerms,
+296|);
+297|router.post(
+298|  "/teacher/e-booklet-terms/accept-code-generation",
+299|  ...teacherAuth,
+300|  eBookletController.acceptCodeGenerationTerms,
+301|);
+302|router.post(
+303|  "/teacher/e-booklets/:instanceId/access-codes",
+304|  ...teacherAuth,
+305|  eBookletController.generateAccessCode,
+306|);
+307|router.get(
+308|  "/teacher/e-booklet-milestones",
+309|  ...teacherAuth,
+310|  eBookletController.listMilestones,
+311|);
+312|router.post(
+313|  "/teacher/e-booklet-milestones/evaluate",
+314|  ...teacherAuth,
+315|  eBookletController.evaluateMilestones,
+316|);
+317|router.get(
+318|  "/teacher/e-booklet-wallet",
+319|  ...teacherAuth,
+320|  eBookletController.getTeacherWallet,
+321|);
+322|router.post(
+323|  "/teacher/e-booklet-wallet/preview",
+324|  ...teacherAuth,
+325|  eBookletController.previewTeacherWallet,
+326|);
+327|router.post(
+328|  "/teacher/e-booklet-wallet/apply",
+329|  ...teacherAuth,
+330|  eBookletController.applyTeacherWallet,
+331|);
+332|router.post(
+333|  "/teacher/e-booklet-milestone-achievements/:achievementId/claim",
+334|  ...teacherAuth,
+335|  eBookletController.claimMilestoneReward,
+336|);
+337|router.get(
+338|  "/teacher/e-booklets/:instanceId/invites",
+339|  ...teacherAuth,
+340|  eBookletController.listInvites,
+341|);
+342|router.post(
+343|  "/teacher/e-booklets/:instanceId/invites",
+344|  ...teacherAuth,
+345|  eBookletController.createInvite,
+346|);
+347|router.patch(
+348|  "/teacher/e-booklet-invites/:inviteId/disable",
+349|  ...teacherAuth,
+350|  eBookletController.disableInvite,
+351|);
+352|router.get(
+353|  "/teacher/e-booklets/:instanceId/students",
+354|  ...teacherAuth,
+355|  eBookletController.listInstanceStudents,
+356|);
+357|router.patch(
+358|  "/teacher/e-booklets/:instanceId/students/:studentId/revoke",
+359|  ...teacherAuth,
+360|  eBookletController.revokeStudentAccess,
+361|);
+362|router.get(
+363|  "/teacher/e-booklet-analytics",
+364|  ...teacherAuth,
+365|  eBookletController.teacherAnalytics,
+366|);
+367|
+368|// Student APIs.
+369|router.get("/student/e-booklets", ...studentAuth, eBookletController.listStudentEBooklets);
+370|router.post(
+371|  "/e-booklet-access-codes/redeem",
+372|  inviteAcceptanceLimiter,
+373|  ...studentAuth,
+374|  eBookletController.redeemAccessCode,
+375|);
+376|router.get(
+377|  "/e-booklet-invites/:token/open",
+378|  inviteAcceptanceLimiter,
+379|  eBookletController.recordInviteOpen,
+380|);
+381|router.post(
+382|  "/e-booklet-invites/:token/accept",
+383|  inviteAcceptanceLimiter,
+384|  ...studentAuth,
+385|  uploadSingleImage("paymentScreenshot"),
+386|  eBookletController.acceptInvite,
+387|);
+388|
+389|// Admin View Mode APIs.
+390|router.get(
+391|  "/admin/e-booklet-viewer/:instanceId/metadata",
+392|  viewerLimiter,
+393|  ...adminAuth,
+394|  eBookletController.getAdminViewerMetadata,
+395|);
+396|router.get(
+397|  "/admin/e-booklet-viewer/:instanceId/pages/:pageNumber",
+398|  viewerLimiter,
+399|  ...adminAuth,
+400|  eBookletController.getAdminViewerPage,
+401|);
+402|router.get(
+403|  "/admin/e-booklet-viewer/:instanceId/pages/:pageNumber/hotspots",
+404|  viewerLimiter,
+405|  ...adminAuth,
+406|  eBookletController.getAdminViewerPageHotspots,
+407|);
+408|router.get(
+409|  "/admin/e-booklet-viewer/hotspots/:hotspotId/content",
+410|  viewerLimiter,
+411|  ...adminAuth,
+412|  eBookletController.getAdminHotspotContent,
+413|);
+414|router.get(
+415|  "/admin/e-booklet-viewer/hotspots/:hotspotId/assets/:assetId",
+416|  viewerLimiter,
+417|  ...adminAuth,
+418|  eBookletController.getAdminAuthorizedHotspotAsset,
+419|);
+420|
+421|// Viewer APIs.
+422|router.get(
+423|  "/e-booklet-viewer/:instanceId/metadata",
+424|  viewerLimiter,
+425|  ...viewerAuth,
+426|  eBookletController.getViewerMetadata,
+427|);
+428|router.post(
+429|  "/e-booklet-viewer/:instanceId/devices/bind",
+430|  viewerLimiter,
+431|  ...viewerAuth,
+432|  eBookletController.bindViewerDevice,
+433|);
+434|router.get(
+435|  "/e-booklet-viewer/:instanceId/pages/:pageNumber",
+436|  viewerLimiter,
+437|  ...viewerAuth,
+438|  eBookletController.getViewerPage,
+439|);
+440|router.get(
+441|  "/e-booklet-viewer/:instanceId/pages/:pageNumber/hotspots",
+442|  viewerLimiter,
+443|  ...viewerAuth,
+444|  eBookletController.getViewerPageHotspots,
+445|);
+446|router.get(
+447|  "/e-booklet-viewer/hotspots/:hotspotId/content",
+448|  viewerLimiter,
+449|  ...viewerAuth,
+450|  eBookletController.getHotspotContent,
+451|);
+452|router.get(
+453|  "/e-booklet-viewer/hotspots/:hotspotId/assets/:assetId",
+454|  viewerLimiter,
+455|  ...viewerAuth,
+456|  eBookletController.getAuthorizedHotspotAsset,
+457|);
+458|
+459|export default router;
+
+===== FILE: kalima-platform/backend/src/apps/store-api/services/e-booklet-access-code.service.ts (170 lines) =====
+1|import crypto from "crypto";
+2|import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../../../libs/errors";
+3|
+4|export type EBookletAccessCodeKind = "paid" | "free";
+5|
+6|function getAccessCodeSecret(): string {
+7|  const secret = process.env.E_BOOKLET_ACCESS_CODE_SECRET;
+8|  if (secret) return secret;
+9|  if (process.env.NODE_ENV === "production") {
+10|    throw new Error("E_BOOKLET_ACCESS_CODE_SECRET is not set");
+11|  }
+12|  return "dev-e-booklet-access-code-secret";
+13|}
+14|
+15|export function hashEBookletAccessCode(code: string): string {
+16|  return crypto.createHmac("sha256", getAccessCodeSecret()).update(code.trim().toUpperCase()).digest("hex");
+17|}
+18|
+19|function generatePlainCode(): string {
+20|  return `KLM-${crypto.randomBytes(6).toString("hex").toUpperCase()}`;
+21|}
+22|
+23|function codeHint(code: string): string {
+24|  return code.slice(-4);
+25|}
+26|
+27|function redemptionUrl(): string {
+28|  const base = (process.env.APP_URL || process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
+29|  return `${base}/e-booklet-code`;
+30|}
+31|
+32|function arabicWhatsAppMessage(code: string, url: string): string {
+33|  return `رابط البوكليت الإلكتروني: ${url}\nكود الدخول: ${code}\nافتح الرابط ثم أدخل الكود مرة واحدة لتفعيل الوصول.`;
+34|}
+35|
+36|export class EBookletAccessCodeService {
+37|  constructor(private readonly db: any) {}
+38|
+39|  private async assertAcceptedGenerationTerms(teacherId: number, termId: number) {
+40|    const now = new Date();
+41|    const term = await this.db.e_booklet_terms.findFirst({
+42|      where: {
+43|        id: termId,
+44|        status: "active",
+45|        starts_at: { lte: now },
+46|        OR: [{ ends_at: null }, { ends_at: { gt: now } }],
+47|      },
+48|    });
+49|    if (!term) throw new NotFoundError("Active e-booklet terms not found.");
+50|
+51|    const acceptance = await this.db.e_booklet_teacher_terms_acceptances.findFirst({
+52|      where: {
+53|        teacher_id: teacherId,
+54|        term_id: termId,
+55|        acceptance_type: "code_generation",
+56|      },
+57|    });
+58|    if (!acceptance) {
+59|      throw new ForbiddenError("Code-generation terms must be accepted before generating e-booklet codes.");
+60|    }
+61|    return term;
+62|  }
+63|
+64|  private async assertTeacherOwnsInstance(teacherId: number, bookletInstanceId: number) {
+65|    const instance = await this.db.e_booklet_instances.findFirst({
+66|      where: { id: bookletInstanceId, teacher_id: teacherId, status: "active" },
+67|      include: { template: true },
+68|    });
+69|    if (!instance) throw new NotFoundError("E-booklet instance not found.");
+70|    return instance;
+71|  }
+72|
+73|  private assertTermMatchesInstance(term: any, instance: any) {
+74|    if (term.template_id !== null && term.template_id !== undefined && Number(term.template_id) !== Number(instance.template_id)) {
+75|      throw new BadRequestError("Terms do not match this e-booklet template.");
+76|    }
+77|  }
+78|
+79|  private sanitizeCodeRecord(record: any) {
+80|    if (!record) return record;
+81|    const { code_hash: _codeHash, ...safeRecord } = record;
+82|    return safeRecord;
+83|  }
+84|
+85|  private parseExpiresAt(value: Date | string | null | undefined): Date | null {
+86|    if (!value) return null;
+87|    const expiresAt = value instanceof Date ? value : new Date(value);
+88|    if (Number.isNaN(expiresAt.getTime())) throw new BadRequestError("Invalid expiration date.");
+89|    if (expiresAt.getTime() <= Date.now()) throw new BadRequestError("Expiration date must be in the future.");
+90|    return expiresAt;
+91|  }
+92|
+93|  async generateCode(input: {
+94|    bookletInstanceId: number;
+95|    teacherId: number;
+96|    kind: EBookletAccessCodeKind;
+97|    termId: number;
+98|    expiresAt?: Date | string | null;
+99|    maxRedemptions?: number | null;
+100|    adminActorId?: number | null;
+101|    ipAddress?: string | null;
+102|    userAgent?: string | null;
+103|  }) {
+104|    if (!input.termId) throw new BadRequestError("Active terms are required to generate e-booklet codes.");
+105|    const term = await this.assertAcceptedGenerationTerms(input.teacherId, input.termId);
+106|    const instance = await this.assertTeacherOwnsInstance(input.teacherId, input.bookletInstanceId);
+107|    this.assertTermMatchesInstance(term, instance);
+108|
+109|    const maxRedemptions = input.maxRedemptions ?? (input.kind === "paid" ? 1 : 999999);
+110|    const expiresAt = this.parseExpiresAt(input.expiresAt);
+111|
+112|    for (let attempt = 0; attempt < 5; attempt += 1) {
+113|      const code = generatePlainCode();
+114|      const codeHash = hashEBookletAccessCode(code);
+115|      const existing = await this.db.e_booklet_access_codes.findUnique({
+116|        where: { code_hash: codeHash },
+117|      });
+118|      if (existing) continue;
+119|
+120|      const record = await this.db.e_booklet_access_codes.create({
+121|        data: {
+122|          booklet_instance_id: input.bookletInstanceId,
+123|          term_id: input.termId,
+124|          teacher_id: input.teacherId,
+125|          code_hash: codeHash,
+126|          code_hint: codeHint(code),
+127|          kind: input.kind,
+128|          status: "active",
+129|          max_redemptions: maxRedemptions,
+130|          redeemed_count: 0,
+131|          expires_at: expiresAt,
+132|        },
+133|      });
+134|      if (input.adminActorId && this.db.e_booklet_audit_logs?.create) {
+135|        await this.db.e_booklet_audit_logs.create({
+136|          data: {
+137|            actor_user_id: input.adminActorId,
+138|            action: "admin_generate_free_access_code",
+139|            entity_type: "e_booklet_access_code",
+140|            entity_id: record.id,
+141|            metadata_json: {
+142|              teacher_id: input.teacherId,
+143|              booklet_instance_id: input.bookletInstanceId,
+144|              term_id: input.termId,
+145|              kind: input.kind,
+146|            },
+147|            ip_address: input.ipAddress ?? null,
+148|            user_agent: input.userAgent ?? null,
+149|          },
+150|        });
+151|      }
+152|      const url = redemptionUrl();
+153|      return { code, redeemUrl: url, whatsappMessage: arabicWhatsAppMessage(code, url), record: this.sanitizeCodeRecord(record) };
+154|    }
+155|
+156|    throw new ConflictError("Unable to generate a unique e-booklet access code.");
+157|  }
+158|
+159|  async listCodes(filters: { teacherId?: number; bookletInstanceId?: number; termId?: number; kind?: EBookletAccessCodeKind } = {}) {
+160|    return this.db.e_booklet_access_codes.findMany({
+161|      where: {
+162|        ...(filters.teacherId ? { teacher_id: filters.teacherId } : {}),
+163|        ...(filters.bookletInstanceId ? { booklet_instance_id: filters.bookletInstanceId } : {}),
+164|        ...(filters.termId ? { term_id: filters.termId } : {}),
+165|        ...(filters.kind ? { kind: filters.kind } : {}),
+166|      },
+167|      orderBy: { created_at: "desc" },
+168|    });
+169|  }
+170|}
+
+===== FILE: kalima-platform/backend/src/apps/store-api/services/e-booklet-domain.service.ts (16 lines) =====
+1|import { prisma } from "../../../libs/db/prisma";
+2|import { EBookletAccessCodeService } from "./e-booklet-access-code.service";
+3|import { EBookletMilestoneService } from "./e-booklet-milestone.service";
+4|import { EBookletRedemptionService } from "./e-booklet-redemption.service";
+5|import { EBookletTermsService } from "./e-booklet-terms.service";
+6|import { TeacherWalletService } from "./teacher-wallet.service";
+7|
+8|export function getEBookletDomainServices(db: any = prisma) {
+9|  return {
+10|    terms: new EBookletTermsService(db),
+11|    accessCodes: new EBookletAccessCodeService(db),
+12|    redemptions: new EBookletRedemptionService(db),
+13|    milestones: new EBookletMilestoneService(db),
+14|    wallet: new TeacherWalletService(db),
+15|  };
+16|}
+
+===== FILE: kalima-platform/backend/src/apps/store-api/services/e-booklet-milestone-notification.service.ts (169 lines) =====
+1|import type { Server as SocketIOServer } from "socket.io";
+2|import { notification_key_enum } from "../generated/prisma/client";
+3|import { getEmailService, type EmailService } from "../emails/email.service";
+4|import { emitNotificationToUser, emitNotificationToUsers } from "../../../libs/redis/socketNotificationEmitter";
+5|
+6|const E_BOOKLET_MILESTONE_NOTIFICATION_CATEGORY = 8;
+7|const MILESTONE_ENTITY_TYPE = "e_booklet_milestone_achievement";
+8|
+9|export interface EBookletMilestoneNotificationAchievement {
+10|  id: number;
+11|  teacher_id: number;
+12|  term_id: number;
+13|  milestone_id: number;
+14|  paid_redemptions_snapshot?: number | null;
+15|  reward_amount?: number | { toNumber(): number } | null;
+16|  notification_recipients?: "admins" | "teacher_and_admins" | string | null;
+17|}
+18|
+19|export interface EBookletMilestoneNotificationContext {
+20|  io?: SocketIOServer | null;
+21|  term?: { id: number; name?: string | null } | null;
+22|  milestones?: Array<{ id: number; title?: string | null }>;
+23|  dashboardUrl?: string;
+24|}
+25|
+26|function number(value: unknown): number {
+27|  if (value && typeof (value as any).toNumber === "function") return (value as any).toNumber();
+28|  return Number(value ?? 0);
+29|}
+30|
+31|export class EBookletMilestoneNotificationService {
+32|  constructor(
+33|    private readonly db: any,
+34|    private readonly emailService: Pick<EmailService, "sendEBookletMilestoneTeacherEmail" | "sendEBookletMilestoneAdminEmail"> = getEmailService(),
+35|  ) {}
+36|
+37|  private async ensureTeacherNotification(achievement: EBookletMilestoneNotificationAchievement, targetLink: string) {
+38|    const where = {
+39|      user_id: achievement.teacher_id,
+40|      message_key: notification_key_enum.E_BOOKLET_MILESTONE_ACHIEVED,
+41|      entity_type: MILESTONE_ENTITY_TYPE,
+42|      entity_id: achievement.id,
+43|    };
+44|    const existing = await this.db.notifications.findFirst?.({ where });
+45|    if (existing) return { notification: existing, created: false };
+46|    const notification = await this.db.notifications.create({
+47|      data: {
+48|        user_id: achievement.teacher_id,
+49|        category: E_BOOKLET_MILESTONE_NOTIFICATION_CATEGORY,
+50|        message_key: notification_key_enum.E_BOOKLET_MILESTONE_ACHIEVED,
+51|        entity_type: MILESTONE_ENTITY_TYPE,
+52|        entity_id: achievement.id,
+53|        target_link: targetLink,
+54|      },
+55|    });
+56|    return { notification, created: true };
+57|  }
+58|
+59|  async notifyMilestoneAchievements(
+60|    achievements: EBookletMilestoneNotificationAchievement[],
+61|    context: EBookletMilestoneNotificationContext = {},
+62|  ): Promise<void> {
+63|    if (achievements.length === 0) return;
+64|    const milestoneById = new Map((context.milestones ?? []).map((milestone) => [milestone.id, milestone]));
+65|
+66|    for (const achievement of achievements) {
+67|      const teacher = await this.db.users.findUnique({
+68|        where: { id: achievement.teacher_id },
+69|        select: { id: true, name: true, email: true },
+70|      });
+71|      if (!teacher) continue;
+72|
+73|      const milestone = milestoneById.get(achievement.milestone_id);
+74|      const notificationRecipients = achievement.notification_recipients ?? (milestone as any)?.notification_recipients ?? "admins";
+75|      const notifyTeacher = notificationRecipients === "teacher_and_admins";
+76|      const notifyAdmins = notificationRecipients === "admins" || notificationRecipients === "teacher_and_admins";
+77|      const milestoneTitle = milestone?.title ?? `Milestone #${achievement.milestone_id}`;
+78|      const teacherTargetLink = `/teacher/e-booklets/milestones/${achievement.id}`;
+79|      const adminTargetLink = `/admin/e-booklets/milestones/${achievement.id}`;
+80|      let teacherNotificationResult: any = { notification: null, created: false };
+81|      if (notifyTeacher) {
+82|        teacherNotificationResult = await this.ensureTeacherNotification(achievement, teacherTargetLink);
+83|      }
+84|      const teacherNotification = teacherNotificationResult.notification;
+85|      if (context.io && teacherNotificationResult.created && teacherNotification) {
+86|        emitNotificationToUser(context.io, achievement.teacher_id, {
+87|          id: teacherNotification.id,
+88|          category: teacherNotification.category,
+89|          message_key: teacherNotification.message_key,
+90|          entity_type: teacherNotification.entity_type,
+91|          entity_id: teacherNotification.entity_id,
+92|          target_link: teacherNotification.target_link,
+93|          created_at: teacherNotification.created_at,
+94|        });
+95|      }
+96|
+97|      const admins = notifyAdmins ? await this.db.users.findMany({
+98|        where: {
+99|          user_roles: {
+100|            some: { portal: "store", role: { in: ["Admin", "SubAdmin"] } },
+101|          },
+102|          OR: [{ is_deleted: false }, { is_deleted: null }],
+103|        },
+104|        select: { id: true, name: true, email: true },
+105|      }) : [];
+106|      const adminIds = admins.map((admin: any) => admin.id);
+107|      let missingAdminIds: number[] = [];
+108|      if (adminIds.length > 0) {
+109|        const existingAdminNotifications = await this.db.notifications.findMany?.({
+110|          where: {
+111|            user_id: { in: adminIds },
+112|            message_key: notification_key_enum.E_BOOKLET_MILESTONE_ADMIN_ALERT,
+113|            entity_type: MILESTONE_ENTITY_TYPE,
+114|            entity_id: achievement.id,
+115|          },
+116|          select: { user_id: true },
+117|        });
+118|        const alreadyNotifiedAdminIds = new Set((existingAdminNotifications ?? []).map((row: any) => row.user_id));
+119|        missingAdminIds = adminIds.filter((adminId: number) => !alreadyNotifiedAdminIds.has(adminId));
+120|        if (missingAdminIds.length > 0) {
+121|          await this.db.notifications.createMany({
+122|            data: missingAdminIds.map((adminId: number) => ({
+123|              user_id: adminId,
+124|              category: E_BOOKLET_MILESTONE_NOTIFICATION_CATEGORY,
+125|              message_key: notification_key_enum.E_BOOKLET_MILESTONE_ADMIN_ALERT,
+126|              entity_type: MILESTONE_ENTITY_TYPE,
+127|              entity_id: achievement.id,
+128|              target_link: adminTargetLink,
+129|            })),
+130|          });
+131|        }
+132|        if (context.io && missingAdminIds.length > 0) {
+133|          emitNotificationToUsers(context.io, missingAdminIds, {
+134|            id: 0,
+135|            category: E_BOOKLET_MILESTONE_NOTIFICATION_CATEGORY,
+136|            message_key: notification_key_enum.E_BOOKLET_MILESTONE_ADMIN_ALERT,
+137|            entity_type: MILESTONE_ENTITY_TYPE,
+138|            entity_id: achievement.id,
+139|            target_link: adminTargetLink,
+140|            created_at: null,
+141|          });
+142|        }
+143|      }
+144|
+145|      const commonEmailData = {
+146|        teacherName: teacher.name,
+147|        milestoneTitle,
+148|        paidRedemptions: Number(achievement.paid_redemptions_snapshot ?? 0),
+149|        rewardAmount: number(achievement.reward_amount),
+150|        termName: context.term?.name ?? null,
+151|      };
+152|      if (teacherNotificationResult.created && teacher.email) {
+153|        await this.emailService.sendEBookletMilestoneTeacherEmail(teacher.email, {
+154|          ...commonEmailData,
+155|          dashboardUrl: context.dashboardUrl ?? teacherTargetLink,
+156|        });
+157|      }
+158|      const missingAdminIdSet = new Set(missingAdminIds ?? []);
+159|      for (const admin of admins) {
+160|        if (admin.email && missingAdminIdSet.has(admin.id)) {
+161|          await this.emailService.sendEBookletMilestoneAdminEmail(admin.email, {
+162|            ...commonEmailData,
+163|            dashboardUrl: adminTargetLink,
+164|          });
+165|        }
+166|      }
+167|    }
+168|  }
+169|}
+
+===== FILE: kalima-platform/backend/src/apps/store-api/services/e-booklet-milestone.service.ts (415 lines) =====
+1|import { BadRequestError, NotFoundError } from "../../../libs/errors";
+2|import { TeacherWalletService } from "./teacher-wallet.service";
+3|import { EBookletMilestoneNotificationService } from "./e-booklet-milestone-notification.service";
+4|
+5|type EBookletMilestoneServiceOptions = {
+6|  milestoneNotifier?: Pick<EBookletMilestoneNotificationService, "notifyMilestoneAchievements"> | null;
+7|};
+8|
+9|type EBookletMilestoneEvaluationContext = {
+10|  io?: any;
+11|};
+12|
+13|const MILESTONE_NOTIFICATION_RECIPIENTS = new Set(["admins", "teacher_and_admins"]);
+14|
+15|export class EBookletMilestoneService {
+16|  constructor(private readonly db: any, private readonly options: EBookletMilestoneServiceOptions = {}) {}
+17|
+18|  private notificationRecipients(value: any): string {
+19|    return MILESTONE_NOTIFICATION_RECIPIENTS.has(value) ? value : "admins";
+20|  }
+21|
+22|  private transaction<T>(callback: (tx: any) => Promise<T>): Promise<T> {
+23|    if (typeof this.db.$transaction === "function") return this.db.$transaction(callback, { isolationLevel: "Serializable" });
+24|    return callback(this.db);
+25|  }
+26|
+27|  private number(value: any): number {
+28|    const n = value && typeof value.toNumber === "function" ? value.toNumber() : Number(value ?? 0);
+29|    if (!Number.isFinite(n)) throw new BadRequestError("Invalid number.");
+30|    return n;
+31|  }
+32|
+33|  private nonEmptyString(value: any, label: string): string {
+34|    const text = String(value ?? "").trim();
+35|    if (!text) throw new BadRequestError(`Invalid ${label}.`);
+36|    return text;
+37|  }
+38|
+39|  private finiteInt(value: any, label: string): number {
+40|    const n = Number(value);
+41|    if (!Number.isInteger(n)) throw new BadRequestError(`Invalid ${label}.`);
+42|    return n;
+43|  }
+44|
+45|  private strictBoolean(value: any, label: string): boolean {
+46|    if (value === true || value === false) return value;
+47|    throw new BadRequestError(`Invalid ${label}.`);
+48|  }
+49|
+50|  private positiveInt(value: any, label: string): number {
+51|    const n = Number(value);
+52|    if (!Number.isInteger(n) || n <= 0) throw new BadRequestError(`Invalid ${label}.`);
+53|    return n;
+54|  }
+55|
+56|  private nonNegativeNumber(value: any, label: string, required = false): number | null {
+57|    if (value === undefined || value === null || value === "") {
+58|      if (required) throw new BadRequestError(`Invalid ${label}.`);
+59|      return null;
+60|    }
+61|    const n = Number(value);
+62|    if (!Number.isFinite(n) || n < 0) throw new BadRequestError(`Invalid ${label}.`);
+63|    return n;
+64|  }
+65|
+66|  private positiveNumber(value: any, label: string): number {
+67|    const n = this.nonNegativeNumber(value, label, true);
+68|    if (n === null || n <= 0) throw new BadRequestError(`Invalid ${label}.`);
+69|    return n;
+70|  }
+71|
+72|  private isUniqueConflict(error: any) {
+73|    return error?.code === "P2002";
+74|  }
+75|
+76|  private async getActiveTerm(tx: any, termId?: number) {
+77|    const now = new Date();
+78|    const term = await tx.e_booklet_terms.findFirst({
+79|      where: {
+80|        ...(termId ? { id: termId } : {}),
+81|        status: "active",
+82|        starts_at: { lte: now },
+83|        OR: [{ ends_at: null }, { ends_at: { gt: now } }],
+84|      },
+85|      orderBy: { starts_at: "desc" },
+86|    });
+87|    if (!term) throw new NotFoundError("Active e-booklet terms not found.");
+88|    return term;
+89|  }
+90|
+91|  private async assertTermExists(termId: number) {
+92|    const term = await this.db.e_booklet_terms.findFirst({ where: { id: termId } });
+93|    if (!term) throw new NotFoundError("E-booklet terms not found.");
+94|    return term;
+95|  }
+96|
+97|  async listMilestones(termId?: number, teacherId?: number, includeInactive = false) {
+98|    const milestones = await this.db.e_booklet_milestones.findMany({
+99|      where: { ...(termId ? { term_id: termId } : {}), ...(includeInactive ? {} : { active: true }) },
+100|      orderBy: [{ term_id: "asc" }, { sort_order: "asc" }, { target_paid_redemptions: "asc" }],
+101|    });
+102|    if (!teacherId || milestones.length === 0) return milestones;
+103|
+104|    const termIds = Array.from(new Set(milestones.map((milestone: any) => milestone.term_id).filter(Boolean)));
+105|    const [achievements, paidRedemptionsByTerm] = await Promise.all([
+106|      this.db.e_booklet_milestone_achievements.findMany({
+107|        where: { teacher_id: teacherId, ...(termId ? { term_id: termId } : { term_id: { in: termIds } }) },
+108|      }),
+109|      Promise.all(
+110|        termIds.map(async (id) => ({
+111|          termId: id,
+112|          paidRedemptions: await this.db.e_booklet_access_code_redemptions.count({
+113|            where: {
+114|              counted_for_progress: true,
+115|              access_code: { teacher_id: teacherId, term_id: id, kind: "paid" },
+116|            },
+117|          }),
+118|        })),
+119|      ),
+120|    ]);
+121|
+122|    const achievementByMilestoneId = new Map<number, any>(achievements.map((achievement: any) => [achievement.milestone_id, achievement]));
+123|    const progressByTermId = new Map<number, number>(paidRedemptionsByTerm.map((item: any) => [item.termId, item.paidRedemptions]));
+124|
+125|    return milestones.map((milestone: any) => {
+126|      const achievement = achievementByMilestoneId.get(milestone.id) ?? null;
+127|      const progressCount = progressByTermId.get(milestone.term_id) ?? 0;
+128|      return {
+129|        ...milestone,
+130|        progress_count: progressCount,
+131|        paid_redemptions_snapshot: achievement?.paid_redemptions_snapshot ?? progressCount,
+132|        achievement,
+133|        achievement_id: achievement?.id ?? null,
+134|        milestone_achievement_id: achievement?.id ?? null,
+135|        claimed_at: achievement?.claimed_at ?? null,
+136|        reward_terms_accepted_at: achievement?.reward_terms_accepted_at ?? null,
+137|        reward_amount: achievement?.reward_amount ?? milestone.reward_amount_snapshot ?? null,
+138|      };
+139|    });
+140|  }
+141|
+142|  async createMilestone(input: any, _adminUserId?: number) {
+143|    const termId = this.positiveInt(input.termId ?? input.term_id, "term ID");
+144|    const targetPaidRedemptions = this.positiveInt(input.targetPaidRedemptions ?? input.target_paid_redemptions, "target paid redemptions");
+145|    const milestonePrice = this.nonNegativeNumber(input.milestonePrice ?? input.milestone_price, "milestone price", true);
+146|    const previousPriceSnapshot = this.nonNegativeNumber(input.previousPriceSnapshot ?? input.previous_price_snapshot, "previous price");
+147|    const rewardAmountSnapshot = this.positiveNumber(input.rewardAmountSnapshot ?? input.reward_amount_snapshot, "reward amount");
+148|    const title = this.nonEmptyString(input.title, "milestone title");
+149|    const sortOrder = this.finiteInt(input.sortOrder ?? input.sort_order ?? 0, "sort order");
+150|    const active = input.active === undefined ? true : this.strictBoolean(input.active, "active flag");
+151|    await this.assertTermExists(termId);
+152|    return this.db.e_booklet_milestones.create({
+153|      data: {
+154|        term_id: termId,
+155|        title,
+156|        description: input.description ?? null,
+157|        target_paid_redemptions: targetPaidRedemptions,
+158|        milestone_price: milestonePrice,
+159|        previous_price_snapshot: previousPriceSnapshot,
+160|        reward_amount_snapshot: rewardAmountSnapshot,
+161|        notification_recipients: this.notificationRecipients(input.notificationRecipients ?? input.notification_recipients),
+162|        sort_order: sortOrder,
+163|        active,
+164|      },
+165|    });
+166|  }
+167|
+168|  async updateMilestone(id: number, input: any) {
+169|    const data: any = {};
+170|    if (input.termId !== undefined || input.term_id !== undefined) data.term_id = this.positiveInt(input.termId ?? input.term_id, "term ID");
+171|    if (input.title !== undefined) data.title = this.nonEmptyString(input.title, "milestone title");
+172|    if (input.description !== undefined) data.description = input.description;
+173|    if (input.targetPaidRedemptions !== undefined || input.target_paid_redemptions !== undefined) {
+174|      data.target_paid_redemptions = this.positiveInt(input.targetPaidRedemptions ?? input.target_paid_redemptions, "target paid redemptions");
+175|    }
+176|    if (input.milestonePrice !== undefined || input.milestone_price !== undefined) data.milestone_price = this.nonNegativeNumber(input.milestonePrice ?? input.milestone_price, "milestone price", true);
+177|    if (input.previousPriceSnapshot !== undefined || input.previous_price_snapshot !== undefined) data.previous_price_snapshot = this.nonNegativeNumber(input.previousPriceSnapshot ?? input.previous_price_snapshot, "previous price");
+178|    if (input.rewardAmountSnapshot !== undefined || input.reward_amount_snapshot !== undefined) data.reward_amount_snapshot = this.positiveNumber(input.rewardAmountSnapshot ?? input.reward_amount_snapshot, "reward amount");
+179|    if (input.notificationRecipients !== undefined || input.notification_recipients !== undefined) data.notification_recipients = this.notificationRecipients(input.notificationRecipients ?? input.notification_recipients);
+180|    if (input.sortOrder !== undefined || input.sort_order !== undefined) data.sort_order = this.finiteInt(input.sortOrder ?? input.sort_order, "sort order");
+181|    if (input.active !== undefined) data.active = this.strictBoolean(input.active, "active flag");
+182|    if (data.term_id !== undefined) await this.assertTermExists(data.term_id);
+183|    data.updated_at = new Date();
+184|    return this.db.e_booklet_milestones.update({
+185|      where: { id },
+186|      data,
+187|    });
+188|  }
+189|
+190|  async deleteMilestone(id: number) {
+191|    return this.db.e_booklet_milestones.update({
+192|      where: { id },
+193|      data: { active: false, updated_at: new Date() },
+194|    });
+195|  }
+196|
+197|  async reorderMilestones(termId: number, items: Array<{ id: number; sortOrder?: number; sort_order?: number }>) {
+198|    return this.transaction(async (tx) => {
+199|      const updated: any[] = [];
+200|      for (const item of items) {
+201|        const milestone = await tx.e_booklet_milestones.findFirst({
+202|          where: { id: this.positiveInt(item.id, "milestone ID"), term_id: this.positiveInt(termId, "term ID") },
+203|        });
+204|        if (!milestone) throw new NotFoundError("Milestone not found for this term.");
+205|        updated.push(await tx.e_booklet_milestones.update({
+206|          where: { id: this.positiveInt(item.id, "milestone ID") },
+207|          data: {
+208|            sort_order: this.finiteInt(item.sortOrder ?? item.sort_order ?? 0, "sort order"),
+209|            updated_at: new Date(),
+210|          },
+211|        }));
+212|      }
+213|      return updated;
+214|    });
+215|  }
+216|
+217|  async listProgress(termId?: number) {
+218|    const where = termId ? { term_id: termId } : {};
+219|    const [achievements, redemptions] = await Promise.all([
+220|      this.db.e_booklet_milestone_achievements.findMany({
+221|        where,
+222|        orderBy: { achieved_at: "desc" },
+223|      }),
+224|      this.db.e_booklet_access_code_redemptions.findMany({
+225|        where: {
+226|          counted_for_progress: true,
+227|          access_code: {
+228|            kind: "paid",
+229|            ...(termId ? { term_id: termId } : {}),
+230|          },
+231|        },
+232|        include: { access_code: { select: { teacher_id: true, term_id: true, teacher: { select: { id: true, name: true, email: true } } } } },
+233|      }),
+234|    ]);
+235|    const teacherRows = new Map<number, any>();
+236|    for (const redemption of redemptions) {
+237|      const teacherId = Number(redemption?.access_code?.teacher_id);
+238|      if (!Number.isInteger(teacherId)) continue;
+239|      const row = teacherRows.get(teacherId) ?? {
+240|        teacherId,
+241|        teacherName: redemption?.access_code?.teacher?.name ?? null,
+242|        teacher: redemption?.access_code?.teacher ?? null,
+243|        paidRedemptions: 0,
+244|        achievements: [],
+245|      };
+246|      if (!row.teacher && redemption?.access_code?.teacher) row.teacher = redemption.access_code.teacher;
+247|      if (!row.teacherName && redemption?.access_code?.teacher?.name) row.teacherName = redemption.access_code.teacher.name;
+248|      row.paidRedemptions += 1;
+249|      teacherRows.set(teacherId, row);
+250|    }
+251|    for (const achievement of achievements) {
+252|      const teacherId = Number(achievement.teacher_id);
+253|      if (!Number.isInteger(teacherId)) continue;
+254|      const row = teacherRows.get(teacherId) ?? {
+255|        teacherId,
+256|        teacherName: achievement?.teacher?.name ?? null,
+257|        teacher: achievement?.teacher ?? null,
+258|        paidRedemptions: 0,
+259|        achievements: [],
+260|      };
+261|      if (!row.teacher && achievement?.teacher) row.teacher = achievement.teacher;
+262|      if (!row.teacherName && achievement?.teacher?.name) row.teacherName = achievement.teacher.name;
+263|      row.achievements.push(achievement);
+264|      teacherRows.set(teacherId, row);
+265|    }
+266|    const teacherProgress = Array.from(teacherRows.values()).sort((a, b) => b.paidRedemptions - a.paidRedemptions || a.teacherId - b.teacherId);
+267|    const paidRedemptions = teacherProgress.reduce((sum, row) => sum + row.paidRedemptions, 0);
+268|    return { termId: termId ?? null, paidRedemptions, achievements, teacherProgress };
+269|  }
+270|
+271|  async claimReward(teacherId: number, milestoneAchievementId: number, meta: { ipAddress?: string; userAgent?: string; termsAccepted?: boolean } = {}) {
+272|    if (meta.termsAccepted !== true) {
+273|      throw new BadRequestError("Reward claim terms must be accepted.");
+274|    }
+275|    return this.transaction(async (tx) => {
+276|      const achievement = await tx.e_booklet_milestone_achievements.findFirst({
+277|        where: { id: milestoneAchievementId, teacher_id: teacherId },
+278|      });
+279|      if (!achievement) throw new NotFoundError("E-booklet milestone achievement not found.");
+280|      if (achievement.claimed_at) {
+281|        return { claimed: true, alreadyClaimed: true, achievement };
+282|      }
+283|
+284|      const claimUpdate = await tx.e_booklet_milestone_achievements.updateMany({
+285|        where: { id: achievement.id, teacher_id: teacherId, claimed_at: null },
+286|        data: {
+287|          reward_terms_accepted_at: new Date(),
+288|          claimed_at: new Date(),
+289|        },
+290|      });
+291|      if (claimUpdate.count !== 1) {
+292|        const latest = await tx.e_booklet_milestone_achievements.findFirst({
+293|          where: { id: milestoneAchievementId, teacher_id: teacherId },
+294|        });
+295|        return { claimed: true, alreadyClaimed: true, achievement: latest ?? achievement };
+296|      }
+297|
+298|      const terms = await tx.e_booklet_terms.findFirst({ where: { id: achievement.term_id } });
+299|      const existingAcceptance = await tx.e_booklet_teacher_terms_acceptances.findFirst({
+300|        where: {
+301|          teacher_id: teacherId,
+302|          term_id: achievement.term_id,
+303|          acceptance_type: "reward_claim",
+304|          milestone_achievement_id: achievement.id,
+305|        },
+306|      });
+307|      if (!existingAcceptance) {
+308|        try {
+309|          await tx.e_booklet_teacher_terms_acceptances.create({
+310|            data: {
+311|              teacher_id: teacherId,
+312|              term_id: achievement.term_id,
+313|              acceptance_type: "reward_claim",
+314|              milestone_achievement_id: achievement.id,
+315|              terms_version: `term:${achievement.term_id}`,
+316|              terms_snapshot: terms?.reward_claim_terms ?? null,
+317|              ip_address: meta.ipAddress,
+318|              user_agent: meta.userAgent,
+319|            },
+320|          });
+321|        } catch (error) {
+322|          if (!this.isUniqueConflict(error)) throw error;
+323|        }
+324|      }
+325|      const updatedAchievement = await tx.e_booklet_milestone_achievements.findFirst({
+326|        where: { id: milestoneAchievementId, teacher_id: teacherId },
+327|      }) ?? {
+328|        ...achievement,
+329|        reward_terms_accepted_at: new Date(),
+330|        claimed_at: new Date(),
+331|      };
+332|      const walletCredit = await new TeacherWalletService(tx).creditMilestone({
+333|        teacherId,
+334|        amount: this.number(achievement.reward_amount),
+335|        milestoneAchievementId: achievement.id,
+336|        notes: `E-booklet milestone reward claim ${achievement.id}`,
+337|      });
+338|      return { claimed: true, alreadyClaimed: false, achievement: updatedAchievement, walletCredit };
+339|    });
+340|  }
+341|
+342|  async evaluateTeacherMilestones(teacherId: number, termId?: number, context: EBookletMilestoneEvaluationContext = {}) {
+343|    const result = await this.transaction(async (tx) => {
+344|      const term = await this.getActiveTerm(tx, termId);
+345|      const paidFirstAccessCount = await tx.e_booklet_access_code_redemptions.count({
+346|        where: {
+347|          counted_for_progress: true,
+348|          access_code: {
+349|            teacher_id: teacherId,
+350|            term_id: term.id,
+351|            kind: "paid",
+352|          },
+353|        },
+354|      });
+355|
+356|      const milestones = await tx.e_booklet_milestones.findMany({
+357|        where: {
+358|          term_id: term.id,
+359|          active: true,
+360|          target_paid_redemptions: { lte: paidFirstAccessCount },
+361|        },
+362|        orderBy: { target_paid_redemptions: "asc" },
+363|      });
+364|
+365|      const awarded: any[] = [];
+366|      const notifyable: any[] = [];
+367|      for (const milestone of milestones) {
+368|        const existing = await tx.e_booklet_milestone_achievements.findUnique({
+369|          where: {
+370|            teacher_id_term_id_milestone_id: {
+371|              teacher_id: teacherId,
+372|              term_id: term.id,
+373|              milestone_id: milestone.id,
+374|            },
+375|          },
+376|        });
+377|        if (existing) {
+378|          continue;
+379|        }
+380|
+381|        const rewardAmount = this.positiveNumber(milestone.reward_amount_snapshot, "reward amount");
+382|        const achievement = await tx.e_booklet_milestone_achievements.create({
+383|          data: {
+384|            teacher_id: teacherId,
+385|            term_id: term.id,
+386|            milestone_id: milestone.id,
+387|            paid_redemptions_snapshot: paidFirstAccessCount,
+388|            previous_price_snapshot: milestone.previous_price_snapshot ?? 0,
+389|            milestone_price_snapshot: milestone.milestone_price,
+390|            reward_amount: rewardAmount,
+391|          },
+392|        });
+393|        awarded.push(achievement);
+394|        notifyable.push({ ...achievement, notification_recipients: milestone.notification_recipients });
+395|      }
+396|
+397|      return { termId: term.id, term, paidFirstAccessCount, milestones, awarded, notifyable };
+398|    });
+399|
+400|    if (result.notifyable.length > 0) {
+401|      const notifier = this.options.milestoneNotifier ?? new EBookletMilestoneNotificationService(this.db);
+402|      try {
+403|        await notifier.notifyMilestoneAchievements(result.notifyable, {
+404|          term: result.term,
+405|          milestones: result.milestones,
+406|          io: context.io ?? null,
+407|        });
+408|      } catch (error) {
+409|        console.error("Failed to notify e-booklet milestone achievements", error);
+410|      }
+411|    }
+412|
+413|    return { termId: result.termId, paidFirstAccessCount: result.paidFirstAccessCount, awarded: result.awarded };
+414|  }
+415|}
+
+===== FILE: kalima-platform/backend/src/apps/store-api/services/e-booklet-redemption.service.ts (178 lines) =====
+1|import { BadRequestError, ForbiddenError, NotFoundError } from "../../../libs/errors";
+2|import { hashEBookletAccessCode } from "./e-booklet-access-code.service";
+3|
+4|export interface RedeemCodeInput {
+5|  termsAccepted?: boolean;
+6|  ipAddress?: string;
+7|  userAgent?: string;
+8|  purchaseId?: number | null;
+9|}
+10|
+11|export class EBookletRedemptionService {
+12|  constructor(private readonly db: any) {}
+13|
+14|  private transaction<T>(callback: (tx: any) => Promise<T>): Promise<T> {
+15|    if (typeof this.db.$transaction === "function") {
+16|      return this.db.$transaction(callback, { isolationLevel: "Serializable" });
+17|    }
+18|    return callback(this.db);
+19|  }
+20|
+21|  private assertTermsAccepted(input: RedeemCodeInput) {
+22|    if (input.termsAccepted !== true) {
+23|      throw new BadRequestError("Student terms acceptance is required.");
+24|    }
+25|  }
+26|
+27|  private assertCodeExistsAndRedeemable(code: any, studentId: number, now = new Date()) {
+28|    if (!code) throw new NotFoundError("Invalid e-booklet access code.");
+29|    if (code.expires_at && new Date(code.expires_at) <= now) {
+30|      throw new ForbiddenError("This e-booklet access code has expired.");
+31|    }
+32|    if (code.status === "active") return;
+33|    const isSameStudentPaidRedemption =
+34|      code.status === "redeemed" &&
+35|      code.kind === "paid" &&
+36|      Number(code.bound_student_id) === Number(studentId);
+37|    if (!isSameStudentPaidRedemption) {
+38|      throw new ForbiddenError("This e-booklet access code is no longer active.");
+39|    }
+40|  }
+41|
+42|  private async reserveCapacity(tx: any, code: any, studentId: number, isPaid: boolean) {
+43|    const maxRedemptions = Number(code.max_redemptions ?? 1);
+44|    const result = await tx.e_booklet_access_codes.updateMany({
+45|      where: {
+46|        id: code.id,
+47|        status: "active",
+48|        redeemed_count: { lt: maxRedemptions },
+49|        ...(isPaid ? { bound_student_id: null } : {}),
+50|      },
+51|      data: {
+52|        bound_student_id: isPaid ? studentId : code.bound_student_id ?? null,
+53|        redeemed_count: { increment: 1 },
+54|        ...(isPaid ? { status: "redeemed" } : {}),
+55|      },
+56|    });
+57|    if (result.count !== 1) {
+58|      throw new ForbiddenError(
+59|        isPaid
+60|          ? "This e-booklet access code has already been redeemed."
+61|          : "This e-booklet access code has reached its redemption limit.",
+62|      );
+63|    }
+64|  }
+65|
+66|  private async findStudentRedemption(tx: any, codeId: number, studentId: number) {
+67|    return tx.e_booklet_access_code_redemptions.findFirst({
+68|      where: { access_code_id: codeId, student_id: studentId },
+69|    });
+70|  }
+71|
+72|  private isUniqueConflict(error: any) {
+73|    return error?.code === "P2002";
+74|  }
+75|
+76|  private async grantViewerAccess(tx: any, code: any, studentId: number) {
+77|    return tx.e_booklet_access.upsert({
+78|      where: {
+79|        booklet_instance_id_user_id_role: {
+80|          booklet_instance_id: code.booklet_instance_id,
+81|          user_id: studentId,
+82|          role: "student",
+83|        },
+84|      },
+85|      create: {
+86|        booklet_instance_id: code.booklet_instance_id,
+87|        user_id: studentId,
+88|        role: "student",
+89|        access_source: "teacher_code",
+90|        terms_accepted_at: new Date(),
+91|        terms_version: code.term_id ? `term:${code.term_id}` : null,
+92|        status: "active",
+93|      },
+94|      update: {
+95|        status: "active",
+96|        revoked_at: null,
+97|        terms_accepted_at: new Date(),
+98|        terms_version: code.term_id ? `term:${code.term_id}` : null,
+99|      },
+100|    });
+101|  }
+102|
+103|  private redemptionDto(redemption: any, access: any, code: any) {
+104|    return {
+105|      ...redemption,
+106|      access_id: access?.id ?? redemption?.access_id ?? null,
+107|      accessId: access?.id ?? redemption?.access_id ?? null,
+108|      booklet_instance_id: code.booklet_instance_id,
+109|      bookletInstanceId: code.booklet_instance_id,
+110|      accessCodeId: code.id,
+111|      countedForProgress: Boolean(redemption?.counted_for_progress),
+112|    };
+113|  }
+114|
+115|  async redeemCode(rawCode: string, studentId: number, input: RedeemCodeInput) {
+116|    this.assertTermsAccepted(input);
+117|    const normalizedCode = String(rawCode ?? "").trim();
+118|    if (!normalizedCode) throw new BadRequestError("E-booklet access code is required.");
+119|    const codeHash = hashEBookletAccessCode(normalizedCode);
+120|
+121|    return this.transaction(async (tx) => {
+122|      const code = await tx.e_booklet_access_codes.findUnique({ where: { code_hash: codeHash } });
+123|      this.assertCodeExistsAndRedeemable(code, studentId);
+124|
+125|      const existingForStudent = await this.findStudentRedemption(tx, code.id, studentId);
+126|      if (existingForStudent) {
+127|        const access = await this.grantViewerAccess(tx, code, studentId);
+128|        if (!existingForStudent.access_id && access?.id) {
+129|          await tx.e_booklet_access_code_redemptions.update({
+130|            where: { id: existingForStudent.id },
+131|            data: { access_id: access.id },
+132|          });
+133|        }
+134|        return this.redemptionDto(existingForStudent, access, code);
+135|      }
+136|
+137|      const isPaid = code.kind === "paid";
+138|      if (isPaid && code.bound_student_id && Number(code.bound_student_id) !== Number(studentId)) {
+139|        throw new ForbiddenError("This e-booklet access code has already been redeemed.");
+140|      }
+141|
+142|      try {
+143|        await this.reserveCapacity(tx, code, studentId, isPaid);
+144|      } catch (error) {
+145|        const redemptionAfterWait = await this.findStudentRedemption(tx, code.id, studentId);
+146|        if (redemptionAfterWait) {
+147|          const access = await this.grantViewerAccess(tx, code, studentId);
+148|          return this.redemptionDto(redemptionAfterWait, access, code);
+149|        }
+150|        throw error;
+151|      }
+152|      const access = await this.grantViewerAccess(tx, code, studentId);
+153|
+154|      try {
+155|        const redemption = await tx.e_booklet_access_code_redemptions.create({
+156|          data: {
+157|            access_code_id: code.id,
+158|            booklet_instance_id: code.booklet_instance_id,
+159|            student_id: studentId,
+160|            access_id: access?.id ?? null,
+161|            purchase_id: input.purchaseId ?? null,
+162|            paid_redemption_guard: isPaid ? `paid-code-${code.id}` : null,
+163|            counted_for_progress: isPaid,
+164|            ip_address: input.ipAddress,
+165|            user_agent: input.userAgent,
+166|          },
+167|        });
+168|        return this.redemptionDto(redemption, access, code);
+169|      } catch (error) {
+170|        if (this.isUniqueConflict(error)) {
+171|          const concurrentRedemption = await this.findStudentRedemption(tx, code.id, studentId);
+172|          if (concurrentRedemption) return this.redemptionDto(concurrentRedemption, access, code);
+173|        }
+174|        throw error;
+175|      }
+176|    });
+177|  }
+178|}
+
+===== FILE: kalima-platform/backend/src/apps/store-api/services/e-booklet-terms.service.ts (240 lines) =====
+1|import { BadRequestError, NotFoundError } from "../../../libs/errors";
+2|
+3|type AcceptanceType = "code_generation" | "reward_claim";
+4|
+5|export interface TermsMeta {
+6|  ipAddress?: string;
+7|  userAgent?: string;
+8|  milestoneAchievementId?: number;
+9|}
+10|
+11|export class EBookletTermsService {
+12|  constructor(private readonly db: any) {}
+13|
+14|  private parseStatus(status: unknown = "draft"): "draft" | "active" | "archived" {
+15|    if (status === "draft" || status === "active" || status === "archived") return status;
+16|    throw new BadRequestError("Invalid e-booklet terms status.");
+17|  }
+18|
+19|  private parseDate(value: Date | string | undefined | null, label: string, required = true): Date | null {
+20|    if (value === undefined || value === null || value === "") {
+21|      if (required) throw new BadRequestError(`Invalid ${label}.`);
+22|      return null;
+23|    }
+24|    const date = value instanceof Date ? value : new Date(value);
+25|    if (Number.isNaN(date.getTime())) throw new BadRequestError(`Invalid ${label}.`);
+26|    return date;
+27|  }
+28|
+29|  private assertDateWindow(startsAt: Date, endsAt: Date | null) {
+30|    if (endsAt && endsAt <= startsAt) throw new BadRequestError("Terms end date must be after start date.");
+31|  }
+32|
+33|  private assertCurrentWindow(startsAt: Date, endsAt: Date | null) {
+34|    const now = new Date();
+35|    if (startsAt > now) throw new BadRequestError("Terms cannot be activated before their start date.");
+36|    if (endsAt && endsAt <= now) throw new BadRequestError("Expired terms cannot be activated.");
+37|  }
+38|
+39|  async createTerms(
+40|    input: {
+41|      name: string;
+42|      description?: string | null;
+43|      templateId?: number | null;
+44|      codeGenerationTerms?: string | null;
+45|      rewardClaimTerms?: string | null;
+46|      startsAt: Date | string;
+47|      endsAt?: Date | string | null;
+48|      status?: "draft" | "active" | "archived" | string;
+49|    },
+50|    adminUserId: number,
+51|  ) {
+52|    const status = this.parseStatus(input.status ?? "draft");
+53|    const startsAt = this.parseDate(input.startsAt, "start date") as Date;
+54|    const endsAt = this.parseDate(input.endsAt, "end date", false);
+55|    this.assertDateWindow(startsAt, endsAt);
+56|    if (status === "active") this.assertCurrentWindow(startsAt, endsAt);
+57|    const templateId = input.templateId ?? null;
+58|    if (status === "active") {
+59|      const active = await this.db.e_booklet_terms.findFirst({
+60|        where: {
+61|          status: "active",
+62|          ...(templateId === null ? { template_id: null } : { template_id: templateId }),
+63|        },
+64|      });
+65|      if (active) {
+66|        throw new BadRequestError("This e-booklet scope already has an active terms version.");
+67|      }
+68|    }
+69|
+70|    return this.db.e_booklet_terms.create({
+71|      data: {
+72|        template_id: templateId,
+73|        name: input.name,
+74|        description: input.description ?? null,
+75|        status,
+76|        active_guard: status === "active" ? `template:${templateId ?? "global"}` : null,
+77|        starts_at: startsAt,
+78|        ends_at: endsAt,
+79|        code_generation_terms: input.codeGenerationTerms ?? null,
+80|        reward_claim_terms: input.rewardClaimTerms ?? null,
+81|        created_by: adminUserId,
+82|      },
+83|    });
+84|  }
+85|
+86|  async listTerms(filters: { templateId?: number | null; status?: string } = {}) {
+87|    return this.db.e_booklet_terms.findMany({
+88|      where: {
+89|        ...(filters.templateId === undefined ? {} : filters.templateId === null ? { template_id: null } : { template_id: filters.templateId }),
+90|        ...(filters.status ? { status: filters.status } : {}),
+91|      },
+92|      orderBy: [{ starts_at: "desc" }, { id: "desc" }],
+93|    });
+94|  }
+95|
+96|  async updateTerms(
+97|    id: number,
+98|    input: {
+99|      name?: string;
+100|      description?: string | null;
+101|      codeGenerationTerms?: string | null;
+102|      rewardClaimTerms?: string | null;
+103|      startsAt?: Date | string;
+104|      endsAt?: Date | string | null;
+105|      status?: "draft" | "active" | "archived" | string;
+106|    },
+107|  ) {
+108|    const existing = await this.db.e_booklet_terms.findUnique({ where: { id } });
+109|    if (!existing) throw new NotFoundError("E-booklet terms not found.");
+110|    if (existing.status === "active" && (
+111|      input.codeGenerationTerms !== undefined
+112|      || input.rewardClaimTerms !== undefined
+113|      || input.startsAt !== undefined
+114|      || input.endsAt !== undefined
+115|    )) {
+116|      throw new BadRequestError("Active terms policy text and date window cannot be edited in place.");
+117|    }
+118|    const data: any = {};
+119|    if (input.name !== undefined) data.name = input.name;
+120|    if (input.description !== undefined) data.description = input.description;
+121|    if (input.codeGenerationTerms !== undefined) data.code_generation_terms = input.codeGenerationTerms;
+122|    if (input.rewardClaimTerms !== undefined) data.reward_claim_terms = input.rewardClaimTerms;
+123|    const startsAt = input.startsAt !== undefined ? this.parseDate(input.startsAt, "start date") as Date : new Date(existing.starts_at);
+124|    const endsAt = input.endsAt !== undefined ? this.parseDate(input.endsAt, "end date", false) : (existing.ends_at ? new Date(existing.ends_at) : null);
+125|    if (input.startsAt !== undefined || input.endsAt !== undefined) {
+126|      this.assertDateWindow(startsAt, endsAt);
+127|      data.starts_at = startsAt;
+128|      data.ends_at = endsAt;
+129|    }
+130|    if (input.status !== undefined) {
+131|      const status = this.parseStatus(input.status);
+132|      if (status === "active") {
+133|        throw new BadRequestError("Use the activate endpoint to activate e-booklet terms.");
+134|      }
+135|      data.status = status;
+136|      data.active_guard = null;
+137|    }
+138|
+139|    return this.db.e_booklet_terms.update({
+140|      where: { id },
+141|      data,
+142|    });
+143|  }
+144|
+145|  async activateTerms(id: number, adminUserId: number) {
+146|    const transaction = typeof this.db.$transaction === "function" ? this.db.$transaction.bind(this.db) : async (callback: any) => callback(this.db);
+147|    return transaction(async (tx: any) => {
+148|      const term = await tx.e_booklet_terms.findUnique({ where: { id } });
+149|      if (!term) throw new NotFoundError("E-booklet terms not found.");
+150|      const startsAt = this.parseDate(term.starts_at, "start date") as Date;
+151|      const endsAt = this.parseDate(term.ends_at, "end date", false);
+152|      this.assertDateWindow(startsAt, endsAt);
+153|      this.assertCurrentWindow(startsAt, endsAt);
+154|
+155|      await tx.e_booklet_terms.updateMany({
+156|        where: {
+157|          status: "active",
+158|          id: { not: id },
+159|          ...(term.template_id === null ? { template_id: null } : { template_id: term.template_id }),
+160|        },
+161|        data: {
+162|          status: "archived",
+163|          active_guard: null,
+164|          updated_by: adminUserId,
+165|          updated_at: new Date(),
+166|        },
+167|      });
+168|
+169|      return tx.e_booklet_terms.update({
+170|        where: { id },
+171|        data: {
+172|          status: "active",
+173|          active_guard: `template:${term.template_id ?? "global"}`,
+174|          updated_by: adminUserId,
+175|          updated_at: new Date(),
+176|        },
+177|      });
+178|    });
+179|  }
+180|
+181|  async getLatestActiveTerms(templateId?: number | null) {
+182|    const now = new Date();
+183|    const currentWindowWhere = {
+184|      status: "active",
+185|      starts_at: { lte: now },
+186|      OR: [{ ends_at: null }, { ends_at: { gt: now } }],
+187|    };
+188|    const orderBy = { starts_at: "desc" };
+189|    const findActive = (template_id?: number | null) => this.db.e_booklet_terms.findFirst({
+190|      where: {
+191|        ...currentWindowWhere,
+192|        ...(template_id === undefined ? {} : { template_id }),
+193|      },
+194|      orderBy,
+195|    });
+196|
+197|    let terms = await findActive(templateId === undefined ? undefined : templateId);
+198|    if (!terms && templateId !== undefined && templateId !== null) {
+199|      terms = await findActive(null);
+200|    }
+201|    if (!terms) throw new NotFoundError("Active e-booklet terms not found.");
+202|    return terms;
+203|  }
+204|
+205|  private snapshotFor(terms: any, acceptanceType: AcceptanceType): string | null {
+206|    if (acceptanceType === "reward_claim") return terms.reward_claim_terms ?? null;
+207|    return terms.code_generation_terms ?? null;
+208|  }
+209|
+210|  async acceptLatestTerms(
+211|    teacherId: number,
+212|    acceptanceType: AcceptanceType,
+213|    meta: TermsMeta = {},
+214|    templateId?: number | null,
+215|  ) {
+216|    const terms = await this.getLatestActiveTerms(templateId);
+217|    const existing = await this.db.e_booklet_teacher_terms_acceptances.findFirst({
+218|      where: {
+219|        teacher_id: teacherId,
+220|        term_id: terms.id,
+221|        acceptance_type: acceptanceType,
+222|        milestone_achievement_id: meta.milestoneAchievementId ?? null,
+223|      },
+224|    });
+225|    if (existing) return existing;
+226|
+227|    return this.db.e_booklet_teacher_terms_acceptances.create({
+228|      data: {
+229|        teacher_id: teacherId,
+230|        term_id: terms.id,
+231|        acceptance_type: acceptanceType,
+232|        milestone_achievement_id: meta.milestoneAchievementId ?? null,
+233|        terms_snapshot: this.snapshotFor(terms, acceptanceType),
+234|        terms_version: terms.name ?? null,
+235|        ip_address: meta.ipAddress,
+236|        user_agent: meta.userAgent,
+237|      },
+238|    });
+239|  }
+240|}

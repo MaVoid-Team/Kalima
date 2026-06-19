@@ -1,0 +1,132 @@
+{
+  "runId": "phase8-remaining-proof-rerun-20260615T115805Z",
+  "generatedAt": "2026-06-15T11:58:05Z",
+  "backendUrl": "http://127.0.0.1:5001",
+  "frontendUrl": "http://127.0.0.1:5173",
+  "redaction": "JWTs, refresh tokens, passwords, passcodes, invite tokens, generated access-code values, and database connection strings intentionally omitted.",
+  "fixtures": {
+    "source": "previous disposable local QA fixture from phase-8-remaining-proof",
+    "activeInstanceId": 33,
+    "teacherUserId": 89,
+    "studentUserId": 90,
+    "adminUserId": 88,
+    "hotspotCount": 8
+  },
+  "browserBackendReachability": {
+    "frontendOrigin": "http://127.0.0.1:5173",
+    "fetchUrl": "http://127.0.0.1:5001/api/v2/health",
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "version": "v2 new"
+    }
+  },
+  "teacherAuthenticatedUiShareProof": {
+    "route": "http://127.0.0.1:5173/teacher/e-booklets/33/invites",
+    "authSetup": "browser localStorage populated through a temporary localhost helper using disposable local fixture users; sensitive auth values not persisted to evidence",
+    "initialVisibleText": [
+      "E-booklet access codes",
+      "QA active viewer/share phase8-rem-20260615113426-3157a7",
+      "Create paid WhatsApp message",
+      "Create paid code only",
+      "Create free shared access code",
+      "Generated this session",
+      "Students",
+      "Active"
+    ],
+    "termsModal": {
+      "opened": true,
+      "visibleTitle": "Accept code-generation terms",
+      "accepted": true
+    },
+    "paidWhatsappGeneration": {
+      "result": "PASS",
+      "generatedSessionEntryVisible": true,
+      "codeValue": "REDACTED",
+      "whatsappMessageValue": "REDACTED",
+      "messageContainsRedeemRoute": true,
+      "messageContainsArabicCodeLabel": true,
+      "copyCodeButtonVisible": true,
+      "copyWhatsappMessageButtonVisible": true
+    }
+  },
+  "viewerHotspotBrowserProof": {
+    "route": "http://127.0.0.1:5173/teacher/e-booklets/33",
+    "note": "Student route reached backend but was device-bound to a previous fixture fingerprint; teacher delivered-viewer route was used for browser-visible hotspot rendering, while the prior API proof already covered student device binding behavior.",
+    "visibleText": [
+      "No download",
+      "Page 1 of 1",
+      "Render mode: server-page",
+      "Hotspots",
+      "#1 QA Text Hotspot",
+      "#2 QA Image Hotspot",
+      "#3 QA Audio Hotspot",
+      "#4 QA Video Hotspot",
+      "#5 QA File Hotspot",
+      "#6 QA Link Hotspot",
+      "#7 QA Question Hotspot",
+      "#8 QA Multi Card Hotspot"
+    ],
+    "hotspotButtonsVisible": [
+      "QA Text Hotspot",
+      "QA Image Hotspot",
+      "QA Audio Hotspot",
+      "QA Video Hotspot",
+      "QA File Hotspot",
+      "QA Link Hotspot",
+      "QA Question Hotspot",
+      "QA Multi Card Hotspot"
+    ],
+    "browserOriginApi": {
+      "hotspotListStatus": 200,
+      "hotspotTypes": ["text", "image", "audio", "video", "file", "link", "question_answer", "text"],
+      "contentResults": [
+        { "title": "QA Text Hotspot", "type": "text", "status": 200, "blockTypes": ["text"], "blockCount": 1 },
+        { "title": "QA Image Hotspot", "type": "image", "status": 200, "blockTypes": ["image"], "blockCount": 1 },
+        { "title": "QA Audio Hotspot", "type": "audio", "status": 200, "blockTypes": ["audio"], "blockCount": 1 },
+        { "title": "QA Video Hotspot", "type": "video", "status": 200, "blockTypes": ["video"], "blockCount": 1, "autoplayTrue": false },
+        { "title": "QA File Hotspot", "type": "file", "status": 200, "blockTypes": ["file"], "blockCount": 1 },
+        { "title": "QA Link Hotspot", "type": "link", "status": 200, "blockTypes": ["link"], "blockCount": 1 },
+        { "title": "QA Question Hotspot", "type": "question_answer", "status": 200, "blockTypes": ["question_answer"], "blockCount": 1 },
+        { "title": "QA Multi Card Hotspot", "type": "text", "status": 200, "blockTypes": ["text", "link"], "blockCount": 2 }
+      ]
+    },
+    "openedHotspots": {
+      "video": {
+        "clicked": true,
+        "panelVisible": true,
+        "contentLoadedAsVideoHotspot": true,
+        "videoElementAutoplay": false,
+        "note": "The panel showed the private asset fallback instead of a playable video element, but browser-origin content API proved a single video block and no autoplay=true metadata."
+      },
+      "multiCard": {
+        "clicked": true,
+        "panelVisible": true,
+        "visibleBlocks": ["Block 1", "Block 2"],
+        "visibleLinkText": "QA second card"
+      }
+    }
+  },
+  "adminViewModeBrowserProof": {
+    "route": "http://127.0.0.1:5173/admin/e-booklet-instances/33/view",
+    "visibleText": [
+      "Admin View Mode",
+      "No download",
+      "Page 1 of 1",
+      "Admin View Mode: previewing the delivered e-booklet without consuming a student seat or binding a device.",
+      "Render mode: server-page",
+      "Hotspots",
+      "#1 QA Text Hotspot",
+      "#8 QA Multi Card Hotspot"
+    ],
+    "browserOriginApi": {
+      "metadataStatus": 200,
+      "metadataAdminViewMode": true,
+      "pageStatus": 200,
+      "hotspotsStatus": 200,
+      "hotspotCount": 8,
+      "hotspotTypes": ["text", "image", "audio", "video", "file", "link", "question_answer", "text"]
+    }
+  },
+  "requiredFixesOrBlockers": []
+}

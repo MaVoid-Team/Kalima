@@ -295,6 +295,27 @@ export class PublicEBookletCheckoutItemDto {
   @IsInt()
   @Min(1)
   template_version_id!: number;
+}
+
+export class PublicEBookletCheckoutDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  instance_id?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  template_id?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  template_version_id?: number;
+
+  @IsOptional()
+  @IsArray()
+  items?: PublicEBookletCheckoutItemDto[];
 
   @IsOptional()
   @IsArray()
