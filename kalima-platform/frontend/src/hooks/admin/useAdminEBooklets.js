@@ -647,6 +647,30 @@ export function useAdminEBookletTermsMilestones() {
   };
 }
 
+export function useAdminEBookletSettings() {
+  const { mutate: fetchApi, loading } = useApiMutation();
+  const [settings, setSettings] = useState(null);
+
+  const fetchSettings = useCallback(async () => {
+    const response = await fetchApi({ endpoint: "/admin/e-booklet-settings", method: "get" }, false);
+    setSettings(response?.data || null);
+    return response;
+  }, [fetchApi]);
+
+  const updateSettings = useCallback(async (data) => {
+    const response = await fetchApi({
+      endpoint: "/admin/e-booklet-settings",
+      method: "put",
+      data,
+      defaultSuccessMessage: i18n.t("eBooklets:toasts.settingsSaved", "E-booklet settings saved"),
+    });
+    setSettings(response?.data || null);
+    return response;
+  }, [fetchApi]);
+
+  return { settings, loading, fetchSettings, updateSettings };
+}
+
 export function useAdminEBookletDevices() {
   const { mutate: fetchApi, loading } = useApiMutation();
   const [devices, setDevices] = useState([]);

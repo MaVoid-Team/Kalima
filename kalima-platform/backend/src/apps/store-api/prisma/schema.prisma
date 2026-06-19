@@ -1048,6 +1048,31 @@ model e_booklet_terms {
   @@index([template_id, status], map: "ix_e_booklet_terms_template_status")
 }
 
+model e_booklet_global_settings {
+  id                                      Int       @id @default(1)
+  default_invite_quota                    Int       @default(0)
+  default_access_duration_days            Int?
+  default_invite_expiration_days          Int?
+  default_delivery_notes                  String?   @db.Text
+  default_student_marketing_price         Decimal   @default(0) @db.Decimal(10, 2)
+  default_internal_price                  Decimal   @default(0) @db.Decimal(10, 2)
+  default_access_code_kind                String    @default("paid") @db.VarChar(20)
+  max_bulk_access_codes                   Int       @default(100)
+  default_access_code_expiration_days     Int?
+  require_terms_for_code_generation       Boolean   @default(true)
+  default_allowed_devices_per_student     Int       @default(1)
+  default_allowed_devices_per_teacher     Int       @default(2)
+  device_reset_policy                     String?   @db.Text
+  notify_admins_on_delivery               Boolean   @default(true)
+  notify_teacher_on_delivery              Boolean   @default(true)
+  notify_admins_on_milestone              Boolean   @default(true)
+  notify_teacher_on_milestone             Boolean   @default(true)
+  notify_admins_on_access_code_redemption Boolean   @default(false)
+  updated_by                              Int?
+  created_at                              DateTime? @default(now()) @db.Timestamp(6)
+  updated_at                              DateTime? @db.Timestamp(6)
+}
+
 model e_booklet_instances {
   id                      Int                              @id @default(autoincrement())
   purchase_id             Int                              @unique

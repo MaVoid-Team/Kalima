@@ -244,6 +244,16 @@ router.get(
   ...adminManagerAuth,
   eBookletController.listTerms,
 );
+router.get(
+  "/admin/e-booklet-settings",
+  ...adminManagerAuth,
+  eBookletController.getSettings,
+);
+router.put(
+  "/admin/e-booklet-settings",
+  ...adminManagerAuth,
+  eBookletController.updateSettings,
+);
 router.post(
   "/admin/e-booklet-terms",
   ...adminManagerAuth,

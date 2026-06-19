@@ -100,6 +100,7 @@ export const ModelName = {
   e_booklet_template_required_fields: 'e_booklet_template_required_fields',
   e_booklet_purchase_required_fields: 'e_booklet_purchase_required_fields',
   e_booklet_terms: 'e_booklet_terms',
+  e_booklet_global_settings: 'e_booklet_global_settings',
   e_booklet_instances: 'e_booklet_instances',
   e_booklet_milestones: 'e_booklet_milestones',
   e_booklet_milestone_achievements: 'e_booklet_milestone_achievements',
@@ -837,6 +838,34 @@ export const E_booklet_termsScalarFieldEnum = {
 } as const
 
 export type E_booklet_termsScalarFieldEnum = (typeof E_booklet_termsScalarFieldEnum)[keyof typeof E_booklet_termsScalarFieldEnum]
+
+
+export const E_booklet_global_settingsScalarFieldEnum = {
+  id: 'id',
+  default_invite_quota: 'default_invite_quota',
+  default_access_duration_days: 'default_access_duration_days',
+  default_invite_expiration_days: 'default_invite_expiration_days',
+  default_delivery_notes: 'default_delivery_notes',
+  default_student_marketing_price: 'default_student_marketing_price',
+  default_internal_price: 'default_internal_price',
+  default_access_code_kind: 'default_access_code_kind',
+  max_bulk_access_codes: 'max_bulk_access_codes',
+  default_access_code_expiration_days: 'default_access_code_expiration_days',
+  require_terms_for_code_generation: 'require_terms_for_code_generation',
+  default_allowed_devices_per_student: 'default_allowed_devices_per_student',
+  default_allowed_devices_per_teacher: 'default_allowed_devices_per_teacher',
+  device_reset_policy: 'device_reset_policy',
+  notify_admins_on_delivery: 'notify_admins_on_delivery',
+  notify_teacher_on_delivery: 'notify_teacher_on_delivery',
+  notify_admins_on_milestone: 'notify_admins_on_milestone',
+  notify_teacher_on_milestone: 'notify_teacher_on_milestone',
+  notify_admins_on_access_code_redemption: 'notify_admins_on_access_code_redemption',
+  updated_by: 'updated_by',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_global_settingsScalarFieldEnum = (typeof E_booklet_global_settingsScalarFieldEnum)[keyof typeof E_booklet_global_settingsScalarFieldEnum]
 
 
 export const E_booklet_instancesScalarFieldEnum = {

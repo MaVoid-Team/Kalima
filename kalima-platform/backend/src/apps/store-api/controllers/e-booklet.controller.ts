@@ -794,6 +794,24 @@ export const eBookletController = {
     }
   },
 
+  async getSettings(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().settings.getSettings();
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async updateSettings(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().settings.updateSettings(req.body, currentUserId(req));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async updateTerms(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await domainServices().terms.updateTerms(parseId(req.params.termId, "term ID"), req.body);
