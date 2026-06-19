@@ -1,128 +1,128 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-lerna-debug.log*
-.pnpm-debug.log*
+# # Logs
+# logs
+# *.log
+# npm-debug.log*
+# yarn-debug.log*
+# lerna-debug.log*
+# .pnpm-debug.log*
 
-# Diagnostic reports
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+# # Diagnostic reports
+# report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-kalima-platform/backend/.local-postgres/
+# # Runtime data
+# pids
+# *.pid
+# *.seed
+# *.pid.lock
+# kalima-platform/backend/.local-postgres/
 
-# Dependency directories
-node_modules/
-frontend/node_modules/
-jspm_packages/
-bower_components/
-backend/upload/
-# Build output
-build/
-**/build/
-dist/
-frontend/dist/
+# # Dependency directories
+# node_modules/
+# frontend/node_modules/
+# jspm_packages/
+# bower_components/
+# backend/upload/
+# # Build output
+# build/
+# **/build/
+# dist/
+# frontend/dist/
 
-# Capacitor
-android/
-frontend/android/
+# # Capacitor
+# android/
+# frontend/android/
 
-# Vite
-frontend/.vite/
+# # Vite
+# frontend/.vite/
 
-# Cache and temp folders
-.cache/
-frontend/.cache/
-.parcel-cache/
-.temp/
-.nyc_output/
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-.docusaurus/
-.serverless/
-.fusebox/
-.dynamodb/
+# # Cache and temp folders
+# .cache/
+# frontend/.cache/
+# .parcel-cache/
+# .temp/
+# .nyc_output/
+# .rpt2_cache/
+# .rts2_cache_cjs/
+# .rts2_cache_es/
+# .rts2_cache_umd/
+# .docusaurus/
+# .serverless/
+# .fusebox/
+# .dynamodb/
 
-uploads/
-# Config files
-.env
-.env.*
-.pnpm-debug.log*
-.lock-wscript
-.eslintcache
-.stylelintcache
-.node_repl_history
-.yarn-integrity
-.yarn/cache/
-.yarn/unplugged/
-.yarn/build-state.yml
-.yarn/install-state.gz
-.pnp.*
-.pnp.js
+# uploads/
+# # Config files
+# .env
+# .env.*
+# .pnpm-debug.log*
+# .lock-wscript
+# .eslintcache
+# .stylelintcache
+# .node_repl_history
+# .yarn-integrity
+# .yarn/cache/
+# .yarn/unplugged/
+# .yarn/build-state.yml
+# .yarn/install-state.gz
+# .pnp.*
+# .pnp.js
 
-# Framework specific
-.next/
-out/
-.nuxt/
-.vuepress/dist/
-.docusaurus/
-.serverless/
-public/ # (only if needed)
+# # Framework specific
+# .next/
+# out/
+# .nuxt/
+# .vuepress/dist/
+# .docusaurus/
+# .serverless/
+# public/ # (only if needed)
 
-# Testing
-coverage/
+# # Testing
+# coverage/
 
-# Other
-.vscode-test
-.DS_Store
-*.tgz
-# Added by code-review-graph
-.code-review-graph/
+# # Other
+# .vscode-test
+# .DS_Store
+# *.tgz
+# # Added by code-review-graph
+# .code-review-graph/
 
-# Local agent/planning/working artifacts — keep inside the repo but never push
-kalima-platform/.local-workdocs/
-kalima-platform/CONTEXT.md
-.codegraph/
+# # Local agent/planning/working artifacts — keep inside the repo but never push
+# kalima-platform/.local-workdocs/
+# kalima-platform/CONTEXT.md
+# .codegraph/
 
-# macOS metadata
-.DS_Store
-**/.DS_Store
+# # macOS metadata
+# .DS_Store
+# **/.DS_Store
 
-# AI/model/evaluation local artifacts — do not commit generated weights, caches, or harness output
-*.gguf
-*.ggml
-*.safetensors
-*.ckpt
-*.pt
-*.pth
-*.onnx
-*.tflite
-*.mlmodel
-*.mlpackage
-*.h5
-*.keras
-ai-models/
-model-artifacts/
-model-cache/
-models-cache/
-checkpoints/
-weights/
-loras/
-adapters/
-hf-cache/
-.hf-cache/
-.huggingface/
-.fallow/
-harness-artifacts/
-harness-results/
-eval-artifacts/
-eval-results/
-benchmark-results/
-artifacts/last-harness*.txt
+# # AI/model/evaluation local artifacts — do not commit generated weights, caches, or harness output
+# *.gguf
+# *.ggml
+# *.safetensors
+# *.ckpt
+# *.pt
+# *.pth
+# *.onnx
+# *.tflite
+# *.mlmodel
+# *.mlpackage
+# *.h5
+# *.keras
+# ai-models/
+# model-artifacts/
+# model-cache/
+# models-cache/
+# checkpoints/
+# weights/
+# loras/
+# adapters/
+# hf-cache/
+# .hf-cache/
+# .huggingface/
+# .fallow/
+# harness-artifacts/
+# harness-results/
+# eval-artifacts/
+# eval-results/
+# benchmark-results/
+# artifacts/last-harness*.txt
