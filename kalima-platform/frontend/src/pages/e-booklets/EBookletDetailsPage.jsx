@@ -203,15 +203,11 @@ export default function EBookletDetailsPage() {
                   {formatMoney(template.price, template.currency, i18n.language)}
                 </div>
               </div>
-              <Button
-                type="button"
-                size="lg"
-                onClick={handleAddToCart}
-                disabled={!activeVersion?.id}
-                className="w-full active:scale-[0.98] md:w-auto"
-              >
-                <ShoppingBag className="h-4 w-4" />
-                {t("details.addToCart")}
+              <Button asChild size="lg" disabled={!activeVersion?.id} className="w-full active:scale-[0.98] md:w-auto">
+                <Link to="/e-booklet-code">
+                  <ShoppingBag className="h-4 w-4" />
+                  {t("details.redeemCode")}
+                </Link>
               </Button>
             </div>
           </div>

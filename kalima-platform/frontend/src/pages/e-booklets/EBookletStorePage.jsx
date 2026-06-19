@@ -180,14 +180,11 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
               {formatMoney(template.price, template.currency, language)}
             </div>
           </div>
-          <Button
-            type="button"
-            onClick={() => onAdd(template)}
-            disabled={!template.activeVersion?.id}
-            className="active:scale-[0.98]"
-          >
-            <ShoppingBag className="h-4 w-4" />
-            {t("store.add")}
+          <Button asChild disabled={!template.activeVersion?.id} className="active:scale-[0.98]">
+            <Link to="/e-booklet-code">
+              <ShoppingBag className="h-4 w-4" />
+              {t("store.redeemCode")}
+            </Link>
           </Button>
         </div>
       </div>
@@ -350,7 +347,7 @@ export default function EBookletStorePage() {
                   key={template.id}
                   template={template}
                   featured={index === 0}
-                  onAdd={handleAddToCart}
+                  onAdd={() => {}}
                   t={t}
                   language={i18n.language}
                 />

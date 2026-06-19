@@ -40,12 +40,13 @@ export default function Navbar() {
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(true);
   const lastScrollY = useRef(0);
+  const canShowMarketToUser = hasStoreAccess && !isStudent;
+  const canShowEBookletStoreToUser = !isStudent;
   const shouldShowBottomNav =
     showMobileNav &&
     !location.pathname.startsWith('/product/') &&
     !location.pathname.startsWith('/e-booklet-cart') &&
     !location.pathname.startsWith('/e-booklet-checkout');
-  const canSeeEBookletStore = !isAuthenticated || !isStudent;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -113,16 +114,15 @@ export default function Navbar() {
   useEffect(() => {
     if (!open) return;
 
-    const routeValues = hasStoreAccess ? ["/samples", "/market"] : [];
-    if (canSeeEBookletStore) {
-      routeValues.push("/e-booklets");
-    }
-    if (isAuthenticated && isTeacher && !hasAdminAccess) {
-      routeValues.push(E_BOOKLET_ORDERS_ROUTE);
-    }
+    const routeValues = [
+      ...(hasStoreAccess ? ["/samples"] : []),
+      ...(canShowMarketToUser ? ["/market"] : []),
+      ...(canShowEBookletStoreToUser ? ["/e-booklets"] : []),
+      ...(isAuthenticated && isTeacher && !hasAdminAccess ? [E_BOOKLET_ORDERS_ROUTE] : []),
+    ];
     const current = routeValues.find((route) => location.pathname.startsWith(route));
     setCommandValue(current || "");
-  }, [open, location.pathname, hasStoreAccess, canSeeEBookletStore, isAuthenticated, isTeacher, hasAdminAccess]);
+  }, [open, location.pathname, hasStoreAccess, canShowMarketToUser, canShowEBookletStoreToUser, isAuthenticated, isTeacher, hasAdminAccess]);
 
 
   const toggleLanguage = () => {
@@ -203,7 +203,7 @@ export default function Navbar() {
                     {t("navbar.samples")}
                   </Button>
                 )}
-                {hasStoreAccess && (
+                {canShowMarketToUser && (
                   <Button
                     variant="ghost"
                     onClick={() => navigate("/market")}
@@ -213,7 +213,7 @@ export default function Navbar() {
                     {t("navbar.market")}
                   </Button>
                 )}
-                {canSeeEBookletStore && (
+                {canShowEBookletStoreToUser && (
                   <Button
                     variant="secondary"
                     onClick={() => navigate("/e-booklets")}
@@ -246,7 +246,7 @@ export default function Navbar() {
                 </Button>
 
                 {/* Cart Button Desktop */}
-                {isAuthenticated && hasStoreAccess && !hasAdminAccess && (
+                {isAuthenticated && canShowMarketToUser && !hasAdminAccess && (
                   <Button
                     variant="ghost"
                     size="icon"
@@ -345,7 +345,7 @@ export default function Navbar() {
               </Button>
 
               {/* Cart Button Mobile */}
-              {isAuthenticated && hasStoreAccess && !hasAdminAccess && (
+              {isAuthenticated && canShowMarketToUser && !hasAdminAccess && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -445,7 +445,7 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {hasStoreAccess && (
+              {canShowMarketToUser && (
                 <Link to="/market" className={cn(
                   "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
                   location.pathname === "/market" ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -464,7 +464,7 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {canSeeEBookletStore && (
+              {canShowEBookletStoreToUser && (
                 <Link to="/e-booklets" className={cn(
                   "flex items-center justify-center min-w-[48px] h-10 transition-all relative group",
                   location.pathname.startsWith("/e-booklets") || location.pathname.startsWith("/e-booklet-") ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -546,12 +546,12 @@ export default function Navbar() {
                 {t("navbar.samples")}
               </CommandItem>
             )}
-            {hasStoreAccess && (
+            {canShowMarketToUser && (
               <CommandItem value="/market" onSelect={() => runCommand(() => navigate("/market"))}>
                 {t("navbar.market")}
               </CommandItem>
             )}
-            {canSeeEBookletStore && (
+            {canShowEBookletStoreToUser && (
               <CommandItem value="/e-booklets" onSelect={() => runCommand(() => navigate("/e-booklets"))}>
                 {t("navbar.eBooklets")}
               </CommandItem>

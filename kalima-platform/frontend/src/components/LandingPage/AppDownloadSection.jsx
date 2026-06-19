@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Download, Sparkles } from "lucide-react";
+import { useRole } from "@/hooks/useRole";
 
 const sectionContainer = {
   hidden: { opacity: 0, y: 30 },
@@ -20,6 +21,7 @@ const childFade = {
 
 export default function AppDownloadSection() {
   const { t } = useTranslation("landing");
+  const { isStudent } = useRole();
 
   return (
     <motion.section
@@ -63,11 +65,13 @@ export default function AppDownloadSection() {
                     {t("landingPage.download.downloadButton")}
                   </Button>
                 </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
-                  <Button asChild size="lg" variant="outline" className="w-full" data-testid="landing-page-app-explore-market-button">
-                    <Link to="/market">{t("landingPage.download.exploreMarket")}</Link>
-                  </Button>
-                </motion.div>
+                {!isStudent && (
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
+                    <Button asChild size="lg" variant="outline" className="w-full" data-testid="landing-page-app-explore-market-button">
+                      <Link to="/market">{t("landingPage.download.exploreMarket")}</Link>
+                    </Button>
+                  </motion.div>
+                )}
               </motion.div>
             </div>
             <motion.div

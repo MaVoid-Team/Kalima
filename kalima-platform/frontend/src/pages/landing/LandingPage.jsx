@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import WelcomeSection from "@/components/LandingPage/WelcomeSection";
 import BackgroundAnimation from "@/components/LandingPage/BackgroundAnimation";
+import { useRole } from "@/hooks/useRole";
 
 const AboutSection = lazy(() => import("@/components/LandingPage/AboutSection"));
 const LearningJourneySection = lazy(() => import("@/components/LandingPage/LearningJourneySection"));
@@ -9,11 +10,12 @@ const SuccessStoriesSection = lazy(() => import("@/components/LandingPage/Succes
 const AppDownloadSection = lazy(() => import("@/components/LandingPage/AppDownloadSection"));
 
 export default function LandingPage() {
+  const { isStudent } = useRole();
   const sections = [
     { key: "welcome", component: <WelcomeSection /> },
     { key: "journey", component: <LearningJourneySection /> },
     { key: "about", component: <AboutSection /> },
-    { key: "marketplace", component: <MarketplaceSection /> },
+    ...(!isStudent ? [{ key: "marketplace", component: <MarketplaceSection /> }] : []),
     { key: "stories", component: <SuccessStoriesSection /> },
     { key: "download", component: <AppDownloadSection /> },
   ];

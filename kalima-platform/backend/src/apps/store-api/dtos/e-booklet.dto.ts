@@ -318,31 +318,6 @@ export class PublicEBookletCheckoutDto {
   items?: PublicEBookletCheckoutItemDto[];
 
   @IsOptional()
-  @IsArray()
-  required_field_values?: Array<{ field_definition_id: number; value: string }>;
-}
-
-export class PublicEBookletCheckoutDto {
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  instance_id?: number;
-
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  template_id?: number;
-
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  template_version_id?: number;
-
-  @IsOptional()
-  @IsArray()
-  items?: PublicEBookletCheckoutItemDto[];
-
-  @IsOptional()
   @IsInt()
   @Min(1)
   payment_method_id?: number;

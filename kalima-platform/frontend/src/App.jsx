@@ -175,8 +175,8 @@ const router = createBrowserRouter(
           <Route path="/e-booklets/:templateId" element={<EBookletDetailsPage />} />
         </Route>
 
-        {/* Market and Product Routes - Restricted by store access */}
-        <Route element={<RoleRoute requireStoreAccess={true} />}>
+        {/* Market and Product Routes - Restricted by store access and hidden from logged-in students for now. */}
+        <Route element={<RoleRoute requireStoreAccess={true} excludedRole={["Student"]} />}>
           <Route path="/market" element={<MarketPage />} />
           <Route path="/product/:id" element={<ProductDetailsPage />} />
           <Route path="/booklet/:id" element={<BookletDetailsPage />} />
@@ -201,7 +201,7 @@ const router = createBrowserRouter(
         <Route element={<RoleRoute requireStoreAccess={true} />}>
           <Route element={<ProtectedRoute requireAuth={true} />}>
             {/* Purchase flow blocked for Admins */}
-            <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin"]} />}>
+            <Route element={<RoleRoute excludedRole={["Admin", "SubAdmin", "Student"]} />}>
               <Route path="/cart" element={<WizardCheckoutPage />} />
               <Route path="/checkout" element={<WizardCheckoutPage />} />
               <Route

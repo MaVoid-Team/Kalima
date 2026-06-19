@@ -5,15 +5,12 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logo from "../assets/Logo.webp";
 import { useWhatsAppContact } from "@/lib/whatsappUtils";
-import useAuth from "@/hooks/auth/useAuth";
 import { useRole } from "@/hooks/useRole";
 
 export default function Footer() {
   const { t } = useTranslation("landing");
   const { handleWhatsAppContact } = useWhatsAppContact();
-  const { isAuthenticated } = useAuth();
   const { isStudent } = useRole();
-  const canSeeEBookletStore = !isAuthenticated || !isStudent;
 
   const SOCIAL_LINKS = [
     { Icon: FacebookIcon, href: "https://www.facebook.com/kalima010", label: "Facebook" },
@@ -26,8 +23,10 @@ export default function Footer() {
       title: t("footer.platform"),
       links: [
         { label: t("footer.samples"), href: "/samples" },
-        { label: t("footer.market"), href: "/market" },
-        ...(canSeeEBookletStore ? [{ label: t("footer.eBooklets"), href: "/e-booklets" }] : []),
+        ...(!isStudent ? [
+          { label: t("footer.market"), href: "/market" },
+          { label: t("footer.eBooklets"), href: "/e-booklets" },
+        ] : []),
         { label: t("footer.privacyPolicy"), href: "/privacy-policy" },
         { label: t("footer.deleteMyData"), href: "/delete-my-data" },
       ],
