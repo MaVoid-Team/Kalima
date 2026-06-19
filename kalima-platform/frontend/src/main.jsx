@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { Agentation } from 'agentation'
 import App from './App.jsx'
 import './index.css'
 import './i18n';
@@ -13,9 +14,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <NotificationsProvider>
         <CartProvider>
           <App />
+          {import.meta.env.DEV && <Agentation />}
         </CartProvider>
       </NotificationsProvider>
     </AuthProvider>
   </React.StrictMode>
 )
-

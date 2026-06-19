@@ -190,6 +190,7 @@
         "widthPercent": "Width %",
         "heightPercent": "Height %",
         "opacityPercent": "Visibility %",
+        "glowPercent": "Glow effect %",
         "color": "Color",
         "colors": {
           "red": "Red",

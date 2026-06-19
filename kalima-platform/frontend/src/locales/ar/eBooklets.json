@@ -190,6 +190,7 @@
         "widthPercent": "العرض %",
         "heightPercent": "الارتفاع %",
         "opacityPercent": "الظهور %",
+        "glowPercent": "تأثير التوهج %",
         "color": "اللون",
         "colors": {
           "red": "أحمر",

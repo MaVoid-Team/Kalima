@@ -36,11 +36,18 @@ const HOTSPOT_TYPES = {
 };
 
 const VIEWER_COLOR_CLASS_MAP = {
-  red: "bg-red-600",
-  blue: "bg-blue-600",
-  green: "bg-green-600",
-  amber: "bg-amber-600",
-  violet: "bg-violet-600",
+  red: "bg-red-600 ring-red-600/30",
+  blue: "bg-blue-600 ring-blue-600/30",
+  green: "bg-green-600 ring-green-600/30",
+  amber: "bg-amber-600 ring-amber-600/30",
+  violet: "bg-violet-600 ring-violet-600/30",
+};
+const VIEWER_COLOR_RGB_MAP = {
+  red: "220 38 38",
+  blue: "37 99 235",
+  green: "22 163 74",
+  amber: "217 119 6",
+  violet: "124 58 237",
 };
 const DEFAULT_HOTSPOT_COLOR = "blue";
 
@@ -48,6 +55,11 @@ const getHotspotColorClass = (hotspot) => {
   const color = hotspot?.display_behavior?.color;
   if (!color) return VIEWER_COLOR_CLASS_MAP[DEFAULT_HOTSPOT_COLOR];
   return VIEWER_COLOR_CLASS_MAP[color] || null;
+};
+
+const getHotspotColorRgb = (hotspot) => {
+  const color = hotspot?.display_behavior?.color;
+  return VIEWER_COLOR_RGB_MAP[color] || VIEWER_COLOR_RGB_MAP[DEFAULT_HOTSPOT_COLOR];
 };
 
 const getDimensions = (metadata, pageNumber) => {
@@ -60,6 +72,17 @@ const clamp = (value, fallback, min, max) => {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.min(max, Math.max(min, parsed));
+};
+
+const getHotspotGlowPercent = (hotspot) => clamp(hotspot.display_behavior?.glow_percent, 100, 0, 100);
+
+const getHotspotGlowStyle = (hotspot) => {
+  const glow = getHotspotGlowPercent(hotspot);
+  if (glow <= 0) return {};
+  const blur = 8 + Math.round((glow / 100) * 18);
+  const spread = Math.round((glow / 100) * 4);
+  const alpha = 0.18 + (glow / 100) * 0.22;
+  return { boxShadow: `0 0 ${blur}px ${spread}px rgb(${getHotspotColorRgb(hotspot)} / ${alpha})` };
 };
 
 const getBlocks = (hotspot) => {
@@ -150,6 +173,8 @@ function HotspotMarker({ hotspot, active, onOpen, t }) {
   const left = clamp(hotspot.x_percent, 50, 0, 100);
   const top = clamp(hotspot.y_percent, 50, 0, 100);
   const opacity = clamp(hotspot.display_behavior?.opacity_percent, 100, 0, 100) / 100;
+  const glow = getHotspotGlowPercent(hotspot);
+  const glowStyle = getHotspotGlowStyle(hotspot);
   const baseStyle = {
     left: `${left}%`,
     top: `${top}%`,
@@ -170,7 +195,7 @@ function HotspotMarker({ hotspot, active, onOpen, t }) {
       >
         <span
           className={`absolute inset-0 ${active ? "opacity-95" : "opacity-80"}`}
-          style={{ clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)" }}
+          style={{ clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)", ...glowStyle }}
         >
           <span className={`block h-full w-full ${colorClass}`} />
         </span>
@@ -186,8 +211,8 @@ function HotspotMarker({ hotspot, active, onOpen, t }) {
     <button
       type="button"
       onClick={() => onOpen(hotspot)}
-      className={`absolute flex items-center justify-center border-2 border-white text-white shadow-lg transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${roundedClass} ${colorClass} ${active ? "ring-4 ring-primary/30" : ""}`}
-      style={baseStyle}
+      className={`absolute flex items-center justify-center border-2 border-white text-white transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${glow > 0 ? "shadow-lg ring-4" : "shadow-md"} ${roundedClass} ${colorClass} ${active ? "scale-105 ring-offset-2" : ""}`}
+      style={{ ...baseStyle, ...glowStyle }}
       aria-label={getHotspotLabel(hotspot, t)}
     >
       <Icon className="h-4 w-4 opacity-90" />
