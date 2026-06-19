@@ -67,7 +67,6 @@ const shapeIcons = {
   rectangle: Square,
   square: Square,
   triangle: Triangle,
-  oval: CircleDot,
 };
 
 const hotspotShapes = ["circle", "rectangle", "square", "triangle", "oval"];
@@ -1973,7 +1972,11 @@ export default function AdminEBookletEditorPage() {
                           title={t(`admin.editor.hotspots.shapes.${shape}`)}
                           aria-label={t(`admin.editor.hotspots.shapes.${shape}`)}
                         >
-                          <ShapeIcon className="h-4 w-4" />
+                          {shape === "oval" ? (
+                            <span className="h-3 w-5 rounded-full border-2 border-current" aria-hidden="true" />
+                          ) : (
+                            <ShapeIcon className="h-4 w-4" />
+                          )}
                         </Button>
                       );
                     })}
