@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "frontend": {
+    "adminRoute": {
+      "inputUrl": "http://127.0.0.1:5173/admin/e-booklets",
+      "observedUrl": "http://127.0.0.1:5173/login",
+      "result": "redirected to visible login UI; acceptable unauthenticated behavior",
+      "rootLength": 30788,
+      "elementCount": 211,
+      "visibleTextIncludes": ["Welcome Back", "Email or Phone Number", "Log In", "Sign Up"],
+      "consoleErrors": 0
+    },
+    "rootRoute": {
+      "inputUrl": "http://127.0.0.1:5173/",
+      "observedUrl": "http://127.0.0.1:5173/",
+      "result": "rendered non-empty public home UI",
+      "rootLength": 59057,
+      "elementCount": 406,
+      "visibleTextIncludes": ["Education-first platform for students, teachers, and families", "Start Learning", "Visit Marketplace"],
+      "consoleErrors": 0
+    },
+    "reactRefreshProbe": {
+      "loadingSpinnerDynamicImport": "ok; module default export loaded",
+      "viteHtml": {
+        "hasReactRefreshPreamble": true,
+        "hasViteClient": true
+      }
+    }
+  },
+  "backend": {
+    "health": { "url": "/api/v2/health", "status": 200, "body": { "status": "ok", "version": "v2 new" } },
+    "protectedAdminTemplatesWithoutToken": { "url": "/api/v2/admin/e-booklet-templates", "status": 401, "message": "Authorization header required" },
+    "protectedAdminInstancesWithoutToken": { "url": "/api/v2/admin/e-booklet-instances", "status": 401, "message": "Authorization header required" }
+  },
+  "priorPhase8AdminApiEvidenceReviewed": {
+    "source": ".hermes/reviews/phase-8-parallel-browser-qa/admin/latest-api-results.json",
+    "runId": "admin-qa-1781520740879",
+    "templateCreate": "201 template id 24",
+    "pdfAccepted": "201 PDF asset id 115 with page_count 2",
+    "docxRejected": "400 invalid document type; PDF only",
+    "hotspotsAndPublish": "hotspots ids 160-167; version 24 published active",
+    "teacherInstanceDealFields": "purchase id 30; instance id 26; quota 7; marketing_price 160; internal_price 80; active",
+    "deviceListResetAllowance": "seeded instance 25/student 76; device list 200, reset 200, allowance 200"
+  },
+  "notes": [
+    "No source files were edited.",
+    "No secrets or token values were recorded.",
+    "Destructive authenticated admin API creation/publish flow was not repeated because the rerun target was the fixed browser blocker and prior lane API evidence already passed; current backend availability and protected route behavior were re-checked."
+  ]
+}

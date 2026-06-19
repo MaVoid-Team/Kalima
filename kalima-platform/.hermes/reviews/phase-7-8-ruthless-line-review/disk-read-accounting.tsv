@@ -1,0 +1,175 @@
+file	status	line_ranges_reviewed	verdict	notes
+.hermes/plans/2026-06-02-e-booklet-v2-subagent-execution-tracker.md	read	1-410	APPROVED	scope/control artifact for Phase 7/8 review
+.hermes/plans/2026-06-15-phase-8-parallel-orchestration.md	read	1-77	APPROVED	scope/control artifact for Phase 7/8 review
+.hermes/reviews/e-booklet-admin-editor-full-browser-proof/handoff.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/e-booklet-auth-e2e-followup/handoff.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/e-booklet-remaining-browser-proof/handoff.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/fekra-e-booklet-v2/handoff.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-e-booklet-required-blocker-fix/critique-report.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-e-booklet-required-blocker-fix/handoff.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/critique-report.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/handoff.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/ruthless-line-review.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/strict-24-file-review-fixup.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/strict-24-file-review.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/handoff.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/phase-6-admin-terms-milestones-handoff.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-rereview-prompt.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-rereview.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-review-prompt.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-review.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-background-review.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-final-rereview-prompt.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-final-rereview.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-rereview-prompt.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-rereview.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-review-prompt.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-phase-6-admin-terms-milestones/critique-report.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/kalima-phase-6-admin-terms-milestones/handoff.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/phase-7-8-ruthless-line-review/files-to-review.txt	read	1-169	APPROVED	scope/control artifact for Phase 7/8 review
+.hermes/reviews/phase-7-8-ruthless-line-review/prompt.md	read	1-78	APPROVED	scope/control artifact for Phase 7/8 review
+.hermes/reviews/phase-7-student-code-redemption/critique-report.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/phase-7-student-code-redemption/handoff.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/phase-8-blank-page-fix/critique-prompt.md	read	1-27	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-blank-page-fix/critique-report.md	read	1-23	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-blank-page-fix/handoff.md	read	1-36	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-final-evidence.md	read	1-30	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-lifecycle-e2e/evidence.json	read	1-97	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-lifecycle-e2e/prompt.md	read	1-49	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-lifecycle-e2e/qa-lifecycle.mjs	read	1-300	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-lifecycle-e2e/report.md	read	1-28	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-parallel-browser-qa-rerun/admin/prompt.md	read	1-10	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa-rerun/admin/report.md	read	1-53	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-parallel-browser-qa-rerun/admin/rerun-evidence.json	read	1-50	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-parallel-browser-qa-rerun/student/prompt.md	read	1-10	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa-rerun/student/report.md	read	1-55	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-parallel-browser-qa-rerun/teacher-viewer-device/prompt.md	read	1-10	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa-rerun/teacher-viewer-device/report.md	read	1-45	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-parallel-browser-qa/admin/admin-qa-1781520740879-api-results.json	read	1-1090	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/admin/admin-qa-1781520740879-reject.docx	read	1-1	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/admin/admin-qa-1781520740879-valid.pdf	read	1-44	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/admin/browser-console-notes.md	read	1-11	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/admin/device-allowance-retry-results.json	read	1-19	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/admin/device-controls-api-results.json	read	1-788	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/admin/latest-api-results.json	read	1-1090	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/admin/prompt.md	read	1-39	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/admin/report.md	read	1-43	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-parallel-browser-qa/student/notes.md	read	1-26	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/student/prompt.md	read	1-40	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/student/report.md	read	1-27	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-parallel-browser-qa/teacher-viewer-device/console-network-notes.md	read	1-46	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/teacher-viewer-device/prompt.md	read	1-39	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-parallel-browser-qa/teacher-viewer-device/report.md	read	1-28	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-remaining-proof-rerun/evidence.json	read	1-132	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-remaining-proof-rerun/prompt.md	read	1-47	APPROVED	Phase 8 QA/evidence/blank-page artifact
+.hermes/reviews/phase-8-remaining-proof-rerun/report.md	read	1-27	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-remaining-proof/evidence.json	read	1-199	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/phase-8-remaining-proof/report.md	read	1-47	REQUIRED_FIX	evidence/pass status is not fully supported by analytics source code findings
+.hermes/reviews/ruthless-line-by-line-2026-06-15/handoff.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-2026-06-15/prompt.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-2026-06-15/report.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/file-accounting.tsv	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/files-to-review.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/final-review-disk-read-accounting.tsv	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/final-review-files-to-review.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/final-review-prompt.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/final-review-report.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/fix-agent-prompt.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/fix-agent-report.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/followup-fix-prompt.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/followup-fix-report.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/prompt.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/report.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/rereview-disk-read-accounting.tsv	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/rereview-files-to-review.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/rereview-matrix.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/rereview-prompt.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/rereview-report.md	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-1.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-10.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-11.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-12.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-13.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-14.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-2.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-3.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-4.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-5.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-6.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-7.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-8.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-9.txt	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/controllers/e-booklet.controller.ts	read	1-1157	APPROVED	Phase 7/8 central API contract surface
+backend/src/apps/store-api/emails/email.service.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/emails/templates/e-booklet-milestone-achievement.template.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/emails/templates/index.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/browser.ts	read	1-354	APPROVED	generated Prisma surface containing Phase 7 archive/analytics model fields
+backend/src/apps/store-api/generated/prisma/client.ts	read	1-374	APPROVED	generated Prisma surface containing Phase 7 archive/analytics model fields
+backend/src/apps/store-api/generated/prisma/commonInputTypes.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/enums.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/internal/class.ts	read	1-863	APPROVED	generated Prisma surface containing Phase 7 archive/analytics model fields
+backend/src/apps/store-api/generated/prisma/internal/prismaNamespace.ts	read	1-7276	APPROVED	generated Prisma surface containing Phase 7 archive/analytics model fields
+backend/src/apps/store-api/generated/prisma/internal/prismaNamespaceBrowser.ts	read	1-1189	APPROVED	generated Prisma surface containing Phase 7 archive/analytics model fields
+backend/src/apps/store-api/generated/prisma/models.ts	read	1-78	APPROVED	generated Prisma surface containing Phase 7 archive/analytics model fields
+backend/src/apps/store-api/generated/prisma/models/e_booklet_access_code_redemptions.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/e_booklet_access_codes.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/e_booklet_access.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/e_booklet_instances.ts	read	1-4357	APPROVED	generated Prisma surface containing Phase 7 archive/analytics model fields
+backend/src/apps/store-api/generated/prisma/models/e_booklet_milestone_achievements.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/e_booklet_milestones.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/e_booklet_purchases.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/e_booklet_teacher_terms_acceptances.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/e_booklet_templates.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/e_booklet_terms.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/purchases.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/teacher_wallet_ledger.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/teacher_wallets.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/generated/prisma/models/users.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/prisma/migrations/20260614180000_e_booklet_terms_milestones_wallet/migration.sql	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/prisma/migrations/20260614210000_e_booklet_milestone_notifications/migration.sql	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/prisma/migrations/20260615120000_e_booklet_purchase_wallet_amounts/migration.sql	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/prisma/schema.prisma	read	1-1483	APPROVED	Phase 7 Prisma schema for archive/analytics
+backend/src/apps/store-api/routes/v2/e-booklet.routes.ts	read	1-459	REQUIRED_FIX	admin analytics/CSV route allows Moderator via adminAuth
+backend/src/apps/store-api/services/e-booklet-access-code.service.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/services/e-booklet-domain.service.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/services/e-booklet-milestone-notification.service.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/services/e-booklet-milestone.service.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/services/e-booklet-redemption.service.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/services/e-booklet-terms.service.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/apps/store-api/services/teacher-wallet.service.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/config/corsOptions.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/src/libs/auth/firebase.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/tests/e-booklet/e-booklet-phase1-migration.spec.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/tests/e-booklet/e-booklet-phase2-services.spec.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/tests/e-booklet/e-booklet-phase4-notifications.spec.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/tests/e-booklet/e-booklet-security-config.spec.ts	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+backend/tests/e-booklet/e-booklet.routes.spec.ts	read	1-847	REQUIRED_FIX	tests/source checks do not catch missing page_viewed/device_bound analytics or Moderator CSV access
+backend/tests/e-booklet/e-booklet.service.spec.ts	read	1-1627	REQUIRED_FIX	tests/source checks do not catch missing page_viewed/device_bound analytics or Moderator CSV access
+frontend/src/App.jsx	read	1-305	APPROVED	Phase 7/8 route/navigation exposure
+frontend/src/components/admin/Sidebar.jsx	read	1-196	APPROVED	Phase 7/8 route/navigation exposure
+frontend/src/components/admin/users/CreateUserDialog.jsx	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/src/components/student/StudentSidebar.jsx	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/src/hooks/admin/useAdminEBooklets.js	read	1-597	APPROVED	Phase 7 analytics frontend API hook
+frontend/src/hooks/useEBookletAccess.js	read	1-366	APPROVED	Phase 7 analytics frontend API hook
+frontend/src/layouts/Navbar.jsx	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/src/locales/ar/admin.json	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/src/locales/ar/eBooklets.json	read	1-731	APPROVED	Phase 7/8 UI copy/evidence-visible labels
+frontend/src/locales/ar/student.json	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/src/locales/en/admin.json	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/src/locales/en/eBooklets.json	read	1-731	APPROVED	Phase 7/8 UI copy/evidence-visible labels
+frontend/src/locales/en/student.json	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/src/pages/admin/e-booklets/AdminEBookletTermsMilestonesPage.jsx	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/src/pages/e-booklets/AcceptEBookletInvitePage.jsx	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/src/pages/student/e-booklets/StudentEBookletsPage.jsx	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/src/pages/teacher/e-booklets/TeacherEBookletsPage.jsx	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/src/pages/teacher/e-booklets/TeacherInviteManagementPage.jsx	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/tests/e-booklet-phase5-source-check.mjs	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/tests/e-booklet-phase6-source-check.mjs	out_of_scope	N/A	OUT_OF_SCOPE	not Phase 7 expiry/analytics or Phase 8 browser QA/blank-page scope
+frontend/tests/e-booklet-phase7-source-check.mjs	read	1-48	REQUIRED_FIX	tests/source checks do not catch missing page_viewed/device_bound analytics or Moderator CSV access
+frontend/vite.config.js	read	1-58	APPROVED	Phase 8 blank-page build fix
+backend/scripts/archiveExpiredEBookletInstances.js	read	1-29	APPROVED	Phase 7 archive/analytics schema artifact
+backend/src/apps/store-api/prisma/migrations/20260605090000_e_booklet_analytics_events/migration.sql	read	1-32	APPROVED	Phase 7 archive/analytics schema artifact
+backend/src/apps/store-api/generated/prisma/models/e_booklet_analytics_events.ts	read	1-1522	APPROVED	generated Prisma surface containing Phase 7 archive/analytics model fields
+frontend/src/pages/admin/e-booklets/AdminEBookletAnalyticsPage.jsx	read	1-136	REQUIRED_FIX	UI displays page_viewed/device_bound metrics not backed by analytics events
+frontend/src/pages/teacher/e-booklets/TeacherEBookletAnalyticsPage.jsx	read	1-145	REQUIRED_FIX	UI includes page_viewed in engagement metrics not backed by analytics events
+frontend/src/components/teacher/TeacherSidebar.jsx	read	1-169	APPROVED	Phase 7/8 route/navigation exposure

@@ -1,0 +1,148 @@
+# Final Ruthless Re-Review
+Verdict: APPROVED
+
+## Scope and method
+- Total files accounted for: 126.
+- Read `rereview-report.md`, `followup-fix-report.md`, and every non-empty path in `final-review-files-to-review.txt` from disk.
+- Disk-read accounting log: `/Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/final-review-disk-read-accounting.tsv`.
+- Scope was strict re-review of the two remaining blockers plus sanity checks that earlier blockers did not visibly regress.
+- No source code was modified by this review.
+
+## Remaining blocker status
+- Notification DB-backed idempotency: FIXED. Evidence: `backend/src/apps/store-api/prisma/migrations/20260614210000_e_booklet_milestone_notifications/migration.sql:5-17` deletes duplicate non-null notification identities and creates partial unique index `ux_notifications_user_message_entity` on `(user_id, message_key, entity_type, entity_id)` when `user_id`, `entity_type`, and `entity_id` are non-null. `backend/src/apps/store-api/services/e-booklet-milestone-notification.service.ts:121-132` still uses `createMany(..., skipDuplicates: true)` for admin milestone rows with all identity columns populated, so it now has a real conflict target. `backend/tests/e-booklet/e-booklet-phase1-migration.spec.ts:41-44` fails if that index is absent.
+- Disabled reward end-to-end contract: FIXED. Evidence: frontend submits explicit zero when disabled at `frontend/src/pages/admin/e-booklets/AdminEBookletTermsMilestonesPage.jsx:176-183`; backend create/update/evaluation use `nonNegativeNumber` at `backend/src/apps/store-api/services/e-booklet-milestone.service.ts:56-63`, `:142-148`, `:176-178`, and `:381-383`, which accepts `0` and rejects negative/NaN; DB constraints allow zero at `backend/src/apps/store-api/prisma/migrations/20260614180000_e_booklet_terms_milestones_wallet/migration.sql:123-127`; tests/source guard cover create/update/evaluation and cross-boundary contract at `backend/tests/e-booklet/e-booklet-phase2-services.spec.ts:426-454` and `frontend/tests/e-booklet-phase6-source-check.mjs:56-64`.
+
+## Required fixes
+None.
+
+## File-by-file matrix
+- `.gitignore` — ARTIFACT/OK: read from disk; repository ignore artifact only in this scope.
+- `kalima-platform/.hermes/reviews/e-booklet-admin-editor-full-browser-proof/handoff.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/e-booklet-auth-e2e-followup/handoff.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/e-booklet-remaining-browser-proof/handoff.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/fekra-e-booklet-v2/handoff.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-required-blocker-fix/critique-report.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-required-blocker-fix/handoff.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/critique-report.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/handoff.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/ruthless-line-review.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/strict-24-file-review-fixup.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-e-booklet-teacher-store-invite-quota-fix/strict-24-file-review.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/handoff.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/phase-6-admin-terms-milestones-handoff.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-rereview-prompt.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-rereview.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-review-prompt.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase1-review.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-background-review.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-final-rereview-prompt.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-final-rereview.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-rereview-prompt.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-rereview.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-meeting-2026-06-11/ruthless-phase2-review-prompt.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-phase-6-admin-terms-milestones/critique-report.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/kalima-phase-6-admin-terms-milestones/handoff.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/phase-7-student-code-redemption/critique-report.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/phase-7-student-code-redemption/handoff.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-2026-06-15/handoff.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-2026-06-15/prompt.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-2026-06-15/report.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/file-accounting.tsv` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/files-to-review.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/final-review-files-to-review.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/fix-agent-prompt.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/fix-agent-report.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/followup-fix-prompt.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/followup-fix-report.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/prompt.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/report.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/rereview-disk-read-accounting.tsv` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/rereview-files-to-review.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/rereview-matrix.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/rereview-prompt.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/rereview-report.md` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-1.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-10.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-11.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-12.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-13.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-14.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-2.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-3.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-4.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-5.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-6.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-7.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-8.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/.hermes/reviews/ruthless-line-by-line-full-2026-06-15/source-bundle-9.txt` — ARTIFACT/OK: read from disk and accounted for; historical review/proof artifact only.
+- `kalima-platform/backend/src/apps/store-api/controllers/e-booklet.controller.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/apps/store-api/emails/email.service.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/apps/store-api/emails/templates/e-booklet-milestone-achievement.template.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/apps/store-api/emails/templates/index.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/browser.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/client.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/commonInputTypes.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/enums.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/internal/class.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/internal/prismaNamespace.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/internal/prismaNamespaceBrowser.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_access_code_redemptions.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_access_codes.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_access.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_instances.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_milestone_achievements.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_milestones.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_purchases.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_teacher_terms_acceptances.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_templates.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/e_booklet_terms.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/purchases.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/teacher_wallet_ledger.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/teacher_wallets.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/generated/prisma/models/users.ts` — GENERATED/OK: read from disk and accounted for; generated Prisma client/type artifact, no handwritten logic issue in scoped fixes.
+- `kalima-platform/backend/src/apps/store-api/prisma/migrations/20260614180000_e_booklet_terms_milestones_wallet/migration.sql` — OK: reward constraints now allow zero: milestone reward_amount_snapshot >= 0 and achievement reward_amount >= 0; other money/target constraints remain non-negative/positive where appropriate.
+- `kalima-platform/backend/src/apps/store-api/prisma/migrations/20260614210000_e_booklet_milestone_notifications/migration.sql` — OK: dedupes existing duplicate notification identities, then creates partial unique index ux_notifications_user_message_entity on (user_id, message_key, entity_type, entity_id) for non-null recipient/entity rows.
+- `kalima-platform/backend/src/apps/store-api/prisma/migrations/20260615120000_e_booklet_purchase_wallet_amounts/migration.sql` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/apps/store-api/prisma/schema.prisma` — OK: notifications model documents DB-only partial unique index; milestone/achievement reward fields align with zero-reward contract.
+- `kalima-platform/backend/src/apps/store-api/routes/v2/e-booklet.routes.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-access-code.service.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-domain.service.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-milestone-notification.service.ts` — OK: admin bulk insert still uses createMany(skipDuplicates) with non-null user/message/entity identity, now backed by DB partial unique index; pre-query suppresses normal retries.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-milestone.service.ts` — OK: create/update/evaluation use nonNegativeNumber for reward amounts, accepting 0 and rejecting NaN/negative values.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-redemption.service.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/apps/store-api/services/e-booklet-terms.service.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/apps/store-api/services/teacher-wallet.service.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/config/corsOptions.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/src/libs/auth/firebase.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/tests/e-booklet/e-booklet-phase1-migration.spec.ts` — OK: asserts notification partial unique index exists and reward DB constraints allow >= 0 while rejecting old > 0 checks.
+- `kalima-platform/backend/tests/e-booklet/e-booklet-phase2-services.spec.ts` — OK: covers disabled reward zero create/update and zero reward achievement evaluation; existing invalid numeric tests plus service guard reject negative/NaN.
+- `kalima-platform/backend/tests/e-booklet/e-booklet-phase4-notifications.spec.ts` — OK: service retry tests remain consistent with DB-backed skipDuplicates; schema invariant is covered in phase1 migration test.
+- `kalima-platform/backend/tests/e-booklet/e-booklet-security-config.spec.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/tests/e-booklet/e-booklet.routes.spec.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/backend/tests/e-booklet/e-booklet.service.spec.ts` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/App.jsx` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/components/admin/Sidebar.jsx` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/components/admin/users/CreateUserDialog.jsx` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/components/student/StudentSidebar.jsx` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/hooks/admin/useAdminEBooklets.js` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/hooks/useEBookletAccess.js` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/layouts/Navbar.jsx` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/locales/ar/admin.json` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/locales/ar/eBooklets.json` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/locales/ar/student.json` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/locales/en/admin.json` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/locales/en/eBooklets.json` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/locales/en/student.json` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/pages/admin/e-booklets/AdminEBookletTermsMilestonesPage.jsx` — OK: disabled reward checkbox disables amount input and submits rewardAmountSnapshot: 0.
+- `kalima-platform/frontend/src/pages/e-booklets/AcceptEBookletInvitePage.jsx` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/pages/student/e-booklets/StudentEBookletsPage.jsx` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/pages/teacher/e-booklets/TeacherEBookletsPage.jsx` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/src/pages/teacher/e-booklets/TeacherInviteManagementPage.jsx` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/tests/e-booklet-phase5-source-check.mjs` — OK: read from disk and accounted for; no scoped regression found.
+- `kalima-platform/frontend/tests/e-booklet-phase6-source-check.mjs` — OK: now asserts frontend zero payload, backend nonNegativeNumber contract, and DB >= 0 constraints together.
+- `kalima-platform/frontend/tests/e-booklet-phase7-source-check.mjs` — OK: read from disk and accounted for; no scoped regression found.
+
+## Verification
+- Accepted parent full verification from follow-up report: backend `npx prisma validate`, `npm run build`, `npm test -- --runInBand tests/e-booklet` passed 6 suites / 127 tests; frontend phase 5/6/7 source checks, lint, and build passed.
+- Re-ran focused verification: `cd /Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/backend && npx prisma validate --schema=src/apps/store-api/prisma/schema.prisma && npm test -- --runInBand tests/e-booklet/e-booklet-phase1-migration.spec.ts tests/e-booklet/e-booklet-phase2-services.spec.ts tests/e-booklet/e-booklet-phase4-notifications.spec.ts && cd ../frontend && node tests/e-booklet-phase6-source-check.mjs` — PASS. Prisma schema valid; 3 backend suites / 52 tests passed; Phase 6 admin frontend source contract passed.

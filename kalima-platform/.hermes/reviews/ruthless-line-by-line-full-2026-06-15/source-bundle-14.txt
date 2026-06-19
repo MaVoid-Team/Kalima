@@ -1,0 +1,965 @@
+
+===== FILE: kalima-platform/frontend/src/pages/e-booklets/AcceptEBookletInvitePage.jsx (217 lines) =====
+1|import { useEffect, useState } from "react";
+2|import { Link, useNavigate, useParams } from "react-router-dom";
+3|import { BookOpenCheck, CreditCard, KeyRound, Loader2, Ticket, Upload } from "lucide-react";
+4|import { Button } from "@/components/ui/button";
+5|import { Input } from "@/components/ui/input";
+6|import { Label } from "@/components/ui/label";
+7|import { Textarea } from "@/components/ui/textarea";
+8|import { useStudentEBooklets } from "@/hooks/useEBookletAccess";
+9|import useAuth from "@/hooks/auth/useAuth";
+10|import api from "@/api/axios";
+11|import { useTranslation } from "react-i18next";
+12|
+13|const TERMS_VERSION = "e-booklet-invite-v1";
+14|
+15|const normalizePaymentMethods = (payload) => {
+16|  if (Array.isArray(payload)) return payload;
+17|  if (Array.isArray(payload?.data)) return payload.data;
+18|  if (Array.isArray(payload?.payment_methods)) return payload.payment_methods;
+19|  if (Array.isArray(payload?.methods)) return payload.methods;
+20|  return [];
+21|};
+22|
+23|const normalizeRedemptionPayload = (payload) => payload?.data && !Array.isArray(payload.data) ? payload.data : payload;
+24|const redemptionInstanceId = (payload) => {
+25|  const result = normalizeRedemptionPayload(payload);
+26|  return result?.bookletInstanceId || result?.booklet_instance_id || result?.bookletInstance?.id || result?.booklet_instance?.id;
+27|};
+28|const redemptionCountedForProgress = (payload) => {
+29|  const result = normalizeRedemptionPayload(payload);
+30|  return Boolean(result?.countedForProgress ?? result?.counted_for_progress);
+31|};
+32|
+33|export default function AcceptEBookletInvitePage({ mode = "invite" }) {
+34|  const { t } = useTranslation("eBooklets");
+35|  const { token } = useParams();
+36|  const navigate = useNavigate();
+37|  const { isAuthenticated, loading: authLoading } = useAuth() || {};
+38|  const { acceptInvite, openInvite, redeemAccessCode } = useStudentEBooklets();
+39|  const [state, setState] = useState({ status: "idle", message: "" });
+40|  const [code, setCode] = useState("");
+41|  const [passcode, setPasscode] = useState("");
+42|  const [paymentMethods, setPaymentMethods] = useState([]);
+43|  const [paymentMethodId, setPaymentMethodId] = useState("");
+44|  const [numberTransferredFrom, setNumberTransferredFrom] = useState("");
+45|  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
+46|  const [notes, setNotes] = useState("");
+47|  const [termsAccepted, setTermsAccepted] = useState(false);
+48|  const isCodeMode = mode === "code";
+49|  const loginRedirect = isCodeMode ? "/e-booklet-code" : `/e-booklet-invite/${token}`;
+50|
+51|  useEffect(() => {
+52|    if (!token || isCodeMode) return;
+53|    openInvite(token).catch(() => {});
+54|  }, [isCodeMode, openInvite, token]);
+55|
+56|  useEffect(() => {
+57|    if (!isAuthenticated || isCodeMode) return;
+58|    let active = true;
+59|    api.get("/payment-methods")
+60|      .then((response) => {
+61|        if (!active) return;
+62|        const methods = normalizePaymentMethods(response?.data);
+63|        setPaymentMethods(methods);
+64|        if (methods[0]?.id) setPaymentMethodId(String(methods[0].id));
+65|      })
+66|      .catch(() => {
+67|        if (active) setPaymentMethods([]);
+68|      });
+69|    return () => { active = false; };
+70|  }, [isAuthenticated, isCodeMode]);
+71|
+72|  const requireTerms = () => {
+73|    if (termsAccepted) return false;
+74|    setState({ status: "error", message: t("inviteAccept.termsRequired") });
+75|    return true;
+76|  };
+77|
+78|  const submitCode = async () => {
+79|    const trimmedCode = code.trim();
+80|    if (!trimmedCode) {
+81|      setState({ status: "error", message: t("inviteAccept.codeRedemption.codeRequired") });
+82|      return;
+83|    }
+84|    if (requireTerms()) return;
+85|    setState({ status: "loading", message: "" });
+86|    try {
+87|      const response = await redeemAccessCode(trimmedCode, TERMS_VERSION);
+88|      const result = normalizeRedemptionPayload(response?.data ?? response);
+89|      const instanceId = redemptionInstanceId(result);
+90|      if (instanceId) {
+91|        navigate(`/student/e-booklets/${instanceId}`, { replace: true });
+92|        return;
+93|      }
+94|      setState({
+95|        status: "success",
+96|        message: redemptionCountedForProgress(result)
+97|          ? t("inviteAccept.codeRedemption.paidSuccess")
+98|          : t("inviteAccept.codeRedemption.freeAccessNoPaidProgressSuccess"),
+99|      });
+100|    } catch (error) {
+101|      setState({ status: "error", message: error?.response?.data?.message || t("inviteAccept.codeRedemption.error") });
+102|    }
+103|  };
+104|
+105|  const submit = async (accessPath) => {
+106|    if (requireTerms()) return;
+107|    if (accessPath === "online_purchase" && (!paymentMethodId || !numberTransferredFrom || !paymentScreenshot)) {
+108|      setState({
+109|        status: "error",
+110|        message: t("inviteAccept.paymentRequired", { defaultValue: "Choose a payment method, enter the number you paid from, and upload the payment proof." }),
+111|      });
+112|      return;
+113|    }
+114|    setState({ status: "loading", message: "" });
+115|    try {
+116|      let payload;
+117|      if (accessPath === "online_purchase") {
+118|        payload = new FormData();
+119|        payload.append("accessPath", "online_purchase");
+120|        payload.append("termsAccepted", "true");
+121|        payload.append("termsVersion", TERMS_VERSION);
+122|        payload.append("payment_method_id", paymentMethodId);
+123|        payload.append("numberTransferredFrom", numberTransferredFrom.trim());
+124|        if (notes.trim()) payload.append("notes", notes.trim());
+125|        payload.append("paymentScreenshot", paymentScreenshot);
+126|      } else {
+127|        payload = { accessPath, termsAccepted: true, termsVersion: TERMS_VERSION };
+128|        if (accessPath === "offline_passcode") payload.passcode = passcode;
+129|      }
+130|      const response = await acceptInvite(token, payload);
+131|      const instanceId = redemptionInstanceId(response?.data);
+132|      if (accessPath === "online_purchase") {
+133|        setState({ status: "success", message: t("inviteAccept.purchaseSubmitted") });
+134|        return;
+135|      }
+136|      if (instanceId) navigate(`/student/e-booklets/${instanceId}`, { replace: true });
+137|      else setState({ status: "success", message: t("inviteAccept.accepted") });
+138|    } catch (error) {
+139|      setState({ status: "error", message: error?.response?.data?.message || t("inviteAccept.error") });
+140|    }
+141|  };
+142|
+143|  if (authLoading) {
+144|    return <div className="mx-auto flex min-h-[60vh] max-w-lg items-center justify-center text-sm text-muted-foreground"><Loader2 className="me-2 h-4 w-4 animate-spin" />{t("inviteAccept.loading")}</div>;
+145|  }
+146|
+147|  if (!isAuthenticated) {
+148|    return (
+149|      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center px-4 text-center">
+150|        <BookOpenCheck className="h-12 w-12 text-primary" />
+151|        <h1 className="mt-4 text-2xl font-bold">{isCodeMode ? t("inviteAccept.codeRedemption.title") : t("inviteAccept.title")}</h1>
+152|        <p className="mt-3 text-sm text-muted-foreground">{t("inviteAccept.loginRequired")}</p>
+153|        <div className="mt-5 flex gap-2">
+154|          <Button asChild><Link to={`/login?redirect=${encodeURIComponent(loginRedirect)}`}>{t("inviteAccept.login")}</Link></Button>
+155|          <Button asChild variant="outline"><Link to={`/signup?redirect=${encodeURIComponent(loginRedirect)}`}>{t("inviteAccept.register")}</Link></Button>
+156|        </div>
+157|      </div>
+158|    );
+159|  }
+160|
+161|  return (
+162|    <div className="mx-auto max-w-2xl space-y-5 px-4 py-10" data-testid="accept-e-booklet-invite-page">
+163|      <div className="text-center">
+164|        <BookOpenCheck className="mx-auto h-12 w-12 text-primary" />
+165|        <h1 className="mt-4 text-2xl font-bold">{isCodeMode ? t("inviteAccept.codeRedemption.title") : t("inviteAccept.title")}</h1>
+166|        <p className="mt-2 text-sm text-muted-foreground">{isCodeMode ? t("inviteAccept.codeRedemption.description") : t("inviteAccept.description")}</p>
+167|      </div>
+168|
+169|      {isCodeMode ? (
+170|        <section className="space-y-3 rounded-lg border bg-background p-4" data-testid="e-booklet-code-redemption-form">
+171|          <h2 className="flex items-center gap-2 font-semibold"><Ticket className="h-4 w-4" />{t("inviteAccept.codeRedemption.heading")}</h2>
+172|          <p className="text-sm text-muted-foreground">{t("inviteAccept.codeRedemption.helper")}</p>
+173|          <Label>{t("inviteAccept.codeRedemption.codeLabel")}</Label>
+174|          <Input value={code} onChange={(event) => setCode(event.target.value.toUpperCase())} placeholder={t("inviteAccept.codeRedemption.codePlaceholder")} />
+175|          <Button className="w-full" onClick={submitCode} disabled={state.status === "loading" || !code.trim()}>
+176|            {state.status === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ticket className="h-4 w-4" />}
+177|            {t("inviteAccept.codeRedemption.submit")}
+178|          </Button>
+179|        </section>
+180|      ) : (
+181|        <>
+182|          <div className="rounded-lg border bg-amber-50 p-3 text-sm text-amber-900">{t("inviteAccept.metadataUnavailable")}</div>
+183|          <div className="grid gap-4 md:grid-cols-2">
+184|            <section className="space-y-3 rounded-lg border bg-background p-4">
+185|              <h2 className="flex items-center gap-2 font-semibold"><KeyRound className="h-4 w-4" />{t("inviteAccept.offlineTitle")}</h2>
+186|              <p className="text-sm text-muted-foreground">{t("inviteAccept.offlineDescription")}</p>
+187|              <Label>{t("inviteAccept.passcode")}</Label>
+188|              <Input value={passcode} onChange={(event) => setPasscode(event.target.value)} placeholder={t("inviteAccept.passcodePlaceholder")} />
+189|              <Button className="w-full" onClick={() => submit("offline_passcode")} disabled={state.status === "loading" || !passcode}>{state.status === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}{t("inviteAccept.unlockWithPasscode")}</Button>
+190|            </section>
+191|            <section className="space-y-3 rounded-lg border bg-background p-4">
+192|              <h2 className="flex items-center gap-2 font-semibold"><CreditCard className="h-4 w-4" />{t("inviteAccept.purchaseTitle")}</h2>
+193|              <p className="text-sm text-muted-foreground">{t("inviteAccept.purchaseDescription")}</p>
+194|              <div className="rounded-md bg-muted p-2 text-xs text-muted-foreground">{t("inviteAccept.internalPriceHidden")}</div>
+195|              <Label>{t("inviteAccept.paymentMethod", { defaultValue: "Payment method" })}</Label>
+196|              <select className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={paymentMethodId} onChange={(event) => setPaymentMethodId(event.target.value)}>
+197|                <option value="">{t("inviteAccept.selectPaymentMethod", { defaultValue: "Select payment method" })}</option>
+198|                {paymentMethods.map((method) => <option key={method.id} value={method.id}>{method.name || method.title || method.phone_number || `#${method.id}`}</option>)}
+199|              </select>
+200|              <Label>{t("inviteAccept.numberTransferredFrom", { defaultValue: "Number transferred from" })}</Label>
+201|              <Input value={numberTransferredFrom} onChange={(event) => setNumberTransferredFrom(event.target.value)} placeholder={t("inviteAccept.numberTransferredFromPlaceholder", { defaultValue: "Your wallet/mobile number" })} />
+202|              <Label>{t("inviteAccept.paymentScreenshot", { defaultValue: "Payment proof screenshot" })}</Label>
+203|              <Input type="file" accept="image/*" onChange={(event) => setPaymentScreenshot(event.target.files?.[0] || null)} />
+204|              <Textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder={t("inviteAccept.notesPlaceholder", { defaultValue: "Optional notes for the admin" })} />
+205|              <Button className="w-full" variant="outline" onClick={() => submit("online_purchase")} disabled={state.status === "loading" || !paymentMethodId || !numberTransferredFrom || !paymentScreenshot}>{state.status === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}{t("inviteAccept.requestOnlinePurchase")}</Button>
+206|              <Button className="w-full" onClick={() => submit("free")} disabled={state.status === "loading"}>{t("inviteAccept.acceptFree")}</Button>
+207|            </section>
+208|          </div>
+209|        </>
+210|      )}
+211|
+212|      <label className="flex items-start gap-2 rounded-md border p-3 text-sm"><input type="checkbox" className="mt-1" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} /><span>{t("inviteAccept.terms")}</span></label>
+213|      {state.message && <div className={`rounded-md border p-3 text-sm ${state.status === "error" ? "text-destructive" : "text-emerald-700"}`}>{state.message}</div>}
+214|      {state.status === "success" && <Button asChild><Link to="/student/e-booklets">{t("inviteAccept.openMyEBooklets")}</Link></Button>}
+215|    </div>
+216|  );
+217|}
+
+===== FILE: kalima-platform/frontend/src/pages/student/e-booklets/StudentEBookletsPage.jsx (90 lines) =====
+1|import { useEffect } from "react";
+2|import { Link } from "react-router-dom";
+3|import { BookOpenCheck, CalendarClock, Play } from "lucide-react";
+4|import { Button } from "@/components/ui/button";
+5|import { Badge } from "@/components/ui/badge";
+6|import { useStudentEBooklets } from "@/hooks/useEBookletAccess";
+7|import { useTranslation } from "react-i18next";
+8|
+9|export default function StudentEBookletsPage() {
+10|  const { t, i18n } = useTranslation("eBooklets");
+11|  const { items, loading, fetchStudentEBooklets } = useStudentEBooklets();
+12|
+13|  useEffect(() => {
+14|    fetchStudentEBooklets().catch(() => {});
+15|  }, [fetchStudentEBooklets]);
+16|
+17|  return (
+18|    <div className="space-y-6" data-testid="student-e-booklets-page">
+19|      <div>
+20|        <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
+21|          <BookOpenCheck className="h-8 w-8 text-primary" />
+22|          {t("student.title")}
+23|        </h1>
+24|        <p className="mt-1 text-sm text-muted-foreground">
+25|          {t("student.description")}
+26|        </p>
+27|      </div>
+28|
+29|      {loading && (
+30|        <div className="rounded-lg border bg-background p-8 text-center text-muted-foreground">
+31|          {t("student.loading")}
+32|        </div>
+33|      )}
+34|
+35|      {!loading && items.length === 0 && (
+36|        <div className="rounded-lg border bg-background p-8 text-center">
+37|          <div className="font-semibold">{t("student.emptyTitle")}</div>
+38|          <p className="mt-1 text-sm text-muted-foreground">
+39|            {t("student.emptyDescription")}
+40|          </p>
+41|          <Button asChild className="mt-4" variant="outline">
+42|            <Link to="/e-booklet-code">{t("student.redeemCodeCta")}</Link>
+43|          </Button>
+44|        </div>
+45|      )}
+46|
+47|      <div className="grid gap-4 lg:grid-cols-2">
+48|        {items.map((access) => {
+49|          const instance = access.booklet_instance;
+50|          const expiry = access.access_expires_at || instance?.access_expires_at || instance?.expires_at;
+51|          const expired = expiry && new Date(expiry).getTime() <= Date.now();
+52|          const formatDate = (value) => value ? new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(new Date(value)) : t("teacher.invites.noExpiry");
+53|          return (
+54|            <article key={access.id} className="rounded-lg border bg-background p-5">
+55|              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+56|                <div>
+57|                  <Badge variant="outline" className="mb-3">
+58|                    {t(`statuses.${access.status || "active"}`, {
+59|                      defaultValue: access.status || t("common.active"),
+60|                    })}
+61|                  </Badge>
+62|                  <h2 className="text-xl font-semibold">
+63|                    {instance?.display_title || instance?.template?.title || t("common.eBooklet")}
+64|                  </h2>
+65|                  <p className="mt-1 text-sm text-muted-foreground">
+66|                    {t("student.teacherLabel", {
+67|                      value: instance?.teacher?.name || t("common.teacher"),
+68|                    })}
+69|                  </p>
+70|                </div>
+71|                <div className="rounded-md border px-3 py-2 text-sm">
+72|                  <div className="text-xs text-muted-foreground">{t("student.expiry")}</div>
+73|                  <div className="text-sm font-semibold"><CalendarClock className="me-1 inline h-4 w-4" />{formatDate(expiry)}</div>
+74|                </div>
+75|              </div>
+76|              {expired && <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">{t("student.expiredBlocked")}</div>}
+77|              {access.device_lock_status && <div className="mt-3 rounded-md border p-3 text-sm text-muted-foreground">{t("student.deviceLocked", { value: access.device_lock_status })}</div>}
+78|              <Button asChild className="mt-5" disabled={expired}>
+79|                <Link to={`/student/e-booklets/${instance.id}`}>
+80|                  <Play className="h-4 w-4" />
+81|                  {t("common.open")}
+82|                </Link>
+83|              </Button>
+84|            </article>
+85|          );
+86|        })}
+87|      </div>
+88|    </div>
+89|  );
+90|}
+
+===== FILE: kalima-platform/frontend/src/pages/teacher/e-booklets/TeacherEBookletsPage.jsx (193 lines) =====
+1|import { useEffect } from "react";
+2|import { Link } from "react-router-dom";
+3|import { BookOpenCheck, CalendarClock, Link2, Play, BarChart3, Trophy, WalletCards } from "lucide-react";
+4|import { Button } from "@/components/ui/button";
+5|import { Badge } from "@/components/ui/badge";
+6|import { useTeacherEBooklets } from "@/hooks/useEBookletAccess";
+7|import { useTranslation } from "react-i18next";
+8|
+9|const numberOrFallback = (value, fallback = 0) => {
+10|  const parsed = Number(value);
+11|  return Number.isFinite(parsed) ? parsed : fallback;
+12|};
+13|
+14|const milestoneTarget = (milestone) => numberOrFallback(milestone?.target_paid_redemptions ?? milestone?.required_paid_access_count);
+15|const milestoneReward = (milestone) => numberOrFallback(milestone?.reward_amount_snapshot ?? milestone?.rewardAmount ?? milestone?.reward_amount);
+16|const milestoneAchievementId = (milestone) => milestone?.achievement?.id ?? milestone?.achievement_id ?? milestone?.milestone_achievement_id;
+17|const milestonePaidCount = (milestones) => Math.max(0, ...milestones.map((milestone) => numberOrFallback(milestone?.paid_redemptions_snapshot ?? milestone?.paidRedemptions ?? milestone?.progress_count)));
+18|
+19|export default function TeacherEBookletsPage() {
+20|  const { t, i18n } = useTranslation("eBooklets");
+21|  const {
+22|    items,
+23|    milestones,
+24|    wallet,
+25|    currentTerms,
+26|    loading,
+27|    fetchTeacherEBooklets,
+28|    fetchTeacherMilestones,
+29|    fetchTeacherWallet,
+30|    fetchCurrentTerms,
+31|  } = useTeacherEBooklets();
+32|
+33|  useEffect(() => {
+34|    fetchTeacherEBooklets().catch(() => {});
+35|    fetchTeacherMilestones().catch(() => {});
+36|    fetchTeacherWallet().catch(() => {});
+37|    fetchCurrentTerms().catch(() => {});
+38|  }, [fetchCurrentTerms, fetchTeacherEBooklets, fetchTeacherMilestones, fetchTeacherWallet]);
+39|
+40|  const paidCount = milestonePaidCount(milestones);
+41|  const sortedMilestones = [...milestones].sort((a, b) => milestoneTarget(a) - milestoneTarget(b));
+42|  const completedCount = sortedMilestones.filter((milestone) => milestoneTarget(milestone) <= paidCount || milestoneAchievementId(milestone)).length;
+43|  const nextMilestone = sortedMilestones.find((milestone) => milestoneTarget(milestone) > paidCount && !milestoneAchievementId(milestone));
+44|  const remainingToNext = nextMilestone ? Math.max(0, milestoneTarget(nextMilestone) - paidCount) : 0;
+45|  const claimableMilestone = sortedMilestones.find((milestone) => milestoneAchievementId(milestone) && !milestone?.claimed_at && !milestone?.achievement?.claimed_at);
+46|
+47|  const formatDate = (value) => value ? new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(new Date(value)) : t("teacher.invites.noExpiry");
+48|  const formatMoney = (value) => new Intl.NumberFormat(i18n.language, { style: "currency", currency: "EGP", maximumFractionDigits: 2 }).format(numberOrFallback(value));
+49|
+50|  return (
+51|    <div className="space-y-6" data-testid="teacher-e-booklets-page">
+52|      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+53|        <div>
+54|          <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
+55|            <BookOpenCheck className="h-8 w-8 text-primary" />
+56|            {t("teacher.title")}
+57|          </h1>
+58|          <p className="mt-1 text-sm text-muted-foreground">
+59|            {t("teacher.description")}
+60|          </p>
+61|        </div>
+62|        <Button asChild variant="outline">
+63|          <Link to="/teacher/e-booklet-analytics">
+64|            <BarChart3 className="h-4 w-4" />
+65|            {t("teacher.analytics.title")}
+66|          </Link>
+67|        </Button>
+68|      </div>
+69|
+70|      <section className="grid gap-4 lg:grid-cols-[1.4fr_0.6fr]" data-testid="teacher-milestone-summary">
+71|        <div className="rounded-lg border bg-background p-5">
+72|          <div className="flex items-start justify-between gap-3">
+73|            <div>
+74|              <h2 className="flex items-center gap-2 text-xl font-semibold">
+75|                <Trophy className="h-5 w-5 text-primary" />
+76|                {t("teacher.milestones.title")}
+77|              </h2>
+78|              <p className="mt-1 text-sm text-muted-foreground">{t("teacher.milestones.motivation")}</p>
+79|            </div>
+80|            <Badge variant="secondary">{t("teacher.milestones.completed", { count: completedCount, total: sortedMilestones.length })}</Badge>
+81|          </div>
+82|          <div className="mt-4 grid gap-3 sm:grid-cols-4">
+83|            <div className="rounded-md border p-3">
+84|              <div className="text-xs text-muted-foreground">{t("teacher.milestones.activeTerm")}</div>
+85|              <div className="text-sm font-semibold">{currentTerms?.name || t("teacher.milestones.noActiveTerm")}</div>
+86|              <div className="mt-1 text-xs text-muted-foreground">{currentTerms?.starts_at || currentTerms?.ends_at ? t("teacher.milestones.termRange", { start: formatDate(currentTerms?.starts_at), end: formatDate(currentTerms?.ends_at) }) : t("teacher.milestones.termRangeMissing")}</div>
+87|            </div>
+88|            <div className="rounded-md border p-3">
+89|              <div className="text-xs text-muted-foreground">{t("teacher.milestones.paidProgress")}</div>
+90|              <div className="text-2xl font-semibold">{paidCount}</div>
+91|            </div>
+92|            <div className="rounded-md border p-3">
+93|              <div className="text-xs text-muted-foreground">{t("teacher.milestones.nextRemaining")}</div>
+94|              <div className="text-2xl font-semibold">{nextMilestone ? remainingToNext : t("teacher.milestones.allDone")}</div>
+95|            </div>
+96|            <div className="rounded-md border p-3">
+97|              <div className="text-xs text-muted-foreground">{t("teacher.milestones.claimableReward")}</div>
+98|              <div className="text-2xl font-semibold">{claimableMilestone ? formatMoney(milestoneReward(claimableMilestone)) : formatMoney(0)}</div>
+99|            </div>
+100|          </div>
+101|          <div className="mt-5 space-y-3" data-testid="teacher-milestone-timeline">
+102|            {sortedMilestones.map((milestone) => {
+103|              const target = milestoneTarget(milestone);
+104|              const achieved = target <= paidCount || milestoneAchievementId(milestone);
+105|              const isNext = nextMilestone?.id === milestone.id;
+106|              return (
+107|                <div key={milestone.id} className={`rounded-md border p-3 ${achieved ? "border-emerald-500/40 bg-emerald-500/5" : isNext ? "border-primary/40 bg-primary/5" : ""}`}>
+108|                  <div className="flex flex-wrap items-center justify-between gap-2">
+109|                    <div className="font-medium">{milestone.title || milestone.name || t("teacher.milestones.untitled")}</div>
+110|                    <Badge variant={achieved ? "default" : "outline"}>{achieved ? t("teacher.milestones.achieved") : t("teacher.milestones.target", { count: target })}</Badge>
+111|                  </div>
+112|                  <div className="mt-1 text-sm text-muted-foreground">
+113|                    {achieved ? t("teacher.milestones.achievedCopy") : t("teacher.milestones.remainingCopy", { count: Math.max(0, target - paidCount) })}
+114|                  </div>
+115|                  {milestoneReward(milestone) > 0 && <div className="mt-2 text-sm font-medium">{t("teacher.milestones.reward", { value: formatMoney(milestoneReward(milestone)) })}</div>}
+116|                </div>
+117|              );
+118|            })}
+119|            {sortedMilestones.length === 0 && <div className="rounded-md border p-4 text-sm text-muted-foreground">{t("teacher.milestones.empty")}</div>}
+120|          </div>
+121|        </div>
+122|        <div className="rounded-lg border bg-background p-5" data-testid="teacher-wallet-balance">
+123|          <h2 className="flex items-center gap-2 font-semibold"><WalletCards className="h-5 w-5 text-primary" />{t("teacher.wallet.title")}</h2>
+124|          <div className="mt-3 text-3xl font-bold">{formatMoney(wallet?.balance)}</div>
+125|          <p className="mt-2 text-sm text-muted-foreground">{t("teacher.wallet.noStacking")}</p>
+126|          {claimableMilestone && (
+127|            <Button asChild className="mt-4 w-full">
+128|              <Link to={`/teacher/e-booklets/${items[0]?.booklet_instance?.id || ""}/invites`}>{t("teacher.milestones.claimCta")}</Link>
+129|            </Button>
+130|          )}
+131|        </div>
+132|      </section>
+133|
+134|      {loading && (
+135|        <div className="rounded-lg border bg-background p-8 text-center text-muted-foreground">
+136|          {t("teacher.loading")}
+137|        </div>
+138|      )}
+139|
+140|      {!loading && items.length === 0 && (
+141|        <div className="rounded-lg border bg-background p-8 text-center">
+142|          <div className="font-semibold">{t("teacher.emptyTitle")}</div>
+143|          <p className="mt-1 text-sm text-muted-foreground">
+144|            {t("teacher.emptyDescription")}
+145|          </p>
+146|          <Button asChild className="mt-4">
+147|            <Link to="/e-booklets">{t("common.browse")}</Link>
+148|          </Button>
+149|        </div>
+150|      )}
+151|
+152|      <div className="grid gap-4 lg:grid-cols-2">
+153|        {items.map((access) => {
+154|          const instance = access.booklet_instance;
+155|          const expiry = instance?.access_expires_at || instance?.expires_at;
+156|          const expired = expiry && new Date(expiry).getTime() <= Date.now();
+157|          return (
+158|            <article key={access.id} className="rounded-lg border bg-background p-5">
+159|              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+160|                <div>
+161|                  <Badge variant="outline" className="mb-3">
+162|                    {t(`statuses.${instance?.status || "active"}`, {
+163|                      defaultValue: instance?.status || t("common.active"),
+164|                    })}
+165|                  </Badge>
+166|                  <h2 className="text-xl font-semibold">
+167|                    {instance?.display_title || instance?.template?.title || t("common.eBooklet")}
+168|                  </h2>
+169|                  <p className="mt-1 text-sm text-muted-foreground">
+170|                    {t("teacher.templateLabel", {
+171|                      value: instance?.template?.title || t("common.template"),
+172|                    })}
+173|                  </p>
+174|                </div>
+175|                <div className="rounded-md border px-3 py-2 text-sm">
+176|                  <div className="text-xs text-muted-foreground">{t("teacher.expiry")}</div>
+177|                  <div className="text-sm font-semibold"><CalendarClock className="me-1 inline h-4 w-4" />{formatDate(expiry)}</div>
+178|                </div>
+179|              </div>
+180|              {expired && <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">{t("teacher.expiredBlocked")}</div>}
+181|              {access.device_lock_status && <div className="mt-3 rounded-md border p-3 text-sm text-muted-foreground">{t("teacher.deviceLocked", { value: access.device_lock_status })}</div>}
+182|
+183|              <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+184|                {expired ? <Button disabled><Play className="h-4 w-4" />{t("common.open")}</Button> : <Button asChild><Link to={`/teacher/e-booklets/${instance.id}`}><Play className="h-4 w-4" />{t("common.open")}</Link></Button>}
+185|                {expired ? <Button variant="outline" disabled><Link2 className="h-4 w-4" />{t("teacher.manageAccessCodes")}</Button> : <Button asChild variant="outline"><Link to={`/teacher/e-booklets/${instance.id}/invites`}><Link2 className="h-4 w-4" />{t("teacher.manageAccessCodes")}</Link></Button>}
+186|              </div>
+187|            </article>
+188|          );
+189|        })}
+190|      </div>
+191|    </div>
+192|  );
+193|}
+
+===== FILE: kalima-platform/frontend/src/pages/teacher/e-booklets/TeacherInviteManagementPage.jsx (288 lines) =====
+1|import { useEffect, useMemo, useState } from "react";
+2|import { Link, useParams } from "react-router-dom";
+3|import { CalendarClock, Copy, KeyRound, Link2, MessageCircle, ShieldCheck, UserMinus, Users, WalletCards } from "lucide-react";
+4|import { toast } from "sonner";
+5|import { Button } from "@/components/ui/button";
+6|import { Badge } from "@/components/ui/badge";
+7|import { useTeacherEBooklets } from "@/hooks/useEBookletAccess";
+8|import { useTranslation } from "react-i18next";
+9|
+10|const numberOrFallback = (value, fallback = 0) => {
+11|  const parsed = Number(value);
+12|  return Number.isFinite(parsed) ? parsed : fallback;
+13|};
+14|
+15|const getCode = (response) => response?.data?.code || response?.code || "";
+16|const getMessage = (response) => response?.data?.whatsappMessage || response?.whatsappMessage || "";
+17|const getRecord = (response) => response?.data?.record || response?.record || {};
+18|
+19|export default function TeacherInviteManagementPage() {
+20|  const { t, i18n } = useTranslation("eBooklets");
+21|  const { instanceId } = useParams();
+22|  const {
+23|    items,
+24|    students,
+25|    milestones,
+26|    wallet,
+27|    currentTerms,
+28|    loading,
+29|    fetchTeacherEBooklets,
+30|    fetchStudents,
+31|    revokeStudent,
+32|    fetchCurrentTerms,
+33|    acceptCodeGenerationTerms,
+34|    createAccessCode,
+35|    fetchTeacherMilestones,
+36|    fetchTeacherWallet,
+37|    claimMilestoneReward,
+38|  } = useTeacherEBooklets();
+39|  const [generatedCodes, setGeneratedCodes] = useState([]);
+40|  const [pendingAction, setPendingAction] = useState(null);
+41|  const [rewardTermsAchievement, setRewardTermsAchievement] = useState(null);
+42|
+43|  useEffect(() => {
+44|    fetchTeacherEBooklets().catch(() => {});
+45|    fetchStudents(instanceId).catch(() => {});
+46|    fetchTeacherWallet().catch(() => {});
+47|  }, [fetchStudents, fetchTeacherEBooklets, fetchTeacherWallet, instanceId]);
+48|
+49|  const instance = useMemo(() => {
+50|    return items
+51|      .map((item) => item.booklet_instance)
+52|      .find((booklet) => String(booklet?.id) === String(instanceId));
+53|  }, [instanceId, items]);
+54|
+55|  const title = instance?.display_title || instance?.template?.title || t("common.eBooklet");
+56|  const templateId = instance?.template_id || instance?.template?.id;
+57|  const termId = currentTerms?.id;
+58|
+59|  useEffect(() => {
+60|    if (templateId) fetchCurrentTerms(templateId).catch(() => {});
+61|  }, [fetchCurrentTerms, templateId]);
+62|
+63|  useEffect(() => {
+64|    if (termId) fetchTeacherMilestones(termId).catch(() => {});
+65|  }, [fetchTeacherMilestones, termId]);
+66|
+67|  const activeStudents = students.filter((student) => student.status === "active");
+68|  const claimableMilestone = milestones.find((milestone) => {
+69|    const achievementId = milestone?.achievement?.id ?? milestone?.achievement_id ?? milestone?.milestone_achievement_id;
+70|    return achievementId && !milestone?.claimed_at && !milestone?.achievement?.claimed_at;
+71|  });
+72|  const claimableAchievementId = claimableMilestone?.achievement?.id ?? claimableMilestone?.achievement_id ?? claimableMilestone?.milestone_achievement_id;
+73|
+74|  const instanceExpiry = instance?.access_expires_at || instance?.expires_at || instance?.valid_until || null;
+75|  const currency = instance?.currency || instance?.template?.currency || "EGP";
+76|
+77|  const formatDate = (value) => {
+78|    if (!value) return t("teacher.invites.noExpiry");
+79|    const date = new Date(value);
+80|    if (Number.isNaN(date.getTime())) return t("teacher.invites.noExpiry");
+81|    return new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium", timeStyle: "short" }).format(date);
+82|  };
+83|
+84|  const formatMoney = (value) => new Intl.NumberFormat(i18n.language, { style: "currency", currency, maximumFractionDigits: 2 }).format(numberOrFallback(value));
+85|
+86|  const copyText = async (text, toastKey = "toasts.accessCodeCopied") => {
+87|    await navigator.clipboard.writeText(text);
+88|    toast.success(t(toastKey));
+89|  };
+90|
+91|  const runCodeGeneration = async (kind, mode, acceptedTermId = termId) => {
+92|    if (!acceptedTermId) {
+93|      toast.error(t("teacher.invites.noActiveTerms"));
+94|      return;
+95|    }
+96|    const response = await createAccessCode(instanceId, { kind, termId: acceptedTermId, maxRedemptions: kind === "paid" ? 1 : 999999 });
+97|    const code = getCode(response);
+98|    const whatsappMessage = getMessage(response);
+99|    const record = getRecord(response);
+100|    const created = {
+101|      id: record.id || `${kind}-${Date.now()}`,
+102|      kind,
+103|      mode,
+104|      code,
+105|      whatsappMessage,
+106|      codeHint: record.code_hint,
+107|      createdAt: record.created_at || new Date().toISOString(),
+108|      notPaidProgress: kind === "free",
+109|    };
+110|    setGeneratedCodes((current) => [created, ...current]);
+111|    if (mode === "message" && whatsappMessage) await copyText(whatsappMessage, "toasts.accessMessageCopied");
+112|    if (mode === "code" && code) await copyText(code, "toasts.accessCodeCopied");
+113|  };
+114|
+115|  const requireTermsFor = (action) => {
+116|    setPendingAction(() => action);
+117|  };
+118|
+119|  const confirmTermsAndRun = async () => {
+120|    const response = await acceptCodeGenerationTerms(templateId);
+121|    const acceptedTermId = response?.data?.term_id || response?.data?.terms?.id || termId;
+122|    setPendingAction(null);
+123|    if (pendingAction) await pendingAction(acceptedTermId);
+124|  };
+125|
+126|  const generatePaidMessageCode = () => requireTermsFor((acceptedTermId) => runCodeGeneration("paid", "message", acceptedTermId));
+127|  const generatePaidCodeOnly = () => requireTermsFor((acceptedTermId) => runCodeGeneration("paid", "code", acceptedTermId));
+128|  const generateFreeSharedCode = () => requireTermsFor((acceptedTermId) => runCodeGeneration("free", "code", acceptedTermId));
+129|
+130|  const claimRewardAfterTerms = async () => {
+131|    if (!rewardTermsAchievement) return;
+132|    const response = await claimMilestoneReward(rewardTermsAchievement);
+133|    setRewardTermsAchievement(null);
+134|    await fetchTeacherWallet();
+135|    await fetchTeacherMilestones(termId);
+136|    toast.success(t("toasts.rewardClaimed"));
+137|    return response;
+138|  };
+139|
+140|  const handleRevokeStudent = async (studentId) => {
+141|    await revokeStudent(instanceId, studentId);
+142|    fetchStudents(instanceId);
+143|  };
+144|
+145|  return (
+146|    <div className="space-y-6" data-testid="teacher-invite-management-page">
+147|      <div>
+148|        <Button asChild variant="ghost" size="sm" className="-ms-2 mb-2">
+149|          <Link to="/teacher/e-booklets">{t("common.backToMyEBooklets")}</Link>
+150|        </Button>
+151|        <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
+152|          <KeyRound className="h-8 w-8 text-primary" />
+153|          {t("teacher.invites.accessCodeTitle")}
+154|        </h1>
+155|        <p className="mt-1 text-sm text-muted-foreground">
+156|          {t("teacher.invites.accessCodeDescription")}
+157|        </p>
+158|        <div className="mt-3 flex flex-wrap gap-2 text-sm">
+159|          <Badge variant="secondary">{title}</Badge>
+160|          <Badge variant="outline"><CalendarClock className="h-3.5 w-3.5" />{t("teacher.invites.instanceExpiry", { value: formatDate(instanceExpiry) })}</Badge>
+161|          <Badge variant="outline"><WalletCards className="h-3.5 w-3.5" />{t("teacher.wallet.balance", { value: formatMoney(wallet?.balance) })}</Badge>
+162|        </div>
+163|      </div>
+164|
+165|      <div className="grid gap-4 md:grid-cols-3">
+166|        <div className="rounded-lg border bg-background p-4" data-testid="teacher-milestone-summary">
+167|          <div className="text-xs uppercase text-muted-foreground">{t("teacher.milestones.paidProgress")}</div>
+168|          <div className="mt-2 text-2xl font-semibold">{Math.max(0, ...milestones.map((milestone) => numberOrFallback(milestone?.paid_redemptions_snapshot ?? milestone?.progress_count)))}</div>
+169|        </div>
+170|        <div className="rounded-lg border bg-background p-4" data-testid="teacher-wallet-balance">
+171|          <div className="text-xs uppercase text-muted-foreground">{t("teacher.wallet.title")}</div>
+172|          <div className="mt-2 text-2xl font-semibold">{formatMoney(wallet?.balance)}</div>
+173|        </div>
+174|        <div className="rounded-lg border bg-background p-4">
+175|          <div className="text-xs uppercase text-muted-foreground">{t("teacher.invites.activeStudents")}</div>
+176|          <div className="mt-2 text-2xl font-semibold">{activeStudents.length}</div>
+177|        </div>
+178|      </div>
+179|
+180|      <div className="grid gap-5 xl:grid-cols-[420px_minmax(0,1fr)]">
+181|        <section className="space-y-4 rounded-lg border bg-background p-4">
+182|          <div>
+183|            <h2 className="font-semibold">{t("teacher.invites.createAccessCode")}</h2>
+184|            <p className="text-sm text-muted-foreground">{t("teacher.invites.createAccessCodeDescription")}</p>
+185|          </div>
+186|          <div className="rounded-md border bg-muted/40 p-3 text-sm">
+187|            <ShieldCheck className="me-1 inline h-4 w-4 text-primary" />
+188|            {t("teacher.invites.termsRequiredCopy")}
+189|          </div>
+190|          <div className="grid gap-2">
+191|            <Button onClick={generatePaidMessageCode} disabled={loading} className="w-full">
+192|              <MessageCircle className="h-4 w-4" />
+193|              {t("teacher.invites.generatePaidMessageCode")}
+194|            </Button>
+195|            <Button onClick={generatePaidCodeOnly} disabled={loading} variant="outline" className="w-full">
+196|              <Copy className="h-4 w-4" />
+197|              {t("teacher.invites.generatePaidCodeOnly")}
+198|            </Button>
+199|            <Button onClick={generateFreeSharedCode} disabled={loading} variant="secondary" className="w-full">
+200|              <Link2 className="h-4 w-4" />
+201|              {t("teacher.invites.generateFreeSharedCode")}
+202|            </Button>
+203|          </div>
+204|          <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-sm" data-testid="free-code-not-paid-progress-copy">
+205|            {t("teacher.invites.notPaidProgress")}
+206|          </div>
+207|          {claimableAchievementId && (
+208|            <div className="rounded-md border p-3">
+209|              <div className="font-medium">{t("teacher.milestones.claimableReward")}</div>
+210|              <p className="mt-1 text-sm text-muted-foreground">{t("teacher.wallet.noStacking")}</p>
+211|              <Button className="mt-3 w-full" onClick={() => setRewardTermsAchievement(claimableAchievementId)}>{t("teacher.milestones.claimCta")}</Button>
+212|            </div>
+213|          )}
+214|        </section>
+215|
+216|        <section className="grid gap-5 lg:grid-cols-2">
+217|          <div className="rounded-lg border bg-background p-4">
+218|            <h2 className="font-semibold">{t("teacher.invites.generatedCodesTitle")}</h2>
+219|            <div className="mt-4 space-y-3">
+220|              {generatedCodes.map((entry) => (
+221|                <div key={entry.id} className="rounded-md border p-3">
+222|                  <div className="flex flex-wrap items-center justify-between gap-2">
+223|                    <Badge variant={entry.kind === "paid" ? "default" : "outline"}>{entry.kind === "paid" ? t("teacher.invites.paidUnique") : t("teacher.invites.freeShared")}</Badge>
+224|                    <span className="text-xs text-muted-foreground">{formatDate(entry.createdAt)}</span>
+225|                  </div>
+226|                  {entry.code && <div className="mt-3 break-all rounded-md bg-muted p-2 text-sm font-semibold">{entry.code}</div>}
+227|                  {entry.codeHint && <div className="mt-2 text-xs text-muted-foreground">{t("teacher.invites.codeHint", { value: entry.codeHint })}</div>}
+228|                  {entry.notPaidProgress && <div className="mt-2 text-xs text-amber-700">{t("teacher.invites.notPaidProgress")}</div>}
+229|                  {entry.whatsappMessage && <div className="mt-3 whitespace-pre-line rounded-md bg-muted p-2 text-xs">{entry.whatsappMessage}</div>}
+230|                  <div className="mt-3 flex flex-wrap gap-2">
+231|                    {entry.code && <Button variant="outline" size="sm" onClick={() => copyText(entry.code)}><Copy className="h-4 w-4" />{t("teacher.invites.copyCode")}</Button>}
+232|                    {entry.whatsappMessage && <Button variant="outline" size="sm" onClick={() => copyText(entry.whatsappMessage, "toasts.accessMessageCopied")}><MessageCircle className="h-4 w-4" />{t("teacher.invites.copyWhatsAppMessage")}</Button>}
+233|                  </div>
+234|                </div>
+235|              ))}
+236|              {generatedCodes.length === 0 && <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">{t("teacher.invites.emptyGeneratedCodes")}</div>}
+237|            </div>
+238|          </div>
+239|
+240|          <div className="rounded-lg border bg-background p-4">
+241|            <h2 className="font-semibold">{t("teacher.invites.studentsTitle")}</h2>
+242|            <div className="mt-4 space-y-3">
+243|              {students.map((studentAccess) => (
+244|                <div key={studentAccess.id} className="flex items-center justify-between gap-3 rounded-md border p-3">
+245|                  <div className="min-w-0">
+246|                    <div className="truncate font-medium">{studentAccess.user?.name || t("common.student")}</div>
+247|                    <div className="truncate text-xs text-muted-foreground">{studentAccess.user?.email}</div>
+248|                    <Badge variant="outline" className="mt-2">{t(`statuses.${studentAccess.status}`, { defaultValue: studentAccess.status })}</Badge>
+249|                  </div>
+250|                  <Button variant="outline" size="sm" onClick={() => handleRevokeStudent(studentAccess.user_id)} disabled={studentAccess.status !== "active"}>
+251|                    <UserMinus className="h-4 w-4" />
+252|                  </Button>
+253|                </div>
+254|              ))}
+255|              {students.length === 0 && <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">{t("teacher.invites.emptyStudents")}</div>}
+256|            </div>
+257|          </div>
+258|        </section>
+259|      </div>
+260|
+261|      {pendingAction && (
+262|        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" data-testid="code-generation-terms-modal">
+263|          <div className="max-w-lg rounded-lg border bg-background p-5 shadow-lg">
+264|            <h2 className="text-lg font-semibold">{t("teacher.invites.termsModal.title")}</h2>
+265|            <p className="mt-2 text-sm text-muted-foreground">{currentTerms?.code_generation_terms || currentTerms?.description || t("teacher.invites.termsModal.description")}</p>
+266|            <div className="mt-5 flex justify-end gap-2">
+267|              <Button variant="outline" onClick={() => setPendingAction(null)}>{t("common.close")}</Button>
+268|              <Button onClick={confirmTermsAndRun}>{t("teacher.invites.termsModal.accept")}</Button>
+269|            </div>
+270|          </div>
+271|        </div>
+272|      )}
+273|
+274|      {rewardTermsAchievement && (
+275|        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" data-testid="reward-claim-terms-modal">
+276|          <div className="max-w-lg rounded-lg border bg-background p-5 shadow-lg">
+277|            <h2 className="text-lg font-semibold">{t("teacher.milestones.rewardTermsTitle")}</h2>
+278|            <p className="mt-2 text-sm text-muted-foreground">{currentTerms?.reward_claim_terms || t("teacher.milestones.rewardTermsDescription")}</p>
+279|            <div className="mt-5 flex justify-end gap-2">
+280|              <Button variant="outline" onClick={() => setRewardTermsAchievement(null)}>{t("common.close")}</Button>
+281|              <Button onClick={claimRewardAfterTerms}>{t("teacher.milestones.claimCta")}</Button>
+282|            </div>
+283|          </div>
+284|        </div>
+285|      )}
+286|    </div>
+287|  );
+288|}
+
+===== FILE: kalima-platform/frontend/tests/e-booklet-phase5-source-check.mjs (49 lines) =====
+1|import fs from 'node:fs';
+2|import assert from 'node:assert/strict';
+3|
+4|const root = new URL('../', import.meta.url);
+5|const read = (path) => fs.readFileSync(new URL(path, root), 'utf8');
+6|
+7|const teacherPage = read('src/pages/teacher/e-booklets/TeacherEBookletsPage.jsx');
+8|const invitePage = read('src/pages/teacher/e-booklets/TeacherInviteManagementPage.jsx');
+9|const hook = read('src/hooks/useEBookletAccess.js');
+10|const en = read('src/locales/en/eBooklets.json');
+11|const ar = read('src/locales/ar/eBooklets.json');
+12|
+13|assert.match(teacherPage, /data-testid="teacher-milestone-summary"/, 'teacher list must render milestone progress summary');
+14|assert.match(teacherPage, /data-testid="teacher-milestone-timeline"/, 'teacher list must render milestone timeline');
+15|assert.match(teacherPage, /data-testid="teacher-wallet-balance"/, 'teacher list must render wallet balance');
+16|assert.doesNotMatch(teacherPage, /remainingInvites|invite_quota|used_invites_count|invitesLeft|teacher\.quota/, 'teacher list must not surface old invite quota cards');
+17|
+18|assert.match(invitePage, /data-testid="code-generation-terms-modal"/, 'invite page must block code generation behind terms modal');
+19|assert.match(invitePage, /generatePaidMessageCode/, 'invite page must have WhatsApp-message paid code generation path');
+20|assert.match(invitePage, /generatePaidCodeOnly/, 'invite page must have paid code-only generation path');
+21|assert.match(invitePage, /generateFreeSharedCode/, 'invite page must have free shared tracking code generation path');
+22|assert.match(invitePage, /fetchCurrentTerms\(templateId\)/, 'invite page must fetch template-scoped terms after instance/template is known');
+23|assert.doesNotMatch(invitePage, /currentTerms\?\.id\s*\|\|\s*milestones\[0\]\?\.term_id/, 'invite page must not fall back to unrelated milestone term id');
+24|assert.match(invitePage, /whatsappMessage/, 'invite page must render/copy backend WhatsApp URL+code message');
+25|assert.match(invitePage, /notPaidProgress/, 'free shared code UI must label no paid-seat/no milestone rewards');
+26|assert.doesNotMatch(invitePage, /remaining\s*<=\s*0/, 'code generation must not disable on old remaining-seat count');
+27|assert.match(invitePage, /currentTerms\?\.code_generation_terms/, 'code-generation modal must show backend code_generation_terms');
+28|assert.match(invitePage, /currentTerms\?\.reward_claim_terms/, 'reward claim modal must show backend reward_claim_terms');
+29|assert.match(invitePage, /acceptedTermId = response\?\.data\?\.term_id/, 'accepted terms response must pin generated code term id');
+30|assert.match(invitePage, /termId: acceptedTermId/, 'access-code generation must use accepted term id, not stale current terms');
+31|assert.doesNotMatch(invitePage, /await pendingAction\(\)/, 'terms confirmation must not run code generation without accepted term id');
+32|assert.doesNotMatch(invitePage, /currentTerms\?\.terms_text/, 'terms modal must not read nonexistent terms_text');
+33|
+34|assert.match(hook, /fetchTeacherMilestones/, 'hook must fetch teacher milestone timeline');
+35|assert.match(hook, /fetchTeacherWallet/, 'hook must fetch teacher wallet');
+36|assert.match(hook, /acceptCodeGenerationTerms/, 'hook must accept code-generation terms');
+37|assert.match(hook, /createAccessCode/, 'hook must create new access codes via backend access-code API');
+38|assert.match(hook, /claimMilestoneReward/, 'hook must call reward claim API');
+39|assert.match(hook, /data:\s*\{\s*termsAccepted:\s*true\s*\}/, 'reward claim API call must send accepted terms as axios data payload');
+40|assert.doesNotMatch(hook, /body:\s*\{\s*termsAccepted:\s*true\s*\}/, 'reward claim API call must not use unsupported body payload key');
+41|
+42|for (const [localeName, locale] of [['en', en], ['ar', ar]]) {
+43|  assert.match(locale, /milestones/, `${localeName} locale must include milestone frontend copy`);
+44|  assert.match(locale, /wallet/, `${localeName} locale must include wallet frontend copy`);
+45|  assert.match(locale, /notPaidProgress/, `${localeName} locale must include free-code no-paid-progress copy`);
+46|  assert.match(locale, /termsModal/, `${localeName} locale must include terms modal copy`);
+47|}
+48|
+49|console.log('Phase 5 teacher frontend source contract passed');
+
+===== FILE: kalima-platform/frontend/tests/e-booklet-phase6-source-check.mjs (66 lines) =====
+1|import fs from 'node:fs';
+2|import assert from 'node:assert/strict';
+3|
+4|const root = new URL('../', import.meta.url);
+5|const read = (path) => fs.readFileSync(new URL(path, root), 'utf8');
+6|
+7|const app = read('src/App.jsx');
+8|const sidebar = read('src/components/admin/Sidebar.jsx');
+9|const hook = read('src/hooks/admin/useAdminEBooklets.js');
+10|const page = read('src/pages/admin/e-booklets/AdminEBookletTermsMilestonesPage.jsx');
+11|const en = read('src/locales/en/eBooklets.json');
+12|const ar = read('src/locales/ar/eBooklets.json');
+13|const backendRead = (path) => fs.readFileSync(new URL(`../backend/${path}`, root), 'utf8');
+14|const backendRoutes = backendRead('src/apps/store-api/routes/v2/e-booklet.routes.ts');
+15|const backendController = backendRead('src/apps/store-api/controllers/e-booklet.controller.ts');
+16|const milestoneService = backendRead('src/apps/store-api/services/e-booklet-milestone.service.ts');
+17|const prismaSchema = backendRead('src/apps/store-api/prisma/schema.prisma');
+18|const migration = backendRead('src/apps/store-api/prisma/migrations/20260614180000_e_booklet_terms_milestones_wallet/migration.sql');
+19|
+20|assert.match(app, /AdminEBookletTermsMilestonesPage/, 'admin terms/milestones page must be lazy loaded');
+21|assert.match(app, /\/admin\/e-booklet-terms-milestones/, 'admin terms/milestones route must be registered');
+22|assert.match(sidebar, /eBookletTermsMilestones/, 'admin sidebar must expose terms/milestones navigation');
+23|assert.match(sidebar, /\/admin\/e-booklet-terms-milestones/, 'sidebar link must route to terms/milestones admin page');
+24|
+25|assert.match(hook, /useAdminEBookletTermsMilestones/, 'admin hook must expose terms/milestones workflow');
+26|assert.match(hook, /\/admin\/e-booklet-terms\b/, 'hook must list/create/update terms via backend terms endpoint');
+27|assert.match(hook, /\/admin\/e-booklet-terms\/\$\{termId\}\/activate/, 'hook must call set-active terms endpoint');
+28|assert.match(hook, /\/admin\/e-booklet-milestones\b/, 'hook must create/update milestones via backend milestone endpoint');
+29|assert.match(hook, /\/admin\/e-booklet-milestones\/reorder/, 'hook must call milestone reorder endpoint');
+30|assert.match(hook, /\/admin\/e-booklet-progress/, 'hook must load achievement/claim progress status');
+31|assert.doesNotMatch(hook, /\/teacher\/e-booklet-milestones/, 'admin hook must not use teacher milestone listing endpoint');
+32|
+33|assert.match(backendRoutes, /const adminManagerAuth[\s\S]*role_enum\.Admin[\s\S]*role_enum\.SubAdmin/, 'backend must define Admin/SubAdmin-only manager auth for terms/milestones');
+34|assert.match(backendRoutes, /"\/admin\/e-booklet-milestones"[\s\S]*\.\.\.adminManagerAuth[\s\S]*eBookletController\.listMilestones/, 'admin milestone list route must use manager auth');
+35|assert.match(backendController, /listMilestones\([\s\S]*isAdminRoute[\s\S]*listMilestones\([\s\S]*isAdminRoute \? undefined : currentUserId\(req\)[\s\S]*isAdminRoute/, 'admin milestone listing must be unscoped and include inactive rows while teacher listing remains teacher-scoped');
+36|assert.match(milestoneService, /includeInactive = false/, 'milestone service must default to active-only milestone listing');
+37|assert.match(milestoneService, /includeInactive \? \{\} : \{ active: true \}/, 'milestone service must allow admin listing inactive milestones');
+38|assert.match(milestoneService, /notification_recipients/, 'milestone service must persist notification recipient setting');
+39|assert.match(prismaSchema, /notification_recipients\s+String/, 'Prisma schema must persist notification recipients');
+40|assert.match(migration, /"notification_recipients" VARCHAR\(50\) NOT NULL DEFAULT 'admins'/, 'migration must create persisted notification recipients column');
+41|
+42|assert.match(page, /data-testid="admin-e-booklet-terms-table"/, 'page must render admin terms table');
+43|assert.match(page, /data-testid="admin-e-booklet-term-form"/, 'page must render create/edit term form');
+44|assert.match(page, /data-testid="admin-e-booklet-set-active-term"/, 'page must expose set-active action');
+45|assert.match(page, /data-testid="admin-e-booklet-milestones-table"/, 'page must render milestones table');
+46|assert.match(page, /data-testid="admin-e-booklet-milestone-form"/, 'page must render milestone create/edit form');
+47|assert.match(page, /data-testid="admin-e-booklet-reorder-milestones"/, 'page must expose milestone reorder action');
+48|assert.match(page, /targetPaidRedemptions/, 'milestone form must include paid redemption target');
+49|assert.match(page, /milestonePrice/, 'milestone form must include pricing rule/tier field');
+50|assert.match(page, /codeGenerationTerms/, 'term form must include code-generation policy field');
+51|assert.match(page, /rewardClaimTerms/, 'term form must include reward-claim policy field');
+52|assert.match(page, /notificationRecipients/, 'page must include notification settings/recipients field');
+53|assert.match(page, /rewardEnabled/, 'page must include reward enabled/disabled control');
+54|assert.match(page, /data-testid="admin-e-booklet-progress-view"/, 'page must render achievement/claim status view');
+55|assert.match(page, /editingTerm\?\.status === "active"/, 'active terms edit form must detect active terms');
+56|assert.match(page, /delete payload\.status/, 'editing active terms must not PATCH status active through update endpoint');
+57|assert.match(page, /disabled=\{editingTerm\?\.status === "active"\}/, 'active terms status select must be disabled');
+58|assert.doesNotMatch(page, /motivationalMessage|motivational_message|motivation/i, 'admin UI must not add admin-authored motivational message field');
+59|
+60|for (const [localeName, locale] of [['en', en], ['ar', ar]]) {
+61|  assert.match(locale, /termsMilestones/, `${localeName} locale must include terms/milestones admin copy`);
+62|  assert.match(locale, /notificationRecipients/, `${localeName} locale must include notification-recipient copy`);
+63|  assert.match(locale, /rewardEnabled/, `${localeName} locale must include reward-enabled copy`);
+64|}
+65|
+66|console.log('Phase 6 admin frontend source contract passed');
+
+===== FILE: kalima-platform/frontend/tests/e-booklet-phase7-source-check.mjs (48 lines) =====
+1|import fs from 'node:fs';
+2|import assert from 'node:assert/strict';
+3|
+4|const root = new URL('../', import.meta.url);
+5|const read = (path) => fs.readFileSync(new URL(path, root), 'utf8');
+6|const backendRead = (path) => fs.readFileSync(new URL(`../backend/${path}`, root), 'utf8');
+7|
+8|const app = read('src/App.jsx');
+9|const acceptPage = read('src/pages/e-booklets/AcceptEBookletInvitePage.jsx');
+10|const hook = read('src/hooks/useEBookletAccess.js');
+11|const studentPage = read('src/pages/student/e-booklets/StudentEBookletsPage.jsx');
+12|const en = read('src/locales/en/eBooklets.json');
+13|const ar = read('src/locales/ar/eBooklets.json');
+14|const redemptionService = backendRead('src/apps/store-api/services/e-booklet-redemption.service.ts');
+15|const backendRoutes = backendRead('src/apps/store-api/routes/v2/e-booklet.routes.ts');
+16|
+17|assert.match(app, /\/e-booklet-code/, 'student code redemption route must be registered');
+18|assert.match(app, /AcceptEBookletInvitePage/, 'code redemption route must render the existing invite/code acceptance surface');
+19|
+20|assert.match(hook, /redeemAccessCode/, 'student hook must expose redeemAccessCode');
+21|assert.match(hook, /\/e-booklet-access-codes\/redeem/, 'student hook must call backend access-code redemption endpoint');
+22|assert.match(hook, /data:\s*\{[\s\S]*code[\s\S]*termsAccepted[\s\S]*termsVersion[\s\S]*\}/, 'redeemAccessCode must send axios data payload with code and terms acceptance');
+23|assert.doesNotMatch(hook, /body:\s*\{[\s\S]*code[\s\S]*termsAccepted/, 'redeemAccessCode must not use unsupported body payload key');
+24|
+25|assert.match(acceptPage, /mode[\s\S]{0,40}"code"/, 'accept page must support direct code mode');
+26|assert.match(acceptPage, /data-testid="e-booklet-code-redemption-form"/, 'code mode must render a code redemption form');
+27|assert.match(acceptPage, /redeemAccessCode\(/, 'code mode must submit through redeemAccessCode');
+28|assert.match(acceptPage, /counted_for_progress/, 'code mode must still display paid/free success copy when backend does not return instance id');
+29|assert.match(acceptPage, /if \(instanceId\)/, 'code mode must navigate for paid and free code redemptions when access was granted');
+30|assert.match(acceptPage, /freeAccessNoPaidProgressSuccess/, 'free code success copy must say access opens without paid-seat/milestone reward credit');
+31|assert.doesNotMatch(acceptPage, /counted_for_progress\s*&&\s*instanceId/, 'free code redemption must not be stranded by paid-only navigation');
+32|assert.doesNotMatch(acceptPage, /free[\s\S]{0,80}milestone progress/i, 'free code UI must not imply free codes count toward paid milestone progress');
+33|
+34|assert.match(studentPage, /\/e-booklet-code/, 'student empty state must offer code redemption');
+35|assert.match(studentPage, /redeemCodeCta/, 'student empty state must use code redemption CTA copy');
+36|
+37|assert.match(backendRoutes, /"\/e-booklet-access-codes\/redeem"[\s\S]*\.\.\.studentAuth[\s\S]*redeemAccessCode/, 'access code redemption route must require student auth');
+38|assert.match(redemptionService, /const access = await this\.grantViewerAccess/, 'paid and free code redemption must grant viewer access');
+39|assert.match(redemptionService, /counted_for_progress:\s*isPaid/, 'only paid code redemptions count toward paid progress');
+40|assert.match(redemptionService, /access_id:\s*access\?\.id\s*\?\?\s*null/, 'redemption must persist granted access id when access was created');
+41|
+42|for (const [localeName, locale] of [['en', en], ['ar', ar]]) {
+43|  assert.match(locale, /codeRedemption/, `${localeName} locale must include code redemption copy`);
+44|  assert.match(locale, /freeAccessNoPaidProgressSuccess/, `${localeName} locale must include free-code access/no-paid-progress success copy`);
+45|  assert.match(locale, /redeemCodeCta/, `${localeName} locale must include student redeem-code CTA`);
+46|}
+47|
+48|console.log('Phase 7 student code redemption source contract passed');

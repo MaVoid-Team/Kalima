@@ -1,0 +1,199 @@
+{
+  "runId": "phase8-rem-20260615113426-3157a7",
+  "generatedAt": "2026-06-15T11:34:26.598Z",
+  "backendUrl": "http://127.0.0.1:5001",
+  "frontendUrl": "http://127.0.0.1:5173",
+  "redaction": "JWTs, passwords, passcodes, invite tokens, access codes, and database connection strings intentionally omitted.",
+  "fixtures": {
+    "adminUserId": 88,
+    "teacherUserId": 89,
+    "studentUserId": 90,
+    "expiredStudentUserId": 91,
+    "templateId": 27,
+    "templateVersionId": 27,
+    "activeInstanceId": 33,
+    "expiredInstanceId": 34,
+    "hotspotTypes": [
+      "text",
+      "image",
+      "audio",
+      "video",
+      "file",
+      "link",
+      "question_answer",
+      "text"
+    ],
+    "multiCardHotspotRef": 8
+  },
+  "api": {
+    "auth": {
+      "adminLogin": "PASS",
+      "teacherLogin": "PASS",
+      "studentLogin": "PASS",
+      "expiredStudentLogin": "PASS"
+    },
+    "teacher": {
+      "listStatus": 200,
+      "listIncludesActiveInstance": false,
+      "studentsStatus": 200,
+      "generatedCodeStatus": 201,
+      "generatedWhatsappMessageHasRedeemUrl": true,
+      "generatedWhatsappMessageHasArabicCodeLabel": true
+    },
+    "deviceBinding": {
+      "firstBindStatus": 200,
+      "sameDeviceBindStatus": 200,
+      "differentDeviceBindStatus": 403,
+      "differentDeviceBlocked": true,
+      "activeDeviceCount": 1
+    },
+    "viewer": {
+      "metadataStatus": 200,
+      "pageStatus": 200,
+      "pageRenderMode": "server-page",
+      "hotspotListStatus": 200,
+      "hotspotTypes": [
+        "text",
+        "image",
+        "audio",
+        "video",
+        "file",
+        "link",
+        "question_answer",
+        "text"
+      ],
+      "contentResults": [
+        {
+          "ref": 1,
+          "type": "text",
+          "status": 200,
+          "blockTypes": [
+            "text"
+          ],
+          "blocks": 1
+        },
+        {
+          "ref": 2,
+          "type": "image",
+          "status": 200,
+          "blockTypes": [
+            "image"
+          ],
+          "blocks": 1
+        },
+        {
+          "ref": 3,
+          "type": "audio",
+          "status": 200,
+          "blockTypes": [
+            "audio"
+          ],
+          "blocks": 1
+        },
+        {
+          "ref": 4,
+          "type": "video",
+          "status": 200,
+          "blockTypes": [
+            "video"
+          ],
+          "blocks": 1
+        },
+        {
+          "ref": 5,
+          "type": "file",
+          "status": 200,
+          "blockTypes": [
+            "file"
+          ],
+          "blocks": 1
+        },
+        {
+          "ref": 6,
+          "type": "link",
+          "status": 200,
+          "blockTypes": [
+            "link"
+          ],
+          "blocks": 1
+        },
+        {
+          "ref": 7,
+          "type": "question_answer",
+          "status": 200,
+          "blockTypes": [
+            "question_answer"
+          ],
+          "blocks": 1
+        },
+        {
+          "ref": 8,
+          "type": "text",
+          "status": 200,
+          "blockTypes": [
+            "text",
+            "link"
+          ],
+          "blocks": 2
+        }
+      ],
+      "videoContent": {
+        "ref": 4,
+        "type": "video",
+        "status": 200,
+        "blockTypes": [
+          "video"
+        ],
+        "blocks": 1
+      },
+      "multiCardContent": {
+        "ref": 8,
+        "type": "text",
+        "status": 200,
+        "blockTypes": [
+          "text",
+          "link"
+        ],
+        "blocks": 2
+      },
+      "expiredMetadataStatus": 403,
+      "expiredBlocked": true,
+      "expiredMessage": "This e-booklet has expired."
+    },
+    "adminView": {
+      "metadataStatus": 200,
+      "pageStatus": 200,
+      "hotspotStatus": 200,
+      "metadataAdminMode": true,
+      "hotspotCount": 8
+    }
+  },
+  "browser": {
+    "frontendReachable": true,
+    "backendFetchFromBrowser": "BLOCKED_BY_ENV: browser tool loaded the Vite frontend, but direct browser fetches to http://127.0.0.1:5001, http://localhost:5001, and http://0.0.0.0:5001 failed. Backend-backed UI actions could not be completed in browser tool.",
+    "teacherAuthenticatedRoute": {
+      "url": "http://127.0.0.1:5173/teacher/e-booklets/33/invites",
+      "renderedTexts": [
+        "E-booklet access codes",
+        "Create paid WhatsApp message",
+        "Create paid code only",
+        "Create free shared access code",
+        "Generated this session"
+      ],
+      "note": "Authenticated teacher shell rendered. Backend-backed generate/copy/list actions were blocked in browser by backend reachability; same functionality was verified through local API before backend became unavailable."
+    },
+    "adminAuthenticatedRoute": {
+      "url": "http://127.0.0.1:5173/admin/e-booklet-instances/33/view",
+      "renderedTexts": [
+        "Admin View Mode",
+        "No download",
+        "Page 1 of 1",
+        "Hotspots"
+      ],
+      "note": "Admin View Mode shell rendered in browser. Hotspot list did not populate in browser because backend API was unreachable from browser tool; same route APIs passed earlier."
+    }
+  },
+  "environmentNotes": [
+    "After the initial API proof run completed, local port 5001 was no longer listening; a restart attempt did not expose health endpoint within 30s, so no additional API/browser-backed UI actions were run afterward."
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "runId": "phase8-20260615112710-8cd2f4",
+  "generatedAt": "2026-06-15T11:27:10.089Z",
+  "backendUrl": "http://127.0.0.1:5001",
+  "frontendUrl": "http://127.0.0.1:5173",
+  "fixtures": {
+    "adminUserId": 83,
+    "teacherUserId": 84,
+    "studentUserIds": {
+      "passcode": 85,
+      "paid": 86,
+      "zeroPrice": 87
+    },
+    "templateId": 26,
+    "templateVersionId": 26,
+    "instances": {
+      "passcode": {
+        "purchaseId": 34,
+        "instanceId": 30,
+        "price": 0
+      },
+      "paid": {
+        "purchaseId": 35,
+        "instanceId": 31,
+        "price": 25
+      },
+      "zeroPrice": {
+        "purchaseId": 36,
+        "instanceId": 32,
+        "price": 0
+      }
+    },
+    "paymentMethodId": 3
+  },
+  "api": {
+    "auth": {
+      "adminLogin": "PASS",
+      "teacherLogin": "PASS",
+      "studentLogins": "PASS"
+    },
+    "passcode": {
+      "wrongPasscodeStatus": 403,
+      "wrongPasscodeBlocked": true,
+      "correctPasscodeStatus": 200,
+      "accessSource": "offline_passcode",
+      "viewerMetadataStatus": 200,
+      "viewerMetadataHasInstance": true
+    },
+    "paidPurchase": {
+      "protectedViewerBeforeApprovalStatus": 403,
+      "checkoutStatus": 201,
+      "createdPurchaseStatus": "pending",
+      "linkBeforeApprovalHasAccess": false,
+      "approvalStatus": 200,
+      "linkAfterApprovalHasAccess": true,
+      "approvedAtPresent": true,
+      "usedInvitesCountAfterApproval": 1,
+      "viewerMetadataStatus": 200
+    },
+    "zeroPrice": {
+      "checkoutStatus": 201,
+      "checkoutPurchaseStatus": "confirmed",
+      "nextUrlPresent": true,
+      "accessIdPresent": true,
+      "linkHasAccess": true,
+      "approvedAtPresent": true,
+      "viewerMetadataStatus": 200
+    },
+    "viewerPage": {
+      "zeroPricePageStatus": 200,
+      "renderMode": "server-page"
+    }
+  },
+  "browser": {
+    "status": "PASS",
+    "notes": [
+      "Unauthenticated browser navigation to the student viewer route redirected to login with non-empty UI. Authenticated viewer metadata/page access was verified through API using transient in-memory tokens only."
+    ],
+    "seed": {
+      "routeToSmoke": "http://127.0.0.1:5173/student/e-booklets/32",
+      "studentUserId": 87,
+      "note": "Browser smoke will authenticate separately; credentials/tokens omitted from evidence."
+    },
+    "protectedRouteSmoke": {
+      "attemptedRoute": "http://127.0.0.1:5173/student/e-booklets/32",
+      "observedFinalUrl": "http://127.0.0.1:5173/login",
+      "observedTitle": "منصة كلمة التعليمية | طريقك للتميز والنجاح",
+      "visibleUi": [
+        "Welcome Back",
+        "Email or Phone Number",
+        "Log In"
+      ],
+      "classification": "browser-visible protected-route behavior; authenticated viewer access verified by API metadata/page checks without recording credentials or JWTs"
+    }
+  },
+  "redaction": "JWTs, passwords, passcodes, invite tokens, access codes, and connection strings intentionally omitted."
+}
