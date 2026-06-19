@@ -227,16 +227,26 @@ export const eBookletController = {
 
   async previewAdminFileAsset(req: Request, res: Response, next: NextFunction) {
     try {
-      const { asset, absolutePath } =
-        await getEBookletService().getPrivateFileAssetForAdmin(
-          parseId(req.params.assetId, "file asset ID"),
-        );
+      const pageNumber = parseOptionalId(req.query.page);
+      const { asset, absolutePath, pageBuffer } =
+        pageNumber
+          ? await getEBookletService().getPrivateFileAssetForAdmin(
+              parseId(req.params.assetId, "file asset ID"),
+              pageNumber,
+            )
+          : await getEBookletService().getPrivateFileAssetForAdmin(
+              parseId(req.params.assetId, "file asset ID"),
+            );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/octet-stream");
       res.set(
         "Content-Disposition",
         `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
       );
+      if (pageBuffer) {
+        res.send(pageBuffer);
+        return;
+      }
       res.sendFile(absolutePath);
     } catch (error) {
       next(error);
@@ -1272,16 +1282,27 @@ export const eBookletController = {
 
   async getAuthorizedViewerDocument(req: Request, res: Response, next: NextFunction) {
     try {
-      const { asset, absolutePath } = await getEBookletService().getAuthorizedViewerDocument(
-        parseId(req.params.instanceId, "instance ID"),
-        currentUserId(req),
-      );
+      const pageNumber = parseOptionalId(req.query.page);
+      const { asset, absolutePath, pageBuffer } = pageNumber
+        ? await getEBookletService().getAuthorizedViewerDocument(
+            parseId(req.params.instanceId, "instance ID"),
+            currentUserId(req),
+            pageNumber,
+          )
+        : await getEBookletService().getAuthorizedViewerDocument(
+            parseId(req.params.instanceId, "instance ID"),
+            currentUserId(req),
+          );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/pdf");
       res.set(
         "Content-Disposition",
         `inline; filename="${String(asset.original_filename || "e-booklet-document.pdf").replace(/"/g, "")}"`,
       );
+      if (pageBuffer) {
+        res.send(pageBuffer);
+        return;
+      }
       res.sendFile(absolutePath);
     } catch (error) {
       next(error);
@@ -1290,15 +1311,25 @@ export const eBookletController = {
 
   async getAdminAuthorizedViewerDocument(req: Request, res: Response, next: NextFunction) {
     try {
-      const { asset, absolutePath } = await getEBookletService().getAdminAuthorizedViewerDocument(
-        parseId(req.params.instanceId, "instance ID"),
-      );
+      const pageNumber = parseOptionalId(req.query.page);
+      const { asset, absolutePath, pageBuffer } = pageNumber
+        ? await getEBookletService().getAdminAuthorizedViewerDocument(
+            parseId(req.params.instanceId, "instance ID"),
+            pageNumber,
+          )
+        : await getEBookletService().getAdminAuthorizedViewerDocument(
+            parseId(req.params.instanceId, "instance ID"),
+          );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/pdf");
       res.set(
         "Content-Disposition",
         `inline; filename="${String(asset.original_filename || "e-booklet-document.pdf").replace(/"/g, "")}"`,
       );
+      if (pageBuffer) {
+        res.send(pageBuffer);
+        return;
+      }
       res.sendFile(absolutePath);
     } catch (error) {
       next(error);

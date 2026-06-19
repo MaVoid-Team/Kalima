@@ -295,6 +295,10 @@ export class PublicEBookletCheckoutItemDto {
   @IsInt()
   @Min(1)
   template_version_id!: number;
+
+  @IsOptional()
+  @IsArray()
+  required_field_values?: Array<{ field_definition_id: number; value: string }>;
 }
 
 export class PublicEBookletCheckoutDto {

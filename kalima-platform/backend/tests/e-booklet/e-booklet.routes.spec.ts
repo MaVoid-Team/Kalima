@@ -513,6 +513,25 @@ describe("e-booklet routes", () => {
     }
   });
 
+  test("passes requested PDF page number to the authorized viewer document service", async () => {
+    mockService.getAuthorizedViewerDocument.mockResolvedValue({
+      asset: { original_filename: "lesson-page-2.pdf", mime_type: "application/pdf" },
+      absolutePath: "/not-used-for-page-buffer.pdf",
+      pageBuffer: Buffer.from("%PDF-1.4\n%page-2\n"),
+      cacheControl: "private, no-store",
+    });
+
+    await request(app)
+      .get("/api/v2/e-booklet-viewer/10/document?page=2")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .expect(200)
+      .expect("Cache-Control", "private, no-store")
+      .expect("Content-Type", /application\/pdf/)
+      .expect("Content-Disposition", /inline; filename="lesson-page-2.pdf"/);
+
+    expect(mockService.getAuthorizedViewerDocument).toHaveBeenCalledWith(10, 55, 2);
+  });
+
   test("serves admin view mode without student access or device binding", async () => {
     mockService.getAdminViewerMetadata.mockResolvedValue({ admin_view_mode: true, booklet_instance_id: 10 });
     mockService.getAdminViewerPage.mockResolvedValue({ pageNumber: 1, adminViewMode: true });

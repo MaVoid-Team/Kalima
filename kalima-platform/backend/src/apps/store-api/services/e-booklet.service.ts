@@ -577,7 +577,8 @@ export class EBookletService {
 
   async getPrivateFileAssetForAdmin(
     assetId: number,
-  ): Promise<{ asset: any; absolutePath: string }> {
+    pageNumber?: number,
+  ): Promise<{ asset: any; absolutePath: string; pageBuffer: Buffer | null }> {
     const asset = await this.db.e_booklet_file_assets.findUnique({
       where: { id: assetId },
     });
@@ -586,7 +587,10 @@ export class EBookletService {
     const filename = path.basename(asset.storage_key || "");
     const absolutePath = path.join(E_BOOKLET_UPLOAD_DIR, filename);
     await fsPromises.access(absolutePath);
-    return { asset, absolutePath };
+    const pageBuffer = pageNumber && asset.mime_type === "application/pdf"
+      ? await this.extractSinglePagePdf(absolutePath, pageNumber)
+      : null;
+    return { asset, absolutePath, pageBuffer };
   }
 
   async getPublicCoverFileAsset(
@@ -1265,6 +1269,7 @@ export class EBookletService {
         include: {
           cover_file: true,
           category: { select: { id: true, title: true } },
+          ...this.templateCheckoutInclude(),
         },
       },
       template_version: {
@@ -1316,6 +1321,7 @@ export class EBookletService {
           include: {
             cover_file: true,
             category: { select: { id: true, title: true } },
+            ...this.templateCheckoutInclude(),
           },
         },
         template_version: {
@@ -1484,7 +1490,7 @@ export class EBookletService {
           access_expires_at: { gt: new Date() },
         },
         include: {
-          template: true,
+          template: { include: this.templateCheckoutInclude() },
           template_version: true,
         },
       });
@@ -1495,7 +1501,11 @@ export class EBookletService {
       if (Number(instance.template_version_id) !== Number(item.template_version_id)) {
         throw new BadRequestError("Checkout version does not match the selected e-booklet instance.");
       }
-      instances.push(instance);
+      const requiredFieldValues = await this.validateEBookletRequiredFields(
+        instance.template,
+        item.required_field_values ?? dto.required_field_values,
+      );
+      instances.push({ ...instance, requiredFieldValues });
     }
 
     const total = instances.reduce((sum, instance) => sum + Number(instance.student_marketing_price ?? 0), 0);
@@ -1545,6 +1555,17 @@ export class EBookletService {
             payment_screenshot_id: total > 0 ? paymentScreenshotId : null,
           },
         });
+
+        if (instance.requiredFieldValues.length > 0) {
+          await tx.e_booklet_purchase_required_fields.createMany({
+            data: instance.requiredFieldValues.map((field: any) => ({
+              purchase_id: purchase.id,
+              field_definition_id: field.field_definition_id,
+              value: field.value,
+            })),
+            skipDuplicates: true,
+          });
+        }
 
         await this.recordAnalyticsEvent(tx, {
           event_type: "teacher_purchase_requested",
@@ -2711,7 +2732,24 @@ export class EBookletService {
     };
   }
 
-  private async buildViewerDocumentResponse(instance: any) {
+  private async extractSinglePagePdf(absolutePath: string, pageNumber: number) {
+    const sourceBytes = await fsPromises.readFile(absolutePath);
+    const sourceDocument = await PDFDocument.load(sourceBytes, {
+      ignoreEncryption: true,
+      updateMetadata: false,
+    });
+    const pageCount = sourceDocument.getPageCount();
+    if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pageCount) {
+      throw new BadRequestError("Invalid e-booklet page number.");
+    }
+
+    const pageDocument = await PDFDocument.create();
+    const [page] = await pageDocument.copyPages(sourceDocument, [pageNumber - 1]);
+    pageDocument.addPage(page);
+    return Buffer.from(await pageDocument.save({ updateFieldAppearances: false }));
+  }
+
+  private async buildViewerDocumentResponse(instance: any, pageNumber?: number) {
     const documentAssetId = this.resolveViewerDocumentAssetId(instance);
     if (!documentAssetId) {
       throw new NotFoundError("E-booklet document is not available.");
@@ -2721,28 +2759,35 @@ export class EBookletService {
       throw new NotFoundError("E-booklet PDF document not found.");
     }
     const filename = path.basename(asset.storage_key || "");
+    const absolutePath = path.join(E_BOOKLET_UPLOAD_DIR, filename);
+    const pageBuffer = pageNumber
+      ? await this.extractSinglePagePdf(absolutePath, pageNumber)
+      : null;
     return {
       asset: {
         id: asset.id,
         file_type: asset.file_type,
-        original_filename: asset.original_filename,
+        original_filename: pageNumber
+          ? `${path.basename(asset.original_filename || "e-booklet-document", ".pdf")}-page-${pageNumber}.pdf`
+          : asset.original_filename,
         mime_type: asset.mime_type,
         size_bytes: asset.size_bytes,
         visibility: asset.visibility,
       },
-      absolutePath: path.join(E_BOOKLET_UPLOAD_DIR, filename),
+      absolutePath,
+      pageBuffer,
       cacheControl: "private, no-store",
     };
   }
 
-  async getAdminAuthorizedViewerDocument(instanceId: number) {
+  async getAdminAuthorizedViewerDocument(instanceId: number, pageNumber?: number) {
     const access: any = await this.getAdminViewerAccess(instanceId);
-    return this.buildViewerDocumentResponse(access.booklet_instance);
+    return this.buildViewerDocumentResponse(access.booklet_instance, pageNumber);
   }
 
-  async getAuthorizedViewerDocument(instanceId: number, userId: number) {
+  async getAuthorizedViewerDocument(instanceId: number, userId: number, pageNumber?: number) {
     const access: any = await this.assertViewerAccess(instanceId, userId);
-    return this.buildViewerDocumentResponse(access.booklet_instance);
+    return this.buildViewerDocumentResponse(access.booklet_instance, pageNumber);
   }
 
   async getViewerMetadata(instanceId: number, userId: number) {

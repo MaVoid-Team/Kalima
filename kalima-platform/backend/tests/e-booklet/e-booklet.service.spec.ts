@@ -69,6 +69,9 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
       findUnique: jest.fn(),
       update: jest.fn(),
     },
+    e_booklet_purchase_required_fields: {
+      createMany: jest.fn(),
+    },
     e_booklet_invites: {
       findFirst: jest.fn(),
       findMany: jest.fn(),
@@ -837,6 +840,59 @@ describe("EBookletService", () => {
       expect(db.e_booklet_invites.create).not.toHaveBeenCalled();
       expect(db.e_booklet_student_purchase_links.create).not.toHaveBeenCalled();
       expect(db.e_booklet_access.create).not.toHaveBeenCalled();
+      expect(result).toEqual(expect.objectContaining({ purchase_id: 91, booklet_instance_id: 10, next_url: "/e-booklet-orders" }));
+    });
+
+    test("public instance checkout validates and stores configured required fields", async () => {
+      const db = createMockDb();
+      const expiry = new Date("2027-01-15T10:30:00.000Z");
+      const instance = {
+        id: 10,
+        teacher_id: 7,
+        template_id: 3,
+        template_version_id: 8,
+        invite_quota: 5,
+        access_expires_at: expiry,
+        status: "active",
+        student_marketing_price: 0,
+        internal_price: 70,
+        template: {
+          currency: "EGP",
+          required_fields: [{
+            id: 21,
+            field_definition_id: 12,
+            is_required: true,
+            active: true,
+            required_field_definitions: { id: 12, label: "Student phone", active: true, is_deleted: false },
+          }],
+        },
+      };
+      db.e_booklet_instances.findFirst.mockResolvedValue(instance);
+      db.e_booklet_access.count.mockResolvedValue(0);
+      db.e_booklet_student_purchase_links.count.mockResolvedValue(0);
+      db.e_booklet_purchases.create.mockResolvedValue({ id: 91, status: "ready", price: 0, currency: "EGP" });
+
+      const service = new EBookletService(db);
+
+      await expect(service.createPublicCheckoutRequest(55, {
+        instance_id: 10,
+        template_id: 3,
+        template_version_id: 8,
+        terms_accepted: true,
+      })).rejects.toThrow("Student phone is required for this e-booklet purchase");
+
+      const result: any = await service.createPublicCheckoutRequest(55, {
+        instance_id: 10,
+        template_id: 3,
+        template_version_id: 8,
+        required_field_values: [{ field_definition_id: 12, value: "01012345678" }],
+        terms_accepted: true,
+      });
+
+      expect(db.e_booklet_purchase_required_fields.createMany).toHaveBeenCalledWith({
+        data: [{ purchase_id: 91, field_definition_id: 12, value: "01012345678" }],
+        skipDuplicates: true,
+      });
       expect(result).toEqual(expect.objectContaining({ purchase_id: 91, booklet_instance_id: 10, next_url: "/e-booklet-orders" }));
     });
 
