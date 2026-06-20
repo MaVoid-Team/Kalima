@@ -93,6 +93,7 @@ const AdminEBookletInstanceStudentsPage = lazy(() => import("./pages/admin/e-boo
 const AdminEBookletAnalyticsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletAnalyticsPage"));
 const AdminEBookletSettingsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletSettingsPage"));
 const AdminEBookletTermsMilestonesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTermsMilestonesPage"));
+const AdminEBookletHotspotLibraryPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletHotspotLibraryPage"));
 
 // Public viewer (no layout)
 const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
@@ -193,7 +194,6 @@ const router = createBrowserRouter(
           <Route element={<RoleRoute requiredRole={E_BOOKLET_ORDERS_ALLOWED_ROLES} />}>
             <Route path="/e-booklet-cart" element={<EBookletCartPage />} />
             <Route path="/e-booklet-checkout" element={<EBookletCheckoutPage />} />
-            <Route path={E_BOOKLET_ORDERS_ROUTE} element={<EBookletOrdersPage />} />
           </Route>
         </Route>
 
@@ -243,6 +243,7 @@ const router = createBrowserRouter(
             <Route path="access/:instanceId/students" element={<AdminEBookletInstanceStudentsPage />} />
             <Route path="access/:instanceId/devices" element={<AdminEBookletDevicesPage />} />
             <Route path="analytics" element={<AdminEBookletAnalyticsPage />} />
+            <Route path="hotspot-library" element={<AdminEBookletHotspotLibraryPage />} />
             <Route path="settings" element={<AdminEBookletSettingsPage />} />
             <Route path="settings/terms-milestones" element={<AdminEBookletTermsMilestonesPage />} />
           </Route>
@@ -278,7 +279,9 @@ const router = createBrowserRouter(
           <Route path="/teacher/profile" element={<TeacherProfilePage />} />
           <Route path="/teacher/settings" element={<TeacherSettingsPage />} />
           <Route path="/teacher/e-booklets" element={<TeacherEBookletsPage />} />
+          <Route path={E_BOOKLET_ORDERS_ROUTE} element={<EBookletOrdersPage />} />
           <Route path="/teacher/e-booklet-analytics" element={<TeacherEBookletAnalyticsPage />} />
+          <Route path="/teacher/orders" element={<MyOrdersPage />} />
           <Route path="/teacher/e-booklets/:instanceId" element={<EBookletViewerPage />} />
           <Route path="/teacher/e-booklets/:instanceId/invites" element={<TeacherInviteManagementPage />} />
         </Route>

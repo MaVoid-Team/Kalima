@@ -890,6 +890,261 @@ export class EBookletService {
     return hotspots.map((hotspot: any) => this.normalizeHotspotRecord(hotspot));
   }
 
+  private normalizePresetTags(value: unknown): string[] {
+    const rawTags = Array.isArray(value)
+      ? value
+      : typeof value === "string"
+        ? value.split(",")
+        : [];
+    const seen = new Set<string>();
+    return rawTags
+      .map((tag) => String(tag || "").trim())
+      .filter((tag) => {
+        if (!tag || tag.length > 64) return false;
+        const key = tag.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+  }
+
+  private normalizePresetRecord(preset: any): any {
+    if (!preset || typeof preset !== "object") return preset;
+    const tags = Array.isArray(preset.tags_json)
+      ? preset.tags_json
+      : Array.isArray(preset.tags)
+        ? preset.tags
+        : [];
+    return {
+      ...preset,
+      tags,
+      content_json: this.normalizeLegacyHotspotContent(preset),
+    };
+  }
+
+  private getPresetSearchText(preset: any): string {
+    const blockText = Array.isArray(preset?.content_json?.blocks)
+      ? preset.content_json.blocks
+          .map((block: any) => [
+            block?.text_content,
+            block?.supplementary_text,
+            block?.url,
+            block?.youtube_url,
+          ].filter(Boolean).join(" "))
+          .join(" ")
+      : "";
+    return [
+      preset?.name,
+      preset?.description,
+      preset?.title,
+      preset?.text_content,
+      ...(Array.isArray(preset?.tags_json) ? preset.tags_json : []),
+      blockText,
+    ].filter(Boolean).join(" ").toLowerCase();
+  }
+
+  private hotspotPresetContentDataFromHotspot(hotspot: any, includePosition = true) {
+    const normalizedContent = this.normalizeLegacyHotspotContent(hotspot);
+    return {
+      type: hotspot.type,
+      shape: hotspot.shape || "circle",
+      width_percent: hotspot.width_percent,
+      height_percent: hotspot.height_percent,
+      radius_percent: hotspot.radius_percent,
+      title: hotspot.title,
+      text_content: hotspot.text_content,
+      asset_file_id: hotspot.asset_file_id,
+      trigger_type: hotspot.trigger_type || "click",
+      display_behavior: hotspot.display_behavior,
+      content_json: normalizedContent,
+      interaction_json: hotspot.interaction_json,
+      default_page_number: includePosition ? hotspot.page_number : null,
+      default_x_percent: includePosition ? hotspot.x_percent : null,
+      default_y_percent: includePosition ? hotspot.y_percent : null,
+      source_template_id: hotspot.template_version?.template_id ?? null,
+      source_template_version_id: hotspot.template_version_id,
+      source_hotspot_id: hotspot.id,
+    };
+  }
+
+  private async getSourceHotspotForPreset(sourceHotspotId: number) {
+    const hotspot = await this.db.e_booklet_hotspots.findUnique({
+      where: { id: sourceHotspotId },
+      include: { template_version: { select: { id: true, template_id: true } } },
+    });
+    if (!hotspot) throw new NotFoundError("E-booklet hotspot not found");
+    return hotspot;
+  }
+
+  async listHotspotPresets(filters: {
+    search?: string;
+    type?: string;
+    tag?: string;
+    includeInactive?: boolean;
+    page?: number;
+    limit?: number;
+  } = {}): Promise<{ data: unknown[]; total: number; page: number; limit: number }> {
+    const page = filters.page ?? 1;
+    const limit = filters.limit ?? 20;
+    const where: any = {};
+    if (!filters.includeInactive) where.is_active = true;
+    if (filters.type) where.type = filters.type;
+
+    const rows = await this.db.e_booklet_hotspot_presets.findMany({
+      where,
+      orderBy: [{ updated_at: "desc" }, { created_at: "desc" }],
+    });
+    const search = String(filters.search || "").trim().toLowerCase();
+    const tag = String(filters.tag || "").trim().toLowerCase();
+    const filtered = rows
+      .map((preset: any) => this.normalizePresetRecord(preset))
+      .filter((preset: any) => !search || this.getPresetSearchText(preset).includes(search))
+      .filter((preset: any) => !tag || (preset.tags || []).some((value: string) => String(value).toLowerCase() === tag));
+    const skip = (page - 1) * limit;
+    return { data: filtered.slice(skip, skip + limit), total: filtered.length, page, limit };
+  }
+
+  async getHotspotPreset(presetId: number): Promise<unknown> {
+    const preset = await this.db.e_booklet_hotspot_presets.findUnique({ where: { id: presetId } });
+    if (!preset) throw new NotFoundError("E-booklet hotspot preset not found");
+    return this.normalizePresetRecord(preset);
+  }
+
+  async createHotspotPreset(dto: any, adminUserId: number): Promise<unknown> {
+    const name = String(dto?.name || "").trim();
+    if (!name) throw new BadRequestError("Hotspot preset name is required.");
+    const sourceHotspotId = Number(dto?.source_hotspot_id ?? dto?.sourceHotspotId);
+    if (!Number.isInteger(sourceHotspotId) || sourceHotspotId <= 0) {
+      throw new BadRequestError("Source hotspot is required.");
+    }
+    const hotspot = await this.getSourceHotspotForPreset(sourceHotspotId);
+    const preset = await this.db.e_booklet_hotspot_presets.create({
+      data: {
+        name,
+        description: dto?.description ? String(dto.description).trim() : null,
+        tags_json: this.normalizePresetTags(dto?.tags),
+        ...this.hotspotPresetContentDataFromHotspot(hotspot, dto?.include_position !== false),
+        created_by: adminUserId,
+      },
+    });
+    return this.normalizePresetRecord(preset);
+  }
+
+  async updateHotspotPresetMetadata(presetId: number, dto: any, adminUserId: number): Promise<unknown> {
+    const name = String(dto?.name || "").trim();
+    if (!name) throw new BadRequestError("Hotspot preset name is required.");
+    const preset = await this.db.e_booklet_hotspot_presets.update({
+      where: { id: presetId },
+      data: {
+        name,
+        description: dto?.description ? String(dto.description).trim() : null,
+        tags_json: this.normalizePresetTags(dto?.tags),
+        updated_by: adminUserId,
+        updated_at: new Date(),
+      },
+    });
+    return this.normalizePresetRecord(preset);
+  }
+
+  async replaceHotspotPresetContent(presetId: number, dto: any, adminUserId: number): Promise<unknown> {
+    const sourceHotspotId = Number(dto?.source_hotspot_id ?? dto?.sourceHotspotId);
+    if (!Number.isInteger(sourceHotspotId) || sourceHotspotId <= 0) {
+      throw new BadRequestError("Source hotspot is required.");
+    }
+    const existing = await this.db.e_booklet_hotspot_presets.findUnique({ where: { id: presetId }, select: { id: true } });
+    if (!existing) throw new NotFoundError("E-booklet hotspot preset not found");
+    const hotspot = await this.getSourceHotspotForPreset(sourceHotspotId);
+    const preset = await this.db.e_booklet_hotspot_presets.update({
+      where: { id: presetId },
+      data: {
+        ...this.hotspotPresetContentDataFromHotspot(hotspot, dto?.include_position !== false),
+        updated_by: adminUserId,
+        updated_at: new Date(),
+      },
+    });
+    return this.normalizePresetRecord(preset);
+  }
+
+  async deleteHotspotPreset(presetId: number): Promise<unknown> {
+    const usageCount = await this.db.e_booklet_hotspot_preset_usages.count({ where: { preset_id: presetId } });
+    if (usageCount > 0) {
+      const preset = await this.db.e_booklet_hotspot_presets.update({
+        where: { id: presetId },
+        data: { is_active: false, updated_at: new Date() },
+      });
+      return { action: "archived", preset: this.normalizePresetRecord(preset) };
+    }
+    await this.db.e_booklet_hotspot_presets.delete({ where: { id: presetId } });
+    return { action: "deleted" };
+  }
+
+  async restoreHotspotPreset(presetId: number, adminUserId: number): Promise<unknown> {
+    const preset = await this.db.e_booklet_hotspot_presets.update({
+      where: { id: presetId },
+      data: { is_active: true, updated_by: adminUserId, updated_at: new Date() },
+    });
+    return this.normalizePresetRecord(preset);
+  }
+
+  async createHotspotFromPreset(templateVersionId: number, dto: any, adminUserId: number): Promise<unknown> {
+    const presetId = Number(dto?.preset_id ?? dto?.presetId);
+    if (!Number.isInteger(presetId) || presetId <= 0) throw new BadRequestError("Hotspot preset is required.");
+    const [version, preset] = await Promise.all([
+      this.db.e_booklet_template_versions.findUnique({ where: { id: templateVersionId }, select: { id: true, template_id: true } }),
+      this.db.e_booklet_hotspot_presets.findUnique({ where: { id: presetId } }),
+    ]);
+    if (!version) throw new NotFoundError("E-booklet template version not found");
+    if (!preset || preset.is_active === false) throw new NotFoundError("E-booklet hotspot preset not found");
+
+    const pageNumber = Number(dto?.page_number ?? preset.default_page_number);
+    const xPercent = Number(dto?.x_percent ?? preset.default_x_percent);
+    const yPercent = Number(dto?.y_percent ?? preset.default_y_percent);
+    if (!Number.isInteger(pageNumber) || pageNumber <= 0 || !Number.isFinite(xPercent) || !Number.isFinite(yPercent)) {
+      throw new BadRequestError("Preset placement is required.");
+    }
+
+    return this.transaction(async (tx: EBookletDb) => {
+      const lastReference = await tx.e_booklet_hotspots.findFirst({
+        where: { template_version_id: templateVersionId },
+        orderBy: { reference_number: "desc" },
+        select: { reference_number: true },
+      });
+      const normalizedContent = this.normalizeLegacyHotspotContent(preset);
+      const hotspot = await tx.e_booklet_hotspots.create({
+        data: {
+          template_version_id: templateVersionId,
+          page_number: pageNumber,
+          x_percent: xPercent,
+          y_percent: yPercent,
+          radius_percent: preset.radius_percent,
+          reference_number: Number(lastReference?.reference_number ?? 0) + 1,
+          shape: preset.shape || "circle",
+          width_percent: preset.width_percent,
+          height_percent: preset.height_percent,
+          type: preset.type,
+          title: preset.title,
+          text_content: preset.text_content,
+          asset_file_id: preset.asset_file_id,
+          trigger_type: preset.trigger_type || "click",
+          display_behavior: preset.display_behavior,
+          content_json: normalizedContent,
+          interaction_json: preset.interaction_json,
+          created_by: adminUserId,
+        },
+      });
+      await tx.e_booklet_hotspot_preset_usages.create({
+        data: {
+          preset_id: preset.id,
+          target_template_id: version.template_id,
+          target_template_version_id: templateVersionId,
+          target_hotspot_id: hotspot.id,
+          used_by: adminUserId,
+        },
+      });
+      return this.normalizeHotspotRecord(hotspot);
+    });
+  }
+
   async publishTemplateVersion(versionId: number): Promise<unknown> {
     const version = await this.db.e_booklet_template_versions.findUnique({
       where: { id: versionId },
@@ -1645,7 +1900,7 @@ export class EBookletService {
     const limit = filters.limit ?? 20;
     const skip = (page - 1) * limit;
     const where: Record<string, unknown> = { teacher_id: teacherId };
-    if (filters.status) where.status = filters.status;
+    if (filters.status && filters.status !== "all") where.status = filters.status;
 
     const [data, total] = await Promise.all([
       this.db.e_booklet_purchases.findMany({
@@ -1673,7 +1928,7 @@ export class EBookletService {
     const page = filters.page ?? 1;
     const limit = filters.limit ?? 20;
     const skip = (page - 1) * limit;
-    const where = filters.status ? { status: filters.status } : {};
+    const where = filters.status && filters.status !== "all" ? { status: filters.status } : {};
     const [data, total] = await Promise.all([
       this.db.e_booklet_purchases.findMany({
         where,
@@ -2733,20 +2988,25 @@ export class EBookletService {
   }
 
   private async extractSinglePagePdf(absolutePath: string, pageNumber: number) {
-    const sourceBytes = await fsPromises.readFile(absolutePath);
-    const sourceDocument = await PDFDocument.load(sourceBytes, {
-      ignoreEncryption: true,
-      updateMetadata: false,
-    });
-    const pageCount = sourceDocument.getPageCount();
-    if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pageCount) {
-      throw new BadRequestError("Invalid e-booklet page number.");
-    }
+    try {
+      const sourceBytes = await fsPromises.readFile(absolutePath);
+      const sourceDocument = await PDFDocument.load(sourceBytes, {
+        ignoreEncryption: true,
+        updateMetadata: false,
+      });
+      const pageCount = sourceDocument.getPageCount();
+      if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pageCount) {
+        throw new BadRequestError("Invalid e-booklet page number.");
+      }
 
-    const pageDocument = await PDFDocument.create();
-    const [page] = await pageDocument.copyPages(sourceDocument, [pageNumber - 1]);
-    pageDocument.addPage(page);
-    return Buffer.from(await pageDocument.save({ updateFieldAppearances: false }));
+      const pageDocument = await PDFDocument.create();
+      const [page] = await pageDocument.copyPages(sourceDocument, [pageNumber - 1]);
+      pageDocument.addPage(page);
+      return Buffer.from(await pageDocument.save({ updateFieldAppearances: false }));
+    } catch (error) {
+      if (error instanceof BadRequestError) throw error;
+      throw new BadRequestError("The e-booklet PDF page could not be rendered. Please contact support.");
+    }
   }
 
   private async buildViewerDocumentResponse(instance: any, pageNumber?: number) {
@@ -2760,6 +3020,11 @@ export class EBookletService {
     }
     const filename = path.basename(asset.storage_key || "");
     const absolutePath = path.join(E_BOOKLET_UPLOAD_DIR, filename);
+    try {
+      await fsPromises.access(absolutePath);
+    } catch {
+      throw new NotFoundError("E-booklet PDF file is not available.");
+    }
     const pageBuffer = pageNumber
       ? await this.extractSinglePagePdf(absolutePath, pageNumber)
       : null;

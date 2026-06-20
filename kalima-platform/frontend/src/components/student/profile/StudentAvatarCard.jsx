@@ -32,21 +32,21 @@ export default function StudentAvatarCard({ profile, uploadAvatar, fetchProfile 
     const student = profile?.students;
 
     return (
-        <Card className="shadow-sm overflow-hidden">
-            <div className="h-20 bg-linear-to-r from-primary/30 via-primary/10 to-transparent" />
-            <CardContent className="px-6 pb-6 -mt-10">
-                <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-                    <div className="relative shrink-0">
-                        <Avatar className="h-20 w-20 border-4 border-background shadow-md">
+        <Card className="relative overflow-hidden border-primary/10 shadow-sm">
+            <div className="pointer-events-none absolute inset-y-0 end-0 w-1/2 bg-linear-to-l from-primary/10 via-primary/5 to-transparent" />
+            <CardContent className="relative p-4 sm:p-5">
+                <div className="flex items-center gap-4">
+                    <div className="relative shrink-0 rounded-2xl bg-primary/10 p-1.5 ring-1 ring-primary/15">
+                        <Avatar className="h-16 w-16 border-2 border-background shadow-sm sm:h-[4.5rem] sm:w-[4.5rem]">
                             <AvatarImage src={getImageUrl(profile?.profile_pic_url)} alt={profile?.name} className="object-cover" />
-                            <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold uppercase">
+                            <AvatarFallback className="bg-background text-primary text-xl font-bold uppercase">
                                 {profile?.name?.trim().charAt(0) || 'S'}
                             </AvatarFallback>
                         </Avatar>
                         <button
                             onClick={() => avatarInputRef.current?.click()}
                             disabled={avatarUploading}
-                            className="absolute bottom-0 end-0 h-7 w-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow border-2 border-background hover:bg-primary/90 transition-colors"
+                            className="absolute -bottom-1 -end-1 h-7 w-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow border-2 border-background hover:bg-primary/90 transition-colors"
                             data-testid="student-upload-avatar-button"
                         >
                             {avatarUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
@@ -59,11 +59,11 @@ export default function StudentAvatarCard({ profile, uploadAvatar, fetchProfile 
                             onChange={handleAvatarChange}
                         />
                     </div>
-                    <div className="flex-1 min-w-0 pt-3 sm:pt-0">
-                        <h2 className="text-xl font-bold truncate">{profile?.name}</h2>
-                        <p className="text-sm text-muted-foreground mt-0.5">{profile?.email}</p>
+                    <div className="min-w-0 flex-1">
+                        <h2 className="min-w-0 text-lg font-semibold leading-tight tracking-tight sm:text-xl">{profile?.name}</h2>
+                        <p className="mt-1 max-w-full break-words text-sm leading-snug text-muted-foreground sm:truncate">{profile?.email}</p>
 
-                        <div className="flex flex-wrap items-center gap-2 mt-2">
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
                             {student?.levels?.title && (
                                 <Badge variant="secondary">{student.levels.title}</Badge>
                             )}

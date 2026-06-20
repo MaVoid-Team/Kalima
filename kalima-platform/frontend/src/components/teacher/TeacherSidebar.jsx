@@ -43,7 +43,7 @@ export default function TeacherSidebar({ isMobileOpen, setIsMobileOpen }) {
     { name: t('nav.eBooklets', 'My E-Booklets'), href: '/teacher/e-booklets', icon: BookOpenCheck, id: 'e-booklets' },
     { name: t('nav.eBookletOrders', 'E-Booklet Orders'), href: '/e-booklet-orders', icon: ShoppingBag, id: 'e-booklet-orders' },
     { name: t('nav.eBookletAnalytics', 'E-Booklet Analytics'), href: '/teacher/e-booklet-analytics', icon: BarChart3, id: 'e-booklet-analytics' },
-    { name: t('nav.orders', 'My Orders'), href: '/orders', icon: ShoppingBag, id: 'orders' },
+    { name: t('nav.orders', 'My Orders'), href: '/teacher/orders', icon: ShoppingBag, id: 'orders' },
     { name: t('nav.settings', 'Settings'), href: '/teacher/settings', icon: Settings, id: 'settings' },
   ];
 

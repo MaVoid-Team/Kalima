@@ -142,6 +142,12 @@ function parseAccessCodeKind(raw: unknown): "paid" | "free" {
   return value;
 }
 
+function assertTeacherCanGenerateAccessCodeKind(kind: "paid" | "free") {
+  if (kind === "free") {
+    throw new BadRequestError("Teachers cannot generate free e-booklet access codes.");
+  }
+}
+
 function parseOptionalIsoDate(raw: unknown, label: string): string | undefined {
   if (!raw) return undefined;
   const value = String(Array.isArray(raw) ? raw[0] : raw);
@@ -484,6 +490,103 @@ export const eBookletController = {
         currentUserId(req),
       );
       res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async listHotspotPresets(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await getEBookletService().listHotspotPresets({
+        search: req.query.search as string | undefined,
+        type: req.query.type as string | undefined,
+        tag: req.query.tag as string | undefined,
+        includeInactive: parseBoolean(req.query.include_inactive),
+        ...pagination(req),
+      });
+      res.status(200).json({ success: true, ...result });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getHotspotPreset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getHotspotPreset(
+        parseId(req.params.presetId, "hotspot preset ID"),
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async createHotspotPreset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().createHotspotPreset(req.body, currentUserId(req));
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async updateHotspotPresetMetadata(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().updateHotspotPresetMetadata(
+        parseId(req.params.presetId, "hotspot preset ID"),
+        req.body,
+        currentUserId(req),
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async replaceHotspotPresetContent(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().replaceHotspotPresetContent(
+        parseId(req.params.presetId, "hotspot preset ID"),
+        req.body,
+        currentUserId(req),
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async deleteHotspotPreset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().deleteHotspotPreset(
+        parseId(req.params.presetId, "hotspot preset ID"),
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async restoreHotspotPreset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().restoreHotspotPreset(
+        parseId(req.params.presetId, "hotspot preset ID"),
+        currentUserId(req),
+      );
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async createHotspotFromPreset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().createHotspotFromPreset(
+        parseId(req.params.versionId, "template version ID"),
+        req.body,
+        currentUserId(req),
+      );
+      res.status(201).json({ success: true, data });
     } catch (error) {
       next(error);
     }
@@ -848,6 +951,7 @@ export const eBookletController = {
   async generateAccessCode(req: Request, res: Response, next: NextFunction) {
     try {
       const requestedKind = parseAccessCodeKind(req.body?.kind ?? "paid");
+      assertTeacherCanGenerateAccessCodeKind(requestedKind);
       const data = await domainServices().accessCodes.generateCode({
         bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
         teacherId: currentUserId(req),
@@ -865,6 +969,7 @@ export const eBookletController = {
   async generateAccessCodes(req: Request, res: Response, next: NextFunction) {
     try {
       const requestedKind = parseAccessCodeKind(req.body?.kind ?? "paid");
+      assertTeacherCanGenerateAccessCodeKind(requestedKind);
       const data = await domainServices().accessCodes.generateCodes({
         bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
         teacherId: currentUserId(req),

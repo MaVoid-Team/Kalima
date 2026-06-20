@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { CalendarClock, Copy, KeyRound, Link2, MessageCircle, ShieldCheck, UserMinus, Users, WalletCards } from "lucide-react";
+import { CalendarClock, Copy, HardDrive, KeyRound, MessageCircle, ShieldCheck, UserMinus, Users, WalletCards } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useTeacherEBooklets } from "@/hooks/useEBookletAccess";
 import { useTranslation } from "react-i18next";
 
@@ -70,6 +71,37 @@ export default function TeacherInviteManagementPage() {
   }, [fetchTeacherMilestones, termId]);
 
   const activeStudents = students.filter((student) => student.status === "active");
+  const visibleAccessRows = useMemo(() => {
+    const rowsById = new Map();
+    generatedCodes.forEach((entry) => {
+      rowsById.set(`generated-${entry.id}`, {
+        id: `generated-${entry.id}`,
+        kind: entry.kind,
+        status: t("teacher.invites.sessionOnly", { defaultValue: "New" }),
+        createdAt: entry.createdAt,
+        code: entry.code,
+        codeHint: entry.codeHint,
+        whatsappMessage: entry.whatsappMessage,
+        isGenerated: true,
+      });
+    });
+    accessCodes.forEach((entry) => {
+      const existingGenerated = generatedCodes.find((code) => String(code.codeHint || "") === String(entry.code_hint || ""));
+      const key = existingGenerated ? `generated-${existingGenerated.id}` : `stored-${entry.id}`;
+      rowsById.set(key, {
+        ...(rowsById.get(key) || {}),
+        id: key,
+        kind: entry.kind,
+        status: entry.status,
+        createdAt: entry.created_at,
+        codeHint: entry.code_hint,
+        redeemedCount: entry.redeemed_count,
+        maxRedemptions: entry.max_redemptions,
+        expiresAt: entry.expires_at,
+      });
+    });
+    return Array.from(rowsById.values()).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  }, [accessCodes, generatedCodes, t]);
   const claimableMilestone = milestones.find((milestone) => {
     const achievementId = milestone?.achievement?.id ?? milestone?.achievement_id ?? milestone?.milestone_achievement_id;
     return achievementId && !milestone?.claimed_at && !milestone?.achievement?.claimed_at;
@@ -93,24 +125,23 @@ export default function TeacherInviteManagementPage() {
     toast.success(t(toastKey));
   };
 
-  const runCodeGeneration = async (kind, mode, acceptedTermId = termId) => {
+  const runCodeGeneration = async (mode, acceptedTermId = termId) => {
     if (!acceptedTermId) {
       toast.error(t("teacher.invites.noActiveTerms"));
       return;
     }
-    const response = await createAccessCode(instanceId, { kind, termId: acceptedTermId, maxRedemptions: kind === "paid" ? 1 : 999999 });
+    const response = await createAccessCode(instanceId, { kind: "paid", termId: acceptedTermId, maxRedemptions: 1 });
     const code = getCode(response);
     const whatsappMessage = getMessage(response);
     const record = getRecord(response);
     const created = {
-      id: record.id || `${kind}-${Date.now()}`,
-      kind,
+      id: record.id || `paid-${Date.now()}`,
+      kind: "paid",
       mode,
       code,
       whatsappMessage,
       codeHint: record.code_hint,
       createdAt: record.created_at || new Date().toISOString(),
-      notPaidProgress: kind === "free",
     };
     setGeneratedCodes((current) => [created, ...current]);
     fetchAccessCodes(instanceId).catch(() => {});
@@ -129,9 +160,8 @@ export default function TeacherInviteManagementPage() {
     if (pendingAction) await pendingAction(acceptedTermId);
   };
 
-  const generatePaidMessageCode = () => requireTermsFor((acceptedTermId) => runCodeGeneration("paid", "message", acceptedTermId));
-  const generatePaidCodeOnly = () => requireTermsFor((acceptedTermId) => runCodeGeneration("paid", "code", acceptedTermId));
-  const generateFreeSharedCode = () => requireTermsFor((acceptedTermId) => runCodeGeneration("free", "code", acceptedTermId));
+  const generatePaidMessageCode = () => requireTermsFor((acceptedTermId) => runCodeGeneration("message", acceptedTermId));
+  const generatePaidCodeOnly = () => requireTermsFor((acceptedTermId) => runCodeGeneration("code", acceptedTermId));
   const generateBulkPaidCodes = () => requireTermsFor(async (acceptedTermId) => {
     const count = Math.max(1, Number(bulkCount) || 1);
     const response = await createAccessCodes(instanceId, { kind: "paid", termId: acceptedTermId, count, maxRedemptions: 1 });
@@ -206,8 +236,8 @@ export default function TeacherInviteManagementPage() {
         </div>
       </div>
 
-      <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
-        <section className="min-w-0 space-y-4 rounded-lg border bg-background p-4">
+      <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(320px,380px)_minmax(0,1fr)]">
+        <section className="min-w-0 space-y-4 rounded-lg border bg-background p-4 shadow-sm">
           <div>
             <h2 className="font-semibold">{t("teacher.invites.createAccessCode")}</h2>
             <p className="text-sm text-muted-foreground">{t("teacher.invites.createAccessCodeDescription")}</p>
@@ -225,10 +255,6 @@ export default function TeacherInviteManagementPage() {
               <Copy className="h-4 w-4" />
               {t("teacher.invites.generatePaidCodeOnly")}
             </Button>
-            <Button onClick={generateFreeSharedCode} disabled={loading} variant="secondary" className="h-auto min-h-10 w-full whitespace-normal break-words text-center leading-snug">
-              <Link2 className="h-4 w-4" />
-              {t("teacher.invites.generateFreeSharedCode")}
-            </Button>
             <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]" data-testid="bulk-access-code-controls">
               <input
                 type="number"
@@ -245,9 +271,6 @@ export default function TeacherInviteManagementPage() {
               </Button>
             </div>
           </div>
-          <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-sm" data-testid="free-code-not-paid-progress-copy">
-            {t("teacher.invites.notPaidProgress")}
-          </div>
           {claimableAchievementId && (
             <div className="rounded-md border p-3">
               <div className="font-medium">{t("teacher.milestones.claimableReward")}</div>
@@ -257,62 +280,82 @@ export default function TeacherInviteManagementPage() {
           )}
         </section>
 
-        <section className="grid min-w-0 gap-5 lg:grid-cols-2">
-          <div className="min-w-0 rounded-lg border bg-background p-4">
-            <h2 className="font-semibold">{t("teacher.invites.generatedCodesTitle")}</h2>
-            <div className="mt-4 space-y-3">
-              {generatedCodes.map((entry) => (
-                <div key={entry.id} className="rounded-md border p-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <Badge variant={entry.kind === "paid" ? "default" : "outline"}>{entry.kind === "paid" ? t("teacher.invites.paidUnique") : t("teacher.invites.freeShared")}</Badge>
-                    <span className="text-xs text-muted-foreground">{formatDate(entry.createdAt)}</span>
-                  </div>
-                  {entry.code && <div className="mt-3 break-all rounded-md bg-muted p-2 text-sm font-semibold">{entry.code}</div>}
-                  {entry.codeHint && <div className="mt-2 text-xs text-muted-foreground">{t("teacher.invites.codeHint", { value: entry.codeHint })}</div>}
-                  {entry.notPaidProgress && <div className="mt-2 text-xs text-amber-700">{t("teacher.invites.notPaidProgress")}</div>}
-                  {entry.whatsappMessage && <div className="mt-3 whitespace-pre-line rounded-md bg-muted p-2 text-xs">{entry.whatsappMessage}</div>}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {entry.code && <Button variant="outline" size="sm" onClick={() => copyText(entry.code)}><Copy className="h-4 w-4" />{t("teacher.invites.copyCode")}</Button>}
-                    {entry.whatsappMessage && <Button variant="outline" size="sm" onClick={() => copyText(entry.whatsappMessage, "toasts.accessMessageCopied")}><MessageCircle className="h-4 w-4" />{t("teacher.invites.copyWhatsAppMessage")}</Button>}
-                  </div>
-                </div>
-              ))}
-              {generatedCodes.length === 0 && <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">{t("teacher.invites.emptyGeneratedCodes")}</div>}
+        <section className="min-w-0 rounded-lg border bg-background shadow-sm" data-testid="access-code-status-list">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b p-4">
+            <div>
+              <h2 className="font-semibold">{t("teacher.invites.accessLedgerTitle", { defaultValue: "Access code ledger" })}</h2>
+              <p className="text-sm text-muted-foreground">{t("teacher.invites.accessLedgerDescription", { defaultValue: "Rows stay compact so bulk generations remain visible and easy to share." })}</p>
             </div>
-            <div className="mt-5 border-t pt-4" data-testid="access-code-status-list">
-              <h3 className="text-sm font-semibold">{t("teacher.invites.codeStatusTitle", { defaultValue: "Code status" })}</h3>
-              <div className="mt-3 space-y-2">
-                {accessCodes.map((entry) => (
-                  <div key={entry.id} className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-md border p-2 text-sm">
-                    <span className="min-w-0 break-all">{entry.code_hint ? t("teacher.invites.codeHint", { value: entry.code_hint }) : entry.id}</span>
-                    <Badge variant="outline" className="shrink-0">{entry.status}</Badge>
-                  </div>
-                ))}
-                {accessCodes.length === 0 && <div className="text-sm text-muted-foreground">{t("teacher.invites.emptyCodeStatuses", { defaultValue: "No generated code statuses yet." })}</div>}
-              </div>
-            </div>
+            <Badge variant="secondary" className="shrink-0">{t("teacher.invites.codeCount", { defaultValue: "{{count}} codes", count: visibleAccessRows.length })}</Badge>
           </div>
-
-          <div className="min-w-0 rounded-lg border bg-background p-4">
-            <h2 className="font-semibold">{t("teacher.invites.studentsTitle")}</h2>
-            <div className="mt-4 space-y-3">
-              {students.map((studentAccess) => (
-                <div key={studentAccess.id} className="flex items-center justify-between gap-3 rounded-md border p-3">
-                  <div className="min-w-0">
-                    <div className="truncate font-medium">{studentAccess.user?.name || t("common.student")}</div>
-                    <div className="truncate text-xs text-muted-foreground">{studentAccess.user?.email}</div>
-                    <Badge variant="outline" className="mt-2">{t(`statuses.${studentAccess.status}`, { defaultValue: studentAccess.status })}</Badge>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => handleRevokeStudent(studentAccess.user_id)} disabled={studentAccess.status !== "active"}>
-                    <UserMinus className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-              {students.length === 0 && <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">{t("teacher.invites.emptyStudents")}</div>}
+          {visibleAccessRows.length > 0 ? (
+            <div className="max-h-[560px] overflow-auto">
+              <Table>
+                <TableHeader className="sticky top-0 z-10 bg-background">
+                  <TableRow>
+                    <TableHead>{t("teacher.invites.codeColumn", { defaultValue: "Code / hint" })}</TableHead>
+                    <TableHead>{t("teacher.invites.typeColumn", { defaultValue: "Type" })}</TableHead>
+                    <TableHead>{t("teacher.invites.usageColumn", { defaultValue: "Used" })}</TableHead>
+                    <TableHead>{t("teacher.invites.createdColumn", { defaultValue: "Created" })}</TableHead>
+                    <TableHead className="text-end">{t("teacher.invites.actionsColumn", { defaultValue: "Actions" })}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {visibleAccessRows.map((entry) => (
+                    <TableRow key={entry.id} className="group">
+                      <TableCell className="min-w-[220px] whitespace-normal">
+                        <div className="flex min-w-0 flex-col gap-1">
+                          <span className="break-all font-mono text-sm font-semibold leading-snug">{entry.code || (entry.codeHint ? t("teacher.invites.codeHintShort", { defaultValue: "**** {{value}}", value: entry.codeHint }) : entry.id)}</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            <Badge variant={entry.isGenerated ? "default" : "outline"} className="w-fit">{entry.status}</Badge>
+                            {entry.codeHint && entry.code && <span className="text-xs text-muted-foreground">{t("teacher.invites.codeHint", { value: entry.codeHint })}</span>}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell><Badge variant={entry.kind === "paid" ? "default" : "outline"}>{entry.kind === "paid" ? t("teacher.invites.paidUnique") : t("teacher.invites.freeShared")}</Badge></TableCell>
+                      <TableCell>{entry.redeemedCount ?? 0}{entry.maxRedemptions ? ` / ${entry.maxRedemptions}` : ""}</TableCell>
+                      <TableCell className="text-muted-foreground">{formatDate(entry.createdAt)}</TableCell>
+                      <TableCell>
+                        <div className="flex justify-end gap-2">
+                          {entry.code && <Button variant="outline" size="sm" onClick={() => copyText(entry.code)}><Copy className="h-4 w-4" />{t("teacher.invites.copyCode")}</Button>}
+                          {entry.whatsappMessage && <Button variant="outline" size="sm" onClick={() => copyText(entry.whatsappMessage, "toasts.accessMessageCopied")}><MessageCircle className="h-4 w-4" />{t("teacher.invites.copyWhatsAppMessage")}</Button>}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
-          </div>
+          ) : (
+            <div className="p-6 text-center text-sm text-muted-foreground">{t("teacher.invites.emptyCodeStatuses", { defaultValue: "No generated code statuses yet." })}</div>
+          )}
         </section>
       </div>
+
+      <section className="min-w-0 rounded-lg border bg-background p-4 shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="flex items-center gap-2 font-semibold"><Users className="h-4 w-4 text-primary" />{t("teacher.invites.studentsTitle")}</h2>
+            <p className="text-sm text-muted-foreground">{t("teacher.invites.studentsDescription", { defaultValue: "Manage accepted students and keep device issues separate from access-code sharing." })}</p>
+          </div>
+          <Badge variant="outline"><HardDrive className="h-3.5 w-3.5" />{t("teacher.invites.deviceManagement", { defaultValue: "Device management" })}</Badge>
+        </div>
+        <div className="mt-4 grid gap-2 lg:grid-cols-2">
+          {students.map((studentAccess) => (
+            <div key={studentAccess.id} className="flex items-center justify-between gap-3 rounded-md border p-3 transition-colors hover:bg-muted/40">
+              <div className="min-w-0">
+                <div className="truncate font-medium">{studentAccess.user?.name || t("common.student")}</div>
+                <div className="truncate text-xs text-muted-foreground">{studentAccess.user?.email}</div>
+                <Badge variant="outline" className="mt-2">{t(`statuses.${studentAccess.status}`, { defaultValue: studentAccess.status })}</Badge>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => handleRevokeStudent(studentAccess.user_id)} disabled={studentAccess.status !== "active"}>
+                <UserMinus className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+          {students.length === 0 && <div className="rounded-md border p-5 text-center text-sm text-muted-foreground lg:col-span-2">{t("teacher.invites.emptyStudents")}</div>}
+        </div>
+      </section>
 
       {pendingAction && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" data-testid="code-generation-terms-modal">

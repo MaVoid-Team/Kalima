@@ -30,7 +30,7 @@ function redemptionUrl(): string {
 }
 
 function arabicWhatsAppMessage(code: string, url: string): string {
-  return `رابط البوكليت الإلكتروني: ${url}\nكود الدخول: ${code}\nافتح الرابط ثم أدخل الكود مرة واحدة لتفعيل الوصول.`;
+  return `رابط المذكرة التفاعلية: ${url}\nكود الدخول: ${code}\nافتح الرابط ثم أدخل الكود مرة واحدة لتفعيل الوصول.`;
 }
 
 export class EBookletAccessCodeService {

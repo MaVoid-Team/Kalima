@@ -11,9 +11,22 @@ export const E_BOOKLET_ORDER_STATUSES = [
   "needs_branding_info",
   "customization_in_progress",
   "ready",
+  "delivered",
   "rejected",
   "cancelled",
   "unknown",
+];
+
+export const E_BOOKLET_ORDER_FILTER_STATUSES = E_BOOKLET_ORDER_STATUSES.filter(
+  (status) => status !== "unknown",
+);
+
+export const E_BOOKLET_ORDER_TEACHER_FILTER_STATUSES = [
+  "pending",
+  "ready",
+  "delivered",
+  "rejected",
+  "cancelled",
 ];
 
 export const E_BOOKLET_ORDERS_NAV_CONTRACT = Object.freeze({

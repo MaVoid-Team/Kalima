@@ -29,24 +29,15 @@ export default function ParentLayout() {
 
             {/* Main Column */}
             <div className="flex flex-1 flex-col min-w-0">
-                {/* Header */}
-                <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-4 sm:px-6 lg:px-8">
-                    <button
-                        type="button"
-                        className="text-muted-foreground border-border px-2 focus:outline-none lg:hidden -ms-2"
-                        onClick={() => setIsMobileOpen(true)}
-                        data-testid="parent-layout-mobile-sidebar-button"
-                    >
-                        <span className="sr-only">{t('layout.openSidebar', 'Open sidebar')}</span>
-                        <Menu className="h-6 w-6" aria-hidden="true" />
-                    </button>
-
-                    <div className="flex flex-1 justify-between px-4">
-                        <div className="flex flex-1">
-                            {/* Potential breadcrumb or something */}
-                        </div>
-                    </div>
-                </header>
+                <button
+                    type="button"
+                    className="fixed start-4 top-4 z-30 rounded-md border border-border bg-background p-2 text-muted-foreground shadow-sm focus:outline-none lg:hidden"
+                    onClick={() => setIsMobileOpen(true)}
+                    data-testid="parent-layout-mobile-sidebar-button"
+                >
+                    <span className="sr-only">{t('layout.openSidebar', 'Open sidebar')}</span>
+                    <Menu className="h-6 w-6" aria-hidden="true" />
+                </button>
 
                 {/* Main Content Area */}
                 <main className="flex-1 p-4 sm:p-12 lg:p-16" data-testid="parent-layout-main-content">

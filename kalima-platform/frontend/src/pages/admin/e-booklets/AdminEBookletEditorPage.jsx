@@ -35,6 +35,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -43,9 +44,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAdminEBookletEditor } from "@/hooks/admin/useAdminEBooklets";
+import { useAdminEBookletEditor, useAdminEBookletHotspotLibrary } from "@/hooks/admin/useAdminEBooklets";
 import { useAdminPaymentMethods } from "@/hooks/admin/useAdminPaymentMethods";
 import useAdminRequiredFields from "@/hooks/admin/useAdminRequiredFields";
+import HotspotLibraryPickerDialog from "@/components/admin/e-booklets/HotspotLibraryPickerDialog";
 import { useTranslation } from "react-i18next";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
@@ -494,6 +496,7 @@ export default function AdminEBookletEditorPage() {
   const audioChunksRef = useRef([]);
 
   const editor = useAdminEBookletEditor();
+  const hotspotLibrary = useAdminEBookletHotspotLibrary();
   const paymentMethodsManager = useAdminPaymentMethods();
   const requiredFieldsManager = useAdminRequiredFields();
   const [activeStep, setActiveStep] = useState(isTeacherTemplateMode ? "file" : "basic");
@@ -520,6 +523,12 @@ export default function AdminEBookletEditorPage() {
   const [documentPageData, setDocumentPageData] = useState(null);
   const [documentPageStatus, setDocumentPageStatus] = useState("idle");
   const [collapsedHotspotPages, setCollapsedHotspotPages] = useState(() => new Set());
+  const [hotspotLibrarySaveOpen, setHotspotLibrarySaveOpen] = useState(false);
+  const [hotspotLibraryInsertOpen, setHotspotLibraryInsertOpen] = useState(false);
+  const [hotspotLibraryApplyOpen, setHotspotLibraryApplyOpen] = useState(false);
+  const [hotspotLibraryReplaceOpen, setHotspotLibraryReplaceOpen] = useState(false);
+  const [pendingInsertPreset, setPendingInsertPreset] = useState(null);
+  const [presetForm, setPresetForm] = useState({ name: "", description: "", tags: "" });
 
   latestHotspotFormRef.current = hotspotForm;
 
@@ -955,6 +964,94 @@ export default function AdminEBookletEditorPage() {
     toast.success(t("toasts.hotspotConfigurationApplied"));
   };
 
+  const applyPresetToHotspotForm = (preset) => {
+    if (!preset) return;
+    const contentJson = cloneContentJsonForForm(preset.content_json, preset.type || "text");
+    const primaryPresetBlock = contentJson.blocks[0] || createDefaultBlock(preset.type || "text");
+    setHotspotForm((current) => ({
+      ...current,
+      shape: preset.shape || current.shape,
+      width_percent: parseNumber(preset.width_percent, current.width_percent),
+      height_percent: parseNumber(preset.height_percent, current.height_percent),
+      radius_percent: parseNumber(preset.radius_percent, current.radius_percent),
+      display_behavior: normalizeDisplayBehaviorForForm(preset),
+      type: primaryPresetBlock.type || preset.type || current.type,
+      title: preset.title || current.title,
+      text_content: preset.text_content || primaryPresetBlock.text_content || "",
+      asset_file_id: preset.asset_file_id ? String(preset.asset_file_id) : primaryPresetBlock.asset_file_id || "",
+      trigger_type: preset.trigger_type || current.trigger_type || "click",
+      content_json: contentJson,
+      interaction_json: normalizeInteractionForForm(preset),
+    }));
+    toast.success(t("admin.hotspotLibrary.applied"));
+  };
+
+  const getPresetTagsPayload = () => presetForm.tags
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+
+  const ensureCurrentHotspotSaved = async () => {
+    if (hotspotForm.id) return hotspotForm.id;
+    const savedHotspot = await saveHotspot({ resetAfterSave: false, showToast: false });
+    return savedHotspot?.id || latestHotspotFormRef.current?.id || null;
+  };
+
+  const openSaveHotspotPresetDialog = () => {
+    setPresetForm({
+      name: hotspotForm.title || "",
+      description: "",
+      tags: hotspotForm.type || "",
+    });
+    setHotspotLibrarySaveOpen(true);
+  };
+
+  const saveCurrentHotspotAsPreset = async () => {
+    if (!presetForm.name.trim()) {
+      toast.error(t("admin.hotspotLibrary.nameRequired"));
+      return;
+    }
+    const sourceHotspotId = await ensureCurrentHotspotSaved();
+    if (!sourceHotspotId) return;
+    await hotspotLibrary.createPreset({
+      name: presetForm.name.trim(),
+      description: presetForm.description.trim(),
+      tags: getPresetTagsPayload(),
+      source_hotspot_id: sourceHotspotId,
+      include_position: true,
+    });
+    setHotspotLibrarySaveOpen(false);
+  };
+
+  const replacePresetContentFromCurrentHotspot = async (preset) => {
+    const sourceHotspotId = await ensureCurrentHotspotSaved();
+    if (!sourceHotspotId) return;
+    const confirmed = window.confirm(t("admin.hotspotLibrary.replaceConfirm", { name: preset.name }));
+    if (!confirmed) return;
+    await hotspotLibrary.replacePresetContent(preset.id, {
+      source_hotspot_id: sourceHotspotId,
+      include_position: true,
+    });
+    setHotspotLibraryReplaceOpen(false);
+  };
+
+  const handleHotspotPresetSelected = async (preset, mode) => {
+    if (mode === "insert") {
+      setPendingInsertPreset(preset);
+      setHotspotLibraryInsertOpen(false);
+      toast.info(t("admin.hotspotLibrary.clickPageToPlaceToast"));
+      return;
+    }
+    if (mode === "apply") {
+      applyPresetToHotspotForm(preset);
+      setHotspotLibraryApplyOpen(false);
+      return;
+    }
+    if (mode === "replace") {
+      await replacePresetContentFromCurrentHotspot(preset);
+    }
+  };
+
   const saveBasicInfo = async () => {
     if (!templateForm.title.trim()) {
       toast.error(t("admin.editor.validation.titleRequired"));
@@ -1123,11 +1220,24 @@ export default function AdminEBookletEditorPage() {
     }
   };
 
-  const handlePageClick = (event) => {
+  const handlePageClick = async (event) => {
     if (!pageRef.current || !activeVersionId) return;
     const rect = pageRef.current.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
+    if (pendingInsertPreset) {
+      const response = await hotspotLibrary.insertPreset(activeVersionId, {
+        preset_id: pendingInsertPreset.id,
+        page_number: selectedPage,
+        x_percent: Number(x.toFixed(2)),
+        y_percent: Number(y.toFixed(2)),
+      });
+      setPendingInsertPreset(null);
+      setHasDraftHotspotPreview(false);
+      await loadHotspots(activeVersionId);
+      if (response?.data) selectHotspot(response.data);
+      return;
+    }
     setHasDraftHotspotPreview(true);
     setHotspotForm((current) => ({
       ...defaultHotspotForm,
@@ -1223,6 +1333,7 @@ export default function AdminEBookletEditorPage() {
         lastSavedHotspotSnapshotRef.current = getHotspotAutosaveSnapshot(savingForm);
       }
       setHotspotSaveState("saved");
+      return savedHotspot;
     } catch (error) {
       setHotspotSaveState("idle");
       throw error;
@@ -2003,7 +2114,21 @@ export default function AdminEBookletEditorPage() {
                   )}
                   {hotspotSaveStatusLabel}
                 </div>
-                <div className="mt-1 flex items-center gap-1">
+                {pendingInsertPreset && (
+                  <div className="mt-1 flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                    <span>{t("admin.hotspotLibrary.clickPageToPlace", { name: pendingInsertPreset.name })}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs text-primary hover:text-primary"
+                      onClick={() => setPendingInsertPreset(null)}
+                    >
+                      {t("common.close")}
+                    </Button>
+                  </div>
+                )}
+                <div className="mt-1 flex flex-wrap items-center gap-1">
                   <Button
                     type="button"
                     variant="outline"
@@ -2027,6 +2152,46 @@ export default function AdminEBookletEditorPage() {
                     aria-label={t("admin.editor.hotspots.applyConfiguration")}
                   >
                     <ClipboardPaste className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-2 text-xs"
+                    onClick={openSaveHotspotPresetDialog}
+                    disabled={editor.loading || hotspotLibrary.actionLoading || (!hotspotForm.id && !hasDraftHotspotPreview)}
+                  >
+                    {t("admin.hotspotLibrary.saveToLibrary")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={pendingInsertPreset ? "default" : "outline"}
+                    size="sm"
+                    className="h-8 px-2 text-xs"
+                    onClick={() => setHotspotLibraryInsertOpen(true)}
+                    disabled={editor.loading || hotspotLibrary.actionLoading || !activeVersionId}
+                  >
+                    {t("admin.hotspotLibrary.insertFromLibrary")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-2 text-xs"
+                    onClick={() => setHotspotLibraryApplyOpen(true)}
+                    disabled={editor.loading || hotspotLibrary.actionLoading}
+                  >
+                    {t("admin.hotspotLibrary.applyPreset")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-2 text-xs"
+                    onClick={() => setHotspotLibraryReplaceOpen(true)}
+                    disabled={editor.loading || hotspotLibrary.actionLoading || (!hotspotForm.id && !hasDraftHotspotPreview)}
+                  >
+                    {t("admin.hotspotLibrary.replacePreset")}
                   </Button>
                   <Button
                     type="button"
@@ -2631,6 +2796,80 @@ export default function AdminEBookletEditorPage() {
           </div>
         </section>
       )}
+
+      <Dialog open={hotspotLibrarySaveOpen} onOpenChange={setHotspotLibrarySaveOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("admin.hotspotLibrary.saveDialogTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("admin.hotspotLibrary.saveDialogDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="hotspot-preset-name">{t("admin.hotspotLibrary.name")}</Label>
+              <Input
+                id="hotspot-preset-name"
+                value={presetForm.name}
+                onChange={(event) => setPresetForm((current) => ({ ...current, name: event.target.value }))}
+                placeholder={t("admin.hotspotLibrary.namePlaceholder")}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="hotspot-preset-description">{t("admin.hotspotLibrary.descriptionLabel")}</Label>
+              <Textarea
+                id="hotspot-preset-description"
+                value={presetForm.description}
+                onChange={(event) => setPresetForm((current) => ({ ...current, description: event.target.value }))}
+                placeholder={t("admin.hotspotLibrary.descriptionPlaceholder")}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="hotspot-preset-tags">{t("admin.hotspotLibrary.tags")}</Label>
+              <Input
+                id="hotspot-preset-tags"
+                value={presetForm.tags}
+                onChange={(event) => setPresetForm((current) => ({ ...current, tags: event.target.value }))}
+                placeholder={t("admin.hotspotLibrary.tagsPlaceholder")}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setHotspotLibrarySaveOpen(false)}>
+              {t("common.close")}
+            </Button>
+            <Button type="button" onClick={saveCurrentHotspotAsPreset} disabled={hotspotLibrary.actionLoading}>
+              {hotspotLibrary.actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {t("admin.hotspotLibrary.savePreset")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <HotspotLibraryPickerDialog
+        open={hotspotLibraryInsertOpen}
+        onOpenChange={setHotspotLibraryInsertOpen}
+        onSelectPreset={handleHotspotPresetSelected}
+        mode="insert"
+        title={t("admin.hotspotLibrary.insertDialogTitle")}
+        description={t("admin.hotspotLibrary.insertDialogDescription")}
+      />
+      <HotspotLibraryPickerDialog
+        open={hotspotLibraryApplyOpen}
+        onOpenChange={setHotspotLibraryApplyOpen}
+        onSelectPreset={handleHotspotPresetSelected}
+        mode="apply"
+        title={t("admin.hotspotLibrary.applyDialogTitle")}
+        description={t("admin.hotspotLibrary.applyDialogDescription")}
+      />
+      <HotspotLibraryPickerDialog
+        open={hotspotLibraryReplaceOpen}
+        onOpenChange={setHotspotLibraryReplaceOpen}
+        onSelectPreset={handleHotspotPresetSelected}
+        mode="replace"
+        title={t("admin.hotspotLibrary.replaceDialogTitle")}
+        description={t("admin.hotspotLibrary.replaceDialogDescription")}
+      />
 
       <div className="flex flex-col gap-3 border-t bg-background py-4 sm:flex-row sm:items-center sm:justify-start">
         <Button

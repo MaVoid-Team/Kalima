@@ -95,6 +95,8 @@ export const ModelName = {
   e_booklet_templates: 'e_booklet_templates',
   e_booklet_template_versions: 'e_booklet_template_versions',
   e_booklet_hotspots: 'e_booklet_hotspots',
+  e_booklet_hotspot_presets: 'e_booklet_hotspot_presets',
+  e_booklet_hotspot_preset_usages: 'e_booklet_hotspot_preset_usages',
   e_booklet_purchases: 'e_booklet_purchases',
   e_booklet_template_payment_methods: 'e_booklet_template_payment_methods',
   e_booklet_template_required_fields: 'e_booklet_template_required_fields',
@@ -761,6 +763,52 @@ export const E_booklet_hotspotsScalarFieldEnum = {
 export type E_booklet_hotspotsScalarFieldEnum = (typeof E_booklet_hotspotsScalarFieldEnum)[keyof typeof E_booklet_hotspotsScalarFieldEnum]
 
 
+export const E_booklet_hotspot_presetsScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  tags_json: 'tags_json',
+  type: 'type',
+  shape: 'shape',
+  width_percent: 'width_percent',
+  height_percent: 'height_percent',
+  radius_percent: 'radius_percent',
+  title: 'title',
+  text_content: 'text_content',
+  asset_file_id: 'asset_file_id',
+  trigger_type: 'trigger_type',
+  display_behavior: 'display_behavior',
+  content_json: 'content_json',
+  interaction_json: 'interaction_json',
+  default_page_number: 'default_page_number',
+  default_x_percent: 'default_x_percent',
+  default_y_percent: 'default_y_percent',
+  source_template_id: 'source_template_id',
+  source_template_version_id: 'source_template_version_id',
+  source_hotspot_id: 'source_hotspot_id',
+  is_active: 'is_active',
+  created_by: 'created_by',
+  updated_by: 'updated_by',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_hotspot_presetsScalarFieldEnum = (typeof E_booklet_hotspot_presetsScalarFieldEnum)[keyof typeof E_booklet_hotspot_presetsScalarFieldEnum]
+
+
+export const E_booklet_hotspot_preset_usagesScalarFieldEnum = {
+  id: 'id',
+  preset_id: 'preset_id',
+  target_template_id: 'target_template_id',
+  target_template_version_id: 'target_template_version_id',
+  target_hotspot_id: 'target_hotspot_id',
+  used_by: 'used_by',
+  used_at: 'used_at'
+} as const
+
+export type E_booklet_hotspot_preset_usagesScalarFieldEnum = (typeof E_booklet_hotspot_preset_usagesScalarFieldEnum)[keyof typeof E_booklet_hotspot_preset_usagesScalarFieldEnum]
+
+
 export const E_booklet_purchasesScalarFieldEnum = {
   id: 'id',
   teacher_id: 'teacher_id',
@@ -1229,6 +1277,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

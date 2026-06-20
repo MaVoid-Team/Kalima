@@ -607,7 +607,7 @@
 605|    mockDomainServices.terms.listTerms.mockResolvedValue([{ id: 1, name: "Term", status: "active" }]);
 606|    mockDomainServices.terms.updateTerms.mockResolvedValue({ id: 1, name: "Updated term", status: "draft" });
 607|    mockDomainServices.terms.activateTerms.mockResolvedValue({ id: 1, name: "Updated term", status: "active" });
-608|    mockDomainServices.accessCodes.generateCode.mockResolvedValue({ code: "KLM-ABC123XYZ789", whatsappMessage: "كود الدخول للبوكليت الإلكتروني: KLM-ABC123XYZ789", record: { id: 7, kind: "paid", code_hash: "hash" } });
+608|    mockDomainServices.accessCodes.generateCode.mockResolvedValue({ code: "KLM-ABC123XYZ789", whatsappMessage: "كود الدخول للمذكرة التفاعلية: KLM-ABC123XYZ789", record: { id: 7, kind: "paid", code_hash: "hash" } });
 609|    mockDomainServices.redemptions.redeemCode.mockResolvedValue({ id: 8, access_id: 88, counted_for_progress: true });
 610|    mockDomainServices.milestones.listMilestones.mockResolvedValue([{ id: 3, target_paid_redemptions: 10 }]);
 611|    mockDomainServices.milestones.createMilestone.mockResolvedValue({ id: 4, target_paid_redemptions: 20 });

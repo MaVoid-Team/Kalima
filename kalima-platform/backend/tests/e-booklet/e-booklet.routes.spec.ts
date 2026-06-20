@@ -675,10 +675,21 @@ describe("e-booklet routes", () => {
       .post("/api/v2/teacher/e-booklets/10/access-codes")
       .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
       .send({ kind: "free", termId: 1, maxRedemptions: 20 })
-      .expect(201);
+      .expect(400)
+      .expect((res) => expect(res.body.message).toContain("Teachers cannot generate free e-booklet access codes"));
 
-    expect(mockDomainServices.accessCodes.generateCode).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, kind: "free" }));
+    expect(mockDomainServices.accessCodes.generateCode).not.toHaveBeenCalled();
     mockDomainServices.accessCodes.generateCode.mockClear();
+
+    await request(app)
+      .post("/api/v2/teacher/e-booklets/10/access-codes/bulk")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+      .send({ kind: "free", termId: 1, quantity: 3 })
+      .expect(400)
+      .expect((res) => expect(res.body.message).toContain("Teachers cannot generate free e-booklet access codes"));
+
+    expect(mockDomainServices.accessCodes.generateCodes).not.toHaveBeenCalled();
+    mockDomainServices.accessCodes.generateCodes.mockClear();
 
     await request(app)
       .post("/api/v2/teacher/e-booklets/10/access-codes/bulk")
@@ -735,7 +746,7 @@ describe("e-booklet routes", () => {
     mockDomainServices.terms.listTerms.mockResolvedValue([{ id: 1, name: "Term", status: "active" }]);
     mockDomainServices.terms.updateTerms.mockResolvedValue({ id: 1, name: "Updated term", status: "draft" });
     mockDomainServices.terms.activateTerms.mockResolvedValue({ id: 1, name: "Updated term", status: "active" });
-    mockDomainServices.accessCodes.generateCode.mockResolvedValue({ code: "KLM-ABC123XYZ789", whatsappMessage: "كود الدخول للبوكليت الإلكتروني: KLM-ABC123XYZ789", record: { id: 7, kind: "paid", code_hash: "hash" } });
+    mockDomainServices.accessCodes.generateCode.mockResolvedValue({ code: "KLM-ABC123XYZ789", whatsappMessage: "كود الدخول للمذكرة التفاعلية: KLM-ABC123XYZ789", record: { id: 7, kind: "paid", code_hash: "hash" } });
     mockDomainServices.redemptions.redeemCode.mockResolvedValue({ id: 8, access_id: 88, counted_for_progress: true });
     mockDomainServices.milestones.listMilestones.mockResolvedValue([{ id: 3, target_paid_redemptions: 10 }]);
     mockDomainServices.milestones.createMilestone.mockResolvedValue({ id: 4, target_paid_redemptions: 20 });

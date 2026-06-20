@@ -9,7 +9,7 @@
     "collapseSidebar": "طي القائمة الجانبية",
     "closeSidebar": "إغلاق القائمة الجانبية",
     "profile": "ملفي الشخصي",
-    "eBooklets": "بوكليتاتي",
+    "eBooklets": "مذكراتي",
     "orders": "طلباتي",
     "settings": "الإعدادات",
     "themeToggle": "تبديل المظهر",
@@ -17,8 +17,8 @@
     "darkMode": "الوضع الداكن (الليلي)",
     "backToStore": "العودة للمتجر",
     "logout": "تسجيل الخروج",
-    "eBookletAnalytics": "تحليلات الكتيبات الإلكترونية",
-    "eBookletOrders": "طلبات البوكليت"
+    "eBookletAnalytics": "تحليلات المذكرات التفاعلية",
+    "eBookletOrders": "طلبات المذكرة"
   },
   "settings": {
     "title": "إعدادات الحساب",

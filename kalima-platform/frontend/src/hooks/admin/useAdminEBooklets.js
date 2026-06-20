@@ -396,6 +396,81 @@ export function useAdminEBookletEditor() {
   };
 }
 
+export function useAdminEBookletHotspotLibrary() {
+  const { mutate: fetchApi, loading } = useApiMutation();
+  const [presets, setPresets] = useState([]);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20 });
+  const [filters, setFilters] = useState({ search: "", type: "all", tag: "", includeInactive: false });
+  const [actionLoading, setActionLoading] = useState(false);
+
+  const buildQuery = useCallback((overrides = {}) => {
+    const query = new URLSearchParams();
+    const nextFilters = { ...filters, ...overrides };
+    const page = overrides.page ?? pagination.page;
+    const limit = overrides.limit ?? pagination.limit;
+    query.set("page", String(page));
+    query.set("limit", String(limit));
+    if (nextFilters.search) query.set("search", nextFilters.search);
+    if (nextFilters.type && nextFilters.type !== "all") query.set("type", nextFilters.type);
+    if (nextFilters.tag) query.set("tag", nextFilters.tag);
+    if (nextFilters.includeInactive) query.set("include_inactive", "true");
+    return query.toString();
+  }, [filters, pagination.limit, pagination.page]);
+
+  const fetchPresets = useCallback(async (overrides = {}) => {
+    const response = await fetchApi({ endpoint: `/admin/e-booklet-hotspot-presets?${buildQuery(overrides)}`, method: "get" }, false);
+    const normalized = normalizeListResponse(response);
+    setPresets(normalized.data);
+    setPagination((current) => ({ ...current, total: normalized.total, page: normalized.page, limit: normalized.limit }));
+    return response;
+  }, [buildQuery, fetchApi]);
+
+  const fetchPreset = useCallback((presetId) => fetchApi({ endpoint: `/admin/e-booklet-hotspot-presets/${presetId}`, method: "get" }, false), [fetchApi]);
+
+  const runAction = useCallback(async (action) => {
+    setActionLoading(true);
+    try {
+      return await action();
+    } finally {
+      setActionLoading(false);
+    }
+  }, []);
+
+  const createPreset = useCallback((data) => runAction(() => fetchApi({ endpoint: "/admin/e-booklet-hotspot-presets", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:admin.hotspotLibrary.saved") })), [fetchApi, runAction]);
+  const updatePresetMetadata = useCallback((presetId, data) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-hotspot-presets/${presetId}/metadata`, method: "patch", data, defaultSuccessMessage: i18n.t("eBooklets:admin.hotspotLibrary.detailsSaved") })), [fetchApi, runAction]);
+  const replacePresetContent = useCallback((presetId, data) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-hotspot-presets/${presetId}/content`, method: "put", data, defaultSuccessMessage: i18n.t("eBooklets:admin.hotspotLibrary.replaced") })), [fetchApi, runAction]);
+  const deletePreset = useCallback((presetId) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-hotspot-presets/${presetId}`, method: "delete" })), [fetchApi, runAction]);
+  const restorePreset = useCallback((presetId) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-hotspot-presets/${presetId}/restore`, method: "post", defaultSuccessMessage: i18n.t("eBooklets:admin.hotspotLibrary.restored") })), [fetchApi, runAction]);
+  const insertPreset = useCallback((versionId, data) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-template-versions/${versionId}/hotspots/from-preset`, method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:admin.hotspotLibrary.inserted") })), [fetchApi, runAction]);
+
+  const setSearch = useCallback((search) => { setFilters((current) => ({ ...current, search })); setPagination((current) => ({ ...current, page: 1 })); }, []);
+  const setType = useCallback((type) => { setFilters((current) => ({ ...current, type })); setPagination((current) => ({ ...current, page: 1 })); }, []);
+  const setTag = useCallback((tag) => { setFilters((current) => ({ ...current, tag })); setPagination((current) => ({ ...current, page: 1 })); }, []);
+  const setIncludeInactive = useCallback((includeInactive) => { setFilters((current) => ({ ...current, includeInactive })); setPagination((current) => ({ ...current, page: 1 })); }, []);
+  const setPage = useCallback((page) => setPagination((current) => ({ ...current, page })), []);
+
+  return {
+    presets,
+    pagination,
+    filters,
+    loading,
+    actionLoading,
+    fetchPresets,
+    fetchPreset,
+    createPreset,
+    updatePresetMetadata,
+    replacePresetContent,
+    deletePreset,
+    restorePreset,
+    insertPreset,
+    setSearch,
+    setType,
+    setTag,
+    setIncludeInactive,
+    setPage,
+  };
+}
+
 export function useAdminEBookletPurchases() {
   const { mutate: fetchApi, loading } = useApiMutation();
   const [purchases, setPurchases] = useState([]);

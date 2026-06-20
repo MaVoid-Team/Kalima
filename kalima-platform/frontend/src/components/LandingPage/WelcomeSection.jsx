@@ -108,7 +108,7 @@ export default function WelcomeSection() {
               className="h-[460px] w-full rounded-3xl object-cover shadow-2xl"
             />
             <motion.div
-              className="absolute -bottom-5 start-4 w-[92%] rounded-2xl border border-border/60 bg-background/95 p-4 shadow-lg"
+              className="absolute -bottom-[46px] start-0 w-full rounded-2xl border border-border/60 bg-background/95 p-4 shadow-lg"
               variants={heroChild}
             >
               <div className="grid gap-3 sm:grid-cols-3">
