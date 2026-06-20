@@ -309,6 +309,8 @@ export type e_booklet_templatesWhereInput = {
   terms?: Prisma.E_booklet_termsListRelationFilter
   payment_methods?: Prisma.E_booklet_template_payment_methodsListRelationFilter
   required_fields?: Prisma.E_booklet_template_required_fieldsListRelationFilter
+  hotspot_presets_source?: Prisma.E_booklet_hotspot_presetsListRelationFilter
+  hotspot_preset_usages?: Prisma.E_booklet_hotspot_preset_usagesListRelationFilter
 }
 
 export type e_booklet_templatesOrderByWithRelationInput = {
@@ -334,6 +336,8 @@ export type e_booklet_templatesOrderByWithRelationInput = {
   terms?: Prisma.e_booklet_termsOrderByRelationAggregateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsOrderByRelationAggregateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsOrderByRelationAggregateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsOrderByRelationAggregateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesOrderByRelationAggregateInput
 }
 
 export type e_booklet_templatesWhereUniqueInput = Prisma.AtLeast<{
@@ -362,6 +366,8 @@ export type e_booklet_templatesWhereUniqueInput = Prisma.AtLeast<{
   terms?: Prisma.E_booklet_termsListRelationFilter
   payment_methods?: Prisma.E_booklet_template_payment_methodsListRelationFilter
   required_fields?: Prisma.E_booklet_template_required_fieldsListRelationFilter
+  hotspot_presets_source?: Prisma.E_booklet_hotspot_presetsListRelationFilter
+  hotspot_preset_usages?: Prisma.E_booklet_hotspot_preset_usagesListRelationFilter
 }, "id" | "slug">
 
 export type e_booklet_templatesOrderByWithAggregationInput = {
@@ -423,6 +429,8 @@ export type e_booklet_templatesCreateInput = {
   terms?: Prisma.e_booklet_termsCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesUncheckedCreateInput = {
@@ -445,6 +453,8 @@ export type e_booklet_templatesUncheckedCreateInput = {
   terms?: Prisma.e_booklet_termsUncheckedCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesUpdateInput = {
@@ -466,6 +476,8 @@ export type e_booklet_templatesUpdateInput = {
   terms?: Prisma.e_booklet_termsUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateInput = {
@@ -488,6 +500,8 @@ export type e_booklet_templatesUncheckedUpdateInput = {
   terms?: Prisma.e_booklet_termsUncheckedUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesCreateManyInput = {
@@ -722,6 +736,38 @@ export type e_booklet_templatesUpdateOneRequiredWithoutVersionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_templatesUpdateToOneWithWhereWithoutVersionsInput, Prisma.e_booklet_templatesUpdateWithoutVersionsInput>, Prisma.e_booklet_templatesUncheckedUpdateWithoutVersionsInput>
 }
 
+export type e_booklet_templatesCreateNestedOneWithoutHotspot_presets_sourceInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_templatesCreateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_templatesUncheckedCreateWithoutHotspot_presets_sourceInput>
+  connectOrCreate?: Prisma.e_booklet_templatesCreateOrConnectWithoutHotspot_presets_sourceInput
+  connect?: Prisma.e_booklet_templatesWhereUniqueInput
+}
+
+export type e_booklet_templatesUpdateOneWithoutHotspot_presets_sourceNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_templatesCreateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_templatesUncheckedCreateWithoutHotspot_presets_sourceInput>
+  connectOrCreate?: Prisma.e_booklet_templatesCreateOrConnectWithoutHotspot_presets_sourceInput
+  upsert?: Prisma.e_booklet_templatesUpsertWithoutHotspot_presets_sourceInput
+  disconnect?: Prisma.e_booklet_templatesWhereInput | boolean
+  delete?: Prisma.e_booklet_templatesWhereInput | boolean
+  connect?: Prisma.e_booklet_templatesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_templatesUpdateToOneWithWhereWithoutHotspot_presets_sourceInput, Prisma.e_booklet_templatesUpdateWithoutHotspot_presets_sourceInput>, Prisma.e_booklet_templatesUncheckedUpdateWithoutHotspot_presets_sourceInput>
+}
+
+export type e_booklet_templatesCreateNestedOneWithoutHotspot_preset_usagesInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_templatesCreateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_templatesUncheckedCreateWithoutHotspot_preset_usagesInput>
+  connectOrCreate?: Prisma.e_booklet_templatesCreateOrConnectWithoutHotspot_preset_usagesInput
+  connect?: Prisma.e_booklet_templatesWhereUniqueInput
+}
+
+export type e_booklet_templatesUpdateOneWithoutHotspot_preset_usagesNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_templatesCreateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_templatesUncheckedCreateWithoutHotspot_preset_usagesInput>
+  connectOrCreate?: Prisma.e_booklet_templatesCreateOrConnectWithoutHotspot_preset_usagesInput
+  upsert?: Prisma.e_booklet_templatesUpsertWithoutHotspot_preset_usagesInput
+  disconnect?: Prisma.e_booklet_templatesWhereInput | boolean
+  delete?: Prisma.e_booklet_templatesWhereInput | boolean
+  connect?: Prisma.e_booklet_templatesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_templatesUpdateToOneWithWhereWithoutHotspot_preset_usagesInput, Prisma.e_booklet_templatesUpdateWithoutHotspot_preset_usagesInput>, Prisma.e_booklet_templatesUncheckedUpdateWithoutHotspot_preset_usagesInput>
+}
+
 export type e_booklet_templatesCreateNestedOneWithoutPurchasesInput = {
   create?: Prisma.XOR<Prisma.e_booklet_templatesCreateWithoutPurchasesInput, Prisma.e_booklet_templatesUncheckedCreateWithoutPurchasesInput>
   connectOrCreate?: Prisma.e_booklet_templatesCreateOrConnectWithoutPurchasesInput
@@ -854,6 +900,8 @@ export type e_booklet_templatesCreateWithoutCreatorInput = {
   terms?: Prisma.e_booklet_termsCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesUncheckedCreateWithoutCreatorInput = {
@@ -875,6 +923,8 @@ export type e_booklet_templatesUncheckedCreateWithoutCreatorInput = {
   terms?: Prisma.e_booklet_termsUncheckedCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesCreateOrConnectWithoutCreatorInput = {
@@ -940,6 +990,8 @@ export type e_booklet_templatesCreateWithoutCategoryInput = {
   terms?: Prisma.e_booklet_termsCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesUncheckedCreateWithoutCategoryInput = {
@@ -961,6 +1013,8 @@ export type e_booklet_templatesUncheckedCreateWithoutCategoryInput = {
   terms?: Prisma.e_booklet_termsUncheckedCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesCreateOrConnectWithoutCategoryInput = {
@@ -1007,6 +1061,8 @@ export type e_booklet_templatesCreateWithoutVersionsInput = {
   terms?: Prisma.e_booklet_termsCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesUncheckedCreateWithoutVersionsInput = {
@@ -1028,6 +1084,8 @@ export type e_booklet_templatesUncheckedCreateWithoutVersionsInput = {
   terms?: Prisma.e_booklet_termsUncheckedCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesCreateOrConnectWithoutVersionsInput = {
@@ -1064,6 +1122,8 @@ export type e_booklet_templatesUpdateWithoutVersionsInput = {
   terms?: Prisma.e_booklet_termsUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateWithoutVersionsInput = {
@@ -1085,6 +1145,220 @@ export type e_booklet_templatesUncheckedUpdateWithoutVersionsInput = {
   terms?: Prisma.e_booklet_termsUncheckedUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_templateNestedInput
+}
+
+export type e_booklet_templatesCreateWithoutHotspot_presets_sourceInput = {
+  title: string
+  slug: string
+  description?: string | null
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  status?: $Enums.e_booklet_template_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  cover_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutTemplate_coversInput
+  category?: Prisma.categoriesCreateNestedOneWithoutE_booklet_templatesInput
+  creator: Prisma.usersCreateNestedOneWithoutE_booklet_templates_createdInput
+  versions?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutTemplateInput
+  purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTemplateInput
+  instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplateInput
+  terms?: Prisma.e_booklet_termsCreateNestedManyWithoutTemplateInput
+  payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutTemplateInput
+  required_fields?: Prisma.e_booklet_template_required_fieldsCreateNestedManyWithoutTemplateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_templateInput
+}
+
+export type e_booklet_templatesUncheckedCreateWithoutHotspot_presets_sourceInput = {
+  id?: number
+  title: string
+  slug: string
+  description?: string | null
+  cover_file_id?: number | null
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  status?: $Enums.e_booklet_template_status_enum
+  category_id?: number | null
+  created_by: number
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  versions?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutTemplateInput
+  purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTemplateInput
+  instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplateInput
+  terms?: Prisma.e_booklet_termsUncheckedCreateNestedManyWithoutTemplateInput
+  payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutTemplateInput
+  required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_templateInput
+}
+
+export type e_booklet_templatesCreateOrConnectWithoutHotspot_presets_sourceInput = {
+  where: Prisma.e_booklet_templatesWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_templatesCreateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_templatesUncheckedCreateWithoutHotspot_presets_sourceInput>
+}
+
+export type e_booklet_templatesUpsertWithoutHotspot_presets_sourceInput = {
+  update: Prisma.XOR<Prisma.e_booklet_templatesUpdateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_templatesUncheckedUpdateWithoutHotspot_presets_sourceInput>
+  create: Prisma.XOR<Prisma.e_booklet_templatesCreateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_templatesUncheckedCreateWithoutHotspot_presets_sourceInput>
+  where?: Prisma.e_booklet_templatesWhereInput
+}
+
+export type e_booklet_templatesUpdateToOneWithWhereWithoutHotspot_presets_sourceInput = {
+  where?: Prisma.e_booklet_templatesWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_templatesUpdateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_templatesUncheckedUpdateWithoutHotspot_presets_sourceInput>
+}
+
+export type e_booklet_templatesUpdateWithoutHotspot_presets_sourceInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cover_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutTemplate_coversNestedInput
+  category?: Prisma.categoriesUpdateOneWithoutE_booklet_templatesNestedInput
+  creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_templates_createdNestedInput
+  versions?: Prisma.e_booklet_template_versionsUpdateManyWithoutTemplateNestedInput
+  purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTemplateNestedInput
+  instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplateNestedInput
+  terms?: Prisma.e_booklet_termsUpdateManyWithoutTemplateNestedInput
+  payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutTemplateNestedInput
+  required_fields?: Prisma.e_booklet_template_required_fieldsUpdateManyWithoutTemplateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_templateNestedInput
+}
+
+export type e_booklet_templatesUncheckedUpdateWithoutHotspot_presets_sourceInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cover_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
+  category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_by?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  versions?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutTemplateNestedInput
+  purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplateNestedInput
+  instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplateNestedInput
+  terms?: Prisma.e_booklet_termsUncheckedUpdateManyWithoutTemplateNestedInput
+  payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutTemplateNestedInput
+  required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_templateNestedInput
+}
+
+export type e_booklet_templatesCreateWithoutHotspot_preset_usagesInput = {
+  title: string
+  slug: string
+  description?: string | null
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  status?: $Enums.e_booklet_template_status_enum
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  cover_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutTemplate_coversInput
+  category?: Prisma.categoriesCreateNestedOneWithoutE_booklet_templatesInput
+  creator: Prisma.usersCreateNestedOneWithoutE_booklet_templates_createdInput
+  versions?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutTemplateInput
+  purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTemplateInput
+  instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplateInput
+  terms?: Prisma.e_booklet_termsCreateNestedManyWithoutTemplateInput
+  payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutTemplateInput
+  required_fields?: Prisma.e_booklet_template_required_fieldsCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_templateInput
+}
+
+export type e_booklet_templatesUncheckedCreateWithoutHotspot_preset_usagesInput = {
+  id?: number
+  title: string
+  slug: string
+  description?: string | null
+  cover_file_id?: number | null
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  status?: $Enums.e_booklet_template_status_enum
+  category_id?: number | null
+  created_by: number
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  versions?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutTemplateInput
+  purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTemplateInput
+  instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplateInput
+  terms?: Prisma.e_booklet_termsUncheckedCreateNestedManyWithoutTemplateInput
+  payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutTemplateInput
+  required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_templateInput
+}
+
+export type e_booklet_templatesCreateOrConnectWithoutHotspot_preset_usagesInput = {
+  where: Prisma.e_booklet_templatesWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_templatesCreateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_templatesUncheckedCreateWithoutHotspot_preset_usagesInput>
+}
+
+export type e_booklet_templatesUpsertWithoutHotspot_preset_usagesInput = {
+  update: Prisma.XOR<Prisma.e_booklet_templatesUpdateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_templatesUncheckedUpdateWithoutHotspot_preset_usagesInput>
+  create: Prisma.XOR<Prisma.e_booklet_templatesCreateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_templatesUncheckedCreateWithoutHotspot_preset_usagesInput>
+  where?: Prisma.e_booklet_templatesWhereInput
+}
+
+export type e_booklet_templatesUpdateToOneWithWhereWithoutHotspot_preset_usagesInput = {
+  where?: Prisma.e_booklet_templatesWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_templatesUpdateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_templatesUncheckedUpdateWithoutHotspot_preset_usagesInput>
+}
+
+export type e_booklet_templatesUpdateWithoutHotspot_preset_usagesInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cover_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutTemplate_coversNestedInput
+  category?: Prisma.categoriesUpdateOneWithoutE_booklet_templatesNestedInput
+  creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_templates_createdNestedInput
+  versions?: Prisma.e_booklet_template_versionsUpdateManyWithoutTemplateNestedInput
+  purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTemplateNestedInput
+  instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplateNestedInput
+  terms?: Prisma.e_booklet_termsUpdateManyWithoutTemplateNestedInput
+  payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutTemplateNestedInput
+  required_fields?: Prisma.e_booklet_template_required_fieldsUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_templateNestedInput
+}
+
+export type e_booklet_templatesUncheckedUpdateWithoutHotspot_preset_usagesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cover_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  marketing_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.Enume_booklet_template_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_status_enum
+  category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_by?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  versions?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutTemplateNestedInput
+  purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplateNestedInput
+  instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplateNestedInput
+  terms?: Prisma.e_booklet_termsUncheckedUpdateManyWithoutTemplateNestedInput
+  payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutTemplateNestedInput
+  required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_templateNestedInput
 }
 
 export type e_booklet_templatesCreateWithoutPurchasesInput = {
@@ -1105,6 +1379,8 @@ export type e_booklet_templatesCreateWithoutPurchasesInput = {
   terms?: Prisma.e_booklet_termsCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesUncheckedCreateWithoutPurchasesInput = {
@@ -1126,6 +1402,8 @@ export type e_booklet_templatesUncheckedCreateWithoutPurchasesInput = {
   terms?: Prisma.e_booklet_termsUncheckedCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesCreateOrConnectWithoutPurchasesInput = {
@@ -1162,6 +1440,8 @@ export type e_booklet_templatesUpdateWithoutPurchasesInput = {
   terms?: Prisma.e_booklet_termsUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateWithoutPurchasesInput = {
@@ -1183,6 +1463,8 @@ export type e_booklet_templatesUncheckedUpdateWithoutPurchasesInput = {
   terms?: Prisma.e_booklet_termsUncheckedUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesCreateWithoutPayment_methodsInput = {
@@ -1203,6 +1485,8 @@ export type e_booklet_templatesCreateWithoutPayment_methodsInput = {
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplateInput
   terms?: Prisma.e_booklet_termsCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesUncheckedCreateWithoutPayment_methodsInput = {
@@ -1224,6 +1508,8 @@ export type e_booklet_templatesUncheckedCreateWithoutPayment_methodsInput = {
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplateInput
   terms?: Prisma.e_booklet_termsUncheckedCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesCreateOrConnectWithoutPayment_methodsInput = {
@@ -1260,6 +1546,8 @@ export type e_booklet_templatesUpdateWithoutPayment_methodsInput = {
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplateNestedInput
   terms?: Prisma.e_booklet_termsUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateWithoutPayment_methodsInput = {
@@ -1281,6 +1569,8 @@ export type e_booklet_templatesUncheckedUpdateWithoutPayment_methodsInput = {
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplateNestedInput
   terms?: Prisma.e_booklet_termsUncheckedUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesCreateWithoutRequired_fieldsInput = {
@@ -1301,6 +1591,8 @@ export type e_booklet_templatesCreateWithoutRequired_fieldsInput = {
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplateInput
   terms?: Prisma.e_booklet_termsCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesUncheckedCreateWithoutRequired_fieldsInput = {
@@ -1322,6 +1614,8 @@ export type e_booklet_templatesUncheckedCreateWithoutRequired_fieldsInput = {
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplateInput
   terms?: Prisma.e_booklet_termsUncheckedCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesCreateOrConnectWithoutRequired_fieldsInput = {
@@ -1358,6 +1652,8 @@ export type e_booklet_templatesUpdateWithoutRequired_fieldsInput = {
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplateNestedInput
   terms?: Prisma.e_booklet_termsUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateWithoutRequired_fieldsInput = {
@@ -1379,6 +1675,8 @@ export type e_booklet_templatesUncheckedUpdateWithoutRequired_fieldsInput = {
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplateNestedInput
   terms?: Prisma.e_booklet_termsUncheckedUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesCreateWithoutTermsInput = {
@@ -1399,6 +1697,8 @@ export type e_booklet_templatesCreateWithoutTermsInput = {
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesUncheckedCreateWithoutTermsInput = {
@@ -1420,6 +1720,8 @@ export type e_booklet_templatesUncheckedCreateWithoutTermsInput = {
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesCreateOrConnectWithoutTermsInput = {
@@ -1456,6 +1758,8 @@ export type e_booklet_templatesUpdateWithoutTermsInput = {
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateWithoutTermsInput = {
@@ -1477,6 +1781,8 @@ export type e_booklet_templatesUncheckedUpdateWithoutTermsInput = {
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesCreateWithoutInstancesInput = {
@@ -1497,6 +1803,8 @@ export type e_booklet_templatesCreateWithoutInstancesInput = {
   terms?: Prisma.e_booklet_termsCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesUncheckedCreateWithoutInstancesInput = {
@@ -1518,6 +1826,8 @@ export type e_booklet_templatesUncheckedCreateWithoutInstancesInput = {
   terms?: Prisma.e_booklet_termsUncheckedCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesCreateOrConnectWithoutInstancesInput = {
@@ -1554,6 +1864,8 @@ export type e_booklet_templatesUpdateWithoutInstancesInput = {
   terms?: Prisma.e_booklet_termsUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateWithoutInstancesInput = {
@@ -1575,6 +1887,8 @@ export type e_booklet_templatesUncheckedUpdateWithoutInstancesInput = {
   terms?: Prisma.e_booklet_termsUncheckedUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesCreateWithoutCover_fileInput = {
@@ -1595,6 +1909,8 @@ export type e_booklet_templatesCreateWithoutCover_fileInput = {
   terms?: Prisma.e_booklet_termsCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesUncheckedCreateWithoutCover_fileInput = {
@@ -1616,6 +1932,8 @@ export type e_booklet_templatesUncheckedCreateWithoutCover_fileInput = {
   terms?: Prisma.e_booklet_termsUncheckedCreateNestedManyWithoutTemplateInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedCreateNestedManyWithoutTemplateInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedCreateNestedManyWithoutTemplateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_templateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_templateInput
 }
 
 export type e_booklet_templatesCreateOrConnectWithoutCover_fileInput = {
@@ -1677,6 +1995,8 @@ export type e_booklet_templatesUpdateWithoutCreatorInput = {
   terms?: Prisma.e_booklet_termsUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateWithoutCreatorInput = {
@@ -1698,6 +2018,8 @@ export type e_booklet_templatesUncheckedUpdateWithoutCreatorInput = {
   terms?: Prisma.e_booklet_termsUncheckedUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateManyWithoutCreatorInput = {
@@ -1748,6 +2070,8 @@ export type e_booklet_templatesUpdateWithoutCategoryInput = {
   terms?: Prisma.e_booklet_termsUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateWithoutCategoryInput = {
@@ -1769,6 +2093,8 @@ export type e_booklet_templatesUncheckedUpdateWithoutCategoryInput = {
   terms?: Prisma.e_booklet_termsUncheckedUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateManyWithoutCategoryInput = {
@@ -1819,6 +2145,8 @@ export type e_booklet_templatesUpdateWithoutCover_fileInput = {
   terms?: Prisma.e_booklet_termsUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateWithoutCover_fileInput = {
@@ -1840,6 +2168,8 @@ export type e_booklet_templatesUncheckedUpdateWithoutCover_fileInput = {
   terms?: Prisma.e_booklet_termsUncheckedUpdateManyWithoutTemplateNestedInput
   payment_methods?: Prisma.e_booklet_template_payment_methodsUncheckedUpdateManyWithoutTemplateNestedInput
   required_fields?: Prisma.e_booklet_template_required_fieldsUncheckedUpdateManyWithoutTemplateNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_templateNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_templateNestedInput
 }
 
 export type e_booklet_templatesUncheckedUpdateManyWithoutCover_fileInput = {
@@ -1869,6 +2199,8 @@ export type E_booklet_templatesCountOutputType = {
   terms: number
   payment_methods: number
   required_fields: number
+  hotspot_presets_source: number
+  hotspot_preset_usages: number
 }
 
 export type E_booklet_templatesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1878,6 +2210,8 @@ export type E_booklet_templatesCountOutputTypeSelect<ExtArgs extends runtime.Typ
   terms?: boolean | E_booklet_templatesCountOutputTypeCountTermsArgs
   payment_methods?: boolean | E_booklet_templatesCountOutputTypeCountPayment_methodsArgs
   required_fields?: boolean | E_booklet_templatesCountOutputTypeCountRequired_fieldsArgs
+  hotspot_presets_source?: boolean | E_booklet_templatesCountOutputTypeCountHotspot_presets_sourceArgs
+  hotspot_preset_usages?: boolean | E_booklet_templatesCountOutputTypeCountHotspot_preset_usagesArgs
 }
 
 /**
@@ -1932,6 +2266,20 @@ export type E_booklet_templatesCountOutputTypeCountRequired_fieldsArgs<ExtArgs e
   where?: Prisma.e_booklet_template_required_fieldsWhereInput
 }
 
+/**
+ * E_booklet_templatesCountOutputType without action
+ */
+export type E_booklet_templatesCountOutputTypeCountHotspot_presets_sourceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_hotspot_presetsWhereInput
+}
+
+/**
+ * E_booklet_templatesCountOutputType without action
+ */
+export type E_booklet_templatesCountOutputTypeCountHotspot_preset_usagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_hotspot_preset_usagesWhereInput
+}
+
 
 export type e_booklet_templatesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1956,6 +2304,8 @@ export type e_booklet_templatesSelect<ExtArgs extends runtime.Types.Extensions.I
   terms?: boolean | Prisma.e_booklet_templates$termsArgs<ExtArgs>
   payment_methods?: boolean | Prisma.e_booklet_templates$payment_methodsArgs<ExtArgs>
   required_fields?: boolean | Prisma.e_booklet_templates$required_fieldsArgs<ExtArgs>
+  hotspot_presets_source?: boolean | Prisma.e_booklet_templates$hotspot_presets_sourceArgs<ExtArgs>
+  hotspot_preset_usages?: boolean | Prisma.e_booklet_templates$hotspot_preset_usagesArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_templatesCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["e_booklet_templates"]>
 
@@ -2024,6 +2374,8 @@ export type e_booklet_templatesInclude<ExtArgs extends runtime.Types.Extensions.
   terms?: boolean | Prisma.e_booklet_templates$termsArgs<ExtArgs>
   payment_methods?: boolean | Prisma.e_booklet_templates$payment_methodsArgs<ExtArgs>
   required_fields?: boolean | Prisma.e_booklet_templates$required_fieldsArgs<ExtArgs>
+  hotspot_presets_source?: boolean | Prisma.e_booklet_templates$hotspot_presets_sourceArgs<ExtArgs>
+  hotspot_preset_usages?: boolean | Prisma.e_booklet_templates$hotspot_preset_usagesArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_templatesCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type e_booklet_templatesIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2049,6 +2401,8 @@ export type $e_booklet_templatesPayload<ExtArgs extends runtime.Types.Extensions
     terms: Prisma.$e_booklet_termsPayload<ExtArgs>[]
     payment_methods: Prisma.$e_booklet_template_payment_methodsPayload<ExtArgs>[]
     required_fields: Prisma.$e_booklet_template_required_fieldsPayload<ExtArgs>[]
+    hotspot_presets_source: Prisma.$e_booklet_hotspot_presetsPayload<ExtArgs>[]
+    hotspot_preset_usages: Prisma.$e_booklet_hotspot_preset_usagesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2467,6 +2821,8 @@ export interface Prisma__e_booklet_templatesClient<T, Null = never, ExtArgs exte
   terms<T extends Prisma.e_booklet_templates$termsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_templates$termsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_termsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payment_methods<T extends Prisma.e_booklet_templates$payment_methodsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_templates$payment_methodsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_template_payment_methodsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   required_fields<T extends Prisma.e_booklet_templates$required_fieldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_templates$required_fieldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_template_required_fieldsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  hotspot_presets_source<T extends Prisma.e_booklet_templates$hotspot_presets_sourceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_templates$hotspot_presets_sourceArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_hotspot_presetsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  hotspot_preset_usages<T extends Prisma.e_booklet_templates$hotspot_preset_usagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_templates$hotspot_preset_usagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_hotspot_preset_usagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3093,6 +3449,54 @@ export type e_booklet_templates$required_fieldsArgs<ExtArgs extends runtime.Type
   take?: number
   skip?: number
   distinct?: Prisma.E_booklet_template_required_fieldsScalarFieldEnum | Prisma.E_booklet_template_required_fieldsScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_templates.hotspot_presets_source
+ */
+export type e_booklet_templates$hotspot_presets_sourceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_hotspot_presets
+   */
+  select?: Prisma.e_booklet_hotspot_presetsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_hotspot_presets
+   */
+  omit?: Prisma.e_booklet_hotspot_presetsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_hotspot_presetsInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_hotspot_presetsWhereInput
+  orderBy?: Prisma.e_booklet_hotspot_presetsOrderByWithRelationInput | Prisma.e_booklet_hotspot_presetsOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_hotspot_presetsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_hotspot_presetsScalarFieldEnum | Prisma.E_booklet_hotspot_presetsScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_templates.hotspot_preset_usages
+ */
+export type e_booklet_templates$hotspot_preset_usagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_hotspot_preset_usages
+   */
+  select?: Prisma.e_booklet_hotspot_preset_usagesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_hotspot_preset_usages
+   */
+  omit?: Prisma.e_booklet_hotspot_preset_usagesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_hotspot_preset_usagesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_hotspot_preset_usagesWhereInput
+  orderBy?: Prisma.e_booklet_hotspot_preset_usagesOrderByWithRelationInput | Prisma.e_booklet_hotspot_preset_usagesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_hotspot_preset_usagesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_hotspot_preset_usagesScalarFieldEnum | Prisma.E_booklet_hotspot_preset_usagesScalarFieldEnum[]
 }
 
 /**

@@ -493,7 +493,7 @@
 30|}
 31|
 32|function arabicWhatsAppMessage(code: string, url: string): string {
-33|  return `رابط البوكليت الإلكتروني: ${url}\nكود الدخول: ${code}\nافتح الرابط ثم أدخل الكود مرة واحدة لتفعيل الوصول.`;
+33|  return `رابط المذكرة التفاعلية: ${url}\nكود الدخول: ${code}\nافتح الرابط ثم أدخل الكود مرة واحدة لتفعيل الوصول.`;
 34|}
 35|
 36|export class EBookletAccessCodeService {

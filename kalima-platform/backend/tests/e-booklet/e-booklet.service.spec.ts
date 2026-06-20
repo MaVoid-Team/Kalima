@@ -30,6 +30,17 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
       create: jest.fn(),
       update: jest.fn(),
     },
+    e_booklet_hotspot_presets: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    e_booklet_hotspot_preset_usages: {
+      count: jest.fn(),
+      create: jest.fn(),
+    },
     e_booklet_file_assets: {
       create: jest.fn(),
       findUnique: jest.fn(),
@@ -1084,6 +1095,125 @@ describe("EBookletService", () => {
     });
   });
 
+  describe("hotspot preset library", () => {
+    const sourceHotspot = {
+      id: 50,
+      template_version_id: 8,
+      page_number: 3,
+      x_percent: 40.25,
+      y_percent: 55.75,
+      radius_percent: 1.8,
+      reference_number: 7,
+      shape: "circle",
+      width_percent: 5,
+      height_percent: 5,
+      type: "question_answer",
+      title: "Checkpoint",
+      text_content: "Choose one",
+      asset_file_id: null,
+      trigger_type: "click",
+      display_behavior: { color: "blue" },
+      content_json: { version: 2, blocks: [{ type: "question_answer", text_content: "Q", answers: [{ text: "A", isCorrect: true }, { text: "B", isCorrect: false }] }] },
+      interaction_json: { audio: { autoplay: false } },
+      template_version: { id: 8, template_id: 3 },
+    };
+
+    test("creates a preset from a saved hotspot with normalized tags and source placement", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspots.findUnique.mockResolvedValue(sourceHotspot);
+      db.e_booklet_hotspot_presets.create.mockImplementation(async ({ data }: any) => ({ id: 1, ...data, is_active: true }));
+      const service = new EBookletService(db);
+
+      const result: any = await service.createHotspotPreset({
+        source_hotspot_id: 50,
+        name: "  Checkpoint preset  ",
+        description: " Reusable ",
+        tags: ["Grammar", "grammar", " quiz "],
+      }, 9);
+
+      expect(db.e_booklet_hotspot_presets.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          name: "Checkpoint preset",
+          description: "Reusable",
+          tags_json: ["Grammar", "quiz"],
+          type: "question_answer",
+          default_page_number: 3,
+          default_x_percent: 40.25,
+          default_y_percent: 55.75,
+          source_template_id: 3,
+          source_template_version_id: 8,
+          source_hotspot_id: 50,
+          created_by: 9,
+        }),
+      });
+      expect(result.tags).toEqual(["Grammar", "quiz"]);
+    });
+
+    test("lists active presets with search, type, and tag filtering", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspot_presets.findMany.mockResolvedValue([
+        { id: 1, name: "Grammar quiz", tags_json: ["grammar"], type: "question_answer", title: "Checkpoint", content_json: sourceHotspot.content_json, is_active: true },
+        { id: 2, name: "Image info", tags_json: ["visual"], type: "image", title: "Diagram", content_json: { version: 2, blocks: [] }, is_active: true },
+      ]);
+      const service = new EBookletService(db);
+
+      const result: any = await service.listHotspotPresets({ search: "check", type: "question_answer", tag: "grammar", page: 1, limit: 10 });
+
+      expect(db.e_booklet_hotspot_presets.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: { is_active: true, type: "question_answer" },
+      }));
+      expect(result.total).toBe(1);
+      expect(result.data[0]).toEqual(expect.objectContaining({ id: 1, tags: ["grammar"] }));
+    });
+
+    test("inserts a preset as a normal hotspot and records usage in one transaction", async () => {
+      const db = createMockDb();
+      db.e_booklet_template_versions.findUnique.mockResolvedValue({ id: 8, template_id: 3 });
+      db.e_booklet_hotspot_presets.findUnique.mockResolvedValue({ ...sourceHotspot, id: 1, is_active: true, default_page_number: 2, default_x_percent: 10, default_y_percent: 20 });
+      db.e_booklet_hotspots.findFirst.mockResolvedValue({ reference_number: 12 });
+      db.e_booklet_hotspots.create.mockImplementation(async ({ data }: any) => ({ id: 99, ...data }));
+      db.e_booklet_hotspot_preset_usages.create.mockResolvedValue({ id: 5 });
+      const service = new EBookletService(db);
+
+      const result: any = await service.createHotspotFromPreset(8, { preset_id: 1, page_number: 5, x_percent: 44, y_percent: 66 }, 9);
+
+      expect(db.e_booklet_hotspots.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          template_version_id: 8,
+          page_number: 5,
+          x_percent: 44,
+          y_percent: 66,
+          reference_number: 13,
+          type: "question_answer",
+          created_by: 9,
+        }),
+      });
+      expect(db.e_booklet_hotspot_preset_usages.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          preset_id: 1,
+          target_template_id: 3,
+          target_template_version_id: 8,
+          target_hotspot_id: 99,
+          used_by: 9,
+        }),
+      });
+      expect(result.id).toBe(99);
+    });
+
+    test("deletes unused presets and archives used presets", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspot_preset_usages.count.mockResolvedValueOnce(0).mockResolvedValueOnce(2);
+      db.e_booklet_hotspot_presets.delete.mockResolvedValue({ id: 1 });
+      db.e_booklet_hotspot_presets.update.mockResolvedValue({ id: 2, is_active: false, tags_json: [] });
+      const service = new EBookletService(db);
+
+      await expect(service.deleteHotspotPreset(1)).resolves.toEqual({ action: "deleted" });
+      await expect(service.deleteHotspotPreset(2)).resolves.toEqual(expect.objectContaining({ action: "archived" }));
+      expect(db.e_booklet_hotspot_presets.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(db.e_booklet_hotspot_presets.update).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 2 }, data: expect.objectContaining({ is_active: false }) }));
+    });
+  });
+
   describe("admin template editing reads", () => {
     test("lists versions for an existing template with usage counts", async () => {
       const db = createMockDb();
@@ -1999,6 +2129,43 @@ describe("EBookletService", () => {
 
       await expect(service.getViewerPage(10, 4, 55)).rejects.toThrow(
         "Invalid e-booklet page number.",
+      );
+    });
+
+    test("returns a controlled error when the authorized viewer PDF file is missing", async () => {
+      const db = createMockDb();
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 1,
+        booklet_instance_id: 10,
+        user_id: 55,
+        status: "active",
+        booklet_instance: {
+          id: 10,
+          status: "active",
+          custom_document_file_id: 99,
+          access_expires_at: null,
+          template_version: {
+            id: 22,
+            page_count: 3,
+            base_document_file_id: 88,
+            rendered_document_file_id: 77,
+          },
+        },
+      });
+      db.e_booklet_file_assets.findUnique.mockResolvedValue({
+        id: 99,
+        file_type: "pdf",
+        storage_key: "e-booklets/private/definitely-missing-viewer-file.pdf",
+        original_filename: "lesson.pdf",
+        mime_type: "application/pdf",
+        size_bytes: 1024,
+        visibility: "private",
+      });
+
+      const service = new EBookletService(db);
+
+      await expect(service.getAuthorizedViewerDocument(10, 55)).rejects.toThrow(
+        "E-booklet PDF file is not available.",
       );
     });
 

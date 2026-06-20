@@ -1,16 +1,19 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { BarChart3, BookOpenCheck, ClipboardList, LayoutGrid, Settings, ShieldCheck } from "lucide-react";
+import { BarChart3, BookOpenCheck, ClipboardList, Library, LayoutGrid, Settings, ShieldCheck } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const tabs = [
-  { label: "Overview", href: "/admin/e-booklets", icon: BookOpenCheck, exact: true },
-  { label: "Catalog", href: "/admin/e-booklets/catalog", icon: LayoutGrid },
-  { label: "Orders & Delivery", href: "/admin/e-booklets/orders", icon: ClipboardList },
-  { label: "Teacher Access", href: "/admin/e-booklets/access", icon: ShieldCheck },
-  { label: "Analytics", href: "/admin/e-booklets/analytics", icon: BarChart3 },
-  { label: "Settings", href: "/admin/e-booklets/settings", icon: Settings },
+  { labelKey: "admin.workspace.tabs.overview", href: "/admin/e-booklets", icon: BookOpenCheck, exact: true, testId: "overview" },
+  { labelKey: "admin.workspace.tabs.catalog", href: "/admin/e-booklets/catalog", icon: LayoutGrid, testId: "catalog" },
+  { labelKey: "admin.workspace.tabs.orders", href: "/admin/e-booklets/orders", icon: ClipboardList, testId: "orders-delivery" },
+  { labelKey: "admin.workspace.tabs.access", href: "/admin/e-booklets/access", icon: ShieldCheck, testId: "teacher-access" },
+  { labelKey: "admin.workspace.tabs.analytics", href: "/admin/e-booklets/analytics", icon: BarChart3, testId: "analytics" },
+  { labelKey: "admin.workspace.tabs.hotspotLibrary", href: "/admin/e-booklets/hotspot-library", icon: Library, testId: "hotspot-library" },
+  { labelKey: "admin.workspace.tabs.settings", href: "/admin/e-booklets/settings", icon: Settings, testId: "settings" },
 ];
 
 export default function AdminEBookletsWorkspaceLayout() {
+  const { t } = useTranslation("eBooklets");
   const { pathname } = useLocation();
 
   return (
@@ -18,19 +21,19 @@ export default function AdminEBookletsWorkspaceLayout() {
       <section className="rounded-3xl border border-primary/15 bg-background p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-medium text-primary">Admin workspace</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight">E-Booklets</h1>
+            <p className="text-sm font-medium text-primary">{t("admin.workspace.kicker")}</p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight">{t("common.eBooklets")}</h1>
             <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-              Manage the eBooklet lifecycle from catalog setup to orders, delivery, teacher access, analytics, and settings.
+              {t("admin.workspace.description")}
             </p>
           </div>
         </div>
 
         <div className="mt-5 rounded-2xl border border-border bg-muted/40 p-2">
           <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            E-Booklet workspace tabs
+            {t("admin.workspace.tabsLabel")}
           </p>
-          <nav className="flex gap-2 overflow-x-auto pb-1" aria-label="E-Booklet workspace navigation">
+          <nav className="flex gap-2 overflow-x-auto pb-1" aria-label={t("admin.workspace.navLabel")}>
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = tab.exact ? pathname === tab.href : pathname.startsWith(tab.href);
@@ -43,10 +46,10 @@ export default function AdminEBookletsWorkspaceLayout() {
                     ? "border-primary bg-primary text-primary-foreground shadow-sm"
                     : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
-                data-testid={`admin-e-booklets-tab-${tab.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                data-testid={`admin-e-booklets-tab-${tab.testId}`}
               >
                 <Icon className="h-4 w-4" />
-                {tab.label}
+                {t(tab.labelKey)}
               </Link>
             );
           })}

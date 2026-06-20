@@ -135,6 +135,11 @@ router.get(
   eBookletController.listVersionHotspots,
 );
 router.post(
+  "/admin/e-booklet-template-versions/:versionId/hotspots/from-preset",
+  ...adminAuth,
+  eBookletController.createHotspotFromPreset,
+);
+router.post(
   "/admin/e-booklet-template-versions/:versionId/publish",
   ...adminAuth,
   eBookletController.publishVersion,
@@ -153,6 +158,41 @@ router.delete(
   "/admin/e-booklet-hotspots/:hotspotId",
   ...adminAuth,
   eBookletController.deleteHotspot,
+);
+router.get(
+  "/admin/e-booklet-hotspot-presets",
+  ...adminAuth,
+  eBookletController.listHotspotPresets,
+);
+router.post(
+  "/admin/e-booklet-hotspot-presets",
+  ...adminAuth,
+  eBookletController.createHotspotPreset,
+);
+router.get(
+  "/admin/e-booklet-hotspot-presets/:presetId",
+  ...adminAuth,
+  eBookletController.getHotspotPreset,
+);
+router.patch(
+  "/admin/e-booklet-hotspot-presets/:presetId/metadata",
+  ...adminAuth,
+  eBookletController.updateHotspotPresetMetadata,
+);
+router.put(
+  "/admin/e-booklet-hotspot-presets/:presetId/content",
+  ...adminAuth,
+  eBookletController.replaceHotspotPresetContent,
+);
+router.delete(
+  "/admin/e-booklet-hotspot-presets/:presetId",
+  ...adminAuth,
+  eBookletController.deleteHotspotPreset,
+);
+router.post(
+  "/admin/e-booklet-hotspot-presets/:presetId/restore",
+  ...adminAuth,
+  eBookletController.restoreHotspotPreset,
 );
 router.get(
   "/admin/e-booklet-purchases",

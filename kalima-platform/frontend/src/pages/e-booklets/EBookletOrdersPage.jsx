@@ -1,163 +1,161 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BookOpenCheck, Loader2, ReceiptText } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { BookOpenCheck, PackageOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import LoadingSpinner from "@/components/ui/loading-spinner";
+import OrdersPageHeader from "@/components/orders/OrdersPageHeader";
+import OrdersStatusFilter from "@/components/orders/OrdersStatusFilter";
+import EBookletOrderCard from "@/components/e-booklets/EBookletOrderCard";
 import { useEBookletOrders } from "@/hooks/useEBooklets";
 import { useTranslation } from "react-i18next";
 import {
-  E_BOOKLET_ORDER_STATUSES,
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  generatePaginationLinks,
+} from "@/components/ui/pagination";
+import {
+  E_BOOKLET_ORDER_TEACHER_FILTER_STATUSES,
   E_BOOKLET_STORE_ROUTE,
   E_BOOKLET_TEACHER_LIBRARY_ROUTE,
 } from "./eBookletOrdersContract.mjs";
 
-const getReference = (order) => order?.purchase_serial || order?.serial || order?.reference || `#${order?.id}`;
-const getLinks = (order) => {
-  if (Array.isArray(order?.instances) && order.instances.length > 0) {
-    return order.instances.map((instance) => ({
-      id: `instance-${instance.id}`,
-      status: instance.status || order?.status,
-      booklet_instance: instance,
-      template: order?.template,
-    }));
-  }
-  if (Array.isArray(order?.e_booklet_student_purchase_links) && order.e_booklet_student_purchase_links.length > 0) {
-    return order.e_booklet_student_purchase_links;
-  }
-  return [{
-    id: `purchase-${order?.id}`,
-    status: order?.status,
-    template: order?.template,
-    booklet_instance: Array.isArray(order?.instances) && order.instances.length > 0 ? order.instances[0] : null,
-  }];
-};
-const getTitle = (link, t) => link?.booklet_instance?.display_title || link?.booklet_instance?.template?.title || link?.template?.title || t("orders.fallbackTitle");
-const ORDER_STATUSES = new Set(E_BOOKLET_ORDER_STATUSES);
-const getStatus = (value) => {
-  const status = String(value || "unknown").toLowerCase();
-  return ORDER_STATUSES.has(status) ? status : "unknown";
-};
-const getManagementPath = (link) => {
-  const instanceId = link?.booklet_instance?.id || link?.booklet_instance_id || link?.instance_id;
-  return instanceId ? `/teacher/e-booklets/${instanceId}/invites` : "/teacher/e-booklets";
-};
-
 export default function EBookletOrdersPage() {
   const { t } = useTranslation("eBooklets");
-  const { orders, pagination, fetchOrders, loading, error } = useEBookletOrders();
+  const { orders, pagination, filters, fetchOrders, setStatus, setPage, loading, error } = useEBookletOrders();
 
   useEffect(() => {
-    fetchOrders({ limit: 20 });
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    fetchOrders().catch(() => {});
   }, [fetchOrders]);
 
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > pagination.pages) return;
+    setPage(newPage);
+  };
+
+  const statusOptions = [
+    { value: "all", label: t("orders.status.all", "All Orders") },
+    ...E_BOOKLET_ORDER_TEACHER_FILTER_STATUSES.map((status) => ({
+      value: status,
+      label: t(`orders.statuses.${status}`, status.replaceAll("_", " ")),
+    })),
+  ];
+
   return (
-    <main className="bg-[linear-gradient(180deg,rgba(248,250,252,0.9),#ffffff_42%)] pt-24 text-foreground">
-      <section className="mx-auto max-w-5xl px-4 pb-20 pt-10 md:px-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <Badge className="rounded-md bg-emerald-800 text-white hover:bg-emerald-800">
-              {t("orders.badge")}
-            </Badge>
-            <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-950">
-              {t("orders.title")}
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-              {t("orders.description")}
+    <div className="container mx-auto max-w-5xl space-y-8 px-4 py-10 animate-fade-in md:px-6" data-testid="e-booklet-orders-page">
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+        <OrdersPageHeader
+          title={t("orders.title", "My teacher e-booklet orders")}
+          subtitle={t("orders.description", "Track teacher e-booklet purchases from checkout through admin customization and delivery.")}
+        />
+
+        <OrdersStatusFilter
+          statusOptions={statusOptions}
+          filters={filters}
+          onStatusChange={setStatus}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <Button asChild variant="outline">
+          <Link to={E_BOOKLET_STORE_ROUTE}>{t("orders.openStore", "Browse e-booklets")}</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to={E_BOOKLET_TEACHER_LIBRARY_ROUTE}>{t("orders.openLibrary", "Open teacher e-booklets")}</Link>
+        </Button>
+      </div>
+
+      <div className="min-h-100">
+        {loading ? (
+          <LoadingSpinner />
+        ) : error ? (
+          <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-5 text-sm text-destructive">
+            {error?.response?.data?.message || t("orders.loadError", "Could not load e-booklet orders.")}
+          </div>
+        ) : orders.length > 0 ? (
+          <div className="flex flex-col space-y-4">
+            {orders.map((order) => (
+              <EBookletOrderCard key={order.id} order={order} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center rounded-xl border border-border/40 py-20 text-center shadow-sm">
+            <div className="mb-4 rounded-full bg-primary/10 p-4">
+              {filters.status && filters.status !== "all" ? (
+                <PackageOpen className="h-12 w-12 text-primary opacity-80" />
+              ) : (
+                <BookOpenCheck className="h-12 w-12 text-primary opacity-80" />
+              )}
+            </div>
+            <h3 className="mb-2 text-xl font-semibold text-foreground">
+              {t("orders.emptyTitle", "No e-booklet orders yet")}
+            </h3>
+            <p className="max-w-sm text-muted-foreground">
+              {filters.status && filters.status !== "all"
+                ? t("orders.noOrdersForStatus", "You have no e-booklet orders with this status.")
+                : t("orders.emptyDescription", "Browse e-booklets and submit your first teacher-customized purchase request.")}
             </p>
+            {(!filters.status || filters.status === "all") && (
+              <Button asChild className="mt-4">
+                <Link to={E_BOOKLET_STORE_ROUTE}>{t("common.browse", "Browse E-Booklets")}</Link>
+              </Button>
+            )}
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Button asChild variant="outline">
-              <Link to={E_BOOKLET_STORE_ROUTE}>{t("orders.openStore")}</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to={E_BOOKLET_TEACHER_LIBRARY_ROUTE}>{t("orders.openLibrary")}</Link>
-            </Button>
-          </div>
+        )}
+      </div>
+
+      {pagination.pages > 1 && (
+        <div className="mt-4 flex justify-end">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => handlePageChange(pagination.page - 1)}
+                  className={pagination.page <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  text={t("common.previous", "Previous")}
+                  data-testid="e-booklet-orders-pagination-previous-button"
+                />
+              </PaginationItem>
+
+              {generatePaginationLinks(pagination.page, pagination.pages).map((link, idx) => (
+                link === "ellipsis" ? (
+                  <PaginationItem key={`ellipsis-${idx}`}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                ) : (
+                  <PaginationItem key={link}>
+                    <PaginationLink
+                      onClick={() => handlePageChange(link)}
+                      isActive={pagination.page === link}
+                      className="cursor-pointer"
+                      data-testid={`e-booklet-orders-pagination-page-${link}-button`}
+                    >
+                      {link}
+                    </PaginationLink>
+                  </PaginationItem>
+                )
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => handlePageChange(pagination.page + 1)}
+                  className={pagination.page >= pagination.pages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  text={t("common.next", "Next")}
+                  data-testid="e-booklet-orders-pagination-next-button"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
-
-        {loading && (
-          <div className="mt-10 flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            {t("common.loading")}
-          </div>
-        )}
-
-        {error && (
-          <div className="mt-8 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {error?.response?.data?.message || t("orders.loadError")}
-          </div>
-        )}
-
-        {!loading && orders.length === 0 && !error && (
-          <div className="mt-10 rounded-2xl border bg-white p-8 text-center shadow-sm">
-            <BookOpenCheck className="mx-auto h-10 w-10 text-emerald-800" />
-            <h2 className="mt-4 text-xl font-bold">{t("orders.emptyTitle")}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">{t("orders.emptyDescription")}</p>
-            <Button asChild className="mt-5">
-              <Link to="/e-booklets">{t("common.browse")}</Link>
-            </Button>
-          </div>
-        )}
-
-        <div className="mt-8 grid gap-4">
-          {orders.map((order) => {
-            const links = getLinks(order);
-            const orderStatus = getStatus(order.status);
-            return (
-              <article key={order.id} className="rounded-2xl border bg-white p-5 shadow-sm">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
-                      <ReceiptText className="h-4 w-4 text-emerald-800" />
-                      <span>{getReference(order)}</span>
-                    </div>
-                    {order.created_at && (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {t("orders.submittedAt", { value: new Date(order.created_at).toLocaleString() })}
-                      </p>
-                    )}
-                  </div>
-                  <Badge variant="outline" className="w-fit">
-                    {t(`orders.statuses.${orderStatus}`)}
-                  </Badge>
-                </div>
-                <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5 text-muted-foreground">
-                  {t(`orders.statusCopy.${orderStatus}`)}
-                </p>
-
-                <div className="mt-5 grid gap-3">
-                  {links.map((link) => {
-                    const linkStatus = getStatus(link.status || order.status);
-                    return (
-                    <div key={link.id} className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                          <p className="font-semibold text-slate-950">{getTitle(link, t)}</p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            {t("orders.itemStatus")}: {t(`orders.statuses.${linkStatus}`)}
-                          </p>
-                        </div>
-                        {(linkStatus === "ready" || orderStatus === "ready") && (
-                          <Button asChild size="sm">
-                            <Link to={getManagementPath(link)}>{t("orders.manageAccess")}</Link>
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                    );
-                  })}
-                </div>
-              </article>
-            );
-          })}
-        </div>
-
-        {pagination.total > 0 && (
-          <p className="mt-6 text-xs text-muted-foreground">
-            {t("orders.count", { count: orders.length })}
-          </p>
-        )}
-      </section>
-    </main>
+      )}
+    </div>
   );
 }

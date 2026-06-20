@@ -27,19 +27,9 @@ import {
 } from "@/components/ui/table";
 import { useAdminEBookletPurchases } from "@/hooks/admin/useAdminEBooklets";
 import { useTranslation } from "react-i18next";
+import { E_BOOKLET_ORDER_FILTER_STATUSES } from "@/pages/e-booklets/eBookletOrdersContract.mjs";
 
-const purchaseStatuses = [
-  "all",
-  "pending",
-  "awaiting_payment",
-  "paid",
-  "needs_branding_info",
-  "customization_in_progress",
-  "ready",
-  "delivered",
-  "cancelled",
-  "rejected",
-];
+const purchaseStatuses = ["all", ...E_BOOKLET_ORDER_FILTER_STATUSES];
 
 const statusTone = {
   ready: "border-emerald-200 bg-emerald-50 text-emerald-700",
@@ -86,7 +76,7 @@ export default function AdminEBookletPurchasesPage() {
 
   const pageCount = Math.max(1, Math.ceil(pagination.total / pagination.limit));
   const statusLabel = useCallback(
-    (value) => t(`statuses.${value}`, { defaultValue: prettyStatus(value) }),
+    (value) => t(`orders.statuses.${value}`, { defaultValue: t(`statuses.${value}`, { defaultValue: prettyStatus(value) }) }),
     [t],
   );
 
@@ -211,7 +201,7 @@ export default function AdminEBookletPurchasesPage() {
                     <TableCell>v{purchase.template_version?.version_number || 1}</TableCell>
                     <TableCell>
                       <div className="flex flex-wrap justify-end gap-2">
-                        {["pending", "awaiting_payment", "needs_branding_info", "customization_in_progress"].includes(purchase.status) && (
+                        {["pending", "awaiting_payment"].includes(purchase.status) && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -220,7 +210,7 @@ export default function AdminEBookletPurchasesPage() {
                           >
                             <CheckCircle2 className="h-4 w-4" />
                             <span className="hidden xl:inline">
-                              {t("admin.purchases.approveUnlockShort", { defaultValue: "Approve / unlock" })}
+                              {t("admin.purchases.approvePaymentShort", { defaultValue: "Approve payment" })}
                             </span>
                           </Button>
                         )}

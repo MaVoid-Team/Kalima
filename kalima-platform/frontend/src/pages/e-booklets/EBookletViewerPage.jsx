@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -17,6 +17,7 @@ import {
   HelpCircle,
   ZoomIn,
   ZoomOut,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -426,9 +427,13 @@ export default function EBookletViewerPage() {
   const [zoom, setZoom] = useState(1);
   const [activeHotspot, setActiveHotspot] = useState(null);
   const [hotspotContent, setHotspotContent] = useState(null);
+  const [hotspotLoading, setHotspotLoading] = useState(false);
+  const [hotspotError, setHotspotError] = useState("");
   const [documentPageUrl, setDocumentPageUrl] = useState(null);
+  const [documentPageError, setDocumentPageError] = useState("");
   const [deviceStatus, setDeviceStatus] = useState("checking");
   const [deviceError, setDeviceError] = useState("");
+  const hotspotRequestRef = useRef(0);
 
   useEffect(() => {
     let active = true;
@@ -468,16 +473,20 @@ export default function EBookletViewerPage() {
     viewer.fetchPage(instanceId, pageNumber).catch(() => {});
     setActiveHotspot(null);
     setHotspotContent(null);
+    setHotspotLoading(false);
+    setHotspotError("");
   }, [deviceStatus, instanceId, pageNumber, viewer.fetchPage]);
 
   useEffect(() => {
     if (viewer.page?.renderMode !== "pdf-document" || !viewer.page?.documentAssetId) {
       setDocumentPageUrl(null);
+      setDocumentPageError("");
       return undefined;
     }
     let active = true;
     let createdUrl = null;
     setDocumentPageUrl(null);
+    setDocumentPageError("");
     viewer.fetchViewerDocumentBlobUrl(instanceId, pageNumber)
       .then((url) => {
         createdUrl = url;
@@ -487,14 +496,17 @@ export default function EBookletViewerPage() {
           URL.revokeObjectURL(url);
         }
       })
-      .catch(() => {
-        if (active) setDocumentPageUrl(null);
+      .catch((error) => {
+        if (active) {
+          setDocumentPageUrl(null);
+          setDocumentPageError(error?.response?.data?.message || error?.message || t("viewer.documentUnavailable"));
+        }
       });
     return () => {
       active = false;
       if (createdUrl) URL.revokeObjectURL(createdUrl);
     };
-  }, [instanceId, pageNumber, viewer.fetchViewerDocumentBlobUrl, viewer.page?.documentAssetId, viewer.page?.renderMode]);
+  }, [instanceId, pageNumber, t, viewer.fetchViewerDocumentBlobUrl, viewer.page?.documentAssetId, viewer.page?.renderMode]);
 
   useEffect(() => {
     const preventContextMenu = (event) => event.preventDefault();
@@ -538,15 +550,50 @@ export default function EBookletViewerPage() {
     [dimensions.height, dimensions.width, zoom],
   );
 
+  const closeHotspot = useCallback(() => {
+    hotspotRequestRef.current += 1;
+    setActiveHotspot(null);
+    setHotspotContent(null);
+    setHotspotLoading(false);
+    setHotspotError("");
+  }, []);
+
+  useEffect(() => {
+    if (!activeHotspot) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") closeHotspot();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [activeHotspot, closeHotspot]);
+
   const openHotspot = useCallback(async (hotspot) => {
+    const requestId = hotspotRequestRef.current + 1;
+    hotspotRequestRef.current = requestId;
     setActiveHotspot(hotspot);
-    const response = await viewer.fetchHotspotContent(hotspot.id, instanceId);
-    setHotspotContent({ ...hotspot, ...(response?.data || {}) });
-  }, [instanceId, viewer]);
+    setHotspotContent(null);
+    setHotspotError("");
+    setHotspotLoading(true);
+    try {
+      const response = await viewer.fetchHotspotContent(hotspot.id, instanceId);
+      if (hotspotRequestRef.current === requestId) {
+        setHotspotContent({ ...hotspot, ...(response?.data || {}) });
+      }
+    } catch (error) {
+      if (hotspotRequestRef.current === requestId) {
+        setHotspotError(error?.response?.data?.message || error?.message || t("viewer.assetUnavailable"));
+      }
+    } finally {
+      if (hotspotRequestRef.current === requestId) {
+        setHotspotLoading(false);
+      }
+    }
+  }, [instanceId, t, viewer]);
 
   const contentHotspot = hotspotContent || activeHotspot;
   const pageUrl = documentPageUrl || viewer.page?.url || viewer.page?.pageUrl || viewer.page?.assetUrl || null;
   const serverPage = viewer.page?.renderMode === "server-page" ? viewer.page : null;
+  const pdfDocumentFailed = viewer.page?.renderMode === "pdf-document" && viewer.page?.documentAssetId && documentPageError;
 
   if (deviceStatus === "blocked") {
     return (
@@ -614,7 +661,7 @@ export default function EBookletViewerPage() {
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-7xl gap-5 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <main className="mx-auto max-w-7xl px-4 py-6">
         <section className="select-none overflow-auto rounded-lg border bg-slate-200 p-4" onContextMenu={(event) => event.preventDefault()}>
           <div className="mx-auto w-full max-w-[820px] pb-10">
             <div className="relative overflow-hidden rounded-md border bg-white shadow-sm" style={pageStyle} draggable={false}>
@@ -624,6 +671,14 @@ export default function EBookletViewerPage() {
                   src={`${pageUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                   className="absolute inset-0 h-full w-full border-0"
                 />
+              ) : pdfDocumentFailed ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-slate-50 p-8 text-center">
+                  <div className="max-w-md rounded-lg border border-destructive/30 bg-background/90 p-5 shadow-sm">
+                    <FileText className="mx-auto h-8 w-8 text-destructive" />
+                    <h2 className="mt-3 font-semibold text-destructive">{t("viewer.documentUnavailable")}</h2>
+                    <p className="mt-2 text-sm text-muted-foreground">{documentPageError}</p>
+                  </div>
+                </div>
               ) : serverPage ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-50 p-8 text-center">
                   <div className="max-w-md rounded-lg border bg-background/90 p-5 shadow-sm">
@@ -663,65 +718,49 @@ export default function EBookletViewerPage() {
                   t={t}
                 />
               ))}
+              {contentHotspot && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-950/25 p-3 sm:p-6">
+                  <div className="flex max-h-[90%] w-full max-w-[min(92%,34rem)] flex-col overflow-hidden rounded-xl border bg-background text-foreground shadow-2xl">
+                    <div className="flex items-start justify-between gap-3 border-b p-3 sm:p-4">
+                      <div className="min-w-0">
+                        <h3 className="truncate text-sm font-semibold sm:text-base">#{getReference(contentHotspot)} {contentHotspot.title || t("viewer.hotspotFallback")}</h3>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {t(`admin.editor.hotspots.types.${contentHotspot.type}`, { defaultValue: contentHotspot.type })}
+                        </p>
+                      </div>
+                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={closeHotspot} aria-label={t("common.close", { defaultValue: "Close" })}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="min-h-0 overflow-y-auto p-3 sm:p-4">
+                      {hotspotLoading ? (
+                        <p className="text-sm text-muted-foreground">{t("viewer.loadingAsset")}</p>
+                      ) : hotspotError ? (
+                        <p className="text-sm text-destructive">{hotspotError}</p>
+                      ) : (
+                        <div className="space-y-4">
+                          {getBlocks(contentHotspot).map((block, index) => (
+                            <div className="rounded-md border bg-background/80 p-3" key={`${block.type}-${block.asset_file_id || index}`}>
+                              {getBlocks(contentHotspot).length > 1 && (
+                                <div className="mb-2 text-xs font-medium text-muted-foreground">
+                                  {t("admin.editor.hotspots.blockNumber", { number: index + 1 })}
+                                </div>
+                              )}
+                              <ContentBlock block={block} hotspot={contentHotspot} viewer={viewer} t={t} instanceId={instanceId} />
+                              {block.supplementary_text && (
+                                <p className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground">{block.supplementary_text}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
-
-        <aside className="rounded-lg border bg-background p-4">
-          <h2 className="font-semibold">{t("viewer.hotspotsTitle")}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{t("viewer.hotspotsDescription")}</p>
-          <div className="mt-4 space-y-3">
-            {viewer.hotspots.map((hotspot) => (
-              <button
-                key={hotspot.id}
-                type="button"
-                onClick={() => openHotspot(hotspot)}
-                className={`w-full rounded-md border p-3 text-start hover:bg-muted/50 ${String(activeHotspot?.id) === String(hotspot.id) ? "border-primary bg-primary/5" : ""}`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="font-medium">#{getReference(hotspot)} {getHotspotLabel(hotspot, t)}</div>
-                  <Badge variant="outline">
-                    {t(`admin.editor.hotspots.shapes.${hotspot.shape || "circle"}`, {
-                      defaultValue: hotspot.shape || t("admin.editor.hotspots.shapes.circle"),
-                    })}
-                  </Badge>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {t(`admin.editor.hotspots.types.${hotspot.type}`, { defaultValue: hotspot.type })}
-                </div>
-              </button>
-            ))}
-            {viewer.hotspots.length === 0 && (
-              <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">{t("viewer.emptyHotspots")}</div>
-            )}
-          </div>
-
-          {contentHotspot && (
-            <div className="mt-5 rounded-md border bg-muted/30 p-4">
-              <div className="mb-3 flex items-center justify-between gap-2">
-                <h3 className="font-semibold">#{getReference(contentHotspot)} {contentHotspot.title || t("viewer.hotspotFallback")}</h3>
-                <Badge variant="outline">
-                  {t(`admin.editor.hotspots.types.${contentHotspot.type}`, { defaultValue: contentHotspot.type })}
-                </Badge>
-              </div>
-              <div className="space-y-4">
-                {getBlocks(contentHotspot).map((block, index) => (
-                  <div className="rounded-md border bg-background/80 p-3" key={`${block.type}-${block.asset_file_id || index}`}>
-                    {getBlocks(contentHotspot).length > 1 && (
-                      <div className="mb-2 text-xs font-medium text-muted-foreground">
-                        {t("admin.editor.hotspots.blockNumber", { number: index + 1 })}
-                      </div>
-                    )}
-                    <ContentBlock block={block} hotspot={contentHotspot} viewer={viewer} t={t} instanceId={instanceId} />
-                    {block.supplementary_text && (
-                      <p className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground">{block.supplementary_text}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </aside>
       </main>
     </div>
   );

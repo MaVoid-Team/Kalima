@@ -1,0 +1,10 @@
+**Findings**
+- High: [EBookletOrderDetailsDialog.jsx](/Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/frontend/src/components/e-booklets/EBookletOrderDetailsDialog.jsx:44) renders `order.admin_notes` to teachers. The teacher endpoint returns raw purchase rows, so internal admin notes can leak unless the backend has already sanitized them. Use only teacher-facing fields, or sanitize/select at the API boundary.
+
+- High: [AdminEBookletPurchasesPage.jsx](/Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/frontend/src/pages/admin/e-booklets/AdminEBookletPurchasesPage.jsx:204) shows “Approve payment” for `needs_branding_info` and `customization_in_progress`. The backend `mark-paid` route sets status to `paid`, so clicking this can move a later lifecycle order backward and break teacher/admin parity. Restrict it to payment-waiting states or use a status-specific action.
+
+- Medium: Manage-access eligibility ignores item/link status. [EBookletOrderCard.jsx](/Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/frontend/src/components/e-booklets/EBookletOrderCard.jsx:49), [EBookletOrderDetailsDialog.jsx](/Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/frontend/src/components/e-booklets/EBookletOrderDetailsDialog.jsx:85), and [EBookletOrderItemsCollapsible.jsx](/Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/frontend/src/components/e-booklets/EBookletOrderItemsCollapsible.jsx:66) pass the order status into `canManageEBookletOrder`, so `link.status` is ignored when the order status is truthy. Mixed item states can show or hide `Manage access` incorrectly.
+
+- Low: [EBookletOrderItemsCollapsible.jsx](/Users/ziadnasreldin/Documents/GitHub/Kalima/kalima-platform/frontend/src/components/e-booklets/EBookletOrderItemsCollapsible.jsx:25) lacks `aria-expanded` on the expand/collapse button. This is a small accessibility regression versus an explicit disclosure control.
+
+I did not modify files. I did not rerun build/lint; this was review-only.

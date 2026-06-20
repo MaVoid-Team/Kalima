@@ -291,6 +291,8 @@ export type e_booklet_template_versionsWhereInput = {
   hotspots?: Prisma.E_booklet_hotspotsListRelationFilter
   purchases?: Prisma.E_booklet_purchasesListRelationFilter
   instances?: Prisma.E_booklet_instancesListRelationFilter
+  hotspot_presets_source?: Prisma.E_booklet_hotspot_presetsListRelationFilter
+  hotspot_preset_usages?: Prisma.E_booklet_hotspot_preset_usagesListRelationFilter
 }
 
 export type e_booklet_template_versionsOrderByWithRelationInput = {
@@ -312,6 +314,8 @@ export type e_booklet_template_versionsOrderByWithRelationInput = {
   hotspots?: Prisma.e_booklet_hotspotsOrderByRelationAggregateInput
   purchases?: Prisma.e_booklet_purchasesOrderByRelationAggregateInput
   instances?: Prisma.e_booklet_instancesOrderByRelationAggregateInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsOrderByRelationAggregateInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesOrderByRelationAggregateInput
 }
 
 export type e_booklet_template_versionsWhereUniqueInput = Prisma.AtLeast<{
@@ -337,6 +341,8 @@ export type e_booklet_template_versionsWhereUniqueInput = Prisma.AtLeast<{
   hotspots?: Prisma.E_booklet_hotspotsListRelationFilter
   purchases?: Prisma.E_booklet_purchasesListRelationFilter
   instances?: Prisma.E_booklet_instancesListRelationFilter
+  hotspot_presets_source?: Prisma.E_booklet_hotspot_presetsListRelationFilter
+  hotspot_preset_usages?: Prisma.E_booklet_hotspot_preset_usagesListRelationFilter
 }, "id" | "template_id_version_number">
 
 export type e_booklet_template_versionsOrderByWithAggregationInput = {
@@ -389,6 +395,8 @@ export type e_booklet_template_versionsCreateInput = {
   hotspots?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsUncheckedCreateInput = {
@@ -406,6 +414,8 @@ export type e_booklet_template_versionsUncheckedCreateInput = {
   hotspots?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsUpdateInput = {
@@ -422,6 +432,8 @@ export type e_booklet_template_versionsUpdateInput = {
   hotspots?: Prisma.e_booklet_hotspotsUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateInput = {
@@ -439,6 +451,8 @@ export type e_booklet_template_versionsUncheckedUpdateInput = {
   hotspots?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsCreateManyInput = {
@@ -558,6 +572,11 @@ export type E_booklet_template_versionsScalarRelationFilter = {
   isNot?: Prisma.e_booklet_template_versionsWhereInput
 }
 
+export type E_booklet_template_versionsNullableScalarRelationFilter = {
+  is?: Prisma.e_booklet_template_versionsWhereInput | null
+  isNot?: Prisma.e_booklet_template_versionsWhereInput | null
+}
+
 export type e_booklet_template_versionsCreateNestedManyWithoutCreatorInput = {
   create?: Prisma.XOR<Prisma.e_booklet_template_versionsCreateWithoutCreatorInput, Prisma.e_booklet_template_versionsUncheckedCreateWithoutCreatorInput> | Prisma.e_booklet_template_versionsCreateWithoutCreatorInput[] | Prisma.e_booklet_template_versionsUncheckedCreateWithoutCreatorInput[]
   connectOrCreate?: Prisma.e_booklet_template_versionsCreateOrConnectWithoutCreatorInput | Prisma.e_booklet_template_versionsCreateOrConnectWithoutCreatorInput[]
@@ -658,6 +677,36 @@ export type e_booklet_template_versionsUpdateOneRequiredWithoutHotspotsNestedInp
   upsert?: Prisma.e_booklet_template_versionsUpsertWithoutHotspotsInput
   connect?: Prisma.e_booklet_template_versionsWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_template_versionsUpdateToOneWithWhereWithoutHotspotsInput, Prisma.e_booklet_template_versionsUpdateWithoutHotspotsInput>, Prisma.e_booklet_template_versionsUncheckedUpdateWithoutHotspotsInput>
+}
+
+export type e_booklet_template_versionsCreateNestedOneWithoutHotspot_presets_sourceInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_template_versionsCreateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_template_versionsUncheckedCreateWithoutHotspot_presets_sourceInput>
+  connectOrCreate?: Prisma.e_booklet_template_versionsCreateOrConnectWithoutHotspot_presets_sourceInput
+  connect?: Prisma.e_booklet_template_versionsWhereUniqueInput
+}
+
+export type e_booklet_template_versionsUpdateOneWithoutHotspot_presets_sourceNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_template_versionsCreateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_template_versionsUncheckedCreateWithoutHotspot_presets_sourceInput>
+  connectOrCreate?: Prisma.e_booklet_template_versionsCreateOrConnectWithoutHotspot_presets_sourceInput
+  upsert?: Prisma.e_booklet_template_versionsUpsertWithoutHotspot_presets_sourceInput
+  disconnect?: Prisma.e_booklet_template_versionsWhereInput | boolean
+  delete?: Prisma.e_booklet_template_versionsWhereInput | boolean
+  connect?: Prisma.e_booklet_template_versionsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_template_versionsUpdateToOneWithWhereWithoutHotspot_presets_sourceInput, Prisma.e_booklet_template_versionsUpdateWithoutHotspot_presets_sourceInput>, Prisma.e_booklet_template_versionsUncheckedUpdateWithoutHotspot_presets_sourceInput>
+}
+
+export type e_booklet_template_versionsCreateNestedOneWithoutHotspot_preset_usagesInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_template_versionsCreateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_template_versionsUncheckedCreateWithoutHotspot_preset_usagesInput>
+  connectOrCreate?: Prisma.e_booklet_template_versionsCreateOrConnectWithoutHotspot_preset_usagesInput
+  connect?: Prisma.e_booklet_template_versionsWhereUniqueInput
+}
+
+export type e_booklet_template_versionsUpdateOneRequiredWithoutHotspot_preset_usagesNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_template_versionsCreateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_template_versionsUncheckedCreateWithoutHotspot_preset_usagesInput>
+  connectOrCreate?: Prisma.e_booklet_template_versionsCreateOrConnectWithoutHotspot_preset_usagesInput
+  upsert?: Prisma.e_booklet_template_versionsUpsertWithoutHotspot_preset_usagesInput
+  connect?: Prisma.e_booklet_template_versionsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_template_versionsUpdateToOneWithWhereWithoutHotspot_preset_usagesInput, Prisma.e_booklet_template_versionsUpdateWithoutHotspot_preset_usagesInput>, Prisma.e_booklet_template_versionsUncheckedUpdateWithoutHotspot_preset_usagesInput>
 }
 
 export type e_booklet_template_versionsCreateNestedOneWithoutPurchasesInput = {
@@ -785,6 +834,8 @@ export type e_booklet_template_versionsCreateWithoutCreatorInput = {
   hotspots?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsUncheckedCreateWithoutCreatorInput = {
@@ -801,6 +852,8 @@ export type e_booklet_template_versionsUncheckedCreateWithoutCreatorInput = {
   hotspots?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsCreateOrConnectWithoutCreatorInput = {
@@ -859,6 +912,8 @@ export type e_booklet_template_versionsCreateWithoutTemplateInput = {
   hotspots?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsUncheckedCreateWithoutTemplateInput = {
@@ -875,6 +930,8 @@ export type e_booklet_template_versionsUncheckedCreateWithoutTemplateInput = {
   hotspots?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsCreateOrConnectWithoutTemplateInput = {
@@ -916,6 +973,8 @@ export type e_booklet_template_versionsCreateWithoutHotspotsInput = {
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_template_versions_createdInput
   purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsUncheckedCreateWithoutHotspotsInput = {
@@ -932,6 +991,8 @@ export type e_booklet_template_versionsUncheckedCreateWithoutHotspotsInput = {
   published_at?: Date | string | null
   purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsCreateOrConnectWithoutHotspotsInput = {
@@ -963,6 +1024,8 @@ export type e_booklet_template_versionsUpdateWithoutHotspotsInput = {
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_template_versions_createdNestedInput
   purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateWithoutHotspotsInput = {
@@ -979,6 +1042,180 @@ export type e_booklet_template_versionsUncheckedUpdateWithoutHotspotsInput = {
   published_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_template_versionNestedInput
+}
+
+export type e_booklet_template_versionsCreateWithoutHotspot_presets_sourceInput = {
+  version_number: number
+  page_count: number
+  page_dimensions_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.e_booklet_template_version_status_enum
+  created_at?: Date | string | null
+  published_at?: Date | string | null
+  template: Prisma.e_booklet_templatesCreateNestedOneWithoutVersionsInput
+  base_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutVersion_base_documentsInput
+  rendered_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutVersion_rendered_documentsInput
+  creator: Prisma.usersCreateNestedOneWithoutE_booklet_template_versions_createdInput
+  hotspots?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutTemplate_versionInput
+  purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTemplate_versionInput
+  instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplate_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_template_versionInput
+}
+
+export type e_booklet_template_versionsUncheckedCreateWithoutHotspot_presets_sourceInput = {
+  id?: number
+  template_id: number
+  version_number: number
+  base_document_file_id?: number | null
+  rendered_document_file_id?: number | null
+  page_count: number
+  page_dimensions_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.e_booklet_template_version_status_enum
+  created_by: number
+  created_at?: Date | string | null
+  published_at?: Date | string | null
+  hotspots?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutTemplate_versionInput
+  purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_template_versionInput
+}
+
+export type e_booklet_template_versionsCreateOrConnectWithoutHotspot_presets_sourceInput = {
+  where: Prisma.e_booklet_template_versionsWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_template_versionsCreateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_template_versionsUncheckedCreateWithoutHotspot_presets_sourceInput>
+}
+
+export type e_booklet_template_versionsUpsertWithoutHotspot_presets_sourceInput = {
+  update: Prisma.XOR<Prisma.e_booklet_template_versionsUpdateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_template_versionsUncheckedUpdateWithoutHotspot_presets_sourceInput>
+  create: Prisma.XOR<Prisma.e_booklet_template_versionsCreateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_template_versionsUncheckedCreateWithoutHotspot_presets_sourceInput>
+  where?: Prisma.e_booklet_template_versionsWhereInput
+}
+
+export type e_booklet_template_versionsUpdateToOneWithWhereWithoutHotspot_presets_sourceInput = {
+  where?: Prisma.e_booklet_template_versionsWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_template_versionsUpdateWithoutHotspot_presets_sourceInput, Prisma.e_booklet_template_versionsUncheckedUpdateWithoutHotspot_presets_sourceInput>
+}
+
+export type e_booklet_template_versionsUpdateWithoutHotspot_presets_sourceInput = {
+  version_number?: Prisma.IntFieldUpdateOperationsInput | number
+  page_count?: Prisma.IntFieldUpdateOperationsInput | number
+  page_dimensions_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.Enume_booklet_template_version_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_version_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  published_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutVersionsNestedInput
+  base_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutVersion_base_documentsNestedInput
+  rendered_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutVersion_rendered_documentsNestedInput
+  creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_template_versions_createdNestedInput
+  hotspots?: Prisma.e_booklet_hotspotsUpdateManyWithoutTemplate_versionNestedInput
+  purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTemplate_versionNestedInput
+  instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_template_versionNestedInput
+}
+
+export type e_booklet_template_versionsUncheckedUpdateWithoutHotspot_presets_sourceInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  version_number?: Prisma.IntFieldUpdateOperationsInput | number
+  base_document_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rendered_document_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  page_count?: Prisma.IntFieldUpdateOperationsInput | number
+  page_dimensions_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.Enume_booklet_template_version_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_version_status_enum
+  created_by?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  published_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hotspots?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_template_versionNestedInput
+}
+
+export type e_booklet_template_versionsCreateWithoutHotspot_preset_usagesInput = {
+  version_number: number
+  page_count: number
+  page_dimensions_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.e_booklet_template_version_status_enum
+  created_at?: Date | string | null
+  published_at?: Date | string | null
+  template: Prisma.e_booklet_templatesCreateNestedOneWithoutVersionsInput
+  base_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutVersion_base_documentsInput
+  rendered_document_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutVersion_rendered_documentsInput
+  creator: Prisma.usersCreateNestedOneWithoutE_booklet_template_versions_createdInput
+  hotspots?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutTemplate_versionInput
+  purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTemplate_versionInput
+  instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_template_versionInput
+}
+
+export type e_booklet_template_versionsUncheckedCreateWithoutHotspot_preset_usagesInput = {
+  id?: number
+  template_id: number
+  version_number: number
+  base_document_file_id?: number | null
+  rendered_document_file_id?: number | null
+  page_count: number
+  page_dimensions_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: $Enums.e_booklet_template_version_status_enum
+  created_by: number
+  created_at?: Date | string | null
+  published_at?: Date | string | null
+  hotspots?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutTemplate_versionInput
+  purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_template_versionInput
+}
+
+export type e_booklet_template_versionsCreateOrConnectWithoutHotspot_preset_usagesInput = {
+  where: Prisma.e_booklet_template_versionsWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_template_versionsCreateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_template_versionsUncheckedCreateWithoutHotspot_preset_usagesInput>
+}
+
+export type e_booklet_template_versionsUpsertWithoutHotspot_preset_usagesInput = {
+  update: Prisma.XOR<Prisma.e_booklet_template_versionsUpdateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_template_versionsUncheckedUpdateWithoutHotspot_preset_usagesInput>
+  create: Prisma.XOR<Prisma.e_booklet_template_versionsCreateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_template_versionsUncheckedCreateWithoutHotspot_preset_usagesInput>
+  where?: Prisma.e_booklet_template_versionsWhereInput
+}
+
+export type e_booklet_template_versionsUpdateToOneWithWhereWithoutHotspot_preset_usagesInput = {
+  where?: Prisma.e_booklet_template_versionsWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_template_versionsUpdateWithoutHotspot_preset_usagesInput, Prisma.e_booklet_template_versionsUncheckedUpdateWithoutHotspot_preset_usagesInput>
+}
+
+export type e_booklet_template_versionsUpdateWithoutHotspot_preset_usagesInput = {
+  version_number?: Prisma.IntFieldUpdateOperationsInput | number
+  page_count?: Prisma.IntFieldUpdateOperationsInput | number
+  page_dimensions_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.Enume_booklet_template_version_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_version_status_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  published_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  template?: Prisma.e_booklet_templatesUpdateOneRequiredWithoutVersionsNestedInput
+  base_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutVersion_base_documentsNestedInput
+  rendered_document_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutVersion_rendered_documentsNestedInput
+  creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_template_versions_createdNestedInput
+  hotspots?: Prisma.e_booklet_hotspotsUpdateManyWithoutTemplate_versionNestedInput
+  purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTemplate_versionNestedInput
+  instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_template_versionNestedInput
+}
+
+export type e_booklet_template_versionsUncheckedUpdateWithoutHotspot_preset_usagesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.IntFieldUpdateOperationsInput | number
+  version_number?: Prisma.IntFieldUpdateOperationsInput | number
+  base_document_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  rendered_document_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  page_count?: Prisma.IntFieldUpdateOperationsInput | number
+  page_dimensions_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.Enume_booklet_template_version_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_template_version_status_enum
+  created_by?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  published_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  hotspots?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsCreateWithoutPurchasesInput = {
@@ -994,6 +1231,8 @@ export type e_booklet_template_versionsCreateWithoutPurchasesInput = {
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_template_versions_createdInput
   hotspots?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsUncheckedCreateWithoutPurchasesInput = {
@@ -1010,6 +1249,8 @@ export type e_booklet_template_versionsUncheckedCreateWithoutPurchasesInput = {
   published_at?: Date | string | null
   hotspots?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsCreateOrConnectWithoutPurchasesInput = {
@@ -1041,6 +1282,8 @@ export type e_booklet_template_versionsUpdateWithoutPurchasesInput = {
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_template_versions_createdNestedInput
   hotspots?: Prisma.e_booklet_hotspotsUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateWithoutPurchasesInput = {
@@ -1057,6 +1300,8 @@ export type e_booklet_template_versionsUncheckedUpdateWithoutPurchasesInput = {
   published_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hotspots?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsCreateWithoutInstancesInput = {
@@ -1072,6 +1317,8 @@ export type e_booklet_template_versionsCreateWithoutInstancesInput = {
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_template_versions_createdInput
   hotspots?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsUncheckedCreateWithoutInstancesInput = {
@@ -1088,6 +1335,8 @@ export type e_booklet_template_versionsUncheckedCreateWithoutInstancesInput = {
   published_at?: Date | string | null
   hotspots?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsCreateOrConnectWithoutInstancesInput = {
@@ -1119,6 +1368,8 @@ export type e_booklet_template_versionsUpdateWithoutInstancesInput = {
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_template_versions_createdNestedInput
   hotspots?: Prisma.e_booklet_hotspotsUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateWithoutInstancesInput = {
@@ -1135,6 +1386,8 @@ export type e_booklet_template_versionsUncheckedUpdateWithoutInstancesInput = {
   published_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hotspots?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsCreateWithoutBase_document_fileInput = {
@@ -1150,6 +1403,8 @@ export type e_booklet_template_versionsCreateWithoutBase_document_fileInput = {
   hotspots?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsUncheckedCreateWithoutBase_document_fileInput = {
@@ -1166,6 +1421,8 @@ export type e_booklet_template_versionsUncheckedCreateWithoutBase_document_fileI
   hotspots?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsCreateOrConnectWithoutBase_document_fileInput = {
@@ -1191,6 +1448,8 @@ export type e_booklet_template_versionsCreateWithoutRendered_document_fileInput 
   hotspots?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsUncheckedCreateWithoutRendered_document_fileInput = {
@@ -1207,6 +1466,8 @@ export type e_booklet_template_versionsUncheckedCreateWithoutRendered_document_f
   hotspots?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutTemplate_versionInput
   purchases?: Prisma.e_booklet_purchasesUncheckedCreateNestedManyWithoutTemplate_versionInput
   instances?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutTemplate_versionInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_template_versionInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_template_versionInput
 }
 
 export type e_booklet_template_versionsCreateOrConnectWithoutRendered_document_fileInput = {
@@ -1277,6 +1538,8 @@ export type e_booklet_template_versionsUpdateWithoutCreatorInput = {
   hotspots?: Prisma.e_booklet_hotspotsUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateWithoutCreatorInput = {
@@ -1293,6 +1556,8 @@ export type e_booklet_template_versionsUncheckedUpdateWithoutCreatorInput = {
   hotspots?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateManyWithoutCreatorInput = {
@@ -1334,6 +1599,8 @@ export type e_booklet_template_versionsUpdateWithoutTemplateInput = {
   hotspots?: Prisma.e_booklet_hotspotsUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateWithoutTemplateInput = {
@@ -1350,6 +1617,8 @@ export type e_booklet_template_versionsUncheckedUpdateWithoutTemplateInput = {
   hotspots?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateManyWithoutTemplateInput = {
@@ -1404,6 +1673,8 @@ export type e_booklet_template_versionsUpdateWithoutBase_document_fileInput = {
   hotspots?: Prisma.e_booklet_hotspotsUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateWithoutBase_document_fileInput = {
@@ -1420,6 +1691,8 @@ export type e_booklet_template_versionsUncheckedUpdateWithoutBase_document_fileI
   hotspots?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateManyWithoutBase_document_fileInput = {
@@ -1448,6 +1721,8 @@ export type e_booklet_template_versionsUpdateWithoutRendered_document_fileInput 
   hotspots?: Prisma.e_booklet_hotspotsUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateWithoutRendered_document_fileInput = {
@@ -1464,6 +1739,8 @@ export type e_booklet_template_versionsUncheckedUpdateWithoutRendered_document_f
   hotspots?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionNestedInput
   purchases?: Prisma.e_booklet_purchasesUncheckedUpdateManyWithoutTemplate_versionNestedInput
   instances?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutTemplate_versionNestedInput
+  hotspot_presets_source?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_template_versionNestedInput
+  hotspot_preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_template_versionNestedInput
 }
 
 export type e_booklet_template_versionsUncheckedUpdateManyWithoutRendered_document_fileInput = {
@@ -1488,12 +1765,16 @@ export type E_booklet_template_versionsCountOutputType = {
   hotspots: number
   purchases: number
   instances: number
+  hotspot_presets_source: number
+  hotspot_preset_usages: number
 }
 
 export type E_booklet_template_versionsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   hotspots?: boolean | E_booklet_template_versionsCountOutputTypeCountHotspotsArgs
   purchases?: boolean | E_booklet_template_versionsCountOutputTypeCountPurchasesArgs
   instances?: boolean | E_booklet_template_versionsCountOutputTypeCountInstancesArgs
+  hotspot_presets_source?: boolean | E_booklet_template_versionsCountOutputTypeCountHotspot_presets_sourceArgs
+  hotspot_preset_usages?: boolean | E_booklet_template_versionsCountOutputTypeCountHotspot_preset_usagesArgs
 }
 
 /**
@@ -1527,6 +1808,20 @@ export type E_booklet_template_versionsCountOutputTypeCountInstancesArgs<ExtArgs
   where?: Prisma.e_booklet_instancesWhereInput
 }
 
+/**
+ * E_booklet_template_versionsCountOutputType without action
+ */
+export type E_booklet_template_versionsCountOutputTypeCountHotspot_presets_sourceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_hotspot_presetsWhereInput
+}
+
+/**
+ * E_booklet_template_versionsCountOutputType without action
+ */
+export type E_booklet_template_versionsCountOutputTypeCountHotspot_preset_usagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_hotspot_preset_usagesWhereInput
+}
+
 
 export type e_booklet_template_versionsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1547,6 +1842,8 @@ export type e_booklet_template_versionsSelect<ExtArgs extends runtime.Types.Exte
   hotspots?: boolean | Prisma.e_booklet_template_versions$hotspotsArgs<ExtArgs>
   purchases?: boolean | Prisma.e_booklet_template_versions$purchasesArgs<ExtArgs>
   instances?: boolean | Prisma.e_booklet_template_versions$instancesArgs<ExtArgs>
+  hotspot_presets_source?: boolean | Prisma.e_booklet_template_versions$hotspot_presets_sourceArgs<ExtArgs>
+  hotspot_preset_usages?: boolean | Prisma.e_booklet_template_versions$hotspot_preset_usagesArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_template_versionsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["e_booklet_template_versions"]>
 
@@ -1609,6 +1906,8 @@ export type e_booklet_template_versionsInclude<ExtArgs extends runtime.Types.Ext
   hotspots?: boolean | Prisma.e_booklet_template_versions$hotspotsArgs<ExtArgs>
   purchases?: boolean | Prisma.e_booklet_template_versions$purchasesArgs<ExtArgs>
   instances?: boolean | Prisma.e_booklet_template_versions$instancesArgs<ExtArgs>
+  hotspot_presets_source?: boolean | Prisma.e_booklet_template_versions$hotspot_presets_sourceArgs<ExtArgs>
+  hotspot_preset_usages?: boolean | Prisma.e_booklet_template_versions$hotspot_preset_usagesArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_template_versionsCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type e_booklet_template_versionsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1634,6 +1933,8 @@ export type $e_booklet_template_versionsPayload<ExtArgs extends runtime.Types.Ex
     hotspots: Prisma.$e_booklet_hotspotsPayload<ExtArgs>[]
     purchases: Prisma.$e_booklet_purchasesPayload<ExtArgs>[]
     instances: Prisma.$e_booklet_instancesPayload<ExtArgs>[]
+    hotspot_presets_source: Prisma.$e_booklet_hotspot_presetsPayload<ExtArgs>[]
+    hotspot_preset_usages: Prisma.$e_booklet_hotspot_preset_usagesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2048,6 +2349,8 @@ export interface Prisma__e_booklet_template_versionsClient<T, Null = never, ExtA
   hotspots<T extends Prisma.e_booklet_template_versions$hotspotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_template_versions$hotspotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_hotspotsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   purchases<T extends Prisma.e_booklet_template_versions$purchasesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_template_versions$purchasesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_purchasesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   instances<T extends Prisma.e_booklet_template_versions$instancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_template_versions$instancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_instancesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  hotspot_presets_source<T extends Prisma.e_booklet_template_versions$hotspot_presets_sourceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_template_versions$hotspot_presets_sourceArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_hotspot_presetsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  hotspot_preset_usages<T extends Prisma.e_booklet_template_versions$hotspot_preset_usagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_template_versions$hotspot_preset_usagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_hotspot_preset_usagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2600,6 +2903,54 @@ export type e_booklet_template_versions$instancesArgs<ExtArgs extends runtime.Ty
   take?: number
   skip?: number
   distinct?: Prisma.E_booklet_instancesScalarFieldEnum | Prisma.E_booklet_instancesScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_template_versions.hotspot_presets_source
+ */
+export type e_booklet_template_versions$hotspot_presets_sourceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_hotspot_presets
+   */
+  select?: Prisma.e_booklet_hotspot_presetsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_hotspot_presets
+   */
+  omit?: Prisma.e_booklet_hotspot_presetsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_hotspot_presetsInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_hotspot_presetsWhereInput
+  orderBy?: Prisma.e_booklet_hotspot_presetsOrderByWithRelationInput | Prisma.e_booklet_hotspot_presetsOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_hotspot_presetsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_hotspot_presetsScalarFieldEnum | Prisma.E_booklet_hotspot_presetsScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_template_versions.hotspot_preset_usages
+ */
+export type e_booklet_template_versions$hotspot_preset_usagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_hotspot_preset_usages
+   */
+  select?: Prisma.e_booklet_hotspot_preset_usagesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_hotspot_preset_usages
+   */
+  omit?: Prisma.e_booklet_hotspot_preset_usagesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_hotspot_preset_usagesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_hotspot_preset_usagesWhereInput
+  orderBy?: Prisma.e_booklet_hotspot_preset_usagesOrderByWithRelationInput | Prisma.e_booklet_hotspot_preset_usagesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_hotspot_preset_usagesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_hotspot_preset_usagesScalarFieldEnum | Prisma.E_booklet_hotspot_preset_usagesScalarFieldEnum[]
 }
 
 /**

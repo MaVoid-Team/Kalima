@@ -408,6 +408,8 @@ export type e_booklet_hotspotsWhereInput = {
   asset_file?: Prisma.XOR<Prisma.E_booklet_file_assetsNullableScalarRelationFilter, Prisma.e_booklet_file_assetsWhereInput> | null
   creator?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   updater?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
+  source_for_presets?: Prisma.E_booklet_hotspot_presetsListRelationFilter
+  preset_usages?: Prisma.E_booklet_hotspot_preset_usagesListRelationFilter
 }
 
 export type e_booklet_hotspotsOrderByWithRelationInput = {
@@ -439,6 +441,8 @@ export type e_booklet_hotspotsOrderByWithRelationInput = {
   asset_file?: Prisma.e_booklet_file_assetsOrderByWithRelationInput
   creator?: Prisma.usersOrderByWithRelationInput
   updater?: Prisma.usersOrderByWithRelationInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsOrderByRelationAggregateInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesOrderByRelationAggregateInput
 }
 
 export type e_booklet_hotspotsWhereUniqueInput = Prisma.AtLeast<{
@@ -474,6 +478,8 @@ export type e_booklet_hotspotsWhereUniqueInput = Prisma.AtLeast<{
   asset_file?: Prisma.XOR<Prisma.E_booklet_file_assetsNullableScalarRelationFilter, Prisma.e_booklet_file_assetsWhereInput> | null
   creator?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   updater?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
+  source_for_presets?: Prisma.E_booklet_hotspot_presetsListRelationFilter
+  preset_usages?: Prisma.E_booklet_hotspot_preset_usagesListRelationFilter
 }, "id" | "template_version_id_reference_number">
 
 export type e_booklet_hotspotsOrderByWithAggregationInput = {
@@ -562,6 +568,8 @@ export type e_booklet_hotspotsCreateInput = {
   asset_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutHotspot_assetsInput
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_createdInput
   updater?: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_updatedInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_hotspotInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_hotspotInput
 }
 
 export type e_booklet_hotspotsUncheckedCreateInput = {
@@ -589,6 +597,8 @@ export type e_booklet_hotspotsUncheckedCreateInput = {
   updated_by?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_hotspotInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_hotspotInput
 }
 
 export type e_booklet_hotspotsUpdateInput = {
@@ -615,6 +625,8 @@ export type e_booklet_hotspotsUpdateInput = {
   asset_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutHotspot_assetsNestedInput
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_hotspots_createdNestedInput
   updater?: Prisma.usersUpdateOneWithoutE_booklet_hotspots_updatedNestedInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_hotspotNestedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_hotspotNestedInput
 }
 
 export type e_booklet_hotspotsUncheckedUpdateInput = {
@@ -642,6 +654,8 @@ export type e_booklet_hotspotsUncheckedUpdateInput = {
   updated_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_hotspotNestedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_hotspotNestedInput
 }
 
 export type e_booklet_hotspotsCreateManyInput = {
@@ -842,6 +856,16 @@ export type e_booklet_hotspotsSumOrderByAggregateInput = {
   updated_by?: Prisma.SortOrder
 }
 
+export type E_booklet_hotspotsNullableScalarRelationFilter = {
+  is?: Prisma.e_booklet_hotspotsWhereInput | null
+  isNot?: Prisma.e_booklet_hotspotsWhereInput | null
+}
+
+export type E_booklet_hotspotsScalarRelationFilter = {
+  is?: Prisma.e_booklet_hotspotsWhereInput
+  isNot?: Prisma.e_booklet_hotspotsWhereInput
+}
+
 export type e_booklet_hotspotsCreateNestedManyWithoutCreatorInput = {
   create?: Prisma.XOR<Prisma.e_booklet_hotspotsCreateWithoutCreatorInput, Prisma.e_booklet_hotspotsUncheckedCreateWithoutCreatorInput> | Prisma.e_booklet_hotspotsCreateWithoutCreatorInput[] | Prisma.e_booklet_hotspotsUncheckedCreateWithoutCreatorInput[]
   connectOrCreate?: Prisma.e_booklet_hotspotsCreateOrConnectWithoutCreatorInput | Prisma.e_booklet_hotspotsCreateOrConnectWithoutCreatorInput[]
@@ -980,6 +1004,36 @@ export type Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput = 
   set?: $Enums.e_booklet_hotspot_trigger_type_enum
 }
 
+export type e_booklet_hotspotsCreateNestedOneWithoutSource_for_presetsInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_hotspotsCreateWithoutSource_for_presetsInput, Prisma.e_booklet_hotspotsUncheckedCreateWithoutSource_for_presetsInput>
+  connectOrCreate?: Prisma.e_booklet_hotspotsCreateOrConnectWithoutSource_for_presetsInput
+  connect?: Prisma.e_booklet_hotspotsWhereUniqueInput
+}
+
+export type e_booklet_hotspotsUpdateOneWithoutSource_for_presetsNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_hotspotsCreateWithoutSource_for_presetsInput, Prisma.e_booklet_hotspotsUncheckedCreateWithoutSource_for_presetsInput>
+  connectOrCreate?: Prisma.e_booklet_hotspotsCreateOrConnectWithoutSource_for_presetsInput
+  upsert?: Prisma.e_booklet_hotspotsUpsertWithoutSource_for_presetsInput
+  disconnect?: Prisma.e_booklet_hotspotsWhereInput | boolean
+  delete?: Prisma.e_booklet_hotspotsWhereInput | boolean
+  connect?: Prisma.e_booklet_hotspotsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_hotspotsUpdateToOneWithWhereWithoutSource_for_presetsInput, Prisma.e_booklet_hotspotsUpdateWithoutSource_for_presetsInput>, Prisma.e_booklet_hotspotsUncheckedUpdateWithoutSource_for_presetsInput>
+}
+
+export type e_booklet_hotspotsCreateNestedOneWithoutPreset_usagesInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_hotspotsCreateWithoutPreset_usagesInput, Prisma.e_booklet_hotspotsUncheckedCreateWithoutPreset_usagesInput>
+  connectOrCreate?: Prisma.e_booklet_hotspotsCreateOrConnectWithoutPreset_usagesInput
+  connect?: Prisma.e_booklet_hotspotsWhereUniqueInput
+}
+
+export type e_booklet_hotspotsUpdateOneRequiredWithoutPreset_usagesNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_hotspotsCreateWithoutPreset_usagesInput, Prisma.e_booklet_hotspotsUncheckedCreateWithoutPreset_usagesInput>
+  connectOrCreate?: Prisma.e_booklet_hotspotsCreateOrConnectWithoutPreset_usagesInput
+  upsert?: Prisma.e_booklet_hotspotsUpsertWithoutPreset_usagesInput
+  connect?: Prisma.e_booklet_hotspotsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_hotspotsUpdateToOneWithWhereWithoutPreset_usagesInput, Prisma.e_booklet_hotspotsUpdateWithoutPreset_usagesInput>, Prisma.e_booklet_hotspotsUncheckedUpdateWithoutPreset_usagesInput>
+}
+
 export type e_booklet_hotspotsCreateNestedManyWithoutAsset_fileInput = {
   create?: Prisma.XOR<Prisma.e_booklet_hotspotsCreateWithoutAsset_fileInput, Prisma.e_booklet_hotspotsUncheckedCreateWithoutAsset_fileInput> | Prisma.e_booklet_hotspotsCreateWithoutAsset_fileInput[] | Prisma.e_booklet_hotspotsUncheckedCreateWithoutAsset_fileInput[]
   connectOrCreate?: Prisma.e_booklet_hotspotsCreateOrConnectWithoutAsset_fileInput | Prisma.e_booklet_hotspotsCreateOrConnectWithoutAsset_fileInput[]
@@ -1045,6 +1099,8 @@ export type e_booklet_hotspotsCreateWithoutCreatorInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutHotspotsInput
   asset_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutHotspot_assetsInput
   updater?: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_updatedInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_hotspotInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_hotspotInput
 }
 
 export type e_booklet_hotspotsUncheckedCreateWithoutCreatorInput = {
@@ -1071,6 +1127,8 @@ export type e_booklet_hotspotsUncheckedCreateWithoutCreatorInput = {
   updated_by?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_hotspotInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_hotspotInput
 }
 
 export type e_booklet_hotspotsCreateOrConnectWithoutCreatorInput = {
@@ -1106,6 +1164,8 @@ export type e_booklet_hotspotsCreateWithoutUpdaterInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutHotspotsInput
   asset_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutHotspot_assetsInput
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_createdInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_hotspotInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_hotspotInput
 }
 
 export type e_booklet_hotspotsUncheckedCreateWithoutUpdaterInput = {
@@ -1132,6 +1192,8 @@ export type e_booklet_hotspotsUncheckedCreateWithoutUpdaterInput = {
   created_by: number
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_hotspotInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_hotspotInput
 }
 
 export type e_booklet_hotspotsCreateOrConnectWithoutUpdaterInput = {
@@ -1229,6 +1291,8 @@ export type e_booklet_hotspotsCreateWithoutTemplate_versionInput = {
   asset_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutHotspot_assetsInput
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_createdInput
   updater?: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_updatedInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_hotspotInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_hotspotInput
 }
 
 export type e_booklet_hotspotsUncheckedCreateWithoutTemplate_versionInput = {
@@ -1255,6 +1319,8 @@ export type e_booklet_hotspotsUncheckedCreateWithoutTemplate_versionInput = {
   updated_by?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_hotspotInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_hotspotInput
 }
 
 export type e_booklet_hotspotsCreateOrConnectWithoutTemplate_versionInput = {
@@ -1283,6 +1349,258 @@ export type e_booklet_hotspotsUpdateManyWithWhereWithoutTemplate_versionInput = 
   data: Prisma.XOR<Prisma.e_booklet_hotspotsUpdateManyMutationInput, Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionInput>
 }
 
+export type e_booklet_hotspotsCreateWithoutSource_for_presetsInput = {
+  page_number: number
+  x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  type: $Enums.e_booklet_hotspot_type_enum
+  title?: string | null
+  text_content?: string | null
+  trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
+  display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sort_order?: number | null
+  is_active?: boolean
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutHotspotsInput
+  asset_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutHotspot_assetsInput
+  creator: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_createdInput
+  updater?: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_updatedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_hotspotInput
+}
+
+export type e_booklet_hotspotsUncheckedCreateWithoutSource_for_presetsInput = {
+  id?: number
+  template_version_id: number
+  page_number: number
+  x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  type: $Enums.e_booklet_hotspot_type_enum
+  title?: string | null
+  text_content?: string | null
+  asset_file_id?: number | null
+  trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
+  display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sort_order?: number | null
+  is_active?: boolean
+  created_by: number
+  updated_by?: number | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_hotspotInput
+}
+
+export type e_booklet_hotspotsCreateOrConnectWithoutSource_for_presetsInput = {
+  where: Prisma.e_booklet_hotspotsWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_hotspotsCreateWithoutSource_for_presetsInput, Prisma.e_booklet_hotspotsUncheckedCreateWithoutSource_for_presetsInput>
+}
+
+export type e_booklet_hotspotsUpsertWithoutSource_for_presetsInput = {
+  update: Prisma.XOR<Prisma.e_booklet_hotspotsUpdateWithoutSource_for_presetsInput, Prisma.e_booklet_hotspotsUncheckedUpdateWithoutSource_for_presetsInput>
+  create: Prisma.XOR<Prisma.e_booklet_hotspotsCreateWithoutSource_for_presetsInput, Prisma.e_booklet_hotspotsUncheckedCreateWithoutSource_for_presetsInput>
+  where?: Prisma.e_booklet_hotspotsWhereInput
+}
+
+export type e_booklet_hotspotsUpdateToOneWithWhereWithoutSource_for_presetsInput = {
+  where?: Prisma.e_booklet_hotspotsWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_hotspotsUpdateWithoutSource_for_presetsInput, Prisma.e_booklet_hotspotsUncheckedUpdateWithoutSource_for_presetsInput>
+}
+
+export type e_booklet_hotspotsUpdateWithoutSource_for_presetsInput = {
+  page_number?: Prisma.IntFieldUpdateOperationsInput | number
+  x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
+  display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutHotspotsNestedInput
+  asset_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutHotspot_assetsNestedInput
+  creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_hotspots_createdNestedInput
+  updater?: Prisma.usersUpdateOneWithoutE_booklet_hotspots_updatedNestedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_hotspotNestedInput
+}
+
+export type e_booklet_hotspotsUncheckedUpdateWithoutSource_for_presetsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  page_number?: Prisma.IntFieldUpdateOperationsInput | number
+  x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asset_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
+  display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_by?: Prisma.IntFieldUpdateOperationsInput | number
+  updated_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_hotspotNestedInput
+}
+
+export type e_booklet_hotspotsCreateWithoutPreset_usagesInput = {
+  page_number: number
+  x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  type: $Enums.e_booklet_hotspot_type_enum
+  title?: string | null
+  text_content?: string | null
+  trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
+  display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sort_order?: number | null
+  is_active?: boolean
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutHotspotsInput
+  asset_file?: Prisma.e_booklet_file_assetsCreateNestedOneWithoutHotspot_assetsInput
+  creator: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_createdInput
+  updater?: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_updatedInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_hotspotInput
+}
+
+export type e_booklet_hotspotsUncheckedCreateWithoutPreset_usagesInput = {
+  id?: number
+  template_version_id: number
+  page_number: number
+  x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  y_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  radius_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: number | null
+  shape?: $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  type: $Enums.e_booklet_hotspot_type_enum
+  title?: string | null
+  text_content?: string | null
+  asset_file_id?: number | null
+  trigger_type?: $Enums.e_booklet_hotspot_trigger_type_enum
+  display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sort_order?: number | null
+  is_active?: boolean
+  created_by: number
+  updated_by?: number | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_hotspotInput
+}
+
+export type e_booklet_hotspotsCreateOrConnectWithoutPreset_usagesInput = {
+  where: Prisma.e_booklet_hotspotsWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_hotspotsCreateWithoutPreset_usagesInput, Prisma.e_booklet_hotspotsUncheckedCreateWithoutPreset_usagesInput>
+}
+
+export type e_booklet_hotspotsUpsertWithoutPreset_usagesInput = {
+  update: Prisma.XOR<Prisma.e_booklet_hotspotsUpdateWithoutPreset_usagesInput, Prisma.e_booklet_hotspotsUncheckedUpdateWithoutPreset_usagesInput>
+  create: Prisma.XOR<Prisma.e_booklet_hotspotsCreateWithoutPreset_usagesInput, Prisma.e_booklet_hotspotsUncheckedCreateWithoutPreset_usagesInput>
+  where?: Prisma.e_booklet_hotspotsWhereInput
+}
+
+export type e_booklet_hotspotsUpdateToOneWithWhereWithoutPreset_usagesInput = {
+  where?: Prisma.e_booklet_hotspotsWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_hotspotsUpdateWithoutPreset_usagesInput, Prisma.e_booklet_hotspotsUncheckedUpdateWithoutPreset_usagesInput>
+}
+
+export type e_booklet_hotspotsUpdateWithoutPreset_usagesInput = {
+  page_number?: Prisma.IntFieldUpdateOperationsInput | number
+  x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
+  display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutHotspotsNestedInput
+  asset_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutHotspot_assetsNestedInput
+  creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_hotspots_createdNestedInput
+  updater?: Prisma.usersUpdateOneWithoutE_booklet_hotspots_updatedNestedInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_hotspotNestedInput
+}
+
+export type e_booklet_hotspotsUncheckedUpdateWithoutPreset_usagesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_version_id?: Prisma.IntFieldUpdateOperationsInput | number
+  page_number?: Prisma.IntFieldUpdateOperationsInput | number
+  x_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  y_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  radius_percent?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reference_number?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  shape?: Prisma.Enume_booklet_hotspot_shape_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_shape_enum
+  width_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  height_percent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  type?: Prisma.Enume_booklet_hotspot_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_type_enum
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  text_content?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  asset_file_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  trigger_type?: Prisma.Enume_booklet_hotspot_trigger_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_hotspot_trigger_type_enum
+  display_behavior?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  content_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  interaction_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  sort_order?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_by?: Prisma.IntFieldUpdateOperationsInput | number
+  updated_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_hotspotNestedInput
+}
+
 export type e_booklet_hotspotsCreateWithoutAsset_fileInput = {
   page_number: number
   x_percent: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1306,6 +1624,8 @@ export type e_booklet_hotspotsCreateWithoutAsset_fileInput = {
   template_version: Prisma.e_booklet_template_versionsCreateNestedOneWithoutHotspotsInput
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_createdInput
   updater?: Prisma.usersCreateNestedOneWithoutE_booklet_hotspots_updatedInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutSource_hotspotInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesCreateNestedManyWithoutTarget_hotspotInput
 }
 
 export type e_booklet_hotspotsUncheckedCreateWithoutAsset_fileInput = {
@@ -1332,6 +1652,8 @@ export type e_booklet_hotspotsUncheckedCreateWithoutAsset_fileInput = {
   updated_by?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutSource_hotspotInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedCreateNestedManyWithoutTarget_hotspotInput
 }
 
 export type e_booklet_hotspotsCreateOrConnectWithoutAsset_fileInput = {
@@ -1435,6 +1757,8 @@ export type e_booklet_hotspotsUpdateWithoutCreatorInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutHotspotsNestedInput
   asset_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutHotspot_assetsNestedInput
   updater?: Prisma.usersUpdateOneWithoutE_booklet_hotspots_updatedNestedInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_hotspotNestedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_hotspotNestedInput
 }
 
 export type e_booklet_hotspotsUncheckedUpdateWithoutCreatorInput = {
@@ -1461,6 +1785,8 @@ export type e_booklet_hotspotsUncheckedUpdateWithoutCreatorInput = {
   updated_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_hotspotNestedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_hotspotNestedInput
 }
 
 export type e_booklet_hotspotsUncheckedUpdateManyWithoutCreatorInput = {
@@ -1512,6 +1838,8 @@ export type e_booklet_hotspotsUpdateWithoutUpdaterInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutHotspotsNestedInput
   asset_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutHotspot_assetsNestedInput
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_hotspots_createdNestedInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_hotspotNestedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_hotspotNestedInput
 }
 
 export type e_booklet_hotspotsUncheckedUpdateWithoutUpdaterInput = {
@@ -1538,6 +1866,8 @@ export type e_booklet_hotspotsUncheckedUpdateWithoutUpdaterInput = {
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_hotspotNestedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_hotspotNestedInput
 }
 
 export type e_booklet_hotspotsUncheckedUpdateManyWithoutUpdaterInput = {
@@ -1615,6 +1945,8 @@ export type e_booklet_hotspotsUpdateWithoutTemplate_versionInput = {
   asset_file?: Prisma.e_booklet_file_assetsUpdateOneWithoutHotspot_assetsNestedInput
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_hotspots_createdNestedInput
   updater?: Prisma.usersUpdateOneWithoutE_booklet_hotspots_updatedNestedInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_hotspotNestedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_hotspotNestedInput
 }
 
 export type e_booklet_hotspotsUncheckedUpdateWithoutTemplate_versionInput = {
@@ -1641,6 +1973,8 @@ export type e_booklet_hotspotsUncheckedUpdateWithoutTemplate_versionInput = {
   updated_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_hotspotNestedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_hotspotNestedInput
 }
 
 export type e_booklet_hotspotsUncheckedUpdateManyWithoutTemplate_versionInput = {
@@ -1718,6 +2052,8 @@ export type e_booklet_hotspotsUpdateWithoutAsset_fileInput = {
   template_version?: Prisma.e_booklet_template_versionsUpdateOneRequiredWithoutHotspotsNestedInput
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_hotspots_createdNestedInput
   updater?: Prisma.usersUpdateOneWithoutE_booklet_hotspots_updatedNestedInput
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutSource_hotspotNestedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUpdateManyWithoutTarget_hotspotNestedInput
 }
 
 export type e_booklet_hotspotsUncheckedUpdateWithoutAsset_fileInput = {
@@ -1744,6 +2080,8 @@ export type e_booklet_hotspotsUncheckedUpdateWithoutAsset_fileInput = {
   updated_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  source_for_presets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutSource_hotspotNestedInput
+  preset_usages?: Prisma.e_booklet_hotspot_preset_usagesUncheckedUpdateManyWithoutTarget_hotspotNestedInput
 }
 
 export type e_booklet_hotspotsUncheckedUpdateManyWithoutAsset_fileInput = {
@@ -1772,6 +2110,44 @@ export type e_booklet_hotspotsUncheckedUpdateManyWithoutAsset_fileInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
+
+/**
+ * Count Type E_booklet_hotspotsCountOutputType
+ */
+
+export type E_booklet_hotspotsCountOutputType = {
+  source_for_presets: number
+  preset_usages: number
+}
+
+export type E_booklet_hotspotsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  source_for_presets?: boolean | E_booklet_hotspotsCountOutputTypeCountSource_for_presetsArgs
+  preset_usages?: boolean | E_booklet_hotspotsCountOutputTypeCountPreset_usagesArgs
+}
+
+/**
+ * E_booklet_hotspotsCountOutputType without action
+ */
+export type E_booklet_hotspotsCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the E_booklet_hotspotsCountOutputType
+   */
+  select?: Prisma.E_booklet_hotspotsCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * E_booklet_hotspotsCountOutputType without action
+ */
+export type E_booklet_hotspotsCountOutputTypeCountSource_for_presetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_hotspot_presetsWhereInput
+}
+
+/**
+ * E_booklet_hotspotsCountOutputType without action
+ */
+export type E_booklet_hotspotsCountOutputTypeCountPreset_usagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_hotspot_preset_usagesWhereInput
+}
 
 
 export type e_booklet_hotspotsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1803,6 +2179,9 @@ export type e_booklet_hotspotsSelect<ExtArgs extends runtime.Types.Extensions.In
   asset_file?: boolean | Prisma.e_booklet_hotspots$asset_fileArgs<ExtArgs>
   creator?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   updater?: boolean | Prisma.e_booklet_hotspots$updaterArgs<ExtArgs>
+  source_for_presets?: boolean | Prisma.e_booklet_hotspots$source_for_presetsArgs<ExtArgs>
+  preset_usages?: boolean | Prisma.e_booklet_hotspots$preset_usagesArgs<ExtArgs>
+  _count?: boolean | Prisma.E_booklet_hotspotsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["e_booklet_hotspots"]>
 
 export type e_booklet_hotspotsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1900,6 +2279,9 @@ export type e_booklet_hotspotsInclude<ExtArgs extends runtime.Types.Extensions.I
   asset_file?: boolean | Prisma.e_booklet_hotspots$asset_fileArgs<ExtArgs>
   creator?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   updater?: boolean | Prisma.e_booklet_hotspots$updaterArgs<ExtArgs>
+  source_for_presets?: boolean | Prisma.e_booklet_hotspots$source_for_presetsArgs<ExtArgs>
+  preset_usages?: boolean | Prisma.e_booklet_hotspots$preset_usagesArgs<ExtArgs>
+  _count?: boolean | Prisma.E_booklet_hotspotsCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type e_booklet_hotspotsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   template_version?: boolean | Prisma.e_booklet_template_versionsDefaultArgs<ExtArgs>
@@ -1921,6 +2303,8 @@ export type $e_booklet_hotspotsPayload<ExtArgs extends runtime.Types.Extensions.
     asset_file: Prisma.$e_booklet_file_assetsPayload<ExtArgs> | null
     creator: Prisma.$usersPayload<ExtArgs>
     updater: Prisma.$usersPayload<ExtArgs> | null
+    source_for_presets: Prisma.$e_booklet_hotspot_presetsPayload<ExtArgs>[]
+    preset_usages: Prisma.$e_booklet_hotspot_preset_usagesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2345,6 +2729,8 @@ export interface Prisma__e_booklet_hotspotsClient<T, Null = never, ExtArgs exten
   asset_file<T extends Prisma.e_booklet_hotspots$asset_fileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_hotspots$asset_fileArgs<ExtArgs>>): Prisma.Prisma__e_booklet_file_assetsClient<runtime.Types.Result.GetResult<Prisma.$e_booklet_file_assetsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   creator<T extends Prisma.usersDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.usersDefaultArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   updater<T extends Prisma.e_booklet_hotspots$updaterArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_hotspots$updaterArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  source_for_presets<T extends Prisma.e_booklet_hotspots$source_for_presetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_hotspots$source_for_presetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_hotspot_presetsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  preset_usages<T extends Prisma.e_booklet_hotspots$preset_usagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_hotspots$preset_usagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_hotspot_preset_usagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2838,6 +3224,54 @@ export type e_booklet_hotspots$updaterArgs<ExtArgs extends runtime.Types.Extensi
    */
   include?: Prisma.usersInclude<ExtArgs> | null
   where?: Prisma.usersWhereInput
+}
+
+/**
+ * e_booklet_hotspots.source_for_presets
+ */
+export type e_booklet_hotspots$source_for_presetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_hotspot_presets
+   */
+  select?: Prisma.e_booklet_hotspot_presetsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_hotspot_presets
+   */
+  omit?: Prisma.e_booklet_hotspot_presetsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_hotspot_presetsInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_hotspot_presetsWhereInput
+  orderBy?: Prisma.e_booklet_hotspot_presetsOrderByWithRelationInput | Prisma.e_booklet_hotspot_presetsOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_hotspot_presetsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_hotspot_presetsScalarFieldEnum | Prisma.E_booklet_hotspot_presetsScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_hotspots.preset_usages
+ */
+export type e_booklet_hotspots$preset_usagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_hotspot_preset_usages
+   */
+  select?: Prisma.e_booklet_hotspot_preset_usagesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_hotspot_preset_usages
+   */
+  omit?: Prisma.e_booklet_hotspot_preset_usagesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_hotspot_preset_usagesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_hotspot_preset_usagesWhereInput
+  orderBy?: Prisma.e_booklet_hotspot_preset_usagesOrderByWithRelationInput | Prisma.e_booklet_hotspot_preset_usagesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_hotspot_preset_usagesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_hotspot_preset_usagesScalarFieldEnum | Prisma.E_booklet_hotspot_preset_usagesScalarFieldEnum[]
 }
 
 /**

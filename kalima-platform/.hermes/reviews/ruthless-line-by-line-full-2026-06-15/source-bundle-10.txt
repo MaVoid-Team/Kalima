@@ -12,8 +12,8 @@
 10|  "nav": {
 11|    "orders": "الطلبات",
 12|    "products": "المنتجات",
-13|    "eBooklets": "البوكليتات التفاعلية",
-14|    "eBookletPurchases": "طلبات البوكليتات",
+13|    "eBooklets": "المذكرات التفاعلية",
+14|    "eBookletPurchases": "طلبات المذكرات",
 15|    "samples": "العينات",
 16|    "coupons": "القسائم",
 17|    "categories": "الفئات",
@@ -31,8 +31,8 @@
 29|    "analytics": "الإحصائيات",
 30|    "dashboard": "لوحة التحكم",
 31|    "employeePerformance": "أداء الموظفين",
-32|    "eBookletInstances": "وصول البوكليتات",
-33|    "eBookletAnalytics": "تحليلات البوكليتات",
+32|    "eBookletInstances": "وصول المذكرات",
+33|    "eBookletAnalytics": "تحليلات المذكرات",
 34|    "eBookletTermsMilestones": "الشروط والمراحل"
 35|  },
 36|  "common": {

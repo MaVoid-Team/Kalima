@@ -35,20 +35,43 @@ export default defineConfig(({ command }) => {
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (id.includes('firebase')) {
+            if (!id.includes('node_modules')) return undefined;
+
+            if (id.includes('/firebase/') || id.includes('/@firebase/')) {
               return 'firebase-bundle';
             }
-            if (id.includes('@embedpdf') || id.includes('pdfjs-dist')) {
-              return 'pdf-viewer';
+            if (id.includes('/pdfjs-dist/')) {
+              return 'pdfjs';
             }
-            if (id.includes('libphonenumber-js') || id.includes('country-data-list') || id.includes('lodash') || id.includes('date-fns')) {
-              return 'heavy-utils';
+            if (id.includes('/@embedpdf/engines/') || id.includes('/@embedpdf/pdfium/') || id.includes('/@embedpdf/fonts-')) {
+              return 'embedpdf-engine';
             }
-            if (id.includes('framer-motion') || id.includes('lucide-react') || id.includes('lenis') || id.includes('@radix-ui')) {
-              return 'ui-frameworks';
+            if (id.includes('/@embedpdf/plugin-')) {
+              return 'embedpdf-plugins';
             }
-            if (id.includes('node_modules')) {
-              return 'vendor';
+            if (id.includes('/@embedpdf/react-pdf-viewer/')) {
+              return 'embedpdf-react';
+            }
+            if (id.includes('/@embedpdf/core/')) {
+              return 'embedpdf-core';
+            }
+            if (id.includes('/@embedpdf/models/')) {
+              return 'embedpdf-models';
+            }
+            if (id.includes('/@embedpdf/utils/')) {
+              return 'embedpdf-utils';
+            }
+            if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('/react-router-dom/')) {
+              return 'react-vendor';
+            }
+            if (id.includes('/@radix-ui/')) {
+              return 'radix-ui';
+            }
+            if (id.includes('/framer-motion/') || id.includes('/lucide-react/') || id.includes('/lenis/')) {
+              return 'ui-libs';
+            }
+            if (id.includes('/libphonenumber-js/') || id.includes('/country-data-list/') || id.includes('/lodash/') || id.includes('/date-fns/')) {
+              return 'utility-libs';
             }
           }
         }

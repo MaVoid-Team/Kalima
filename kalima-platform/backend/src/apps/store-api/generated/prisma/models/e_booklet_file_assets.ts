@@ -268,6 +268,7 @@ export type e_booklet_file_assetsWhereInput = {
   version_base_documents?: Prisma.E_booklet_template_versionsListRelationFilter
   version_rendered_documents?: Prisma.E_booklet_template_versionsListRelationFilter
   hotspot_assets?: Prisma.E_booklet_hotspotsListRelationFilter
+  hotspot_preset_assets?: Prisma.E_booklet_hotspot_presetsListRelationFilter
   instance_custom_documents?: Prisma.E_booklet_instancesListRelationFilter
 }
 
@@ -286,6 +287,7 @@ export type e_booklet_file_assetsOrderByWithRelationInput = {
   version_base_documents?: Prisma.e_booklet_template_versionsOrderByRelationAggregateInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsOrderByRelationAggregateInput
   hotspot_assets?: Prisma.e_booklet_hotspotsOrderByRelationAggregateInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsOrderByRelationAggregateInput
   instance_custom_documents?: Prisma.e_booklet_instancesOrderByRelationAggregateInput
 }
 
@@ -307,6 +309,7 @@ export type e_booklet_file_assetsWhereUniqueInput = Prisma.AtLeast<{
   version_base_documents?: Prisma.E_booklet_template_versionsListRelationFilter
   version_rendered_documents?: Prisma.E_booklet_template_versionsListRelationFilter
   hotspot_assets?: Prisma.E_booklet_hotspotsListRelationFilter
+  hotspot_preset_assets?: Prisma.E_booklet_hotspot_presetsListRelationFilter
   instance_custom_documents?: Prisma.E_booklet_instancesListRelationFilter
 }, "id" | "storage_key">
 
@@ -358,6 +361,7 @@ export type e_booklet_file_assetsCreateInput = {
   version_base_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutBase_document_fileInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutRendered_document_fileInput
   hotspot_assets?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutAsset_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutAsset_fileInput
   instance_custom_documents?: Prisma.e_booklet_instancesCreateNestedManyWithoutCustom_document_fileInput
 }
 
@@ -376,6 +380,7 @@ export type e_booklet_file_assetsUncheckedCreateInput = {
   version_base_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutBase_document_fileInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutRendered_document_fileInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutAsset_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutAsset_fileInput
   instance_custom_documents?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutCustom_document_fileInput
 }
 
@@ -393,6 +398,7 @@ export type e_booklet_file_assetsUpdateInput = {
   version_base_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutBase_document_fileNestedInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutRendered_document_fileNestedInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUpdateManyWithoutAsset_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutAsset_fileNestedInput
   instance_custom_documents?: Prisma.e_booklet_instancesUpdateManyWithoutCustom_document_fileNestedInput
 }
 
@@ -411,6 +417,7 @@ export type e_booklet_file_assetsUncheckedUpdateInput = {
   version_base_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutBase_document_fileNestedInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutRendered_document_fileNestedInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutAsset_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutAsset_fileNestedInput
   instance_custom_documents?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutCustom_document_fileNestedInput
 }
 
@@ -572,6 +579,22 @@ export type e_booklet_file_assetsUpdateOneWithoutHotspot_assetsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_file_assetsUpdateToOneWithWhereWithoutHotspot_assetsInput, Prisma.e_booklet_file_assetsUpdateWithoutHotspot_assetsInput>, Prisma.e_booklet_file_assetsUncheckedUpdateWithoutHotspot_assetsInput>
 }
 
+export type e_booklet_file_assetsCreateNestedOneWithoutHotspot_preset_assetsInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_file_assetsCreateWithoutHotspot_preset_assetsInput, Prisma.e_booklet_file_assetsUncheckedCreateWithoutHotspot_preset_assetsInput>
+  connectOrCreate?: Prisma.e_booklet_file_assetsCreateOrConnectWithoutHotspot_preset_assetsInput
+  connect?: Prisma.e_booklet_file_assetsWhereUniqueInput
+}
+
+export type e_booklet_file_assetsUpdateOneWithoutHotspot_preset_assetsNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_file_assetsCreateWithoutHotspot_preset_assetsInput, Prisma.e_booklet_file_assetsUncheckedCreateWithoutHotspot_preset_assetsInput>
+  connectOrCreate?: Prisma.e_booklet_file_assetsCreateOrConnectWithoutHotspot_preset_assetsInput
+  upsert?: Prisma.e_booklet_file_assetsUpsertWithoutHotspot_preset_assetsInput
+  disconnect?: Prisma.e_booklet_file_assetsWhereInput | boolean
+  delete?: Prisma.e_booklet_file_assetsWhereInput | boolean
+  connect?: Prisma.e_booklet_file_assetsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_file_assetsUpdateToOneWithWhereWithoutHotspot_preset_assetsInput, Prisma.e_booklet_file_assetsUpdateWithoutHotspot_preset_assetsInput>, Prisma.e_booklet_file_assetsUncheckedUpdateWithoutHotspot_preset_assetsInput>
+}
+
 export type e_booklet_file_assetsCreateNestedOneWithoutInstance_custom_documentsInput = {
   create?: Prisma.XOR<Prisma.e_booklet_file_assetsCreateWithoutInstance_custom_documentsInput, Prisma.e_booklet_file_assetsUncheckedCreateWithoutInstance_custom_documentsInput>
   connectOrCreate?: Prisma.e_booklet_file_assetsCreateOrConnectWithoutInstance_custom_documentsInput
@@ -609,6 +632,7 @@ export type e_booklet_file_assetsCreateWithoutTemplate_coversInput = {
   version_base_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutBase_document_fileInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutRendered_document_fileInput
   hotspot_assets?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutAsset_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutAsset_fileInput
   instance_custom_documents?: Prisma.e_booklet_instancesCreateNestedManyWithoutCustom_document_fileInput
 }
 
@@ -626,6 +650,7 @@ export type e_booklet_file_assetsUncheckedCreateWithoutTemplate_coversInput = {
   version_base_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutBase_document_fileInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutRendered_document_fileInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutAsset_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutAsset_fileInput
   instance_custom_documents?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutCustom_document_fileInput
 }
 
@@ -658,6 +683,7 @@ export type e_booklet_file_assetsUpdateWithoutTemplate_coversInput = {
   version_base_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutBase_document_fileNestedInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutRendered_document_fileNestedInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUpdateManyWithoutAsset_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutAsset_fileNestedInput
   instance_custom_documents?: Prisma.e_booklet_instancesUpdateManyWithoutCustom_document_fileNestedInput
 }
 
@@ -675,6 +701,7 @@ export type e_booklet_file_assetsUncheckedUpdateWithoutTemplate_coversInput = {
   version_base_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutBase_document_fileNestedInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutRendered_document_fileNestedInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutAsset_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutAsset_fileNestedInput
   instance_custom_documents?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutCustom_document_fileNestedInput
 }
 
@@ -691,6 +718,7 @@ export type e_booklet_file_assetsCreateWithoutVersion_base_documentsInput = {
   template_covers?: Prisma.e_booklet_templatesCreateNestedManyWithoutCover_fileInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutRendered_document_fileInput
   hotspot_assets?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutAsset_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutAsset_fileInput
   instance_custom_documents?: Prisma.e_booklet_instancesCreateNestedManyWithoutCustom_document_fileInput
 }
 
@@ -708,6 +736,7 @@ export type e_booklet_file_assetsUncheckedCreateWithoutVersion_base_documentsInp
   template_covers?: Prisma.e_booklet_templatesUncheckedCreateNestedManyWithoutCover_fileInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutRendered_document_fileInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutAsset_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutAsset_fileInput
   instance_custom_documents?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutCustom_document_fileInput
 }
 
@@ -729,6 +758,7 @@ export type e_booklet_file_assetsCreateWithoutVersion_rendered_documentsInput = 
   template_covers?: Prisma.e_booklet_templatesCreateNestedManyWithoutCover_fileInput
   version_base_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutBase_document_fileInput
   hotspot_assets?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutAsset_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutAsset_fileInput
   instance_custom_documents?: Prisma.e_booklet_instancesCreateNestedManyWithoutCustom_document_fileInput
 }
 
@@ -746,6 +776,7 @@ export type e_booklet_file_assetsUncheckedCreateWithoutVersion_rendered_document
   template_covers?: Prisma.e_booklet_templatesUncheckedCreateNestedManyWithoutCover_fileInput
   version_base_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutBase_document_fileInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutAsset_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutAsset_fileInput
   instance_custom_documents?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutCustom_document_fileInput
 }
 
@@ -778,6 +809,7 @@ export type e_booklet_file_assetsUpdateWithoutVersion_base_documentsInput = {
   template_covers?: Prisma.e_booklet_templatesUpdateManyWithoutCover_fileNestedInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutRendered_document_fileNestedInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUpdateManyWithoutAsset_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutAsset_fileNestedInput
   instance_custom_documents?: Prisma.e_booklet_instancesUpdateManyWithoutCustom_document_fileNestedInput
 }
 
@@ -795,6 +827,7 @@ export type e_booklet_file_assetsUncheckedUpdateWithoutVersion_base_documentsInp
   template_covers?: Prisma.e_booklet_templatesUncheckedUpdateManyWithoutCover_fileNestedInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutRendered_document_fileNestedInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutAsset_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutAsset_fileNestedInput
   instance_custom_documents?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutCustom_document_fileNestedInput
 }
 
@@ -822,6 +855,7 @@ export type e_booklet_file_assetsUpdateWithoutVersion_rendered_documentsInput = 
   template_covers?: Prisma.e_booklet_templatesUpdateManyWithoutCover_fileNestedInput
   version_base_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutBase_document_fileNestedInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUpdateManyWithoutAsset_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutAsset_fileNestedInput
   instance_custom_documents?: Prisma.e_booklet_instancesUpdateManyWithoutCustom_document_fileNestedInput
 }
 
@@ -839,6 +873,7 @@ export type e_booklet_file_assetsUncheckedUpdateWithoutVersion_rendered_document
   template_covers?: Prisma.e_booklet_templatesUncheckedUpdateManyWithoutCover_fileNestedInput
   version_base_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutBase_document_fileNestedInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutAsset_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutAsset_fileNestedInput
   instance_custom_documents?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutCustom_document_fileNestedInput
 }
 
@@ -855,6 +890,7 @@ export type e_booklet_file_assetsCreateWithoutHotspot_assetsInput = {
   template_covers?: Prisma.e_booklet_templatesCreateNestedManyWithoutCover_fileInput
   version_base_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutBase_document_fileInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutRendered_document_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutAsset_fileInput
   instance_custom_documents?: Prisma.e_booklet_instancesCreateNestedManyWithoutCustom_document_fileInput
 }
 
@@ -872,6 +908,7 @@ export type e_booklet_file_assetsUncheckedCreateWithoutHotspot_assetsInput = {
   template_covers?: Prisma.e_booklet_templatesUncheckedCreateNestedManyWithoutCover_fileInput
   version_base_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutBase_document_fileInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutRendered_document_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutAsset_fileInput
   instance_custom_documents?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutCustom_document_fileInput
 }
 
@@ -904,6 +941,7 @@ export type e_booklet_file_assetsUpdateWithoutHotspot_assetsInput = {
   template_covers?: Prisma.e_booklet_templatesUpdateManyWithoutCover_fileNestedInput
   version_base_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutBase_document_fileNestedInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutRendered_document_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutAsset_fileNestedInput
   instance_custom_documents?: Prisma.e_booklet_instancesUpdateManyWithoutCustom_document_fileNestedInput
 }
 
@@ -921,6 +959,93 @@ export type e_booklet_file_assetsUncheckedUpdateWithoutHotspot_assetsInput = {
   template_covers?: Prisma.e_booklet_templatesUncheckedUpdateManyWithoutCover_fileNestedInput
   version_base_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutBase_document_fileNestedInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutRendered_document_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutAsset_fileNestedInput
+  instance_custom_documents?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutCustom_document_fileNestedInput
+}
+
+export type e_booklet_file_assetsCreateWithoutHotspot_preset_assetsInput = {
+  owner_type: string
+  owner_id?: number | null
+  file_type: $Enums.e_booklet_file_type_enum
+  storage_key: string
+  original_filename: string
+  mime_type: string
+  size_bytes: number
+  visibility?: $Enums.e_booklet_file_visibility_enum
+  created_at?: Date | string | null
+  template_covers?: Prisma.e_booklet_templatesCreateNestedManyWithoutCover_fileInput
+  version_base_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutBase_document_fileInput
+  version_rendered_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutRendered_document_fileInput
+  hotspot_assets?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutAsset_fileInput
+  instance_custom_documents?: Prisma.e_booklet_instancesCreateNestedManyWithoutCustom_document_fileInput
+}
+
+export type e_booklet_file_assetsUncheckedCreateWithoutHotspot_preset_assetsInput = {
+  id?: number
+  owner_type: string
+  owner_id?: number | null
+  file_type: $Enums.e_booklet_file_type_enum
+  storage_key: string
+  original_filename: string
+  mime_type: string
+  size_bytes: number
+  visibility?: $Enums.e_booklet_file_visibility_enum
+  created_at?: Date | string | null
+  template_covers?: Prisma.e_booklet_templatesUncheckedCreateNestedManyWithoutCover_fileInput
+  version_base_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutBase_document_fileInput
+  version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutRendered_document_fileInput
+  hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutAsset_fileInput
+  instance_custom_documents?: Prisma.e_booklet_instancesUncheckedCreateNestedManyWithoutCustom_document_fileInput
+}
+
+export type e_booklet_file_assetsCreateOrConnectWithoutHotspot_preset_assetsInput = {
+  where: Prisma.e_booklet_file_assetsWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_file_assetsCreateWithoutHotspot_preset_assetsInput, Prisma.e_booklet_file_assetsUncheckedCreateWithoutHotspot_preset_assetsInput>
+}
+
+export type e_booklet_file_assetsUpsertWithoutHotspot_preset_assetsInput = {
+  update: Prisma.XOR<Prisma.e_booklet_file_assetsUpdateWithoutHotspot_preset_assetsInput, Prisma.e_booklet_file_assetsUncheckedUpdateWithoutHotspot_preset_assetsInput>
+  create: Prisma.XOR<Prisma.e_booklet_file_assetsCreateWithoutHotspot_preset_assetsInput, Prisma.e_booklet_file_assetsUncheckedCreateWithoutHotspot_preset_assetsInput>
+  where?: Prisma.e_booklet_file_assetsWhereInput
+}
+
+export type e_booklet_file_assetsUpdateToOneWithWhereWithoutHotspot_preset_assetsInput = {
+  where?: Prisma.e_booklet_file_assetsWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_file_assetsUpdateWithoutHotspot_preset_assetsInput, Prisma.e_booklet_file_assetsUncheckedUpdateWithoutHotspot_preset_assetsInput>
+}
+
+export type e_booklet_file_assetsUpdateWithoutHotspot_preset_assetsInput = {
+  owner_type?: Prisma.StringFieldUpdateOperationsInput | string
+  owner_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  file_type?: Prisma.Enume_booklet_file_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_file_type_enum
+  storage_key?: Prisma.StringFieldUpdateOperationsInput | string
+  original_filename?: Prisma.StringFieldUpdateOperationsInput | string
+  mime_type?: Prisma.StringFieldUpdateOperationsInput | string
+  size_bytes?: Prisma.IntFieldUpdateOperationsInput | number
+  visibility?: Prisma.Enume_booklet_file_visibility_enumFieldUpdateOperationsInput | $Enums.e_booklet_file_visibility_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  template_covers?: Prisma.e_booklet_templatesUpdateManyWithoutCover_fileNestedInput
+  version_base_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutBase_document_fileNestedInput
+  version_rendered_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutRendered_document_fileNestedInput
+  hotspot_assets?: Prisma.e_booklet_hotspotsUpdateManyWithoutAsset_fileNestedInput
+  instance_custom_documents?: Prisma.e_booklet_instancesUpdateManyWithoutCustom_document_fileNestedInput
+}
+
+export type e_booklet_file_assetsUncheckedUpdateWithoutHotspot_preset_assetsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  owner_type?: Prisma.StringFieldUpdateOperationsInput | string
+  owner_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  file_type?: Prisma.Enume_booklet_file_type_enumFieldUpdateOperationsInput | $Enums.e_booklet_file_type_enum
+  storage_key?: Prisma.StringFieldUpdateOperationsInput | string
+  original_filename?: Prisma.StringFieldUpdateOperationsInput | string
+  mime_type?: Prisma.StringFieldUpdateOperationsInput | string
+  size_bytes?: Prisma.IntFieldUpdateOperationsInput | number
+  visibility?: Prisma.Enume_booklet_file_visibility_enumFieldUpdateOperationsInput | $Enums.e_booklet_file_visibility_enum
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  template_covers?: Prisma.e_booklet_templatesUncheckedUpdateManyWithoutCover_fileNestedInput
+  version_base_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutBase_document_fileNestedInput
+  version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutRendered_document_fileNestedInput
+  hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutAsset_fileNestedInput
   instance_custom_documents?: Prisma.e_booklet_instancesUncheckedUpdateManyWithoutCustom_document_fileNestedInput
 }
 
@@ -938,6 +1063,7 @@ export type e_booklet_file_assetsCreateWithoutInstance_custom_documentsInput = {
   version_base_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutBase_document_fileInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsCreateNestedManyWithoutRendered_document_fileInput
   hotspot_assets?: Prisma.e_booklet_hotspotsCreateNestedManyWithoutAsset_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsCreateNestedManyWithoutAsset_fileInput
 }
 
 export type e_booklet_file_assetsUncheckedCreateWithoutInstance_custom_documentsInput = {
@@ -955,6 +1081,7 @@ export type e_booklet_file_assetsUncheckedCreateWithoutInstance_custom_documents
   version_base_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutBase_document_fileInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedCreateNestedManyWithoutRendered_document_fileInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedCreateNestedManyWithoutAsset_fileInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedCreateNestedManyWithoutAsset_fileInput
 }
 
 export type e_booklet_file_assetsCreateOrConnectWithoutInstance_custom_documentsInput = {
@@ -987,6 +1114,7 @@ export type e_booklet_file_assetsUpdateWithoutInstance_custom_documentsInput = {
   version_base_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutBase_document_fileNestedInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUpdateManyWithoutRendered_document_fileNestedInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUpdateManyWithoutAsset_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUpdateManyWithoutAsset_fileNestedInput
 }
 
 export type e_booklet_file_assetsUncheckedUpdateWithoutInstance_custom_documentsInput = {
@@ -1004,6 +1132,7 @@ export type e_booklet_file_assetsUncheckedUpdateWithoutInstance_custom_documents
   version_base_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutBase_document_fileNestedInput
   version_rendered_documents?: Prisma.e_booklet_template_versionsUncheckedUpdateManyWithoutRendered_document_fileNestedInput
   hotspot_assets?: Prisma.e_booklet_hotspotsUncheckedUpdateManyWithoutAsset_fileNestedInput
+  hotspot_preset_assets?: Prisma.e_booklet_hotspot_presetsUncheckedUpdateManyWithoutAsset_fileNestedInput
 }
 
 
@@ -1016,6 +1145,7 @@ export type E_booklet_file_assetsCountOutputType = {
   version_base_documents: number
   version_rendered_documents: number
   hotspot_assets: number
+  hotspot_preset_assets: number
   instance_custom_documents: number
 }
 
@@ -1024,6 +1154,7 @@ export type E_booklet_file_assetsCountOutputTypeSelect<ExtArgs extends runtime.T
   version_base_documents?: boolean | E_booklet_file_assetsCountOutputTypeCountVersion_base_documentsArgs
   version_rendered_documents?: boolean | E_booklet_file_assetsCountOutputTypeCountVersion_rendered_documentsArgs
   hotspot_assets?: boolean | E_booklet_file_assetsCountOutputTypeCountHotspot_assetsArgs
+  hotspot_preset_assets?: boolean | E_booklet_file_assetsCountOutputTypeCountHotspot_preset_assetsArgs
   instance_custom_documents?: boolean | E_booklet_file_assetsCountOutputTypeCountInstance_custom_documentsArgs
 }
 
@@ -1068,6 +1199,13 @@ export type E_booklet_file_assetsCountOutputTypeCountHotspot_assetsArgs<ExtArgs 
 /**
  * E_booklet_file_assetsCountOutputType without action
  */
+export type E_booklet_file_assetsCountOutputTypeCountHotspot_preset_assetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_hotspot_presetsWhereInput
+}
+
+/**
+ * E_booklet_file_assetsCountOutputType without action
+ */
 export type E_booklet_file_assetsCountOutputTypeCountInstance_custom_documentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.e_booklet_instancesWhereInput
 }
@@ -1088,6 +1226,7 @@ export type e_booklet_file_assetsSelect<ExtArgs extends runtime.Types.Extensions
   version_base_documents?: boolean | Prisma.e_booklet_file_assets$version_base_documentsArgs<ExtArgs>
   version_rendered_documents?: boolean | Prisma.e_booklet_file_assets$version_rendered_documentsArgs<ExtArgs>
   hotspot_assets?: boolean | Prisma.e_booklet_file_assets$hotspot_assetsArgs<ExtArgs>
+  hotspot_preset_assets?: boolean | Prisma.e_booklet_file_assets$hotspot_preset_assetsArgs<ExtArgs>
   instance_custom_documents?: boolean | Prisma.e_booklet_file_assets$instance_custom_documentsArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_file_assetsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["e_booklet_file_assets"]>
@@ -1137,6 +1276,7 @@ export type e_booklet_file_assetsInclude<ExtArgs extends runtime.Types.Extension
   version_base_documents?: boolean | Prisma.e_booklet_file_assets$version_base_documentsArgs<ExtArgs>
   version_rendered_documents?: boolean | Prisma.e_booklet_file_assets$version_rendered_documentsArgs<ExtArgs>
   hotspot_assets?: boolean | Prisma.e_booklet_file_assets$hotspot_assetsArgs<ExtArgs>
+  hotspot_preset_assets?: boolean | Prisma.e_booklet_file_assets$hotspot_preset_assetsArgs<ExtArgs>
   instance_custom_documents?: boolean | Prisma.e_booklet_file_assets$instance_custom_documentsArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_file_assetsCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1150,6 +1290,7 @@ export type $e_booklet_file_assetsPayload<ExtArgs extends runtime.Types.Extensio
     version_base_documents: Prisma.$e_booklet_template_versionsPayload<ExtArgs>[]
     version_rendered_documents: Prisma.$e_booklet_template_versionsPayload<ExtArgs>[]
     hotspot_assets: Prisma.$e_booklet_hotspotsPayload<ExtArgs>[]
+    hotspot_preset_assets: Prisma.$e_booklet_hotspot_presetsPayload<ExtArgs>[]
     instance_custom_documents: Prisma.$e_booklet_instancesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1561,6 +1702,7 @@ export interface Prisma__e_booklet_file_assetsClient<T, Null = never, ExtArgs ex
   version_base_documents<T extends Prisma.e_booklet_file_assets$version_base_documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_file_assets$version_base_documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_template_versionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   version_rendered_documents<T extends Prisma.e_booklet_file_assets$version_rendered_documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_file_assets$version_rendered_documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_template_versionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   hotspot_assets<T extends Prisma.e_booklet_file_assets$hotspot_assetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_file_assets$hotspot_assetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_hotspotsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  hotspot_preset_assets<T extends Prisma.e_booklet_file_assets$hotspot_preset_assetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_file_assets$hotspot_preset_assetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_hotspot_presetsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   instance_custom_documents<T extends Prisma.e_booklet_file_assets$instance_custom_documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_file_assets$instance_custom_documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_instancesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2091,6 +2233,30 @@ export type e_booklet_file_assets$hotspot_assetsArgs<ExtArgs extends runtime.Typ
   take?: number
   skip?: number
   distinct?: Prisma.E_booklet_hotspotsScalarFieldEnum | Prisma.E_booklet_hotspotsScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_file_assets.hotspot_preset_assets
+ */
+export type e_booklet_file_assets$hotspot_preset_assetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_hotspot_presets
+   */
+  select?: Prisma.e_booklet_hotspot_presetsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_hotspot_presets
+   */
+  omit?: Prisma.e_booklet_hotspot_presetsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_hotspot_presetsInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_hotspot_presetsWhereInput
+  orderBy?: Prisma.e_booklet_hotspot_presetsOrderByWithRelationInput | Prisma.e_booklet_hotspot_presetsOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_hotspot_presetsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_hotspot_presetsScalarFieldEnum | Prisma.E_booklet_hotspot_presetsScalarFieldEnum[]
 }
 
 /**

@@ -19,8 +19,18 @@ const PORTAL_OPTIONS = ['store', 'academy'];
 
 function getUserRoles(user) {
     const roles = user?.roles || user?.user_roles || [];
+    const seen = new Set();
+    const uniqueRoles = [];
+
     if (Array.isArray(roles) && roles.length > 0) {
-        return roles.map((entry) => entry.role || entry).filter(Boolean);
+        roles.forEach((entry) => {
+            const role = entry.role || entry;
+            const normalizedRole = String(role || '').trim().toLowerCase();
+            if (!normalizedRole || seen.has(normalizedRole)) return;
+            seen.add(normalizedRole);
+            uniqueRoles.push(role);
+        });
+        return uniqueRoles;
     }
     return user?.role ? [user.role] : [];
 }
@@ -152,13 +162,18 @@ export default function AdminImpersonationPage() {
                         <div className="flex justify-center py-10"><LoadingSpinner /></div>
                     ) : (
                         <div className="overflow-hidden rounded-md border">
-                            <Table>
+                            <Table className="table-fixed">
+                                <colgroup>
+                                    <col className="w-[28%]" />
+                                    <col className="w-[34%]" />
+                                    <col className="w-[22%]" />
+                                    <col className="w-[16%]" />
+                                </colgroup>
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>{t('impersonation.table.user')}</TableHead>
                                         <TableHead>{t('impersonation.table.email')}</TableHead>
                                         <TableHead>{t('impersonation.table.roles')}</TableHead>
-                                        <TableHead>{t('impersonation.table.status')}</TableHead>
                                         <TableHead className="text-end">{t('impersonation.table.action')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -168,18 +183,15 @@ export default function AdminImpersonationPage() {
                                         const roles = getUserRoles(target);
                                         return (
                                             <TableRow key={target.id} data-testid={`impersonation-user-row-${target.id}`}>
-                                                <TableCell>
+                                                <TableCell className="whitespace-normal break-words">
                                                     <div className="font-medium">{target.name || t('impersonation.table.unnamedUser')}</div>
                                                     <div className="text-xs text-muted-foreground">{t('impersonation.table.userId', { id: target.id })}</div>
                                                 </TableCell>
-                                                <TableCell>{target.email || '—'}</TableCell>
-                                                <TableCell>
+                                                <TableCell className="whitespace-normal break-all">{target.email || '—'}</TableCell>
+                                                <TableCell className="whitespace-normal">
                                                     <div className="flex flex-wrap gap-1">
                                                         {roles.length > 0 ? roles.map((role) => <Badge key={role} variant="secondary">{t(`roles.${getRoleTranslationKey(role)}`, { defaultValue: role })}</Badge>) : <span className="text-muted-foreground">—</span>}
                                                     </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {target.confirmed === false ? <Badge variant="outline">{t('impersonation.status.unconfirmed')}</Badge> : <Badge variant="secondary">{t('impersonation.status.active')}</Badge>}
                                                 </TableCell>
                                                 <TableCell className="text-end">
                                                     <Button
@@ -198,7 +210,7 @@ export default function AdminImpersonationPage() {
                                     })}
                                     {!loading && filteredUsers.length === 0 && (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">{t('impersonation.empty')}</TableCell>
+                                            <TableCell colSpan={4} className="py-10 text-center text-muted-foreground">{t('impersonation.empty')}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>

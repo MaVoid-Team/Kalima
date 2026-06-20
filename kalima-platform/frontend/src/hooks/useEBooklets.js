@@ -339,30 +339,51 @@ export function useEBookletCheckout() {
 export function useEBookletOrders() {
   const { mutate: fetchApi, loading, error } = useApiMutation();
   const [orders, setOrders] = useState([]);
-  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20 });
+  const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1, limit: 20 });
+  const [filters, setFilters] = useState({ status: "all" });
 
   const fetchOrders = useCallback(
     async (params = {}) => {
+      const nextPage = params.page ?? pagination.page;
+      const nextLimit = params.limit ?? pagination.limit;
+      const nextStatus = params.status ?? filters.status;
+      const query = new URLSearchParams();
+      query.set("page", String(nextPage));
+      query.set("limit", String(nextLimit));
+      if (nextStatus && nextStatus !== "all") query.set("status", nextStatus);
+
       const response = await fetchApi(
         {
-          endpoint: "/e-booklet-orders",
+          endpoint: `/e-booklet-orders?${query.toString()}`,
           method: "get",
-          params,
         },
         false,
       );
       const payload = Array.isArray(response?.data) ? response : (response?.data || response || {});
       const data = Array.isArray(payload.data) ? payload.data : [];
+      const total = payload.total ?? data.length;
+      const page = payload.page ?? nextPage ?? 1;
+      const limit = payload.limit ?? nextLimit ?? 20;
       setOrders(data);
       setPagination({
-        total: payload.total ?? data.length,
-        page: payload.page ?? params.page ?? 1,
-        limit: payload.limit ?? params.limit ?? 20,
+        total,
+        page,
+        pages: Math.max(1, Math.ceil(total / Math.max(1, limit))),
+        limit,
       });
       return payload;
     },
-    [fetchApi],
+    [fetchApi, filters.status, pagination.limit, pagination.page],
   );
 
-  return { orders, pagination, fetchOrders, loading, error };
+  const setStatus = useCallback((status) => {
+    setFilters((current) => ({ ...current, status }));
+    setPagination((current) => ({ ...current, page: 1 }));
+  }, []);
+
+  const setPage = useCallback((page) => {
+    setPagination((current) => ({ ...current, page }));
+  }, []);
+
+  return { orders, pagination, filters, fetchOrders, setStatus, setPage, loading, error };
 }
