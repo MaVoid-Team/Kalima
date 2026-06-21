@@ -117,13 +117,25 @@ const sessionForRole = (role) => ({
 
 const installSession = async (context, session = null) => {
   await context.addInitScript((value) => {
-    window.localStorage.clear();
-    if (!value) return;
-    window.localStorage.setItem('user', JSON.stringify(value.user));
-    window.localStorage.setItem('portalAccess', JSON.stringify(value.portalAccess));
-    window.localStorage.setItem('accessToken', value.accessToken);
-    window.localStorage.setItem('refreshToken', value.refreshToken);
+    try {
+      window.localStorage.clear();
+      if (!value) return;
+      window.localStorage.setItem('user', JSON.stringify(value.user));
+      window.localStorage.setItem('portalAccess', JSON.stringify(value.portalAccess));
+      window.localStorage.setItem('accessToken', value.accessToken);
+      window.localStorage.setItem('refreshToken', value.refreshToken);
+    } catch {
+      // Some browser-internal or cross-origin documents deny localStorage access.
+    }
   }, session);
+};
+
+const closeContext = async (context) => {
+  try {
+    await context.close();
+  } catch (error) {
+    if (!String(error?.message || '').includes('has been closed')) throw error;
+  }
 };
 
 const blockApiForRouteShellSmoke = async (context) => {
@@ -528,7 +540,7 @@ try {
     }
 
     if (consoleErrors.length) failures.push(`${lng}: console errors: ${consoleErrors.slice(0, 10).join(' | ')}`);
-    await context.close();
+    await closeContext(context);
 
     for (const { role, route, expectedPathPrefix } of roleRoutes) {
       const roleContext = await browser.newContext({ locale: lng === 'ar' ? 'ar-EG' : 'en-US' });
@@ -545,7 +557,7 @@ try {
 
       await visitRoute({ page: rolePage, lng, dir, route, expectedPathPrefix: expectedPathPrefix || route, label: `${lng} ${role} ${route}`, failures });
       if (roleConsoleErrors.length) failures.push(`${lng} ${role} ${route}: console errors: ${roleConsoleErrors.slice(0, 5).join(' | ')}`);
-      await roleContext.close();
+      await closeContext(roleContext);
     }
 
     if (adminSession && discoveredAdmin.routes.length) {
@@ -571,7 +583,7 @@ try {
           failures,
         });
         if (adminConsoleErrors.length) failures.push(`${lng} real-admin ${route}: console errors: ${adminConsoleErrors.slice(0, 5).join(' | ')}`);
-        await adminContext.close();
+        await closeContext(adminContext);
       }
     }
 
@@ -598,7 +610,7 @@ try {
           failures,
         });
         if (routeConsoleErrors.length) failures.push(`${lng} role-token ${route}: console errors: ${routeConsoleErrors.slice(0, 5).join(' | ')}`);
-        await context.close();
+        await closeContext(context);
       }
     }
   }
