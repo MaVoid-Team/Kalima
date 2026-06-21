@@ -138,7 +138,7 @@ export default function AccountReviewSection() {
                                     checked={allEnabled}
                                     onCheckedChange={handleToggleAll}
                                     data-testid="admin-settings-account-review-toggle-all"
-                                    aria-label="Toggle all account types review"
+                                    aria-label={t('settings.accountReview.toggleAllAria', 'Toggle all account types review')}
                                 />
                             )}
                         </div>

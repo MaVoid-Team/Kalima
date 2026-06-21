@@ -8,6 +8,7 @@ const normalizeListResponse = (response) => ({
   total: Number(response?.total ?? 0),
   page: Number(response?.page ?? 1),
   limit: Number(response?.limit ?? 20),
+  pages: Number(response?.pages ?? Math.max(1, Math.ceil(Number(response?.total ?? 0) / Math.max(1, Number(response?.limit ?? 20))))),
 });
 
 const ANALYTICS_QUERY_KEYS = {
@@ -26,6 +27,29 @@ const buildQueryString = (filters = {}) => {
     }
   });
   return query.toString();
+};
+
+const startOfDay = (value) => {
+  if (!value) return null;
+  const date = new Date(value);
+  date.setHours(0, 0, 0, 0);
+  return date;
+};
+
+const endOfDay = (value) => {
+  if (!value) return null;
+  const date = new Date(value);
+  date.setHours(23, 59, 59, 999);
+  return date;
+};
+
+const buildPurchaseFilterParams = (filters = {}) => {
+  const params = {};
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === "" || value === "all") return;
+    params[key] = value instanceof Date ? value.toISOString() : String(value);
+  });
+  return params;
 };
 
 export function useAdminEBookletAnalytics() {
@@ -368,11 +392,11 @@ export function useAdminEBookletEditor() {
     return URL.createObjectURL(response.data);
   }, []);
 
-  const fetchAssetArrayBuffer = useCallback(async (assetId, params) => {
+  const fetchAssetArrayBuffer = useCallback(async (assetId, params, signal) => {
     if (!assetId) return null;
     const response = await axiosInstance.get(
       `/admin/e-booklet-files/${assetId}/preview`,
-      { responseType: "arraybuffer", params },
+      { responseType: "arraybuffer", params, signal },
     );
     return response.data;
   }, []);
@@ -474,43 +498,87 @@ export function useAdminEBookletHotspotLibrary() {
 export function useAdminEBookletPurchases() {
   const { mutate: fetchApi, loading } = useApiMutation();
   const [purchases, setPurchases] = useState([]);
-  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 12 });
-  const [status, setStatus] = useState("all");
+  const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1, limit: 12 });
+  const [filters, setFilters] = useState({
+    search: "",
+    status: "all",
+    startDate: null,
+    endDate: null,
+    minTotal: "",
+    maxTotal: "",
+  });
+
+  const buildPurchaseQuery = useCallback((overrides = {}) => {
+    const query = new URLSearchParams();
+    const nextFilters = { ...filters, ...overrides };
+    const page = overrides.page ?? pagination.page;
+    const limit = overrides.limit ?? pagination.limit;
+    query.set("page", String(page));
+    query.set("limit", String(limit));
+    Object.entries(buildPurchaseFilterParams(nextFilters)).forEach(([key, value]) => {
+      query.set(key, value);
+    });
+    return query.toString();
+  }, [filters, pagination.limit, pagination.page]);
+
+  const buildPurchaseExportFilters = useCallback(
+    (overrides = {}) => buildPurchaseFilterParams({ ...filters, ...overrides }),
+    [filters],
+  );
 
   const fetchPurchases = useCallback(
     async (overrides = {}) => {
-      const query = new URLSearchParams();
-      query.set("page", String(overrides.page ?? pagination.page));
-      query.set("limit", String(overrides.limit ?? pagination.limit));
-      const nextStatus = overrides.status ?? status;
-      if (nextStatus && nextStatus !== "all") query.set("status", nextStatus);
-
       const response = await fetchApi(
         {
-          endpoint: `/admin/e-booklet-purchases?${query.toString()}`,
+          endpoint: `/admin/e-booklet-purchases?${buildPurchaseQuery(overrides)}`,
           method: "get",
         },
         false,
       );
       const normalized = normalizeListResponse(response);
       setPurchases(normalized.data);
-      setPagination((current) => ({
-        ...current,
-        total: normalized.total,
-        page: normalized.page,
-        limit: normalized.limit,
-      }));
+        setPagination((current) => ({
+          ...current,
+          total: normalized.total,
+          page: normalized.page,
+          limit: normalized.limit,
+          pages: normalized.pages,
+        }));
       return response;
     },
-    [fetchApi, pagination.limit, pagination.page, status],
+    [buildPurchaseQuery, fetchApi],
   );
 
   const setPage = useCallback((page) => {
     setPagination((current) => ({ ...current, page }));
   }, []);
 
+  const setSearch = useCallback((search) => {
+    setFilters((current) => ({ ...current, search }));
+    setPagination((current) => ({ ...current, page: 1 }));
+  }, []);
+
   const changeStatusFilter = useCallback((value) => {
-    setStatus(value);
+    setFilters((current) => ({ ...current, status: value }));
+    setPagination((current) => ({ ...current, page: 1 }));
+  }, []);
+
+  const setDateRange = useCallback((startDate, endDate) => {
+    setFilters((current) => ({
+      ...current,
+      startDate: startOfDay(startDate),
+      endDate: endOfDay(endDate || startDate),
+    }));
+    setPagination((current) => ({ ...current, page: 1 }));
+  }, []);
+
+  const setTotalRange = useCallback((minTotal, maxTotal) => {
+    setFilters((current) => ({ ...current, minTotal, maxTotal }));
+    setPagination((current) => ({ ...current, page: 1 }));
+  }, []);
+
+  const clearFilters = useCallback(() => {
+    setFilters({ search: "", status: "all", startDate: null, endDate: null, minTotal: "", maxTotal: "" });
     setPagination((current) => ({ ...current, page: 1 }));
   }, []);
 
@@ -603,10 +671,16 @@ export function useAdminEBookletPurchases() {
   return {
     purchases,
     pagination,
-    status,
+    filters,
+    status: filters.status,
     loading,
     setPage,
+    setSearch,
     setStatus: changeStatusFilter,
+    setDateRange,
+    setTotalRange,
+    clearFilters,
+    buildPurchaseExportFilters,
     fetchPurchases,
     fetchPurchase,
     updatePurchaseStatus,

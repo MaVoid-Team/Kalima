@@ -40,13 +40,13 @@ const getStatusIcon = (status) => {
   }
 };
 
-export default function EBookletOrderCard({ order }) {
+export default function EBookletOrderCard({ order, canManageLink = canManageEBookletOrder, getManagementPath = getEBookletOrderManagementPath }) {
   const { t, i18n } = useTranslation("eBooklets");
   const status = getEBookletOrderStatus(order?.status);
   const reference = getEBookletOrderReference(order);
   const amount = getEBookletOrderAmount(order);
   const links = getEBookletOrderLinks(order);
-  const manageableLink = links.find((link) => canManageEBookletOrder(status, link));
+  const manageableLink = links.find((link) => canManageLink(order, link, status));
   const terminal = ["cancelled", "rejected"].includes(status);
   const trackingMessage = t("orders.trackingMessage", {
     reference,
@@ -104,7 +104,7 @@ export default function EBookletOrderCard({ order }) {
             )}
             {manageableLink && (
               <Button asChild size="sm" data-testid={`e-booklet-order-manage-${order.id}-button`}>
-                <Link to={getEBookletOrderManagementPath(manageableLink)}>{t("orders.manageAccess", "Manage access")}</Link>
+                <Link to={getManagementPath(manageableLink)}>{t("orders.manageAccess", "Manage access")}</Link>
               </Button>
             )}
           </div>

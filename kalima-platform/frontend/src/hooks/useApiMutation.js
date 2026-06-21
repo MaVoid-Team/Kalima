@@ -12,14 +12,14 @@ export default function useApiMutation() {
   const [error, setError] = useState(null);
 
   const mutate = useCallback(async (config, showToast = true) => {
-    const { endpoint, method = 'post', data, defaultSuccessMessage, onUploadProgress, signal } = config;
+    const { endpoint, method = 'post', data, params, defaultSuccessMessage, onUploadProgress, signal } = config;
 
     setLoading(true);
     setError(null);
 
     try {
       // if we are sending a FormData object, make sure we don't force JSON
-      const axiosConfig = { method, url: endpoint, data };
+      const axiosConfig = { method, url: endpoint, data, params };
       if (onUploadProgress) {
         axiosConfig.onUploadProgress = onUploadProgress;
       }

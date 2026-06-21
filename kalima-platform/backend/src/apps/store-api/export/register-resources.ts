@@ -16,6 +16,7 @@ import {
   categoryMapper,
   couponMapper,
   purchaseMapper,
+  eBookletPurchaseMapper,
   sampleMapper,
   governmentMapper,
   zoneMapper,
@@ -26,6 +27,10 @@ import {
   userMapper,
   paymentMethodMapper,
 } from "./mappers";
+import {
+  E_BOOKLET_ADMIN_PURCHASE_INCLUDE,
+  EBookletService,
+} from "../services/e-booklet.service";
 
 // ─── Shared Prisma include shapes (mirrors existing services) ──────────
 
@@ -243,6 +248,25 @@ export function registerAllExportResources(): void {
       return prisma.purchases.findMany({
         where,
         include: PURCHASE_INCLUDE,
+        orderBy: { created_at: "desc" },
+      });
+    },
+  });
+
+  // ── E-booklet Purchases ─────────────────────────────────────────────
+  // Filters: status (string), search (string), startDate (ISO), endDate (ISO),
+  //          minTotal (number), maxTotal (number)
+  registerExportResource("admin/e-booklet-purchases", {
+    label: "e-booklet-purchases",
+    mapper: eBookletPurchaseMapper,
+    fetcher: (ids, filters) => {
+      const service = new EBookletService(prisma as any);
+      const where: any = service.buildAdminPurchaseWhere(filters || {});
+      if (ids) where.id = { in: ids };
+
+      return prisma.e_booklet_purchases.findMany({
+        where,
+        include: E_BOOKLET_ADMIN_PURCHASE_INCLUDE,
         orderBy: { created_at: "desc" },
       });
     },

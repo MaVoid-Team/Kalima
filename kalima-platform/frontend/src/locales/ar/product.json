@@ -37,6 +37,9 @@
     "viewOptions": "عرض الخيارات",
     "backToMarket": "العودة للمتجر"
   },
+  "media": {
+    "externalVideo": "فيديو خارجي"
+  },
   "info": {
     "sku": "رقم المنتج",
     "inStock": "متوفر",
@@ -84,7 +87,7 @@
     "seeAll": "عرض الكل",
     "verifiedBuyer": "✓ مشتري موثق",
     "weeksAgo": "منذ {{count}} أسابيع",
-    "monthAgo": "منذ شهر",
+    "monthAgo": "منذ {{count}} شهر",
     "monthsAgo": "منذ {{count}} أشهر",
     "title": "المراجعات",
     "rating": "التقييم",
@@ -138,7 +141,12 @@
     "curriculumAlignment": "توافق المنهج",
     "fileDetails": "تفاصيل الملف",
     "publisherInfo": "معلومات الناشر",
-    "saveToPlan": "حفظ في الخطة"
+    "saveToPlan": "حفظ في الخطة",
+    "gradeLevel": "المرحلة الدراسية:",
+    "subject": "المادة:",
+    "curriculumAlignmentDescription": "متوافق مع معايير علوم الجيل القادم (NGSS) لعلوم الحياة للصف الخامس.",
+    "fileDetailsDescription": "PDF (يتضمن مقاسي A4 وLetter). إجمالي 20 صفحة.",
+    "publisherDescription": "ScienceWithSarah - إنشاء مواد تعليمية تفاعلية منذ عام 2018."
   },
   "common": {
     "cancel": "إلغاء"

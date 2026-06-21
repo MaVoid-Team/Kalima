@@ -7,6 +7,7 @@
     "teacher": "المعلم",
     "student": "الطالب",
     "user": "المستخدم",
+    "name": "الاسم",
     "active": "نشط",
     "draft": "مسودة",
     "untitled": "بدون عنوان",
@@ -40,6 +41,7 @@
     "pages": "الصفحات",
     "actions": "الإجراءات",
     "total": "الإجمالي",
+    "currencyEGP": "ج.م",
     "subtotal": "المجموع الفرعي",
     "payment": "الدفع",
     "manual": "يدوي",
@@ -52,7 +54,7 @@
     "page": "صفحة",
     "pageOf": "صفحة {{page}} من {{total}}",
     "pageCount": "{{count}} صفحة",
-    "pageCountOne": "صفحة واحدة",
+    "pageCountOne": "{{count}} صفحة",
     "hotspotCount": "{{count}} نقطة تفاعل",
     "noDownload": "بدون تحميل",
     "searchResultsFor": "نتائج البحث عن",
@@ -115,6 +117,7 @@
     "milestoneSaved": "تم حفظ مرحلة المذكرة التفاعلية",
     "milestonesReordered": "تم إعادة ترتيب المراحل",
     "teacherTemplateReady": "قالب المعلم المخصص جاهز للتعديل.",
+    "settingsSaved": "تم حفظ إعدادات المذكرة التفاعلية",
     "hotspotConfigurationCopied": "تم نسخ إعدادات نقطة التفاعل",
     "hotspotConfigurationApplied": "تم تطبيق إعدادات نقطة التفاعل",
     "accessCodesGenerated": "تم إنشاء أكواد الوصول",
@@ -342,7 +345,12 @@
         "autosaveIdle": "الحفظ التلقائي مفعّل",
         "emptyPage": "لا توجد نقاط تفاعل في هذه الصفحة.",
         "collapsePage": "طي الصفحة {{page}}",
-        "expandPage": "توسيع الصفحة {{page}}"
+        "expandPage": "توسيع الصفحة {{page}}",
+        "previousPage": "الصفحة السابقة",
+        "goToPage": "انتقل إلى صفحة",
+        "nextPage": "الصفحة التالية",
+        "renderLoading": "جاري تحميل صفحة PDF...",
+        "renderFailed": "تعذر عرض صفحة PDF هذه."
       },
       "review": {
         "title": "مراجعة ونشر",
@@ -394,7 +402,22 @@
       "accessExpiresAt": "انتهاء وصول الطلاب",
       "studentMarketingPrice": "سعر متجر الطالب",
       "internalPrice": "تكلفة المعلم الداخلية",
-      "editTeacherTemplate": "تعديل هذا المعلم"
+      "editTeacherTemplate": "تعديل هذا المعلم",
+      "alreadyDelivered": "تم تسليم هذه المذكرة التفاعلية بالفعل.",
+      "approvePaymentBeforeDelivery": "اعتمد الدفع قبل تسليم هذه المذكرة التفاعلية.",
+      "total": "{{count}} عملية شراء مذكرة تفاعلية",
+      "whatsapp": "تواصل واتساب",
+      "editWhatsAppMessage": "تعديل رسالة واتساب",
+      "editWhatsAppMessageDesc": "راجع وعدّل رسالة المذكرة التفاعلية قبل إرسالها إلى المعلم.",
+      "whatsappPlaceholder": "اكتب رسالتك هنا...",
+      "sendOnWhatsApp": "إرسال عبر واتساب",
+      "whatsappGreeting": "مرحبًا {{name}}!",
+      "whatsappSuccess": "تم استلام طلب المذكرة التفاعلية الخاص بك وجارٍ تجهيزه.",
+      "whatsappOrderDetails": "طلب المذكرة التفاعلية: {{serial}}",
+      "whatsappItems": "تفاصيل المذكرة التفاعلية:",
+      "whatsappTotal": "الإجمالي: {{total}} {{currency}}",
+      "whatsappSupport": "إذا كانت لديك أي أسئلة، لا تتردد في التواصل معنا.",
+      "whatsappClosing": "شكرًا لاختيارك منصة كلمة!"
     },
     "instances": {
       "title": "وصول المعلمين للمذكرات تفاعلية",
@@ -436,7 +459,22 @@
       "noStudents": "لا يوجد طلاب لديهم وصول نشط بعد.",
       "viewerOpens": "مرات فتح العارض",
       "source": "المصدر",
-      "adminView": "عرض الإدارة"
+      "adminView": "عرض الإدارة",
+      "totalAccess": "إجمالي الوصول",
+      "seats": "المقاعد",
+      "seatsSummary": "{{used}} مستخدم / {{total}} إجمالي",
+      "capacity": "سعة المقاعد",
+      "accessCodes": "أكواد الوصول",
+      "selectTerm": "اختر الشروط",
+      "paidCode": "كود مدفوع",
+      "freeCode": "كود مجاني",
+      "codeCount": "عدد الأكواد",
+      "maxRedemptions": "أقصى عدد استردادات",
+      "generateCodes": "إنشاء الأكواد",
+      "copyGeneratedCodes": "نسخ الأكواد المنشأة",
+      "generatedNow": "تم الإنشاء الآن",
+      "redemptions": "الاستردادات",
+      "noAccessCodes": "لم يتم إنشاء أكواد وصول بعد."
     },
     "students": {
       "title": "طلاب المذكرة التفاعلية",
@@ -529,7 +567,56 @@
       "claimedCount": "المكافآت المحصلة",
       "teacherId": "المعلم #{{id}}",
       "claimed": "تم التحصيل",
-      "unclaimed": "غير محصلة"
+      "unclaimed": "غير محصلة",
+      "deleteMilestoneConfirm": "حذف هذه المرحلة؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "settings": {
+      "title": "إعدادات المذكرة التفاعلية",
+      "description": "اضبط القيم والسياسات العامة المستخدمة في مساحة المذكرات التفاعلية.",
+      "refresh": "تحديث",
+      "save": "حفظ الإعدادات",
+      "termsMilestonesTitle": "الشروط والمراحل",
+      "termsMilestonesDescription": "إدارة شروط المذكرات التفاعلية النشطة ومكافآت المراحل.",
+      "deliveryDefaults": "إعدادات التسليم الافتراضية",
+      "deliveryDefaultsDescription": "القيم الابتدائية لتسليم المذكرات الجديدة وإعداد الدعوات.",
+      "defaultInviteQuota": "حصة الدعوات الافتراضية",
+      "defaultInviteQuotaHint": "عدد دعوات الطلاب التي تبدأ بها المذكرة المسلّمة.",
+      "accessDurationDays": "مدة الوصول بالأيام",
+      "accessDurationDaysHint": "اتركه فارغًا إذا لم يكن هناك انتهاء وصول تلقائي افتراضي.",
+      "inviteExpirationDays": "انتهاء الدعوات بالأيام",
+      "inviteExpirationDaysHint": "اتركه فارغًا عندما يجب ألا تنتهي روابط أو أكواد الدعوة افتراضيًا.",
+      "defaultDeliveryNotes": "ملاحظات التسليم الافتراضية",
+      "defaultDeliveryNotesPlaceholder": "إرشادات تسليم داخلية اختيارية",
+      "pricingDefaults": "إعدادات الأسعار الافتراضية",
+      "pricingDefaultsDescription": "أسعار افتراضية تُنسخ إلى قرارات التسليم والوصول.",
+      "studentMarketingPrice": "سعر تسويق الطالب",
+      "studentMarketingPriceHint": "السعر المقترح الظاهر للطلاب.",
+      "internalTeacherCost": "تكلفة المعلم الداخلية",
+      "internalTeacherCostHint": "تكلفة أساسية داخلية لاستخدامها في اقتصاديات المعلم والوصول.",
+      "accessCodePolicy": "سياسة أكواد الوصول",
+      "accessCodePolicyDescription": "القيم والحدود الافتراضية لأكواد وصول المذكرة المنشأة.",
+      "defaultAccessCodeKind": "نوع كود الوصول الافتراضي",
+      "paid": "مدفوع",
+      "free": "مجاني",
+      "maxBulkAccessCodes": "أقصى عدد أكواد بالجملة",
+      "maxBulkAccessCodesHint": "الحد الأعلى لطلب إنشاء بالجملة واحد.",
+      "accessCodeExpirationDays": "انتهاء كود الوصول بالأيام",
+      "accessCodeExpirationDaysHint": "اتركه فارغًا عندما يجب ألا تنتهي الأكواد المنشأة افتراضيًا.",
+      "requireTermsBeforeCodeGeneration": "اشتراط قبول الشروط قبل إنشاء الأكواد",
+      "requireTermsBeforeCodeGenerationHint": "يجب على المعلمين قبول شروط المذكرة الحالية قبل إنشاء أكواد الوصول.",
+      "devicePolicy": "سياسة الأجهزة",
+      "devicePolicyDescription": "حدود أجهزة العارض الافتراضية وإرشادات إعادة التعيين.",
+      "allowedStudentDevices": "أجهزة الطالب المسموحة",
+      "allowedTeacherDevices": "أجهزة المعلم المسموحة",
+      "deviceResetPolicy": "سياسة إعادة تعيين الأجهزة",
+      "deviceResetPolicyPlaceholder": "اشرح متى يجب على الإدارة إعادة تعيين أو توسيع وصول الأجهزة",
+      "notificationRules": "قواعد الإشعارات",
+      "notificationRulesDescription": "اختر من يجب إشعاره بأحداث المذكرة المهمة.",
+      "notifyAdminsOnDelivery": "إشعار الإدارة عند التسليم",
+      "notifyTeacherOnDelivery": "إشعار المعلم عند التسليم",
+      "notifyAdminsOnMilestone": "إشعار الإدارة عند تحقيق مرحلة",
+      "notifyTeacherOnMilestone": "إشعار المعلم عند تحقيق مرحلة",
+      "notifyAdminsOnAccessCodeRedemption": "إشعار الإدارة عند استرداد كود وصول"
     }
   },
   "store": {
@@ -556,7 +643,8 @@
     "accessExpires": "ينتهي {{value}}",
     "noExpiry": "لا يوجد انتهاء",
     "add": "إضافة",
-    "seatsRemaining": "{{count}} مقعد"
+    "seatsRemaining": "{{count}} مقعد",
+    "redeemCode": "استرداد كود"
   },
   "details": {
     "coverLabel": "مذكرة تفاعلية من Kalima",
@@ -585,7 +673,8 @@
     ],
     "hotspotContent": "محتوى نقطة التفاعل",
     "hotspotDescription": "تُعرض نقاط التفاعل من إحداثيات قالب معيارية، لذلك يمكن تغيير PDF المعلم بينما تبقى الطبقة التفاعلية قابلة لإعادة الاستخدام.",
-    "antiDownload": "يتم حظر التنزيل داخل Kalima من خلال التخزين الخاص والوصول المصدق للصفحات وإخفاء أدوات تنزيل العارض والعلامة المائية. لا يمكن لأي منصة ويب منع لقطات الشاشة أو التصوير بالكاميرا بالكامل."
+    "antiDownload": "يتم حظر التنزيل داخل Kalima من خلال التخزين الخاص والوصول المصدق للصفحات وإخفاء أدوات تنزيل العارض والعلامة المائية. لا يمكن لأي منصة ويب منع لقطات الشاشة أو التصوير بالكاميرا بالكامل.",
+    "redeemCode": "استرداد كود الوصول"
   },
   "cart": {
     "emptyTitle": "سلة المذكرة التفاعلية فارغة",
@@ -600,7 +689,9 @@
     "adminNotice": "ستؤكد الإدارة الدفع، وترفع PDF المعلم الخاص، وتحدد حصة الدعوات، ثم تسلم المذكرة.",
     "checkout": "متابعة إلى الدفع",
     "keepBrowsing": "متابعة التصفح",
-    "clear": "مسح السلة"
+    "clear": "مسح السلة",
+    "directCheckoutDisabled": "الدفع المباشر معطل لهذا المسار. استرد كود المعلم أو اطلب الوصول من معلمك.",
+    "redeemCode": "استرداد كود"
   },
   "checkout": {
     "emptyTitle": "اختر مذكرة تفاعلية قبل الدفع",
@@ -665,7 +756,8 @@
     },
     "templateMissing": "قالب المذكرة التفاعلية المحدد غير موجود.",
     "termsRequired": "اقبل الشروط قبل المتابعة.",
-    "paymentRequired": "اختر طريقة الدفع، وأدخل الرقم الذي حولت منه، وارفع إثبات الدفع."
+    "paymentRequired": "اختر طريقة الدفع، وأدخل الرقم الذي حولت منه، وارفع إثبات الدفع.",
+    "requiredFieldsTitle": "المعلومات المطلوبة"
   },
   "viewer": {
     "titleFallback": "مذكرة تفاعلية",
@@ -680,6 +772,8 @@
     "loadingAsset": "جاري تحميل الأصل الخاص...",
     "assetUnavailable": "تعذر تحميل هذا الأصل الخاص.",
     "documentUnavailable": "تعذر تحميل ملف PDF لهذه المذكرة التفاعلية.",
+    "metadataLoadFailed": "تعذر تحميل بيانات المذكرة التفاعلية.",
+    "pageLoadFailed": "تعذر تحميل صفحة المذكرة التفاعلية.",
     "questionFallback": "اختر الإجابة الصحيحة.",
     "answerFeedback": "تم فحص إجابتك.",
     "unsupportedBlock": "كتلة محتوى غير مدعومة: {{type}}",
@@ -735,7 +829,11 @@
     "numberTransferredFrom": "الرقم الذي تم التحويل منه",
     "numberTransferredFromPlaceholder": "رقم محفظتك/هاتفك",
     "paymentScreenshot": "صورة إثبات الدفع",
-    "notesPlaceholder": "ملاحظات اختيارية للإدارة"
+    "notesPlaceholder": "ملاحظات اختيارية للإدارة",
+    "teacherCodeTitle": "كود وصول المعلم",
+    "teacherCodeDescription": "استخدم الكود الذي شاركه معك معلمك لفتح هذه المذكرة.",
+    "directPurchaseDisabled": "الشراء المباشر معطل لهذه الدعوة. استخدم كود وصول المعلم بدلًا من ذلك.",
+    "openCodeRedemption": "فتح استرداد الكود"
   },
   "teacher": {
     "title": "مذكراتي",
@@ -913,7 +1011,10 @@
       "instance": "النسخة",
       "instancePlaceholder": "رقم النسخة",
       "allInstances": "كل النسخ",
-      "source": "المصدر"
+      "source": "المصدر",
+      "title": "الفلاتر",
+      "live": "مباشر",
+      "teacherSearch": "بحث المعلم"
     },
     "metrics": {
       "inviteOpens": "فتح روابط الدعوة",
@@ -984,6 +1085,15 @@
       "cancelled": "ملغي",
       "unknown": "قيد الانتظار"
     },
+    "export": "تصدير",
+    "exportCsv": "تصدير كـ CSV",
+    "exportXlsx": "تصدير كـ Excel",
+    "table": {
+      "selectAll": "اختيار الكل",
+      "serial": "الطلب",
+      "total": "الإجمالي",
+      "payment": "الدفع"
+    },
     "statusCopy": {
       "pending": "ما زالت الإدارة بحاجة لمراجعة طلب شراء المعلم.",
       "awaiting_payment": "بيانات الدفع ما زالت مطلوبة أو بانتظار المراجعة.",
@@ -995,6 +1105,10 @@
       "rejected": "تم رفض هذا الطلب. تواصل مع الإدارة أو أرسل طلبا جديدا ببيانات مصححة.",
       "cancelled": "تم إلغاء هذا الطلب.",
       "unknown": "بانتظار أحدث حالة من الإدارة."
-    }
+    },
+    "exporting": "جاري التصدير..."
+  },
+  "export": {
+    "exporting": "جاري التصدير..."
   }
 }

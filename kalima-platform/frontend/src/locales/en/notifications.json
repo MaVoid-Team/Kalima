@@ -46,6 +46,8 @@
     "mass_notifications": "Mass Notifications",
     "manage_desc": "Manage and send system-wide notifications",
     "select_users": "Select Users",
+    "userIdsPlaceholder": "User IDs (e.g. 1, 2, 3)",
+    "commaSeparatedIds": "Comma-separated IDs",
     "all_users": "All Users",
     "role_based": "By Role",
     "target_type": "Target Type",

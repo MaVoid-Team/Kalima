@@ -155,12 +155,12 @@ export default function AdminNotificationsPage() {
                                 <div className="space-y-2">
                                     <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">{t('admin.select_users')}</label>
                                     <Input 
-                                        placeholder="User IDs (e.g. 1, 2, 3)" 
+                                        placeholder={t('admin.userIdsPlaceholder')}
                                         value={targetIds}
                                         onChange={(e) => setTargetIds(e.target.value)}
                                         className="h-12 rounded-xl border-border bg-muted/30 font-medium"
                                     />
-                                    <p className="text-[10px] text-muted-foreground font-medium">Comma-separated IDs</p>
+                                    <p className="text-[10px] text-muted-foreground font-medium">{t('admin.commaSeparatedIds')}</p>
                                 </div>
                             ) : (
                                 <div className="space-y-2">
@@ -332,4 +332,3 @@ export default function AdminNotificationsPage() {
         </div>
     );
 }
-

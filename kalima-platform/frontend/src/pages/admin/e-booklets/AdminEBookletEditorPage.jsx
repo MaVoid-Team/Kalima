@@ -48,6 +48,7 @@ import { useAdminEBookletEditor, useAdminEBookletHotspotLibrary } from "@/hooks/
 import { useAdminPaymentMethods } from "@/hooks/admin/useAdminPaymentMethods";
 import useAdminRequiredFields from "@/hooks/admin/useAdminRequiredFields";
 import HotspotLibraryPickerDialog from "@/components/admin/e-booklets/HotspotLibraryPickerDialog";
+import { normalizeHotspotGeometry } from "@/utils/eBookletHotspotGeometry";
 import { useTranslation } from "react-i18next";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
@@ -422,6 +423,7 @@ function PdfPageCanvas({ fileData, renderWidth, className = "", onRenderStart, o
     let renderTask = null;
     let documentTask = null;
     let loadedDocument = null;
+    let loadedPage = null;
 
     const renderPage = async () => {
       try {
@@ -431,18 +433,35 @@ function PdfPageCanvas({ fileData, renderWidth, className = "", onRenderStart, o
         onRenderStart?.();
         documentTask = pdfjsLib.getDocument({ data: pdfData });
         loadedDocument = await documentTask.promise;
-        if (cancelled) return;
+        if (cancelled) {
+          await loadedDocument?.destroy?.();
+          loadedDocument = null;
+          return;
+        }
 
-        const page = await loadedDocument.getPage(1);
-        if (cancelled) return;
+        loadedPage = await loadedDocument.getPage(1);
+        if (cancelled) {
+          loadedPage?.cleanup?.();
+          loadedPage = null;
+          await loadedDocument?.destroy?.();
+          loadedDocument = null;
+          return;
+        }
 
-        const baseViewport = page.getViewport({ scale: 1 });
+        const baseViewport = loadedPage.getViewport({ scale: 1 });
         const scale = renderWidth / baseViewport.width;
-        const viewport = page.getViewport({ scale });
+        const viewport = loadedPage.getViewport({ scale });
         const dpr = window.devicePixelRatio || 1;
         const canvas = canvasRef.current;
         const context = canvas?.getContext("2d");
-        if (!canvas || !context) return;
+        if (!canvas || !context) {
+          loadedPage?.cleanup?.();
+          loadedPage = null;
+          await loadedDocument?.destroy?.();
+          loadedDocument = null;
+          documentTask = null;
+          return;
+        }
 
         canvas.width = Math.max(1, Math.floor(viewport.width * dpr));
         canvas.height = Math.max(1, Math.floor(viewport.height * dpr));
@@ -451,10 +470,20 @@ function PdfPageCanvas({ fileData, renderWidth, className = "", onRenderStart, o
         context.setTransform(dpr, 0, 0, dpr, 0, 0);
         context.clearRect(0, 0, viewport.width, viewport.height);
 
-        renderTask = page.render({ canvasContext: context, viewport });
+        renderTask = loadedPage.render({ canvasContext: context, viewport });
         await renderTask.promise;
+        loadedPage.cleanup?.();
+        loadedPage = null;
+        await loadedDocument.destroy?.();
+        loadedDocument = null;
+        documentTask = null;
         if (!cancelled) onRenderSuccess?.();
       } catch (error) {
+        loadedPage?.cleanup?.();
+        loadedPage = null;
+        await loadedDocument?.destroy?.();
+        loadedDocument = null;
+        documentTask = null;
         if (!cancelled && error?.name !== "RenderingCancelledException") {
           // Keep the white page visible; the editor can still place hotspots.
           console.error("Failed to render e-booklet PDF page", error);
@@ -468,6 +497,7 @@ function PdfPageCanvas({ fileData, renderWidth, className = "", onRenderStart, o
     return () => {
       cancelled = true;
       renderTask?.cancel?.();
+      loadedPage?.cleanup?.();
       documentTask?.destroy?.();
       loadedDocument?.destroy?.();
     };
@@ -677,9 +707,10 @@ export default function AdminEBookletEditorPage() {
     }
 
     let active = true;
+    const controller = new AbortController();
     setDocumentPageData(null);
     setDocumentPageStatus("loading");
-    editor.fetchAssetArrayBuffer(versionForm.base_document_file_id, { page: selectedPage })
+    editor.fetchAssetArrayBuffer(versionForm.base_document_file_id, { page: selectedPage }, controller.signal)
       .then((arrayBuffer) => {
         if (active) {
           setDocumentPageData(arrayBuffer);
@@ -695,6 +726,7 @@ export default function AdminEBookletEditorPage() {
 
     return () => {
       active = false;
+      controller.abort();
     };
   }, [activeStep, editor.fetchAssetArrayBuffer, selectedPage, versionForm.base_document_file_id]);
 
@@ -1342,7 +1374,7 @@ export default function AdminEBookletEditorPage() {
 
   useEffect(() => {
     if (activeStep !== "hotspots" || !activeVersionId || recording || dragRef.current) return undefined;
-    if (!hotspotForm.id && !hasDraftHotspotPreview) return undefined;
+    if (!hotspotForm.id) return undefined;
 
     const snapshot = getHotspotAutosaveSnapshot(hotspotForm);
     if (snapshot === lastSavedHotspotSnapshotRef.current) return undefined;
@@ -2342,11 +2374,11 @@ export default function AdminEBookletEditorPage() {
                   <div className="absolute inset-0 z-10 bg-transparent" />
                   {pageHotspots.map((hotspot) => {
                   const Icon = hotspotIcons[hotspot.type] || CircleDot;
-                  const shape = hotspot.shape || "circle";
-                  const width = clampHotspotSize(hotspot.width_percent || hotspot.radius_percent || 5);
-                  const height = clampHotspotSize(hotspot.height_percent || hotspot.radius_percent || 5);
-                  const renderedWidth = shape === "circle" || shape === "square" ? Math.max(width, height) : width;
-                  const renderedHeight = shape === "circle" || shape === "square" ? Math.max(width, height) : height;
+                  const { shape, width: renderedWidth, height: renderedHeight } = normalizeHotspotGeometry(hotspot, {
+                    defaultSize: 5,
+                    minSize: 2,
+                    maxSize: 35,
+                  });
                   const opacity = Math.min(1, Math.max(0, parseNumber(hotspot.display_behavior?.opacity_percent, 100) / 100));
                   const isSelected = hotspotForm.id === hotspot.id;
                   return (

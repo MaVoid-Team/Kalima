@@ -10,6 +10,7 @@
   "nav": {
     "orders": "الطلبات",
     "products": "المنتجات",
+    "store": "المتجر",
     "eBooklets": "المذكرات التفاعلية",
     "eBookletPurchases": "طلبات المذكرات",
     "samples": "العينات",
@@ -23,6 +24,7 @@
     "backToStore": "العودة للمتجر",
     "logout": "تسجيل الخروج",
     "settings": "الإعدادات",
+    "notifications": "الإشعارات",
     "expandSidebar": "توسيع الشريط الجانبي",
     "collapseSidebar": "طي الشريط الجانبي",
     "closeSidebar": "إغلاق الشريط الجانبي",
@@ -32,6 +34,19 @@
     "eBookletInstances": "وصول المذكرات",
     "eBookletAnalytics": "تحليلات المذكرات",
     "eBookletTermsMilestones": "الشروط والمراحل"
+  },
+  "storeWorkspace": {
+    "kicker": "مساحة الإدارة",
+    "title": "المتجر",
+    "description": "إدارة سير عمل المتجر الأساسي من إعداد كتالوج المنتجات إلى الطلبات والعينات والفئات.",
+    "tabsLabel": "تبويبات مساحة المتجر",
+    "navLabel": "تنقل مساحة المتجر",
+    "tabs": {
+      "products": "المنتجات",
+      "orders": "الطلبات",
+      "samples": "العينات",
+      "categories": "الفئات"
+    }
   },
   "common": {
     "currencyEGP": "ج.م",
@@ -440,6 +455,7 @@
       "fieldOptional": "اختياري",
       "fieldToggleSuccess": "تم تحديث الحقل المطلوب بنجاح",
       "fieldToggleError": "فشل في تحديث الحقل المطلوب",
+      "toggleRequiredStatus": "تبديل حالة الإلزام",
       "yes": "نعم",
       "no": "لا",
       "sample": "ملف العينة",
@@ -947,7 +963,8 @@
       "updateSuccess": "تم تحديث إعدادات مراجعة الحساب بنجاح",
       "allAccounts": "جميع أنواع الحسابات",
       "allAccountsDesc": "تمكين أو تعطيل متطلب المراجعة لجميع أنواع الحسابات دفعة واحدة.",
-      "partial": "جزئي"
+      "partial": "جزئي",
+      "toggleAllAria": "تبديل مراجعة كل أنواع الحسابات"
     },
     "general": {
       "title": "إعدادات الإدارة العامة (واتس/واتساب)",
@@ -1211,7 +1228,18 @@
     "actions": {
       "impersonate": "انتحال الحساب",
       "starting": "جارٍ البدء…",
-      "currentUser": "المستخدم الحالي"
+      "currentUser": "المستخدم الحالي",
+      "expandBanner": "توسيع شريط انتحال الحساب",
+      "minimizeBanner": "تصغير شريط انتحال الحساب",
+      "stop": "إيقاف انتحال الحساب",
+      "stopping": "جارٍ الإيقاف…"
+    },
+    "banner": {
+      "impersonating": "يتم انتحال حساب",
+      "impersonatingUser": "يتم انتحال حساب {{name}}",
+      "originalAdmin": "المسؤول الأصلي: {{name}}",
+      "adminFallback": "مسؤول",
+      "userFallback": "مستخدم"
     },
     "empty": "لم يتم العثور على مستخدمين.",
     "paginationSummary": "الصفحة {{page}} من {{totalPages}}",

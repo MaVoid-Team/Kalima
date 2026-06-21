@@ -154,6 +154,43 @@ export const purchaseMapper: ExportMapper = {
   },
 };
 
+// ─── E-booklet Purchases ───────────────────────────────────────────────
+
+export const eBookletPurchaseMapper: ExportMapper = {
+  columns: [
+    "id", "created_at", "teacher_name", "teacher_email", "teacher_phone",
+    "template_title", "version", "status", "price", "wallet_credit_applied",
+    "final_payable_price", "currency", "payment_method", "payment_reference",
+    "access_expires_at", "admin_notes",
+  ],
+  headers: [
+    "ID", "Created At", "Teacher Name", "Teacher Email", "Teacher Phone",
+    "Template", "Version", "Status", "Price", "Wallet Credit Applied",
+    "Final Payable Price", "Currency", "Payment Method", "Payment Reference",
+    "Access Expires At", "Admin Notes",
+  ],
+  toRow(r: any) {
+    return {
+      id: r.id,
+      created_at: iso(r.created_at),
+      teacher_name: r.teacher?.name ?? "",
+      teacher_email: r.teacher?.email ?? "",
+      teacher_phone: r.teacher?.phone ?? "",
+      template_title: r.template?.title ?? "",
+      version: r.template_version?.version_number ? `v${r.template_version.version_number}` : "",
+      status: r.status ?? "",
+      price: r.price != null ? Number(r.price) : "",
+      wallet_credit_applied: r.wallet_credit_applied != null ? Number(r.wallet_credit_applied) : "",
+      final_payable_price: r.final_payable_price != null ? Number(r.final_payable_price) : "",
+      currency: r.currency ?? "",
+      payment_method: r.payment_methods?.name ?? r.payment_method ?? "",
+      payment_reference: r.payment_reference ?? "",
+      access_expires_at: iso(r.access_expires_at),
+      admin_notes: r.admin_notes ?? "",
+    };
+  },
+};
+
 // ─── Samples ───────────────────────────────────────────────────────────
 
 export const sampleMapper: ExportMapper = {

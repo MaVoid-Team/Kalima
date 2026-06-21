@@ -4,10 +4,17 @@ import jwt from "jsonwebtoken";
 import path from "path";
 import os from "os";
 import { promises as fs } from "fs";
+import { isRefreshSessionActive } from "../../src/libs/auth/jwt";
 
 process.env.DATABASE_URL =
   process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/postgres?schema=test";
 process.env.JWT_SECRET = process.env.JWT_SECRET || "test-secret";
+
+jest.mock("../../src/libs/auth/jwt", () => ({
+  verifyAccessToken: (token: string) =>
+    jwt.verify(token, process.env.JWT_SECRET as string),
+  isRefreshSessionActive: jest.fn().mockResolvedValue(true),
+}));
 
 const mockDomainServices = {
   terms: {
@@ -80,6 +87,7 @@ const mockService = {
   getAuthorizedHotspotAsset: jest.fn(),
   getAuthorizedViewerDocument: jest.fn(),
   createFileAsset: jest.fn(),
+  restoreHotspotPreset: jest.fn(),
   recordInviteOpen: jest.fn(),
   getTeacherAnalytics: jest.fn(),
   getAdminAnalytics: jest.fn(),
@@ -113,6 +121,7 @@ function tokenFor(
   return jwt.sign(
     {
       userId,
+      sessionId: userId + 1000,
       roles: [{ role, portal }],
     },
     process.env.JWT_SECRET as string,
@@ -125,6 +134,7 @@ describe("e-booklet routes", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (isRefreshSessionActive as jest.Mock).mockResolvedValue(true);
     for (const serviceGroup of Object.values(mockDomainServices)) {
       for (const fn of Object.values(serviceGroup)) {
         (fn as jest.Mock).mockReset();
@@ -210,6 +220,21 @@ describe("e-booklet routes", () => {
       .set("Authorization", `Bearer ${tokenFor("Teacher", 2)}`)
       .send({ title: "Teacher should not create", price: 100 })
       .expect(403);
+
+    expect(mockService.createTemplate).not.toHaveBeenCalled();
+  });
+
+  test("rejects protected e-booklet routes when the backing auth session is inactive", async () => {
+    (isRefreshSessionActive as jest.Mock).mockResolvedValueOnce(false);
+
+    await request(app)
+      .post("/api/v2/admin/e-booklet-templates")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .send({ title: "Inactive session", price: 100 })
+      .expect(401)
+      .expect((res) => {
+        expect(res.body.message).toBe("Session expired");
+      });
 
     expect(mockService.createTemplate).not.toHaveBeenCalled();
   });
@@ -339,6 +364,20 @@ describe("e-booklet routes", () => {
       });
 
     expect(mockService.listVersionHotspots).toHaveBeenCalledWith(5, 3);
+  });
+
+  test("allows admin users to restore archived hotspot presets", async () => {
+    mockService.restoreHotspotPreset.mockResolvedValue({ id: 12, is_active: true });
+
+    await request(app)
+      .post("/api/v2/admin/e-booklet-hotspot-presets/12/restore")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 9)}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body).toEqual({ success: true, data: { id: 12, is_active: true } });
+      });
+
+    expect(mockService.restoreHotspotPreset).toHaveBeenCalledWith(12, 9);
   });
 
   test("allows teachers to create invite links for their own e-booklet instances", async () => {
@@ -489,28 +528,14 @@ describe("e-booklet routes", () => {
     expect(mockService.getViewerPage).toHaveBeenCalledWith(10, 1, 55);
   });
 
-  test("serves the authorized viewer PDF document as private no-store", async () => {
-    const pdfPath = path.join(os.tmpdir(), `kalima-viewer-${Date.now()}.pdf`);
-    await fs.writeFile(pdfPath, Buffer.from("%PDF-1.4\n%stub\n"));
-    mockService.getAuthorizedViewerDocument.mockResolvedValue({
-      asset: { original_filename: "lesson.pdf", mime_type: "application/pdf" },
-      absolutePath: pdfPath,
-      cacheControl: "private, no-store",
-    });
+  test("rejects authorized viewer PDF document requests without a page", async () => {
+    await request(app)
+      .get("/api/v2/e-booklet-viewer/10/document")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .expect(400)
+      .expect((res) => expect(res.body.message).toContain("document page is required"));
 
-    try {
-      await request(app)
-        .get("/api/v2/e-booklet-viewer/10/document")
-        .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
-        .expect(200)
-        .expect("Cache-Control", "private, no-store")
-        .expect("Content-Type", /application\/pdf/)
-        .expect("Content-Disposition", /inline; filename="lesson.pdf"/);
-
-      expect(mockService.getAuthorizedViewerDocument).toHaveBeenCalledWith(10, 55);
-    } finally {
-      await fs.rm(pdfPath, { force: true });
-    }
+    expect(mockService.getAuthorizedViewerDocument).not.toHaveBeenCalled();
   });
 
   test("passes requested PDF page number to the authorized viewer document service", async () => {
@@ -524,12 +549,63 @@ describe("e-booklet routes", () => {
     await request(app)
       .get("/api/v2/e-booklet-viewer/10/document?page=2")
       .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .set("X-E-Booklet-Page-Token", "page-token")
       .expect(200)
       .expect("Cache-Control", "private, no-store")
       .expect("Content-Type", /application\/pdf/)
       .expect("Content-Disposition", /inline; filename="lesson-page-2.pdf"/);
 
-    expect(mockService.getAuthorizedViewerDocument).toHaveBeenCalledWith(10, 55, 2);
+    expect(mockService.getAuthorizedViewerDocument).toHaveBeenCalledWith(10, 55, 2, "page-token");
+  });
+
+  test("does not accept viewer page tokens from query parameters", async () => {
+    mockService.getAuthorizedViewerDocument.mockResolvedValue({
+      asset: { original_filename: "lesson-page-2.pdf", mime_type: "application/pdf" },
+      absolutePath: "/not-used-for-page-buffer.pdf",
+      pageBuffer: Buffer.from("%PDF-1.4\n%page-2\n"),
+      cacheControl: "private, no-store",
+    });
+
+    await request(app)
+      .get("/api/v2/e-booklet-viewer/10/document?page=2&token=query-token")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .expect(200);
+
+    expect(mockService.getAuthorizedViewerDocument).toHaveBeenCalledWith(10, 55, 2, "");
+  });
+
+  test("passes requested admin PDF page token to the authorized viewer document service", async () => {
+    mockService.getAdminAuthorizedViewerDocument.mockResolvedValue({
+      asset: { original_filename: "lesson-page-1.pdf", mime_type: "application/pdf" },
+      absolutePath: "/not-used-for-page-buffer.pdf",
+      pageBuffer: Buffer.from("%PDF-1.4\n%page-1\n"),
+      cacheControl: "private, no-store",
+    });
+
+    await request(app)
+      .get("/api/v2/admin/e-booklet-viewer/10/document?page=1")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .set("X-E-Booklet-Page-Token", "admin-page-token")
+      .expect(200)
+      .expect("Content-Type", /application\/pdf/);
+
+    expect(mockService.getAdminAuthorizedViewerDocument).toHaveBeenCalledWith(10, 1, "admin-page-token", 1);
+  });
+
+  test("does not accept admin viewer page tokens from query parameters", async () => {
+    mockService.getAdminAuthorizedViewerDocument.mockResolvedValue({
+      asset: { original_filename: "lesson-page-1.pdf", mime_type: "application/pdf" },
+      absolutePath: "/not-used-for-page-buffer.pdf",
+      pageBuffer: Buffer.from("%PDF-1.4\n%page-1\n"),
+      cacheControl: "private, no-store",
+    });
+
+    await request(app)
+      .get("/api/v2/admin/e-booklet-viewer/10/document?page=1&token=query-token")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .expect(200);
+
+    expect(mockService.getAdminAuthorizedViewerDocument).toHaveBeenCalledWith(10, 1, "", 1);
   });
 
   test("serves admin view mode without student access or device binding", async () => {
@@ -626,7 +702,7 @@ describe("e-booklet routes", () => {
     });
 
     await request(app)
-      .get("/api/v2/e-booklet-viewer/hotspots/77/assets/123")
+      .get("/api/v2/e-booklet-viewer/10/hotspots/77/assets/123")
       .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
       .expect(200)
       .expect("Cache-Control", "private, no-store")
@@ -634,7 +710,21 @@ describe("e-booklet routes", () => {
       .expect("Expires", "0")
       .expect("Content-Type", /audio\/mpeg/);
 
-    expect(mockService.getAuthorizedHotspotAsset).toHaveBeenCalledWith(77, 123, 55);
+    expect(mockService.getAuthorizedHotspotAsset).toHaveBeenCalledWith(10, 77, 123, 55);
+  });
+
+  test("returns a deliberate upgrade response for deprecated unscoped viewer hotspot routes", async () => {
+    await request(app)
+      .get("/api/v2/e-booklet-viewer/hotspots/77/content")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .expect(410)
+      .expect((res) => expect(res.body.message).toContain("refresh the viewer"));
+
+    await request(app)
+      .get("/api/v2/e-booklet-viewer/hotspots/77/assets/123")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .expect(410)
+      .expect((res) => expect(res.body.message).toContain("refresh the viewer"));
   });
 
   test("teacher reward claim requires explicit reward terms acceptance", async () => {

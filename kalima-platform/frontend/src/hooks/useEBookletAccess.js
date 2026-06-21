@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import i18n from "@/i18n";
 import api from "@/api/axios";
 import useApiMutation from "./useApiMutation";
@@ -243,46 +243,77 @@ export function useTeacherEBookletAnalytics() {
 export function useEBookletViewer({ adminMode = false } = {}) {
   const { mutate: fetchApi, loading } = useApiMutation();
   const [metadata, setMetadata] = useState(null);
+  const [metadataError, setMetadataError] = useState("");
   const [page, setPage] = useState(null);
+  const [pageError, setPageError] = useState("");
   const [hotspots, setHotspots] = useState([]);
+  const metadataRequestRef = useRef(0);
+  const pageRequestRef = useRef(0);
   const viewerBase = adminMode ? "/admin/e-booklet-viewer" : "/e-booklet-viewer";
 
   const fetchMetadata = useCallback(
-    async (instanceId) => {
-      const response = await fetchApi(
-        {
-          endpoint: `${viewerBase}/${instanceId}/metadata`,
-          method: "get",
-        },
-        false,
-      );
-      setMetadata(response?.data || null);
-      return response;
+    async (instanceId, fallbackMessage) => {
+      const requestId = metadataRequestRef.current + 1;
+      metadataRequestRef.current = requestId;
+      setMetadataError("");
+      try {
+        const response = await fetchApi(
+          {
+            endpoint: `${viewerBase}/${instanceId}/metadata`,
+            method: "get",
+          },
+          false,
+        );
+        if (metadataRequestRef.current === requestId) {
+          setMetadata(response?.data || null);
+        }
+        return response;
+      } catch (error) {
+        if (metadataRequestRef.current === requestId) {
+          setMetadata(null);
+          setMetadataError(error?.response?.data?.message || error?.message || fallbackMessage || "");
+        }
+        throw error;
+      }
     },
     [fetchApi, viewerBase],
   );
 
   const fetchPage = useCallback(
-    async (instanceId, pageNumber) => {
-      const [pageResponse, hotspotsResponse] = await Promise.all([
-        fetchApi(
-          {
-            endpoint: `${viewerBase}/${instanceId}/pages/${pageNumber}`,
-            method: "get",
-          },
-          false,
-        ),
-        fetchApi(
-          {
-            endpoint: `${viewerBase}/${instanceId}/pages/${pageNumber}/hotspots`,
-            method: "get",
-          },
-          false,
-        ),
-      ]);
-      setPage(pageResponse?.data || null);
-      setHotspots(Array.isArray(hotspotsResponse?.data) ? hotspotsResponse.data : []);
-      return { page: pageResponse?.data, hotspots: hotspotsResponse?.data };
+    async (instanceId, pageNumber, fallbackMessage) => {
+      const requestId = pageRequestRef.current + 1;
+      pageRequestRef.current = requestId;
+      setPageError("");
+      try {
+        const [pageResponse, hotspotsResponse] = await Promise.all([
+          fetchApi(
+            {
+              endpoint: `${viewerBase}/${instanceId}/pages/${pageNumber}`,
+              method: "get",
+            },
+            false,
+          ),
+          fetchApi(
+            {
+              endpoint: `${viewerBase}/${instanceId}/pages/${pageNumber}/hotspots`,
+              method: "get",
+            },
+            false,
+          ),
+        ]);
+        if (pageRequestRef.current === requestId) {
+          setPage(pageResponse?.data || null);
+          setHotspots(Array.isArray(hotspotsResponse?.data) ? hotspotsResponse.data : []);
+        }
+        return { page: pageResponse?.data, hotspots: hotspotsResponse?.data };
+      } catch (error) {
+        if (pageRequestRef.current === requestId) {
+          setPage(null);
+          setHotspots([]);
+          setPageError(error?.response?.data?.message || error?.message || fallbackMessage || "");
+        }
+        throw error;
+      }
     },
     [fetchApi, viewerBase],
   );
@@ -314,13 +345,17 @@ export function useEBookletViewer({ adminMode = false } = {}) {
     [fetchApi],
   );
 
-  const fetchViewerDocumentBlobUrl = useCallback(async (instanceId, pageNumber) => {
-    const params = pageNumber ? { page: pageNumber } : undefined;
+  const fetchViewerDocumentPageData = useCallback(async (instanceId, pageNumber, pageAccessToken, signal) => {
     const response = await api.get(
       `${viewerBase}/${instanceId}/document`,
-      { responseType: "blob", params },
+      {
+        responseType: "arraybuffer",
+        params: { page: pageNumber },
+        headers: { "X-E-Booklet-Page-Token": pageAccessToken },
+        signal,
+      },
     );
-    return URL.createObjectURL(response.data);
+    return response.data;
   }, [viewerBase]);
 
   const fetchHotspotAssetBlobUrl = useCallback(async (hotspotId, assetId, instanceId) => {
@@ -334,14 +369,16 @@ export function useEBookletViewer({ adminMode = false } = {}) {
 
   return {
     metadata,
+    metadataError,
     page,
+    pageError,
     hotspots,
     loading,
     fetchMetadata,
     fetchPage,
     fetchHotspotContent,
     bindDevice,
-    fetchViewerDocumentBlobUrl,
+    fetchViewerDocumentPageData,
     fetchHotspotAssetBlobUrl,
   };
 }

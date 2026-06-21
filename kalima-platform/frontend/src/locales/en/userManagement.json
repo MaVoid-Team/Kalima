@@ -45,6 +45,8 @@
     "appreciation": "Appreciation page",
     "approve": "Approve",
     "reject": "Reject",
+    "impersonate": "Impersonate",
+    "currentUser": "Current user",
     "delete": "Delete",
     "close": "Close",
     "confirm": "Confirm",
@@ -59,6 +61,7 @@
   "messages": {
     "approveSuccess": "User approved successfully",
     "rejectSuccess": "User rejected successfully",
+    "impersonationStarted": "Impersonation started",
     "deleteSuccess": "User deleted successfully",
     "revokeConfirm": "Are you sure you want to revoke this role? The user must always keep at least one role.",
     "noRoles": "No roles assigned"
@@ -141,6 +144,8 @@
     "secondaryPhone": "Secondary Phone",
     "phone": "Phone",
     "assignRolePrompt": "Assign a role to get started",
+    "noAvailablePortals": "This user already has roles in every available portal.",
+    "oneRolePerPortalMessage": "A user cannot hold more than one active role in the same portal.",
     "flags": {
       "ELITE": "Elite",
       "PRO": "Pro",
@@ -173,7 +178,21 @@
     "teachingLevels": "Teaching Levels",
     "primary": "Primary",
     "preparatory": "Preparatory",
-    "secondary": "Secondary"
+    "secondary": "Secondary",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "locationFields": "Location",
+    "studentFields": "Student Details",
+    "level": "Level",
+    "selectLevel": "Select level",
+    "parentPhone": "Parent Phone",
+    "faction": "Faction",
+    "assistantFields": "Assistant Details",
+    "lecturerId": "Lecturer ID",
+    "selectType": "Select type",
+    "namePlaceholder": "John Doe",
+    "selectGender": "Select gender",
+    "factionPlaceholder": "Alpha, Beta..."
   },
   "pagination": {
     "previous": "Previous",

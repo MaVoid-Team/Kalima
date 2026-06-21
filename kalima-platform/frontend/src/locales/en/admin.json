@@ -10,6 +10,7 @@
   "nav": {
     "orders": "Orders",
     "products": "Products",
+    "store": "Store",
     "eBooklets": "E-Booklets",
     "eBookletPurchases": "E-Booklet Purchases",
     "samples": "Samples",
@@ -23,6 +24,7 @@
     "backToStore": "Back to Store",
     "logout": "Logout",
     "settings": "Settings",
+    "notifications": "Notifications",
     "expandSidebar": "Expand Sidebar",
     "collapseSidebar": "Collapse Sidebar",
     "closeSidebar": "Close Sidebar",
@@ -32,6 +34,19 @@
     "eBookletInstances": "E-Booklet Access",
     "eBookletAnalytics": "E-Booklet Analytics",
     "eBookletTermsMilestones": "Terms & Milestones"
+  },
+  "storeWorkspace": {
+    "kicker": "Admin workspace",
+    "title": "Store",
+    "description": "Manage the core store workflow from product catalog setup to orders, samples, and categories.",
+    "tabsLabel": "Store workspace tabs",
+    "navLabel": "Store workspace navigation",
+    "tabs": {
+      "products": "Products",
+      "orders": "Orders",
+      "samples": "Samples",
+      "categories": "Categories"
+    }
   },
   "common": {
     "currencyEGP": "EGP",
@@ -213,7 +228,18 @@
       "whatsapp": "Contact WhatsApp",
       "collapseItems": "Collapse",
       "expandItems": "Expand",
-      "viewNote": "View Note"
+      "viewNote": "View Note",
+      "editWhatsAppMessage": "Edit WhatsApp Message",
+      "editWhatsAppMessageDesc": "Review and edit the order message before sending it on WhatsApp.",
+      "whatsappPlaceholder": "Type your message here...",
+      "sendOnWhatsApp": "Send on WhatsApp",
+      "whatsappGreeting": "Hello {{name}}",
+      "whatsappSuccess": "Your order has been received and is being processed.",
+      "whatsappOrderDetails": "Order number: {{serial}}",
+      "whatsappItems": "Order items:",
+      "whatsappTotal": "Total: {{total}} {{currency}}",
+      "whatsappSupport": "If you have any questions, feel free to contact us.",
+      "whatsappClosing": "Thank you for choosing Kalima Platform!"
     },
     "messages": {
       "receiveSuccess": "Order marked as received",
@@ -429,6 +455,7 @@
       "fieldOptional": "Optional",
       "fieldToggleSuccess": "Required field updated successfully",
       "fieldToggleError": "Failed to toggle required field",
+      "toggleRequiredStatus": "Toggle required status",
       "yes": "Yes",
       "no": "No",
       "sample": "Sample File",
@@ -936,7 +963,8 @@
       "updateSuccess": "Account review settings updated successfully",
       "allAccounts": "All Account Types",
       "allAccountsDesc": "Enable or disable review requirement for all account types at once.",
-      "partial": "partial"
+      "partial": "partial",
+      "toggleAllAria": "Toggle all account types review"
     },
     "general": {
       "title": "General Administration Settings",
@@ -1116,6 +1144,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "description": "Overview of store performance",
     "totalRevenue": "Total Revenue",
     "currency": "EGP",
     "totalPurchases": "Total Purchases",
@@ -1199,7 +1228,18 @@
     "actions": {
       "impersonate": "Impersonate",
       "starting": "Starting…",
-      "currentUser": "Current user"
+      "currentUser": "Current user",
+      "expandBanner": "Expand impersonation banner",
+      "minimizeBanner": "Minimize impersonation banner",
+      "stop": "Stop impersonation",
+      "stopping": "Stopping…"
+    },
+    "banner": {
+      "impersonating": "Impersonating",
+      "impersonatingUser": "Impersonating {{name}}",
+      "originalAdmin": "Original admin: {{name}}",
+      "adminFallback": "Admin",
+      "userFallback": "user"
     },
     "empty": "No users found.",
     "paginationSummary": "Page {{page}} of {{totalPages}}",

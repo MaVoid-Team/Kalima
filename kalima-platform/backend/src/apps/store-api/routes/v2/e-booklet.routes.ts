@@ -5,6 +5,7 @@ import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { uploadSingleImage } from "../../middleware/upload.middleware";
 import { role_enum, portal_enum } from "../../generated/prisma/client";
+import { makeExportHandler } from "../../export";
 import {
   uploadEBookletCover,
   uploadEBookletDocument,
@@ -193,6 +194,11 @@ router.post(
   "/admin/e-booklet-hotspot-presets/:presetId/restore",
   ...adminAuth,
   eBookletController.restoreHotspotPreset,
+);
+router.get(
+  "/admin/e-booklet-purchases/export",
+  ...adminAuth,
+  makeExportHandler("admin/e-booklet-purchases"),
 );
 router.get(
   "/admin/e-booklet-purchases",
@@ -542,10 +548,28 @@ router.get(
   "/e-booklet-viewer/hotspots/:hotspotId/content",
   viewerLimiter,
   ...viewerAuth,
-  eBookletController.getHotspotContent,
+  (_req, res) => res.status(410).json({
+    success: false,
+    message: "This e-booklet hotspot route has moved. Please refresh the viewer.",
+  }),
 );
 router.get(
   "/e-booklet-viewer/hotspots/:hotspotId/assets/:assetId",
+  viewerLimiter,
+  ...viewerAuth,
+  (_req, res) => res.status(410).json({
+    success: false,
+    message: "This e-booklet hotspot asset route has moved. Please refresh the viewer.",
+  }),
+);
+router.get(
+  "/e-booklet-viewer/:instanceId/hotspots/:hotspotId/content",
+  viewerLimiter,
+  ...viewerAuth,
+  eBookletController.getHotspotContent,
+);
+router.get(
+  "/e-booklet-viewer/:instanceId/hotspots/:hotspotId/assets/:assetId",
   viewerLimiter,
   ...viewerAuth,
   eBookletController.getAuthorizedHotspotAsset,

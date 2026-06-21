@@ -8,6 +8,10 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
+    "i18n:audit": "node scripts/i18n-audit.mjs",
+    "i18n:hardcoded": "node scripts/i18n-hardcoded-audit.mjs",
+    "i18n:smoke": "node scripts/i18n-dom-smoke.mjs",
+    "i18n:fullstack-smoke": "node scripts/i18n-fullstack-smoke.mjs",
     "preview": "vite preview"
   },
   "eslintIgnore": [

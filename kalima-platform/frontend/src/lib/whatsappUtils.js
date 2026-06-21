@@ -21,7 +21,7 @@ export const WHATSAPP_MESSAGES = {
     CART_CHECKOUT: (total, itemsCount) => {
         const lines = [
             i18n.t('common:whatsapp.cartCheckoutHeader', 'مرحباً، أود إتمام الطلب الخاص بي.'),
-            `${i18n.t('cart:orderSummary.itemsCount', 'عدد المنتجات')}: ${itemsCount}`,
+            `${i18n.t('cart:whatsappItemsCount', 'Number of items')}: ${itemsCount}`,
             `${i18n.t('cart:total', 'الإجمالي')}: ${total} ${i18n.t('cart:L.E', 'جم')}`
         ];
         return lines.join('\n');
@@ -88,4 +88,3 @@ export function useWhatsAppContact() {
 
     return { handleWhatsAppContact, loading };
 }
-

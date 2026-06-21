@@ -7,6 +7,7 @@
     "teacher": "Teacher",
     "student": "Student",
     "user": "User",
+    "name": "Name",
     "active": "active",
     "draft": "draft",
     "untitled": "Untitled",
@@ -40,6 +41,7 @@
     "pages": "Pages",
     "actions": "Actions",
     "total": "Total",
+    "currencyEGP": "EGP",
     "subtotal": "Subtotal",
     "payment": "Payment",
     "manual": "Manual",
@@ -115,6 +117,7 @@
     "milestoneSaved": "E-booklet milestone saved",
     "milestonesReordered": "E-booklet milestones reordered",
     "teacherTemplateReady": "Teacher-specific eBooklet template is ready to edit.",
+    "settingsSaved": "E-booklet settings saved",
     "hotspotConfigurationCopied": "Hotspot configuration copied",
     "hotspotConfigurationApplied": "Hotspot configuration applied",
     "accessCodesGenerated": "Access codes generated",
@@ -342,7 +345,12 @@
         "autosaveIdle": "Autosave on",
         "emptyPage": "No hotspots on this page.",
         "collapsePage": "Collapse page {{page}}",
-        "expandPage": "Expand page {{page}}"
+        "expandPage": "Expand page {{page}}",
+        "previousPage": "Previous page",
+        "goToPage": "Go to page",
+        "nextPage": "Next page",
+        "renderLoading": "Loading PDF page...",
+        "renderFailed": "Could not render this PDF page."
       },
       "review": {
         "title": "Review and Publish",
@@ -394,7 +402,22 @@
       "accessExpiresAt": "Student access expires",
       "studentMarketingPrice": "Student store price",
       "internalPrice": "Internal teacher cost",
-      "editTeacherTemplate": "Edit this teacher"
+      "editTeacherTemplate": "Edit this teacher",
+      "alreadyDelivered": "This e-booklet has already been delivered.",
+      "approvePaymentBeforeDelivery": "Approve the payment before delivering this e-booklet.",
+      "total": "{{count}} e-booklet purchases",
+      "whatsapp": "Contact WhatsApp",
+      "editWhatsAppMessage": "Edit WhatsApp Message",
+      "editWhatsAppMessageDesc": "Review and edit the e-booklet message before sending it to the teacher.",
+      "whatsappPlaceholder": "Type your message here...",
+      "sendOnWhatsApp": "Send on WhatsApp",
+      "whatsappGreeting": "Greetings {{name}}!",
+      "whatsappSuccess": "Your e-booklet order has been received and is being processed.",
+      "whatsappOrderDetails": "E-booklet Order: {{serial}}",
+      "whatsappItems": "E-booklet details:",
+      "whatsappTotal": "Total: {{total}} {{currency}}",
+      "whatsappSupport": "If you have any questions, feel free to contact us.",
+      "whatsappClosing": "Thank you for choosing Kalima Platform!"
     },
     "instances": {
       "title": "Teacher E-Booklet Access",
@@ -436,7 +459,22 @@
       "noStudents": "No students have active access yet.",
       "viewerOpens": "Viewer opens",
       "source": "Source",
-      "adminView": "Admin View"
+      "adminView": "Admin View",
+      "totalAccess": "Total access",
+      "seats": "Seats",
+      "seatsSummary": "{{used}} used / {{total}} total",
+      "capacity": "Seat capacity",
+      "accessCodes": "Access codes",
+      "selectTerm": "Select term",
+      "paidCode": "Paid code",
+      "freeCode": "Free code",
+      "codeCount": "Code count",
+      "maxRedemptions": "Max redemptions",
+      "generateCodes": "Generate codes",
+      "copyGeneratedCodes": "Copy generated codes",
+      "generatedNow": "Generated now",
+      "redemptions": "Redemptions",
+      "noAccessCodes": "No access codes generated yet."
     },
     "students": {
       "title": "E-Booklet Students",
@@ -529,7 +567,56 @@
       "claimedCount": "Claimed rewards",
       "teacherId": "Teacher #{{id}}",
       "claimed": "Claimed",
-      "unclaimed": "Unclaimed"
+      "unclaimed": "Unclaimed",
+      "deleteMilestoneConfirm": "Delete this milestone? This cannot be undone."
+    },
+    "settings": {
+      "title": "E-Booklet Settings",
+      "description": "Configure global defaults and policies used across the eBooklet workspace.",
+      "refresh": "Refresh",
+      "save": "Save settings",
+      "termsMilestonesTitle": "Terms & Milestones",
+      "termsMilestonesDescription": "Manage active eBooklet terms and milestone rewards.",
+      "deliveryDefaults": "Delivery Defaults",
+      "deliveryDefaultsDescription": "Starting values for new eBooklet deliveries and invite setup.",
+      "defaultInviteQuota": "Default invite quota",
+      "defaultInviteQuotaHint": "How many student invites a delivered eBooklet starts with.",
+      "accessDurationDays": "Access duration days",
+      "accessDurationDaysHint": "Leave blank for no automatic access expiry default.",
+      "inviteExpirationDays": "Invite expiration days",
+      "inviteExpirationDaysHint": "Leave blank when invite links/codes should not expire by default.",
+      "defaultDeliveryNotes": "Default delivery notes",
+      "defaultDeliveryNotesPlaceholder": "Optional internal delivery guidance",
+      "pricingDefaults": "Pricing Defaults",
+      "pricingDefaultsDescription": "Default prices copied into eBooklet delivery and access decisions.",
+      "studentMarketingPrice": "Student marketing price",
+      "studentMarketingPriceHint": "Public-facing suggested student price.",
+      "internalTeacherCost": "Internal teacher cost",
+      "internalTeacherCostHint": "Internal baseline cost used for teacher/access economics.",
+      "accessCodePolicy": "Access-Code Policy",
+      "accessCodePolicyDescription": "Defaults and limits for generated eBooklet access codes.",
+      "defaultAccessCodeKind": "Default access-code kind",
+      "paid": "Paid",
+      "free": "Free",
+      "maxBulkAccessCodes": "Max bulk access codes",
+      "maxBulkAccessCodesHint": "Upper bound for one bulk generation request.",
+      "accessCodeExpirationDays": "Access-code expiration days",
+      "accessCodeExpirationDaysHint": "Leave blank when generated codes should not expire by default.",
+      "requireTermsBeforeCodeGeneration": "Require terms before code generation",
+      "requireTermsBeforeCodeGenerationHint": "Teachers must accept current eBooklet terms before creating access codes.",
+      "devicePolicy": "Device Policy",
+      "devicePolicyDescription": "Default viewer device limits and reset guidance.",
+      "allowedStudentDevices": "Allowed student devices",
+      "allowedTeacherDevices": "Allowed teacher devices",
+      "deviceResetPolicy": "Device reset policy",
+      "deviceResetPolicyPlaceholder": "Explain when admins should reset or expand device access",
+      "notificationRules": "Notification Rules",
+      "notificationRulesDescription": "Choose who should be notified for key eBooklet events.",
+      "notifyAdminsOnDelivery": "Notify admins on delivery",
+      "notifyTeacherOnDelivery": "Notify teacher on delivery",
+      "notifyAdminsOnMilestone": "Notify admins on milestone",
+      "notifyTeacherOnMilestone": "Notify teacher on milestone",
+      "notifyAdminsOnAccessCodeRedemption": "Notify admins on access-code redemption"
     }
   },
   "store": {
@@ -556,7 +643,8 @@
     "accessExpires": "Expires {{value}}",
     "noExpiry": "No expiry",
     "add": "Add",
-    "seatsRemaining": "{{count}} seats"
+    "seatsRemaining": "{{count}} seats",
+    "redeemCode": "Redeem code"
   },
   "details": {
     "coverLabel": "Kalima E-Booklet",
@@ -585,7 +673,8 @@
     ],
     "hotspotContent": "Hotspot content",
     "hotspotDescription": "Hotspots are rendered from normalized template coordinates, so the teacher PDF can change while the interactive layer stays reusable.",
-    "antiDownload": "Downloading is blocked inside Kalima through private storage, authenticated page access, hidden viewer download controls, and watermarking. Screenshots and camera capture cannot be fully prevented by any web platform."
+    "antiDownload": "Downloading is blocked inside Kalima through private storage, authenticated page access, hidden viewer download controls, and watermarking. Screenshots and camera capture cannot be fully prevented by any web platform.",
+    "redeemCode": "Redeem access code"
   },
   "cart": {
     "emptyTitle": "Your e-booklet cart is empty",
@@ -600,7 +689,9 @@
     "adminNotice": "Admin will confirm payment, upload the teacher-specific PDF, assign invite quota, then deliver the booklet.",
     "checkout": "Continue to checkout",
     "keepBrowsing": "Keep browsing",
-    "clear": "Clear cart"
+    "clear": "Clear cart",
+    "directCheckoutDisabled": "Direct checkout is disabled for this access path. Redeem a teacher code or request access from your teacher.",
+    "redeemCode": "Redeem code"
   },
   "checkout": {
     "emptyTitle": "Choose an e-booklet before checkout",
@@ -665,7 +756,8 @@
     },
     "templateMissing": "Selected e-booklet template is missing.",
     "termsRequired": "Accept the terms before continuing.",
-    "paymentRequired": "Choose a payment method, enter the number you paid from, and upload payment proof."
+    "paymentRequired": "Choose a payment method, enter the number you paid from, and upload payment proof.",
+    "requiredFieldsTitle": "Required information"
   },
   "viewer": {
     "titleFallback": "E-Booklet",
@@ -680,6 +772,8 @@
     "loadingAsset": "Loading private asset...",
     "assetUnavailable": "This private asset could not be loaded.",
     "documentUnavailable": "This e-booklet PDF could not be loaded.",
+    "metadataLoadFailed": "Failed to load e-booklet metadata.",
+    "pageLoadFailed": "Failed to load e-booklet page.",
     "questionFallback": "Choose the correct answer.",
     "answerFeedback": "Your answer has been checked.",
     "unsupportedBlock": "Unsupported content block: {{type}}",
@@ -735,7 +829,11 @@
     "numberTransferredFrom": "Number transferred from",
     "numberTransferredFromPlaceholder": "Your wallet/mobile number",
     "paymentScreenshot": "Payment proof screenshot",
-    "notesPlaceholder": "Optional notes for the admin"
+    "notesPlaceholder": "Optional notes for the admin",
+    "teacherCodeTitle": "Teacher access code",
+    "teacherCodeDescription": "Use the code your teacher shared to unlock this e-booklet.",
+    "directPurchaseDisabled": "Direct purchase is disabled for this invite. Use a teacher access code instead.",
+    "openCodeRedemption": "Open code redemption"
   },
   "teacher": {
     "title": "My E-Booklets",
@@ -913,7 +1011,10 @@
       "instance": "Instance",
       "instancePlaceholder": "Instance ID",
       "allInstances": "All instances",
-      "source": "Source"
+      "source": "Source",
+      "title": "Filters",
+      "live": "Live",
+      "teacherSearch": "Teacher search"
     },
     "metrics": {
       "inviteOpens": "Invite opens",
@@ -984,6 +1085,15 @@
       "cancelled": "Cancelled",
       "unknown": "Pending"
     },
+    "export": "Export",
+    "exportCsv": "Export as CSV",
+    "exportXlsx": "Export as Excel",
+    "table": {
+      "selectAll": "Select all",
+      "serial": "Order",
+      "total": "Total",
+      "payment": "Payment"
+    },
     "statusCopy": {
       "pending": "Admin still needs to review this teacher purchase request.",
       "awaiting_payment": "Payment details are still required or waiting for review.",
@@ -995,6 +1105,10 @@
       "rejected": "This request was rejected. Contact admin or submit a new request with corrected details.",
       "cancelled": "This request was cancelled.",
       "unknown": "Waiting for the latest admin status."
-    }
+    },
+    "exporting": "Exporting..."
+  },
+  "export": {
+    "exporting": "Exporting..."
   }
 }

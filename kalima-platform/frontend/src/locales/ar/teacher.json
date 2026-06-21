@@ -191,6 +191,9 @@
     "cancel": "إلغاء",
     "update": "تحديث",
     "remove": "إزالة",
-    "delete": "حذف"
+    "delete": "حذف",
+    "notSpecified": "غير محدد",
+    "save": "حفظ",
+    "select": "اختر"
   }
 }

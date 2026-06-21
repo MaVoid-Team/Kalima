@@ -12,6 +12,59 @@ import { generateInviteToken, hashInviteToken } from "../utils/e-booklet-token";
 
 type EBookletDb = PrismaClient | any;
 
+export type EBookletPurchaseListFilters = {
+  status?: string;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+  minTotal?: number;
+  maxTotal?: number;
+  page?: number;
+  limit?: number;
+};
+
+export const E_BOOKLET_ADMIN_PURCHASE_INCLUDE = {
+  teacher: { select: { id: true, name: true, email: true, phone: true } },
+  template: true,
+  template_version: true,
+  instances: true,
+  payment_methods: { select: { id: true, name: true, phone_number: true } },
+  payment_screenshot: { select: { id: true, url: true } },
+  required_fields: { include: { required_field_definitions: true } },
+} as const;
+
+const E_BOOKLET_PURCHASE_STATUSES = new Set([
+  "pending",
+  "awaiting_payment",
+  "paid",
+  "needs_branding_info",
+  "customization_in_progress",
+  "ready",
+  "delivered",
+  "rejected",
+  "cancelled",
+  "unknown",
+]);
+
+function parseFilterDate(value: unknown, label: string, boundary?: "start" | "end"): Date | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  const raw = String(value);
+  const date = new Date(raw);
+  if (Number.isNaN(date.getTime())) throw new BadRequestError(`Invalid ${label}`);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    if (boundary === "end") date.setUTCHours(23, 59, 59, 999);
+    if (boundary === "start") date.setUTCHours(0, 0, 0, 0);
+  }
+  return date;
+}
+
+function parseFilterMoney(value: unknown, label: string): number | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount < 0) throw new BadRequestError(`Invalid ${label}`);
+  return amount;
+}
+
 const E_BOOKLET_UPLOAD_DIR = path.resolve(
   process.env.E_BOOKLET_UPLOAD_DIR || process.cwd(),
   process.env.E_BOOKLET_UPLOAD_DIR ? "" : "uploads/e-booklets/private",
@@ -304,6 +357,52 @@ function createViewerPageToken(input: {
   return `${body}.${signature}`;
 }
 
+function verifyViewerPageToken(input: {
+  token: string | undefined;
+  instanceId: number;
+  pageNumber: number;
+  userId: number;
+}) {
+  if (!input.token) {
+    throw new ForbiddenError("A valid e-booklet page token is required.");
+  }
+  const [body, signature] = input.token.split(".");
+  if (!body || !signature) {
+    throw new ForbiddenError("A valid e-booklet page token is required.");
+  }
+  const expected = crypto
+    .createHmac("sha256", viewerTokenSecret())
+    .update(body)
+    .digest("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+  const signatureBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expected);
+  if (
+    signatureBuffer.length !== expectedBuffer.length ||
+    !crypto.timingSafeEqual(signatureBuffer, expectedBuffer)
+  ) {
+    throw new ForbiddenError("A valid e-booklet page token is required.");
+  }
+  let payload: any;
+  try {
+    payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8"));
+  } catch {
+    throw new ForbiddenError("A valid e-booklet page token is required.");
+  }
+  const expiresAt = new Date(payload.expiresAt);
+  if (
+    Number(payload.instanceId) !== input.instanceId ||
+    Number(payload.pageNumber) !== input.pageNumber ||
+    Number(payload.userId) !== input.userId ||
+    Number.isNaN(expiresAt.getTime()) ||
+    expiresAt.getTime() <= Date.now()
+  ) {
+    throw new ForbiddenError("A valid e-booklet page token is required.");
+  }
+}
+
 export class EBookletService {
   private fileStorageInitPromise: Promise<unknown> | null = null;
 
@@ -341,6 +440,57 @@ export class EBookletService {
     } catch {
       // Audit failures must not mask the primary e-booklet action/error.
     }
+  }
+
+  buildAdminPurchaseWhere(filters: EBookletPurchaseListFilters = {}) {
+    const where: Record<string, any> = {};
+    const andClauses: Array<Record<string, any>> = [];
+    if (filters.status && filters.status !== "all") {
+      if (!E_BOOKLET_PURCHASE_STATUSES.has(String(filters.status))) {
+        throw new BadRequestError("Invalid e-booklet purchase status");
+      }
+      where.status = filters.status;
+    }
+
+    if (filters.startDate || filters.endDate) {
+      const startDate = parseFilterDate(filters.startDate, "startDate", "start");
+      const endDate = parseFilterDate(filters.endDate, "endDate", "end");
+      where.created_at = {};
+      if (startDate) where.created_at.gte = startDate;
+      if (endDate) where.created_at.lte = endDate;
+    }
+
+    const minTotal = parseFilterMoney(filters.minTotal, "minTotal");
+    const maxTotal = parseFilterMoney(filters.maxTotal, "maxTotal");
+    if (minTotal !== undefined || maxTotal !== undefined) {
+      const payableRange: Record<string, number> = {};
+      if (minTotal !== undefined) payableRange.gte = minTotal;
+      if (maxTotal !== undefined) payableRange.lte = maxTotal;
+      andClauses.push({
+        OR: [
+          { final_payable_price: { not: null, ...payableRange } },
+          { final_payable_price: null, price: payableRange },
+        ],
+      });
+    }
+
+    const search = filters.search?.trim();
+    if (search) {
+      const numericSearch = Number(search);
+      andClauses.push({ OR: [
+        ...(Number.isInteger(numericSearch) && numericSearch > 0 ? [{ id: numericSearch }] : []),
+        { payment_reference: { contains: search, mode: "insensitive" } },
+        { admin_notes: { contains: search, mode: "insensitive" } },
+        { teacher: { name: { contains: search, mode: "insensitive" } } },
+        { teacher: { email: { contains: search, mode: "insensitive" } } },
+        { teacher: { phone: { contains: search, mode: "insensitive" } } },
+        { template: { title: { contains: search, mode: "insensitive" } } },
+      ] });
+    }
+
+    if (andClauses.length > 0) where.AND = andClauses;
+
+    return where;
   }
 
   private async ensureFileStorageDir(): Promise<void> {
@@ -1079,6 +1229,9 @@ export class EBookletService {
   }
 
   async restoreHotspotPreset(presetId: number, adminUserId: number): Promise<unknown> {
+    const existing = await this.db.e_booklet_hotspot_presets.findUnique({ where: { id: presetId }, select: { id: true } });
+    if (!existing) throw new NotFoundError("E-booklet hotspot preset not found");
+
     const preset = await this.db.e_booklet_hotspot_presets.update({
       where: { id: presetId },
       data: { is_active: true, updated_by: adminUserId, updated_at: new Date() },
@@ -1920,24 +2073,15 @@ export class EBookletService {
     return { data, total, page, limit };
   }
 
-  async listPurchases(filters: {
-    status?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<{ data: unknown[]; total: number; page: number; limit: number }> {
+  async listPurchases(filters: EBookletPurchaseListFilters): Promise<{ data: unknown[]; total: number; page: number; limit: number }> {
     const page = filters.page ?? 1;
     const limit = filters.limit ?? 20;
     const skip = (page - 1) * limit;
-    const where = filters.status && filters.status !== "all" ? { status: filters.status } : {};
+    const where = this.buildAdminPurchaseWhere(filters);
     const [data, total] = await Promise.all([
       this.db.e_booklet_purchases.findMany({
         where,
-        include: {
-          teacher: { select: { id: true, name: true, email: true, phone: true } },
-          template: true,
-          template_version: true,
-          instances: true,
-        },
+        include: E_BOOKLET_ADMIN_PURCHASE_INCLUDE,
         orderBy: { created_at: "desc" },
         skip,
         take: limit,
@@ -1950,12 +2094,7 @@ export class EBookletService {
   async getPurchase(id: number): Promise<unknown> {
     const purchase = await this.db.e_booklet_purchases.findUnique({
       where: { id },
-      include: {
-        teacher: { select: { id: true, name: true, email: true, phone: true } },
-        template: true,
-        template_version: true,
-        instances: true,
-      },
+      include: E_BOOKLET_ADMIN_PURCHASE_INCLUDE,
     });
     if (!purchase) throw new NotFoundError("E-booklet purchase not found");
     return purchase;
@@ -2917,7 +3056,7 @@ export class EBookletService {
         },
       },
     });
-    if (!hotspot || !hotspot.template_version.instances.length) {
+    if (!hotspot || hotspot.is_active === false || !hotspot.template_version.instances.length) {
       throw new NotFoundError("E-booklet hotspot not found for this instance.");
     }
     return {
@@ -2967,7 +3106,12 @@ export class EBookletService {
     blocks.forEach((block: any) => {
       if (block?.asset_file_id) referencedAssetIds.add(Number(block.asset_file_id));
     });
-    if (!hotspot || !referencedAssetIds.has(assetId) || !hotspot.template_version?.instances?.length) {
+    if (
+      !hotspot ||
+      hotspot.is_active === false ||
+      !referencedAssetIds.has(assetId) ||
+      !hotspot.template_version?.instances?.length
+    ) {
       throw new ForbiddenError("You do not have access to this hotspot asset.");
     }
     const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: assetId } });
@@ -3045,12 +3189,14 @@ export class EBookletService {
     };
   }
 
-  async getAdminAuthorizedViewerDocument(instanceId: number, pageNumber?: number) {
+  async getAdminAuthorizedViewerDocument(instanceId: number, pageNumber: number, pageAccessToken: string, adminUserId: number) {
+    verifyViewerPageToken({ token: pageAccessToken, instanceId, pageNumber, userId: adminUserId });
     const access: any = await this.getAdminViewerAccess(instanceId);
     return this.buildViewerDocumentResponse(access.booklet_instance, pageNumber);
   }
 
-  async getAuthorizedViewerDocument(instanceId: number, userId: number, pageNumber?: number) {
+  async getAuthorizedViewerDocument(instanceId: number, userId: number, pageNumber: number, pageAccessToken: string) {
+    verifyViewerPageToken({ token: pageAccessToken, instanceId, pageNumber, userId });
     const access: any = await this.assertViewerAccess(instanceId, userId);
     return this.buildViewerDocumentResponse(access.booklet_instance, pageNumber);
   }
@@ -3146,23 +3292,10 @@ export class EBookletService {
     return hotspots.map((hotspot: any) => this.normalizeHotspotRecord(hotspot));
   }
 
-  async getAuthorizedHotspotAsset(hotspotId: number, assetId: number, userId: number) {
+  async getAuthorizedHotspotAsset(instanceId: number, hotspotId: number, assetId: number, userId: number) {
+    const access: any = await this.assertViewerAccess(instanceId, userId);
     const hotspot = await this.db.e_booklet_hotspots.findUnique({
       where: { id: hotspotId },
-      include: {
-        template_version: {
-          include: {
-            instances: {
-              where: {
-                access_records: {
-                  some: { user_id: userId, status: "active" },
-                },
-              },
-              take: 1,
-            },
-          },
-        },
-      },
     });
     const referencedAssetIds = new Set<number>();
     if (hotspot?.asset_file_id) referencedAssetIds.add(Number(hotspot.asset_file_id));
@@ -3173,12 +3306,14 @@ export class EBookletService {
       if (block?.asset_file_id) referencedAssetIds.add(Number(block.asset_file_id));
     });
 
-    if (!hotspot || !referencedAssetIds.has(assetId) || !hotspot.template_version?.instances?.length) {
+    if (
+      !hotspot ||
+      Number(hotspot.template_version_id) !== Number(access.booklet_instance?.template_version_id) ||
+      hotspot.is_active === false ||
+      !referencedAssetIds.has(assetId)
+    ) {
       throw new ForbiddenError("You do not have access to this hotspot asset.");
     }
-
-    const instanceId = hotspot.template_version.instances[0].id;
-    await this.assertViewerAccess(instanceId, userId);
 
     const asset = await this.db.e_booklet_file_assets.findUnique({
       where: { id: assetId },
@@ -3210,29 +3345,21 @@ export class EBookletService {
     };
   }
 
-  async getHotspotContent(hotspotId: number, userId: number) {
+  async getHotspotContent(instanceId: number, hotspotId: number, userId: number) {
+    const access: any = await this.assertViewerAccess(instanceId, userId);
     const hotspot = await this.db.e_booklet_hotspots.findUnique({
       where: { id: hotspotId },
       include: {
         asset_file: true,
-        template_version: {
-          include: {
-            instances: {
-              where: {
-                access_records: {
-                  some: { user_id: userId, status: "active" },
-                },
-              },
-              take: 1,
-            },
-          },
-        },
       },
     });
-    if (!hotspot || !hotspot.template_version.instances.length) {
+    if (
+      !hotspot ||
+      Number(hotspot.template_version_id) !== Number(access.booklet_instance?.template_version_id) ||
+      hotspot.is_active === false
+    ) {
       throw new ForbiddenError("You do not have access to this hotspot.");
     }
-    await this.assertViewerAccess(hotspot.template_version.instances[0].id, userId);
     return {
       id: hotspot.id,
       template_version_id: hotspot.template_version_id,

@@ -152,7 +152,7 @@ export default function ImageGallery({ images, badge }) {
             className="w-full h-full border-0 absolute inset-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            title="External Video"
+            title={t("media.externalVideo")}
           />
         );
       }

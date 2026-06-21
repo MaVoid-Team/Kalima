@@ -24,6 +24,7 @@
   "save": "Save",
   "itemsInCart": "You have {{count}} items in your cart ready for checkout.",
   "orderSummary": "Order Summary",
+  "whatsappItemsCount": "Number of items",
   "fillRequiredFields": "Please fill all required fields for cart items before proceeding to checkout.",
   "fillRequiredFieldsHint": "You can do that by clicking the red 'View more' for each item and filling the required fields.",
   "fillRequiredFields_Client_Missing": "Please fill all highlighted missing required fields first.",

@@ -893,7 +893,7 @@ export default function CreateProductPage() {
                                                 checked={field.is_required}
                                                 onCheckedChange={(checked) => handleToggleFieldRequired(field.id, checked)}
                                                 className="scale-75 origin-left rtl:origin-right"
-                                                aria-label="Toggle required status"
+                                                aria-label={t('products.detail.toggleRequiredStatus')}
                                             />
                                         </div>
 

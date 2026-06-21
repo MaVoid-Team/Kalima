@@ -29,6 +29,7 @@ export interface ImpersonationResponse {
 
 export interface AccessTokenPayload {
   userId: number;
+  sessionId: number;
   roles: UserRole[];
   impersonation?: {
     actorUserId: number;

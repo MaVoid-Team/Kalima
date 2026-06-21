@@ -46,6 +46,8 @@
     "mass_notifications": "إشعارات جماعية",
     "manage_desc": "إدارة وإرسال إشعارات على مستوى النظام",
     "select_users": "اختر المستخدمين",
+    "userIdsPlaceholder": "معرفات المستخدمين (مثال: 1، 2، 3)",
+    "commaSeparatedIds": "معرفات مفصولة بفواصل",
     "all_users": "جميع المستخدمين",
     "role_based": "حسب الدور",
     "target_type": "نوع الاستهداف",

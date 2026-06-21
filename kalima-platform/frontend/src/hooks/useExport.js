@@ -9,12 +9,13 @@ export const useExport = () => {
     const [exportProgress, setExportProgress] = useState(0);
     const { t } = useTranslation('common');
 
-    const exportData = async ({ resource, format = 'csv', ids = [], filters = {} }) => {
+    const exportData = async ({ resource, format = 'csv', ids = [], filters = {}, serializedFilters = false }) => {
         setLoading(true);
         setExportProgress(0);
         try {
-            // Use buildQueryString to handle filters/dates appropriately
-            const baseQuery = buildQueryString({ filters });
+            const baseQuery = serializedFilters
+                ? new URLSearchParams(filters).toString()
+                : buildQueryString({ filters });
             const params = new URLSearchParams(baseQuery);
 
             // Expected by backend

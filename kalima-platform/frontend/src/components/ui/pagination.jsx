@@ -7,15 +7,17 @@ import {
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 function Pagination({
   className,
   ...props
 }) {
+  const { t } = useTranslation("common");
   return (
     <nav
       role="navigation"
-      aria-label="pagination"
+      aria-label={props["aria-label"] || t("aria.pagination")}
       data-slot="pagination"
       className={cn("mx-auto flex w-full justify-center", className)}
       {...props} />
@@ -64,9 +66,10 @@ function PaginationPrevious({
   text = "Previous",
   ...props
 }) {
+  const { t } = useTranslation("common");
   return (
     <PaginationLink
-      aria-label="Go to previous page"
+      aria-label={props["aria-label"] || t("aria.previousPage")}
       size="default"
       className={cn("gap-1 px-2.5 sm:ps-2.5", className)}
       {...props}>
@@ -81,9 +84,10 @@ function PaginationNext({
   text = "Next",
   ...props
 }) {
+  const { t } = useTranslation("common");
   return (
     <PaginationLink
-      aria-label="Go to next page"
+      aria-label={props["aria-label"] || t("aria.nextPage")}
       size="default"
       className={cn("gap-1 px-2.5 sm:pe-2.5", className)}
       {...props}>
