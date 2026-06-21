@@ -23,6 +23,9 @@ FROM node:current-alpine3.23 AS production
 
 WORKDIR /app
 
+# Required for server-rendered e-booklet page preview images.
+RUN apk add --no-cache poppler-utils
+
 # Copy node_modules from builder — keeps the Prisma CLI available for migrations
 COPY --from=builder /app/node_modules ./node_modules
 

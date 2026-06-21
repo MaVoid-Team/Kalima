@@ -376,6 +376,18 @@ export function useEBookletViewer({ adminMode = false } = {}) {
     return response.data;
   }, [viewerBase]);
 
+  const fetchViewerDocumentPagePreviewBlobUrl = useCallback(async (instanceId, pageNumber, pageAccessToken, signal) => {
+    const response = await api.get(
+      `${viewerBase}/${instanceId}/pages/${pageNumber}/preview`,
+      {
+        responseType: "blob",
+        headers: { "X-E-Booklet-Page-Token": pageAccessToken },
+        signal,
+      },
+    );
+    return URL.createObjectURL(response.data);
+  }, [viewerBase]);
+
   const fetchHotspotAssetBlobUrl = useCallback(async (hotspotId, assetId, instanceId) => {
     const endpoint = buildHotspotAssetEndpoint({ adminMode, viewerBase, instanceId, hotspotId, assetId });
     const response = await api.get(
@@ -397,6 +409,7 @@ export function useEBookletViewer({ adminMode = false } = {}) {
     fetchHotspotContent,
     bindDevice,
     fetchViewerDocumentPageData,
+    fetchViewerDocumentPagePreviewBlobUrl,
     fetchHotspotAssetBlobUrl,
   };
 }

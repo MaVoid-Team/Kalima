@@ -36,6 +36,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -50,10 +51,6 @@ import useAdminRequiredFields from "@/hooks/admin/useAdminRequiredFields";
 import HotspotLibraryPickerDialog from "@/components/admin/e-booklets/HotspotLibraryPickerDialog";
 import { normalizeHotspotGeometry } from "@/utils/eBookletHotspotGeometry";
 import { useTranslation } from "react-i18next";
-import * as pdfjsLib from "pdfjs-dist";
-import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 const steps = [
   { id: "basic", labelKey: "admin.editor.steps.basic" },
@@ -109,7 +106,7 @@ const HOTSPOT_COLOR_STORAGE_KEY = "kalima_hotspot_color";
 const DEFAULT_HOTSPOT_COLOR = "blue";
 const contentBlockTypes = ["text", "image", "video", "audio", "file", "link", "question_answer"];
 const textFontOptions = ["Inter", "Arial", "Georgia", "Times New Roman", "Courier New"];
-
+const arabicTextFontOptions = ["Cairo", "Arial", "Tahoma", "Times New Roman", "Amiri", "Noto Naskh Arabic"];
 const getStoredHotspotColor = () => {
   try {
     const color = window.localStorage.getItem(HOTSPOT_COLOR_STORAGE_KEY);
@@ -143,6 +140,7 @@ const createDefaultBlock = (type = "text") => ({
   source: type === "video" ? "uploaded" : undefined,
   youtube_url: "",
   font_family: textFontOptions[0],
+  arabic_font_family: arabicTextFontOptions[0],
   answers: [
     { text: "", isCorrect: true },
     { text: "", isCorrect: false },
@@ -306,7 +304,10 @@ const buildContentJsonPayload = (form) => ({
     if (!["text", "question_answer"].includes(block.type) && block.supplementary_text?.trim()) {
       payload.supplementary_text = block.supplementary_text.trim();
     }
-    if (block.type === "text") payload.font_family = block.font_family || textFontOptions[0];
+    if (block.type === "text") {
+      payload.font_family = block.font_family || textFontOptions[0];
+      payload.arabic_font_family = block.arabic_font_family || arabicTextFontOptions[0];
+    }
     if (["image", "audio", "file"].includes(block.type) && block.asset_file_id) {
       payload.asset_file_id = Number(block.asset_file_id);
     }
@@ -391,7 +392,7 @@ const createHotspotConfigurationSnapshot = (form) => {
 };
 
 const getHotspotShapeStyle = (shape) => {
-  if (shape === "rectangle") return { borderRadius: "0.375rem" };
+  if (shape === "rectangle") return { borderRadius: 0 };
   if (shape === "square") return { borderRadius: "0.25rem" };
   if (shape === "triangle") return { clipPath: "polygon(50% 0%, 100% 100%, 0% 100%)", borderRadius: 0 };
   return { borderRadius: "9999px" };
@@ -411,108 +412,28 @@ const getVersionDimensions = (version, fallbackForm) => {
   return buildPageDimensions(fallbackForm) || [{ width: 612, height: 792 }];
 };
 
-const copyPdfDataForRender = (fileData) => {
-  if (!fileData) return null;
-  if (fileData instanceof ArrayBuffer) {
-    return new Uint8Array(fileData.slice(0));
-  }
-  if (ArrayBuffer.isView(fileData)) {
-    return new Uint8Array(fileData);
-  }
-  return new Uint8Array(fileData);
-};
+function HotspotEditorTooltip({ label, children }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="inline-flex">{children}</span>
+      </TooltipTrigger>
+      <TooltipContent side="top" sideOffset={6} className="max-w-[180px] text-center">
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
 
-function PdfPageCanvas({ fileData, renderWidth, className = "", onRenderStart, onRenderSuccess, onError }) {
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    if (!fileData || !canvasRef.current || !renderWidth) return undefined;
-
-    let cancelled = false;
-    let renderTask = null;
-    let documentTask = null;
-    let loadedDocument = null;
-    let loadedPage = null;
-
-    const renderPage = async () => {
-      try {
-        const pdfData = copyPdfDataForRender(fileData);
-        if (!pdfData?.byteLength) return;
-
-        onRenderStart?.();
-        documentTask = pdfjsLib.getDocument({ data: pdfData });
-        loadedDocument = await documentTask.promise;
-        if (cancelled) {
-          await loadedDocument?.destroy?.();
-          loadedDocument = null;
-          return;
-        }
-
-        loadedPage = await loadedDocument.getPage(1);
-        if (cancelled) {
-          loadedPage?.cleanup?.();
-          loadedPage = null;
-          await loadedDocument?.destroy?.();
-          loadedDocument = null;
-          return;
-        }
-
-        const baseViewport = loadedPage.getViewport({ scale: 1 });
-        const scale = renderWidth / baseViewport.width;
-        const viewport = loadedPage.getViewport({ scale });
-        const dpr = window.devicePixelRatio || 1;
-        const canvas = canvasRef.current;
-        const context = canvas?.getContext("2d");
-        if (!canvas || !context) {
-          loadedPage?.cleanup?.();
-          loadedPage = null;
-          await loadedDocument?.destroy?.();
-          loadedDocument = null;
-          documentTask = null;
-          return;
-        }
-
-        canvas.width = Math.max(1, Math.floor(viewport.width * dpr));
-        canvas.height = Math.max(1, Math.floor(viewport.height * dpr));
-        canvas.style.width = "100%";
-        canvas.style.height = "100%";
-        context.setTransform(dpr, 0, 0, dpr, 0, 0);
-        context.clearRect(0, 0, viewport.width, viewport.height);
-
-        renderTask = loadedPage.render({ canvasContext: context, viewport });
-        await renderTask.promise;
-        loadedPage.cleanup?.();
-        loadedPage = null;
-        await loadedDocument.destroy?.();
-        loadedDocument = null;
-        documentTask = null;
-        if (!cancelled) onRenderSuccess?.();
-      } catch (error) {
-        loadedPage?.cleanup?.();
-        loadedPage = null;
-        await loadedDocument?.destroy?.();
-        loadedDocument = null;
-        documentTask = null;
-        if (!cancelled && error?.name !== "RenderingCancelledException") {
-          // Keep the white page visible; the editor can still place hotspots.
-          console.error("Failed to render e-booklet PDF page", error);
-          onError?.();
-        }
-      }
-    };
-
-    renderPage();
-
-    return () => {
-      cancelled = true;
-      renderTask?.cancel?.();
-      loadedPage?.cleanup?.();
-      documentTask?.destroy?.();
-      loadedDocument?.destroy?.();
-    };
-  }, [fileData, onError, onRenderStart, onRenderSuccess, renderWidth]);
-
-  return <canvas ref={canvasRef} className={className} data-testid="admin-e-booklet-pdf-canvas" />;
+function HotspotSettingLabel({ label, tooltip, className = "text-xs" }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <Label className={className}>{label}</Label>
+      <HotspotEditorTooltip label={tooltip}>
+        <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+      </HotspotEditorTooltip>
+    </div>
+  );
 }
 
 export default function AdminEBookletEditorPage() {
@@ -720,11 +641,12 @@ export default function AdminEBookletEditorPage() {
     const controller = new AbortController();
     setDocumentPageData(null);
     setDocumentPageStatus("loading");
-    editor.fetchAssetArrayBuffer(versionForm.base_document_file_id, { page: selectedPage }, controller.signal)
-      .then((arrayBuffer) => {
+    editor.fetchAssetPagePreviewBlobUrl(versionForm.base_document_file_id, selectedPage, controller.signal)
+      .then((previewUrl) => {
         if (active) {
-          setDocumentPageData(arrayBuffer);
-          setDocumentPageStatus("ready");
+          setDocumentPageData(previewUrl);
+        } else if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
         }
       })
       .catch(() => {
@@ -737,15 +659,15 @@ export default function AdminEBookletEditorPage() {
     return () => {
       active = false;
       controller.abort();
+      setDocumentPageData((currentUrl) => {
+        if (currentUrl) URL.revokeObjectURL(currentUrl);
+        return null;
+      });
     };
-  }, [activeStep, editor.fetchAssetArrayBuffer, selectedPage, versionForm.base_document_file_id]);
+  }, [activeStep, editor.fetchAssetPagePreviewBlobUrl, selectedPage, versionForm.base_document_file_id]);
 
   const handleDocumentPageRenderError = useCallback(() => {
     setDocumentPageStatus("error");
-  }, []);
-
-  const handleDocumentPageRenderStart = useCallback(() => {
-    setDocumentPageStatus((currentStatus) => (currentStatus === "error" ? "ready" : currentStatus));
   }, []);
 
   const handleDocumentPageRenderSuccess = useCallback(() => {
@@ -1605,13 +1527,13 @@ export default function AdminEBookletEditorPage() {
     }
   };
 
-  const ContentBlockFields = ({ block, index }) => {
+  const renderContentBlockFields = (block, index) => {
     const isPrimary = index === 0;
     const blockAssetLabel = block.asset_file_id
       ? t("admin.editor.hotspots.mediaUploaded", { id: block.asset_file_id })
       : t("admin.editor.hotspots.mediaEmpty");
     return (
-      <div className="space-y-2 rounded-md border bg-muted/10 p-2">
+      <div key={block.id || index} className="space-y-2 rounded-md border bg-muted/10 p-2">
         <div className="flex items-center justify-between gap-2">
           <Label className="text-xs font-semibold uppercase text-muted-foreground">
             {t("admin.editor.hotspots.blockNumber", { number: index + 1 })}
@@ -1642,14 +1564,25 @@ export default function AdminEBookletEditorPage() {
 
         {block.type === "text" && (
           <>
-            <div className="space-y-1.5">
-              <Label className="text-xs">{t("admin.editor.hotspots.fontFamily")}</Label>
-              <Select value={block.font_family || textFontOptions[0]} onValueChange={(value) => updateContentBlock(index, "font_family", value)}>
-                <SelectTrigger className="h-8 w-full text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {textFontOptions.map((font) => <SelectItem key={font} value={font}>{font}</SelectItem>)}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label className="text-xs">{t("admin.editor.hotspots.fontFamily")}</Label>
+                <Select value={block.font_family || textFontOptions[0]} onValueChange={(value) => updateContentBlock(index, "font_family", value)}>
+                  <SelectTrigger className="h-8 w-full text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {textFontOptions.map((font) => <SelectItem key={font} value={font}>{font}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">{t("admin.editor.hotspots.arabicFontFamily")}</Label>
+                <Select value={block.arabic_font_family || arabicTextFontOptions[0]} onValueChange={(value) => updateContentBlock(index, "arabic_font_family", value)}>
+                  <SelectTrigger className="h-8 w-full text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {arabicTextFontOptions.map((font) => <SelectItem key={font} value={font}>{font}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <Textarea
               value={block.text_content || ""}
@@ -2155,23 +2088,110 @@ export default function AdminEBookletEditorPage() {
 
       {activeStep === "hotspots" && (
         <section className={`grid gap-2 md:h-[calc(100vh-190px)] md:min-h-0 md:overflow-hidden ${canvasExpanded ? "md:grid-cols-[minmax(0,1fr)_312px]" : "md:grid-cols-[minmax(0,1fr)_312px] xl:grid-cols-[312px_minmax(0,1fr)_272px]"}`}>
+          <TooltipProvider delayDuration={150}>
           <div className={`flex flex-col overflow-hidden rounded-lg border bg-background p-2 md:min-h-0 ${canvasExpanded ? "" : "xl:col-start-2 xl:row-start-1"}`}>
-            <div className="flex shrink-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-base font-semibold">{t("admin.editor.hotspots.title")}</h2>
-                <div className="mt-0.5 inline-flex items-center gap-1.5 rounded-full border bg-muted/30 px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                  {isHotspotSaving ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-600" />
-                  ) : hotspotSaveState === "saved" ? (
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                  ) : (
-                    <CheckCircle2 className="h-3.5 w-3.5 text-muted-foreground/70" />
-                  )}
-                  {hotspotSaveStatusLabel}
+            <div className="shrink-0 space-y-2 rounded-lg border bg-muted/20 p-2">
+              <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+                <div className="min-w-0 space-y-1">
+                  <h2 className="text-base font-semibold">{t("admin.editor.hotspots.title")}</h2>
+                  <div className="inline-flex items-center gap-1.5 rounded-full border bg-background px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                    {isHotspotSaving ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-sky-600" />
+                    ) : hotspotSaveState === "saved" ? (
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                    ) : (
+                      <CheckCircle2 className="h-3.5 w-3.5 text-muted-foreground/70" />
+                    )}
+                    {hotspotSaveStatusLabel}
+                  </div>
                 </div>
-                {pendingInsertPreset && (
-                  <div className="mt-1 flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                    <span>{t("admin.hotspotLibrary.clickPageToPlace", { name: pendingInsertPreset.name })}</span>
+
+                <div className="flex flex-wrap items-center gap-1.5 rounded-md border bg-background p-1">
+                  <HotspotEditorTooltip label={canvasExpanded ? t("admin.editor.hotspots.minimizeCanvasTooltip") : t("admin.editor.hotspots.expandCanvasTooltip")}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 px-2 text-xs"
+                      onClick={() => setCanvasExpanded((current) => !current)}
+                      aria-label={canvasExpanded ? t("admin.editor.hotspots.minimizeCanvas") : t("admin.editor.hotspots.expandCanvas")}
+                    >
+                      {canvasExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                      {canvasExpanded ? t("admin.editor.hotspots.minimizeCanvas") : t("admin.editor.hotspots.expandCanvas")}
+                    </Button>
+                  </HotspotEditorTooltip>
+                  <div className="flex h-8 items-center gap-1 rounded-md border bg-background px-1 text-xs">
+                    <HotspotEditorTooltip label={t("admin.editor.hotspots.previousPageTooltip", { defaultValue: "Move the preview to the previous PDF page." })}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="h-6 w-6"
+                        onClick={() => goToPage(selectedPage - 1)}
+                        disabled={selectedPage <= 1}
+                        aria-label={t("admin.editor.hotspots.previousPage", { defaultValue: "Previous page" })}
+                      >
+                        <ChevronRight className="h-3.5 w-3.5 rotate-180" />
+                      </Button>
+                    </HotspotEditorTooltip>
+                    <Label htmlFor="ebooklet-hotspot-page-input" className="sr-only">
+                      {t("admin.editor.hotspots.goToPage", { defaultValue: "Go to page" })}
+                    </Label>
+                    <Input
+                      id="ebooklet-hotspot-page-input"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      min="1"
+                      max={pageCount}
+                      value={pageInputValue}
+                      onChange={handlePageInputChange}
+                      onBlur={commitPageInput}
+                      onKeyDown={handlePageInputKeyDown}
+                      className="h-6 w-12 border-0 px-1 text-center text-xs shadow-none focus-visible:ring-1"
+                      aria-label={t("admin.editor.hotspots.goToPage", { defaultValue: "Go to page" })}
+                    />
+                    <span className="whitespace-nowrap text-muted-foreground">
+                      / {pageCount}
+                    </span>
+                    <HotspotEditorTooltip label={t("admin.editor.hotspots.nextPageTooltip", { defaultValue: "Move the preview to the next PDF page." })}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="h-6 w-6"
+                        onClick={() => goToPage(selectedPage + 1)}
+                        disabled={selectedPage >= pageCount}
+                        aria-label={t("admin.editor.hotspots.nextPage", { defaultValue: "Next page" })}
+                      >
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </HotspotEditorTooltip>
+                  </div>
+                  <Select
+                    value={String(pageZoomPercent)}
+                    onValueChange={(value) => setPageZoomPercent(Number(value))}
+                  >
+                    <SelectTrigger
+                      className="h-8 w-24 text-xs"
+                      aria-label={t("admin.editor.hotspots.zoomLevel")}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {pageZoomOptions.map((zoomPercent) => (
+                        <SelectItem key={zoomPercent} value={String(zoomPercent)}>
+                          {zoomPercent}%
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {pendingInsertPreset && (
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                  <span>{t("admin.hotspotLibrary.clickPageToPlace", { name: pendingInsertPreset.name })}</span>
+                  <HotspotEditorTooltip label={t("admin.hotspotLibrary.cancelInsertTooltip")}>
                     <Button
                       type="button"
                       variant="ghost"
@@ -2181,176 +2201,124 @@ export default function AdminEBookletEditorPage() {
                     >
                       {t("common.close")}
                     </Button>
-                  </div>
-                )}
-                <div className="mt-1 flex flex-wrap items-center gap-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon-sm"
-                    className="border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 hover:text-sky-800 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-300 dark:hover:bg-sky-950/50"
-                    onClick={copyHotspotConfiguration}
-                    disabled={editor.loading}
-                    title={t("admin.editor.hotspots.copyConfiguration")}
-                    aria-label={t("admin.editor.hotspots.copyConfiguration")}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon-sm"
-                    className="border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100 hover:text-violet-800 disabled:bg-muted dark:border-violet-900/60 dark:bg-violet-950/30 dark:text-violet-300 dark:hover:bg-violet-950/50"
-                    onClick={applyCopiedHotspotConfiguration}
-                    disabled={editor.loading || !copiedHotspotConfiguration}
-                    title={t("admin.editor.hotspots.applyConfiguration")}
-                    aria-label={t("admin.editor.hotspots.applyConfiguration")}
-                  >
-                    <ClipboardPaste className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-8 px-2 text-xs"
-                    onClick={openSaveHotspotPresetDialog}
-                    disabled={editor.loading || hotspotLibrary.actionLoading || (!hotspotForm.id && !hasDraftHotspotPreview)}
-                  >
-                    {t("admin.hotspotLibrary.saveToLibrary")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={pendingInsertPreset ? "default" : "outline"}
-                    size="sm"
-                    className="h-8 px-2 text-xs"
-                    onClick={() => setHotspotLibraryInsertOpen(true)}
-                    disabled={editor.loading || hotspotLibrary.actionLoading || !activeVersionId}
-                  >
-                    {t("admin.hotspotLibrary.insertFromLibrary")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-8 px-2 text-xs"
-                    onClick={() => setHotspotLibraryApplyOpen(true)}
-                    disabled={editor.loading || hotspotLibrary.actionLoading}
-                  >
-                    {t("admin.hotspotLibrary.applyPreset")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-8 px-2 text-xs"
-                    onClick={() => setHotspotLibraryReplaceOpen(true)}
-                    disabled={editor.loading || hotspotLibrary.actionLoading || (!hotspotForm.id && !hasDraftHotspotPreview)}
-                  >
-                    {t("admin.hotspotLibrary.replacePreset")}
-                  </Button>
-                  <Button
-                    type="button"
-                    size="icon-sm"
-                    className="bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-emerald-600/60 dark:bg-emerald-600 dark:hover:bg-emerald-500"
-                    onClick={saveHotspot}
-                    disabled={editor.loading || isHotspotSaving || !activeVersionId}
-                    title={t("common.save")}
-                    aria-label={t("common.save")}
-                  >
-                    {isHotspotSaving ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : hotspotSaveState === "saved" ? (
-                      <CheckCircle2 className="h-4 w-4" />
-                    ) : (
-                      <Save className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon-sm"
-                    onClick={deleteCurrentHotspot}
-                    disabled={!hotspotForm.id || editor.loading}
-                    title={t("common.delete")}
-                    aria-label={t("common.delete")}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  </HotspotEditorTooltip>
                 </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-1">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-8 px-2 text-xs"
-                  onClick={() => setCanvasExpanded((current) => !current)}
-                  aria-label={canvasExpanded ? t("admin.editor.hotspots.minimizeCanvas") : t("admin.editor.hotspots.expandCanvas")}
-                >
-                  {canvasExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                  {canvasExpanded ? t("admin.editor.hotspots.minimizeCanvas") : t("admin.editor.hotspots.expandCanvas")}
-                </Button>
-                <div className="flex h-8 items-center gap-1 rounded-md border bg-background px-1 text-xs">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    className="h-6 w-6"
-                    onClick={() => goToPage(selectedPage - 1)}
-                    disabled={selectedPage <= 1}
-                    aria-label={t("admin.editor.hotspots.previousPage", { defaultValue: "Previous page" })}
-                  >
-                    <ChevronRight className="h-3.5 w-3.5 rotate-180" />
-                  </Button>
-                  <Label htmlFor="ebooklet-hotspot-page-input" className="sr-only">
-                    {t("admin.editor.hotspots.goToPage", { defaultValue: "Go to page" })}
-                  </Label>
-                  <Input
-                    id="ebooklet-hotspot-page-input"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    min="1"
-                    max={pageCount}
-                    value={pageInputValue}
-                    onChange={handlePageInputChange}
-                    onBlur={commitPageInput}
-                    onKeyDown={handlePageInputKeyDown}
-                    className="h-6 w-12 border-0 px-1 text-center text-xs shadow-none focus-visible:ring-1"
-                    aria-label={t("admin.editor.hotspots.goToPage", { defaultValue: "Go to page" })}
-                  />
-                  <span className="whitespace-nowrap text-muted-foreground">
-                    / {pageCount}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    className="h-6 w-6"
-                    onClick={() => goToPage(selectedPage + 1)}
-                    disabled={selectedPage >= pageCount}
-                    aria-label={t("admin.editor.hotspots.nextPage", { defaultValue: "Next page" })}
-                  >
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Button>
+              )}
+
+              <div className="flex flex-col gap-1.5 xl:flex-row xl:items-center xl:justify-between">
+                <div className="flex flex-wrap items-center gap-1 rounded-md border bg-background p-1">
+                  <HotspotEditorTooltip label={t("admin.editor.hotspots.copyConfigurationTooltip")}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      className="border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 hover:text-sky-800 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-300 dark:hover:bg-sky-950/50"
+                      onClick={copyHotspotConfiguration}
+                      disabled={editor.loading}
+                      title={t("admin.editor.hotspots.copyConfiguration")}
+                      aria-label={t("admin.editor.hotspots.copyConfiguration")}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </HotspotEditorTooltip>
+                  <HotspotEditorTooltip label={t("admin.editor.hotspots.applyConfigurationTooltip")}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      className="border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100 hover:text-violet-800 disabled:bg-muted dark:border-violet-900/60 dark:bg-violet-950/30 dark:text-violet-300 dark:hover:bg-violet-950/50"
+                      onClick={applyCopiedHotspotConfiguration}
+                      disabled={editor.loading || !copiedHotspotConfiguration}
+                      title={t("admin.editor.hotspots.applyConfiguration")}
+                      aria-label={t("admin.editor.hotspots.applyConfiguration")}
+                    >
+                      <ClipboardPaste className="h-4 w-4" />
+                    </Button>
+                  </HotspotEditorTooltip>
+                  <HotspotEditorTooltip label={t("admin.hotspotLibrary.saveToLibraryTooltip")}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 px-2 text-xs"
+                      onClick={openSaveHotspotPresetDialog}
+                      disabled={editor.loading || hotspotLibrary.actionLoading || (!hotspotForm.id && !hasDraftHotspotPreview)}
+                    >
+                      {t("admin.hotspotLibrary.saveToLibrary")}
+                    </Button>
+                  </HotspotEditorTooltip>
+                  <HotspotEditorTooltip label={t("admin.hotspotLibrary.insertFromLibraryTooltip")}>
+                    <Button
+                      type="button"
+                      variant={pendingInsertPreset ? "default" : "outline"}
+                      size="sm"
+                      className="h-8 px-2 text-xs"
+                      onClick={() => setHotspotLibraryInsertOpen(true)}
+                      disabled={editor.loading || hotspotLibrary.actionLoading || !activeVersionId}
+                    >
+                      {t("admin.hotspotLibrary.insertFromLibrary")}
+                    </Button>
+                  </HotspotEditorTooltip>
+                  <HotspotEditorTooltip label={t("admin.hotspotLibrary.applyPresetTooltip")}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 px-2 text-xs"
+                      onClick={() => setHotspotLibraryApplyOpen(true)}
+                      disabled={editor.loading || hotspotLibrary.actionLoading}
+                    >
+                      {t("admin.hotspotLibrary.applyPreset")}
+                    </Button>
+                  </HotspotEditorTooltip>
+                  <HotspotEditorTooltip label={t("admin.hotspotLibrary.replacePresetTooltip")}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 px-2 text-xs"
+                      onClick={() => setHotspotLibraryReplaceOpen(true)}
+                      disabled={editor.loading || hotspotLibrary.actionLoading || (!hotspotForm.id && !hasDraftHotspotPreview)}
+                    >
+                      {t("admin.hotspotLibrary.replacePreset")}
+                    </Button>
+                  </HotspotEditorTooltip>
                 </div>
-                <Select
-                  value={String(pageZoomPercent)}
-                  onValueChange={(value) => setPageZoomPercent(Number(value))}
-                >
-                  <SelectTrigger
-                    className="h-8 w-full text-xs sm:w-24"
-                    aria-label={t("admin.editor.hotspots.zoomLevel")}
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {pageZoomOptions.map((zoomPercent) => (
-                      <SelectItem key={zoomPercent} value={String(zoomPercent)}>
-                        {zoomPercent}%
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+
+                <div className="flex shrink-0 items-center gap-1 rounded-md border bg-background p-1">
+                  <HotspotEditorTooltip label={t("admin.editor.hotspots.saveHotspotTooltip")}>
+                    <Button
+                      type="button"
+                      size="icon-sm"
+                      className="bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-emerald-600/60 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+                      onClick={saveHotspot}
+                      disabled={editor.loading || isHotspotSaving || !activeVersionId}
+                      title={t("common.save")}
+                      aria-label={t("common.save")}
+                    >
+                      {isHotspotSaving ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : hotspotSaveState === "saved" ? (
+                        <CheckCircle2 className="h-4 w-4" />
+                      ) : (
+                        <Save className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </HotspotEditorTooltip>
+                  <HotspotEditorTooltip label={t("admin.editor.hotspots.deleteHotspotTooltip")}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      onClick={deleteCurrentHotspot}
+                      disabled={!hotspotForm.id || editor.loading}
+                      title={t("common.delete")}
+                      aria-label={t("common.delete")}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </HotspotEditorTooltip>
+                </div>
               </div>
             </div>
 
@@ -2372,11 +2340,11 @@ export default function AdminEBookletEditorPage() {
                   data-testid="admin-e-booklet-hotspot-page"
                 >
                   {documentPageData ? (
-                    <PdfPageCanvas
-                      fileData={documentPageData}
-                      renderWidth={pageRenderWidth}
-                      onRenderStart={handleDocumentPageRenderStart}
-                      onRenderSuccess={handleDocumentPageRenderSuccess}
+                    <img
+                      src={documentPageData}
+                      alt={t("admin.editor.hotspots.pagePreviewAlt", { page: selectedPage, defaultValue: `Page ${selectedPage} preview` })}
+                      draggable={false}
+                      onLoad={handleDocumentPageRenderSuccess}
                       onError={handleDocumentPageRenderError}
                       className="pointer-events-none absolute inset-0 h-full w-full bg-white"
                     />
@@ -2551,34 +2519,34 @@ export default function AdminEBookletEditorPage() {
                   {!hotspotSettingsCollapsed && (
                     <>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">{t("admin.editor.hotspots.xPercent")}</Label>
+                        <HotspotSettingLabel label={t("admin.editor.hotspots.xPercent")} tooltip={t("admin.editor.hotspots.settingTooltips.xPercent")} />
                         <Input className="h-8 text-sm" type="number" min="0" max="100" value={hotspotForm.x_percent} onChange={(event) => updateHotspotField("x_percent", event.target.value)} />
                       </div>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">{t("admin.editor.hotspots.yPercent")}</Label>
+                        <HotspotSettingLabel label={t("admin.editor.hotspots.yPercent")} tooltip={t("admin.editor.hotspots.settingTooltips.yPercent")} />
                         <Input className="h-8 text-sm" type="number" min="0" max="100" value={hotspotForm.y_percent} onChange={(event) => updateHotspotField("y_percent", event.target.value)} />
                       </div>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">{t("admin.editor.hotspots.widthPercent")}</Label>
+                        <HotspotSettingLabel label={t("admin.editor.hotspots.widthPercent")} tooltip={t("admin.editor.hotspots.settingTooltips.widthPercent")} />
                         <Input className="h-8 text-sm" type="number" min="0.1" max="100" step="0.1" value={hotspotForm.width_percent} onChange={(event) => updateHotspotField("width_percent", event.target.value)} />
                       </div>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">{t("admin.editor.hotspots.heightPercent")}</Label>
+                        <HotspotSettingLabel label={t("admin.editor.hotspots.heightPercent")} tooltip={t("admin.editor.hotspots.settingTooltips.heightPercent")} />
                         <Input className="h-8 text-sm" type="number" min="0.1" max="100" step="0.1" value={hotspotForm.height_percent} onChange={(event) => updateHotspotField("height_percent", event.target.value)} />
                       </div>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">{t("admin.editor.hotspots.radiusPercent")}</Label>
+                        <HotspotSettingLabel label={t("admin.editor.hotspots.radiusPercent")} tooltip={t("admin.editor.hotspots.settingTooltips.radiusPercent")} />
                         <Input className="h-8 text-sm" type="number" min="0.1" max="20" step="0.1" value={hotspotForm.radius_percent} onChange={(event) => updateHotspotField("radius_percent", event.target.value)} />
                       </div>
                       <div className="space-y-1.5">
-                        <Label className="text-xs">{t("admin.editor.hotspots.referenceInput")}</Label>
+                        <HotspotSettingLabel label={t("admin.editor.hotspots.referenceInput")} tooltip={t("admin.editor.hotspots.settingTooltips.referenceInput")} />
                         <Input className="h-8 text-sm" type="number" min="1" value={hotspotForm.reference_number} onChange={(event) => updateHotspotField("reference_number", event.target.value)} placeholder={t("admin.editor.hotspots.referenceAuto")} />
                       </div>
                     </>
                   )}
                   <div className="col-span-2 space-y-1.5">
                     <div className="flex items-center justify-between gap-2">
-                      <Label className="text-xs">{t("admin.editor.hotspots.opacityPercent")}</Label>
+                      <HotspotSettingLabel label={t("admin.editor.hotspots.opacityPercent")} tooltip={t("admin.editor.hotspots.settingTooltips.opacityPercent")} />
                       <span className="text-xs text-muted-foreground">{parseNumber(hotspotForm.display_behavior?.opacity_percent, 100)}%</span>
                     </div>
                     <Input
@@ -2592,7 +2560,7 @@ export default function AdminEBookletEditorPage() {
                   </div>
                   <div className="col-span-2 space-y-1.5">
                     <div className="flex items-center justify-between gap-2">
-                      <Label className="text-xs">{t("admin.editor.hotspots.glowPercent")}</Label>
+                      <HotspotSettingLabel label={t("admin.editor.hotspots.glowPercent")} tooltip={t("admin.editor.hotspots.settingTooltips.glowPercent")} />
                       <span className="text-xs text-muted-foreground">{parseNumber(hotspotForm.display_behavior?.glow_percent, 100)}%</span>
                     </div>
                     <Input
@@ -2609,7 +2577,7 @@ export default function AdminEBookletEditorPage() {
                 {!hotspotSettingsCollapsed && (
                   <>
                     <div className="space-y-2">
-                      <Label>{t("admin.editor.hotspots.color")}</Label>
+                      <HotspotSettingLabel label={t("admin.editor.hotspots.color")} tooltip={t("admin.editor.hotspots.settingTooltips.color")} className="text-sm" />
                       <div className="grid grid-cols-5 gap-2">
                         {hotspotColors.map((color) => {
                           const selected = (hotspotForm.display_behavior?.color || DEFAULT_HOTSPOT_COLOR) === color;
@@ -2634,33 +2602,38 @@ export default function AdminEBookletEditorPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>{t("admin.editor.hotspots.shape")}</Label>
+                      <HotspotSettingLabel label={t("admin.editor.hotspots.shape")} tooltip={t("admin.editor.hotspots.settingTooltips.shape")} className="text-sm" />
                       <div className="grid grid-cols-5 gap-2">
                         {hotspotShapes.map((shape) => {
                           const ShapeIcon = shapeIcons[shape] || CircleDot;
+                          const shapeLabel = t(`admin.editor.hotspots.shapes.${shape}`);
+                          const shapeTooltip = t(`admin.editor.hotspots.shapeTooltips.${shape}`);
                           return (
-                            <Button
-                              key={shape}
-                              type="button"
-                              variant={hotspotForm.shape === shape ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => updateHotspotField("shape", shape)}
-                              title={t(`admin.editor.hotspots.shapes.${shape}`)}
-                              aria-label={t(`admin.editor.hotspots.shapes.${shape}`)}
-                            >
-                              {shape === "oval" ? (
-                                <span className="h-3 w-5 rounded-full border-2 border-current" aria-hidden="true" />
-                              ) : (
-                                <ShapeIcon className="h-4 w-4" />
-                              )}
-                            </Button>
+                            <HotspotEditorTooltip key={shape} label={shapeTooltip}>
+                              <Button
+                                type="button"
+                                variant={hotspotForm.shape === shape ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => updateHotspotField("shape", shape)}
+                                title={shapeTooltip}
+                                aria-label={shapeLabel}
+                              >
+                                {shape === "rectangle" ? (
+                                  <span className="h-3 w-6 rounded-none border-2 border-current" aria-hidden="true" />
+                                ) : shape === "oval" ? (
+                                  <span className="h-3 w-5 rounded-full border-2 border-current" aria-hidden="true" />
+                                ) : (
+                                  <ShapeIcon className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </HotspotEditorTooltip>
                           );
                         })}
                       </div>
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label className="text-xs">{t("admin.editor.hotspots.trigger")}</Label>
+                      <HotspotSettingLabel label={t("admin.editor.hotspots.trigger")} tooltip={t("admin.editor.hotspots.settingTooltips.trigger")} />
                       <Select value={hotspotForm.trigger_type} onValueChange={(value) => updateHotspotField("trigger_type", value)}>
                         <SelectTrigger className="h-8 w-full text-xs"><SelectValue /></SelectTrigger>
                         <SelectContent>
@@ -2688,9 +2661,9 @@ export default function AdminEBookletEditorPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  {(hotspotForm.content_json?.blocks || [primaryBlock]).map((block, index) => (
-                    <ContentBlockFields key={block.id || index} block={block} index={index} />
-                  ))}
+                  {(hotspotForm.content_json?.blocks || [primaryBlock]).map((block, index) =>
+                    renderContentBlockFields(block, index),
+                  )}
                 </div>
 
                 {primaryBlock.type === "audio" && (
@@ -2774,6 +2747,7 @@ export default function AdminEBookletEditorPage() {
               </div>
             </aside>
           )}
+          </TooltipProvider>
         </section>
       )}
 

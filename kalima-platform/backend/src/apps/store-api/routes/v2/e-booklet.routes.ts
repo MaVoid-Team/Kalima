@@ -91,6 +91,11 @@ router.get(
   eBookletController.previewAdminFileAsset,
 );
 router.get(
+  "/admin/e-booklet-files/:assetId/pages/:pageNumber/preview",
+  ...adminAuth,
+  eBookletController.previewAdminFileAssetPage,
+);
+router.get(
   "/admin/e-booklet-templates",
   ...adminAuth,
   eBookletController.listAdminTemplates,
@@ -494,6 +499,12 @@ router.get(
   eBookletController.getAdminAuthorizedViewerDocument,
 );
 router.get(
+  "/admin/e-booklet-viewer/:instanceId/pages/:pageNumber/preview",
+  viewerLimiter,
+  ...adminAuth,
+  eBookletController.getAdminAuthorizedViewerDocumentPagePreview,
+);
+router.get(
   "/admin/e-booklet-viewer/:instanceId/pages/:pageNumber",
   viewerLimiter,
   ...adminAuth,
@@ -536,6 +547,12 @@ router.get(
   viewerLimiter,
   ...viewerAuth,
   eBookletController.getAuthorizedViewerDocument,
+);
+router.get(
+  "/e-booklet-viewer/:instanceId/pages/:pageNumber/preview",
+  viewerLimiter,
+  ...viewerAuth,
+  eBookletController.getAuthorizedViewerDocumentPagePreview,
 );
 router.get(
   "/e-booklet-viewer/:instanceId/pages/:pageNumber",
