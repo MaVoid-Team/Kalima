@@ -4,10 +4,10 @@ import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from ".
 export type EBookletAccessCodeKind = "paid" | "free";
 
 function getAccessCodeSecret(): string {
-  const secret = process.env.E_BOOKLET_ACCESS_CODE_SECRET;
+  const secret = process.env.E_BOOKLET_ACCESS_CODE_SECRET || process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET;
   if (secret) return secret;
   if (process.env.NODE_ENV === "production") {
-    throw new Error("E_BOOKLET_ACCESS_CODE_SECRET is not set");
+    throw new Error("E_BOOKLET_ACCESS_CODE_SECRET, ACCESS_TOKEN_SECRET, or JWT_SECRET is required");
   }
   return "dev-e-booklet-access-code-secret";
 }
