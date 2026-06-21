@@ -1987,12 +1987,12 @@ export default function AdminEBookletEditorPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-3 rounded-lg border p-4">
               <div>
-                <h3 className="font-semibold">Payment methods</h3>
-                <p className="text-sm text-muted-foreground">Select the payment methods available on e-booklet checkout.</p>
+                <h3 className="font-semibold">{t("admin.editor.basic.paymentMethods")}</h3>
+                <p className="text-sm text-muted-foreground">{t("admin.editor.basic.paymentMethodsDescription")}</p>
               </div>
               <div className="space-y-2">
                 {activePaymentMethods.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No active payment methods found.</p>
+                  <p className="text-sm text-muted-foreground">{t("admin.editor.basic.noActivePaymentMethods")}</p>
                 ) : activePaymentMethods.map((method) => {
                   const checked = (templateForm.payment_method_ids || []).map(Number).includes(Number(method.id));
                   return (
@@ -2011,12 +2011,12 @@ export default function AdminEBookletEditorPage() {
 
             <div className="space-y-3 rounded-lg border p-4">
               <div>
-                <h3 className="font-semibold">Required checkout fields</h3>
-                <p className="text-sm text-muted-foreground">Attach global required fields to this e-booklet product.</p>
+                <h3 className="font-semibold">{t("admin.editor.basic.requiredCheckoutFields")}</h3>
+                <p className="text-sm text-muted-foreground">{t("admin.editor.basic.requiredCheckoutFieldsDescription")}</p>
               </div>
               <div className="space-y-2">
                 {fieldDefinitions.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No active required fields found.</p>
+                  <p className="text-sm text-muted-foreground">{t("admin.editor.basic.noActiveRequiredFields")}</p>
                 ) : fieldDefinitions.map((field) => {
                   const attached = (templateForm.required_fields || []).find((item) => Number(item.field_definition_id) === Number(field.id));
                   return (
@@ -2035,7 +2035,7 @@ export default function AdminEBookletEditorPage() {
                             checked={attached.is_required !== false}
                             onCheckedChange={(value) => updateTemplateRequiredFieldFlag(field.id, value === true)}
                           />
-                          Require a value during checkout
+                          {t("admin.editor.basic.requireValueDuringCheckout")}
                         </label>
                       )}
                     </div>

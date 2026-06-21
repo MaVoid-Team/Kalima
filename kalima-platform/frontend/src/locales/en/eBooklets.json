@@ -241,7 +241,14 @@
         "coverEmpty": "Upload a cover image. Private storage asset IDs are managed automatically.",
         "status": "Template status",
         "releaseAt": "Release date",
-        "releaseAtHint": "Leave empty to make this e-booklet available immediately. Future dates keep it visible as Coming Soon but block checkout."
+        "releaseAtHint": "Leave empty to make this e-booklet available immediately. Future dates keep it visible as Coming Soon but block checkout.",
+        "paymentMethods": "Payment methods",
+        "paymentMethodsDescription": "Select the payment methods available on e-booklet checkout.",
+        "noActivePaymentMethods": "No active payment methods found.",
+        "requiredCheckoutFields": "Required checkout fields",
+        "requiredCheckoutFieldsDescription": "Attach global required fields to this e-booklet product.",
+        "noActiveRequiredFields": "No active required fields found.",
+        "requireValueDuringCheckout": "Require a value during checkout"
       },
       "file": {
         "title": "Original Sample File",

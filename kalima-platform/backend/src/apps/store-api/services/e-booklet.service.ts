@@ -553,6 +553,20 @@ export class EBookletService {
       .replace(/^-+|-+$/g, "");
     return base || `e-booklet-${Date.now()}`;
   }
+
+  private async buildUniqueSlug(tx: EBookletDb, title: string): Promise<string> {
+    const baseSlug = this.buildSlug(title);
+    let candidate = baseSlug;
+    let suffix = 2;
+
+    while (await tx.e_booklet_templates.findUnique({ where: { slug: candidate }, select: { id: true } })) {
+      candidate = `${baseSlug}-${suffix}`;
+      suffix += 1;
+    }
+
+    return candidate;
+  }
+
   private templateCheckoutInclude() {
     return {
       payment_methods: {
@@ -947,9 +961,9 @@ export class EBookletService {
   }
 
   async createTemplate(dto: any, adminUserId: number): Promise<unknown> {
-    const slug = dto.slug || this.buildSlug(dto.title);
     const releaseAt = parseTemplateReleaseAt(dto);
     return this.transaction(async (tx: EBookletDb) => {
+      const slug = dto.slug || await this.buildUniqueSlug(tx, dto.title);
       const template = await tx.e_booklet_templates.create({
         data: {
           title: dto.title,
