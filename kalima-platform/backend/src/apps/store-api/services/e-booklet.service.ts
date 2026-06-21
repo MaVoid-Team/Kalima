@@ -65,6 +65,49 @@ function parseFilterMoney(value: unknown, label: string): number | undefined {
   return amount;
 }
 
+function enrichTemplateWithReleaseInfo<T extends { release_at?: Date | string | null }>(
+  template: T,
+): T & { is_released: boolean; time_until_release_ms: number | null; exact_minute: number | null } {
+  const releaseAt = template.release_at ? new Date(template.release_at) : null;
+  const now = new Date();
+  const isReleased = !releaseAt || releaseAt <= now;
+  const timeUntilReleaseMs =
+    releaseAt && releaseAt > now ? releaseAt.getTime() - now.getTime() : null;
+  return {
+    ...template,
+    is_released: isReleased,
+    time_until_release_ms: timeUntilReleaseMs,
+    exact_minute: releaseAt ? releaseAt.getMinutes() : null,
+  };
+}
+
+function parseTemplateReleaseAt(dto: any): Date | null | undefined {
+  if (dto?.release_date !== undefined && dto?.release_hour !== undefined && dto?.release_minute !== undefined) {
+    if (!dto.release_date) return null;
+    const releaseAt = new Date(dto.release_date);
+    releaseAt.setHours(Number(dto.release_hour));
+    releaseAt.setMinutes(Number(dto.release_minute));
+    releaseAt.setSeconds(0);
+    releaseAt.setMilliseconds(0);
+    return releaseAt;
+  }
+  if (dto?.release_at === undefined) return undefined;
+  if (!dto.release_at) return null;
+  const releaseAt = new Date(dto.release_at);
+  releaseAt.setSeconds(0);
+  releaseAt.setMilliseconds(0);
+  return releaseAt;
+}
+
+function assertTemplateReleased(template: { release_at?: Date | string | null; title?: string | null }) {
+  const releaseAt = template.release_at ? new Date(template.release_at) : null;
+  if (releaseAt && releaseAt > new Date()) {
+    throw new BadRequestError(
+      `This e-booklet has not been released yet. It releases at ${releaseAt.toISOString()}`,
+    );
+  }
+}
+
 const E_BOOKLET_UPLOAD_DIR = path.resolve(
   process.env.E_BOOKLET_UPLOAD_DIR || process.cwd(),
   process.env.E_BOOKLET_UPLOAD_DIR ? "" : "uploads/e-booklets/private",
@@ -746,21 +789,33 @@ export class EBookletService {
   async getPublicCoverFileAsset(
     assetId: number,
   ): Promise<{ asset: any; absolutePath: string }> {
-    const now = new Date();
-    const instance = await this.db.e_booklet_instances.findFirst({
+    const template = await this.db.e_booklet_templates.findFirst({
       where: {
-        status: "active",
-        access_expires_at: { gt: now },
-        template: {
-          status: "published",
-          cover_file_id: assetId,
-        },
+        status: "published",
+        cover_file_id: assetId,
       },
-      include: {
-        template: { include: { cover_file: true } },
-      },
+      include: { cover_file: true },
     });
-    const asset = instance?.template?.cover_file;
+    let asset = template?.cover_file;
+
+    if (!asset) {
+      const now = new Date();
+      const instance = await this.db.e_booklet_instances.findFirst({
+        where: {
+          status: "active",
+          access_expires_at: { gt: now },
+          template: {
+            status: "published",
+            cover_file_id: assetId,
+          },
+        },
+        include: {
+          template: { include: { cover_file: true } },
+        },
+      });
+      asset = instance?.template?.cover_file;
+    }
+
     if (!asset || asset.file_type !== "image") throw new NotFoundError("E-booklet cover asset not found");
 
     const filename = path.basename(asset.storage_key || "");
@@ -811,7 +866,7 @@ export class EBookletService {
       this.db.e_booklet_templates.count({ where }),
     ]);
 
-    return { data, total, page, limit };
+    return { data: data.map((template: any) => enrichTemplateWithReleaseInfo(template)), total, page, limit };
   }
 
   async getPublishedTemplateById(id: number): Promise<unknown> {
@@ -830,7 +885,7 @@ export class EBookletService {
       },
     });
     if (!template) throw new NotFoundError("E-booklet template not found");
-    return template;
+    return enrichTemplateWithReleaseInfo(template);
   }
 
   async getPublishedTemplateBySlug(slug: string): Promise<unknown> {
@@ -849,7 +904,7 @@ export class EBookletService {
       },
     });
     if (!template) throw new NotFoundError("E-booklet template not found");
-    return template;
+    return enrichTemplateWithReleaseInfo(template);
   }
 
   async listAdminTemplates(filters: {
@@ -888,11 +943,12 @@ export class EBookletService {
       this.db.e_booklet_templates.count({ where }),
     ]);
 
-    return { data, total, page, limit };
+    return { data: data.map((template: any) => enrichTemplateWithReleaseInfo(template)), total, page, limit };
   }
 
   async createTemplate(dto: any, adminUserId: number): Promise<unknown> {
     const slug = dto.slug || this.buildSlug(dto.title);
+    const releaseAt = parseTemplateReleaseAt(dto);
     return this.transaction(async (tx: EBookletDb) => {
       const template = await tx.e_booklet_templates.create({
         data: {
@@ -905,11 +961,12 @@ export class EBookletService {
           currency: dto.currency || "EGP",
           category_id: dto.category_id,
           status: dto.status || "draft",
+          release_at: releaseAt,
           created_by: adminUserId,
         },
       });
       await this.replaceTemplateCheckoutConfig(tx, template.id, dto);
-      return tx.e_booklet_templates.findUnique({
+      const created = await tx.e_booklet_templates.findUnique({
         where: { id: template.id },
         include: {
           cover_file: true,
@@ -917,6 +974,7 @@ export class EBookletService {
           ...this.templateCheckoutInclude(),
         },
       });
+      return created ? enrichTemplateWithReleaseInfo(created) : created;
     });
   }
 
@@ -931,7 +989,7 @@ export class EBookletService {
       },
     });
     if (!template) throw new NotFoundError("E-booklet template not found");
-    return template;
+    return enrichTemplateWithReleaseInfo(template);
   }
 
   async listTemplateVersions(templateId: number): Promise<unknown[]> {
@@ -953,23 +1011,23 @@ export class EBookletService {
   }
 
   async updateTemplate(id: number, dto: any): Promise<unknown> {
+    const releaseAt = parseTemplateReleaseAt(dto);
     return this.transaction(async (tx: EBookletDb) => {
-      await tx.e_booklet_templates.update({
-        where: { id },
-        data: {
-          title: dto.title,
-          description: dto.description,
-          cover_file_id: dto.cover_file_id,
-          price: dto.price,
-          marketing_price: dto.marketing_price,
-          currency: dto.currency,
-          category_id: dto.category_id,
-          status: dto.status,
-          updated_at: new Date(),
-        },
-      });
+      const data: Record<string, unknown> = {
+        title: dto.title,
+        description: dto.description,
+        cover_file_id: dto.cover_file_id,
+        price: dto.price,
+        marketing_price: dto.marketing_price,
+        currency: dto.currency,
+        category_id: dto.category_id,
+        status: dto.status,
+        updated_at: new Date(),
+      };
+      if (releaseAt !== undefined) data.release_at = releaseAt;
+      await tx.e_booklet_templates.update({ where: { id }, data });
       await this.replaceTemplateCheckoutConfig(tx, id, dto);
-      return tx.e_booklet_templates.findUnique({
+      const updated = await tx.e_booklet_templates.findUnique({
         where: { id },
         include: {
           cover_file: true,
@@ -978,6 +1036,7 @@ export class EBookletService {
           versions: { orderBy: { version_number: "desc" } },
         },
       });
+      return updated ? enrichTemplateWithReleaseInfo(updated) : updated;
     });
   }
 
@@ -1773,6 +1832,20 @@ export class EBookletService {
       throw new BadRequestError("Terms must be accepted before e-booklet checkout.");
     }
 
+    const acceptedTerms = dto.terms_id
+      ? await this.db.e_booklet_terms.findFirst({
+          where: {
+            id: Number(dto.terms_id),
+            status: "active",
+            starts_at: { lte: new Date() },
+            OR: [{ ends_at: null }, { ends_at: { gt: new Date() } }],
+          },
+        })
+      : null;
+    if (dto.terms_id && !acceptedTerms) {
+      throw new BadRequestError("Active e-booklet purchase terms not found.");
+    }
+
     const hasInstanceItems = checkoutItems.some((item: any) => Boolean(item.instance_id));
     const hasTemplateOnlyItems = checkoutItems.some((item: any) => !item.instance_id);
     if (hasInstanceItems && hasTemplateOnlyItems) {
@@ -1803,6 +1876,7 @@ export class EBookletService {
         if (!template || !Array.isArray((template as any).versions) || (template as any).versions.length === 0) {
           throw new NotFoundError("E-booklet template version not found");
         }
+        assertTemplateReleased(template);
         const price = Number((template as any).marketing_price ?? (template as any).price ?? 0);
         const requiredFieldValues = await this.validateEBookletRequiredFields(
           template,
@@ -2775,6 +2849,14 @@ export class EBookletService {
     },
   ) {
     const access = await this.assertViewerAccess(instanceId, userId);
+    if ((access as any).role === "teacher") {
+      return {
+        booklet_instance_id: instanceId,
+        user_id: userId,
+        status: "allowed",
+        binding_exempt: true,
+      };
+    }
     return this.serializableTransaction(async (tx: EBookletDb) => {
       const existing = await tx.e_booklet_devices.findFirst({
         where: {
@@ -2995,6 +3077,16 @@ export class EBookletService {
     return assetId ? Number(assetId) : null;
   }
 
+  private resolveViewerDocumentAssetIds(instance: any): number[] {
+    return [
+      instance?.custom_document_file_id,
+      instance?.template_version?.rendered_document_file_id,
+      instance?.template_version?.base_document_file_id,
+    ]
+      .map((assetId) => Number(assetId))
+      .filter((assetId, index, assetIds) => Number.isInteger(assetId) && assetId > 0 && assetIds.indexOf(assetId) === index);
+  }
+
   async getAdminViewerPage(instanceId: number, pageNumber: number, adminUserId: number) {
     const access: any = await this.getAdminViewerAccess(instanceId);
     const pageCount = Number(access.booklet_instance?.template_version?.page_count || 0);
@@ -3154,39 +3246,42 @@ export class EBookletService {
   }
 
   private async buildViewerDocumentResponse(instance: any, pageNumber?: number) {
-    const documentAssetId = this.resolveViewerDocumentAssetId(instance);
-    if (!documentAssetId) {
+    const documentAssetIds = this.resolveViewerDocumentAssetIds(instance);
+    if (!documentAssetIds.length) {
       throw new NotFoundError("E-booklet document is not available.");
     }
-    const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: documentAssetId } });
-    if (!asset || asset.mime_type !== "application/pdf") {
-      throw new NotFoundError("E-booklet PDF document not found.");
+    let sawPdfAsset = false;
+    for (const documentAssetId of documentAssetIds) {
+      const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: documentAssetId } });
+      if (!asset || asset.mime_type !== "application/pdf") continue;
+      sawPdfAsset = true;
+      const filename = path.basename(asset.storage_key || "");
+      const absolutePath = path.join(E_BOOKLET_UPLOAD_DIR, filename);
+      try {
+        await fsPromises.access(absolutePath);
+      } catch {
+        continue;
+      }
+      const pageBuffer = pageNumber
+        ? await this.extractSinglePagePdf(absolutePath, pageNumber)
+        : null;
+      return {
+        asset: {
+          id: asset.id,
+          file_type: asset.file_type,
+          original_filename: pageNumber
+            ? `${path.basename(asset.original_filename || "e-booklet-document", ".pdf")}-page-${pageNumber}.pdf`
+            : asset.original_filename,
+          mime_type: asset.mime_type,
+          size_bytes: asset.size_bytes,
+          visibility: asset.visibility,
+        },
+        absolutePath,
+        pageBuffer,
+        cacheControl: "private, no-store",
+      };
     }
-    const filename = path.basename(asset.storage_key || "");
-    const absolutePath = path.join(E_BOOKLET_UPLOAD_DIR, filename);
-    try {
-      await fsPromises.access(absolutePath);
-    } catch {
-      throw new NotFoundError("E-booklet PDF file is not available.");
-    }
-    const pageBuffer = pageNumber
-      ? await this.extractSinglePagePdf(absolutePath, pageNumber)
-      : null;
-    return {
-      asset: {
-        id: asset.id,
-        file_type: asset.file_type,
-        original_filename: pageNumber
-          ? `${path.basename(asset.original_filename || "e-booklet-document", ".pdf")}-page-${pageNumber}.pdf`
-          : asset.original_filename,
-        mime_type: asset.mime_type,
-        size_bytes: asset.size_bytes,
-        visibility: asset.visibility,
-      },
-      absolutePath,
-      pageBuffer,
-      cacheControl: "private, no-store",
-    };
+    throw new NotFoundError(sawPdfAsset ? "E-booklet PDF file is not available." : "E-booklet PDF document not found.");
   }
 
   async getAdminAuthorizedViewerDocument(instanceId: number, pageNumber: number, pageAccessToken: string, adminUserId: number) {
@@ -3473,7 +3568,7 @@ export class EBookletService {
     return where;
   }
 
-  async getTeacherAnalytics(teacherId: number, filters: { instanceId?: number; startDate?: string; endDate?: string } = {}) {
+  async getTeacherAnalytics(teacherId: number, filters: { instanceId?: number; startDate?: string; endDate?: string; source?: string } = {}) {
     const seatUsage = this.db.e_booklet_instances.findMany
       ? ((await this.db.e_booklet_instances.findMany({
           where: { teacher_id: teacherId, ...(filters.instanceId ? { id: filters.instanceId } : {}) },
@@ -3484,7 +3579,7 @@ export class EBookletService {
       throw new ForbiddenError("You do not have access to analytics for this e-booklet instance.");
     }
     const ownedInstanceIds = seatUsage.map((instance: any) => instance.id).filter((id: any) => Number.isInteger(Number(id)));
-    const where = this.analyticsWhere({ teacherId, startDate: filters.startDate, endDate: filters.endDate });
+    const where = this.analyticsWhere({ teacherId, startDate: filters.startDate, endDate: filters.endDate, source: filters.source });
     where.booklet_instance_id = { in: ownedInstanceIds };
     const [events, sources, offlineRevenue, onlineRevenue, openAgg, uniqueAnon, failedPasscodes] = await Promise.all([
       this.db.e_booklet_analytics_events.groupBy({ by: ["event_type"], where, _count: { _all: true } }),
@@ -3545,6 +3640,28 @@ export class EBookletService {
     const header = ["id", "event_type", "teacher_id", "student_id", "anonymous_session_id", "template_id", "booklet_instance_id", "invite_id", "access_id", "purchase_id", "source", "marketing_price_snapshot", "internal_price_snapshot", "created_at"];
     const csv = [header.join(","), ...(rows || []).map((row: any) => header.map((key) => JSON.stringify(row[key] ?? "")).join(","))].join("\n");
     return csv;
+  }
+
+  async exportTeacherAnalyticsCsv(teacherId: number, filters: { instanceId?: number; startDate?: string; endDate?: string; source?: string; limit?: number } = {}) {
+    const seatUsage = this.db.e_booklet_instances.findMany
+      ? ((await this.db.e_booklet_instances.findMany({
+          where: { teacher_id: teacherId, ...(filters.instanceId ? { id: filters.instanceId } : {}) },
+          select: { id: true },
+        })) || [])
+      : [];
+    if (filters.instanceId && !seatUsage.some((instance: any) => instance.id === filters.instanceId)) {
+      throw new ForbiddenError("You do not have access to analytics for this e-booklet instance.");
+    }
+    const ownedInstanceIds = seatUsage.map((instance: any) => instance.id).filter((id: any) => Number.isInteger(Number(id)));
+    const where = this.analyticsWhere({ teacherId, startDate: filters.startDate, endDate: filters.endDate, source: filters.source });
+    where.booklet_instance_id = { in: ownedInstanceIds };
+    const rows = await this.db.e_booklet_analytics_events.findMany({
+      where,
+      orderBy: { created_at: "desc" },
+      take: Math.min(Math.max(filters.limit || 10000, 1), 10000),
+    });
+    const header = ["id", "event_type", "student_id", "template_id", "booklet_instance_id", "invite_id", "access_id", "purchase_id", "source", "marketing_price_snapshot", "created_at"];
+    return [header.join(","), ...(rows || []).map((row: any) => header.map((key) => JSON.stringify(row[key] ?? "")).join(","))].join("\n");
   }
 
   async recordInviteOpen(rawToken: string, input: { anonymousSessionId?: string; studentId?: number; source?: string; ipAddress?: string; userAgent?: string } = {}) {

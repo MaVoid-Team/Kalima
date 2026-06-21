@@ -1,4 +1,7 @@
 import crypto from "crypto";
+import fs from "fs/promises";
+import path from "path";
+import { PDFDocument } from "pdf-lib";
 
 jest.mock("../../src/apps/store-api/services/image.service", () => ({
   imageService: { uploadImage: jest.fn().mockResolvedValue({ id: 700 }) },
@@ -165,6 +168,16 @@ describe("EBookletService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
+  async function writeTestPdf(filename: string) {
+    const uploadDir = path.resolve(process.cwd(), "uploads/e-booklets/private");
+    await fs.mkdir(uploadDir, { recursive: true });
+    const pdf = await PDFDocument.create();
+    pdf.addPage([300, 400]);
+    const filePath = path.join(uploadDir, filename);
+    await fs.writeFile(filePath, Buffer.from(await pdf.save()));
+    return filePath;
+  }
 
   describe("validateTeacherDocumentForDelivery", () => {
     test("blocks delivery when uploaded page count differs from template version", async () => {
@@ -1532,6 +1545,30 @@ describe("EBookletService", () => {
   });
 
   describe("V2 device binding", () => {
+    test("allows teacher-owned e-booklets without binding a viewer device", async () => {
+      const db = createMockDb();
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 9,
+        user_id: 55,
+        role: "teacher",
+        status: "active",
+        booklet_instance: { id: 10, status: "active", access_expires_at: new Date("2026-12-31T00:00:00.000Z") },
+      });
+      const service = new EBookletService(db);
+
+      await expect(service.bindViewerDevice(10, 55, { deviceFingerprint: "dev-2" })).resolves.toEqual({
+        booklet_instance_id: 10,
+        user_id: 55,
+        status: "allowed",
+        binding_exempt: true,
+      });
+
+      expect(db.$transaction).not.toHaveBeenCalled();
+      expect(db.e_booklet_devices.findFirst).not.toHaveBeenCalled();
+      expect(db.e_booklet_devices.count).not.toHaveBeenCalled();
+      expect(db.e_booklet_devices.create).not.toHaveBeenCalled();
+    });
+
     test("allows the same active device again and can list safe active viewer devices", async () => {
       const db = createMockDb();
       db.e_booklet_access.findFirst.mockResolvedValue({
@@ -2182,8 +2219,8 @@ describe("EBookletService", () => {
           template_version: {
             id: 22,
             page_count: 3,
-            base_document_file_id: 88,
-            rendered_document_file_id: 77,
+            base_document_file_id: null,
+            rendered_document_file_id: null,
           },
         },
       });
@@ -2271,6 +2308,61 @@ describe("EBookletService", () => {
       await expect(service.getAuthorizedViewerDocument(10, 55, 1, createViewerPageToken({ instanceId: 10, pageNumber: 1, userId: 55 }))).rejects.toThrow(
         "E-booklet PDF file is not available.",
       );
+    });
+
+    test("falls back to the rendered template PDF when the custom document file is missing", async () => {
+      const db = createMockDb();
+      const fallbackFilename = `viewer-fallback-${Date.now()}.pdf`;
+      const fallbackPath = await writeTestPdf(fallbackFilename);
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 1,
+        booklet_instance_id: 10,
+        user_id: 55,
+        status: "active",
+        booklet_instance: {
+          id: 10,
+          status: "active",
+          custom_document_file_id: 99,
+          access_expires_at: null,
+          template_version: {
+            id: 22,
+            page_count: 3,
+            base_document_file_id: null,
+            rendered_document_file_id: 77,
+          },
+        },
+      });
+      db.e_booklet_file_assets.findUnique
+        .mockResolvedValueOnce({
+          id: 99,
+          file_type: "pdf",
+          storage_key: "e-booklets/private/definitely-missing-viewer-file.pdf",
+          original_filename: "custom.pdf",
+          mime_type: "application/pdf",
+          size_bytes: 1024,
+          visibility: "private",
+        })
+        .mockResolvedValueOnce({
+          id: 77,
+          file_type: "pdf",
+          storage_key: `e-booklets/private/${fallbackFilename}`,
+          original_filename: "rendered.pdf",
+          mime_type: "application/pdf",
+          size_bytes: 1024,
+          visibility: "private",
+        });
+      const service = new EBookletService(db);
+
+      try {
+        const result: any = await service.getAuthorizedViewerDocument(10, 55, 1, createViewerPageToken({ instanceId: 10, pageNumber: 1, userId: 55 }));
+
+        expect(result.asset.id).toBe(77);
+        expect(result.asset.original_filename).toBe("rendered-page-1.pdf");
+        expect(result.absolutePath).toBe(fallbackPath);
+        expect(Buffer.isBuffer(result.pageBuffer)).toBe(true);
+      } finally {
+        await fs.unlink(fallbackPath).catch(() => undefined);
+      }
     });
 
     test("requires valid page-scoped tokens before serving viewer PDF pages", async () => {

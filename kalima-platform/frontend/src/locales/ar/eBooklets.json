@@ -61,7 +61,9 @@
     "notEditedYet": "لم يتم التعديل بعد",
     "loading": "جاري التحميل...",
     "done": "تم",
-    "edit": "تعديل"
+    "edit": "تعديل",
+    "comingSoon": "قريبًا",
+    "comingSoonWithTime": "قريبًا - {{time}}"
   },
   "statuses": {
     "all": "كل الحالات",
@@ -140,7 +142,8 @@
       "empty": "لا توجد قوالب مذكرات تفاعلية تطابق الفلاتر الحالية.",
       "noDescription": "لا يوجد وصف بعد",
       "noVersion": "لا توجد نسخة",
-      "totalTemplates": "إجمالي {{count}} قالب"
+      "totalTemplates": "إجمالي {{count}} قالب",
+      "releaseAt": "يصدر {{value}}"
     },
     "workspace": {
       "kicker": "مساحة الإدارة",
@@ -236,7 +239,9 @@
         "coverImage": "صورة الغلاف",
         "coverUploaded": "تم رفع الغلاف (أصل #{{id}})",
         "coverEmpty": "ارفع صورة غلاف. تتم إدارة معرفات الأصول الخاصة تلقائيًا.",
-        "status": "حالة القالب"
+        "status": "حالة القالب",
+        "releaseAt": "تاريخ الإصدار",
+        "releaseAtHint": "اتركه فارغًا لإتاحة المذكرة فورًا. التواريخ المستقبلية تُبقيها ظاهرة كقريبًا وتمنع الدفع."
       },
       "file": {
         "title": "ملف العينة الأصلي",
@@ -541,6 +546,7 @@
       "startsAt": "يبدأ في",
       "endsAt": "ينتهي في",
       "descriptionLabel": "الوصف",
+      "checkoutTerms": "شروط وأحكام الشراء عند الدفع",
       "codeGenerationTerms": "شروط/سياسة إنشاء الأكواد",
       "rewardClaimTerms": "شروط/سياسة المطالبة بالمكافآت",
       "milestonesTitle": "المراحل الديناميكية",
@@ -644,7 +650,8 @@
     "noExpiry": "لا يوجد انتهاء",
     "add": "إضافة",
     "seatsRemaining": "{{count}} مقعد",
-    "redeemCode": "استرداد كود"
+    "redeemCode": "استرداد كود",
+    "unreleasedNotice": "توجد مذكرة أو أكثر في السلة لم تصدر بعد. سيفتح الدفع خلال {{time}}."
   },
   "details": {
     "coverLabel": "مذكرة تفاعلية من Kalima",
@@ -715,6 +722,18 @@
     "teacherPurchaseDescriptionPaid": "ارفع إثبات الدفع حتى تراجع الإدارة شراء مذكرة المعلم وتسلمه.",
     "teacherPurchaseDescriptionFree": "اقبل الشروط لإنشاء طلب مذكرة معلم مجاني.",
     "terms": "أقبل شروط شراء المذكرة التفاعلية وأفهم أن وصول الطلاب يتم تسليمه بشكل منفصل عبر رابط خاص وكود وصول.",
+    "termsSummary": "راجع واقبل شروط شراء المذكرة التفاعلية قبل المتابعة.",
+    "termsAcceptedBadge": "تم قبول الشروط",
+    "termsManagedByAdmin": "تتم إدارة الشروط بواسطة إدارة Kalima.",
+    "viewTerms": "عرض الشروط",
+    "viewAndAcceptTerms": "عرض الشروط وقبولها",
+    "termsDialogTitle": "شروط شراء المذكرة التفاعلية",
+    "termsDialogDescription": "اقرأ الشروط النشطة التي أدخلتها الإدارة قبل إنشاء الطلب.",
+    "termsDialogCancel": "إلغاء",
+    "termsDialogAccept": "أوافق",
+    "termsLoading": "جاري تحميل الشروط...",
+    "termsLoadError": "الشروط والأحكام غير متاحة حاليًا.",
+    "noActiveTerms": "لا توجد شروط شراء نشطة مهيأة.",
     "pendingApprovalNotice": "تراجع الإدارة مشتريات المذكرات التفاعلية المدفوعة قبل التسليم. يصدر وصول الطلاب منفصلًا عبر رابط خاص وكود وصول.",
     "freeAccessNotice": "هذه المذكرة التفاعلية للمعلم مجاني. تسجيل الطلب يحفظ شراء المعلم؛ ويصدر وصول الطلاب منفصلًا عبر رابط خاص وكود وصول.",
     "submitForReview": "إرسال الشراء للمراجعة",
@@ -757,7 +776,8 @@
     "templateMissing": "قالب المذكرة التفاعلية المحدد غير موجود.",
     "termsRequired": "اقبل الشروط قبل المتابعة.",
     "paymentRequired": "اختر طريقة الدفع، وأدخل الرقم الذي حولت منه، وارفع إثبات الدفع.",
-    "requiredFieldsTitle": "المعلومات المطلوبة"
+    "requiredFieldsTitle": "المعلومات المطلوبة",
+    "unreleasedItem": "{{title}} لم تصدر بعد. سيفتح الدفع خلال {{time}}."
   },
   "viewer": {
     "titleFallback": "مذكرة تفاعلية",
@@ -774,13 +794,18 @@
     "documentUnavailable": "تعذر تحميل ملف PDF لهذه المذكرة التفاعلية.",
     "metadataLoadFailed": "تعذر تحميل بيانات المذكرة التفاعلية.",
     "pageLoadFailed": "تعذر تحميل صفحة المذكرة التفاعلية.",
+    "openErrorTitle": "تعذر فتح هذه المذكرة التفاعلية",
+    "openErrorMessage": "لم يتم تحميل المذكرة التفاعلية بشكل صحيح. حاول مرة أخرى. إذا استمرت المشكلة، أبلغ الدعم أو معلمك.",
+    "pageErrorTitle": "تعذر تحميل الصفحة {{page}}",
+    "pageErrorMessage": "لم يتم تحميل هذه الصفحة بشكل صحيح. حاول مرة أخرى. إذا استمرت المشكلة في نفس الصفحة، أبلغنا حتى نصلحها.",
+    "reportReference": "مرجع البلاغ: المذكرة التفاعلية #{{id}}، الصفحة {{page}}",
     "questionFallback": "اختر الإجابة الصحيحة.",
     "answerFeedback": "تم فحص إجابتك.",
     "unsupportedBlock": "كتلة محتوى غير مدعومة: {{type}}",
     "pageFrameTitle": "صفحة المذكرة التفاعلية {{page}}",
     "deviceBlocked": "غير مسموح لهذا الجهاز بفتح هذه المذكرة التفاعلية.",
-    "securePageReady": "تم تجهيز الوصول الآمن للصفحة",
-    "securePagePending": "يقوم عارض الصفحة الآمن بتجهيز هذه الصفحة.",
+    "securePageReady": "يتم تجهيز صفحتك",
+    "securePagePending": "ما زالت هذه الصفحة المحمية قيد التحميل. انتظر قليلًا، ثم حاول مرة أخرى إذا لم تظهر.",
     "renderMode": "وضع العرض: {{mode}}",
     "pageTokenExpires": "ينتهي رمز الصفحة: {{value}}",
     "fileProtected": "يظهر هذا الملف داخل العارض المحمي بدلًا من فتح تبويب تنزيل منفصل."
@@ -938,6 +963,16 @@
     "analytics": {
       "title": "تحليلات المذكرات التفاعلية",
       "description": "تحليلات خاصة بالمعلم لنسخ المذكرات التفاعلية المسلّمة له فقط.",
+      "advancedFilters": "فلاتر متقدمة",
+      "exportReport": "تصدير التقرير",
+      "reportTitle": "ملخص تقرير المعلم",
+      "reportDescription": "لقطة أداء مفلترة للمذكرات المسلمة لك، جاهزة للمتابعة وتخطيط وصول الطلاب.",
+      "teacherScoped": "خاص بالمعلم",
+      "reportPeriod": "الفترة",
+      "reportRevenue": "تقدير الإيراد",
+      "reportAccess": "الوصول المنشأ",
+      "reportSeats": "المقاعد المستخدمة",
+      "sourceBreakdown": "تفصيل المصادر",
       "instancesTitle": "تفاصيل حسب النسخة",
       "instancesDescription": "يعرض المصدر والحالة وإنشاء الوصول والمقاعد والانتهاء وحالة الجهاز/الوصول بدون أسعار داخلية أو بيانات أمنية خام."
     },
@@ -991,7 +1026,8 @@
     "dateRanges": {
       "7d": "آخر 7 أيام",
       "30d": "آخر 30 يومًا",
-      "all": "كل الوقت"
+      "all": "كل الوقت",
+      "custom": "مخصص"
     },
     "sources": {
       "all": "كل المصادر",
@@ -1010,11 +1046,15 @@
       "templatePlaceholder": "فلتر القالب ينتظر دعم الخادم",
       "instance": "النسخة",
       "instancePlaceholder": "رقم النسخة",
+      "instanceValue": "النسخة #{{id}}",
       "allInstances": "كل النسخ",
       "source": "المصدر",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ النهاية",
       "title": "الفلاتر",
       "live": "مباشر",
-      "teacherSearch": "بحث المعلم"
+      "teacherSearch": "بحث المعلم",
+      "clear": "مسح الفلاتر"
     },
     "metrics": {
       "inviteOpens": "فتح روابط الدعوة",

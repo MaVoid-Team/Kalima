@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { formatTimeUntilRelease } from "@/lib/storeUtils";
 import { useEBookletCart, useEBookletTemplate } from "@/hooks/useEBooklets";
 import { useTranslation } from "react-i18next";
 
@@ -131,6 +132,10 @@ export default function EBookletDetailsPage() {
   };
 
   const activeVersion = template.activeVersion;
+  const isReleased = template.is_released !== false;
+  const countdownText = !isReleased
+    ? formatTimeUntilRelease(template.time_until_release_ms, t)
+    : null;
   const hotspotTypes = [
     { label: t("admin.editor.hotspots.types.text"), Icon: FileText },
     { label: t("admin.editor.hotspots.types.image"), Icon: ImageIcon },
@@ -157,6 +162,11 @@ export default function EBookletDetailsPage() {
             <Badge className="rounded-md bg-emerald-800 text-white hover:bg-emerald-800">
               {t("details.templateBadge")}
             </Badge>
+            {!isReleased && (
+              <Badge className="rounded-md bg-amber-100 text-amber-900 hover:bg-amber-100">
+                {t("common.comingSoonWithTime", { time: countdownText })}
+              </Badge>
+            )}
             {template.categoryTitle && (
               <span className="text-sm font-medium text-muted-foreground">
                 {template.categoryTitle}
@@ -203,11 +213,15 @@ export default function EBookletDetailsPage() {
                   {formatMoney(template.price, template.currency, i18n.language)}
                 </div>
               </div>
-              <Button asChild size="lg" disabled={!activeVersion?.id} className="w-full active:scale-[0.98] md:w-auto">
-                <Link to="/e-booklet-code">
-                  <ShoppingBag className="h-4 w-4" />
-                  {t("details.redeemCode")}
-                </Link>
+              <Button
+                type="button"
+                size="lg"
+                onClick={handleAddToCart}
+                disabled={!activeVersion?.id || !isReleased}
+                className="w-full active:scale-[0.98] md:w-auto"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                {t("details.addToCart")}
               </Button>
             </div>
           </div>

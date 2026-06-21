@@ -173,6 +173,7 @@ const defaultTemplateForm = {
   price: "0",
   currency: "EGP",
   status: "draft",
+  release_at: "",
   cover_file_id: "",
   payment_method_ids: [],
   required_fields: [],
@@ -211,6 +212,14 @@ const defaultHotspotForm = {
 const parseNumber = (value, fallback = 0) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const toDatetimeLocalValue = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return offsetDate.toISOString().slice(0, 16);
 };
 
 const clampPercent = (value, fallback = 100) => Math.min(100, Math.max(0, parseNumber(value, fallback)));
@@ -631,6 +640,7 @@ export default function AdminEBookletEditorPage() {
         price: String(template.price ?? "0"),
         currency: template.currency || "EGP",
         status: template.status || "draft",
+        release_at: toDatetimeLocalValue(template.release_at),
         cover_file_id: template.cover_file_id ? String(template.cover_file_id) : "",
         payment_method_ids: Array.isArray(template.payment_methods)
           ? template.payment_methods.map((item) => Number(item.payment_method_id)).filter(Boolean)
@@ -1096,6 +1106,7 @@ export default function AdminEBookletEditorPage() {
       price: parseNumber(templateForm.price, 0),
       currency: templateForm.currency || "EGP",
       status: templateForm.status,
+      release_at: templateForm.release_at ? new Date(templateForm.release_at).toISOString() : null,
       cover_file_id: templateForm.cover_file_id
         ? Number(templateForm.cover_file_id)
         : undefined,
@@ -1932,6 +1943,18 @@ export default function AdminEBookletEditorPage() {
                   <SelectItem value="archived">{t("statuses.archived")}</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ebooklet-release-at">{t("admin.editor.basic.releaseAt")}</Label>
+              <Input
+                id="ebooklet-release-at"
+                type="datetime-local"
+                value={templateForm.release_at}
+                onChange={(event) => updateTemplateField("release_at", event.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("admin.editor.basic.releaseAtHint")}
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="ebooklet-cover">{t("admin.editor.basic.coverImage")}</Label>

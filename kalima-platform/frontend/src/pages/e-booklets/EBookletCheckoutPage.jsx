@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   BookOpenCheck,
@@ -8,9 +8,18 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import PaymentMethod from "@/components/checkout/PaymentMethod";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { useEBookletCart, useEBookletCheckout } from "@/hooks/useEBooklets";
+import { formatTimeUntilRelease } from "@/lib/storeUtils";
 import api from "@/api/axios";
 import { useTranslation } from "react-i18next";
 
@@ -99,14 +108,20 @@ export default function EBookletCheckoutPage() {
   const [notes, setNotes] = useState("");
   const [requiredFieldValues, setRequiredFieldValues] = useState({});
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsDialogOpen, setTermsDialogOpen] = useState(false);
+  const [currentTerms, setCurrentTerms] = useState(null);
+  const [termsLoading, setTermsLoading] = useState(false);
+  const [termsError, setTermsError] = useState(null);
   const [submittedPurchase, setSubmittedPurchase] = useState(null);
   const [formError, setFormError] = useState(null);
   const [hasValidationErrors, setHasValidationErrors] = useState(false);
 
   const isPaid = Number(total || 0) > 0;
+  const unreleasedItem = items.find((cartItem) => cartItem.is_released === false);
 
   const templatePaymentMethods = useMemo(() => normalizeTemplatePaymentMethods(items), [items]);
   const checkoutRequiredFields = useMemo(() => normalizeTemplateRequiredFields(items), [items]);
+  const purchaseTermsText = currentTerms?.description || currentTerms?.code_generation_terms || "";
 
   const getPaymentMethods = useCallback(async () => {
     if (!isPaid) return [];
@@ -122,6 +137,32 @@ export default function EBookletCheckoutPage() {
     total,
   }), [discount, subtotal, total]);
 
+  const fetchPurchaseTerms = useCallback(async () => {
+    setTermsLoading(true);
+    setTermsError(null);
+    try {
+      const response = await api.get("/teacher/e-booklet-terms/current");
+      setCurrentTerms(response?.data?.data || null);
+    } catch (error) {
+      setCurrentTerms(null);
+      setTermsError(error?.response?.data?.message || t("checkout.termsLoadError", { defaultValue: "Terms and conditions are not available right now." }));
+    } finally {
+      setTermsLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    if (!item) return;
+    fetchPurchaseTerms();
+  }, [fetchPurchaseTerms, item]);
+
+  const handleAcceptTerms = () => {
+    if (!purchaseTermsText.trim()) return;
+    setTermsAccepted(true);
+    setTermsDialogOpen(false);
+    setFormError(null);
+  };
+
   const validate = () => {
     if (items.some((cartItem) => !cartItem?.template_id)) {
       setFormError(t("checkout.templateMissing", { defaultValue: "Selected e-booklet template is missing." }));
@@ -129,6 +170,13 @@ export default function EBookletCheckoutPage() {
     }
     if (items.some((cartItem) => !cartItem?.template_version_id)) {
       setFormError(t("checkout.activeVersionMissing"));
+      return false;
+    }
+    if (unreleasedItem) {
+      setFormError(t("checkout.unreleasedItem", {
+        title: unreleasedItem.title,
+        time: formatTimeUntilRelease(unreleasedItem.time_until_release_ms, t),
+      }));
       return false;
     }
     if (!termsAccepted) {
@@ -171,7 +219,8 @@ export default function EBookletCheckoutPage() {
         return payload;
       })));
       formData.append("terms_accepted", "true");
-      formData.append("terms_version", TERMS_VERSION);
+      formData.append("terms_version", currentTerms?.id ? `term:${currentTerms.id}` : TERMS_VERSION);
+      if (currentTerms?.id) formData.append("terms_id", String(currentTerms.id));
       if (notes.trim()) formData.append("notes", notes.trim());
       if (isPaid) {
         formData.append("payment_method_id", String(paymentMethodId));
@@ -319,10 +368,47 @@ export default function EBookletCheckoutPage() {
               </section>
             )}
 
-            <label className="flex items-start gap-2 rounded-md border p-3 text-sm">
-              <input type="checkbox" className="mt-1" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
-              <span>{t("checkout.terms", { defaultValue: "I accept the e-booklet purchase terms and understand student access is delivered separately through private URL and access code." })}</span>
-            </label>
+            <div className="flex flex-col gap-3 rounded-md border p-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <div className="font-medium text-foreground">
+                  {termsAccepted
+                    ? t("checkout.termsAcceptedBadge", { defaultValue: "Terms accepted" })
+                    : t("checkout.termsSummary", { defaultValue: "Review and accept the e-booklet purchase terms before continuing." })}
+                </div>
+                <p className="mt-1 text-muted-foreground">
+                  {currentTerms?.name || t("checkout.termsManagedByAdmin", { defaultValue: "Terms are managed by Kalima admin." })}
+                </p>
+              </div>
+              <Button type="button" variant={termsAccepted ? "outline" : "default"} onClick={() => setTermsDialogOpen(true)}>
+                {termsAccepted
+                  ? t("checkout.viewTerms", { defaultValue: "View terms" })
+                  : t("checkout.viewAndAcceptTerms", { defaultValue: "View and accept terms" })}
+              </Button>
+            </div>
+
+            <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>
+              <DialogContent className="max-h-[85dvh] overflow-hidden sm:max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>{t("checkout.termsDialogTitle", { defaultValue: "E-booklet purchase terms" })}</DialogTitle>
+                  <DialogDescription>
+                    {currentTerms?.name || t("checkout.termsDialogDescription", { defaultValue: "Read the active admin-managed terms before placing this order." })}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="max-h-[52dvh] overflow-y-auto rounded-md border bg-muted/20 p-4 text-sm leading-7 whitespace-pre-wrap">
+                  {termsLoading
+                    ? t("checkout.termsLoading", { defaultValue: "Loading terms..." })
+                    : termsError || purchaseTermsText || t("checkout.noActiveTerms", { defaultValue: "No active purchase terms are configured." })}
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setTermsDialogOpen(false)}>
+                    {t("checkout.termsDialogCancel", { defaultValue: "Cancel" })}
+                  </Button>
+                  <Button type="button" onClick={handleAcceptTerms} disabled={termsLoading || Boolean(termsError) || !purchaseTermsText.trim()}>
+                    {t("checkout.termsDialogAccept", { defaultValue: "I agree" })}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
             {formError && (
               <div className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">

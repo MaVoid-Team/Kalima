@@ -119,7 +119,8 @@ export class EBookletTermsService {
     const existing = await this.db.e_booklet_terms.findUnique({ where: { id } });
     if (!existing) throw new NotFoundError("E-booklet terms not found.");
     if (existing.status === "active" && (
-      input.codeGenerationTerms !== undefined
+      input.description !== undefined
+      || input.codeGenerationTerms !== undefined
       || input.rewardClaimTerms !== undefined
       || input.startsAt !== undefined
       || input.endsAt !== undefined

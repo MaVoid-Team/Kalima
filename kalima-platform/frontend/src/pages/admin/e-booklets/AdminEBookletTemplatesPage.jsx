@@ -171,6 +171,7 @@ export default function AdminEBookletTemplatesPage() {
               templates.map((template) => {
                 const latestVersion = getLatestVersion(template);
                 const status = template.status || "draft";
+                const isReleased = template.is_released !== false;
                 return (
                   <TableRow key={template.id}>
                     <TableCell className="min-w-[260px]">
@@ -181,6 +182,20 @@ export default function AdminEBookletTemplatesPage() {
                       <div className="mt-2 text-xs text-muted-foreground">
                         {Number(template.price || 0).toLocaleString()} {template.currency || "EGP"}
                       </div>
+                      {template.release_at && (
+                        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                          {!isReleased && (
+                            <Badge className="rounded-md bg-amber-100 text-amber-900 hover:bg-amber-100">
+                              {t("common.comingSoon")}
+                            </Badge>
+                          )}
+                          <span>
+                            {t("admin.templates.releaseAt", {
+                              value: formatDate(template.release_at, i18n.language, ""),
+                            })}
+                          </span>
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge

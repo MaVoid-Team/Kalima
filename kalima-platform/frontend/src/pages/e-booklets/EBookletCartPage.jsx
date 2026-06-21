@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { formatTimeUntilRelease } from "@/lib/storeUtils";
 import { useEBookletCart } from "@/hooks/useEBooklets";
 import { useTranslation } from "react-i18next";
 
@@ -45,6 +46,8 @@ export default function EBookletCartPage() {
   const { t, i18n } = useTranslation("eBooklets");
   const navigate = useNavigate();
   const { items, total, currency, removeItem, clear, count } = useEBookletCart();
+  const unreleasedItems = items.filter((item) => item.is_released === false);
+  const hasUnreleasedItems = unreleasedItems.length > 0;
 
   if (items.length === 0) return <EmptyCart t={t} />;
 
@@ -99,6 +102,13 @@ export default function EBookletCartPage() {
                       <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
                         {item.description || t("cart.itemFallback")}
                       </p>
+                      {item.is_released === false && (
+                        <Badge className="mt-3 rounded-md bg-amber-100 text-amber-900 hover:bg-amber-100">
+                          {t("common.comingSoonWithTime", {
+                            time: formatTimeUntilRelease(item.time_until_release_ms, t),
+                          })}
+                        </Badge>
+                      )}
                     </div>
                     <Button
                       type="button"
@@ -167,14 +177,23 @@ export default function EBookletCartPage() {
             {t("cart.adminNotice")}
           </div>
 
-          <div className="mt-6 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-            {t("cart.directCheckoutDisabled")}
-          </div>
-          <Button asChild size="lg" className="mt-3 w-full active:scale-[0.98]">
-            <Link to="/e-booklet-code">
-              {t("cart.redeemCode")}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+          {hasUnreleasedItems && (
+            <div className="mt-4 rounded-md border border-amber-500/30 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+              {t("cart.unreleasedNotice", {
+                time: formatTimeUntilRelease(unreleasedItems[0]?.time_until_release_ms, t),
+              })}
+            </div>
+          )}
+
+          <Button
+            type="button"
+            size="lg"
+            onClick={() => navigate("/e-booklet-checkout")}
+            disabled={hasUnreleasedItems}
+            className="mt-6 w-full active:scale-[0.98]"
+          >
+            {t("cart.checkout")}
+            <ArrowRight className="h-4 w-4" />
           </Button>
           <Button asChild variant="ghost" className="mt-2 w-full">
             <Link to="/e-booklets">{t("cart.keepBrowsing")}</Link>

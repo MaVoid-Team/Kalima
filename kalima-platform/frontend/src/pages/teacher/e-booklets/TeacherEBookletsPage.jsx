@@ -53,28 +53,28 @@ export default function TeacherEBookletsPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-8" data-testid="teacher-e-booklets-page">
-      <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-gradient-to-br from-primary via-red-700 to-rose-950 p-6 text-primary-foreground shadow-2xl shadow-primary/15 sm:p-8">
-        <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-white/15 blur-3xl" />
-        <div className="absolute bottom-0 right-10 hidden h-32 w-32 rounded-t-full border border-white/15 bg-white/10 backdrop-blur md:block" />
-        <BookOpenCheck className="absolute bottom-8 right-16 hidden h-16 w-16 text-white/20 md:block" />
+      <div className="relative overflow-hidden rounded-[2rem] border border-primary/15 bg-gradient-to-br from-card via-primary/10 to-background p-6 text-foreground shadow-xl shadow-primary/10 sm:p-8">
+        <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute bottom-0 right-10 hidden h-32 w-32 rounded-t-full border border-primary/10 bg-primary/5 backdrop-blur md:block" />
+        <BookOpenCheck className="absolute bottom-8 right-16 hidden h-16 w-16 text-primary/20 md:block" />
 
         <div className="relative grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
           <div className="max-w-3xl">
-            <Badge className="mb-4 border-white/20 bg-white/15 text-primary-foreground hover:bg-white/20">{t("teacher.milestones.completed", { count: completedCount, total: sortedMilestones.length })}</Badge>
+            <Badge className="mb-4 border-primary/20 bg-primary/10 text-primary hover:bg-primary/15">{t("teacher.milestones.completed", { count: completedCount, total: sortedMilestones.length })}</Badge>
             <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
               {t("teacher.title")}
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/80 sm:text-base">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
               {t("teacher.description")}
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Button asChild className="bg-white text-primary hover:bg-white/90">
+              <Button asChild>
                 <Link to="/teacher/e-booklet-analytics">
                   <BarChart3 className="h-4 w-4" />
                   {t("teacher.analytics.title")}
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="border-white/30 bg-white/10 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground">
+              <Button asChild variant="outline" className="bg-background/50">
                 <Link to="/e-booklets">
                   {t("common.browse")}
                   <ArrowRight className="h-4 w-4" />
@@ -83,17 +83,17 @@ export default function TeacherEBookletsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur">
-            <div className="rounded-xl bg-white/10 p-3">
-              <div className="text-xs text-white/65">{t("teacher.milestones.paidProgress")}</div>
+          <div className="grid grid-cols-3 gap-2 rounded-2xl border border-primary/10 bg-background/60 p-3 backdrop-blur">
+            <div className="rounded-xl bg-primary/5 p-3">
+              <div className="text-xs text-muted-foreground">{t("teacher.milestones.paidProgress")}</div>
               <div className="mt-1 text-2xl font-black">{paidCount}</div>
             </div>
-            <div className="rounded-xl bg-white/10 p-3">
-              <div className="text-xs text-white/65">{t("teacher.milestones.nextRemaining")}</div>
+            <div className="rounded-xl bg-primary/5 p-3">
+              <div className="text-xs text-muted-foreground">{t("teacher.milestones.nextRemaining")}</div>
               <div className="mt-1 text-2xl font-black">{nextMilestone ? remainingToNext : t("teacher.milestones.allDone")}</div>
             </div>
-            <div className="rounded-xl bg-white/10 p-3">
-              <div className="text-xs text-white/65">{t("teacher.wallet.title")}</div>
+            <div className="rounded-xl bg-primary/5 p-3">
+              <div className="text-xs text-muted-foreground">{t("teacher.wallet.title")}</div>
               <div className="mt-1 truncate text-lg font-black">{formatMoney(walletBalance)}</div>
             </div>
           </div>

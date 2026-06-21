@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useAdminEBookletSettings } from "@/hooks/admin/useAdminEBooklets";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 const emptyForm = {
   defaultInviteQuota: "0",
@@ -126,10 +127,35 @@ function ToggleRow({ label, checked, onCheckedChange, hint }) {
   );
 }
 
+function SettingsCard({ icon: Icon, title, description, active, onClick, as: Component = "button", ...props }) {
+  return (
+    <Component
+      type={Component === "button" ? "button" : undefined}
+      onClick={onClick}
+      className={cn(
+        "group rounded-2xl border bg-background p-5 text-start shadow-sm transition hover:border-primary/40 hover:shadow-md",
+        active && "border-primary/60 bg-primary/5 shadow-md",
+      )}
+      {...props}
+    >
+      <div className="flex items-start gap-3">
+        <span className={cn("rounded-xl bg-primary/10 p-2 text-primary", active && "bg-primary text-primary-foreground")}>
+          <Icon className="h-5 w-5" />
+        </span>
+        <div className="min-w-0">
+          <h3 className="font-semibold leading-tight">{title}</h3>
+          <p className="mt-2 text-sm leading-5 text-muted-foreground">{description}</p>
+        </div>
+      </div>
+    </Component>
+  );
+}
+
 export default function AdminEBookletSettingsPage() {
   const { t } = useTranslation("eBooklets");
   const { settings, loading, fetchSettings, updateSettings } = useAdminEBookletSettings();
   const [form, setForm] = useState(emptyForm);
+  const [activeSection, setActiveSection] = useState("delivery");
 
   useEffect(() => {
     fetchSettings();
@@ -172,81 +198,128 @@ export default function AdminEBookletSettingsPage() {
         </div>
       </section>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Link className="rounded-2xl border bg-background p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md" to="/admin/e-booklets/settings/terms-milestones">
-          <CalendarRange className="h-5 w-5 text-primary" />
-          <h3 className="mt-4 font-semibold">{t("admin.settings.termsMilestonesTitle")}</h3>
-          <p className="mt-2 text-sm text-muted-foreground">{t("admin.settings.termsMilestonesDescription")}</p>
-        </Link>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <SettingsCard
+          icon={Truck}
+          title={t("admin.settings.deliveryDefaults")}
+          description={t("admin.settings.deliveryDefaultsDescription")}
+          active={activeSection === "delivery"}
+          onClick={() => setActiveSection("delivery")}
+        />
+        <SettingsCard
+          icon={ShieldCheck}
+          title={t("admin.settings.pricingDefaults")}
+          description={t("admin.settings.pricingDefaultsDescription")}
+          active={activeSection === "pricing"}
+          onClick={() => setActiveSection("pricing")}
+        />
+        <SettingsCard
+          icon={KeyRound}
+          title={t("admin.settings.accessCodePolicy")}
+          description={t("admin.settings.accessCodePolicyDescription")}
+          active={activeSection === "accessCodes"}
+          onClick={() => setActiveSection("accessCodes")}
+        />
+        <SettingsCard
+          icon={Smartphone}
+          title={t("admin.settings.devicePolicy")}
+          description={t("admin.settings.devicePolicyDescription")}
+          active={activeSection === "devices"}
+          onClick={() => setActiveSection("devices")}
+        />
+        <SettingsCard
+          icon={Bell}
+          title={t("admin.settings.notificationRules")}
+          description={t("admin.settings.notificationRulesDescription")}
+          active={activeSection === "notifications"}
+          onClick={() => setActiveSection("notifications")}
+        />
+        <SettingsCard
+          as={Link}
+          to="/admin/e-booklets/settings/terms-milestones"
+          icon={CalendarRange}
+          title={t("admin.settings.termsMilestonesTitle")}
+          description={t("admin.settings.termsMilestonesDescription")}
+        />
       </div>
 
-      <SettingsSection icon={Truck} title={t("admin.settings.deliveryDefaults")} description={t("admin.settings.deliveryDefaultsDescription")}>
-        <Field label={t("admin.settings.defaultInviteQuota")} hint={t("admin.settings.defaultInviteQuotaHint")}>
-          <Input type="number" min="0" value={form.defaultInviteQuota} onChange={(event) => updateField("defaultInviteQuota", event.target.value)} />
-        </Field>
-        <Field label={t("admin.settings.accessDurationDays")} hint={t("admin.settings.accessDurationDaysHint")}>
-          <Input type="number" min="0" value={form.defaultAccessDurationDays} onChange={(event) => updateField("defaultAccessDurationDays", event.target.value)} />
-        </Field>
-        <Field label={t("admin.settings.inviteExpirationDays")} hint={t("admin.settings.inviteExpirationDaysHint")}>
-          <Input type="number" min="0" value={form.defaultInviteExpirationDays} onChange={(event) => updateField("defaultInviteExpirationDays", event.target.value)} />
-        </Field>
-        <Field label={t("admin.settings.defaultDeliveryNotes")}>
-          <Textarea value={form.defaultDeliveryNotes} onChange={(event) => updateField("defaultDeliveryNotes", event.target.value)} placeholder={t("admin.settings.defaultDeliveryNotesPlaceholder")} />
-        </Field>
-      </SettingsSection>
+      {activeSection === "delivery" && (
+        <SettingsSection icon={Truck} title={t("admin.settings.deliveryDefaults")} description={t("admin.settings.deliveryDefaultsDescription")}>
+          <Field label={t("admin.settings.defaultInviteQuota")} hint={t("admin.settings.defaultInviteQuotaHint")}>
+            <Input type="number" min="0" value={form.defaultInviteQuota} onChange={(event) => updateField("defaultInviteQuota", event.target.value)} />
+          </Field>
+          <Field label={t("admin.settings.accessDurationDays")} hint={t("admin.settings.accessDurationDaysHint")}>
+            <Input type="number" min="0" value={form.defaultAccessDurationDays} onChange={(event) => updateField("defaultAccessDurationDays", event.target.value)} />
+          </Field>
+          <Field label={t("admin.settings.inviteExpirationDays")} hint={t("admin.settings.inviteExpirationDaysHint")}>
+            <Input type="number" min="0" value={form.defaultInviteExpirationDays} onChange={(event) => updateField("defaultInviteExpirationDays", event.target.value)} />
+          </Field>
+          <Field label={t("admin.settings.defaultDeliveryNotes")}>
+            <Textarea value={form.defaultDeliveryNotes} onChange={(event) => updateField("defaultDeliveryNotes", event.target.value)} placeholder={t("admin.settings.defaultDeliveryNotesPlaceholder")} />
+          </Field>
+        </SettingsSection>
+      )}
 
-      <SettingsSection icon={ShieldCheck} title={t("admin.settings.pricingDefaults")} description={t("admin.settings.pricingDefaultsDescription")}>
-        <Field label={t("admin.settings.studentMarketingPrice")} hint={t("admin.settings.studentMarketingPriceHint")}>
-          <Input type="number" min="0" step="0.01" value={form.defaultStudentMarketingPrice} onChange={(event) => updateField("defaultStudentMarketingPrice", event.target.value)} />
-        </Field>
-        <Field label={t("admin.settings.internalTeacherCost")} hint={t("admin.settings.internalTeacherCostHint")}>
-          <Input type="number" min="0" step="0.01" value={form.defaultInternalPrice} onChange={(event) => updateField("defaultInternalPrice", event.target.value)} />
-        </Field>
-      </SettingsSection>
+      {activeSection === "pricing" && (
+        <SettingsSection icon={ShieldCheck} title={t("admin.settings.pricingDefaults")} description={t("admin.settings.pricingDefaultsDescription")}>
+          <Field label={t("admin.settings.studentMarketingPrice")} hint={t("admin.settings.studentMarketingPriceHint")}>
+            <Input type="number" min="0" step="0.01" value={form.defaultStudentMarketingPrice} onChange={(event) => updateField("defaultStudentMarketingPrice", event.target.value)} />
+          </Field>
+          <Field label={t("admin.settings.internalTeacherCost")} hint={t("admin.settings.internalTeacherCostHint")}>
+            <Input type="number" min="0" step="0.01" value={form.defaultInternalPrice} onChange={(event) => updateField("defaultInternalPrice", event.target.value)} />
+          </Field>
+        </SettingsSection>
+      )}
 
-      <SettingsSection icon={KeyRound} title={t("admin.settings.accessCodePolicy")} description={t("admin.settings.accessCodePolicyDescription")}>
-        <Field label={t("admin.settings.defaultAccessCodeKind")}>
-          <Select value={form.defaultAccessCodeKind} onValueChange={(value) => updateField("defaultAccessCodeKind", value)}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="paid">{t("admin.settings.paid")}</SelectItem>
-              <SelectItem value="free">{t("admin.settings.free")}</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
-        <Field label={t("admin.settings.maxBulkAccessCodes")} hint={t("admin.settings.maxBulkAccessCodesHint")}>
-          <Input type="number" min="1" value={form.maxBulkAccessCodes} onChange={(event) => updateField("maxBulkAccessCodes", event.target.value)} />
-        </Field>
-        <Field label={t("admin.settings.accessCodeExpirationDays")} hint={t("admin.settings.accessCodeExpirationDaysHint")}>
-          <Input type="number" min="0" value={form.defaultAccessCodeExpirationDays} onChange={(event) => updateField("defaultAccessCodeExpirationDays", event.target.value)} />
-        </Field>
-        <ToggleRow
-          label={t("admin.settings.requireTermsBeforeCodeGeneration")}
-          hint={t("admin.settings.requireTermsBeforeCodeGenerationHint")}
-          checked={form.requireTermsForCodeGeneration}
-          onCheckedChange={(value) => updateField("requireTermsForCodeGeneration", value)}
-        />
-      </SettingsSection>
+      {activeSection === "accessCodes" && (
+        <SettingsSection icon={KeyRound} title={t("admin.settings.accessCodePolicy")} description={t("admin.settings.accessCodePolicyDescription")}>
+          <Field label={t("admin.settings.defaultAccessCodeKind")}>
+            <Select value={form.defaultAccessCodeKind} onValueChange={(value) => updateField("defaultAccessCodeKind", value)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="paid">{t("admin.settings.paid")}</SelectItem>
+                <SelectItem value="free">{t("admin.settings.free")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label={t("admin.settings.maxBulkAccessCodes")} hint={t("admin.settings.maxBulkAccessCodesHint")}>
+            <Input type="number" min="1" value={form.maxBulkAccessCodes} onChange={(event) => updateField("maxBulkAccessCodes", event.target.value)} />
+          </Field>
+          <Field label={t("admin.settings.accessCodeExpirationDays")} hint={t("admin.settings.accessCodeExpirationDaysHint")}>
+            <Input type="number" min="0" value={form.defaultAccessCodeExpirationDays} onChange={(event) => updateField("defaultAccessCodeExpirationDays", event.target.value)} />
+          </Field>
+          <ToggleRow
+            label={t("admin.settings.requireTermsBeforeCodeGeneration")}
+            hint={t("admin.settings.requireTermsBeforeCodeGenerationHint")}
+            checked={form.requireTermsForCodeGeneration}
+            onCheckedChange={(value) => updateField("requireTermsForCodeGeneration", value)}
+          />
+        </SettingsSection>
+      )}
 
-      <SettingsSection icon={Smartphone} title={t("admin.settings.devicePolicy")} description={t("admin.settings.devicePolicyDescription")}>
-        <Field label={t("admin.settings.allowedStudentDevices")}>
-          <Input type="number" min="1" value={form.defaultAllowedDevicesPerStudent} onChange={(event) => updateField("defaultAllowedDevicesPerStudent", event.target.value)} />
-        </Field>
-        <Field label={t("admin.settings.allowedTeacherDevices")}>
-          <Input type="number" min="1" value={form.defaultAllowedDevicesPerTeacher} onChange={(event) => updateField("defaultAllowedDevicesPerTeacher", event.target.value)} />
-        </Field>
-        <Field label={t("admin.settings.deviceResetPolicy")}>
-          <Textarea value={form.deviceResetPolicy} onChange={(event) => updateField("deviceResetPolicy", event.target.value)} placeholder={t("admin.settings.deviceResetPolicyPlaceholder")} />
-        </Field>
-      </SettingsSection>
+      {activeSection === "devices" && (
+        <SettingsSection icon={Smartphone} title={t("admin.settings.devicePolicy")} description={t("admin.settings.devicePolicyDescription")}>
+          <Field label={t("admin.settings.allowedStudentDevices")}>
+            <Input type="number" min="1" value={form.defaultAllowedDevicesPerStudent} onChange={(event) => updateField("defaultAllowedDevicesPerStudent", event.target.value)} />
+          </Field>
+          <Field label={t("admin.settings.allowedTeacherDevices")}>
+            <Input type="number" min="1" value={form.defaultAllowedDevicesPerTeacher} onChange={(event) => updateField("defaultAllowedDevicesPerTeacher", event.target.value)} />
+          </Field>
+          <Field label={t("admin.settings.deviceResetPolicy")}>
+            <Textarea value={form.deviceResetPolicy} onChange={(event) => updateField("deviceResetPolicy", event.target.value)} placeholder={t("admin.settings.deviceResetPolicyPlaceholder")} />
+          </Field>
+        </SettingsSection>
+      )}
 
-      <SettingsSection icon={Bell} title={t("admin.settings.notificationRules")} description={t("admin.settings.notificationRulesDescription")}>
-        <ToggleRow label={t("admin.settings.notifyAdminsOnDelivery")} checked={form.notifyAdminsOnDelivery} onCheckedChange={(value) => updateField("notifyAdminsOnDelivery", value)} />
-        <ToggleRow label={t("admin.settings.notifyTeacherOnDelivery")} checked={form.notifyTeacherOnDelivery} onCheckedChange={(value) => updateField("notifyTeacherOnDelivery", value)} />
-        <ToggleRow label={t("admin.settings.notifyAdminsOnMilestone")} checked={form.notifyAdminsOnMilestone} onCheckedChange={(value) => updateField("notifyAdminsOnMilestone", value)} />
-        <ToggleRow label={t("admin.settings.notifyTeacherOnMilestone")} checked={form.notifyTeacherOnMilestone} onCheckedChange={(value) => updateField("notifyTeacherOnMilestone", value)} />
-        <ToggleRow label={t("admin.settings.notifyAdminsOnAccessCodeRedemption")} checked={form.notifyAdminsOnAccessCodeRedemption} onCheckedChange={(value) => updateField("notifyAdminsOnAccessCodeRedemption", value)} />
-      </SettingsSection>
+      {activeSection === "notifications" && (
+        <SettingsSection icon={Bell} title={t("admin.settings.notificationRules")} description={t("admin.settings.notificationRulesDescription")}>
+          <ToggleRow label={t("admin.settings.notifyAdminsOnDelivery")} checked={form.notifyAdminsOnDelivery} onCheckedChange={(value) => updateField("notifyAdminsOnDelivery", value)} />
+          <ToggleRow label={t("admin.settings.notifyTeacherOnDelivery")} checked={form.notifyTeacherOnDelivery} onCheckedChange={(value) => updateField("notifyTeacherOnDelivery", value)} />
+          <ToggleRow label={t("admin.settings.notifyAdminsOnMilestone")} checked={form.notifyAdminsOnMilestone} onCheckedChange={(value) => updateField("notifyAdminsOnMilestone", value)} />
+          <ToggleRow label={t("admin.settings.notifyTeacherOnMilestone")} checked={form.notifyTeacherOnMilestone} onCheckedChange={(value) => updateField("notifyTeacherOnMilestone", value)} />
+          <ToggleRow label={t("admin.settings.notifyAdminsOnAccessCodeRedemption")} checked={form.notifyAdminsOnAccessCodeRedemption} onCheckedChange={(value) => updateField("notifyAdminsOnAccessCodeRedemption", value)} />
+        </SettingsSection>
+      )}
     </form>
   );
 }

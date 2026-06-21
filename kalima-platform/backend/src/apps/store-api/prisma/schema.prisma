@@ -863,6 +863,7 @@ model e_booklet_templates {
   currency        String                         @default("EGP") @db.VarChar(3)
   status          e_booklet_template_status_enum @default(draft)
   category_id     Int?
+  release_at      DateTime?                      @db.Timestamptz(6)
   created_by      Int
   created_at      DateTime?                      @default(now()) @db.Timestamp(6)
   updated_at      DateTime?                      @db.Timestamp(6)

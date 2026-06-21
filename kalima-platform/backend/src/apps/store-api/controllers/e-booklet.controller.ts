@@ -840,9 +840,21 @@ export const eBookletController = {
 
   async teacherAnalytics(req: Request, res: Response, next: NextFunction) {
     try {
-      const { teacherId: _ignored, studentId: _studentId, source: _source, ...filters } = analyticsFilters(req);
+      const { teacherId: _ignored, studentId: _studentId, ...filters } = analyticsFilters(req);
       const data = await getEBookletService().getTeacherAnalytics(currentUserId(req), filters);
       res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async exportTeacherAnalyticsCsv(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { teacherId: _ignored, studentId: _studentId, ...filters } = analyticsFilters(req);
+      const csv = await getEBookletService().exportTeacherAnalyticsCsv(currentUserId(req), filters);
+      res.type("text/csv");
+      res.set("Content-Disposition", "attachment; filename=\"teacher-e-booklet-analytics.csv\"");
+      res.status(200).send(csv);
     } catch (error) {
       next(error);
     }
