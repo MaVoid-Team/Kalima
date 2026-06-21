@@ -401,6 +401,15 @@ export function useAdminEBookletEditor() {
     return response.data;
   }, []);
 
+  const fetchAssetPagePreviewBlobUrl = useCallback(async (assetId, pageNumber, signal) => {
+    if (!assetId || !pageNumber) return "";
+    const response = await axiosInstance.get(
+      `/admin/e-booklet-files/${assetId}/pages/${pageNumber}/preview`,
+      { responseType: "blob", signal },
+    );
+    return URL.createObjectURL(response.data);
+  }, []);
+
   return {
     loading,
     fetchTemplate,
@@ -417,6 +426,7 @@ export function useAdminEBookletEditor() {
     uploadAsset,
     fetchAssetBlobUrl,
     fetchAssetArrayBuffer,
+    fetchAssetPagePreviewBlobUrl,
   };
 }
 

@@ -9,6 +9,7 @@ import {
   NotFoundError,
 } from "../../../libs/errors";
 import { generateInviteToken, hashInviteToken } from "../utils/e-booklet-token";
+import { EBookletPagePreviewService } from "./e-booklet-page-preview.service";
 
 type EBookletDb = PrismaClient | any;
 
@@ -448,6 +449,7 @@ function verifyViewerPageToken(input: {
 
 export class EBookletService {
   private fileStorageInitPromise: Promise<unknown> | null = null;
+  private pagePreviewService = new EBookletPagePreviewService(this.db);
 
   constructor(private readonly db: EBookletDb = resolveDefaultPrisma()) {}
 
@@ -543,6 +545,37 @@ export class EBookletService {
       });
     }
     await this.fileStorageInitPromise;
+  }
+
+  private getAssetAbsolutePath(asset: any): string {
+    const filename = path.basename(asset?.storage_key || "");
+    return path.join(E_BOOKLET_UPLOAD_DIR, filename);
+  }
+
+  private async ensurePagePreviews(asset: any, templateVersionId?: number | null, force = false): Promise<void> {
+    if (!asset || asset.mime_type !== "application/pdf") return;
+    const absolutePdfPath = this.getAssetAbsolutePath(asset);
+    const result = await this.pagePreviewService.generateForDocument({
+      documentAsset: asset,
+      absolutePdfPath,
+      templateVersionId,
+      force,
+    });
+    if (templateVersionId) {
+      await this.db.e_booklet_page_previews?.updateMany?.({
+        where: { document_file_id: Number(asset.id), template_version_id: null },
+        data: { template_version_id: templateVersionId, updated_at: new Date() },
+      });
+    }
+    if (result.error) {
+      await this.auditSafely(this.db, {
+        actor_user_id: null,
+        action: "page_preview_generation_failed",
+        entity_type: "e_booklet_file_asset",
+        entity_id: Number(asset.id),
+        metadata_json: { reason: result.error, template_version_id: templateVersionId || null },
+      });
+    }
   }
 
   private buildSlug(title: string): string {
@@ -779,6 +812,9 @@ export class EBookletService {
         visibility: "private",
       },
     });
+    if (file.mimetype === "application/pdf") {
+      await this.ensurePagePreviews(asset).catch(() => undefined);
+    }
     return metadata ? { ...asset, metadata } : asset;
   }
 
@@ -798,6 +834,78 @@ export class EBookletService {
       ? await this.extractSinglePagePdf(absolutePath, pageNumber)
       : null;
     return { asset, absolutePath, pageBuffer };
+  }
+
+  private async getPagePreviewForDocumentAsset(asset: any, pageNumber: number, templateVersionId?: number | null) {
+    if (!asset || asset.mime_type !== "application/pdf") {
+      throw new NotFoundError("E-booklet PDF document not found.");
+    }
+    if (!Number.isInteger(pageNumber) || pageNumber < 1) {
+      throw new BadRequestError("Invalid e-booklet page number.");
+    }
+
+    const absolutePdfPath = this.getAssetAbsolutePath(asset);
+    await fsPromises.access(absolutePdfPath);
+    let preview: any = null;
+    try {
+      preview = await this.db.e_booklet_page_previews?.findUnique?.({
+        where: {
+          document_file_id_page_number_size_key: {
+            document_file_id: Number(asset.id),
+            page_number: pageNumber,
+            size_key: "default",
+          },
+        },
+        include: { image_file: true },
+      });
+    } catch {
+      preview = null;
+    }
+
+    if (!preview) {
+      await this.ensurePagePreviews(asset, templateVersionId).catch(() => undefined);
+      try {
+        preview = await this.db.e_booklet_page_previews?.findUnique?.({
+          where: {
+            document_file_id_page_number_size_key: {
+              document_file_id: Number(asset.id),
+              page_number: pageNumber,
+              size_key: "default",
+            },
+          },
+          include: { image_file: true },
+        });
+      } catch {
+        preview = null;
+      }
+    }
+
+    if (preview?.image_file) {
+      const absolutePath = this.getAssetAbsolutePath(preview.image_file);
+      await fsPromises.access(absolutePath);
+      return { preview, asset: preview.image_file, absolutePath, pageBuffer: null };
+    }
+
+    const renderedPage = await this.pagePreviewService.renderPageBuffer({ absolutePdfPath, pageNumber });
+    return {
+      preview: null,
+      asset: {
+        id: asset.id,
+        file_type: "image",
+        original_filename: `${path.basename(asset.original_filename || "e-booklet", ".pdf")}-page-${pageNumber}.webp`,
+        mime_type: renderedPage.mimeType,
+        size_bytes: renderedPage.buffer.length,
+        visibility: "private",
+      },
+      absolutePath: null,
+      pageBuffer: renderedPage.buffer,
+    };
+  }
+
+  async getPrivateFileAssetPagePreviewForAdmin(assetId: number, pageNumber: number) {
+    const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: assetId } });
+    if (!asset) throw new NotFoundError("E-booklet file asset not found");
+    return this.getPagePreviewForDocumentAsset(asset, pageNumber);
   }
 
   async getPublicCoverFileAsset(
@@ -1055,7 +1163,7 @@ export class EBookletService {
   }
 
   async updateTemplateVersion(versionId: number, dto: any): Promise<unknown> {
-    return this.db.e_booklet_template_versions.update({
+    const version = await this.db.e_booklet_template_versions.update({
       where: { id: versionId },
       data: {
         base_document_file_id: dto.base_document_file_id,
@@ -1065,6 +1173,12 @@ export class EBookletService {
         status: dto.status,
       },
     });
+    const documentAssetId = version.base_document_file_id || version.rendered_document_file_id;
+    if (documentAssetId) {
+      const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: documentAssetId } });
+      await this.ensurePagePreviews(asset, version.id).catch(() => undefined);
+    }
+    return version;
   }
 
   async createTemplateVersion(
@@ -1078,7 +1192,7 @@ export class EBookletService {
       select: { version_number: true },
     });
 
-    return this.db.e_booklet_template_versions.create({
+    const version = await this.db.e_booklet_template_versions.create({
       data: {
         template_id: templateId,
         version_number: (latest?.version_number ?? 0) + 1,
@@ -1090,6 +1204,12 @@ export class EBookletService {
         created_by: adminUserId,
       },
     });
+    const documentAssetId = version.base_document_file_id || version.rendered_document_file_id;
+    if (documentAssetId) {
+      const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: documentAssetId } });
+      await this.ensurePagePreviews(asset, version.id).catch(() => undefined);
+    }
+    return version;
   }
 
   async listVersionHotspots(
@@ -3298,16 +3418,49 @@ export class EBookletService {
     throw new NotFoundError(sawPdfAsset ? "E-booklet PDF file is not available." : "E-booklet PDF document not found.");
   }
 
+  private async buildViewerDocumentPagePreviewResponse(instance: any, pageNumber: number) {
+    const documentAssetIds = this.resolveViewerDocumentAssetIds(instance);
+    if (!documentAssetIds.length) {
+      throw new NotFoundError("E-booklet document is not available.");
+    }
+    let sawPdfAsset = false;
+    for (const documentAssetId of documentAssetIds) {
+      const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: documentAssetId } });
+      if (!asset || asset.mime_type !== "application/pdf") continue;
+      sawPdfAsset = true;
+      try {
+        const result = await this.getPagePreviewForDocumentAsset(asset, pageNumber, instance?.template_version_id);
+        return { ...result, cacheControl: "private, no-store" };
+      } catch (error) {
+        if (error instanceof NotFoundError) continue;
+        throw error;
+      }
+    }
+    throw new NotFoundError(sawPdfAsset ? "E-booklet page preview is not ready yet." : "E-booklet PDF document not found.");
+  }
+
   async getAdminAuthorizedViewerDocument(instanceId: number, pageNumber: number, pageAccessToken: string, adminUserId: number) {
     verifyViewerPageToken({ token: pageAccessToken, instanceId, pageNumber, userId: adminUserId });
     const access: any = await this.getAdminViewerAccess(instanceId);
     return this.buildViewerDocumentResponse(access.booklet_instance, pageNumber);
   }
 
+  async getAdminAuthorizedViewerDocumentPagePreview(instanceId: number, pageNumber: number, pageAccessToken: string, adminUserId: number) {
+    verifyViewerPageToken({ token: pageAccessToken, instanceId, pageNumber, userId: adminUserId });
+    const access: any = await this.getAdminViewerAccess(instanceId);
+    return this.buildViewerDocumentPagePreviewResponse(access.booklet_instance, pageNumber);
+  }
+
   async getAuthorizedViewerDocument(instanceId: number, userId: number, pageNumber: number, pageAccessToken: string) {
     verifyViewerPageToken({ token: pageAccessToken, instanceId, pageNumber, userId });
     const access: any = await this.assertViewerAccess(instanceId, userId);
     return this.buildViewerDocumentResponse(access.booklet_instance, pageNumber);
+  }
+
+  async getAuthorizedViewerDocumentPagePreview(instanceId: number, userId: number, pageNumber: number, pageAccessToken: string) {
+    verifyViewerPageToken({ token: pageAccessToken, instanceId, pageNumber, userId });
+    const access: any = await this.assertViewerAccess(instanceId, userId);
+    return this.buildViewerDocumentPagePreviewResponse(access.booklet_instance, pageNumber);
   }
 
   async getViewerMetadata(instanceId: number, userId: number) {

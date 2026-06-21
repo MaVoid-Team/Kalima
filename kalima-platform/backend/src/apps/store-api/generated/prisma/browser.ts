@@ -239,12 +239,12 @@ export type e_booklet_template_versions = Prisma.e_booklet_template_versionsMode
 export type e_booklet_hotspots = Prisma.e_booklet_hotspotsModel
 /**
  * Model e_booklet_hotspot_presets
- *
+ * 
  */
 export type e_booklet_hotspot_presets = Prisma.e_booklet_hotspot_presetsModel
 /**
  * Model e_booklet_hotspot_preset_usages
- *
+ * 
  */
 export type e_booklet_hotspot_preset_usages = Prisma.e_booklet_hotspot_preset_usagesModel
 /**

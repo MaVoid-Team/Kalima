@@ -268,6 +268,28 @@ export const eBookletController = {
     }
   },
 
+  async previewAdminFileAssetPage(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { asset, absolutePath, pageBuffer } = await getEBookletService().getPrivateFileAssetPagePreviewForAdmin(
+        parseId(req.params.assetId, "file asset ID"),
+        parseId(req.params.pageNumber, "page number"),
+      );
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "image/webp");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-page.webp").replace(/"/g, "")}"`,
+      );
+      if (pageBuffer) {
+        res.send(pageBuffer);
+        return;
+      }
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async previewPublicCoverAsset(req: Request, res: Response, next: NextFunction) {
     try {
       const { asset, absolutePath } =
@@ -1457,6 +1479,32 @@ export const eBookletController = {
     }
   },
 
+  async getAuthorizedViewerDocumentPagePreview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const pageNumber = parseOptionalId(req.query.page) || parseId(req.params.pageNumber, "page number");
+      const pageAccessToken = req.get("X-E-Booklet-Page-Token") || "";
+      const { asset, absolutePath, pageBuffer } = await getEBookletService().getAuthorizedViewerDocumentPagePreview(
+        parseId(req.params.instanceId, "instance ID"),
+        currentUserId(req),
+        pageNumber,
+        pageAccessToken,
+      );
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "image/webp");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-page.webp").replace(/"/g, "")}"`,
+      );
+      if (pageBuffer) {
+        res.send(pageBuffer);
+        return;
+      }
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async getAdminAuthorizedViewerDocument(req: Request, res: Response, next: NextFunction) {
     try {
       const pageNumber = parseOptionalId(req.query.page);
@@ -1473,6 +1521,32 @@ export const eBookletController = {
       res.set(
         "Content-Disposition",
         `inline; filename="${String(asset.original_filename || "e-booklet-document.pdf").replace(/"/g, "")}"`,
+      );
+      if (pageBuffer) {
+        res.send(pageBuffer);
+        return;
+      }
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getAdminAuthorizedViewerDocumentPagePreview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const pageNumber = parseOptionalId(req.query.page) || parseId(req.params.pageNumber, "page number");
+      const pageAccessToken = req.get("X-E-Booklet-Page-Token") || "";
+      const { asset, absolutePath, pageBuffer } = await getEBookletService().getAdminAuthorizedViewerDocumentPagePreview(
+        parseId(req.params.instanceId, "instance ID"),
+        pageNumber,
+        pageAccessToken,
+        currentUserId(req),
+      );
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "image/webp");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-page.webp").replace(/"/g, "")}"`,
       );
       if (pageBuffer) {
         res.send(pageBuffer);

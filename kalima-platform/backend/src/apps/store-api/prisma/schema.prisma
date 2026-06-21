@@ -907,6 +907,7 @@ model e_booklet_template_versions {
   instances              e_booklet_instances[]
   hotspot_presets_source e_booklet_hotspot_presets[]       @relation("EBookletHotspotPresetSourceVersion")
   hotspot_preset_usages  e_booklet_hotspot_preset_usages[] @relation("EBookletHotspotPresetUsageTargetVersion")
+  page_previews          e_booklet_page_previews[]
 
   @@unique([template_id, version_number])
   @@index([template_id, status], map: "ix_e_booklet_versions_template_status")
@@ -1502,9 +1503,33 @@ model e_booklet_file_assets {
   hotspot_assets             e_booklet_hotspots[]          @relation("EBookletHotspotAsset")
   hotspot_preset_assets      e_booklet_hotspot_presets[]   @relation("EBookletHotspotPresetAsset")
   instance_custom_documents  e_booklet_instances[]         @relation("EBookletInstanceCustomDocument")
+  source_page_previews       e_booklet_page_previews[]     @relation("EBookletPagePreviewSourceDocument")
+  image_page_previews        e_booklet_page_previews[]     @relation("EBookletPagePreviewImage")
 
   @@index([owner_type, owner_id], map: "ix_e_booklet_file_assets_owner")
   @@index([file_type], map: "ix_e_booklet_file_assets_file_type")
+}
+
+model e_booklet_page_previews {
+  id                  Int       @id @default(autoincrement())
+  document_file_id    Int
+  template_version_id Int?
+  page_number         Int
+  image_file_id       Int
+  width_px            Int
+  height_px           Int
+  format              String    @default("webp") @db.VarChar(20)
+  size_key            String    @default("default") @db.VarChar(40)
+  created_at          DateTime? @default(now()) @db.Timestamp(6)
+  updated_at          DateTime? @db.Timestamp(6)
+
+  document_file    e_booklet_file_assets       @relation("EBookletPagePreviewSourceDocument", fields: [document_file_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  template_version e_booklet_template_versions? @relation(fields: [template_version_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  image_file       e_booklet_file_assets       @relation("EBookletPagePreviewImage", fields: [image_file_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([document_file_id, page_number, size_key], map: "ux_e_booklet_page_previews_document_page_size")
+  @@index([template_version_id, page_number], map: "ix_e_booklet_page_previews_version_page")
+  @@index([image_file_id], map: "ix_e_booklet_page_previews_image_file")
 }
 
 model e_booklet_audit_logs {
