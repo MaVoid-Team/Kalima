@@ -62,4 +62,26 @@ describe("e-booklet security configuration", () => {
 
     expect(compose).toContain("- E_BOOKLET_ACCESS_CODE_SECRET=${E_BOOKLET_ACCESS_CODE_SECRET}");
   });
+
+  test("access-code hashing can use existing production JWT secrets as a fallback", async () => {
+    process.env.NODE_ENV = "production";
+    delete process.env.E_BOOKLET_ACCESS_CODE_SECRET;
+    delete process.env.ACCESS_TOKEN_SECRET;
+    process.env.JWT_SECRET = "stable-production-jwt-secret";
+
+    const { hashEBookletAccessCode } = await import("../../src/apps/store-api/services/e-booklet-access-code.service");
+
+    expect(hashEBookletAccessCode("klm-test-code")).toBe(hashEBookletAccessCode("KLM-TEST-CODE"));
+  });
+
+  test("access-code hashing still fails closed in production without any secret", async () => {
+    process.env.NODE_ENV = "production";
+    delete process.env.E_BOOKLET_ACCESS_CODE_SECRET;
+    delete process.env.ACCESS_TOKEN_SECRET;
+    delete process.env.JWT_SECRET;
+
+    const { hashEBookletAccessCode } = await import("../../src/apps/store-api/services/e-booklet-access-code.service");
+
+    expect(() => hashEBookletAccessCode("KLM-TEST-CODE")).toThrow("E_BOOKLET_ACCESS_CODE_SECRET, ACCESS_TOKEN_SECRET, or JWT_SECRET is required");
+  });
 });
