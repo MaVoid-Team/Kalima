@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+
 describe("e-booklet security configuration", () => {
   const originalEnv = process.env;
 
@@ -51,5 +54,12 @@ describe("e-booklet security configuration", () => {
     }));
 
     await expect(import("../../src/libs/auth/firebase")).rejects.toThrow("Firebase service-account credentials are required");
+  });
+
+  test("production compose passes the access-code hashing secret to the backend", () => {
+    const composePath = path.resolve(__dirname, "../../../docker-compose.prod.yaml");
+    const compose = fs.readFileSync(composePath, "utf8");
+
+    expect(compose).toContain("- E_BOOKLET_ACCESS_CODE_SECRET=${E_BOOKLET_ACCESS_CODE_SECRET}");
   });
 });
