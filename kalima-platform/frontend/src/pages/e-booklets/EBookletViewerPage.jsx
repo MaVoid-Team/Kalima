@@ -270,9 +270,9 @@ function HotspotMarker({ hotspot, active, onOpen, t }) {
   const Icon = typeMeta.icon;
   const colorClass = getHotspotColorClass(hotspot) || typeMeta.className;
   const { shape, width, height, left, top } = normalizeHotspotGeometry(hotspot, {
-    defaultSize: 8,
-    minSize: 2,
-    maxSize: 40,
+    defaultSize: 4,
+    minSize: 3,
+    maxSize: 8,
   });
   const opacity = clamp(hotspot.display_behavior?.opacity_percent, 100, 0, 100) / 100;
   const glow = getHotspotGlowPercent(hotspot);
@@ -709,6 +709,10 @@ export default function EBookletViewerPage() {
   const serverPage = viewer.page?.renderMode === "server-page" ? viewer.page : null;
   const pdfDocumentFailed = viewer.page?.renderMode === "pdf-document" && viewer.page?.documentAssetId && documentPageError;
   const viewerError = viewer.metadataError || viewer.pageError;
+  const canShowHotspots = !viewerError && !pdfDocumentFailed && (Boolean(documentPageData) || Boolean(serverPage));
+  const viewerErrorTitle = viewer.metadataError ? t("viewer.openErrorTitle") : t("viewer.pageErrorTitle", { page: pageNumber });
+  const viewerErrorMessage = viewer.metadataError ? t("viewer.openErrorMessage") : t("viewer.pageErrorMessage");
+  const viewerReportReference = t("viewer.reportReference", { id: instanceId, page: pageNumber });
 
   if (deviceStatus === "blocked") {
     return (
@@ -784,8 +788,9 @@ export default function EBookletViewerPage() {
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-50 p-8 text-center">
                   <div className="max-w-md rounded-lg border border-destructive/30 bg-background/90 p-5 shadow-sm">
                     <FileText className="mx-auto h-8 w-8 text-destructive" />
-                    <h2 className="mt-3 font-semibold text-destructive">{t("viewer.documentUnavailable")}</h2>
-                    <p className="mt-2 text-sm text-muted-foreground">{viewerError}</p>
+                    <h2 className="mt-3 font-semibold text-destructive">{viewerErrorTitle}</h2>
+                    <p className="mt-2 text-sm text-muted-foreground">{viewerErrorMessage}</p>
+                    <p className="mt-3 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">{viewerReportReference}</p>
                     <Button
                       type="button"
                       className="mt-4"
@@ -803,8 +808,9 @@ export default function EBookletViewerPage() {
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-50 p-8 text-center">
                   <div className="max-w-md rounded-lg border border-destructive/30 bg-background/90 p-5 shadow-sm">
                     <FileText className="mx-auto h-8 w-8 text-destructive" />
-                    <h2 className="mt-3 font-semibold text-destructive">{t("viewer.documentUnavailable")}</h2>
-                    <p className="mt-2 text-sm text-muted-foreground">{documentPageError}</p>
+                    <h2 className="mt-3 font-semibold text-destructive">{t("viewer.pageErrorTitle", { page: pageNumber })}</h2>
+                    <p className="mt-2 text-sm text-muted-foreground">{t("viewer.pageErrorMessage")}</p>
+                    <p className="mt-3 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">{viewerReportReference}</p>
                   </div>
                 </div>
               ) : documentPageData ? (
@@ -828,12 +834,9 @@ export default function EBookletViewerPage() {
                     <Lock className="mx-auto h-8 w-8 text-primary" />
                     <h2 className="mt-3 font-semibold">{t("viewer.securePageReady")}</h2>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      {serverPage.message || t("viewer.securePagePending")}
+                      {t("viewer.securePagePending")}
                     </p>
-                    <div className="mt-4 grid gap-2 text-xs text-muted-foreground">
-                      <span>{t("viewer.renderMode", { mode: serverPage.renderMode })}</span>
-                      {serverPage.expiresAt && <span>{t("viewer.pageTokenExpires", { value: serverPage.expiresAt })}</span>}
-                    </div>
+                    <p className="mt-3 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">{viewerReportReference}</p>
                   </div>
                 </div>
               ) : (
@@ -852,7 +855,7 @@ export default function EBookletViewerPage() {
                 {watermark}
               </div>
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,transparent_60%,rgba(255,255,255,0.02)_100%)]" />
-              {viewer.hotspots.map((hotspot) => (
+              {canShowHotspots && viewer.hotspots.map((hotspot) => (
                 <HotspotMarker
                   key={hotspot.id}
                   hotspot={hotspot}
@@ -861,7 +864,7 @@ export default function EBookletViewerPage() {
                   t={t}
                 />
               ))}
-              {contentHotspot && (
+              {canShowHotspots && contentHotspot && (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-950/25 p-3 sm:p-6">
                   <div className="flex max-h-[90%] w-full max-w-[min(92%,34rem)] flex-col overflow-hidden rounded-xl border bg-background text-foreground shadow-2xl">
                     <div className="flex items-start justify-between gap-3 border-b p-3 sm:p-4">

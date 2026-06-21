@@ -61,7 +61,9 @@
     "notEditedYet": "Not edited yet",
     "loading": "Loading...",
     "done": "Done",
-    "edit": "Edit"
+    "edit": "Edit",
+    "comingSoon": "Coming Soon",
+    "comingSoonWithTime": "Coming Soon - {{time}}"
   },
   "statuses": {
     "all": "All statuses",
@@ -140,7 +142,8 @@
       "empty": "No e-booklet templates match the current filters.",
       "noDescription": "No description yet",
       "noVersion": "No version",
-      "totalTemplates": "{{count}} templates total"
+      "totalTemplates": "{{count}} templates total",
+      "releaseAt": "Releases {{value}}"
     },
     "workspace": {
       "kicker": "Admin workspace",
@@ -236,7 +239,9 @@
         "coverImage": "Cover image",
         "coverUploaded": "Cover uploaded (asset #{{id}})",
         "coverEmpty": "Upload a cover image. Private storage asset IDs are managed automatically.",
-        "status": "Template status"
+        "status": "Template status",
+        "releaseAt": "Release date",
+        "releaseAtHint": "Leave empty to make this e-booklet available immediately. Future dates keep it visible as Coming Soon but block checkout."
       },
       "file": {
         "title": "Original Sample File",
@@ -541,6 +546,7 @@
       "startsAt": "Starts at",
       "endsAt": "Ends at",
       "descriptionLabel": "Description",
+      "checkoutTerms": "Checkout purchase terms / conditions",
       "codeGenerationTerms": "Code-generation terms / policy",
       "rewardClaimTerms": "Reward-claim terms / policy",
       "milestonesTitle": "Dynamic milestones",
@@ -644,7 +650,8 @@
     "noExpiry": "No expiry",
     "add": "Add",
     "seatsRemaining": "{{count}} seats",
-    "redeemCode": "Redeem code"
+    "redeemCode": "Redeem code",
+    "unreleasedNotice": "One or more e-booklets in your cart are not released yet. Checkout opens in {{time}}."
   },
   "details": {
     "coverLabel": "Kalima E-Booklet",
@@ -715,6 +722,18 @@
     "teacherPurchaseDescriptionPaid": "Upload payment proof so admin can review and deliver this teacher e-booklet purchase.",
     "teacherPurchaseDescriptionFree": "Accept the terms to place this free teacher e-booklet order.",
     "terms": "I accept the e-booklet purchase terms and understand student access is delivered separately through private URL and access code.",
+    "termsSummary": "Review and accept the e-booklet purchase terms before continuing.",
+    "termsAcceptedBadge": "Terms accepted",
+    "termsManagedByAdmin": "Terms are managed by Kalima admin.",
+    "viewTerms": "View terms",
+    "viewAndAcceptTerms": "View and accept terms",
+    "termsDialogTitle": "E-booklet purchase terms",
+    "termsDialogDescription": "Read the active admin-managed terms before placing this order.",
+    "termsDialogCancel": "Cancel",
+    "termsDialogAccept": "I agree",
+    "termsLoading": "Loading terms...",
+    "termsLoadError": "Terms and conditions are not available right now.",
+    "noActiveTerms": "No active purchase terms are configured.",
     "pendingApprovalNotice": "Paid teacher e-booklet purchases are reviewed by admin before delivery. Student access is issued separately through a private URL and access code.",
     "freeAccessNotice": "This teacher e-booklet is free. Placing the order records the teacher purchase; student access is issued separately through a private URL and access code.",
     "submitForReview": "Submit purchase for review",
@@ -757,7 +776,8 @@
     "templateMissing": "Selected e-booklet template is missing.",
     "termsRequired": "Accept the terms before continuing.",
     "paymentRequired": "Choose a payment method, enter the number you paid from, and upload payment proof.",
-    "requiredFieldsTitle": "Required information"
+    "requiredFieldsTitle": "Required information",
+    "unreleasedItem": "{{title}} is not released yet. Checkout opens in {{time}}."
   },
   "viewer": {
     "titleFallback": "E-Booklet",
@@ -774,13 +794,18 @@
     "documentUnavailable": "This e-booklet PDF could not be loaded.",
     "metadataLoadFailed": "Failed to load e-booklet metadata.",
     "pageLoadFailed": "Failed to load e-booklet page.",
+    "openErrorTitle": "We could not open this e-booklet",
+    "openErrorMessage": "The e-booklet did not load correctly. Please try again. If it still does not open, report it to support or your teacher.",
+    "pageErrorTitle": "We could not load page {{page}}",
+    "pageErrorMessage": "This page did not load correctly. Please try again. If the same page keeps failing, report it so we can fix it.",
+    "reportReference": "Report reference: e-booklet #{{id}}, page {{page}}",
     "questionFallback": "Choose the correct answer.",
     "answerFeedback": "Your answer has been checked.",
     "unsupportedBlock": "Unsupported content block: {{type}}",
     "pageFrameTitle": "E-booklet page {{page}}",
     "deviceBlocked": "This device is not allowed to open this e-booklet.",
-    "securePageReady": "Secure page access prepared",
-    "securePagePending": "The secure page renderer is preparing this page.",
+    "securePageReady": "Your page is being prepared",
+    "securePagePending": "This protected page is still loading. Please wait a moment, then try again if it does not appear.",
     "renderMode": "Render mode: {{mode}}",
     "pageTokenExpires": "Page token expires: {{value}}",
     "fileProtected": "This file is shown inside the protected viewer instead of opening a separate download tab."
@@ -938,6 +963,16 @@
     "analytics": {
       "title": "E-Booklet Analytics",
       "description": "Teacher-scoped analytics for your own delivered e-booklet instances only.",
+      "advancedFilters": "Advanced filters",
+      "exportReport": "Export report",
+      "reportTitle": "Teacher report summary",
+      "reportDescription": "A filtered performance snapshot for your delivered e-booklets, ready for follow-up and student access planning.",
+      "teacherScoped": "Teacher scoped",
+      "reportPeriod": "Period",
+      "reportRevenue": "Revenue estimate",
+      "reportAccess": "Access created",
+      "reportSeats": "Seats used",
+      "sourceBreakdown": "Source breakdown",
       "instancesTitle": "Per-instance drilldown",
       "instancesDescription": "Shows source/status, access created, seats, expiry, and device/access status without internal prices or raw security data."
     },
@@ -991,7 +1026,8 @@
     "dateRanges": {
       "7d": "Last 7 days",
       "30d": "Last 30 days",
-      "all": "All time"
+      "all": "All time",
+      "custom": "Custom"
     },
     "sources": {
       "all": "All sources",
@@ -1010,11 +1046,15 @@
       "templatePlaceholder": "Template filter pending backend support",
       "instance": "Instance",
       "instancePlaceholder": "Instance ID",
+      "instanceValue": "Instance #{{id}}",
       "allInstances": "All instances",
       "source": "Source",
+      "startDate": "Start date",
+      "endDate": "End date",
       "title": "Filters",
       "live": "Live",
-      "teacherSearch": "Teacher search"
+      "teacherSearch": "Teacher search",
+      "clear": "Clear filters"
     },
     "metrics": {
       "inviteOpens": "Invite opens",

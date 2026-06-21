@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { formatTimeUntilRelease } from "@/lib/storeUtils";
 import { useEBookletCart, useEBookletStore } from "@/hooks/useEBooklets";
 import { useTranslation } from "react-i18next";
 
@@ -92,6 +93,10 @@ function EBookletCover({ template, featured = false, t }) {
 
 function EBookletCard({ template, featured, onAdd, t, language }) {
   const expiryLabel = formatDate(template.accessExpiresAt, language);
+  const isReleased = template.is_released !== false;
+  const countdownText = !isReleased
+    ? formatTimeUntilRelease(template.time_until_release_ms, t)
+    : null;
 
   return (
     <article
@@ -113,6 +118,11 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
           <Badge variant="secondary" className="rounded-md bg-emerald-50 text-emerald-800 hover:bg-emerald-50">
             {t("common.eBooklet")}
           </Badge>
+          {!isReleased && (
+            <Badge className="rounded-md bg-amber-100 text-amber-900 hover:bg-amber-100">
+              {t("common.comingSoonWithTime", { time: countdownText })}
+            </Badge>
+          )}
           {template.categoryTitle && (
             <span className="text-xs font-medium text-muted-foreground">
               {template.categoryTitle}
@@ -180,11 +190,14 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
               {formatMoney(template.price, template.currency, language)}
             </div>
           </div>
-          <Button asChild disabled={!template.activeVersion?.id} className="active:scale-[0.98]">
-            <Link to="/e-booklet-code">
-              <ShoppingBag className="h-4 w-4" />
-              {t("store.redeemCode")}
-            </Link>
+          <Button
+            type="button"
+            onClick={() => onAdd(template)}
+            disabled={!template.activeVersion?.id || !isReleased}
+            className="active:scale-[0.98]"
+          >
+            <ShoppingBag className="h-4 w-4" />
+            {t("store.add")}
           </Button>
         </div>
       </div>
@@ -347,7 +360,7 @@ export default function EBookletStorePage() {
                   key={template.id}
                   template={template}
                   featured={index === 0}
-                  onAdd={() => {}}
+                  onAdd={handleAddToCart}
                   t={t}
                   language={i18n.language}
                 />

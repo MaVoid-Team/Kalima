@@ -449,6 +449,11 @@ router.patch(
   eBookletController.revokeStudentAccess,
 );
 router.get(
+  "/teacher/e-booklet-analytics.csv",
+  ...teacherAuth,
+  eBookletController.exportTeacherAnalyticsCsv,
+);
+router.get(
   "/teacher/e-booklet-analytics",
   ...teacherAuth,
   eBookletController.teacherAnalytics,

@@ -3,6 +3,7 @@ import i18n from "@/i18n";
 import useApiMutation from "./useApiMutation";
 
 const E_BOOKLET_CART_KEY = "kalima:e-booklet-cart:v1";
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "/api/v2").replace(/\/$/, "");
 
 const parseNumber = (value, fallback = 0) => {
   const parsed = Number(value);
@@ -33,9 +34,27 @@ const getInstanceTemplate = (instance) => instance?.template || instance;
 const getInstanceVersion = (instance, template) =>
   instance?.template_version || template?.active_version || template?.template_version;
 
+const getPublicCoverUrl = (template) => {
+  const assetId = template?.cover_file_id || template?.cover_file?.id;
+  return assetId ? `${API_BASE_URL}/e-booklet-store/covers/${assetId}` : null;
+};
+
+const getReleaseInfo = (template) => {
+  const releaseAt = template?.release_at || template?.releaseAt || null;
+  const releaseDate = releaseAt ? new Date(releaseAt) : null;
+  const isReleased = template?.is_released ?? (!releaseDate || releaseDate <= new Date());
+  return {
+    release_at: releaseAt,
+    is_released: Boolean(isReleased),
+    time_until_release_ms: template?.time_until_release_ms ?? (releaseDate && releaseDate > new Date() ? releaseDate.getTime() - Date.now() : null),
+    exact_minute: template?.exact_minute ?? (releaseDate ? releaseDate.getMinutes() : null),
+  };
+};
+
 export const normalizeEBookletTemplate = (template) => {
   const sourceTemplate = getInstanceTemplate(template);
   const activeVersion = getInstanceVersion(template, sourceTemplate) || getActiveVersion(sourceTemplate);
+  const releaseInfo = getReleaseInfo(sourceTemplate || template);
 
   return {
     ...template,
@@ -48,6 +67,7 @@ export const normalizeEBookletTemplate = (template) => {
       sourceTemplate?.cover_url ||
       sourceTemplate?.cover_file?.url ||
       sourceTemplate?.cover_file?.storage_url ||
+      getPublicCoverUrl(sourceTemplate) ||
       null,
     categoryTitle:
       sourceTemplate?.category?.title ||
@@ -69,6 +89,10 @@ export const normalizeEBookletTemplate = (template) => {
     accessExpiresAt: template?.access_expires_at,
     payment_methods: sourceTemplate?.payment_methods || template?.payment_methods || [],
     required_fields: sourceTemplate?.required_fields || template?.required_fields || [],
+    release_at: releaseInfo.release_at,
+    is_released: releaseInfo.is_released,
+    time_until_release_ms: releaseInfo.time_until_release_ms,
+    exact_minute: releaseInfo.exact_minute,
   };
 };
 
@@ -110,6 +134,10 @@ export const buildEBookletCartItem = (template) => {
     hotspotCount: normalized.hotspotCount,
     payment_methods: normalized.payment_methods || [],
     required_fields: normalized.required_fields || [],
+    release_at: normalized.release_at,
+    is_released: normalized.is_released,
+    time_until_release_ms: normalized.time_until_release_ms,
+    exact_minute: normalized.exact_minute,
   };
 };
 

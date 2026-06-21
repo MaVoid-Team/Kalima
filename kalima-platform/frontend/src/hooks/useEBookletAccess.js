@@ -210,6 +210,7 @@ const ANALYTICS_QUERY_KEYS = {
   teacherId: "teacher_id",
   instanceId: "instance_id",
   studentId: "student_id",
+  source: "source",
 };
 
 const buildAnalyticsQueryString = (filters = {}) => {
@@ -237,7 +238,24 @@ export function useTeacherEBookletAnalytics() {
     return response;
   }, [fetchApi]);
 
-  return { analytics, loading, fetchAnalytics };
+  const exportCsv = useCallback(async (filters = {}) => {
+    const query = buildAnalyticsQueryString(filters);
+    const response = await api.get(
+      `/teacher/e-booklet-analytics.csv${query ? `?${query}` : ""}`,
+      { responseType: "blob" },
+    );
+    const url = URL.createObjectURL(response.data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "teacher-e-booklet-analytics.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    return response;
+  }, []);
+
+  return { analytics, loading, fetchAnalytics, exportCsv };
 }
 
 export function useEBookletViewer({ adminMode = false } = {}) {

@@ -140,6 +140,7 @@ export default function AdminEBookletTermsMilestonesPage() {
       delete payload.status;
       delete payload.startsAt;
       delete payload.endsAt;
+      delete payload.description;
       delete payload.codeGenerationTerms;
       delete payload.rewardClaimTerms;
     }
@@ -255,7 +256,7 @@ export default function AdminEBookletTermsMilestonesPage() {
         </div>
       </div>
 
-      <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+      <section className="space-y-6">
         <div className="min-w-0 overflow-hidden rounded-lg border bg-background" data-testid="admin-e-booklet-terms-table">
           <div className="border-b p-4">
             <h2 className="font-semibold">{t("admin.termsMilestones.termsTitle")}</h2>
@@ -335,14 +336,16 @@ export default function AdminEBookletTermsMilestonesPage() {
             <div className="space-y-2"><Label>{t("admin.termsMilestones.startsAt")}</Label><Input type="date" value={termForm.startsAt} onChange={(e) => updateTermField("startsAt", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
             <div className="space-y-2"><Label>{t("admin.termsMilestones.endsAt")}</Label><Input type="date" value={termForm.endsAt} onChange={(e) => updateTermField("endsAt", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
           </div>
-          <div className="space-y-2"><Label>{t("admin.termsMilestones.descriptionLabel")}</Label><Textarea value={termForm.description} onChange={(e) => updateTermField("description", e.target.value)} /></div>
-          <div className="space-y-2"><Label>{t("admin.termsMilestones.codeGenerationTerms")}</Label><Textarea required value={termForm.codeGenerationTerms} onChange={(e) => updateTermField("codeGenerationTerms", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
-          <div className="space-y-2"><Label>{t("admin.termsMilestones.rewardClaimTerms")}</Label><Textarea required value={termForm.rewardClaimTerms} onChange={(e) => updateTermField("rewardClaimTerms", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+          <div className="grid gap-3 xl:grid-cols-3">
+            <div className="space-y-2"><Label>{t("admin.termsMilestones.checkoutTerms")}</Label><Textarea required className="min-h-32" value={termForm.description} onChange={(e) => updateTermField("description", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+            <div className="space-y-2"><Label>{t("admin.termsMilestones.codeGenerationTerms")}</Label><Textarea required className="min-h-32" value={termForm.codeGenerationTerms} onChange={(e) => updateTermField("codeGenerationTerms", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+            <div className="space-y-2"><Label>{t("admin.termsMilestones.rewardClaimTerms")}</Label><Textarea required className="min-h-32" value={termForm.rewardClaimTerms} onChange={(e) => updateTermField("rewardClaimTerms", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+          </div>
           <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={resetTermForm}>{t("common.clear")}</Button><Button type="submit" disabled={actionLoading}>{t("common.save")}</Button></div>
         </form>
       </section>
 
-      <section className="grid gap-6 2xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+      <section className="space-y-6">
         <div className="min-w-0 space-y-4 rounded-lg border bg-background p-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div><h2 className="font-semibold">{t("admin.termsMilestones.milestonesTitle")}</h2><p className="text-sm text-muted-foreground">{t("admin.termsMilestones.milestonesHelp")}</p></div>
@@ -397,11 +400,12 @@ export default function AdminEBookletTermsMilestonesPage() {
 
         <form className="min-w-0 space-y-4 rounded-lg border bg-background p-4" onSubmit={submitMilestone} data-testid="admin-e-booklet-milestone-form">
           <h2 className="font-semibold">{editingMilestoneId ? t("admin.termsMilestones.editMilestone") : t("admin.termsMilestones.createMilestone")}</h2>
-          <div className="min-w-0 space-y-2"><Label>{t("admin.termsMilestones.termName")}</Label><Select value={milestoneForm.termId} onValueChange={(value) => updateMilestoneField("termId", value)}><SelectTrigger className="w-full min-w-0 max-w-full overflow-hidden [&_[data-slot=select-value]]:truncate"><SelectValue placeholder={t("admin.termsMilestones.selectTerm")} /></SelectTrigger><SelectContent>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select></div>
-          <div className="space-y-2"><Label>{t("admin.termsMilestones.milestone")}</Label><Input required value={milestoneForm.title} onChange={(e) => updateMilestoneField("title", e.target.value)} /></div>
+          <div className="grid gap-3 lg:grid-cols-2">
+            <div className="min-w-0 space-y-2"><Label>{t("admin.termsMilestones.termName")}</Label><Select value={milestoneForm.termId} onValueChange={(value) => updateMilestoneField("termId", value)}><SelectTrigger className="w-full min-w-0 max-w-full overflow-hidden [&_[data-slot=select-value]]:truncate"><SelectValue placeholder={t("admin.termsMilestones.selectTerm")} /></SelectTrigger><SelectContent>{terms.map((term) => <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>)}</SelectContent></Select></div>
+            <div className="space-y-2"><Label>{t("admin.termsMilestones.milestone")}</Label><Input required value={milestoneForm.title} onChange={(e) => updateMilestoneField("title", e.target.value)} /></div>
+          </div>
           <div className="space-y-2"><Label>{t("admin.termsMilestones.descriptionLabel")}</Label><Textarea value={milestoneForm.description} onChange={(e) => updateMilestoneField("description", e.target.value)} /></div>
-          <div className="grid gap-3 md:grid-cols-2"><div className="space-y-2"><Label>{t("admin.termsMilestones.target")}</Label><Input name="targetPaidRedemptions" type="number" min="1" value={milestoneForm.targetPaidRedemptions} onChange={(e) => updateMilestoneField("targetPaidRedemptions", e.target.value)} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.sortOrder")}</Label><Input type="number" value={milestoneForm.sortOrder} onChange={(e) => updateMilestoneField("sortOrder", e.target.value)} /></div></div>
-          <div className="grid gap-3 md:grid-cols-2"><div className="space-y-2"><Label>{t("admin.termsMilestones.previousPrice")}</Label><Input type="number" value={milestoneForm.previousPriceSnapshot} onChange={(e) => updateMilestoneField("previousPriceSnapshot", e.target.value)} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.milestonePrice")}</Label><Input name="milestonePrice" type="number" value={milestoneForm.milestonePrice} onChange={(e) => updateMilestoneField("milestonePrice", e.target.value)} /></div></div>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4"><div className="space-y-2"><Label>{t("admin.termsMilestones.target")}</Label><Input name="targetPaidRedemptions" type="number" min="1" value={milestoneForm.targetPaidRedemptions} onChange={(e) => updateMilestoneField("targetPaidRedemptions", e.target.value)} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.sortOrder")}</Label><Input type="number" value={milestoneForm.sortOrder} onChange={(e) => updateMilestoneField("sortOrder", e.target.value)} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.previousPrice")}</Label><Input type="number" value={milestoneForm.previousPriceSnapshot} onChange={(e) => updateMilestoneField("previousPriceSnapshot", e.target.value)} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.milestonePrice")}</Label><Input name="milestonePrice" type="number" value={milestoneForm.milestonePrice} onChange={(e) => updateMilestoneField("milestonePrice", e.target.value)} /></div></div>
           <div className="grid gap-3 md:grid-cols-2"><div className="space-y-2"><Label>{t("admin.termsMilestones.rewardAmount")}</Label><Input type="number" value={milestoneForm.rewardAmountSnapshot} onChange={(e) => updateMilestoneField("rewardAmountSnapshot", e.target.value)} disabled={!milestoneForm.rewardEnabled} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.notificationRecipients")}</Label><Select value={milestoneForm.notificationRecipients} onValueChange={(value) => updateMilestoneField("notificationRecipients", value)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="admins">{t("admin.termsMilestones.recipientAdmins")}</SelectItem><SelectItem value="teacher_and_admins">{t("admin.termsMilestones.recipientTeacherAdmins")}</SelectItem></SelectContent></Select></div></div>
           <div className="flex flex-wrap gap-4 rounded-md border p-3"><label className="flex items-center gap-2 text-sm"><Checkbox checked={milestoneForm.active} onCheckedChange={(value) => updateMilestoneField("active", Boolean(value))} />{t("common.active")}</label><label className="flex items-center gap-2 text-sm"><Checkbox data-testid="admin-e-booklet-reward-enabled" checked={milestoneForm.rewardEnabled} onCheckedChange={(value) => updateMilestoneField("rewardEnabled", Boolean(value))} />{t("admin.termsMilestones.rewardEnabled")}</label></div>
           <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={resetMilestoneForm}>{t("common.clear")}</Button><Button type="submit" disabled={actionLoading || !milestoneForm.termId}>{t("common.save")}</Button></div>

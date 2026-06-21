@@ -6483,6 +6483,7 @@ export const E_booklet_templatesScalarFieldEnum = {
   currency: 'currency',
   status: 'status',
   category_id: 'category_id',
+  release_at: 'release_at',
   created_by: 'created_by',
   created_at: 'created_at',
   updated_at: 'updated_at'

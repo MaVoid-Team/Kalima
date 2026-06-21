@@ -91,6 +91,7 @@ const mockService = {
   recordInviteOpen: jest.fn(),
   getTeacherAnalytics: jest.fn(),
   getAdminAnalytics: jest.fn(),
+  exportTeacherAnalyticsCsv: jest.fn(),
   exportAdminAnalyticsCsv: jest.fn(),
 };
 
@@ -474,6 +475,7 @@ describe("e-booklet routes", () => {
     mockService.recordInviteOpen.mockResolvedValue({ invite_id: 2, has_passcode: true });
     mockService.getTeacherAnalytics.mockResolvedValue({ events: { invite_opened: 3 }, revenue: { offlineEstimated: 150 } });
     mockService.getAdminAnalytics.mockResolvedValue({ events: { access_created: 2 }, revenue: { marketing: 300, internal: 120 } });
+    mockService.exportTeacherAnalyticsCsv.mockResolvedValue("id,event_type\n1,access_created");
     mockService.exportAdminAnalyticsCsv.mockResolvedValue("id,event_type\n1,access_created");
 
     await request(app)
@@ -481,9 +483,14 @@ describe("e-booklet routes", () => {
       .set("x-e-booklet-session", "anon-1")
       .expect(200);
     await request(app)
-      .get("/api/v2/teacher/e-booklet-analytics?instance_id=10")
+      .get("/api/v2/teacher/e-booklet-analytics?instance_id=10&source=offline_passcode&teacher_id=999")
       .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
       .expect(200);
+    await request(app)
+      .get("/api/v2/teacher/e-booklet-analytics.csv?instance_id=10&source=offline_passcode&teacher_id=999")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
+      .expect(200)
+      .expect("Content-Type", /text\/csv/);
     await request(app)
       .get("/api/v2/admin/e-booklet-analytics?teacher_id=9")
       .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
@@ -501,9 +508,16 @@ describe("e-booklet routes", () => {
       .get("/api/v2/admin/e-booklet-analytics.csv")
       .set("Authorization", `Bearer ${tokenFor("Moderator", 4)}`)
       .expect(403);
+    await request(app)
+      .get("/api/v2/teacher/e-booklet-analytics.csv")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55, "academy")}`)
+      .expect(403);
 
     expect(mockService.recordInviteOpen).toHaveBeenCalledWith("raw-token", expect.objectContaining({ anonymousSessionId: "anon-1", source: "whatsapp" }));
-    expect(mockService.getTeacherAnalytics).toHaveBeenCalledWith(9, expect.objectContaining({ instanceId: 10 }));
+    expect(mockService.getTeacherAnalytics).toHaveBeenCalledWith(9, expect.objectContaining({ instanceId: 10, source: "offline_passcode" }));
+    expect(mockService.getTeacherAnalytics).not.toHaveBeenCalledWith(999, expect.anything());
+    expect(mockService.exportTeacherAnalyticsCsv).toHaveBeenCalledWith(9, expect.objectContaining({ instanceId: 10, source: "offline_passcode" }));
+    expect(mockService.exportTeacherAnalyticsCsv).not.toHaveBeenCalledWith(999, expect.anything());
     expect(mockService.getAdminAnalytics).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9 }));
     expect(mockService.exportAdminAnalyticsCsv).toHaveBeenCalled();
   });
