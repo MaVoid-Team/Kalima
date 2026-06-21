@@ -23,6 +23,22 @@ async function validateDto<T extends object>(
 }
 
 export const whatsappController = {
+  /** GET /settings/contact */
+  async getPublicContact(
+    _req: Request, res: Response, next: NextFunction
+  ): Promise<void> {
+    try {
+      const settings = await generalSettingsService.getSettings();
+      res.json({
+        success: true,
+        data: {
+          whatsapp: settings.whatsapp_receiving_number,
+          whatsapp_number: settings.whatsapp_receiving_number,
+        },
+      });
+    } catch (err) { next(err); }
+  },
+
   /** GET /admin/general-settings */
   async getGeneralSettings(
     _req: Request, res: Response, next: NextFunction

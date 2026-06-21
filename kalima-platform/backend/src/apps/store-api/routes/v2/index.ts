@@ -19,6 +19,7 @@ import adminDashboardRoutes from "./admin-dashboard.routes";
 import notificationRoutes from "./notification.routes";
 import appreciationRoutes from "./appreciation.routes";
 import eBookletRoutes from "./e-booklet.routes";
+import settingsRoutes from "./settings.routes";
 
 const router = Router();
 
@@ -44,6 +45,7 @@ router.use("/profile", userProfileRoutes);
 // Payment Methods
 router.use("/payment-methods", paymentMethodRoutes);
 router.use("/appreciation", appreciationRoutes);
+router.use("/settings", settingsRoutes);
 
 // Admin Routes
 router.use("/admin", adminRoutes);
@@ -58,4 +60,3 @@ router.use("/notifications", notificationRoutes);
 router.use("/", eBookletRoutes);
 
 export default router;
-
