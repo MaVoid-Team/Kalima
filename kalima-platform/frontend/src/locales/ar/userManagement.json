@@ -45,6 +45,8 @@
     "appreciation": "صفحة التقدير",
     "approve": "اعتماد",
     "reject": "رفض",
+    "impersonate": "انتحال الحساب",
+    "currentUser": "المستخدم الحالي",
     "delete": "حذف",
     "close": "إغلاق",
     "confirm": "تأكيد",
@@ -59,6 +61,7 @@
   "messages": {
     "approveSuccess": "تم اعتماد المستخدم بنجاح",
     "rejectSuccess": "تم رفض المستخدم بنجاح",
+    "impersonationStarted": "تم بدء انتحال الحساب",
     "deleteSuccess": "تم حذف المستخدم بنجاح",
     "revokeConfirm": "هل أنت متأكد من إلغاء هذا الدور؟ يجب أن يحتفظ المستخدم بدور واحد على الأقل.",
     "noRoles": "لم يتم تعيين أدوار"
@@ -171,7 +174,21 @@
     "teachingLevels": "المراحل الدراسية",
     "primary": "ابتدائي",
     "preparatory": "إعدادي",
-    "secondary": "ثانوي"
+    "secondary": "ثانوي",
+    "hidePassword": "إخفاء كلمة المرور",
+    "showPassword": "إظهار كلمة المرور",
+    "locationFields": "الموقع",
+    "studentFields": "بيانات الطالب",
+    "level": "المرحلة",
+    "selectLevel": "اختر المرحلة",
+    "parentPhone": "هاتف ولي الأمر",
+    "faction": "الفئة",
+    "assistantFields": "بيانات المساعد",
+    "lecturerId": "معرف المحاضر",
+    "selectType": "اختر النوع",
+    "namePlaceholder": "جون دو",
+    "selectGender": "اختر الجنس",
+    "factionPlaceholder": "ألفا، بيتا..."
   },
   "pagination": {
     "previous": "السابق",

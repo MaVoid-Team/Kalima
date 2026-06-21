@@ -39,6 +39,12 @@ app.use(
   },
   express.static(path.join(uploadsRoot, "samples")),
 );
+app.use("/uploads/e-booklets/private", (_req, res) => {
+  res.status(403).json({
+    success: false,
+    message: "Protected e-booklet files cannot be downloaded directly",
+  });
+});
 app.use("/uploads", express.static(uploadsRoot));
 
 app.get("/health", (_, res) => {

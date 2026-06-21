@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { arSA } from 'date-fns/locale';
-import { Eye, CheckCircle2, XCircle, Trash2, ChevronLeft, ChevronRight, HeartHandshake } from 'lucide-react';
+import { Eye, CheckCircle2, XCircle, Trash2, ChevronLeft, ChevronRight, HeartHandshake, UserCog } from 'lucide-react';
 
 import {
     Table,
@@ -38,6 +38,9 @@ export default function UsersTable({
     onApprove,
     onReject,
     onDelete,
+    onImpersonate,
+    currentUserId,
+    impersonatingUserId,
 }) {
     const { t, i18n } = useTranslation('userManagement');
     const isRtl = i18n.dir() === 'rtl';
@@ -102,6 +105,7 @@ export default function UsersTable({
                     <TableBody>
                         {users.map((user) => {
                             const primaryRole = user.role || user.user_roles?.[0]?.role;
+                            const isCurrentUser = Number(user.id) === Number(currentUserId);
                             const displayEmail = user.email?.includes('_deleted_')
                                 ? user.email.split('_deleted_')[0]
                                 : user.email;
@@ -191,6 +195,20 @@ export default function UsersTable({
                                                     <HeartHandshake className="h-4 w-4" />
                                                 </Link>
                                             </Button>
+
+                                            {!user.is_deleted && onImpersonate && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10"
+                                                    onClick={() => onImpersonate(user.id)}
+                                                    disabled={actionLoading || isCurrentUser || impersonatingUserId === user.id}
+                                                    title={isCurrentUser ? t('actions.currentUser') : t('actions.impersonate')}
+                                                    data-testid={`users-table-impersonate-${user.id}`}
+                                                >
+                                                    {impersonatingUserId === user.id ? <LoadingSpinner className="h-4 w-4" /> : <UserCog className="h-4 w-4" />}
+                                                </Button>
+                                            )}
 
                                             {/* Approve */}
                                             {!user.is_deleted && !user.confirmed && (

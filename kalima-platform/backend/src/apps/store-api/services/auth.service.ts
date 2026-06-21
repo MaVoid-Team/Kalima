@@ -1,10 +1,11 @@
 import { firebaseAuth } from "../../../libs/auth/firebase";
 import {
+  consumeRefreshToken,
   generateRefreshToken,
+  generateSingleSessionRefreshToken,
   revokeRefreshToken,
   revokeAllRefreshTokensForUser,
   signAccessToken,
-  verifyRefreshToken,
 } from "../../../libs/auth/jwt";
 import {
   TeacherRegistrationDto,
@@ -349,14 +350,12 @@ class AuthService {
   // ============================================
 
   async refresh(refreshToken: string): Promise<RefreshResponse> {
-    const payload = await verifyRefreshToken(refreshToken);
+    const payload = await consumeRefreshToken(refreshToken);
 
     if (!payload) {
       throw new UnauthorizedError("Invalid or expired refresh token");
     }
 
-    // Revoke old token and issue new ones
-    await revokeRefreshToken(refreshToken);
     const tokens = await this.issueTokens(payload.userId);
 
     return { tokens };
@@ -873,12 +872,21 @@ class AuthService {
       targetUserId: number;
       startedAt: string;
     },
+    options?: { skipSingleSessionRevocation?: boolean },
   ): Promise<AuthTokens> {
     const user = await this.userService.findUserById(userId);
     const roleRows = user?.user_roles ?? [];
+    const shouldRevokeExistingSessions =
+      !options?.skipSingleSessionRevocation &&
+      !this.hasAdminSideRole(roleRows);
+
+    const refresh = shouldRevokeExistingSessions
+      ? await generateSingleSessionRefreshToken(userId)
+      : await generateRefreshToken(userId);
 
     const accessToken = signAccessToken({
       userId,
+      sessionId: refresh.id,
       roles: roleRows.map((r) => ({
         portal: r.portal,
         role: r.role,
@@ -886,13 +894,24 @@ class AuthService {
       ...(impersonation ? { impersonation } : {}),
     });
 
-    const refresh = await generateRefreshToken(userId);
-
     return {
       accessToken,
       refreshToken: refresh.token,
       refreshTokenExpiresAt: refresh.expiresAt,
     };
+  }
+
+  private hasAdminSideRole(roles: Array<{ role: role_enum }>): boolean {
+    const adminSideRoles: role_enum[] = [
+      role_enum.Admin,
+      role_enum.SubAdmin,
+      role_enum.Moderator,
+      role_enum.Assistant,
+    ];
+
+    return roles.some((roleEntry) =>
+      adminSideRoles.includes(roleEntry.role),
+    );
   }
 
   private calculatePortalAccess(

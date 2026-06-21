@@ -24,6 +24,26 @@ import {
   E_BOOKLET_TEACHER_LIBRARY_ROUTE,
 } from "./eBookletOrdersContract.mjs";
 
+const getStatus = (value) => String(value || "unknown").toLowerCase();
+
+const getManagementPath = (link) => {
+  const instanceId = link?.booklet_instance?.id || link?.booklet_instance_id || link?.instance_id;
+  return instanceId ? `/teacher/e-booklets/${instanceId}/invites` : E_BOOKLET_TEACHER_LIBRARY_ROUTE;
+};
+
+const canManageLink = (order, link) => {
+  const orderStatus = getStatus(order?.status);
+  const linkStatus = getStatus(link?.status);
+
+  return Boolean(link?.booklet_instance?.id || link?.booklet_instance_id || link?.instance_id) && (
+    ["approved", "ready", "confirmed"].includes(linkStatus) ||
+    ["ready", "confirmed"].includes(orderStatus)
+  );
+};
+
+const getOrderItemLinks = (order) => order?.e_booklet_student_purchase_links || order?.instances || [];
+const getOrderReference = (order) => order?.purchase_serial || order?.serial || order?.reference || `#${order?.id}`;
+
 export default function EBookletOrdersPage() {
   const { t } = useTranslation("eBooklets");
   const { orders, pagination, filters, fetchOrders, setStatus, setPage, loading, error } = useEBookletOrders();
@@ -83,7 +103,14 @@ export default function EBookletOrdersPage() {
         ) : orders.length > 0 ? (
           <div className="flex flex-col space-y-4">
             {orders.map((order) => (
-              <EBookletOrderCard key={order.id} order={order} />
+              <EBookletOrderCard
+                key={order.id}
+                order={order}
+                itemLinks={getOrderItemLinks(order)}
+                reference={getOrderReference(order)}
+                canManageLink={canManageLink}
+                getManagementPath={getManagementPath}
+              />
             ))}
           </div>
         ) : (

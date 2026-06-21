@@ -25,10 +25,10 @@ export default function BookletAccordions({ product }) {
           <p className="mb-4">{product.description}</p>
           <ul className="list-disc ps-5 space-y-1">
             <li>
-              <strong>Grade Level:</strong> {product.gradeLevel || "4 - 6"}
+              <strong>{t("booklet.gradeLevel")}</strong> {product.gradeLevel || "4 - 6"}
             </li>
             <li>
-              <strong>Subject:</strong>{" "}
+              <strong>{t("booklet.subject")}</strong>{" "}
               {product.subject || "Earth Sciences, Biology"}
             </li>
           </ul>
@@ -42,8 +42,7 @@ export default function BookletAccordions({ product }) {
         </AccordionTrigger>
         <AccordionContent className="text-muted-foreground">
           <p>
-            Aligned with Next Generation Science Standards (NGSS) for 5th Grade
-            Life Science.
+            {t("booklet.curriculumAlignmentDescription")}
           </p>
         </AccordionContent>
       </AccordionItem>
@@ -54,7 +53,7 @@ export default function BookletAccordions({ product }) {
           {t("booklet.fileDetails", "File Details")}
         </AccordionTrigger>
         <AccordionContent className="text-muted-foreground">
-          <p>PDF (A4 and Letter size included). 20 Pages total.</p>
+          <p>{t("booklet.fileDetailsDescription")}</p>
         </AccordionContent>
       </AccordionItem>
 
@@ -65,8 +64,7 @@ export default function BookletAccordions({ product }) {
         </AccordionTrigger>
         <AccordionContent className="text-muted-foreground">
           <p>
-            ScienceWithSarah - Creating interactive learning materials since
-            2018.
+            {t("booklet.publisherDescription")}
           </p>
         </AccordionContent>
       </AccordionItem>

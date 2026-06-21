@@ -298,5 +298,51 @@
       "learningLabel": "Learning & education",
       "marketLabel": "Marketplace"
     }
+  },
+  "privacyPolicy": {
+    "eyebrow": "Privacy",
+    "title": "Privacy Policy",
+    "intro": "This policy explains how Kalima handles account, learning, marketplace, and support data.",
+    "lastUpdated": "Last updated: June 2026",
+    "sections": [
+      {
+        "title": "Information we collect",
+        "body": "We collect account details, contact information, learning activity, order details, uploaded payment proof, and support messages needed to operate Kalima."
+      },
+      {
+        "title": "How we use information",
+        "body": "We use data to provide access, process purchases, manage teacher and student workflows, secure accounts, and respond to support requests."
+      },
+      {
+        "title": "Data sharing",
+        "body": "We do not sell personal data. We share data only with service providers or administrators who need it to operate the platform."
+      },
+      {
+        "title": "Your choices",
+        "body": "You can request correction or deletion of your account data by contacting Kalima support."
+      }
+    ]
+  },
+  "dataDeletion": {
+    "eyebrow": "Account data",
+    "title": "Delete My Data",
+    "intro": "Request deletion of your Kalima account and associated personal data.",
+    "lastUpdated": "Last updated: June 2026",
+    "requestTitle": "Send a deletion request",
+    "requestBody": "We will verify your identity, review required retention obligations, and confirm when eligible data has been deleted.",
+    "requestButton": "Request deletion on WhatsApp",
+    "loading": "Opening WhatsApp...",
+    "stepsTitle": "How deletion works",
+    "steps": [
+      "Send your request from the WhatsApp number or email linked to your account.",
+      "Kalima support verifies ownership and any active orders or access records.",
+      "Eligible personal data is deleted or anonymized, then confirmation is sent to you."
+    ],
+    "dataTitle": "Data that may be affected",
+    "notes": [
+      "Some transaction, tax, fraud-prevention, or legal records may need to be retained.",
+      "Deleted accounts may lose access to courses, e-booklets, orders, and support history."
+    ],
+    "whatsappMessage": "Hello, I want to request deletion of my Kalima account and associated data."
   }
 }

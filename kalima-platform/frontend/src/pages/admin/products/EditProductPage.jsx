@@ -986,7 +986,7 @@ export default function EditProductPage() {
                                                 onCheckedChange={(checked) => handleToggleAttachedFieldRequired(field.id, checked)}
                                                 disabled={actionLoading}
                                                 className="scale-75 origin-left rtl:origin-right"
-                                                aria-label="Toggle required status"
+                                                aria-label={t('products.detail.toggleRequiredStatus')}
                                             />
                                         </div>
 

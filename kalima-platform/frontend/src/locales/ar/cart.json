@@ -24,6 +24,7 @@
   "requiredFieldsUpdated": "تم تحديث الخانات المطلوبة",
   "itemsInCart": "لديك {{count}} عنصر في سلة التسوق جاهز للدفع.",
   "orderSummary": "ملخص الطلب",
+  "whatsappItemsCount": "عدد المنتجات",
   "fillRequiredFields": "يرجى ملء جميع الخانات المطلوبة لعناصر السلة قبل المتابعة إلى الدفع.",
   "fillRequiredFieldsHint": "يمكنك القيام بذلك عن طريق النقر على 'عرض المزيد' الأحمر لكل عنصر وملء الخانات المطلوبة.",
   "fillRequiredFields_Client_Missing": "يرجى ملء الخانات المطلوبة المظللة أولاً.",

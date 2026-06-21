@@ -11,6 +11,25 @@ jest.mock("../../src/apps/store-api/services/checkout-validation.service", () =>
 import { EBookletService } from "../../src/apps/store-api/services/e-booklet.service";
 import { hashInviteToken } from "../../src/apps/store-api/utils/e-booklet-token";
 
+function createViewerPageToken(input: {
+  instanceId: number;
+  pageNumber: number;
+  userId: number;
+  expiresAt?: Date;
+}) {
+  const body = Buffer.from(JSON.stringify({
+    instanceId: input.instanceId,
+    pageNumber: input.pageNumber,
+    userId: input.userId,
+    expiresAt: (input.expiresAt || new Date(Date.now() + 300_000)).toISOString(),
+  })).toString("base64url");
+  const signature = crypto
+    .createHmac("sha256", process.env.E_BOOKLET_PAGE_TOKEN_SECRET || process.env.JWT_SECRET || "dev-e-booklet-page-token-secret")
+    .update(body)
+    .digest("base64url");
+  return `${body}.${signature}`;
+}
+
 function createMockDb(overrides: Record<string, unknown> = {}) {
   const db: any = {
     e_booklet_templates: {
@@ -657,6 +676,77 @@ describe("EBookletService", () => {
       }));
     });
 
+    test("lists admin e-booklet purchases with shared search, date, total, and status filters", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.findMany.mockResolvedValue([{ id: 91, status: "pending" }]);
+      db.e_booklet_purchases.count.mockResolvedValue(1);
+
+      const service = new EBookletService(db);
+      const result: any = await service.listPurchases({
+        page: 2,
+        limit: 5,
+        status: "pending",
+        search: "Sara",
+        startDate: "2026-06-01T00:00:00.000Z",
+        endDate: "2026-06-30T23:59:59.000Z",
+        minTotal: 100,
+        maxTotal: 300,
+      });
+
+      const expectedWhere = expect.objectContaining({
+        status: "pending",
+        created_at: {
+          gte: new Date("2026-06-01T00:00:00.000Z"),
+          lte: new Date("2026-06-30T23:59:59.000Z"),
+        },
+        AND: expect.arrayContaining([
+          {
+            OR: [
+              { final_payable_price: { not: null, gte: 100, lte: 300 } },
+              { final_payable_price: null, price: { gte: 100, lte: 300 } },
+            ],
+          },
+          {
+            OR: expect.arrayContaining([
+              { teacher: { name: { contains: "Sara", mode: "insensitive" } } },
+              { template: { title: { contains: "Sara", mode: "insensitive" } } },
+              { payment_reference: { contains: "Sara", mode: "insensitive" } },
+            ]),
+          },
+        ]),
+      });
+
+      expect(db.e_booklet_purchases.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: expectedWhere,
+        orderBy: { created_at: "desc" },
+        skip: 5,
+        take: 5,
+      }));
+      expect(db.e_booklet_purchases.count).toHaveBeenCalledWith({ where: expectedWhere });
+      expect(result).toEqual(expect.objectContaining({ data: [{ id: 91, status: "pending" }], total: 1, page: 2, limit: 5 }));
+    });
+
+    test("treats admin purchase date-only endDate as the end of that day", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.findMany.mockResolvedValue([]);
+      db.e_booklet_purchases.count.mockResolvedValue(0);
+
+      const service = new EBookletService(db);
+      await service.listPurchases({
+        startDate: "2026-06-01",
+        endDate: "2026-06-30",
+      });
+
+      expect(db.e_booklet_purchases.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: expect.objectContaining({
+          created_at: {
+            gte: new Date("2026-06-01T00:00:00.000Z"),
+            lte: new Date("2026-06-30T23:59:59.999Z"),
+          },
+        }),
+      }));
+    });
+
     test("admin approval of a teacher checkout purchase creates the teacher management instance and access", async () => {
       const db = createMockDb();
       db.e_booklet_purchases.findUnique.mockResolvedValue({
@@ -1211,6 +1301,20 @@ describe("EBookletService", () => {
       await expect(service.deleteHotspotPreset(2)).resolves.toEqual(expect.objectContaining({ action: "archived" }));
       expect(db.e_booklet_hotspot_presets.delete).toHaveBeenCalledWith({ where: { id: 1 } });
       expect(db.e_booklet_hotspot_presets.update).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 2 }, data: expect.objectContaining({ is_active: false }) }));
+    });
+
+    test("restores archived presets and rejects missing preset ids cleanly", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspot_presets.findUnique
+        .mockResolvedValueOnce({ id: 3 })
+        .mockResolvedValueOnce(null);
+      db.e_booklet_hotspot_presets.update.mockResolvedValue({ id: 3, is_active: true, tags_json: [] });
+      const service = new EBookletService(db);
+
+      await expect(service.restoreHotspotPreset(3, 9)).resolves.toEqual(expect.objectContaining({ id: 3, is_active: true }));
+      await expect(service.restoreHotspotPreset(404, 9)).rejects.toThrow("E-booklet hotspot preset not found");
+      expect(db.e_booklet_hotspot_presets.update).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 3 }, data: expect.objectContaining({ is_active: true, updated_by: 9 }) }));
+      expect(db.e_booklet_hotspot_presets.update).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -2164,9 +2268,25 @@ describe("EBookletService", () => {
 
       const service = new EBookletService(db);
 
-      await expect(service.getAuthorizedViewerDocument(10, 55)).rejects.toThrow(
+      await expect(service.getAuthorizedViewerDocument(10, 55, 1, createViewerPageToken({ instanceId: 10, pageNumber: 1, userId: 55 }))).rejects.toThrow(
         "E-booklet PDF file is not available.",
       );
+    });
+
+    test("requires valid page-scoped tokens before serving viewer PDF pages", async () => {
+      const db = createMockDb();
+      const service = new EBookletService(db);
+
+      await expect(service.getAuthorizedViewerDocument(10, 55, 1, "")).rejects.toThrow(
+        "A valid e-booklet page token is required.",
+      );
+      await expect(service.getAuthorizedViewerDocument(10, 55, 2, createViewerPageToken({ instanceId: 10, pageNumber: 1, userId: 55 }))).rejects.toThrow(
+        "A valid e-booklet page token is required.",
+      );
+      await expect(service.getAuthorizedViewerDocument(10, 55, 1, createViewerPageToken({ instanceId: 10, pageNumber: 1, userId: 55, expiresAt: new Date(Date.now() - 1_000) }))).rejects.toThrow(
+        "A valid e-booklet page token is required.",
+      );
+      expect(db.e_booklet_access.findFirst).not.toHaveBeenCalled();
     });
 
     test("does not expose private storage keys from hotspot content", async () => {
@@ -2199,12 +2319,12 @@ describe("EBookletService", () => {
       });
       db.e_booklet_access.findFirst.mockResolvedValue({
         id: 1,
-        booklet_instance: { id: 10, status: "active" },
+        booklet_instance: { id: 10, status: "active", template_version_id: 22 },
       });
 
       const service = new EBookletService(db);
 
-      const result = await service.getHotspotContent(77, 55);
+      const result = await service.getHotspotContent(10, 77, 55);
       const serialized = JSON.stringify(result);
 
       expect(serialized).not.toContain("storage_key");
@@ -2237,15 +2357,32 @@ describe("EBookletService", () => {
         template_version: { instances: [{ id: 10 }] },
       });
       db.e_booklet_access.findFirst.mockResolvedValue({
-        booklet_instance: { id: 10, status: "active", access_expires_at: new Date("2026-01-01T00:00:00.000Z") },
+        booklet_instance: { id: 10, status: "active", template_version_id: 22, access_expires_at: new Date("2026-01-01T00:00:00.000Z") },
       });
 
       const service = new EBookletService(db);
-      await expect(service.getHotspotContent(77, 55)).rejects.toThrow("This e-booklet has expired.");
+      await expect(service.getHotspotContent(10, 77, 55)).rejects.toThrow("This e-booklet has expired.");
       expect(db.e_booklet_instances.update).toHaveBeenCalledWith({
         where: { id: 10 },
         data: expect.objectContaining({ status: "archived", archive_reason: "expired" }),
       });
+    });
+
+    test("denies inactive hotspot content even when the viewer can access the instance", async () => {
+      const db = createMockDb();
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 1,
+        booklet_instance: { id: 10, status: "active", template_version_id: 22, access_expires_at: null },
+      });
+      db.e_booklet_hotspots.findUnique.mockResolvedValue({
+        id: 77,
+        template_version_id: 22,
+        is_active: false,
+      });
+
+      const service = new EBookletService(db);
+
+      await expect(service.getHotspotContent(10, 77, 55)).rejects.toThrow("You do not have access to this hotspot.");
     });
 
     test("authorizes hotspot asset access by active instance access and audits the download", async () => {
@@ -2259,7 +2396,7 @@ describe("EBookletService", () => {
       });
       db.e_booklet_access.findFirst.mockResolvedValue({
         id: 1,
-        booklet_instance: { id: 10, status: "active", access_expires_at: null },
+        booklet_instance: { id: 10, status: "active", template_version_id: 22, access_expires_at: null },
       });
       db.e_booklet_file_assets.findUnique.mockResolvedValue({
         id: 123,
@@ -2272,7 +2409,7 @@ describe("EBookletService", () => {
       });
 
       const service = new EBookletService(db);
-      const result: any = await service.getAuthorizedHotspotAsset(77, 123, 55);
+      const result: any = await service.getAuthorizedHotspotAsset(10, 77, 123, 55);
 
       expect(result.asset).toEqual(expect.objectContaining({ id: 123, original_filename: "audio.mp3" }));
       expect(result.absolutePath).toContain("audio.mp3");
@@ -2298,7 +2435,54 @@ describe("EBookletService", () => {
       });
       const service = new EBookletService(db);
 
-      await expect(service.getAuthorizedHotspotAsset(77, 123, 55)).rejects.toThrow("You do not have access to this hotspot asset.");
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 1,
+        booklet_instance: { id: 10, status: "active", template_version_id: 22, access_expires_at: null },
+      });
+
+      await expect(service.getAuthorizedHotspotAsset(10, 77, 123, 55)).rejects.toThrow("You do not have access to this hotspot asset.");
+    });
+
+    test("denies inactive hotspot assets even when the asset is referenced", async () => {
+      const db = createMockDb();
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 1,
+        booklet_instance: { id: 10, status: "active", template_version_id: 22, access_expires_at: null },
+      });
+      db.e_booklet_hotspots.findUnique.mockResolvedValue({
+        id: 77,
+        template_version_id: 22,
+        is_active: false,
+        asset_file_id: 123,
+        content_json: { blocks: [] },
+      });
+
+      const service = new EBookletService(db);
+
+      await expect(service.getAuthorizedHotspotAsset(10, 77, 123, 55)).rejects.toThrow("You do not have access to this hotspot asset.");
+      expect(db.e_booklet_file_assets.findUnique).not.toHaveBeenCalled();
+    });
+
+    test("denies inactive admin hotspot content and assets", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspots.findUnique.mockResolvedValueOnce({
+        id: 77,
+        is_active: false,
+        template_version: { instances: [{ id: 10 }] },
+      });
+      db.e_booklet_hotspots.findUnique.mockResolvedValueOnce({
+        id: 77,
+        is_active: false,
+        asset_file_id: 123,
+        content_json: { blocks: [] },
+        template_version: { instances: [{ id: 10 }] },
+      });
+
+      const service = new EBookletService(db);
+
+      await expect(service.getAdminHotspotContent(10, 77)).rejects.toThrow("E-booklet hotspot not found for this instance.");
+      await expect(service.getAdminAuthorizedHotspotAsset(10, 77, 123)).rejects.toThrow("You do not have access to this hotspot asset.");
+      expect(db.e_booklet_file_assets.findUnique).not.toHaveBeenCalled();
     });
   });
 

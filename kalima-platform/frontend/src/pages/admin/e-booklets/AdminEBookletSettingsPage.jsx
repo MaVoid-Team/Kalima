@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAdminEBookletSettings } from "@/hooks/admin/useAdminEBooklets";
+import { useTranslation } from "react-i18next";
 
 const emptyForm = {
   defaultInviteQuota: "0",
@@ -126,6 +127,7 @@ function ToggleRow({ label, checked, onCheckedChange, hint }) {
 }
 
 export default function AdminEBookletSettingsPage() {
+  const { t } = useTranslation("eBooklets");
   const { settings, loading, fetchSettings, updateSettings } = useAdminEBookletSettings();
   const [form, setForm] = useState(emptyForm);
 
@@ -151,20 +153,20 @@ export default function AdminEBookletSettingsPage() {
           <div className="flex items-start gap-3">
             <Settings className="mt-1 h-5 w-5 text-primary" />
             <div>
-              <h2 className="text-xl font-semibold">E-Booklet Settings</h2>
+              <h2 className="text-xl font-semibold">{t("admin.settings.title")}</h2>
               <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-                Configure global defaults and policies used across the eBooklet workspace.
+                {t("admin.settings.description")}
               </p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="outline" onClick={fetchSettings} disabled={loading}>
               <RefreshCcw className="me-2 h-4 w-4" />
-              Refresh
+              {t("admin.settings.refresh")}
             </Button>
             <Button type="submit" disabled={loading}>
               <Save className="me-2 h-4 w-4" />
-              Save settings
+              {t("admin.settings.save")}
             </Button>
           </div>
         </div>
@@ -173,77 +175,77 @@ export default function AdminEBookletSettingsPage() {
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Link className="rounded-2xl border bg-background p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md" to="/admin/e-booklets/settings/terms-milestones">
           <CalendarRange className="h-5 w-5 text-primary" />
-          <h3 className="mt-4 font-semibold">Terms & Milestones</h3>
-          <p className="mt-2 text-sm text-muted-foreground">Manage active eBooklet terms and milestone rewards.</p>
+          <h3 className="mt-4 font-semibold">{t("admin.settings.termsMilestonesTitle")}</h3>
+          <p className="mt-2 text-sm text-muted-foreground">{t("admin.settings.termsMilestonesDescription")}</p>
         </Link>
       </div>
 
-      <SettingsSection icon={Truck} title="Delivery Defaults" description="Starting values for new eBooklet deliveries and invite setup.">
-        <Field label="Default invite quota" hint="How many student invites a delivered eBooklet starts with.">
+      <SettingsSection icon={Truck} title={t("admin.settings.deliveryDefaults")} description={t("admin.settings.deliveryDefaultsDescription")}>
+        <Field label={t("admin.settings.defaultInviteQuota")} hint={t("admin.settings.defaultInviteQuotaHint")}>
           <Input type="number" min="0" value={form.defaultInviteQuota} onChange={(event) => updateField("defaultInviteQuota", event.target.value)} />
         </Field>
-        <Field label="Access duration days" hint="Leave blank for no automatic access expiry default.">
+        <Field label={t("admin.settings.accessDurationDays")} hint={t("admin.settings.accessDurationDaysHint")}>
           <Input type="number" min="0" value={form.defaultAccessDurationDays} onChange={(event) => updateField("defaultAccessDurationDays", event.target.value)} />
         </Field>
-        <Field label="Invite expiration days" hint="Leave blank when invite links/codes should not expire by default.">
+        <Field label={t("admin.settings.inviteExpirationDays")} hint={t("admin.settings.inviteExpirationDaysHint")}>
           <Input type="number" min="0" value={form.defaultInviteExpirationDays} onChange={(event) => updateField("defaultInviteExpirationDays", event.target.value)} />
         </Field>
-        <Field label="Default delivery notes">
-          <Textarea value={form.defaultDeliveryNotes} onChange={(event) => updateField("defaultDeliveryNotes", event.target.value)} placeholder="Optional internal delivery guidance" />
+        <Field label={t("admin.settings.defaultDeliveryNotes")}>
+          <Textarea value={form.defaultDeliveryNotes} onChange={(event) => updateField("defaultDeliveryNotes", event.target.value)} placeholder={t("admin.settings.defaultDeliveryNotesPlaceholder")} />
         </Field>
       </SettingsSection>
 
-      <SettingsSection icon={ShieldCheck} title="Pricing Defaults" description="Default prices copied into eBooklet delivery and access decisions.">
-        <Field label="Student marketing price" hint="Public-facing suggested student price.">
+      <SettingsSection icon={ShieldCheck} title={t("admin.settings.pricingDefaults")} description={t("admin.settings.pricingDefaultsDescription")}>
+        <Field label={t("admin.settings.studentMarketingPrice")} hint={t("admin.settings.studentMarketingPriceHint")}>
           <Input type="number" min="0" step="0.01" value={form.defaultStudentMarketingPrice} onChange={(event) => updateField("defaultStudentMarketingPrice", event.target.value)} />
         </Field>
-        <Field label="Internal teacher cost" hint="Internal baseline cost used for teacher/access economics.">
+        <Field label={t("admin.settings.internalTeacherCost")} hint={t("admin.settings.internalTeacherCostHint")}>
           <Input type="number" min="0" step="0.01" value={form.defaultInternalPrice} onChange={(event) => updateField("defaultInternalPrice", event.target.value)} />
         </Field>
       </SettingsSection>
 
-      <SettingsSection icon={KeyRound} title="Access-Code Policy" description="Defaults and limits for generated eBooklet access codes.">
-        <Field label="Default access-code kind">
+      <SettingsSection icon={KeyRound} title={t("admin.settings.accessCodePolicy")} description={t("admin.settings.accessCodePolicyDescription")}>
+        <Field label={t("admin.settings.defaultAccessCodeKind")}>
           <Select value={form.defaultAccessCodeKind} onValueChange={(value) => updateField("defaultAccessCodeKind", value)}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="free">Free</SelectItem>
+              <SelectItem value="paid">{t("admin.settings.paid")}</SelectItem>
+              <SelectItem value="free">{t("admin.settings.free")}</SelectItem>
             </SelectContent>
           </Select>
         </Field>
-        <Field label="Max bulk access codes" hint="Upper bound for one bulk generation request.">
+        <Field label={t("admin.settings.maxBulkAccessCodes")} hint={t("admin.settings.maxBulkAccessCodesHint")}>
           <Input type="number" min="1" value={form.maxBulkAccessCodes} onChange={(event) => updateField("maxBulkAccessCodes", event.target.value)} />
         </Field>
-        <Field label="Access-code expiration days" hint="Leave blank when generated codes should not expire by default.">
+        <Field label={t("admin.settings.accessCodeExpirationDays")} hint={t("admin.settings.accessCodeExpirationDaysHint")}>
           <Input type="number" min="0" value={form.defaultAccessCodeExpirationDays} onChange={(event) => updateField("defaultAccessCodeExpirationDays", event.target.value)} />
         </Field>
         <ToggleRow
-          label="Require terms before code generation"
-          hint="Teachers must accept current eBooklet terms before creating access codes."
+          label={t("admin.settings.requireTermsBeforeCodeGeneration")}
+          hint={t("admin.settings.requireTermsBeforeCodeGenerationHint")}
           checked={form.requireTermsForCodeGeneration}
           onCheckedChange={(value) => updateField("requireTermsForCodeGeneration", value)}
         />
       </SettingsSection>
 
-      <SettingsSection icon={Smartphone} title="Device Policy" description="Default viewer device limits and reset guidance.">
-        <Field label="Allowed student devices">
+      <SettingsSection icon={Smartphone} title={t("admin.settings.devicePolicy")} description={t("admin.settings.devicePolicyDescription")}>
+        <Field label={t("admin.settings.allowedStudentDevices")}>
           <Input type="number" min="1" value={form.defaultAllowedDevicesPerStudent} onChange={(event) => updateField("defaultAllowedDevicesPerStudent", event.target.value)} />
         </Field>
-        <Field label="Allowed teacher devices">
+        <Field label={t("admin.settings.allowedTeacherDevices")}>
           <Input type="number" min="1" value={form.defaultAllowedDevicesPerTeacher} onChange={(event) => updateField("defaultAllowedDevicesPerTeacher", event.target.value)} />
         </Field>
-        <Field label="Device reset policy">
-          <Textarea value={form.deviceResetPolicy} onChange={(event) => updateField("deviceResetPolicy", event.target.value)} placeholder="Explain when admins should reset or expand device access" />
+        <Field label={t("admin.settings.deviceResetPolicy")}>
+          <Textarea value={form.deviceResetPolicy} onChange={(event) => updateField("deviceResetPolicy", event.target.value)} placeholder={t("admin.settings.deviceResetPolicyPlaceholder")} />
         </Field>
       </SettingsSection>
 
-      <SettingsSection icon={Bell} title="Notification Rules" description="Choose who should be notified for key eBooklet events.">
-        <ToggleRow label="Notify admins on delivery" checked={form.notifyAdminsOnDelivery} onCheckedChange={(value) => updateField("notifyAdminsOnDelivery", value)} />
-        <ToggleRow label="Notify teacher on delivery" checked={form.notifyTeacherOnDelivery} onCheckedChange={(value) => updateField("notifyTeacherOnDelivery", value)} />
-        <ToggleRow label="Notify admins on milestone" checked={form.notifyAdminsOnMilestone} onCheckedChange={(value) => updateField("notifyAdminsOnMilestone", value)} />
-        <ToggleRow label="Notify teacher on milestone" checked={form.notifyTeacherOnMilestone} onCheckedChange={(value) => updateField("notifyTeacherOnMilestone", value)} />
-        <ToggleRow label="Notify admins on access-code redemption" checked={form.notifyAdminsOnAccessCodeRedemption} onCheckedChange={(value) => updateField("notifyAdminsOnAccessCodeRedemption", value)} />
+      <SettingsSection icon={Bell} title={t("admin.settings.notificationRules")} description={t("admin.settings.notificationRulesDescription")}>
+        <ToggleRow label={t("admin.settings.notifyAdminsOnDelivery")} checked={form.notifyAdminsOnDelivery} onCheckedChange={(value) => updateField("notifyAdminsOnDelivery", value)} />
+        <ToggleRow label={t("admin.settings.notifyTeacherOnDelivery")} checked={form.notifyTeacherOnDelivery} onCheckedChange={(value) => updateField("notifyTeacherOnDelivery", value)} />
+        <ToggleRow label={t("admin.settings.notifyAdminsOnMilestone")} checked={form.notifyAdminsOnMilestone} onCheckedChange={(value) => updateField("notifyAdminsOnMilestone", value)} />
+        <ToggleRow label={t("admin.settings.notifyTeacherOnMilestone")} checked={form.notifyTeacherOnMilestone} onCheckedChange={(value) => updateField("notifyTeacherOnMilestone", value)} />
+        <ToggleRow label={t("admin.settings.notifyAdminsOnAccessCodeRedemption")} checked={form.notifyAdminsOnAccessCodeRedemption} onCheckedChange={(value) => updateField("notifyAdminsOnAccessCodeRedemption", value)} />
       </SettingsSection>
     </form>
   );

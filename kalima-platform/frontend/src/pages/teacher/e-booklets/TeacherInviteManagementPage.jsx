@@ -162,6 +162,23 @@ export default function TeacherInviteManagementPage() {
 
   const generatePaidMessageCode = () => requireTermsFor((acceptedTermId) => runCodeGeneration("message", acceptedTermId));
   const generatePaidCodeOnly = () => requireTermsFor((acceptedTermId) => runCodeGeneration("code", acceptedTermId));
+  const generateFreeSharedCode = async () => {
+    const response = await createAccessCode(instanceId, { kind: "free", maxRedemptions: null });
+    const code = getCode(response);
+    const whatsappMessage = getMessage(response);
+    const record = getRecord(response);
+    setGeneratedCodes((current) => [{
+      id: record.id || `free-${Date.now()}`,
+      kind: "free",
+      mode: "shared",
+      code,
+      whatsappMessage,
+      codeHint: record.code_hint,
+      createdAt: record.created_at || new Date().toISOString(),
+    }, ...current]);
+    fetchAccessCodes(instanceId).catch(() => {});
+    if (whatsappMessage) await copyText(whatsappMessage, "toasts.accessMessageCopied");
+  };
   const generateBulkPaidCodes = () => requireTermsFor(async (acceptedTermId) => {
     const count = Math.max(1, Number(bulkCount) || 1);
     const response = await createAccessCodes(instanceId, { kind: "paid", termId: acceptedTermId, count, maxRedemptions: 1 });
@@ -255,6 +272,11 @@ export default function TeacherInviteManagementPage() {
               <Copy className="h-4 w-4" />
               {t("teacher.invites.generatePaidCodeOnly")}
             </Button>
+            <Button onClick={generateFreeSharedCode} disabled={loading} variant="outline" className="h-auto min-h-10 w-full whitespace-normal break-words text-center leading-snug">
+              <Copy className="h-4 w-4" />
+              {t("teacher.invites.generateFreeSharedCode", { defaultValue: "Create free shared tracking code" })}
+            </Button>
+            <p className="text-xs text-muted-foreground">{t("teacher.invites.notPaidProgress")}</p>
             <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]" data-testid="bulk-access-code-controls">
               <input
                 type="number"

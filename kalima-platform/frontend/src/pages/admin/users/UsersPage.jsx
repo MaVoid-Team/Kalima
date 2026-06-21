@@ -1,15 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Users } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
+import useAuth from '@/hooks/auth/useAuth';
 import UserStatsCards from '@/components/admin/users/UserStatsCards';
 import UserFilters from '@/components/admin/users/UserFilters';
 import UsersTable from '@/components/admin/users/UsersTable';
 import CreateUserDialog from '@/components/admin/users/CreateUserDialog';
+import { startImpersonation } from '@/services/impersonationService';
 
 export default function UsersPage() {
     const { t } = useTranslation('userManagement');
+    const navigate = useNavigate();
+    const { user: currentUser } = useAuth();
 
     const {
         users,
@@ -25,6 +31,7 @@ export default function UsersPage() {
     const [page, setPage]       = useState(1);
     const [search, setSearch]   = useState('');
     const [role, setRole]       = useState('');
+    const [impersonatingUserId, setImpersonatingUserId] = useState(null);
 
     // ── Fetch whenever filters / page change ──────────────────────────────
     const loadUsers = useCallback(() => {
@@ -60,6 +67,19 @@ export default function UsersPage() {
     const handleDelete = async (userId) => {
         await deleteUser(userId);
         loadUsers();
+    };
+
+    const handleImpersonate = async (userId) => {
+        setImpersonatingUserId(userId);
+        try {
+            const result = await startImpersonation(userId);
+            toast.success(t('messages.impersonationStarted'));
+            window.dispatchEvent(new Event('auth-session-changed'));
+            navigate(result.redirectTo, { replace: true });
+            window.location.reload();
+        } finally {
+            setImpersonatingUserId(null);
+        }
     };
 
     return (
@@ -104,6 +124,9 @@ export default function UsersPage() {
                 onApprove={handleApprove}
                 onReject={handleReject}
                 onDelete={handleDelete}
+                onImpersonate={handleImpersonate}
+                currentUserId={currentUser?.id}
+                impersonatingUserId={impersonatingUserId}
             />
         </div>
     );

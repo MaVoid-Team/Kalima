@@ -347,15 +347,17 @@ export function useEBookletOrders() {
       const nextPage = params.page ?? pagination.page;
       const nextLimit = params.limit ?? pagination.limit;
       const nextStatus = params.status ?? filters.status;
-      const query = new URLSearchParams();
-      query.set("page", String(nextPage));
-      query.set("limit", String(nextLimit));
-      if (nextStatus && nextStatus !== "all") query.set("status", nextStatus);
+      const query = {
+        page: nextPage,
+        limit: nextLimit,
+        ...(nextStatus && nextStatus !== "all" ? { status: nextStatus } : {}),
+      };
 
       const response = await fetchApi(
         {
-          endpoint: `/e-booklet-orders?${query.toString()}`,
+          endpoint: "/e-booklet-orders",
           method: "get",
+          params: query,
         },
         false,
       );

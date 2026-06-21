@@ -270,7 +270,7 @@ export default function CreateUserDialog({ onSuccess }) {
                                     <Select dir={i18n.dir()} onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select type" />
+                                                <SelectValue placeholder={t('createDialog.selectType')} />
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
@@ -296,7 +296,7 @@ export default function CreateUserDialog({ onSuccess }) {
                                 <FormItem>
                                     <FormLabel>{t('createDialog.name')}</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="John Doe" {...field} />
+                                        <Input placeholder={t('createDialog.namePlaceholder')} {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -416,7 +416,7 @@ export default function CreateUserDialog({ onSuccess }) {
                                     <Select dir={i18n.dir()} onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select gender" />
+                                                <SelectValue placeholder={t('createDialog.selectGender')} />
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
@@ -629,7 +629,7 @@ export default function CreateUserDialog({ onSuccess }) {
                                         <FormItem>
                                             <FormLabel>{t('createDialog.faction', 'Faction')}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Alpha, Beta..." {...field} />
+                                                <Input placeholder={t('createDialog.factionPlaceholder')} {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

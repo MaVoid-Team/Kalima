@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyAccessToken, AccessTokenPayload } from './jwt';
+import { isRefreshSessionActive, verifyAccessToken, AccessTokenPayload } from './jwt';
 
 // Extend Express Request to include user
 declare global {
@@ -14,7 +14,7 @@ declare global {
  * Middleware to authenticate JWT access token
  * Extracts user information from the token and attaches it to the request
  */
-export function authenticateToken(req: Request, res: Response, next: NextFunction): void {
+export async function authenticateToken(req: Request, res: Response, next: NextFunction): Promise<void> {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -22,18 +22,32 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
     return;
   }
 
-  const [bearer, token] = authHeader.split(' ');
+  const [bearer, token, extra] = authHeader.split(' ');
 
-  if (bearer !== 'Bearer' || !token) {
+  if (bearer !== 'Bearer' || !token || extra) {
     res.status(401).json({ success: false, message: 'Invalid authorization format. Use: Bearer <token>' });
     return;
   }
 
-  try {
-    const payload = verifyAccessToken(token);
+  let payload: AccessTokenPayload;
 
-    if (!payload) {
-      res.status(401).json({ success: false, message: 'Invalid or expired token' });
+  try {
+    payload = verifyAccessToken(token);
+  } catch {
+    res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    return;
+  }
+
+  if (!payload?.userId || !payload?.sessionId) {
+    res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    return;
+  }
+
+  try {
+    const sessionActive = await isRefreshSessionActive(payload.sessionId, payload.userId);
+
+    if (!sessionActive) {
+      res.status(401).json({ success: false, message: 'Session expired' });
       return;
     }
 
@@ -41,7 +55,7 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
     (req as any).user = payload;
     next();
   } catch (error) {
-    res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    next(error);
   }
 }
 
@@ -50,7 +64,7 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
  * If token is present and valid, attaches user to request
  * If token is missing or invalid, continues without user
  */
-export function optionalAuthenticateToken(req: Request, res: Response, next: NextFunction): void {
+export async function optionalAuthenticateToken(req: Request, res: Response, next: NextFunction): Promise<void> {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -58,21 +72,34 @@ export function optionalAuthenticateToken(req: Request, res: Response, next: Nex
     return;
   }
 
-  const [bearer, token] = authHeader.split(' ');
+  const [bearer, token, extra] = authHeader.split(' ');
 
-  if (bearer !== 'Bearer' || !token) {
+  if (bearer !== 'Bearer' || !token || extra) {
+    next();
+    return;
+  }
+
+  let payload: AccessTokenPayload;
+
+  try {
+    payload = verifyAccessToken(token);
+  } catch {
+    next();
+    return;
+  }
+
+  if (!payload?.userId || !payload?.sessionId) {
     next();
     return;
   }
 
   try {
-    const payload = verifyAccessToken(token);
-
-    if (payload) {
+    if (await isRefreshSessionActive(payload.sessionId, payload.userId)) {
       (req as any).user = payload;
     }
-  } catch {
-    // Ignore errors for optional auth
+  } catch (error) {
+    next(error);
+    return;
   }
 
   next();

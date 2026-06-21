@@ -171,6 +171,15 @@ function parseRequiredFiniteMoney(raw: unknown, label: string, allowZero = false
   return value;
 }
 
+function parseOptionalFiniteMoney(raw: unknown, label: string): number | undefined {
+  if (raw === undefined || raw === null || raw === "") return undefined;
+  const value = Number(Array.isArray(raw) ? raw[0] : raw);
+  if (!Number.isFinite(value) || value < 0) {
+    throw new BadRequestError(`Invalid ${label}`);
+  }
+  return value;
+}
+
 function parseStrictBoolean(raw: unknown, label: string): boolean {
   if (raw === true || raw === "true" || raw === "1" || raw === 1) return true;
   if (raw === false || raw === "false" || raw === "0" || raw === 0) return false;
@@ -608,6 +617,11 @@ export const eBookletController = {
     try {
       const result = await getEBookletService().listPurchases({
         status: req.query.status as string | undefined,
+        search: typeof req.query.search === "string" ? req.query.search : undefined,
+        startDate: (req.query.startDate ?? req.query.start_date) as string | undefined,
+        endDate: (req.query.endDate ?? req.query.end_date) as string | undefined,
+        minTotal: parseOptionalFiniteMoney(req.query.minTotal ?? req.query.min_total, "minTotal"),
+        maxTotal: parseOptionalFiniteMoney(req.query.maxTotal ?? req.query.max_total, "maxTotal"),
         ...pagination(req),
       });
       res.status(200).json({ success: true, ...result });
@@ -1380,6 +1394,7 @@ export const eBookletController = {
   async getHotspotContent(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await getEBookletService().getHotspotContent(
+        parseId(req.params.instanceId, "instance ID"),
         parseId(req.params.hotspotId, "hotspot ID"),
         currentUserId(req),
       );
@@ -1406,16 +1421,14 @@ export const eBookletController = {
   async getAuthorizedViewerDocument(req: Request, res: Response, next: NextFunction) {
     try {
       const pageNumber = parseOptionalId(req.query.page);
-      const { asset, absolutePath, pageBuffer } = pageNumber
-        ? await getEBookletService().getAuthorizedViewerDocument(
-            parseId(req.params.instanceId, "instance ID"),
-            currentUserId(req),
-            pageNumber,
-          )
-        : await getEBookletService().getAuthorizedViewerDocument(
-            parseId(req.params.instanceId, "instance ID"),
-            currentUserId(req),
-          );
+      if (!pageNumber) throw new BadRequestError("E-booklet document page is required.");
+      const pageAccessToken = req.get("X-E-Booklet-Page-Token") || "";
+      const { asset, absolutePath, pageBuffer } = await getEBookletService().getAuthorizedViewerDocument(
+        parseId(req.params.instanceId, "instance ID"),
+        currentUserId(req),
+        pageNumber,
+        pageAccessToken,
+      );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/pdf");
       res.set(
@@ -1435,14 +1448,14 @@ export const eBookletController = {
   async getAdminAuthorizedViewerDocument(req: Request, res: Response, next: NextFunction) {
     try {
       const pageNumber = parseOptionalId(req.query.page);
-      const { asset, absolutePath, pageBuffer } = pageNumber
-        ? await getEBookletService().getAdminAuthorizedViewerDocument(
-            parseId(req.params.instanceId, "instance ID"),
-            pageNumber,
-          )
-        : await getEBookletService().getAdminAuthorizedViewerDocument(
-            parseId(req.params.instanceId, "instance ID"),
-          );
+      if (!pageNumber) throw new BadRequestError("E-booklet document page is required.");
+      const pageAccessToken = req.get("X-E-Booklet-Page-Token") || "";
+      const { asset, absolutePath, pageBuffer } = await getEBookletService().getAdminAuthorizedViewerDocument(
+        parseId(req.params.instanceId, "instance ID"),
+        pageNumber,
+        pageAccessToken,
+        currentUserId(req),
+      );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/pdf");
       res.set(
@@ -1462,6 +1475,7 @@ export const eBookletController = {
   async getAuthorizedHotspotAsset(req: Request, res: Response, next: NextFunction) {
     try {
       const { asset, absolutePath } = await getEBookletService().getAuthorizedHotspotAsset(
+        parseId(req.params.instanceId, "instance ID"),
         parseId(req.params.hotspotId, "hotspot ID"),
         parseId(req.params.assetId, "asset ID"),
         currentUserId(req),

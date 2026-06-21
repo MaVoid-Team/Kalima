@@ -91,7 +91,7 @@ export default function MainInfoCard({
                                     onValueChange={(val) => setFormData({ ...formData, gender: val })}
                                 >
                                     <SelectTrigger className="h-8 text-sm">
-                                        <SelectValue placeholder="Gender" />
+                                        <SelectValue placeholder={t('details.gender', 'Gender')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="MALE">{t('details.male')}</SelectItem>

@@ -3,7 +3,7 @@ import { useState, useEffect, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { Toaster } from 'sonner';
-import { E_BOOKLET_ORDERS_ALLOWED_ROLES, E_BOOKLET_ORDERS_ROUTE } from "./pages/e-booklets/eBookletOrdersContract.mjs";
+import { E_BOOKLET_ORDERS_ALLOWED_ROLES } from "./pages/e-booklets/eBookletOrdersContract.mjs";
 import ImpersonationBanner from "./components/auth/ImpersonationBanner";
 
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -71,7 +71,6 @@ const CategoriesPage = lazy(
   () => import("./pages/admin/categories/CategoriesPage"),
 );
 const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
-const AdminImpersonationPage = lazy(() => import("./pages/admin/impersonation/AdminImpersonationPage"));
 const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
 const UserAppreciationPage = lazy(() => import("./pages/admin/users/UserAppreciationPage"));
 const AdminSamplesPage = lazy(() => import("./pages/admin/samples/AdminSamplesPage"));
@@ -81,11 +80,13 @@ const PaymentMethodsPage = lazy(() => import("./pages/admin/payment-methods/Paym
 const RequiredFieldsPage = lazy(() => import("./pages/admin/required-fields/RequiredFieldsPage"));
 const AnalyticsPage = lazy(() => import("./pages/admin/analytics/AnalyticsPage"));
 const EmployeePerformancePage = lazy(() => import("./pages/admin/employee-performance/EmployeePerformancePage"));
+const AdminStoreWorkspaceLayout = lazy(() => import("./pages/admin/store/AdminStoreWorkspaceLayout"));
 const AdminEBookletsWorkspaceLayout = lazy(() => import("./pages/admin/e-booklets/AdminEBookletsWorkspaceLayout"));
 const AdminEBookletsOverviewPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletsOverviewPage"));
 const AdminEBookletTemplatesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTemplatesPage"));
 const AdminEBookletEditorPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletEditorPage"));
 const AdminEBookletPurchasesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchasesPage"));
+const AdminEBookletPurchaseDetailPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchaseDetailPage"));
 const AdminEBookletPurchaseDeliveryPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchaseDeliveryPage"));
 const AdminEBookletInstancesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstancesPage"));
 const AdminEBookletDevicesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletDevicesPage"));
@@ -100,6 +101,8 @@ const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
 const SamplesDirectoryPage = lazy(() => import("./pages/sample/SamplesDirectoryPage"));
 const SamplePreview = lazy(() => import("./pages/sample/SamplePreviewPage"))
 const AppreciationPublicPage = lazy(() => import("./pages/appreciation/AppreciationPublicPage"));
+const PrivacyPolicyPage = lazy(() => import("./pages/privacy/PrivacyPolicyPage"));
+const DeleteMyDataPage = lazy(() => import("./pages/privacy/DeleteMyDataPage"));
 // User lazy-loaded pages
 const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
 const NotificationsPage = lazy(() => import("./pages/notifications/NotificationsPage"));
@@ -168,6 +171,8 @@ const router = createBrowserRouter(
       {/* Public Routes with MainLayout (Navbar & Footer) */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/delete-my-data" element={<DeleteMyDataPage />} />
 
         {/* E-booklet storefront is public to visitors/teachers; students redeem private URLs/codes only. */}
         <Route element={<RoleRoute excludedRole={["Student"]} />}>
@@ -225,18 +230,24 @@ const router = createBrowserRouter(
         <Route element={<AdminLayout />}>
           <Route path="/admin" element={<DashboardPage />} />
           <Route path="/admin/dashboard" element={<DashboardPage />} />
-          <Route path="/admin/orders" element={<OrdersPage />} />
-          <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
-          <Route path="/admin/products" element={<ProductsPage />} />
-          <Route path="/admin/products/create" element={<CreateProductPage />} />
-          <Route path="/admin/products/:id" element={<ProductDetailPage />} />
-          <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
+          <Route element={<AdminStoreWorkspaceLayout />}>
+            <Route path="/admin/orders" element={<OrdersPage />} />
+            <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
+            <Route path="/admin/products" element={<ProductsPage />} />
+            <Route path="/admin/products/create" element={<CreateProductPage />} />
+            <Route path="/admin/products/:id" element={<ProductDetailPage />} />
+            <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
+            <Route path="/admin/categories" element={<CategoriesPage />} />
+            <Route path="/admin/samples" element={<AdminSamplesPage />} />
+            <Route path="/admin/samples/:id" element={<AdminSampleSectionDetailPage />} />
+          </Route>
           <Route path="/admin/e-booklets/create" element={<AdminEBookletEditorPage />} />
           <Route path="/admin/e-booklets/:id/edit" element={<AdminEBookletEditorPage />} />
           <Route path="/admin/e-booklets" element={<AdminEBookletsWorkspaceLayout />}>
             <Route index element={<AdminEBookletsOverviewPage />} />
             <Route path="catalog" element={<AdminEBookletTemplatesPage />} />
             <Route path="orders" element={<AdminEBookletPurchasesPage />} />
+            <Route path="orders/:purchaseId" element={<AdminEBookletPurchaseDetailPage />} />
             <Route path="orders/:purchaseId/delivery" element={<AdminEBookletPurchaseDeliveryPage />} />
             <Route path="access" element={<AdminEBookletInstancesPage />} />
             <Route path="access/:instanceId/view" element={<EBookletViewerPage />} />
@@ -255,15 +266,11 @@ const router = createBrowserRouter(
           <Route path="/admin/e-booklet-instances/:instanceId/devices" element={<LegacyEBookletRedirect type="instanceDevices" />} />
           <Route path="/admin/e-booklet-analytics" element={<Navigate to="/admin/e-booklets/analytics" replace />} />
           <Route path="/admin/e-booklet-terms-milestones" element={<Navigate to="/admin/e-booklets/settings/terms-milestones" replace />} />
-          <Route path="/admin/categories" element={<CategoriesPage />} />
           <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
           <Route path="/admin/required-fields" element={<RequiredFieldsPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
-          <Route path="/admin/impersonation" element={<AdminImpersonationPage />} />
           <Route path="/admin/users/:id" element={<UserDetailPage />} />
           <Route path="/admin/users/:id/appreciation" element={<UserAppreciationPage />} />
-          <Route path="/admin/samples" element={<AdminSamplesPage />} />
-          <Route path="/admin/samples/:id" element={<AdminSampleSectionDetailPage />} />
           <Route path="/admin/coupons" element={<CouponsPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
           <Route path="/admin/analytics" element={<AnalyticsPage />} />
@@ -279,7 +286,7 @@ const router = createBrowserRouter(
           <Route path="/teacher/profile" element={<TeacherProfilePage />} />
           <Route path="/teacher/settings" element={<TeacherSettingsPage />} />
           <Route path="/teacher/e-booklets" element={<TeacherEBookletsPage />} />
-          <Route path={E_BOOKLET_ORDERS_ROUTE} element={<EBookletOrdersPage />} />
+          <Route path="/e-booklet-orders" element={<EBookletOrdersPage />} />
           <Route path="/teacher/e-booklet-analytics" element={<TeacherEBookletAnalyticsPage />} />
           <Route path="/teacher/orders" element={<MyOrdersPage />} />
           <Route path="/teacher/e-booklets/:instanceId" element={<EBookletViewerPage />} />

@@ -6,28 +6,25 @@ import {
 
 assert.equal(
   buildHotspotContentEndpoint({
-    adminMode: false,
     viewerBase: "/e-booklet-viewer",
     instanceId: 10,
     hotspotId: 77,
   }),
-  "/e-booklet-viewer/hotspots/77/content",
+  "/e-booklet-viewer/10/hotspots/77/content",
 );
 
 assert.equal(
   buildHotspotAssetEndpoint({
-    adminMode: false,
     viewerBase: "/e-booklet-viewer",
     instanceId: 10,
     hotspotId: 77,
     assetId: 123,
   }),
-  "/e-booklet-viewer/hotspots/77/assets/123",
+  "/e-booklet-viewer/10/hotspots/77/assets/123",
 );
 
 assert.equal(
   buildHotspotContentEndpoint({
-    adminMode: true,
     viewerBase: "/admin/e-booklet-viewer",
     instanceId: 10,
     hotspotId: 77,
@@ -37,7 +34,6 @@ assert.equal(
 
 assert.equal(
   buildHotspotAssetEndpoint({
-    adminMode: true,
     viewerBase: "/admin/e-booklet-viewer",
     instanceId: 10,
     hotspotId: 77,

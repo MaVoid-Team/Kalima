@@ -24,7 +24,12 @@ import { Badge } from "@/components/ui/badge";
 import useAuth from "@/hooks/auth/useAuth";
 import useRole from "@/hooks/useRole";
 import { useEBookletViewer } from "@/hooks/useEBookletAccess";
+import { normalizeHotspotGeometry } from "@/utils/eBookletHotspotGeometry";
 import { useTranslation } from "react-i18next";
+import * as pdfjsLib from "pdfjs-dist";
+import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 const HOTSPOT_TYPES = {
   text: { icon: FileText, className: "bg-sky-600" },
@@ -160,19 +165,115 @@ const buildDeviceFingerprint = async () => {
   return fingerprint;
 };
 
+const copyPdfDataForRender = (fileData) => {
+  if (!fileData) return null;
+  if (fileData instanceof ArrayBuffer) return new Uint8Array(fileData.slice(0));
+  if (ArrayBuffer.isView(fileData)) {
+    return new Uint8Array(fileData.buffer.slice(fileData.byteOffset, fileData.byteOffset + fileData.byteLength));
+  }
+  return null;
+};
+
+function PdfDocumentPageCanvas({ fileData, className = "", onRenderStart, onRenderSuccess, onError }) {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    if (!fileData || !canvasRef.current) return undefined;
+
+    let cancelled = false;
+    let renderTask = null;
+    let documentTask = null;
+    let loadedDocument = null;
+    let loadedPage = null;
+
+    const renderPage = async () => {
+      try {
+        const pdfData = copyPdfDataForRender(fileData);
+        if (!pdfData?.byteLength) return;
+
+        onRenderStart?.();
+        documentTask = pdfjsLib.getDocument({ data: pdfData });
+        loadedDocument = await documentTask.promise;
+        if (cancelled) {
+          await loadedDocument?.destroy?.();
+          return;
+        }
+
+        loadedPage = await loadedDocument.getPage(1);
+        if (cancelled) {
+          loadedPage?.cleanup?.();
+          await loadedDocument?.destroy?.();
+          loadedDocument = null;
+          return;
+        }
+
+        const canvas = canvasRef.current;
+        const context = canvas?.getContext("2d");
+        if (!canvas || !context) {
+          loadedPage?.cleanup?.();
+          loadedPage = null;
+          await loadedDocument?.destroy?.();
+          loadedDocument = null;
+          documentTask = null;
+          return;
+        }
+
+        const containerWidth = canvas.parentElement?.clientWidth || 820;
+        const baseViewport = loadedPage.getViewport({ scale: 1 });
+        const scale = containerWidth / baseViewport.width;
+        const viewport = loadedPage.getViewport({ scale });
+        const dpr = window.devicePixelRatio || 1;
+
+        canvas.width = Math.max(1, Math.floor(viewport.width * dpr));
+        canvas.height = Math.max(1, Math.floor(viewport.height * dpr));
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+        context.setTransform(dpr, 0, 0, dpr, 0, 0);
+        context.clearRect(0, 0, viewport.width, viewport.height);
+
+        renderTask = loadedPage.render({ canvasContext: context, viewport });
+        await renderTask.promise;
+        loadedPage.cleanup?.();
+        loadedPage = null;
+        await loadedDocument.destroy?.();
+        loadedDocument = null;
+        documentTask = null;
+        if (!cancelled) onRenderSuccess?.();
+      } catch (error) {
+        loadedPage?.cleanup?.();
+        loadedPage = null;
+        await loadedDocument?.destroy?.();
+        loadedDocument = null;
+        documentTask = null;
+        if (!cancelled && error?.name !== "RenderingCancelledException") {
+          onError?.(error);
+        }
+      }
+    };
+
+    renderPage();
+
+    return () => {
+      cancelled = true;
+      renderTask?.cancel?.();
+      loadedPage?.cleanup?.();
+      documentTask?.destroy?.();
+      loadedDocument?.destroy?.();
+    };
+  }, [fileData, onError, onRenderStart, onRenderSuccess]);
+
+  return <canvas ref={canvasRef} className={className} data-testid="e-booklet-pdf-canvas" />;
+}
+
 function HotspotMarker({ hotspot, active, onOpen, t }) {
   const typeMeta = HOTSPOT_TYPES[hotspot.type] || HOTSPOT_TYPES.text;
   const Icon = typeMeta.icon;
   const colorClass = getHotspotColorClass(hotspot) || typeMeta.className;
-  const shape = hotspot.shape || "circle";
-  const width = shape === "circle" || shape === "oval"
-    ? clamp(hotspot.width_percent || hotspot.radius_percent * 2, 4, 2, 35)
-    : clamp(hotspot.width_percent, 8, 2, 40);
-  const height = shape === "circle" || shape === "square"
-    ? width
-    : clamp(hotspot.height_percent || hotspot.radius_percent * 2, 4, 2, 35);
-  const left = clamp(hotspot.x_percent, 50, 0, 100);
-  const top = clamp(hotspot.y_percent, 50, 0, 100);
+  const { shape, width, height, left, top } = normalizeHotspotGeometry(hotspot, {
+    defaultSize: 8,
+    minSize: 2,
+    maxSize: 40,
+  });
   const opacity = clamp(hotspot.display_behavior?.opacity_percent, 100, 0, 100) / 100;
   const glow = getHotspotGlowPercent(hotspot);
   const glowStyle = getHotspotGlowStyle(hotspot);
@@ -429,8 +530,9 @@ export default function EBookletViewerPage() {
   const [hotspotContent, setHotspotContent] = useState(null);
   const [hotspotLoading, setHotspotLoading] = useState(false);
   const [hotspotError, setHotspotError] = useState("");
-  const [documentPageUrl, setDocumentPageUrl] = useState(null);
+  const [documentPageData, setDocumentPageData] = useState(null);
   const [documentPageError, setDocumentPageError] = useState("");
+  const [documentRenderStatus, setDocumentRenderStatus] = useState("idle");
   const [deviceStatus, setDeviceStatus] = useState("checking");
   const [deviceError, setDeviceError] = useState("");
   const hotspotRequestRef = useRef(0);
@@ -444,7 +546,7 @@ export default function EBookletViewerPage() {
         if (adminMode) {
           if (!active) return;
           setDeviceStatus("allowed");
-          viewer.fetchMetadata(instanceId).catch(() => {});
+          viewer.fetchMetadata(instanceId, t("viewer.metadataLoadFailed")).catch(() => {});
           return;
         }
         const fingerprint = await buildDeviceFingerprint();
@@ -455,7 +557,7 @@ export default function EBookletViewerPage() {
         });
         if (!active) return;
         setDeviceStatus("allowed");
-        viewer.fetchMetadata(instanceId).catch(() => {});
+        viewer.fetchMetadata(instanceId, t("viewer.metadataLoadFailed")).catch(() => {});
       } catch (error) {
         if (!active) return;
         setDeviceStatus("blocked");
@@ -470,43 +572,43 @@ export default function EBookletViewerPage() {
 
   useEffect(() => {
     if (deviceStatus !== "allowed") return;
-    viewer.fetchPage(instanceId, pageNumber).catch(() => {});
+    viewer.fetchPage(instanceId, pageNumber, t("viewer.pageLoadFailed")).catch(() => {});
     setActiveHotspot(null);
     setHotspotContent(null);
     setHotspotLoading(false);
     setHotspotError("");
-  }, [deviceStatus, instanceId, pageNumber, viewer.fetchPage]);
+  }, [deviceStatus, instanceId, pageNumber, t, viewer.fetchPage]);
 
   useEffect(() => {
     if (viewer.page?.renderMode !== "pdf-document" || !viewer.page?.documentAssetId) {
-      setDocumentPageUrl(null);
+      setDocumentPageData(null);
       setDocumentPageError("");
+      setDocumentRenderStatus("idle");
       return undefined;
     }
     let active = true;
-    let createdUrl = null;
-    setDocumentPageUrl(null);
+    const controller = new AbortController();
+    setDocumentPageData(null);
     setDocumentPageError("");
-    viewer.fetchViewerDocumentBlobUrl(instanceId, pageNumber)
-      .then((url) => {
-        createdUrl = url;
+    setDocumentRenderStatus("loading");
+    viewer.fetchViewerDocumentPageData(instanceId, pageNumber, viewer.page.pageAccessToken, controller.signal)
+      .then((data) => {
         if (active) {
-          setDocumentPageUrl(url);
-        } else {
-          URL.revokeObjectURL(url);
+          setDocumentPageData(data);
         }
       })
       .catch((error) => {
         if (active) {
-          setDocumentPageUrl(null);
+          setDocumentPageData(null);
+          setDocumentRenderStatus("error");
           setDocumentPageError(error?.response?.data?.message || error?.message || t("viewer.documentUnavailable"));
         }
       });
     return () => {
       active = false;
-      if (createdUrl) URL.revokeObjectURL(createdUrl);
+      controller.abort();
     };
-  }, [instanceId, pageNumber, t, viewer.fetchViewerDocumentBlobUrl, viewer.page?.documentAssetId, viewer.page?.renderMode]);
+  }, [instanceId, pageNumber, t, viewer.fetchViewerDocumentPageData, viewer.page?.documentAssetId, viewer.page?.pageAccessToken, viewer.page?.renderMode]);
 
   useEffect(() => {
     const preventContextMenu = (event) => event.preventDefault();
@@ -544,8 +646,8 @@ export default function EBookletViewerPage() {
   const pageStyle = useMemo(
     () => ({
       aspectRatio: `${dimensions.width} / ${dimensions.height}`,
-      transform: `scale(${zoom})`,
-      transformOrigin: "top center",
+      width: `${zoom * 100}%`,
+      maxWidth: `${820 * zoom}px`,
     }),
     [dimensions.height, dimensions.width, zoom],
   );
@@ -591,9 +693,22 @@ export default function EBookletViewerPage() {
   }, [instanceId, t, viewer]);
 
   const contentHotspot = hotspotContent || activeHotspot;
-  const pageUrl = documentPageUrl || viewer.page?.url || viewer.page?.pageUrl || viewer.page?.assetUrl || null;
+  const handleDocumentRenderStart = useCallback(() => {
+    setDocumentRenderStatus("rendering");
+  }, []);
+
+  const handleDocumentRenderSuccess = useCallback(() => {
+    setDocumentRenderStatus("ready");
+  }, []);
+
+  const handleDocumentRenderError = useCallback((error) => {
+    setDocumentRenderStatus("error");
+    setDocumentPageError(error?.message || t("viewer.documentUnavailable"));
+  }, [t]);
+
   const serverPage = viewer.page?.renderMode === "server-page" ? viewer.page : null;
   const pdfDocumentFailed = viewer.page?.renderMode === "pdf-document" && viewer.page?.documentAssetId && documentPageError;
+  const viewerError = viewer.metadataError || viewer.pageError;
 
   if (deviceStatus === "blocked") {
     return (
@@ -665,12 +780,25 @@ export default function EBookletViewerPage() {
         <section className="select-none overflow-auto rounded-lg border bg-slate-200 p-4" onContextMenu={(event) => event.preventDefault()}>
           <div className="mx-auto w-full max-w-[820px] pb-10">
             <div className="relative overflow-hidden rounded-md border bg-white shadow-sm" style={pageStyle} draggable={false}>
-              {pageUrl ? (
-                <iframe
-                  title={t("viewer.pageFrameTitle", { page: pageNumber })}
-                  src={`${pageUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-                  className="absolute inset-0 h-full w-full border-0"
-                />
+              {viewerError ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-slate-50 p-8 text-center">
+                  <div className="max-w-md rounded-lg border border-destructive/30 bg-background/90 p-5 shadow-sm">
+                    <FileText className="mx-auto h-8 w-8 text-destructive" />
+                    <h2 className="mt-3 font-semibold text-destructive">{t("viewer.documentUnavailable")}</h2>
+                    <p className="mt-2 text-sm text-muted-foreground">{viewerError}</p>
+                    <Button
+                      type="button"
+                      className="mt-4"
+                      variant="outline"
+                      onClick={() => {
+                        viewer.fetchMetadata(instanceId, t("viewer.metadataLoadFailed")).catch(() => {});
+                        if (deviceStatus === "allowed") viewer.fetchPage(instanceId, pageNumber, t("viewer.pageLoadFailed")).catch(() => {});
+                      }}
+                    >
+                      {t("common.retry", { defaultValue: "Retry" })}
+                    </Button>
+                  </div>
+                </div>
               ) : pdfDocumentFailed ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-50 p-8 text-center">
                   <div className="max-w-md rounded-lg border border-destructive/30 bg-background/90 p-5 shadow-sm">
@@ -679,6 +807,21 @@ export default function EBookletViewerPage() {
                     <p className="mt-2 text-sm text-muted-foreground">{documentPageError}</p>
                   </div>
                 </div>
+              ) : documentPageData ? (
+                <>
+                  <PdfDocumentPageCanvas
+                    fileData={documentPageData}
+                    className="absolute inset-0 h-full w-full"
+                    onRenderStart={handleDocumentRenderStart}
+                    onRenderSuccess={handleDocumentRenderSuccess}
+                    onError={handleDocumentRenderError}
+                  />
+                  {documentRenderStatus !== "ready" && !documentPageError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/75 text-sm text-muted-foreground">
+                      {t("viewer.loadingPage", { defaultValue: "Loading page..." })}
+                    </div>
+                  )}
+                </>
               ) : serverPage ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-50 p-8 text-center">
                   <div className="max-w-md rounded-lg border bg-background/90 p-5 shadow-sm">

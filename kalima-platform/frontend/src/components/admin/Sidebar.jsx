@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Users, UserCog, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, FileText, Ticket, LayoutGrid, Settings, CreditCard, FormInput, BarChart3, Activity, Bell, BookOpenCheck } from 'lucide-react';
+import { Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, Ticket, Settings, CreditCard, FormInput, BarChart3, Activity, Bell, BookOpenCheck } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 import { useRole } from '@/hooks/useRole';
 
@@ -43,16 +43,19 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
     { name: t('nav.dashboard', 'Dashboard'), href: '/admin/dashboard', icon: Home, id: 'dashboard' },
     { name: t('nav.analytics', 'Analytics'), href: '/admin/analytics', icon: BarChart3, id: 'analytics' },
     { name: t('nav.employeePerformance', 'Employee Performance'), href: '/admin/employee-performance', icon: Activity, id: 'employee-performance' },
-    { name: t('nav.orders'), href: '/admin/orders', icon: ShoppingCart, id: 'orders' },
-    { name: t('nav.products'), href: '/admin/products', icon: Package, id: 'products' },
+    {
+      name: t('nav.store', 'Store'),
+      href: '/admin/products',
+      icon: Package,
+      id: 'store',
+      matchPaths: ['/admin/products', '/admin/orders', '/admin/samples', '/admin/categories'],
+    },
     { name: t('nav.eBooklets', 'E-Booklets'), href: '/admin/e-booklets', icon: BookOpenCheck, id: 'e-booklets' },
-    { name: t('nav.samples'), href: '/admin/samples', icon: FileText, id: 'samples' },
+    { name: t('nav.eBookletTermsMilestones', 'E-Booklet Terms & Milestones'), href: '/admin/e-booklet-terms-milestones', icon: BookOpenCheck, id: 'eBookletTermsMilestones', managerOnly: true },
     { name: t('nav.coupons'), href: '/admin/coupons', icon: Ticket, id: 'coupons' },
-    { name: t('nav.categories'), href: '/admin/categories', icon: LayoutGrid, id: 'categories' },
     { name: t('nav.requiredFields'), href: '/admin/required-fields', icon: FormInput, id: 'required-fields' },
     { name: t('nav.paymentMethods', 'Payment Methods'), href: '/admin/payment-methods', icon: CreditCard, id: 'payment-methods' },
     { name: t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users, id: 'users' },
-    { name: t('nav.impersonation', 'Impersonation'), href: '/admin/impersonation', icon: UserCog, id: 'impersonation' },
     { name: t('nav.notifications', 'Notifications'), href: '/admin/notifications', icon: Bell, id: 'notifications' },
     { name: t('nav.settings'), href: '/admin/settings', icon: Settings, id: 'settings' },
 ];
@@ -108,7 +111,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
       {/* Navigation Links */}
       <nav className="flex-1 space-y-2 px-2 py-4 overflow-y-auto">
         {navigation.filter((item) => !item.managerOnly || isAdmin || isSubAdmin).map((item) => {
-          const isActive = location.pathname.startsWith(item.href);
+          const isActive = (item.matchPaths || [item.href]).some((href) => location.pathname.startsWith(href));
           return (
             <Link
               key={item.href}

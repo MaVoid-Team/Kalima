@@ -334,7 +334,7 @@ export default function ProfileSection({ ns = 'admin' }) {
                                         <User className="h-3.5 w-3.5 text-muted-foreground" />
                                     </div>
                                     <p className="font-bold text-sm text-foreground">
-                                        {profile?.name || t('common.notSpecified')}
+                                        {profile?.name || t('common:notSpecified')}
                                     </p>
                                 </div>
                             </div>
@@ -350,7 +350,7 @@ export default function ProfileSection({ ns = 'admin' }) {
                                         <Mail className="h-3.5 w-3.5 text-muted-foreground" />
                                     </div>
                                     <p className="font-bold text-sm text-foreground truncate max-w-[200px]" title={profile?.email}>
-                                        {profile?.email || t('common.notSpecified')}
+                                        {profile?.email || t('common:notSpecified')}
                                     </p>
                                 </div>
                             </div>
@@ -366,7 +366,7 @@ export default function ProfileSection({ ns = 'admin' }) {
                                         <Phone className="h-3.5 w-3.5 text-muted-foreground" />
                                     </div>
                                     <p className="font-bold text-sm text-foreground">
-                                        {profile?.phone || t('common.notSpecified')}
+                                        {profile?.phone || t('common:notSpecified')}
                                     </p>
                                 </div>
                             </div>
@@ -379,7 +379,7 @@ export default function ProfileSection({ ns = 'admin' }) {
                                 </Label>
                                 <div className="flex items-center gap-2 px-1">
                                     <Badge variant="secondary" className="rounded-lg px-2 py-0.5 font-bold text-[10px]">
-                                        {t(`gender.${profile?.gender}`) || t('common.notSpecified')}
+                                        {profile?.gender ? t(`common:gender.${profile.gender}`) : t('common:notSpecified')}
                                     </Badge>
                                 </div>
                             </div>

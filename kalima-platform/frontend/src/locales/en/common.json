@@ -1,6 +1,7 @@
 {
     "na": "N/A",
     "loading": "Loading...",
+    "notSpecified": "Not specified",
     "validation": {
         "required": "This field is required",
         "email": "Please enter a valid email address",
@@ -24,6 +25,12 @@
     "save": "Save",
     "cancel": "Cancel",
     "enterNumber": "Enter number",
+    "aria": {
+        "breadcrumb": "Breadcrumb",
+        "pagination": "Pagination",
+        "previousPage": "Go to previous page",
+        "nextPage": "Go to next page"
+    },
     "whatsapp": {
         "fetchError": "Failed to get WhatsApp number of the administration",
         "productQueryHeader": "Hello, I'd like to inquire about this product:",

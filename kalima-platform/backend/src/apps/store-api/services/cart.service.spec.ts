@@ -21,6 +21,12 @@ function getMockPrismaClient() {
       products: {
         findUnique: jest.fn(),
       },
+      product_required_fields: {
+        findMany: jest.fn(),
+      },
+      images: {
+        findMany: jest.fn(),
+      },
       coupons: {
         findUnique: jest.fn(),
         findMany: jest.fn(),
@@ -91,11 +97,14 @@ describe("CartService", () => {
         subtotal: 0,
         discount: 0,
         total: 0,
+        cart_items: [],
       };
 
       const mockProduct = {
         id: 10,
         price: 100,
+        price_after_discount: 100,
+        release_at: null,
       };
 
       const updatedCartItems = [
@@ -131,6 +140,7 @@ describe("CartService", () => {
 
     it("should recalculate percentage discounts when an item quantity is updated", async () => {
         const mockCart = { id: 1, user_id: 42, status: "active" };
+        const mockActiveCart = { ...mockCart, cart_items: [] };
 
         const mockCartItem = {
            id: 100, cart_id: 1, product_id: 10, quantity: 1, 
@@ -140,8 +150,9 @@ describe("CartService", () => {
         const mockCoupon = { id: 99, discount_percentage: 10, discount_amount: 0 };
         
         // Setup mocks
-        mockPrismaClient.carts.findFirst.mockResolvedValueOnce(mockCart);
+        mockPrismaClient.carts.findFirst.mockResolvedValueOnce(mockActiveCart);
         mockPrismaClient.cart_items.findUnique.mockResolvedValueOnce(mockCartItem);
+        mockPrismaClient.product_required_fields.findMany.mockResolvedValueOnce([]);
         // Step 1: user updates quantity to 3
         mockPrismaClient.cart_items.update.mockResolvedValueOnce({
             ...mockCartItem, quantity: 3
@@ -149,6 +160,11 @@ describe("CartService", () => {
 
         // Step 2: Recalculate discount (100 * 3 * 10% = 30)
         mockPrismaClient.coupons.findUnique.mockResolvedValueOnce(mockCoupon);
+        mockPrismaClient.products.findUnique.mockResolvedValueOnce({
+            id: 10,
+            price: 100,
+            price_after_discount: 100,
+        });
 
         // Step 3: #recalculateAndSaveCart fetches items
         const updatedCartItems = [
@@ -161,7 +177,7 @@ describe("CartService", () => {
 
         // Verify discount was updated to 30
         expect(mockPrismaClient.cart_items.update).toHaveBeenCalledWith(
-           expect.objectContaining({ data: { discount: 30 } })
+           expect.objectContaining({ data: expect.objectContaining({ discount: 30 }) })
         );
 
         // Verify cart totals are saved: subtotal 300, discount 30, total 270

@@ -10,6 +10,11 @@
     "format": "Format",
     "kitAccentColor": "Kit Accent Color"
   },
+  "status": {
+    "active": "Active",
+    "archived": "Archived",
+    "comingSoon": "Coming soon"
+  },
   "types": {
     "Product": "Product",
     "Book": "Book"
@@ -31,6 +36,9 @@
     "pendingReview": "Your account is pending admin review. You can browse freely but cannot make purchases until your account is approved.",
     "viewOptions": "View Options",
     "backToMarket": "Back to Market"
+  },
+  "media": {
+    "externalVideo": "External video"
   },
   "info": {
     "sku": "SKU",
@@ -133,7 +141,12 @@
     "curriculumAlignment": "Curriculum Alignment",
     "fileDetails": "File Details",
     "publisherInfo": "Publisher Info",
-    "saveToPlan": "Save to Plan"
+    "saveToPlan": "Save to Plan",
+    "gradeLevel": "Grade Level:",
+    "subject": "Subject:",
+    "curriculumAlignmentDescription": "Aligned with Next Generation Science Standards (NGSS) for 5th Grade Life Science.",
+    "fileDetailsDescription": "PDF (A4 and Letter size included). 20 Pages total.",
+    "publisherDescription": "ScienceWithSarah - Creating interactive learning materials since 2018."
   },
   "common": {
     "cancel": "Cancel"
