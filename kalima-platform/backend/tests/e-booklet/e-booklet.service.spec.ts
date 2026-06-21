@@ -390,8 +390,28 @@ describe("EBookletService", () => {
   });
 
   describe("admin write DTO persistence", () => {
+    test("generates a unique slug when creating templates with duplicate titles", async () => {
+      const db = createMockDb();
+      db.e_booklet_templates.findUnique
+        .mockResolvedValueOnce({ id: 1 })
+        .mockResolvedValueOnce({ id: 2 })
+        .mockResolvedValueOnce(null);
+      db.e_booklet_templates.create.mockResolvedValue({ id: 3 });
+      db.e_booklet_templates.findUnique.mockResolvedValueOnce({ id: 3 });
+
+      const service = new EBookletService(db);
+      await service.createTemplate({ title: "My Template", price: 100 }, 1);
+
+      expect(db.e_booklet_templates.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ slug: "my-template-3" }),
+        }),
+      );
+    });
+
     test("persists template, purchase, delivery pricing/expiry, and invite passcode fields", async () => {
       const db = createMockDb();
+      db.e_booklet_templates.findUnique.mockResolvedValue(null);
       db.e_booklet_templates.create.mockResolvedValue({ id: 1 });
       db.e_booklet_templates.update.mockResolvedValue({ id: 1 });
       db.e_booklet_purchases.create.mockResolvedValue({ id: 2 });
