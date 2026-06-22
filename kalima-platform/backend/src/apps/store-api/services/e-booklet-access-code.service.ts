@@ -90,6 +90,15 @@ export class EBookletAccessCodeService {
     return safeRecord;
   }
 
+  private async auditSafely(data: Record<string, unknown>) {
+    if (!this.db.e_booklet_audit_logs?.create) return;
+    try {
+      await this.db.e_booklet_audit_logs.create({ data });
+    } catch {
+      // Access-code generation must not fail after the code is created because audit logging is unavailable.
+    }
+  }
+
   private async assertPaidSeatCapacity(instance: any, input: { teacherId: number; bookletInstanceId: number; kind: EBookletAccessCodeKind; requiredSeats: number }) {
     if (input.kind !== "paid") return;
     if (instance.invite_quota === null || instance.invite_quota === undefined) return;
@@ -180,22 +189,20 @@ export class EBookletAccessCodeService {
           expires_at: expiresAt,
         },
       });
-      if (input.adminActorId && this.db.e_booklet_audit_logs?.create) {
-        await this.db.e_booklet_audit_logs.create({
-          data: {
-            actor_user_id: input.adminActorId,
-            action: "admin_generate_free_access_code",
-            entity_type: "e_booklet_access_code",
-            entity_id: record.id,
-            metadata_json: {
-              teacher_id: input.teacherId,
-              booklet_instance_id: input.bookletInstanceId,
-              term_id: input.termId,
-              kind: input.kind,
-            },
-            ip_address: input.ipAddress ?? null,
-            user_agent: input.userAgent ?? null,
+      if (input.adminActorId) {
+        await this.auditSafely({
+          actor_user_id: input.adminActorId,
+          action: "admin_generate_free_access_code",
+          entity_type: "e_booklet_access_code",
+          entity_id: record.id,
+          metadata_json: {
+            teacher_id: input.teacherId,
+            booklet_instance_id: input.bookletInstanceId,
+            term_id: input.termId,
+            kind: input.kind,
           },
+          ip_address: input.ipAddress ?? null,
+          user_agent: input.userAgent ?? null,
         });
       }
       const url = redemptionUrl();
