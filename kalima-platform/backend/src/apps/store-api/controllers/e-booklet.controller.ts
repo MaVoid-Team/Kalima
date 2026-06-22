@@ -351,6 +351,7 @@ export const eBookletController = {
         currentUserId(req),
         dto,
         (req as any).file,
+        req.app.get("io"),
       );
       res.status(201).json({ success: true, data });
     } catch (error) {
@@ -368,6 +369,7 @@ export const eBookletController = {
         dto.teacher_id,
         dto,
         currentUserId(req),
+        req.app.get("io"),
       );
       res.status(201).json({ success: true, data });
     } catch (error) {
