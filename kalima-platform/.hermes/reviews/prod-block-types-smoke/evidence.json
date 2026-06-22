@@ -1,0 +1,189 @@
+{
+  "runId": "prod-block-smoke-20260621235453-b5f477",
+  "generatedAt": "2026-06-21T23:54:53.428Z",
+  "baseUrl": "https://kalima-edu.com",
+  "apiBase": "https://kalima-edu.com/api/v2",
+  "redaction": "Credentials and bearer tokens are intentionally omitted.",
+  "api": {
+    "health": {
+      "status": "ok",
+      "version": "v2 new"
+    },
+    "adminLogin": "PASS",
+    "teacherUserId": 7392,
+    "uploads": {
+      "document": {
+        "status": "PASS",
+        "id": 132,
+        "mime": "application/pdf"
+      },
+      "image": {
+        "status": "PASS",
+        "id": 134,
+        "mime": "image/png"
+      },
+      "audio": {
+        "status": "PASS",
+        "id": 135,
+        "mime": "audio/wav"
+      },
+      "file": {
+        "status": "PASS",
+        "id": 133,
+        "mime": "application/pdf"
+      }
+    },
+    "hotspots": [
+      {
+        "type": "text",
+        "id": 235
+      },
+      {
+        "type": "image",
+        "id": 236
+      },
+      {
+        "type": "audio",
+        "id": 237
+      },
+      {
+        "type": "video",
+        "id": 238
+      },
+      {
+        "type": "file",
+        "id": 239
+      },
+      {
+        "type": "link",
+        "id": 240
+      },
+      {
+        "type": "question_answer",
+        "id": 241
+      }
+    ],
+    "fixture": {
+      "templateId": 47,
+      "versionId": 31,
+      "purchaseId": 20,
+      "instanceId": 19
+    },
+    "viewerHotspotTypes": [
+      "text",
+      "image",
+      "audio",
+      "video",
+      "file",
+      "link",
+      "question_answer"
+    ],
+    "student": {
+      "registeredUserId": 7394,
+      "teacherImpersonation": "PASS",
+      "teacherTermsAccepted": "PASS",
+      "paidCodeGenerated": "PASS",
+      "paidCodeRedeemed": "PASS",
+      "studentListHasInstance": true
+    }
+  },
+  "browser": {
+    "route": "https://kalima-edu.com/admin/e-booklets/access/19/view",
+    "checks": [
+      {
+        "title": "Text block smoke",
+        "status": "PASS"
+      },
+      {
+        "title": "Image block smoke",
+        "status": "PASS",
+        "naturalWidth": 64,
+        "naturalHeight": 64,
+        "maxHeightClassPresent": true
+      },
+      {
+        "title": "Audio block smoke",
+        "status": "PASS",
+        "autoplay": true,
+        "controls": true,
+        "canPlay": "maybe",
+        "playResult": "resolved",
+        "readyState": 4
+      },
+      {
+        "title": "Video block smoke",
+        "status": "PASS",
+        "srcHost": "www.youtube-nocookie.com"
+      },
+      {
+        "title": "File block smoke",
+        "status": "PASS",
+        "hasSandbox": true
+      },
+      {
+        "title": "URL block smoke",
+        "status": "PASS",
+        "href": "https://kalima-edu.com/",
+        "target": "_blank"
+      },
+      {
+        "title": "Question block smoke",
+        "status": "PASS",
+        "correctSelectionStyled": true
+      }
+    ],
+    "screenshot": ".hermes/reviews/prod-block-types-smoke/viewer.png",
+    "consoleErrorCount": 0,
+    "consoleErrors": []
+  },
+  "studentBrowser": {
+    "route": "https://kalima-edu.com/student/e-booklets/19",
+    "checks": [
+      {
+        "title": "Text block smoke",
+        "status": "PASS"
+      },
+      {
+        "title": "Image block smoke",
+        "status": "PASS",
+        "naturalWidth": 64,
+        "naturalHeight": 64,
+        "maxHeightClassPresent": true
+      },
+      {
+        "title": "Audio block smoke",
+        "status": "PASS",
+        "autoplay": true,
+        "controls": true,
+        "playResult": "resolved",
+        "readyState": 4
+      },
+      {
+        "title": "Video block smoke",
+        "status": "PASS",
+        "srcHost": "www.youtube-nocookie.com"
+      },
+      {
+        "title": "File block smoke",
+        "status": "PASS",
+        "hasSandbox": true
+      },
+      {
+        "title": "URL block smoke",
+        "status": "PASS",
+        "href": "https://kalima-edu.com/",
+        "target": "_blank"
+      },
+      {
+        "title": "Question block smoke",
+        "status": "PASS",
+        "correctSelectionStyled": true
+      }
+    ],
+    "screenshot": ".hermes/reviews/prod-block-types-smoke/student-viewer.png",
+    "consoleErrorCount": 0,
+    "consoleErrors": []
+  },
+  "cleanup": "teacher access revoked; temporary template 47 archived; uploaded private smoke assets retained because no e-booklet file delete endpoint is exposed",
+  "status": "PASS"
+}

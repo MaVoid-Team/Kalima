@@ -381,24 +381,17 @@ describe("e-booklet routes", () => {
     expect(mockService.restoreHotspotPreset).toHaveBeenCalledWith(12, 9);
   });
 
-  test("allows teachers to create invite links for their own e-booklet instances", async () => {
-    mockService.createInvite.mockResolvedValue({
-      invite: { id: 8, booklet_instance_id: 10 },
-      token: "raw-token",
-    });
-
+  test("blocks legacy teacher invite links and requires access-code sharing", async () => {
     await request(app)
       .post("/api/v2/teacher/e-booklets/10/invites")
       .set("Authorization", `Bearer ${tokenFor("Teacher", 2)}`)
       .send({ max_uses: 5 })
-      .expect(201)
+      .expect(400)
       .expect((res) => {
-        expect(res.body.data.token).toBe("raw-token");
+        expect(res.body.message).toContain("copying the generated redeem code or WhatsApp template message");
       });
 
-    expect(mockService.createInvite).toHaveBeenCalledWith(10, 2, {
-      max_uses: 5,
-    });
+    expect(mockService.createInvite).not.toHaveBeenCalled();
   });
 
   test("rejects empty legacy invite acceptance bodies instead of bypassing access rules", async () => {
