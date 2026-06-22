@@ -199,6 +199,23 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     }) });
   });
 
+  test("access code service does not fail admin generation when audit logging fails", async () => {
+    const db = createDb();
+    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", template_id: 99 });
+    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue(null);
+    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, template_id: 99, status: "active" });
+    db.e_booklet_access_codes.findUnique.mockResolvedValue(null);
+    db.e_booklet_access_codes.create.mockResolvedValue({ id: 44, code_hint: "SAFE", kind: "free" });
+    db.e_booklet_audit_logs.create.mockRejectedValue(new Error("audit unavailable"));
+    const service = new EBookletAccessCodeService(db);
+
+    await expect(service.generateCode({ bookletInstanceId: 10, teacherId: 9, kind: "free", termId: 1, adminActorId: 5 })).resolves.toMatchObject({
+      record: { id: 44, code_hint: "SAFE", kind: "free" },
+    });
+
+    expect(db.e_booklet_audit_logs.create).toHaveBeenCalledTimes(1);
+  });
+
   test("access code service rejects wrong-template terms for instance code generation", async () => {
     const db = createDb();
     db.e_booklet_terms.findFirst.mockResolvedValue({ id: 2, status: "active", template_id: 88, active_guard: "template:88" });
