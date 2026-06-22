@@ -23,6 +23,7 @@ export default function NotificationsPage() {
 
     const dateLocale = i18n.language === 'ar' ? ar : enUS;
     const getPurchaseTarget = (notification) => {
+        if (notification.target_link) return notification.target_link;
         if (hasAdminAccess) return `/admin/orders/${notification.entity_id}`;
         return isTeacher ? '/teacher/orders' : '/orders';
     };
@@ -63,7 +64,9 @@ export default function NotificationsPage() {
             await handleMarkRead(notification.id);
         }
 
-        if (notification.entity_type === 'purchase') {
+        if (notification.target_link) {
+            navigate(notification.target_link);
+        } else if (notification.entity_type === 'purchase') {
             navigate(getPurchaseTarget(notification));
         }
     };

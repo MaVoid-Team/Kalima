@@ -70,7 +70,7 @@ export const NotificationsProvider = ({ children }) => {
             const { data } = await getMyNotifications({ is_read: false, limit: 20 });
             const nextNotifications = data.notifications || [];
             setNotifications(nextNotifications);
-            if (nextNotifications.some((notification) => notification.entity_type === 'purchase')) {
+            if (nextNotifications.some((notification) => ['purchase', 'e_booklet_purchase'].includes(notification.entity_type))) {
                 window.dispatchEvent(new CustomEvent('kalima:orders-changed'));
             }
             await fetchUnreadCount();
@@ -115,25 +115,25 @@ export const NotificationsProvider = ({ children }) => {
                 console.log('Received notification:', notification);
                 setNotifications(prev => [notification, ...prev]);
                 setUnreadCount(prev => prev + 1);
-                if (notification.entity_type === 'purchase') {
+                if (['purchase', 'e_booklet_purchase'].includes(notification.entity_type)) {
                     window.dispatchEvent(new CustomEvent('kalima:orders-changed', { detail: notification }));
                 }
                 
                 // Show toast
                 const messageKey = notification.message_key;
                 const message = t(`keys.${messageKey}`, messageKey);
-                const purchaseTarget = hasAdminAccess
+                const notificationTarget = notification.target_link || (hasAdminAccess
                     ? `/admin/orders/${notification.entity_id}`
                     : isTeacher
                         ? '/teacher/orders'
-                        : '/orders';
+                        : '/orders');
                 
                 toast(message, {
                     description: t('new_notification', 'You have a new notification'),
                     icon: '🔔',
-                    action: notification.entity_type === 'purchase' ? {
+                    action: notification.target_link || notification.entity_type === 'purchase' ? {
                         label: t('view', 'View'),
-                        onClick: () => window.location.href = purchaseTarget
+                        onClick: () => window.location.href = notificationTarget
                     } : undefined
                 });
             };
@@ -191,4 +191,3 @@ export const useNotifications = () => {
     }
     return context;
 };
-

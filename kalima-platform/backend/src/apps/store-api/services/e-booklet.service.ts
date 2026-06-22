@@ -2,7 +2,9 @@ import path from "path";
 import { promises as fsPromises } from "fs";
 import crypto from "crypto";
 import { PDFDocument } from "pdf-lib";
+import type { Server as SocketIOServer } from "socket.io";
 import type { PrismaClient } from "../../../libs/db/prisma";
+import { notification_key_enum } from "../generated/prisma/client";
 import {
   BadRequestError,
   ForbiddenError,
@@ -10,8 +12,25 @@ import {
 } from "../../../libs/errors";
 import { generateInviteToken, hashInviteToken } from "../utils/e-booklet-token";
 import { EBookletPagePreviewService } from "./e-booklet-page-preview.service";
+import { emitNotificationToUser } from "../../../libs/redis/socketNotificationEmitter";
 
 type EBookletDb = PrismaClient | any;
+type EBookletLiveNotification = {
+  userId: number;
+  notification: {
+    id: number;
+    category: number;
+    message_key: string;
+    entity_type: string | null;
+    entity_id: number | null;
+    target_link: string | null;
+    created_at: Date | null;
+  };
+};
+
+const E_BOOKLET_ORDER_ENTITY_TYPE = "e_booklet_purchase";
+const E_BOOKLET_ORDER_TEACHER_TARGET_LINK = "/e-booklet-orders";
+const E_BOOKLET_ORDER_ADMIN_ROLES = ["Admin", "SubAdmin", "Moderator"] as const;
 
 export type EBookletPurchaseListFilters = {
   status?: string;
@@ -64,6 +83,23 @@ function parseFilterMoney(value: unknown, label: string): number | undefined {
   const amount = Number(value);
   if (!Number.isFinite(amount) || amount < 0) throw new BadRequestError(`Invalid ${label}`);
   return amount;
+}
+
+function eBookletPurchaseAmount(purchase: any): unknown {
+  if (!purchase || typeof purchase !== "object") return 0;
+  if (purchase.final_payable_price !== null && purchase.final_payable_price !== undefined) {
+    return purchase.final_payable_price;
+  }
+  if (Number(purchase.price) > 0) return purchase.price;
+  return purchase.marketing_price ?? purchase.student_marketing_price ?? purchase.total ?? purchase.price ?? 0;
+}
+
+function serializeEBookletPurchase(purchase: any): any {
+  if (!purchase || typeof purchase !== "object") return purchase;
+  return {
+    ...purchase,
+    total: eBookletPurchaseAmount(purchase),
+  };
 }
 
 function enrichTemplateWithReleaseInfo<T extends { release_at?: Date | string | null }>(
@@ -487,6 +523,111 @@ export class EBookletService {
     }
   }
 
+  private toLiveNotificationPayload(userId: number, notification: any): EBookletLiveNotification | null {
+    if (!notification?.id) return null;
+    return {
+      userId,
+      notification: {
+        id: Number(notification.id),
+        category: Number(notification.category),
+        message_key: String(notification.message_key),
+        entity_type: notification.entity_type ?? null,
+        entity_id: notification.entity_id ?? null,
+        target_link: notification.target_link ?? null,
+        created_at: notification.created_at ?? null,
+      },
+    };
+  }
+
+  private emitEBookletLiveNotifications(io: SocketIOServer | null | undefined, payloads: EBookletLiveNotification[]) {
+    if (!io) return;
+    for (const payload of payloads) {
+      emitNotificationToUser(io, payload.userId, payload.notification);
+    }
+  }
+
+  private async createEBookletOrderNotifications(db: EBookletDb, purchase: { id: number; teacher_id: number }, createdBy?: number): Promise<EBookletLiveNotification[]> {
+    if (!purchase?.id || !purchase?.teacher_id || !db.notifications) return [];
+
+    try {
+      const liveNotifications: EBookletLiveNotification[] = [];
+      const adminTargetLink = `/admin/e-booklets/orders/${purchase.id}`;
+      const teacherWhere = {
+        user_id: purchase.teacher_id,
+        message_key: notification_key_enum.ORDER_STATUS_RECEIVED,
+        entity_type: E_BOOKLET_ORDER_ENTITY_TYPE,
+        entity_id: purchase.id,
+      };
+      const existingTeacherNotification = await db.notifications.findFirst?.({ where: teacherWhere, select: { id: true } });
+      if (!existingTeacherNotification) {
+        try {
+          const teacherNotification = await db.notifications.create({
+            data: {
+              user_id: purchase.teacher_id,
+              category: 1,
+              message_key: notification_key_enum.ORDER_STATUS_RECEIVED,
+              entity_type: E_BOOKLET_ORDER_ENTITY_TYPE,
+              entity_id: purchase.id,
+              target_link: E_BOOKLET_ORDER_TEACHER_TARGET_LINK,
+              created_by: createdBy ?? null,
+            },
+          });
+          const payload = this.toLiveNotificationPayload(purchase.teacher_id, teacherNotification);
+          if (payload) liveNotifications.push(payload);
+        } catch (error: any) {
+          if (error?.code !== "P2002") throw error;
+        }
+      }
+
+      const admins = await db.users?.findMany?.({
+        where: {
+          user_roles: {
+            some: { portal: "store", role: { in: [...E_BOOKLET_ORDER_ADMIN_ROLES] } },
+          },
+          OR: [{ is_deleted: false }, { is_deleted: null }],
+        },
+        select: { id: true },
+      });
+      const adminIds: number[] = Array.from(new Set<number>((admins ?? []).map((admin: any) => Number(admin.id)).filter((id: number) => Number.isInteger(id) && id > 0)));
+      if (adminIds.length > 0) {
+        const existingAdminNotifications = await db.notifications.findMany?.({
+          where: {
+            user_id: { in: adminIds },
+            message_key: notification_key_enum.NEW_ORDER_CREATED,
+            entity_type: E_BOOKLET_ORDER_ENTITY_TYPE,
+            entity_id: purchase.id,
+          },
+          select: { user_id: true },
+        });
+        const existingAdminIds = new Set((existingAdminNotifications ?? []).map((notification: any) => Number(notification.user_id)));
+        const missingAdminIds = adminIds.filter((adminId) => !existingAdminIds.has(adminId));
+        for (const adminId of missingAdminIds) {
+          try {
+            const adminNotification = await db.notifications.create({
+              data: {
+                user_id: adminId,
+                category: 4,
+                message_key: notification_key_enum.NEW_ORDER_CREATED,
+                entity_type: E_BOOKLET_ORDER_ENTITY_TYPE,
+                entity_id: purchase.id,
+                target_link: adminTargetLink,
+                created_by: createdBy ?? null,
+              },
+            });
+            const payload = this.toLiveNotificationPayload(adminId, adminNotification);
+            if (payload) liveNotifications.push(payload);
+          } catch (error: any) {
+            if (error?.code !== "P2002") throw error;
+          }
+        }
+      }
+      return liveNotifications;
+    } catch (error) {
+      console.error(`[EBookletNotifications] Failed to create notifications for purchase ${purchase.id}:`, error);
+      return [];
+    }
+  }
+
   buildAdminPurchaseWhere(filters: EBookletPurchaseListFilters = {}) {
     const where: Record<string, any> = {};
     const andClauses: Array<Record<string, any>> = [];
@@ -514,7 +655,8 @@ export class EBookletService {
       andClauses.push({
         OR: [
           { final_payable_price: { not: null, ...payableRange } },
-          { final_payable_price: null, price: payableRange },
+          { final_payable_price: null, price: { gt: 0, ...payableRange } },
+          { final_payable_price: null, price: { lte: 0 }, marketing_price: payableRange },
         ],
       });
     }
@@ -1949,6 +2091,7 @@ export class EBookletService {
     teacherId: number,
     dto: any,
     paymentScreenshotFile?: Express.Multer.File,
+    io?: SocketIOServer | null,
   ): Promise<unknown> {
     const checkoutItems = Array.isArray(dto.items) && dto.items.length > 0
       ? dto.items
@@ -2042,8 +2185,9 @@ export class EBookletService {
         paymentMethod = await this.validateEBookletPaymentMethod(templatePurchases, dto.payment_method_id);
       }
 
-      return this.serializableTransaction(async (tx: EBookletDb) => {
+      const transactionResult = await this.serializableTransaction(async (tx: EBookletDb) => {
         const createdPurchases: any[] = [];
+        const notificationPayloads: EBookletLiveNotification[] = [];
         for (const item of templatePurchases) {
           const purchase = await tx.e_booklet_purchases.create({
             data: {
@@ -2076,8 +2220,12 @@ export class EBookletService {
           createdPurchases.push(purchase);
         }
 
+        for (const purchase of createdPurchases) {
+          notificationPayloads.push(...await this.createEBookletOrderNotifications(tx, { ...purchase, teacher_id: teacherId }));
+        }
+
         const firstPurchase = createdPurchases[0] || {};
-        return {
+        return { response: {
           id: firstPurchase.id,
           purchase_id: firstPurchase.id,
           status: firstPurchase.status,
@@ -2086,8 +2234,10 @@ export class EBookletService {
           item_count: createdPurchases.length,
           items: createdPurchases,
           next_url: "/e-booklet-orders",
-        };
+        }, notificationPayloads };
       });
+      this.emitEBookletLiveNotifications(io, transactionResult.notificationPayloads);
+      return transactionResult.response;
     }
 
     const instances: any[] = [];
@@ -2146,11 +2296,12 @@ export class EBookletService {
       });
     }
 
-    return this.serializableTransaction(async (tx: EBookletDb) => {
+    const transactionResult = await this.serializableTransaction(async (tx: EBookletDb) => {
       for (const instance of instances) {
         await this.assertStudentSeatAvailable(tx, instance);
       }
       const createdPurchases: any[] = [];
+      const notificationPayloads: EBookletLiveNotification[] = [];
       for (const instance of instances) {
         const price = Number(instance.student_marketing_price ?? 0);
         const purchase = await tx.e_booklet_purchases.create({
@@ -2201,8 +2352,12 @@ export class EBookletService {
         });
       }
 
+      for (const purchase of createdPurchases) {
+        notificationPayloads.push(...await this.createEBookletOrderNotifications(tx, { ...purchase, teacher_id: teacherId }));
+      }
+
       const firstPurchase = createdPurchases[0] || {};
-      return {
+      return { response: {
         id: firstPurchase.id,
         purchase_id: firstPurchase.id,
         status: firstPurchase.status,
@@ -2212,14 +2367,19 @@ export class EBookletService {
         items: createdPurchases,
         booklet_instance_id: firstPurchase.booklet_instance_id,
         next_url: "/e-booklet-orders",
-      };
+      }, notificationPayloads };
     });
+    this.emitEBookletLiveNotifications(io, transactionResult.notificationPayloads);
+    return transactionResult.response;
   }
 
-  async createPurchaseRequest(teacherId: number, dto: any, adminUserId?: number): Promise<unknown> {
-    const price = Number(dto.price ?? 0);
+  async createPurchaseRequest(teacherId: number, dto: any, adminUserId?: number, io?: SocketIOServer | null): Promise<unknown> {
+    const rawMarketingPrice = dto.marketing_price ?? dto.student_marketing_price;
+    const submittedPrice = Number(dto.price ?? 0);
+    const submittedMarketingPrice = Number(rawMarketingPrice ?? 0);
+    const price = submittedPrice > 0 ? submittedPrice : submittedMarketingPrice;
     const { marketingPrice, internalPrice } = this.validateInstancePricing({
-      marketing_price: dto.marketing_price ?? price,
+      marketing_price: rawMarketingPrice ?? price,
       internal_price: dto.internal_price ?? 0,
     });
 
@@ -2237,6 +2397,9 @@ export class EBookletService {
         status: "pending",
       },
     });
+
+    const notificationPayloads = await this.createEBookletOrderNotifications(this.db, { ...(purchase as any), teacher_id: teacherId }, adminUserId);
+    this.emitEBookletLiveNotifications(io, notificationPayloads);
 
     await this.auditSafely(this.db, {
       actor_user_id: adminUserId,
@@ -2278,7 +2441,12 @@ export class EBookletService {
       this.db.e_booklet_purchases.count({ where }),
     ]);
 
-    return { data, total, page, limit };
+    return {
+      data: data.map((purchase: any) => serializeEBookletPurchase(purchase)),
+      total,
+      page,
+      limit,
+    };
   }
 
   async listPurchases(filters: EBookletPurchaseListFilters): Promise<{ data: unknown[]; total: number; page: number; limit: number }> {
@@ -2296,7 +2464,7 @@ export class EBookletService {
       }),
       this.db.e_booklet_purchases.count({ where }),
     ]);
-    return { data, total, page, limit };
+    return { data: data.map((purchase: any) => serializeEBookletPurchase(purchase)), total, page, limit };
   }
 
   async getPurchase(id: number): Promise<unknown> {
@@ -2305,7 +2473,7 @@ export class EBookletService {
       include: E_BOOKLET_ADMIN_PURCHASE_INCLUDE,
     });
     if (!purchase) throw new NotFoundError("E-booklet purchase not found");
-    return purchase;
+    return serializeEBookletPurchase(purchase);
   }
 
   async preparePurchaseCustomTemplateVersion(purchaseId: number, adminUserId: number) {

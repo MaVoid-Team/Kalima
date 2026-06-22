@@ -11,8 +11,14 @@ jest.mock("../../src/apps/store-api/services/checkout-validation.service", () =>
   validatePaymentForCheckout: jest.fn().mockResolvedValue({ phone_number: "01000000000" }),
 }));
 
+jest.mock("../../src/libs/redis/socketNotificationEmitter", () => ({
+  emitNotificationToUser: jest.fn(),
+  emitNotificationToUsers: jest.fn(),
+}));
+
 import { EBookletService } from "../../src/apps/store-api/services/e-booklet.service";
 import { hashInviteToken } from "../../src/apps/store-api/utils/e-booklet-token";
+import { emitNotificationToUser } from "../../src/libs/redis/socketNotificationEmitter";
 
 function createViewerPageToken(input: {
   instanceId: number;
@@ -94,6 +100,14 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     },
     payment_methods: {
       findFirst: jest.fn().mockResolvedValue({ id: 1, phone_number: "01000000000", name: "Wallet" }),
+    },
+    users: {
+      findMany: jest.fn().mockResolvedValue([]),
+    },
+    notifications: {
+      create: jest.fn(async (args: any) => ({ id: 1000 + Math.floor(Math.random() * 1000), created_at: new Date("2026-06-22T00:00:00.000Z"), ...args.data })),
+      findFirst: jest.fn().mockResolvedValue(null),
+      findMany: jest.fn().mockResolvedValue([]),
     },
     e_booklet_purchases: {
       create: jest.fn(),
@@ -476,6 +490,95 @@ describe("EBookletService", () => {
       expect(db.e_booklet_invites.create.mock.calls[0][0].data.passcode_ciphertext).not.toBe("123456");
     });
 
+    test("uses marketing price as the teacher purchase price when admin deal omits or zeroes price", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.create.mockResolvedValue({ id: 2, price: 175, marketing_price: 175 });
+
+      const service = new EBookletService(db);
+      await service.createPurchaseRequest(9, {
+        template_id: 3,
+        template_version_id: 4,
+        price: 0,
+        marketing_price: 175,
+        internal_price: 70,
+        branding_json: {},
+      });
+
+      expect(db.e_booklet_purchases.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({
+          price: 175,
+          marketing_price: 175,
+          internal_price: 70,
+        }),
+      }));
+    });
+
+    test("notifies teacher and admin roles when an admin creates an e-booklet purchase request", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.create.mockResolvedValue({ id: 77 });
+      db.users.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }, { id: 2 }]);
+      db.notifications.create
+        .mockImplementationOnce(async (args: any) => ({ id: 901, created_at: new Date("2026-06-22T00:00:00.000Z"), ...args.data }))
+        .mockImplementationOnce(async (args: any) => ({ id: 902, created_at: new Date("2026-06-22T00:00:01.000Z"), ...args.data }))
+        .mockImplementationOnce(async (args: any) => ({ id: 903, created_at: new Date("2026-06-22T00:00:02.000Z"), ...args.data }));
+      const io = { to: jest.fn() } as any;
+
+      const service = new EBookletService(db);
+      await service.createPurchaseRequest(9, {
+        template_id: 3,
+        template_version_id: 4,
+        price: 120,
+        marketing_price: 150,
+        internal_price: 70,
+      }, 5, io);
+
+      expect(db.users.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: expect.objectContaining({
+          user_roles: { some: { portal: "store", role: { in: ["Admin", "SubAdmin", "Moderator"] } } },
+        }),
+      }));
+      expect(db.notifications.create).toHaveBeenNthCalledWith(1, {
+        data: expect.objectContaining({
+          user_id: 9,
+          category: 1,
+          message_key: "ORDER_STATUS_RECEIVED",
+          entity_type: "e_booklet_purchase",
+          entity_id: 77,
+          target_link: "/e-booklet-orders",
+          created_by: 5,
+        }),
+      });
+      expect(db.notifications.create).toHaveBeenNthCalledWith(2, {
+        data: expect.objectContaining({ user_id: 1, category: 4, message_key: "NEW_ORDER_CREATED", entity_type: "e_booklet_purchase", entity_id: 77, target_link: "/admin/e-booklets/orders/77", created_by: 5 }),
+      });
+      expect(db.notifications.create).toHaveBeenNthCalledWith(3, {
+        data: expect.objectContaining({ user_id: 2, category: 4, message_key: "NEW_ORDER_CREATED", entity_type: "e_booklet_purchase", entity_id: 77, target_link: "/admin/e-booklets/orders/77", created_by: 5 }),
+      });
+      expect(emitNotificationToUser).toHaveBeenCalledWith(io, 9, expect.objectContaining({ id: 901, target_link: "/e-booklet-orders" }));
+      expect(emitNotificationToUser).toHaveBeenCalledWith(io, 1, expect.objectContaining({ id: 902, target_link: "/admin/e-booklets/orders/77" }));
+      expect(emitNotificationToUser).toHaveBeenCalledWith(io, 2, expect.objectContaining({ id: 903, target_link: "/admin/e-booklets/orders/77" }));
+    });
+
+    test("does not emit live e-booklet order notifications for existing notification rows", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.create.mockResolvedValue({ id: 77 });
+      db.notifications.findFirst.mockResolvedValue({ id: 901 });
+      db.users.findMany.mockResolvedValue([{ id: 1 }]);
+      db.notifications.findMany.mockResolvedValue([{ user_id: 1 }]);
+
+      const service = new EBookletService(db);
+      await service.createPurchaseRequest(9, {
+        template_id: 3,
+        template_version_id: 4,
+        price: 120,
+        marketing_price: 150,
+        internal_price: 70,
+      }, 5, { to: jest.fn() } as any);
+
+      expect(db.notifications.create).not.toHaveBeenCalled();
+      expect(emitNotificationToUser).not.toHaveBeenCalled();
+    });
+
     test("blocks purchase delivery before payment approval", async () => {
       const db = createMockDb();
       db.e_booklet_purchases.findUnique.mockResolvedValue({
@@ -667,7 +770,9 @@ describe("EBookletService", () => {
           id: 91,
           teacher_id: 55,
           status: "customization_in_progress",
-          price: 250,
+          price: 0,
+          marketing_price: 250,
+          final_payable_price: null,
           created_at: new Date("2026-06-17T10:00:00.000Z"),
           template: { id: 3, title: "Math booklet" },
           template_version: { id: 8, version_number: 1 },
@@ -705,6 +810,7 @@ describe("EBookletService", () => {
         id: 91,
         teacher_id: 55,
         status: "customization_in_progress",
+        total: 250,
         template: expect.objectContaining({ title: "Math booklet" }),
       }));
     });
@@ -736,7 +842,8 @@ describe("EBookletService", () => {
           {
             OR: [
               { final_payable_price: { not: null, gte: 100, lte: 300 } },
-              { final_payable_price: null, price: { gte: 100, lte: 300 } },
+              { final_payable_price: null, price: { gt: 0, gte: 100, lte: 300 } },
+              { final_payable_price: null, price: { lte: 0 }, marketing_price: { gte: 100, lte: 300 } },
             ],
           },
           {
@@ -756,7 +863,51 @@ describe("EBookletService", () => {
         take: 5,
       }));
       expect(db.e_booklet_purchases.count).toHaveBeenCalledWith({ where: expectedWhere });
-      expect(result).toEqual(expect.objectContaining({ data: [{ id: 91, status: "pending" }], total: 1, page: 2, limit: 5 }));
+      expect(result).toEqual(expect.objectContaining({ data: [{ id: 91, status: "pending", total: 0 }], total: 1, page: 2, limit: 5 }));
+    });
+
+    test("returns admin purchase detail with payable total, payment screenshot, method, and required fields", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.findUnique.mockResolvedValue({
+        id: 91,
+        status: "pending",
+        price: 0,
+        marketing_price: 250,
+        final_payable_price: null,
+        payment_method_id: 3,
+        payment_method: "Vodafone Cash",
+        payment_reference: "01012345678",
+        payment_methods: { id: 3, name: "Vodafone Cash", phone_number: "01000000000" },
+        payment_screenshot: { id: 700, url: "/uploads/payment-proof.png" },
+        required_fields: [
+          { id: 1, value: "Sara Academy", required_field_definitions: { id: 10, label: "Academy name", field_type: "text" } },
+          { id: 2, value: "23", required_field_definitions: { id: 11, label: "Teacher count", field_type: "number" } },
+          { id: 3, value: "/uploads/logo.png", required_field_definitions: { id: 12, label: "Logo", field_type: "image" } },
+        ],
+      });
+
+      const service = new EBookletService(db);
+      const result: any = await service.getPurchase(91);
+
+      expect(db.e_booklet_purchases.findUnique).toHaveBeenCalledWith(expect.objectContaining({
+        where: { id: 91 },
+        include: expect.objectContaining({
+          payment_methods: expect.any(Object),
+          payment_screenshot: expect.any(Object),
+          required_fields: expect.any(Object),
+        }),
+      }));
+      expect(result).toEqual(expect.objectContaining({
+        id: 91,
+        total: 250,
+        payment_methods: expect.objectContaining({ name: "Vodafone Cash" }),
+        payment_screenshot: expect.objectContaining({ url: "/uploads/payment-proof.png" }),
+        required_fields: expect.arrayContaining([
+          expect.objectContaining({ value: "Sara Academy" }),
+          expect.objectContaining({ value: "23" }),
+          expect.objectContaining({ value: "/uploads/logo.png" }),
+        ]),
+      }));
     });
 
     test("treats admin purchase date-only endDate as the end of that day", async () => {
@@ -977,6 +1128,61 @@ describe("EBookletService", () => {
       expect(result).toEqual(expect.objectContaining({ purchase_id: 91, booklet_instance_id: 10, next_url: "/e-booklet-orders" }));
     });
 
+    test("public checkout notifies the purchasing teacher and admin roles for e-booklet orders", async () => {
+      const db = createMockDb();
+      const expiry = new Date("2027-01-15T10:30:00.000Z");
+      db.users.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }]);
+      db.e_booklet_instances.findFirst.mockResolvedValue({
+        id: 10,
+        teacher_id: 7,
+        template_id: 3,
+        template_version_id: 8,
+        invite_quota: 5,
+        access_expires_at: expiry,
+        status: "active",
+        student_marketing_price: 0,
+        internal_price: 70,
+        template: { currency: "EGP" },
+      });
+      db.e_booklet_access.count.mockResolvedValue(0);
+      db.e_booklet_student_purchase_links.count.mockResolvedValue(0);
+      db.e_booklet_purchases.create.mockResolvedValue({ id: 91, status: "ready", price: 0, currency: "EGP" });
+      db.notifications.create
+        .mockImplementationOnce(async (args: any) => ({ id: 911, created_at: new Date("2026-06-22T00:00:00.000Z"), ...args.data }))
+        .mockImplementationOnce(async (args: any) => ({ id: 912, created_at: new Date("2026-06-22T00:00:01.000Z"), ...args.data }))
+        .mockImplementationOnce(async (args: any) => ({ id: 913, created_at: new Date("2026-06-22T00:00:02.000Z"), ...args.data }));
+      const io = { to: jest.fn() } as any;
+
+      const service = new EBookletService(db);
+      await service.createPublicCheckoutRequest(55, {
+        instance_id: 10,
+        template_id: 3,
+        template_version_id: 8,
+        terms_accepted: true,
+      }, undefined, io);
+
+      expect(db.notifications.create).toHaveBeenNthCalledWith(1, {
+        data: expect.objectContaining({
+          user_id: 55,
+          category: 1,
+          message_key: "ORDER_STATUS_RECEIVED",
+          entity_type: "e_booklet_purchase",
+          entity_id: 91,
+          target_link: "/e-booklet-orders",
+          created_by: null,
+        }),
+      });
+      expect(db.notifications.create).toHaveBeenNthCalledWith(2, {
+        data: expect.objectContaining({ user_id: 1, category: 4, message_key: "NEW_ORDER_CREATED", entity_type: "e_booklet_purchase", entity_id: 91, target_link: "/admin/e-booklets/orders/91", created_by: null }),
+      });
+      expect(db.notifications.create).toHaveBeenNthCalledWith(3, {
+        data: expect.objectContaining({ user_id: 2, category: 4, message_key: "NEW_ORDER_CREATED", entity_type: "e_booklet_purchase", entity_id: 91, target_link: "/admin/e-booklets/orders/91", created_by: null }),
+      });
+      expect(emitNotificationToUser).toHaveBeenCalledWith(io, 55, expect.objectContaining({ id: 911, target_link: "/e-booklet-orders" }));
+      expect(emitNotificationToUser).toHaveBeenCalledWith(io, 1, expect.objectContaining({ id: 912, target_link: "/admin/e-booklets/orders/91" }));
+      expect(emitNotificationToUser).toHaveBeenCalledWith(io, 2, expect.objectContaining({ id: 913, target_link: "/admin/e-booklets/orders/91" }));
+    });
+
     test("public instance checkout validates and stores configured required fields", async () => {
       const db = createMockDb();
       const expiry = new Date("2027-01-15T10:30:00.000Z");
@@ -992,13 +1198,29 @@ describe("EBookletService", () => {
         internal_price: 70,
         template: {
           currency: "EGP",
-          required_fields: [{
-            id: 21,
-            field_definition_id: 12,
-            is_required: true,
-            active: true,
-            required_field_definitions: { id: 12, label: "Student phone", active: true, is_deleted: false },
-          }],
+          required_fields: [
+            {
+              id: 21,
+              field_definition_id: 12,
+              is_required: true,
+              active: true,
+              required_field_definitions: { id: 12, label: "Student phone", field_type: "text", active: true, is_deleted: false },
+            },
+            {
+              id: 22,
+              field_definition_id: 13,
+              is_required: true,
+              active: true,
+              required_field_definitions: { id: 13, label: "Class size", field_type: "number", active: true, is_deleted: false },
+            },
+            {
+              id: 23,
+              field_definition_id: 14,
+              is_required: false,
+              active: true,
+              required_field_definitions: { id: 14, label: "School logo", field_type: "image", active: true, is_deleted: false },
+            },
+          ],
         },
       };
       db.e_booklet_instances.findFirst.mockResolvedValue(instance);
@@ -1019,12 +1241,20 @@ describe("EBookletService", () => {
         instance_id: 10,
         template_id: 3,
         template_version_id: 8,
-        required_field_values: [{ field_definition_id: 12, value: "01012345678" }],
+        required_field_values: [
+          { field_definition_id: 12, value: "01012345678" },
+          { field_definition_id: 13, value: "32" },
+          { field_definition_id: 14, value: "/uploads/school-logo.png" },
+        ],
         terms_accepted: true,
       });
 
       expect(db.e_booklet_purchase_required_fields.createMany).toHaveBeenCalledWith({
-        data: [{ purchase_id: 91, field_definition_id: 12, value: "01012345678" }],
+        data: [
+          { purchase_id: 91, field_definition_id: 12, value: "01012345678" },
+          { purchase_id: 91, field_definition_id: 13, value: "32" },
+          { purchase_id: 91, field_definition_id: 14, value: "/uploads/school-logo.png" },
+        ],
         skipDuplicates: true,
       });
       expect(result).toEqual(expect.objectContaining({ purchase_id: 91, booklet_instance_id: 10, next_url: "/e-booklet-orders" }));
