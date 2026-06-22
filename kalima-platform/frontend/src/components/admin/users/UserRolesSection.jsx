@@ -139,7 +139,7 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
                         <TableRow>
                             <TableHead>{t('details.portal')}</TableHead>
                             <TableHead>{t('details.role')}</TableHead>
-                            <TableHead className="text-end">{t('table.actions')}</TableHead>
+                            <TableHead actions>{t('table.actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -152,15 +152,15 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
                         ) : (
                             roles.map((roleObj, idx) => (
                                 <TableRow key={`${roleObj.portal}-${roleObj.role}-${idx}`}>
-                                    <TableCell className="font-medium">
+                                    <TableCell truncate className="font-medium" title={t(`portals.${roleObj.portal}`, roleObj.portal)}>
                                         {t(`portals.${roleObj.portal}`, roleObj.portal)}
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell status>
                                         <Badge variant="secondary">
                                             {t(`roles.${roleObj.role}`, roleObj.role)}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className='flex justify-end items-center'>
+                                    <TableCell actions className='flex justify-end items-center'>
                                         <Button
                                             variant="destructive"
                                             size="sm"

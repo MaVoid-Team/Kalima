@@ -27,30 +27,30 @@ export default function PrintableReceipt({ purchase, paymentMethodName = '', bas
           </section>
 
           <section className="mb-4">
-            <table className="w-full text-sm border-collapse">
+            <table className="kalima-data-table border-collapse">
               <thead>
                 <tr>
                   <th className="text-left pb-2">{t('checkout:receipt.item', { defaultValue: 'Item' })}</th>
                   <th className="text-left pb-2">{t('checkout:receipt.type', { defaultValue: 'Type' })}</th>
-                  <th className="text-right pb-2">{t('checkout:receipt.price', { defaultValue: 'Price' })}</th>
+                  <th className="kalima-number pb-2">{t('checkout:receipt.price', { defaultValue: 'Price' })}</th>
                 </tr>
               </thead>
               <tbody>
                 {purchase.purchase_items.map((it, idx) => (
                   <tr key={it.products?.id ?? idx} className="align-top">
-                    <td className="py-2">
+                    <td className="kalima-truncate py-2" title={it.products?.title || undefined}>
                       <div className="flex items-center gap-2">
                         {it.products?.thumbnail_image?.url ? (
                           <img src={new URL(it.products.thumbnail_image.url, baseURL).toString()} alt={it.products?.title || ''} className="w-12 h-12 object-cover rounded" />
                         ) : null}
                         <div>
                           <div className="font-medium">{it.products?.title}</div>
-                          <div className="text-xs text-muted-foreground">{it.created_at ? new Date(it.created_at).toLocaleDateString() : ''}</div>
+                           <div className="text-xs text-muted-foreground tabular-nums">{it.created_at ? new Date(it.created_at).toLocaleDateString() : ''}</div>
                         </div>
                       </div>
                     </td>
                     <td className="py-2">{it.products?.type}</td>
-                    <td className="py-2 text-right">{it.price_at_purchase} </td>
+                    <td className="kalima-number py-2">{it.price_at_purchase} </td>
                   </tr>
                 ))}
               </tbody>

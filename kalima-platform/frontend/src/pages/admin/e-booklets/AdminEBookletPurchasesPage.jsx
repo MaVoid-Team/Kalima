@@ -208,9 +208,9 @@ export default function AdminEBookletPurchasesPage() {
                   <TableHead>{t("common.teacher", { defaultValue: "Teacher" })}</TableHead>
                   <TableHead>{t("common.eBooklet", { defaultValue: "E-booklet" })}</TableHead>
                   <TableHead>{t("common.status")}</TableHead>
-                  <TableHead>{t("orders.table.total", { defaultValue: "Total" })}</TableHead>
-                  <TableHead>{t("orders.table.payment", { defaultValue: "Payment" })}</TableHead>
-                  <TableHead className="text-end">{t("common.actions")}</TableHead>
+                   <TableHead numeric>{t("orders.table.total", { defaultValue: "Total" })}</TableHead>
+                   <TableHead>{t("orders.table.payment", { defaultValue: "Payment" })}</TableHead>
+                   <TableHead actions>{t("common.actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -223,28 +223,28 @@ export default function AdminEBookletPurchasesPage() {
                         aria-label={t("admin.purchases.selectPurchase", { id: purchase.id, defaultValue: "Select e-booklet purchase #{{id}}" })}
                       />
                     </TableCell>
-                    <TableCell className="font-medium">
+                     <TableCell className="font-medium">
                       <Link to={`/admin/e-booklets/orders/${purchase.id}`} className="text-primary hover:underline">
                         #{purchase.id}
                       </Link>
-                      <div className="mt-1 text-xs text-muted-foreground">{formatOrderDate(purchase.created_at, i18n.language)}</div>
-                    </TableCell>
-                    <TableCell>
+                       <div className="mt-1 text-xs text-muted-foreground tabular-nums">{formatOrderDate(purchase.created_at, i18n.language)}</div>
+                     </TableCell>
+                     <TableCell truncate title={purchase.teacher?.email || purchase.teacher?.name || undefined}>
                       <div className="font-medium">{purchase.teacher?.name || t("common.teacher", { defaultValue: "Teacher" })}</div>
                       <div className="text-xs text-muted-foreground">{purchase.teacher?.email}</div>
                       {purchase.teacher?.phone && <div className="text-xs text-muted-foreground">{purchase.teacher.phone}</div>}
                     </TableCell>
-                    <TableCell className="max-w-[280px]">
+                     <TableCell truncate className="max-w-[280px]" title={purchase.template?.title || undefined}>
                       <div className="truncate font-medium">{purchase.template?.title || "-"}</div>
                       <div className="text-xs text-muted-foreground">v{purchase.template_version?.version_number || 1}</div>
                     </TableCell>
-                    <TableCell>{renderStatus(purchase.status)}</TableCell>
-                    <TableCell>{formatCurrency(purchaseAmount(purchase), t)}</TableCell>
-                    <TableCell>
+                     <TableCell status>{renderStatus(purchase.status)}</TableCell>
+                     <TableCell numeric>{formatCurrency(purchaseAmount(purchase), t)}</TableCell>
+                     <TableCell truncate title={purchase.payment_reference || purchase.payment_methods?.name || purchase.payment_method || undefined}>
                       <div className="font-medium">{purchase.payment_methods?.name || purchase.payment_method || "-"}</div>
                       <div className="text-xs text-muted-foreground">{purchase.payment_reference || ""}</div>
                     </TableCell>
-                    <TableCell>
+                     <TableCell actions>
                       <AdminEBookletPurchaseActions purchase={purchase} onMarkPaid={handleMarkPaid} onUpdateStatus={handleUpdateStatus} onActionSuccess={refresh} />
                     </TableCell>
                   </TableRow>

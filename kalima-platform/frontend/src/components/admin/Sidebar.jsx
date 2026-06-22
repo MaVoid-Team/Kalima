@@ -51,7 +51,6 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
       matchPaths: ['/admin/products', '/admin/orders', '/admin/samples', '/admin/categories'],
     },
     { name: t('nav.eBooklets', 'E-Booklets'), href: '/admin/e-booklets', icon: BookOpenCheck, id: 'e-booklets' },
-    { name: t('nav.eBookletTermsMilestones', 'E-Booklet Terms & Milestones'), href: '/admin/e-booklet-terms-milestones', icon: BookOpenCheck, id: 'eBookletTermsMilestones', managerOnly: true },
     { name: t('nav.coupons'), href: '/admin/coupons', icon: Ticket, id: 'coupons' },
     { name: t('nav.requiredFields'), href: '/admin/required-fields', icon: FormInput, id: 'required-fields' },
     { name: t('nav.paymentMethods', 'Payment Methods'), href: '/admin/payment-methods', icon: CreditCard, id: 'payment-methods' },

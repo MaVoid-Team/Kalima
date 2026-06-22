@@ -75,12 +75,12 @@ export default function PaymentMethodsTable({
                             />
                         </TableHead>
                         <TableHead>{t('paymentMethods.table.image', 'Image')}</TableHead>
-                        <TableHead>{t('paymentMethods.table.id', 'ID')}</TableHead>
+                        <TableHead numeric>{t('paymentMethods.table.id', 'ID')}</TableHead>
                         <TableHead>{t('paymentMethods.table.name', 'Name')}</TableHead>
                         <TableHead>{t('paymentMethods.table.phoneNumber', 'Phone Number')}</TableHead>
                         <TableHead>{t('paymentMethods.table.status', 'Status')}</TableHead>
                         <TableHead>{t('paymentMethods.table.createdAt', 'Created')}</TableHead>
-                        <TableHead className="w-12">
+                        <TableHead actions className="w-12">
                             <span className="sr-only">{t('common.actions', 'Actions')}</span>
                         </TableHead>
                     </TableRow>
@@ -114,18 +114,18 @@ export default function PaymentMethodsTable({
                                     </div>
                                 )}
                             </TableCell>
-                            <TableCell className="font-medium">
+                            <TableCell numeric className="font-medium">
                                 {paymentMethod.id}
                             </TableCell>
-                            <TableCell>
+                            <TableCell truncate title={paymentMethod.name}>
                                 <div className="font-medium">{paymentMethod.name}</div>
                             </TableCell>
-                            <TableCell className={`${i18n.language == "ar" ? "text-right" : "text-left"}`}>
+                            <TableCell truncate title={paymentMethod.phone_number} className={`${i18n.language == "ar" ? "text-right" : "text-left"}`}>
                                 <div dir="ltr" className="text-sm text-muted-foreground">
                                     {paymentMethod.phone_number}
                                 </div>
                             </TableCell>
-                            <TableCell>
+                            <TableCell status>
                                 <div className="flex items-center gap-2">
                                     <Switch
                                         checked={paymentMethod.status}
@@ -143,12 +143,12 @@ export default function PaymentMethodsTable({
                                     </Badge>
                                 </div>
                             </TableCell>
-                            <TableCell>
+                            <TableCell date>
                                 <div className="text-sm text-muted-foreground">
                                     {new Date(paymentMethod.created_at).toLocaleDateString()}
                                 </div>
                             </TableCell>
-                            <TableCell>
+                            <TableCell actions>
                                 <DropdownMenu dir={i18n.dir()}>
                                     <DropdownMenuTrigger asChild>
                                         <Button

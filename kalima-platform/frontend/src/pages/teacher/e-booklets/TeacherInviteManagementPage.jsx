@@ -162,23 +162,6 @@ export default function TeacherInviteManagementPage() {
 
   const generatePaidMessageCode = () => requireTermsFor((acceptedTermId) => runCodeGeneration("message", acceptedTermId));
   const generatePaidCodeOnly = () => requireTermsFor((acceptedTermId) => runCodeGeneration("code", acceptedTermId));
-  const generateFreeSharedCode = async () => {
-    const response = await createAccessCode(instanceId, { kind: "free", maxRedemptions: null });
-    const code = getCode(response);
-    const whatsappMessage = getMessage(response);
-    const record = getRecord(response);
-    setGeneratedCodes((current) => [{
-      id: record.id || `free-${Date.now()}`,
-      kind: "free",
-      mode: "shared",
-      code,
-      whatsappMessage,
-      codeHint: record.code_hint,
-      createdAt: record.created_at || new Date().toISOString(),
-    }, ...current]);
-    fetchAccessCodes(instanceId).catch(() => {});
-    if (whatsappMessage) await copyText(whatsappMessage, "toasts.accessMessageCopied");
-  };
   const generateBulkPaidCodes = () => requireTermsFor(async (acceptedTermId) => {
     const count = Math.max(1, Number(bulkCount) || 1);
     const response = await createAccessCodes(instanceId, { kind: "paid", termId: acceptedTermId, count, maxRedemptions: 1 });
@@ -272,10 +255,6 @@ export default function TeacherInviteManagementPage() {
               <Copy className="h-4 w-4" />
               {t("teacher.invites.generatePaidCodeOnly")}
             </Button>
-            <Button onClick={generateFreeSharedCode} disabled={loading} variant="outline" className="h-auto min-h-10 w-full whitespace-normal break-words text-center leading-snug">
-              <Copy className="h-4 w-4" />
-              {t("teacher.invites.generateFreeSharedCode", { defaultValue: "Create free shared tracking code" })}
-            </Button>
             <p className="text-xs text-muted-foreground">{t("teacher.invites.notPaidProgress")}</p>
             <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]" data-testid="bulk-access-code-controls">
               <input
@@ -317,15 +296,15 @@ export default function TeacherInviteManagementPage() {
                   <TableRow>
                     <TableHead>{t("teacher.invites.codeColumn", { defaultValue: "Code / hint" })}</TableHead>
                     <TableHead>{t("teacher.invites.typeColumn", { defaultValue: "Type" })}</TableHead>
-                    <TableHead>{t("teacher.invites.usageColumn", { defaultValue: "Used" })}</TableHead>
+                    <TableHead numeric>{t("teacher.invites.usageColumn", { defaultValue: "Used" })}</TableHead>
                     <TableHead>{t("teacher.invites.createdColumn", { defaultValue: "Created" })}</TableHead>
-                    <TableHead className="text-end">{t("teacher.invites.actionsColumn", { defaultValue: "Actions" })}</TableHead>
+                    <TableHead actions>{t("teacher.invites.actionsColumn", { defaultValue: "Actions" })}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {visibleAccessRows.map((entry) => (
                     <TableRow key={entry.id} className="group">
-                      <TableCell className="min-w-[220px] whitespace-normal">
+                      <TableCell status truncate className="min-w-[220px] whitespace-normal" title={entry.code || entry.codeHint || entry.id}>
                         <div className="flex min-w-0 flex-col gap-1">
                           <span className="break-all font-mono text-sm font-semibold leading-snug">{entry.code || (entry.codeHint ? t("teacher.invites.codeHintShort", { defaultValue: "**** {{value}}", value: entry.codeHint }) : entry.id)}</span>
                           <div className="flex flex-wrap gap-1.5">
@@ -334,10 +313,10 @@ export default function TeacherInviteManagementPage() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell><Badge variant={entry.kind === "paid" ? "default" : "outline"}>{entry.kind === "paid" ? t("teacher.invites.paidUnique") : t("teacher.invites.freeShared")}</Badge></TableCell>
-                      <TableCell>{entry.redeemedCount ?? 0}{entry.maxRedemptions ? ` / ${entry.maxRedemptions}` : ""}</TableCell>
-                      <TableCell className="text-muted-foreground">{formatDate(entry.createdAt)}</TableCell>
-                      <TableCell>
+                      <TableCell status><Badge variant={entry.kind === "paid" ? "default" : "outline"}>{entry.kind === "paid" ? t("teacher.invites.paidUnique") : t("teacher.invites.freeShared")}</Badge></TableCell>
+                      <TableCell numeric>{entry.redeemedCount ?? 0}{entry.maxRedemptions ? ` / ${entry.maxRedemptions}` : ""}</TableCell>
+                      <TableCell date>{formatDate(entry.createdAt)}</TableCell>
+                      <TableCell actions>
                         <div className="flex justify-end gap-2">
                           {entry.code && <Button variant="outline" size="sm" onClick={() => copyText(entry.code)}><Copy className="h-4 w-4" />{t("teacher.invites.copyCode")}</Button>}
                           {entry.whatsappMessage && <Button variant="outline" size="sm" onClick={() => copyText(entry.whatsappMessage, "toasts.accessMessageCopied")}><MessageCircle className="h-4 w-4" />{t("teacher.invites.copyWhatsAppMessage")}</Button>}

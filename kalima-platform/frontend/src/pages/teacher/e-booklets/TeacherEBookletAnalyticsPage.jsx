@@ -256,28 +256,28 @@ export default function TeacherEBookletAnalyticsPage() {
           <p className="text-sm leading-6 text-muted-foreground">{t("teacher.analytics.instancesDescription")}</p>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-muted/50 text-start text-xs uppercase text-muted-foreground">
+          <table className="kalima-data-table min-w-full">
+            <thead className="text-start">
               <tr>
                 <th className="px-4 py-3 text-start">{t("common.eBooklet")}</th>
                 <th className="px-4 py-3 text-start">{t("common.status")}</th>
-                <th className="px-4 py-3 text-start">{t("teacher.quota")}</th>
-                <th className="px-4 py-3 text-start">{t("teacher.used")}</th>
+                <th className="kalima-number px-4 py-3">{t("teacher.quota")}</th>
+                <th className="kalima-number px-4 py-3">{t("teacher.used")}</th>
                 <th className="px-4 py-3 text-start">{t("teacher.expiry")}</th>
                 <th className="px-4 py-3 text-start">{t("analytics.metrics.deviceAccess")}</th>
-                <th className="px-4 py-3 text-start">{t("common.actions")}</th>
+                <th className="kalima-actions px-4 py-3">{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
               {selectedRows.map(({ access, instance, expiry, expired }) => (
-                <tr key={access.id} className="border-t">
-                  <td className="px-4 py-3 font-medium">{instance.display_title || instance.template?.title || t("common.eBooklet")}</td>
+                <tr key={access.id}>
+                  <td className="kalima-truncate px-4 py-3 font-medium" title={instance.display_title || instance.template?.title || t("common.eBooklet")}>{instance.display_title || instance.template?.title || t("common.eBooklet")}</td>
                   <td className="px-4 py-3"><Badge variant="outline" className="rounded-full">{t(`statuses.${instance.status || "active"}`)}</Badge></td>
-                  <td className="px-4 py-3">{numberValue(instance.invite_quota)}</td>
-                  <td className="px-4 py-3">{numberValue(instance.used_invites_count)}</td>
-                  <td className="px-4 py-3"><CalendarDays className="me-1 inline h-4 w-4" />{formatDate(expiry)}</td>
+                  <td className="kalima-number px-4 py-3">{numberValue(instance.invite_quota)}</td>
+                  <td className="kalima-number px-4 py-3">{numberValue(instance.used_invites_count)}</td>
+                  <td className="kalima-date px-4 py-3"><CalendarDays className="me-1 inline h-4 w-4" />{formatDate(expiry)}</td>
                   <td className="px-4 py-3"><ShieldCheck className="me-1 inline h-4 w-4" />{expired ? t("statuses.revoked") : access.device_lock_status || t("statuses.active")}</td>
-                  <td className="px-4 py-3"><Button size="sm" variant="outline" onClick={() => updateFilter("instanceId", String(instance.id))}>{t("analytics.drilldown")}</Button></td>
+                  <td className="kalima-actions px-4 py-3"><Button size="sm" variant="outline" onClick={() => updateFilter("instanceId", String(instance.id))}>{t("analytics.drilldown")}</Button></td>
                 </tr>
               ))}
               {selectedRows.length === 0 && <tr><td colSpan="7" className="px-4 py-8 text-center text-muted-foreground">{t("teacher.emptyTitle")}</td></tr>}

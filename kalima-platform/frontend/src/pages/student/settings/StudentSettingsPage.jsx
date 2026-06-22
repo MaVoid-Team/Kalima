@@ -27,7 +27,7 @@ export default function StudentSettingsPage() {
             </div>
 
             <div className="grid gap-6">
-                <ProfileSection ns="student" />
+                <ProfileSection ns="student" editable={false} />
                 <PasswordSection ns="student" />
                 <AccountSection ns="student" />
                 <SecuritySection ns="student" />

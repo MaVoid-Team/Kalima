@@ -75,11 +75,11 @@ export default function ProductsTable({
                         <TableHead className="w-16">{t('products.table.thumbnail')}</TableHead>
                         <TableHead>{t('products.table.title')}</TableHead>
                         <TableHead className="hidden md:table-cell">{t('products.table.type')}</TableHead>
-                        <TableHead>{t('products.table.price')}</TableHead>
+                        <TableHead numeric>{t('products.table.price')}</TableHead>
                         <TableHead className="hidden lg:table-cell">{t('products.table.rating')}</TableHead>
                         <TableHead className="hidden lg:table-cell">{t('products.table.categories')}</TableHead>
                         <TableHead className="hidden sm:table-cell">{t('products.table.status')}</TableHead>
-                        <TableHead className="text-end">{t('products.table.actions')}</TableHead>
+                        <TableHead actions>{t('products.table.actions')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -122,7 +122,7 @@ export default function ProductsTable({
                                 </TableCell>
 
                                 {/* Title */}
-                                <TableCell className="cursor-pointer" onClick={() => navigate(`/admin/products/${product.id}`)}>
+                                <TableCell truncate className="cursor-pointer" title={product.title} onClick={() => navigate(`/admin/products/${product.id}`)}>
                                     <p className="font-medium line-clamp-1">{product.title}</p>
                                     {product.serial && (
                                         <p className="text-xs text-muted-foreground">{product.serial}</p>
@@ -136,14 +136,14 @@ export default function ProductsTable({
 
                                 {/* Price */}
                                 {product.price_after_discount && product.price_after_discount !== product.price ? (
-                                    <TableCell>
+                                    <TableCell numeric>
                                         <div>
                                             <p className="font-semibold text-sm">{formatCurrency(product.price_after_discount, t)}</p>
                                             <p className="text-xs text-muted-foreground line-through">{formatCurrency(product.price, t)}</p>
                                         </div>
                                     </TableCell>
                                 ) : (
-                                    <TableCell>
+                                    <TableCell numeric>
                                         <div>
                                             <p className="font-semibold text-sm">{formatCurrency(product.price, t)}</p>
                                         </div>
@@ -177,7 +177,7 @@ export default function ProductsTable({
                                 </TableCell>
 
                                 {/* Status */}
-                                <TableCell className="hidden sm:table-cell">
+                                <TableCell status className="hidden sm:table-cell">
                                     <Badge
                                         variant={isArchived ? 'destructive' : 'default'}
                                         className={cn(
@@ -205,7 +205,7 @@ export default function ProductsTable({
                                 </TableCell>
 
                                 {/* Actions */}
-                                <TableCell className="text-end" onClick={(e) => e.stopPropagation()}>
+                                <TableCell actions onClick={(e) => e.stopPropagation()}>
                                     <DropdownMenu dir={i18n.dir()}>
                                         <DropdownMenuTrigger asChild>
                                             <Button

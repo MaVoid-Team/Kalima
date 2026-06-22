@@ -11,8 +11,8 @@ import TeacherAvatarCard from '@/components/teacher/profile/TeacherAvatarCard';
 
 export default function TeacherProfilePage() {
     const { t } = useTranslation('teacher');
-    const { profile, updateProfile, uploadAvatar, fetchProfile, loading } = useProfile();
-    const { governments, subjects, getZonesByGovernment, zones, zonesLoading } = useLookups();
+    const { profile, uploadAvatar, fetchProfile, loading } = useProfile();
+    const { governments, subjects, getZonesByGovernment, zones } = useLookups();
 
     const [formReady, setFormReady] = useState(false);
     const [defaultValues, setDefaultValues] = useState({});
@@ -41,33 +41,6 @@ export default function TeacherProfilePage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleGovernmentChange = (govId) => {
-        if (govId) {
-            getZonesByGovernment(govId);
-        }
-    };
-
-    const onSubmit = async (data) => {
-        const clean = Object.fromEntries(
-            Object.entries(data).filter(([, v]) => v !== '' && v !== undefined)
-        );
-        await updateProfile(clean);
-
-        // Re-load profile to refresh values and form defaults
-        const p = await fetchProfile();
-        if (p) {
-            setDefaultValues({
-                name: p.name || '',
-                phone: p.phone || '',
-                secondary_phone: p.secondary_phone || '',
-                gender: p.gender || undefined,
-                government_id: p.teachers?.government_id || undefined,
-                zone_id: p.teachers?.zone_id || undefined,
-                subject_id: p.teachers?.subject_id || undefined,
-            });
-        }
-    };
-
     if (loading && !profile) {
         return (
             <div className="flex h-[50vh] items-center justify-center">
@@ -77,7 +50,7 @@ export default function TeacherProfilePage() {
     }
 
     return (
-        <div className="space-y-10" data-testid="teacher-profile-page">
+        <div className="space-y-6" data-testid="teacher-profile-page">
             {/* Page Header */}
             <div className="flex items-center gap-3">
                 <User className="h-8 w-8 text-primary" />
@@ -94,17 +67,13 @@ export default function TeacherProfilePage() {
                 fetchProfile={fetchProfile}
             />
 
-            {/* Edit Profile Form */}
+            {/* Read-only Profile Details */}
             {formReady && (
                 <TeacherProfileForm
                     defaultValues={defaultValues}
-                    onSubmit={onSubmit}
-                    loading={loading}
                     governments={governments}
                     subjects={subjects}
                     zones={zones}
-                    zonesLoading={zonesLoading}
-                    onGovernmentChange={handleGovernmentChange}
                 />
             )}
 

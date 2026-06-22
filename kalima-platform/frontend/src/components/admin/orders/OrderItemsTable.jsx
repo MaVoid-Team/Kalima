@@ -83,9 +83,9 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                 <TableRow>
                                     <TableHead>{t('orders.items.product', 'Product')}</TableHead>
                                     <TableHead>{t('orders.items.type', 'Type')}</TableHead>
-                                    <TableHead>{t('orders.items.price', 'Price')}</TableHead>
-                                    <TableHead>{t('orders.items.discount', 'Discount')}</TableHead>
-                                    <TableHead>{t('orders.items.actions', 'Actions')}</TableHead>
+                                    <TableHead numeric>{t('orders.items.price', 'Price')}</TableHead>
+                                    <TableHead numeric>{t('orders.items.discount', 'Discount')}</TableHead>
+                                    <TableHead actions>{t('orders.items.actions', 'Actions')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -94,7 +94,7 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                     const { main: mainImage } = buildProductImages(product);
                                     return (
                                         <TableRow key={item.id} className={item.is_deleted ? 'opacity-60' : ''}>
-                                            <TableCell>
+                                            <TableCell truncate title={product?.title || undefined}>
                                                 <div className="flex items-center gap-3">
                                                     {mainImage && (
                                                         <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md border">
@@ -116,11 +116,11 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                                 </div>
                                             </TableCell>
                                             <TableCell>{product?.type || item.item_type || t('common.na', 'N/A')}</TableCell>
-                                            <TableCell>{formatCurrency(item.price_at_purchase, t)}</TableCell>
-                                            <TableCell className="text-success">
+                                            <TableCell numeric>{formatCurrency(item.price_at_purchase, t)}</TableCell>
+                                            <TableCell numeric className="text-success">
                                                 {item.discount && item.discount > 0 ? formatCurrency(item.discount, t) : '-'}
                                             </TableCell>
-                                            <TableCell>
+                                            <TableCell actions>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"

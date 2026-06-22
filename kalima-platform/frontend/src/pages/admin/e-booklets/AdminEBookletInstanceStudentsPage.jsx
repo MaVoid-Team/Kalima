@@ -78,14 +78,14 @@ export default function AdminEBookletInstanceStudentsPage() {
         {!loading && students.length === 0 && <div className="rounded-md border p-6 text-center text-sm text-muted-foreground">{t("admin.instances.studentsEmpty")}</div>}
         {!loading && students.length > 0 && (
           <div className="overflow-x-auto rounded-md border">
-            <table className="w-full min-w-[980px] text-sm">
+            <table className="kalima-data-table min-w-[980px]">
               <thead>
-                <tr className="border-b bg-muted/40 text-left text-xs uppercase text-muted-foreground">
+                <tr className="text-left">
                   <th className="p-3">{t("common.student")}</th>
                   <th className="p-3">{t("common.access")}</th>
                   <th className="p-3">{t("admin.instances.studentAnalytics")}</th>
                   <th className="p-3">{t("admin.instances.deviceSummary")}</th>
-                  <th className="p-3">{t("common.actions")}</th>
+                  <th className="kalima-actions p-3">{t("common.actions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -95,19 +95,19 @@ export default function AdminEBookletInstanceStudentsPage() {
                   const devicesSummary = student.devices_summary || {};
                   const source = analytics.source || student.access_source;
                   return (
-                    <tr key={student.id || `${instanceId}:${userId}`} className="border-b last:border-0 align-top">
-                      <td className="p-3">
+                    <tr key={student.id || `${instanceId}:${userId}`} className="align-top">
+                      <td className="kalima-truncate p-3" title={student.user?.email || student.user?.name || undefined}>
                         <div className="font-medium">{student.user?.name || t("common.student")}</div>
                         <div className="text-xs text-muted-foreground">{student.user?.email || `${t("admin.devices.userId")} #${userId}`}</div>
                       </td>
-                      <td className="p-3">
+                      <td className="p-3" data-cell="status">
                         <div className="flex flex-col gap-1">
                           <Badge className="w-fit" variant="outline">{t(`statuses.${student.status}`, { defaultValue: student.status })}</Badge>
                           <span className="text-xs text-muted-foreground">{t("admin.instances.accessSource", { source: source || t("common.manual") })}</span>
                           <span className="text-xs text-muted-foreground">{t("admin.instances.grantedAt", { value: formatDate(student.granted_at, true) })}</span>
                         </div>
                       </td>
-                      <td className="p-3">
+                      <td className="p-3" data-cell="status">
                         <div className="flex flex-wrap gap-1">
                           {source && <Badge variant="secondary">{source}</Badge>}
                           <Badge variant="outline">{t("admin.instances.analyticsAccess", { count: numberValue(analytics.access_created) })}</Badge>
@@ -115,14 +115,14 @@ export default function AdminEBookletInstanceStudentsPage() {
                           <Badge variant="outline">{t("admin.instances.analyticsPages", { count: numberValue(analytics.page_viewed) })}</Badge>
                         </div>
                       </td>
-                      <td className="p-3">
+                      <td className="p-3" data-cell="number">
                         <div className="grid gap-1 text-xs text-muted-foreground">
                           <span>{t("admin.instances.activeDevices", { count: numberValue(devicesSummary.active_count) })}</span>
                           <span>{t("admin.instances.allowedDevices", { count: numberValue(devicesSummary.allowed_devices, 1) })}</span>
                           <span>{t("admin.instances.lastSeen", { value: formatDate(devicesSummary.last_seen_at, true) })}</span>
                         </div>
                       </td>
-                      <td className="p-3">
+                      <td className="kalima-actions p-3">
                         <Button asChild size="sm" variant="outline">
                           <Link to={`/admin/e-booklets/access/${instanceId}/devices?userId=${userId}`}><HardDrive className="h-4 w-4" />{t("admin.students.manageDevices")}</Link>
                         </Button>

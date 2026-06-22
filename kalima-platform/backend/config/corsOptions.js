@@ -4,7 +4,7 @@ const corsOptions = {
   origin: allowedOrigins,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-E-Booklet-Page-Token"],
   optionsSuccessStatus: 204,
 };
 

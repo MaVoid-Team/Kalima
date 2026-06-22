@@ -99,7 +99,7 @@ export default function UsersTable({
                             <TableHead>{t('table.phone')}</TableHead>
                             <TableHead>{t('table.role')}</TableHead>
                             <TableHead>{t('table.status')}</TableHead>
-                            <TableHead className="text-end">{t('table.actions')}</TableHead>
+                            <TableHead actions>{t('table.actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -116,7 +116,7 @@ export default function UsersTable({
                             return (
                                 <TableRow key={user.id} data-testid={`users-table-row-${user.id}`}>
                                     {/* User */}
-                                    <TableCell>
+                                    <TableCell truncate title={user.name || undefined}>
                                         <div className="flex items-center gap-3">
                                             <Avatar className="h-9 w-9 shrink-0">
                                                 <AvatarImage src={user.profile_pic_url} alt={user.name} className="object-cover" />
@@ -127,7 +127,7 @@ export default function UsersTable({
                                             <div className="min-w-0">
                                                 <p className="font-medium text-sm truncate max-w-[160px]">{user.name}</p>
                                                 {user.created_at && (
-                                                    <p className="text-xs text-muted-foreground">
+                                                    <p className="text-xs text-muted-foreground tabular-nums">
                                                         {format(new Date(user.created_at), 'PP', { locale: isRtl ? arSA : undefined })}
                                                     </p>
                                                 )}
@@ -136,19 +136,19 @@ export default function UsersTable({
                                     </TableCell>
 
                                     {/* Email */}
-                                    <TableCell>
+                                    <TableCell truncate title={displayEmail || undefined}>
                                         <span className="text-sm truncate max-w-[200px] block" dir="ltr">
                                             {displayEmail || '—'}
                                         </span>
                                     </TableCell>
 
                                     {/* Phone */}
-                                    <TableCell>
+                                    <TableCell truncate title={displayPhone || undefined}>
                                         <span className="text-sm" dir="ltr">{displayPhone || '—'}</span>
                                     </TableCell>
 
                                     {/* Role */}
-                                    <TableCell>
+                                    <TableCell status>
                                         {primaryRole ? (
                                             <Badge variant="secondary">{t(`roles.${primaryRole}`, primaryRole)}</Badge>
                                         ) : (
@@ -157,7 +157,7 @@ export default function UsersTable({
                                     </TableCell>
 
                                     {/* Verification status */}
-                                    <TableCell>
+                                    <TableCell status>
                                         {user.is_deleted ? (
                                             <Badge variant="destructive">{t('status.deleted')}</Badge>
                                         ) : user.is_email_verified ? (
@@ -168,16 +168,17 @@ export default function UsersTable({
                                     </TableCell>
 
                                     {/* Actions */}
-                                    <TableCell>
+                                    <TableCell actions>
                                         <div className="flex items-center justify-end gap-1">
                                             {/* View */}
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-8 w-8"
-                                                asChild
-                                                data-testid={`users-table-view-${user.id}`}
-                                            >
+                                                 <Button
+                                                     variant="ghost"
+                                                     size="icon"
+                                                     className="h-8 w-8"
+                                                     asChild
+                                                     title={t('actions.view')}
+                                                     data-testid={`users-table-view-${user.id}`}
+                                                 >
                                                 <Link to={`/admin/users/${user.id}`}>
                                                     <Eye className="h-4 w-4" />
                                                 </Link>
@@ -247,10 +248,11 @@ export default function UsersTable({
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
-                                                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                            disabled={actionLoading}
-                                                            data-testid={`users-table-delete-${user.id}`}
-                                                        >
+                                                             className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                             disabled={actionLoading}
+                                                             title={t('actions.delete')}
+                                                             data-testid={`users-table-delete-${user.id}`}
+                                                         >
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
                                                     </AlertDialogTrigger>

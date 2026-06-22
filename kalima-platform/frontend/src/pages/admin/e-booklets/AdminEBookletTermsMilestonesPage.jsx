@@ -269,19 +269,19 @@ export default function AdminEBookletTermsMilestonesPage() {
                 <TableHead>{t("admin.termsMilestones.termName")}</TableHead>
                 <TableHead>{t("common.status")}</TableHead>
                 <TableHead>{t("admin.termsMilestones.termWindow")}</TableHead>
-                <TableHead className="text-end">{t("common.actions")}</TableHead>
+                <TableHead actions>{t("common.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {terms.map((term) => (
                 <TableRow key={term.id}>
-                  <TableCell className="max-w-[34rem] whitespace-normal">
+                   <TableCell truncate className="max-w-[34rem] whitespace-normal" title={term.description ? `${term.name}: ${term.description}` : term.name}>
                     <div className="max-w-md break-words font-medium">{term.name}</div>
                     <div className="line-clamp-2 max-w-md text-xs text-muted-foreground">{term.description || "—"}</div>
                   </TableCell>
-                  <TableCell><Badge variant={term.status === "active" ? "default" : "outline"}>{term.status}</Badge></TableCell>
-                  <TableCell className="whitespace-normal">{formatDate(term.starts_at)} — {term.ends_at ? formatDate(term.ends_at) : t("admin.termsMilestones.openEnded")}</TableCell>
-                  <TableCell>
+                   <TableCell status><Badge variant={term.status === "active" ? "default" : "outline"}>{term.status}</Badge></TableCell>
+                   <TableCell date className="whitespace-normal">{formatDate(term.starts_at)} — {term.ends_at ? formatDate(term.ends_at) : t("admin.termsMilestones.openEnded")}</TableCell>
+                   <TableCell actions>
                     <div className="flex justify-end gap-2">
                       <Button size="sm" variant="outline" onClick={() => editTerm(term)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
                       {term.status !== "active" && (
@@ -354,16 +354,16 @@ export default function AdminEBookletTermsMilestonesPage() {
           <div className="overflow-hidden rounded-lg border" data-testid="admin-e-booklet-milestones-table">
             <div className="hidden overflow-x-auto md:block">
             <Table className="min-w-[960px]">
-              <TableHeader><TableRow><TableHead>{t("admin.termsMilestones.milestone")}</TableHead><TableHead>{t("admin.termsMilestones.target")}</TableHead><TableHead>{t("admin.termsMilestones.pricing")}</TableHead><TableHead>{t("admin.termsMilestones.reward")}</TableHead><TableHead>{t("common.status")}</TableHead><TableHead className="text-end">{t("common.actions")}</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>{t("admin.termsMilestones.milestone")}</TableHead><TableHead numeric>{t("admin.termsMilestones.target")}</TableHead><TableHead numeric>{t("admin.termsMilestones.pricing")}</TableHead><TableHead numeric>{t("admin.termsMilestones.reward")}</TableHead><TableHead>{t("common.status")}</TableHead><TableHead actions>{t("common.actions")}</TableHead></TableRow></TableHeader>
               <TableBody>
                 {scopedMilestones.map((milestone) => (
                   <TableRow key={milestone.id}>
-                    <TableCell className="w-[42%] max-w-[34rem] whitespace-normal"><div className="break-words font-medium">{milestone.title}</div><div className="line-clamp-2 break-words text-xs text-muted-foreground">#{milestone.sort_order ?? 0} · {milestone.description || "—"}</div></TableCell>
-                    <TableCell className="whitespace-nowrap">{milestone.target_paid_redemptions}</TableCell>
-                    <TableCell className="whitespace-nowrap">{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</TableCell>
-                    <TableCell className="whitespace-nowrap">{money(milestone.reward_amount_snapshot)}</TableCell>
-                    <TableCell><Badge variant={milestone.active ? "default" : "outline"}>{milestone.active ? t("common.active") : t("statuses.disabled")}</Badge></TableCell>
-                    <TableCell className="whitespace-nowrap"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button><Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button><Button size="sm" variant="destructive" onClick={() => removeMilestone(milestone)} disabled={actionLoading} data-testid="admin-e-booklet-delete-milestone"><Trash2 className="h-4 w-4" />{t("common.delete", { defaultValue: "Delete" })}</Button></div></TableCell>
+                    <TableCell truncate className="w-[42%] max-w-[34rem] whitespace-normal" title={milestone.description ? `${milestone.title}: ${milestone.description}` : milestone.title}><div className="break-words font-medium">{milestone.title}</div><div className="line-clamp-2 break-words text-xs text-muted-foreground">#{milestone.sort_order ?? 0} · {milestone.description || "—"}</div></TableCell>
+                    <TableCell numeric>{milestone.target_paid_redemptions}</TableCell>
+                    <TableCell numeric className="whitespace-nowrap">{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</TableCell>
+                    <TableCell numeric>{money(milestone.reward_amount_snapshot)}</TableCell>
+                    <TableCell status><Badge variant={milestone.active ? "default" : "outline"}>{milestone.active ? t("common.active") : t("statuses.disabled")}</Badge></TableCell>
+                    <TableCell actions className="whitespace-nowrap"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button><Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button><Button size="sm" variant="destructive" onClick={() => removeMilestone(milestone)} disabled={actionLoading} data-testid="admin-e-booklet-delete-milestone"><Trash2 className="h-4 w-4" />{t("common.delete", { defaultValue: "Delete" })}</Button></div></TableCell>
                   </TableRow>
                 ))}
                 {scopedMilestones.length === 0 && (<TableRow><TableCell colSpan={6} className="h-20 text-center text-muted-foreground">{t("admin.termsMilestones.emptyMilestones")}</TableCell></TableRow>)}

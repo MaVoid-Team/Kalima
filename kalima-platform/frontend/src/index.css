@@ -235,6 +235,52 @@
   }
 }
 
+@layer components {
+  .kalima-data-table {
+    @apply w-full caption-bottom text-sm;
+  }
+
+  .kalima-data-table thead {
+    @apply bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground;
+  }
+
+  .kalima-data-table th {
+    @apply h-10 px-4 py-3 text-start align-middle font-medium whitespace-nowrap;
+  }
+
+  .kalima-data-table td {
+    @apply px-4 py-3 align-middle whitespace-nowrap;
+  }
+
+  .kalima-data-table tbody tr {
+    @apply border-b transition-colors hover:bg-muted/50 focus-within:bg-muted/40;
+  }
+
+  .kalima-data-table tbody tr:last-child {
+    @apply border-0;
+  }
+
+  .kalima-data-table .kalima-number,
+  .kalima-data-table [data-cell="number"] {
+    @apply text-end tabular-nums font-medium;
+  }
+
+  .kalima-data-table .kalima-date,
+  .kalima-data-table [data-cell="date"] {
+    @apply text-muted-foreground tabular-nums;
+  }
+
+  .kalima-data-table .kalima-truncate,
+  .kalima-data-table [data-cell="text"] {
+    @apply max-w-[18rem] truncate;
+  }
+
+  .kalima-data-table .kalima-actions,
+  .kalima-data-table [data-cell="actions"] {
+    @apply w-0 text-end transition-opacity md:opacity-80 md:hover:opacity-100;
+  }
+}
+
 @layer utilities {
   .kalima-scrollbar {
     scrollbar-gutter: stable;

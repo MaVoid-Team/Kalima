@@ -52,7 +52,7 @@ export default function CategoryTreeView({
               </TableHead>
               <TableHead>{t("categories.table.status")}</TableHead>
               <TableHead>{t("orders.createdAt")}</TableHead>
-              <TableHead className="text-end pe-6">
+              <TableHead actions className="pe-6">
                 {t("categories.table.actions")}
               </TableHead>
             </TableRow>

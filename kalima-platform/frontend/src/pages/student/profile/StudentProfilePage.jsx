@@ -9,8 +9,8 @@ import StudentAvatarCard from '@/components/student/profile/StudentAvatarCard';
 
 export default function StudentProfilePage() {
     const { t } = useTranslation('student');
-    const { profile, updateProfile, uploadAvatar, fetchProfile, loading } = useProfile();
-    const { governments, levels, getZonesByGovernment, zones, zonesLoading } = useLookups();
+    const { profile, uploadAvatar, fetchProfile, loading } = useProfile();
+    const { governments, levels, getZonesByGovernment, zones } = useLookups();
 
     const [formReady, setFormReady] = useState(false);
     const [defaultValues, setDefaultValues] = useState({});
@@ -42,15 +42,6 @@ export default function StudentProfilePage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const onSubmit = async (data) => {
-        const clean = Object.fromEntries(
-            Object.entries(data).filter(([, v]) => v !== '' && v !== undefined)
-        );
-        await updateProfile(clean);
-        const p = await fetchProfile();
-        if (p) setDefaultValues(buildDefaults(p));
-    };
-
     if (loading && !profile) {
         return (
             <div className="flex h-[50vh] items-center justify-center">
@@ -60,7 +51,7 @@ export default function StudentProfilePage() {
     }
 
     return (
-        <div className="space-y-10" data-testid="student-profile-page">
+        <div className="space-y-6" data-testid="student-profile-page">
             <div className="flex items-center gap-3">
                 <User className="h-8 w-8 text-primary" />
                 <div>
@@ -78,13 +69,9 @@ export default function StudentProfilePage() {
             {formReady && (
                 <StudentProfileForm
                     defaultValues={defaultValues}
-                    onSubmit={onSubmit}
-                    loading={loading}
                     governments={governments}
                     levels={levels}
                     zones={zones}
-                    zonesLoading={zonesLoading}
-                    onGovernmentChange={(govId) => govId && getZonesByGovernment(govId)}
                 />
             )}
         </div>
