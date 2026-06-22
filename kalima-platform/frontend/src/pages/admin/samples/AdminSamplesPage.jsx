@@ -114,22 +114,22 @@ export default function AdminSamplesPage() {
                 </div>
             ) : (
                 <div className="rounded-xl border border-border overflow-hidden" data-testid="admin-sections-list">
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/50 text-muted-foreground">
+                    <table className="kalima-data-table">
+                        <thead>
                             <tr>
-                                <th className="text-start ps-4 py-3 font-medium w-[40px]">#</th>
+                                <th className="kalima-number ps-4 py-3 font-medium w-[40px]">#</th>
                                 <th className="text-start py-3 font-medium">{t('samples.sections.table.title', 'Title')}</th>
                                 <th className="text-start py-3 font-medium hidden md:table-cell">{t('samples.sections.table.description', 'Description')}</th>
-                                <th className="text-start py-3 font-medium hidden sm:table-cell">{t('samples.sections.table.order', 'Order')}</th>
+                                <th className="kalima-number py-3 font-medium hidden sm:table-cell">{t('samples.sections.table.order', 'Order')}</th>
                                 <th className="text-start py-3 font-medium">{t('samples.sections.table.status', 'Status')}</th>
-                                <th className="text-end pe-4 py-3 font-medium">{t('samples.sections.table.actions', 'Actions')}</th>
+                                <th className="kalima-actions pe-4 py-3 font-medium">{t('samples.sections.table.actions', 'Actions')}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-border">
+                        <tbody>
                             {sections.map((section) => (
-                                <tr key={section.id} className="hover:bg-muted/30 transition-colors">
-                                    <td className="ps-4 py-3 text-muted-foreground">{section.id}</td>
-                                    <td className="py-3">
+                                <tr key={section.id}>
+                                    <td className="kalima-number ps-4 py-3 text-muted-foreground">{section.id}</td>
+                                    <td className="kalima-truncate py-3" title={section.title}>
                                         <div className="flex items-center gap-2">
                                             {section.thumbnail_url ? (
                                                 <img src={section.thumbnail_url} alt="" className="w-8 h-8 rounded shrink-0 object-cover" />
@@ -144,13 +144,13 @@ export default function AdminSamplesPage() {
                                             </Link>
                                         </div>
                                     </td>
-                                    <td className="py-3 text-muted-foreground hidden md:table-cell truncate max-w-[200px]">
+                                    <td className="kalima-truncate py-3 text-muted-foreground hidden md:table-cell" title={section.description || undefined}>
                                         {section.description || '—'}
                                     </td>
-                                    <td className="py-3 hidden sm:table-cell">
+                                    <td className="kalima-number py-3 hidden sm:table-cell">
                                         {section.sort_order}
                                     </td>
-                                    <td className="py-3">
+                                    <td className="py-3" data-cell="status">
                                         <Badge variant={section.active ? 'default' : 'secondary'} className="text-xs">
                                             {section.active ? (
                                                 <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {t('common.active', 'Active')}</span>
@@ -159,7 +159,7 @@ export default function AdminSamplesPage() {
                                             )}
                                         </Badge>
                                     </td>
-                                    <td className="pe-4 py-3">
+                                    <td className="kalima-actions pe-4 py-3">
                                         <div className="flex items-center justify-end gap-2">
                                             <Button
                                                 variant="outline"
@@ -175,6 +175,7 @@ export default function AdminSamplesPage() {
                                                 size="icon"
                                                 onClick={() => handleOpenEditDialog(section)}
                                                 className="h-8 w-8 text-muted-foreground hover:text-primary"
+                                                title={t('common.edit', 'Edit')}
                                             >
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
@@ -183,6 +184,7 @@ export default function AdminSamplesPage() {
                                                 size="icon"
                                                 onClick={() => confirmDelete(section)}
                                                 className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                                title={t('common.delete', 'Delete')}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>

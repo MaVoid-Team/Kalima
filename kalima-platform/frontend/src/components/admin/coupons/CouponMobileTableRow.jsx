@@ -15,7 +15,7 @@ export default function CouponMobileTableRow({ coupon, onEdit, onDelete, onToggl
 
     return (
         <TableRow data-testid={`coupons-mobile-row-${couponId}`}>
-            <TableCell className="align-top">
+            <TableCell truncate status className="align-top" title={coupon.code || undefined}>
                 <div className="space-y-1.5 min-w-0">
                     <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
                         {t('coupons.table.code')}
@@ -29,7 +29,7 @@ export default function CouponMobileTableRow({ coupon, onEdit, onDelete, onToggl
                 </div>
             </TableCell>
 
-            <TableCell className="align-top">
+            <TableCell numeric className="align-top">
                 <div className="space-y-1.5 min-w-0">
                     <div className="flex items-center gap-1 flex-wrap">
                         <Badge
@@ -53,7 +53,7 @@ export default function CouponMobileTableRow({ coupon, onEdit, onDelete, onToggl
                 </div>
             </TableCell>
 
-            <TableCell className="align-top text-end">
+            <TableCell actions className="align-top">
                 <CouponMobileActions
                     coupon={coupon}
                     couponId={couponId}

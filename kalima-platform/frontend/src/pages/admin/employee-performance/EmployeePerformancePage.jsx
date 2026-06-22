@@ -98,25 +98,25 @@ export default function EmployeePerformancePage() {
                 <SectionTitle icon={CheckCircle}>{t('dashboard.confirmerStats', 'Confirmer Statistics')}</SectionTitle>
                 <Card className="shadow-sm">
                     <CardContent className="p-0 overflow-x-auto">
-                        <table className="w-full text-sm text-start">
+                        <table className="kalima-data-table text-start">
                             <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
                                 <tr>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.adminName', 'Admin Name')}</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.email', 'Email')}</th>
-                                    <th className="px-6 py-3 font-medium text-start">{t('table.totalHandled', 'Total Handled')}</th>
-                                    <th className="px-6 py-3 font-medium text-start">{t('table.confirmed', 'Confirmed')}</th>
-                                    <th className="px-6 py-3 font-medium text-start">{t('table.pending', 'Pending')}</th>
+                                    <th className="kalima-number px-6 py-3 font-medium">{t('table.totalHandled', 'Total Handled')}</th>
+                                    <th className="kalima-number px-6 py-3 font-medium">{t('table.confirmed', 'Confirmed')}</th>
+                                    <th className="kalima-number px-6 py-3 font-medium">{t('table.pending', 'Pending')}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {confirmerStats && confirmerStats.length > 0 ? (
                                     confirmerStats.map((item, idx) => (
-                                        <tr key={item.user?.id || idx} className=" border-b border-border hover:bg-muted/50 transition-colors">
-                                            <td className="px-6 py-4 font-medium">{item.user?.name || 'Unknown'}</td>
-                                            <td className="px-6 py-4">{item.user?.email}</td>
-                                            <td className="px-6 py-4 tabular-nums">{item.totalHandled || 0}</td>
-                                            <td className="px-6 py-4 tabular-nums text-emerald-600 font-medium">{item.byStatus?.confirmed || 0}</td>
-                                            <td className="px-6 py-4 tabular-nums text-orange-500 font-medium">{item.byStatus?.pending || 0}</td>
+                                        <tr key={item.user?.id || idx}>
+                                            <td className="kalima-truncate px-6 py-4 font-medium" title={item.user?.name || 'Unknown'}>{item.user?.name || 'Unknown'}</td>
+                                            <td className="kalima-truncate px-6 py-4" title={item.user?.email}>{item.user?.email}</td>
+                                            <td className="kalima-number px-6 py-4">{item.totalHandled || 0}</td>
+                                            <td className="kalima-number px-6 py-4 text-emerald-600">{item.byStatus?.confirmed || 0}</td>
+                                            <td className="kalima-number px-6 py-4 text-orange-500">{item.byStatus?.pending || 0}</td>
                                         </tr>
                                     ))
                                 ) : (
@@ -220,28 +220,28 @@ export default function EmployeePerformancePage() {
                 {loading && !confirmedCount && <LoadingSpinner className="h-6 w-6 text-primary mb-4" />}
                 <Card className="shadow-sm">
                     <CardContent className="p-0 overflow-x-auto">
-                        <table className="w-full text-sm text-start">
+                        <table className="kalima-data-table text-start">
                             <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
                                 <tr>
-                                    <th className="px-6 py-3 font-medium text-start">{t('table.id', 'ID')}</th>
+                                    <th className="kalima-number px-6 py-3 font-medium">{t('table.id', 'ID')}</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.name', 'Name')}</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.email', 'Email')}</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.phone', 'Phone')}</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.role', 'Role')}</th>
-                                    <th className="px-6 py-3 font-medium text-start">{t('table.confirmedCount', 'Count')}</th>
+                                    <th className="kalima-number px-6 py-3 font-medium">{t('table.confirmedCount', 'Count')}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {confirmedCount && confirmedCount.length > 0 ? (
                                     confirmedCount.map((item, idx) => {
                                         return (
-                                            <tr key={idx} className="border-b border-border hover:bg-muted/50 transition-colors">
-                                                <td className="px-6 py-4">{item.id}</td>
-                                                <td className="px-6 py-4 font-medium">{item.name || 'Unknown'}</td>
-                                                <td className="px-6 py-4">{item.email}</td>
+                                            <tr key={idx}>
+                                                <td className="kalima-number px-6 py-4">{item.id}</td>
+                                                <td className="kalima-truncate px-6 py-4 font-medium" title={item.name || 'Unknown'}>{item.name || 'Unknown'}</td>
+                                                <td className="kalima-truncate px-6 py-4" title={item.email}>{item.email}</td>
                                                 <td className="px-6 py-4">{item.phone || '—'}</td>
                                                 <td className="px-6 py-4">{t(`roles.${item.role}`, item.role)}</td>
-                                                <td className="px-6 py-4 tabular-nums font-semibold text-primary">{item.count || 0}</td>
+                                                <td className="kalima-number px-6 py-4 text-primary">{item.count || 0}</td>
                                             </tr>
                                         )
                                     })
@@ -263,21 +263,21 @@ export default function EmployeePerformancePage() {
                 <SectionTitle icon={Users}>{t('dashboard.createdAccounts', 'Created Accounts Statistics')}</SectionTitle>
                 <Card className="shadow-sm">
                     <CardContent className="p-0 overflow-x-auto">
-                        <table className="w-full text-sm text-start">
+                        <table className="kalima-data-table text-start">
                             <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
                                 <tr>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.adminName', 'Admin Name')}</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.email', 'Email')}</th>
-                                    <th className="px-6 py-3 font-medium text-start">{t('table.createdAccounts', 'Accounts Created')}</th>
+                                    <th className="kalima-number px-6 py-3 font-medium">{t('table.createdAccounts', 'Accounts Created')}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {createdAccounts && createdAccounts.length > 0 ? (
                                     createdAccounts.map((item, idx) => (
-                                        <tr key={item.user?.id || idx} className="border-b border-border hover:bg-muted/50 transition-colors">
-                                            <td className="px-6 py-4 font-medium">{item.user?.name || 'Unknown'}</td>
-                                            <td className="px-6 py-4">{item.user?.email}</td>
-                                            <td className="px-6 py-4 tabular-nums font-semibold text-blue-600">{item.totalAccounts || 0}</td>
+                                        <tr key={item.user?.id || idx}>
+                                            <td className="kalima-truncate px-6 py-4 font-medium" title={item.user?.name || 'Unknown'}>{item.user?.name || 'Unknown'}</td>
+                                            <td className="kalima-truncate px-6 py-4" title={item.user?.email}>{item.user?.email}</td>
+                                            <td className="kalima-number px-6 py-4 text-blue-600">{item.totalAccounts || 0}</td>
                                         </tr>
                                     ))
                                 ) : (

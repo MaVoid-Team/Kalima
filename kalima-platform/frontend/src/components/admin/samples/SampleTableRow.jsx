@@ -23,7 +23,7 @@ export default function SampleTableRow({ sample, sectionId, onEdit, onDelete, lo
     const thumbnailUrl = getImageUrl(sample.thumbnail_url);
 
     return (
-        <tr className="hover:bg-muted/30 transition-colors">
+        <tr>
             <td className="ps-4 py-3">
                 <div className="flex items-center gap-3">
                     {thumbnailUrl ? (
@@ -38,7 +38,7 @@ export default function SampleTableRow({ sample, sectionId, onEdit, onDelete, lo
                     )}
                     <div className="flex flex-col">
                         <div className="flex items-center gap-2">
-                            <span className="font-medium">{sample.title || `${t('samples.count', 'Sample')} #${sample.id}`}</span>
+                            <span className="font-medium" title={sample.title || undefined}>{sample.title || `${t('samples.count', 'Sample')} #${sample.id}`}</span>
                             {sample.is_archived && (
                                 <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4" title={t('samples.is_archived_hint')}>
                                     {t('samples.archived', 'Archived')}
@@ -60,7 +60,7 @@ export default function SampleTableRow({ sample, sectionId, onEdit, onDelete, lo
                     </div>
                 </div>
             </td>
-            <td className="py-3">
+            <td className="kalima-number py-3">
                 {sample.product_id ? (
                     <Link to={`/admin/products/${sample.product_id}`} className="text-primary hover:underline">
                         {t('samples.table.product', 'Product')} #{sample.product_id}
@@ -76,7 +76,7 @@ export default function SampleTableRow({ sample, sectionId, onEdit, onDelete, lo
                     {t(`samples.mediaTypes.${sample.media_type}`, sample.media_type)}
                 </Badge>
             </td>
-            <td className="pe-4 py-3 text-end">
+            <td className="kalima-actions pe-4 py-3">
                 <div className="flex items-center justify-end gap-2">
                     {/* View sample details page */}
                     <Button

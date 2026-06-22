@@ -44,7 +44,7 @@ export default function RequiredFieldsTable({
             <TableHead>{t('requiredFields.fields.fieldType')}</TableHead>
             <TableHead>{t('requiredFields.fields.active')}</TableHead>
             <TableHead>{t('requiredFields.fields.createdAt')}</TableHead>
-            <TableHead className="text-end">{t('common.actions')}</TableHead>
+            <TableHead actions>{t('common.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

@@ -57,7 +57,7 @@ export default function CategoryTreeNode({
   return (
     <React.Fragment>
       <TableRow>
-        <TableCell className="w-full">
+        <TableCell truncate className="w-full" title={category.description ? `${category.title}: ${category.description}` : category.title}>
           <div className={`flex items-start gap-2 py-1 ${indentClass}`}>
             <div className="pt-0.5 shrink-0">
               {hasChildren ? (
@@ -95,7 +95,7 @@ export default function CategoryTreeNode({
           </div>
         </TableCell>
 
-        <TableCell>
+        <TableCell status>
           <Badge
             variant={category.active ? "default" : "secondary"}
             className={category.active ? "" : "bg-muted text-muted-foreground"}
@@ -105,12 +105,12 @@ export default function CategoryTreeNode({
               : t("products.status.archived")}
           </Badge>
         </TableCell>
-        <TableCell className="whitespace-nowrap text-muted-foreground">
+        <TableCell date>
           {category.created_at
             ? format(new Date(category.created_at), "dd MMM, yyyy")
             : t("common.na")}
         </TableCell>
-        <TableCell>
+        <TableCell actions>
           <div className="flex items-center justify-end gap-2">
             <Button
               variant="ghost"

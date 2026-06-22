@@ -35,7 +35,7 @@ const getProfileSchema = (t) => z.object({
     gender: z.string().optional()
 });
 
-export default function ProfileSection({ ns = 'admin' }) {
+export default function ProfileSection({ ns = 'admin', editable = true }) {
     const { t, i18n } = useTranslation(ns);
     const isRtl = i18n.dir() === 'rtl';
     const [isEditing, setIsEditing] = useState(false);
@@ -143,11 +143,13 @@ export default function ProfileSection({ ns = 'admin' }) {
                                 {profile?.name?.charAt(0)?.toUpperCase()}
                             </AvatarFallback>
                         </Avatar>
-                        <Label htmlFor="avatar-upload" className="absolute bottom-0 right-0 cursor-pointer">
-                            <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors">
-                                <Camera className="h-4 w-4" />
-                            </div>
-                        </Label>
+                        {editable && (
+                            <Label htmlFor="avatar-upload" className="absolute bottom-0 right-0 cursor-pointer">
+                                <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors">
+                                    <Camera className="h-4 w-4" />
+                                </div>
+                            </Label>
+                        )}
                     </div>
 
                     <div className="flex flex-col items-center sm:items-start text-center sm:text-start space-y-3 flex-1">
@@ -165,38 +167,42 @@ export default function ProfileSection({ ns = 'admin' }) {
                                 {t('settings.profile.avatarHint', 'JPG, PNG or GIF. Max size 2MB.')}
                             </p>
                         </div>
-                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                            <Label htmlFor="avatar-upload" className="cursor-pointer">
-                                <Button variant="secondary" size="sm" asChild disabled={isUploading} className="pointer-events-none rounded-xl font-bold text-[10px] uppercase tracking-wider">
-                                    <span>
-                                        <Upload className="h-3.5 w-3.5 mr-1.5" />
-                                        {isUploading ? t('common.loading') : t('settings.profile.uploadAvatar')}
-                                    </span>
-                                </Button>
-                            </Label>
-                            <input
-                                id="avatar-upload"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileSelect}
-                                className="hidden"
-                                disabled={isUploading}
-                            />
-                        </div>
+                        {editable && (
+                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                <Label htmlFor="avatar-upload" className="cursor-pointer">
+                                    <Button variant="secondary" size="sm" asChild disabled={isUploading} className="pointer-events-none rounded-xl font-bold text-[10px] uppercase tracking-wider">
+                                        <span>
+                                            <Upload className="h-3.5 w-3.5 mr-1.5" />
+                                            {isUploading ? t('common.loading') : t('settings.profile.uploadAvatar')}
+                                        </span>
+                                    </Button>
+                                </Label>
+                                <input
+                                    id="avatar-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileSelect}
+                                    className="hidden"
+                                    disabled={isUploading}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {/* Upload Progress */}
-                <FileUploadProgress
-                    progress={uploadProgress}
-                    isUploading={isUploading}
-                    onCancel={handleCancelUpload}
-                    fileName={selectedFile?.name}
-                    error={uploadError}
-                />
+                {editable && (
+                    <FileUploadProgress
+                        progress={uploadProgress}
+                        isUploading={isUploading}
+                        onCancel={handleCancelUpload}
+                        fileName={selectedFile?.name}
+                        error={uploadError}
+                    />
+                )}
 
                 {/* Profile Form */}
-                {isEditing ? (
+                {editable && isEditing ? (
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -384,9 +390,11 @@ export default function ProfileSection({ ns = 'admin' }) {
                                 </div>
                             </div>
                         </div>
-                        <Button onClick={() => setIsEditing(true)} variant="outline">
-                            {t('settings.profile.editProfile')}
-                        </Button>
+                        {editable && (
+                            <Button onClick={() => setIsEditing(true)} variant="outline">
+                                {t('settings.profile.editProfile')}
+                            </Button>
+                        )}
                     </div>
                 )}
             </CardContent>

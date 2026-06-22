@@ -268,23 +268,23 @@ export default function AnalyticsPage() {
                 <SectionTitle icon={TrendingUp}>{t('dashboard.productPerformance', 'Product Performance (Top 50)')}</SectionTitle>
                 <Card className="shadow-sm">
                     <CardContent className="p-0 overflow-x-auto">
-                        <table className="w-full text-sm text-start">
+                        <table className="kalima-data-table text-start">
                             <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
                                 <tr>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.productName', 'Product Name')}</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.serial', 'Serial')}</th>
-                                    <th className="px-6 py-3 font-medium text-start">{t('table.timesPurchased', 'Times Purchased')}</th>
-                                    <th className="px-6 py-3 font-medium text-start">{t('table.totalValue', 'Total Value')}</th>
+                                     <th className="kalima-number px-6 py-3 font-medium">{t('table.timesPurchased', 'Times Purchased')}</th>
+                                     <th className="kalima-number px-6 py-3 font-medium">{t('table.totalValue', 'Total Value')}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {productPerformance && productPerformance.length > 0 ? (
                                     productPerformance.map((item, idx) => (
-                                        <tr key={item.product?.id || idx} className=" border-b border-border hover:bg-muted/50 transition-colors">
-                                            <td className="px-6 py-4 font-medium">{item.product?.title || 'Unknown'}</td>
-                                            <td className="px-6 py-4">{item.product?.serial}</td>
-                                            <td className="px-6 py-4 tabular-nums">{fmt(item.timesPurchased)}</td>
-                                            <td className="px-6 py-4 tabular-nums">{fmt(item.totalValue)} {t('dashboard.currency', 'EGP')}</td>
+                                         <tr key={item.product?.id || idx}>
+                                             <td className="kalima-truncate px-6 py-4 font-medium" title={item.product?.title || 'Unknown'}>{item.product?.title || 'Unknown'}</td>
+                                             <td className="px-6 py-4">{item.product?.serial}</td>
+                                             <td className="kalima-number px-6 py-4">{fmt(item.timesPurchased)}</td>
+                                             <td className="kalima-number px-6 py-4">{fmt(item.totalValue)} {t('dashboard.currency', 'EGP')}</td>
                                         </tr>
                                     ))
                                 ) : (

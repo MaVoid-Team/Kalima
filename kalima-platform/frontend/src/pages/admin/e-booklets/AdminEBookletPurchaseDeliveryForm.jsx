@@ -232,6 +232,9 @@ export default function AdminEBookletPurchaseDeliveryForm({
               value={deliveryForm.student_marketing_price}
               onChange={(event) => setDeliveryForm((current) => ({ ...current, student_marketing_price: event.target.value }))}
             />
+            <p className="text-xs text-muted-foreground">
+              {t("admin.purchases.studentMarketingPriceHint")}
+            </p>
           </div>
         </div>
         <div className="space-y-2">

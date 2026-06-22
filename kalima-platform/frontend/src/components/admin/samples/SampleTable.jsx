@@ -17,16 +17,16 @@ export default function SampleTable({ samples, sectionId, onEdit, onDelete, load
 
     return (
         <div className="rounded-xl border border-border overflow-hidden bg-background">
-            <table className="w-full text-sm">
-                <thead className="bg-muted/50 text-muted-foreground">
+            <table className="kalima-data-table">
+                <thead>
                     <tr>
                         <th className="text-start ps-4 py-3 font-medium">{t('samples.table.file', 'Sample File')}</th>
-                        <th className="text-start py-3 font-medium">{t('samples.table.productId', 'Product ID')}</th>
+                        <th className="kalima-number py-3 font-medium">{t('samples.table.productId', 'Product ID')}</th>
                         <th className="text-start py-3 font-medium hidden sm:table-cell">{t('samples.table.mediaType', 'Media Type')}</th>
-                        <th className="text-end pe-4 py-3 font-medium">{t('common.actions', 'Actions')}</th>
+                        <th className="kalima-actions pe-4 py-3 font-medium">{t('common.actions', 'Actions')}</th>
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody>
                     {samples.map((sample) => (
                         <SampleTableRow
                             key={sample.id}

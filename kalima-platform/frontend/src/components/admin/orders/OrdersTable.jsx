@@ -43,9 +43,9 @@ export default function OrdersTable({
                             <TableHead>{t('orders.table.serial')}</TableHead>
                             <TableHead>{t('orders.table.customer')}</TableHead>
                             <TableHead>{t('orders.table.status')}</TableHead>
-                            <TableHead>{t('orders.table.total')}</TableHead>
+                            <TableHead numeric>{t('orders.table.total')}</TableHead>
                             <TableHead>{t('orders.table.payment')}</TableHead>
-                            <TableHead className="text-end">{t('orders.table.actions')}</TableHead>
+                            <TableHead actions>{t('orders.table.actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -71,29 +71,29 @@ export default function OrdersTable({
                                             </Badge>
                                         )}
                                     </div>
-                                    <div className="text-xs text-muted-foreground mt-1">
+                                    <div className="text-xs text-muted-foreground mt-1 tabular-nums">
                                         {formatOrderDate(order.created_at, i18n.language)}
                                     </div>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell truncate title={order.users?.email || order.users?.name || undefined}>
                                     <div className="font-medium">{order.users?.name || t('common.na', 'N/A')}</div>
                                     <div className="text-xs text-muted-foreground">{order.users?.email}</div>
                                     {order.users?.phone && (
                                         <div className="text-xs text-muted-foreground mt-0.5">{formatPhone(order.users.phone)}</div>
                                     )}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell status>
                                     <Badge variant="outline" className={getStatusColor(order.status)}>
                                         {t(`orders.status${order.status.charAt(0).toUpperCase() + order.status.slice(1).toLowerCase()}`, { defaultValue: order.status })}
                                     </Badge>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell numeric>
                                     {formatCurrency(order.total, t)}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell truncate title={order.payment_methods?.name || undefined}>
                                     {order.payment_methods?.name || t('common.na', 'N/A')}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell actions>
                                     <OrderActions order={order} onActionSuccess={onActionSuccess} />
                                 </TableCell>
                             </TableRow>

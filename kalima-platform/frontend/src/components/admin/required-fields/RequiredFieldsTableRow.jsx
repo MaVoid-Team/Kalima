@@ -58,13 +58,13 @@ export default function RequiredFieldsTableRow({
 
   return (
     <TableRow data-testid={`requiredFields-row-${field.id}`}>
-      <TableCell className="font-medium">{field.label}</TableCell>
-      <TableCell>
+      <TableCell truncate className="font-medium" title={field.label}>{field.label}</TableCell>
+      <TableCell status>
         <Badge variant={getFieldTypeVariant(field.field_type)}>
           {getFieldTypeLabel(field.field_type, t)}
         </Badge>
       </TableCell>
-      <TableCell>
+      <TableCell status>
         <div className="flex items-center gap-3">
           <Switch
             checked={field.active}
@@ -76,15 +76,16 @@ export default function RequiredFieldsTableRow({
           </span>
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell date>
         {field.created_at ? format(new Date(field.created_at), 'MMM dd, yyyy') : '-'}
       </TableCell>
-      <TableCell className="text-end">
+      <TableCell actions>
         <DropdownMenu dir={i18n.dir()}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
               className="h-8 w-8 p-0"
+              title={t('common.actions')}
               data-testid={`requiredFields-actions-${field.id}`}
             >
               <MoreHorizontal className="h-4 w-4" />

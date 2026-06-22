@@ -52,33 +52,34 @@ export default function RequiredFieldsManager({ product, fieldDefinitions, onAtt
                             <TableHead>{t('products.detail.fieldLabel')}</TableHead>
                             <TableHead>{t('products.detail.fieldType')}</TableHead>
                             <TableHead>{t('products.detail.fieldRequired')}</TableHead>
-                            <TableHead></TableHead>
+                            <TableHead actions><span className="sr-only">{t('common.actions', 'Actions')}</span></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {attachedFields.map((field) => (
                             <TableRow key={field.id} data-testid={`required-field-row-${field.id}`}>
-                                <TableCell className="font-medium">
+                                <TableCell truncate className="font-medium" title={field.required_field_definitions?.label}>
                                     {field.required_field_definitions?.label}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell status>
                                     <Badge variant="outline">
                                         {field.required_field_definitions?.field_type}
                                     </Badge>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell status>
                                     {field.is_required ? t('products.detail.yes') : t('products.detail.no')}
                                 </TableCell>
-                                <TableCell className="text-end">
+                                <TableCell actions>
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="icon"
                                         disabled={loading}
                                         onClick={() => onDetach(field.field_definition_id)}
-                                        className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                        data-testid={`required-field-detach-${field.id}`}
-                                    >
+                                         className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                         title={t('products.detail.detachField', 'Detach field')}
+                                         data-testid={`required-field-detach-${field.id}`}
+                                     >
                                         <X className="h-4 w-4" />
                                     </Button>
                                 </TableCell>

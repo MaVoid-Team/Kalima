@@ -146,10 +146,10 @@ export default function AdminEBookletTemplatesPage() {
               <TableHead>{t("admin.templates.table.template")}</TableHead>
               <TableHead>{t("common.status")}</TableHead>
               <TableHead>{t("admin.templates.table.version")}</TableHead>
-              <TableHead>{t("common.pages")}</TableHead>
-              <TableHead>{t("admin.templates.table.purchases")}</TableHead>
+              <TableHead numeric>{t("common.pages")}</TableHead>
+              <TableHead numeric>{t("admin.templates.table.purchases")}</TableHead>
               <TableHead>{t("admin.templates.table.lastEdited")}</TableHead>
-              <TableHead className="text-end">{t("common.actions")}</TableHead>
+              <TableHead actions>{t("common.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -174,7 +174,7 @@ export default function AdminEBookletTemplatesPage() {
                 const isReleased = template.is_released !== false;
                 return (
                   <TableRow key={template.id}>
-                    <TableCell className="min-w-[260px]">
+                    <TableCell truncate className="min-w-[260px]" title={template.description ? `${template.title}: ${template.description}` : template.title}>
                       <div className="font-semibold text-foreground">{template.title}</div>
                       <div className="mt-1 line-clamp-2 max-w-[420px] whitespace-normal text-xs text-muted-foreground">
                         {template.description || t("admin.templates.noDescription")}
@@ -197,7 +197,7 @@ export default function AdminEBookletTemplatesPage() {
                         </div>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell status>
                       <Badge
                         variant="outline"
                         className={statusStyles[status] || statusStyles.draft}
@@ -221,16 +221,16 @@ export default function AdminEBookletTemplatesPage() {
                         </span>
                       )}
                     </TableCell>
-                    <TableCell>{latestVersion?.page_count || 0}</TableCell>
-                    <TableCell>{template._count?.purchases || 0}</TableCell>
-                    <TableCell>
+                    <TableCell numeric>{latestVersion?.page_count || 0}</TableCell>
+                    <TableCell numeric>{template._count?.purchases || 0}</TableCell>
+                    <TableCell date>
                       {formatDate(
                         template.updated_at || template.created_at,
                         i18n.language,
                         t("common.notEditedYet"),
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell actions>
                       <div className="flex justify-end gap-2">
                         {latestVersion?.id && status !== "published" && (
                           <Button

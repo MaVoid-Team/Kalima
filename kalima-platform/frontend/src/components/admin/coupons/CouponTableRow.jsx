@@ -27,7 +27,7 @@ export default function CouponTableRow({ coupon, onEdit, onDelete, onToggleActiv
                     data-testid={`coupons-table-row-checkbox-${couponId}`}
                 />
             </TableCell>
-            <TableCell className="font-medium">{coupon.code || '—'}</TableCell>
+            <TableCell truncate className="font-medium" title={coupon.code || undefined}>{coupon.code || '—'}</TableCell>
 
             <TableCell>
                 <Badge
@@ -42,14 +42,14 @@ export default function CouponTableRow({ coupon, onEdit, onDelete, onToggleActiv
                 </Badge>
             </TableCell>
 
-            <TableCell>{formatDiscount(coupon, t, i18n)}</TableCell>
-            <TableCell>{coupon.product_id || '—'}</TableCell>
+            <TableCell numeric>{formatDiscount(coupon, t, i18n)}</TableCell>
+            <TableCell numeric>{coupon.product_id || '—'}</TableCell>
 
-            <TableCell className="align-top">
+            <TableCell date className="align-top">
                 <CouponDateInfo coupon={coupon} />
             </TableCell>
 
-            <TableCell>
+            <TableCell status>
                 {active ? (
                     <Badge>{t('coupons.status.active')}</Badge>
                 ) : (
@@ -57,7 +57,7 @@ export default function CouponTableRow({ coupon, onEdit, onDelete, onToggleActiv
                 )}
             </TableCell>
 
-            <TableCell>
+            <TableCell actions>
                 <CouponRowActions
                     coupon={coupon}
                     couponId={couponId}

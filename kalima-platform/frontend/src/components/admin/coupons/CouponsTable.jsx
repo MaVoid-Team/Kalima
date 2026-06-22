@@ -53,11 +53,11 @@ export default function CouponsTable({ coupons, loading, onEdit, onDelete, onTog
                             </TableHead>
                             <TableHead>{t('coupons.table.code')}</TableHead>
                             <TableHead>{t('coupons.table.discountType')}</TableHead>
-                            <TableHead>{t('coupons.table.discountValue')}</TableHead>
-                            <TableHead>{t('coupons.table.productId')}</TableHead>
+                            <TableHead numeric>{t('coupons.table.discountValue')}</TableHead>
+                            <TableHead numeric>{t('coupons.table.productId')}</TableHead>
                             <TableHead className="text-center">{t('coupons.table.dates')}</TableHead>
                             <TableHead>{t('coupons.table.status')}</TableHead>
-                            <TableHead className="text-center">{t('coupons.table.actions')}</TableHead>
+                            <TableHead actions className="text-center">{t('coupons.table.actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -81,8 +81,8 @@ export default function CouponsTable({ coupons, loading, onEdit, onDelete, onTog
                     <TableHeader>
                         <TableRow>
                             <TableHead>{t('coupons.table.code')}</TableHead>
-                            <TableHead>{t('coupons.table.discountValue')}</TableHead>
-                            <TableHead className="text-end">{t('coupons.table.actions')}</TableHead>
+                            <TableHead numeric>{t('coupons.table.discountValue')}</TableHead>
+                            <TableHead actions>{t('coupons.table.actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
