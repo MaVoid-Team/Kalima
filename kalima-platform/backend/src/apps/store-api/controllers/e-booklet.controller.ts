@@ -6,7 +6,6 @@ import { getEBookletService } from "../services/e-booklet.service";
 import { getEBookletDomainServices } from "../services/e-booklet-domain.service";
 import {
   AcceptEBookletInviteDto,
-  CreateEBookletInviteDto,
   CreateEBookletTemplateDto,
   DeliverEBookletDto,
   EBookletCheckoutDto,
@@ -794,13 +793,7 @@ export const eBookletController = {
 
   async createInvite(req: Request, res: Response, next: NextFunction) {
     try {
-      const dto = await validateDto(CreateEBookletInviteDto, req.body);
-      const data = await getEBookletService().createInvite(
-        parseId(req.params.instanceId, "instance ID"),
-        currentUserId(req),
-        dto,
-      );
-      res.status(201).json({ success: true, data });
+      throw new BadRequestError("Teacher invite links are disabled. Teachers must share e-booklet access by copying the generated redeem code or WhatsApp template message.");
     } catch (error) {
       next(error);
     }
