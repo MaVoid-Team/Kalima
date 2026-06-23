@@ -100,6 +100,14 @@ axiosInstance.interceptors.response.use(
         return response;
     },
     (error) => {
+        if (axios.isCancel(error) || error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError') {
+            return Promise.reject(error);
+        }
+
+        if (error?.config?.suppressErrorToast) {
+            return Promise.reject(error);
+        }
+
         const { response } = error;
         let errorMessage = i18n.t('auth:errors.default', "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.");
         let errorDetails = '';

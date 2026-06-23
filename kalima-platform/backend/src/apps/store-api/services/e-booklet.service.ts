@@ -3251,12 +3251,19 @@ export class EBookletService {
             template: true,
             template_version: true,
             teacher: { select: { id: true, name: true } },
+            purchase: { select: { id: true, status: true } },
           },
         },
       },
     });
     if (!access || access.booklet_instance?.status !== "active") {
       throw new ForbiddenError("You do not have access to this e-booklet.");
+    }
+    if ((access as any).role === "teacher" && access.booklet_instance?.purchase_id) {
+      const purchaseStatus = String((access as any).booklet_instance?.purchase?.status || "");
+      if (purchaseStatus !== "delivered") {
+        throw new ForbiddenError("This e-booklet is not available until payment is confirmed and customization is complete.");
+      }
     }
     const expiresAt = access.booklet_instance?.access_expires_at
       ? new Date(access.booklet_instance.access_expires_at)

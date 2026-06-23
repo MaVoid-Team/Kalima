@@ -446,6 +446,10 @@
     "purchases": {
       "title": "مشتريات المذكرات التفاعلية",
       "description": "تأكيد الدفع، رفع ملفات المعلمين الخاصة، التحقق من عدد الصفحات، وتسليم الوصول.",
+      "searchPlaceholder": "ابحث عن المعلم أو القالب أو مرجع الدفع...",
+      "minTotal": "أقل إجمالي",
+      "maxTotal": "أعلى إجمالي",
+      "filterByDate": "تصفية حسب التاريخ",
       "table": {
         "teacher": "المعلم",
         "template": "القالب"
@@ -879,6 +883,8 @@
     "reportReference": "مرجع البلاغ: المذكرة التفاعلية #{{id}}، الصفحة {{page}}",
     "questionFallback": "اختر الإجابة الصحيحة.",
     "answerFeedback": "تم فحص إجابتك.",
+    "correctAnswerFeedback": "إجابة صحيحة. أحسنت!",
+    "correctAnswerCelebration": "أحسنت!",
     "unsupportedBlock": "كتلة محتوى غير مدعومة: {{type}}",
     "pageFrameTitle": "صفحة المذكرة التفاعلية {{page}}",
     "deviceBlocked": "غير مسموح لهذا الجهاز بفتح هذه المذكرة التفاعلية.",

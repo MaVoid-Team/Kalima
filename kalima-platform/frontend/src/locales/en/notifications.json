@@ -55,6 +55,16 @@
     "no_history": "No notifications sent yet",
     "read": "Read",
     "unread": "Unread",
-    "load_more": "Load More Activity"
+    "load_more": "Load More Activity",
+    "invalid_user_ids": "Please enter valid User IDs",
+    "notification_id": "ID",
+    "user_label": "User",
+    "role_label": "Role",
+    "roles": {
+      "Student": "Student",
+      "Teacher": "Teacher",
+      "Parent": "Parent",
+      "Moderator": "Moderator"
+    }
   }
 }

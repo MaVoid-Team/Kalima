@@ -446,6 +446,10 @@
     "purchases": {
       "title": "E-Booklet Purchases",
       "description": "Confirm payment, upload teacher-specific files, validate page counts, and deliver access.",
+      "searchPlaceholder": "Search teacher, template, payment reference...",
+      "minTotal": "Min total",
+      "maxTotal": "Max total",
+      "filterByDate": "Filter by date",
       "table": {
         "teacher": "Teacher",
         "template": "Template"
@@ -879,6 +883,8 @@
     "reportReference": "Report reference: e-booklet #{{id}}, page {{page}}",
     "questionFallback": "Choose the correct answer.",
     "answerFeedback": "Your answer has been checked.",
+    "correctAnswerFeedback": "Correct answer. Well done!",
+    "correctAnswerCelebration": "Well done!",
     "unsupportedBlock": "Unsupported content block: {{type}}",
     "pageFrameTitle": "E-booklet page {{page}}",
     "deviceBlocked": "This device is not allowed to open this e-booklet.",

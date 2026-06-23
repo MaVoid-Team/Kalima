@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 import {
@@ -17,6 +18,7 @@ import {
   Music,
   PlaySquare,
   HelpCircle,
+  Sparkles,
   ZoomIn,
   ZoomOut,
   X,
@@ -56,6 +58,16 @@ const VIEWER_COLOR_RGB_MAP = {
   violet: "124 58 237",
 };
 const DEFAULT_HOTSPOT_COLOR = "blue";
+const CONFETTI_PIECES = [
+  { x: -130, y: -96, rotate: -95, color: "bg-rose-500", delay: 0.02, size: "h-2 w-5" },
+  { x: -92, y: -128, rotate: 82, color: "bg-amber-400", delay: 0.08, size: "h-2 w-2" },
+  { x: -58, y: -108, rotate: -140, color: "bg-emerald-400", delay: 0.01, size: "h-5 w-2" },
+  { x: -22, y: -136, rotate: 124, color: "bg-sky-400", delay: 0.1, size: "h-2 w-5" },
+  { x: 18, y: -118, rotate: -62, color: "bg-fuchsia-500", delay: 0.04, size: "h-2 w-2" },
+  { x: 54, y: -142, rotate: 148, color: "bg-lime-400", delay: 0.12, size: "h-5 w-2" },
+  { x: 92, y: -102, rotate: -112, color: "bg-orange-400", delay: 0.06, size: "h-2 w-5" },
+  { x: 126, y: -130, rotate: 76, color: "bg-cyan-400", delay: 0.03, size: "h-2 w-2" },
+];
 
 const getHotspotColorClass = (hotspot) => {
   const color = hotspot?.display_behavior?.color;
@@ -183,7 +195,7 @@ const buildDeviceFingerprint = async () => {
   return fingerprint;
 };
 
-function HotspotMarker({ hotspot, active, onOpen, t }) {
+function HotspotMarker({ hotspot, active, onOpen, t, pageDimensions }) {
   const typeMeta = HOTSPOT_TYPES[hotspot.type] || HOTSPOT_TYPES.text;
   const Icon = typeMeta.icon;
   const colorClass = getHotspotColorClass(hotspot) || typeMeta.className;
@@ -191,6 +203,7 @@ function HotspotMarker({ hotspot, active, onOpen, t }) {
     defaultSize: 4,
     minSize: 3,
     maxSize: 8,
+    aspectRatio: pageDimensions.width / pageDimensions.height,
   });
   const opacity = clamp(hotspot.display_behavior?.opacity_percent, 100, 0, 100) / 100;
   const glow = getHotspotGlowPercent(hotspot);
@@ -232,7 +245,7 @@ function HotspotMarker({ hotspot, active, onOpen, t }) {
       type="button"
       onClick={() => onOpen(hotspot)}
       className={`absolute flex items-center justify-center border-2 border-white text-white transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${glow > 0 ? "shadow-lg ring-4" : "shadow-md"} ${roundedClass} ${colorClass} ${active ? "scale-105 ring-offset-2" : ""}`}
-      style={{ ...baseStyle, ...glowStyle }}
+      style={{ ...baseStyle, ...(shape === "circle" ? { clipPath: "circle(50% at 50% 50%)" } : {}), ...glowStyle }}
       aria-label={getHotspotLabel(hotspot, t)}
     >
       <Icon className="h-4 w-4 opacity-90" />
@@ -296,14 +309,14 @@ function AssetBlock({ block, hotspot, viewer, t, instanceId }) {
     return (
       <button
         type="button"
-        className="block w-full cursor-zoom-in overflow-hidden rounded-md border bg-background"
+        className="block w-full cursor-zoom-in overflow-hidden rounded-md bg-black"
         onClick={() => canExpandOnClick && setExpanded((value) => !value)}
         disabled={!canExpandOnClick}
       >
         <img
           src={assetUrl}
           alt={block.alt || hotspot.title || t("admin.editor.hotspots.types.image")}
-          className={`w-full select-none object-contain ${expanded ? "max-h-[70vh]" : "max-h-72"}`}
+          className={`w-full select-none object-contain ${expanded ? "max-h-[84vh]" : "max-h-[78vh]"}`}
           draggable={false}
         />
       </button>
@@ -328,7 +341,7 @@ function AssetBlock({ block, hotspot, viewer, t, instanceId }) {
         src={assetUrl}
         controls
         controlsList="nodownload noplaybackrate"
-        className="max-h-80 w-full rounded-md bg-black"
+        className="max-h-[84vh] w-full rounded-md bg-black"
       />
     );
   }
@@ -352,11 +365,60 @@ function AssetBlock({ block, hotspot, viewer, t, instanceId }) {
   );
 }
 
+function CorrectAnswerCelebration({ burstKey, t }) {
+  return (
+    <AnimatePresence>
+      {burstKey > 0 && (
+        <motion.div
+          key={burstKey}
+          className="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-lg"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18, delay: 0.95 }}
+          aria-hidden="true"
+        >
+          <motion.div
+            className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-700 shadow-lg"
+            initial={{ scale: 0.76, y: 10, opacity: 0 }}
+            animate={{ scale: [0.76, 1.08, 1], y: 0, opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 1.05, times: [0, 0.22, 0.72, 1] }}
+          >
+            <Sparkles className="h-4 w-4 text-amber-500" />
+            {t("viewer.correctAnswerCelebration")}
+          </motion.div>
+          {CONFETTI_PIECES.map((piece, index) => (
+            <motion.span
+              // eslint-disable-next-line react/no-array-index-key
+              key={index}
+              className={`absolute left-1/2 top-1/2 rounded-sm ${piece.color} ${piece.size}`}
+              initial={{ x: 0, y: 0, rotate: 0, opacity: 0, scale: 0.8 }}
+              animate={{ x: piece.x, y: piece.y, rotate: piece.rotate, opacity: [0, 1, 1, 0], scale: [0.8, 1, 1, 0.65] }}
+              transition={{ duration: 0.9, delay: piece.delay, ease: "easeOut" }}
+            />
+          ))}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 function QuestionAnswerBlock({ block, t }) {
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [celebrationKey, setCelebrationKey] = useState(0);
   const answers = Array.isArray(block.answers) ? block.answers : [];
+  const selectedAnswer = selectedIndex !== null ? answers[selectedIndex] : null;
+  const selectedIsCorrect = selectedAnswer?.isCorrect === true || selectedAnswer?.is_correct === true;
+
+  const selectAnswer = (answer, index) => {
+    const isCorrect = answer.isCorrect === true || answer.is_correct === true;
+    setSelectedIndex(index);
+    if (isCorrect) setCelebrationKey((value) => value + 1);
+  };
+
   return (
-    <div className="space-y-3">
+    <div className="relative space-y-3 overflow-hidden rounded-lg">
+      <CorrectAnswerCelebration burstKey={celebrationKey} t={t} />
       <p className="whitespace-pre-wrap text-sm font-medium">{block.question || block.prompt || block.text_content || t("viewer.questionFallback")}</p>
       <div className="space-y-2">
         {answers.map((answer, index) => {
@@ -367,7 +429,7 @@ function QuestionAnswerBlock({ block, t }) {
               // eslint-disable-next-line react/no-array-index-key
               key={index}
               type="button"
-              onClick={() => setSelectedIndex(index)}
+              onClick={() => selectAnswer(answer, index)}
               className={`w-full rounded-md border p-2 text-start text-sm ${
                 isSelected
                   ? isCorrect
@@ -382,7 +444,9 @@ function QuestionAnswerBlock({ block, t }) {
         })}
       </div>
       {selectedIndex !== null && (
-        <p className="text-xs text-muted-foreground">{t("viewer.answerFeedback")}</p>
+        <p className={`text-xs ${selectedIsCorrect ? "font-medium text-emerald-600" : "text-muted-foreground"}`}>
+          {selectedIsCorrect ? t("viewer.correctAnswerFeedback") : t("viewer.answerFeedback")}
+        </p>
       )}
     </div>
   );
@@ -686,6 +750,14 @@ export default function EBookletViewerPage({ previewMode = false }) {
   }, [instanceId, previewMode, t, viewer]);
 
   const contentHotspot = hotspotContent || activeHotspot;
+  const contentHotspotBlocks = contentHotspot ? getBlocks(contentHotspot) : [];
+  const primaryHotspotBlockType = contentHotspotBlocks[0]?.type || contentHotspot?.type;
+  const singleMediaHotspot = contentHotspotBlocks.length === 1 && ["image", "video"].includes(primaryHotspotBlockType);
+  const hotspotPopupClassName = singleMediaHotspot
+    ? "relative flex max-h-[92vh] w-fit max-w-[96vw] flex-col overflow-hidden rounded-lg border border-white/10 bg-black p-2 shadow-2xl"
+    : "relative flex max-h-[90vh] w-full max-w-[min(92vw,42rem)] flex-col overflow-hidden rounded-lg border bg-background text-foreground shadow-2xl";
+  const hotspotBodyClassName = singleMediaHotspot ? "min-h-0 overflow-auto" : "min-h-0 overflow-y-auto p-4";
+  const hotspotBlocksClassName = singleMediaHotspot ? "space-y-0" : "space-y-3";
   const handleDocumentRenderSuccess = useCallback(() => {
     setDocumentRenderStatus("ready");
   }, []);
@@ -871,32 +943,35 @@ export default function EBookletViewerPage({ previewMode = false }) {
                   active={String(activeHotspot?.id) === String(hotspot.id)}
                   onOpen={openHotspot}
                   t={t}
+                  pageDimensions={dimensions}
                 />
               ))}
               {canShowHotspots && contentHotspot && (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-950/25 p-3 sm:p-6">
-                  <div className="flex max-h-[90%] w-full max-w-[min(92%,34rem)] flex-col overflow-hidden rounded-xl border bg-background text-foreground shadow-2xl">
-                    <div className="flex items-start justify-between gap-3 border-b p-3 sm:p-4">
-                      <div className="min-w-0">
-                        <h3 className="truncate text-sm font-semibold sm:text-base">#{getReference(contentHotspot)} {contentHotspot.title || t("viewer.hotspotFallback")}</h3>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {t(`admin.editor.hotspots.types.${contentHotspot.type}`, { defaultValue: contentHotspot.type })}
-                        </p>
-                      </div>
-                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={closeHotspot} aria-label={t("common.close", { defaultValue: "Close" })}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="min-h-0 overflow-y-auto p-3 sm:p-4">
+                  <div className={hotspotPopupClassName}>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute end-2 top-2 z-10 h-8 w-8 rounded-full bg-black/65 text-white shadow-sm hover:bg-black/80 hover:text-white"
+                      onClick={closeHotspot}
+                      aria-label={t("common.close", { defaultValue: "Close" })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                    <div className={hotspotBodyClassName}>
                       {hotspotLoading ? (
                         <p className="text-sm text-muted-foreground">{t("viewer.loadingAsset")}</p>
                       ) : hotspotError ? (
                         <p className="text-sm text-destructive">{hotspotError}</p>
                       ) : (
-                        <div className="space-y-4">
-                          {getBlocks(contentHotspot).map((block, index) => (
-                            <div className="rounded-md border bg-background/80 p-3" key={`${block.type}-${block.asset_file_id || index}`}>
-                              {getBlocks(contentHotspot).length > 1 && (
+                        <div className={hotspotBlocksClassName}>
+                          {contentHotspotBlocks.map((block, index) => (
+                            <div
+                              className={contentHotspotBlocks.length > 1 ? "rounded-md border bg-background/80 p-3" : ""}
+                              key={`${block.type}-${block.asset_file_id || index}`}
+                            >
+                              {contentHotspotBlocks.length > 1 && (
                                 <div className="mb-2 text-xs font-medium text-muted-foreground">
                                   {t("admin.editor.hotspots.blockNumber", { number: index + 1 })}
                                 </div>

@@ -55,6 +55,16 @@
     "no_history": "لم يتم إرسال أي إشعارات بعد",
     "read": "تمت القراءة",
     "unread": "لم تتم القراءة",
-    "load_more": "تحميل المزيد من النشاط"
+    "load_more": "تحميل المزيد من النشاط",
+    "invalid_user_ids": "يرجى إدخال معرفات مستخدمين صالحة",
+    "notification_id": "المعرّف",
+    "user_label": "المستخدم",
+    "role_label": "الدور",
+    "roles": {
+      "Student": "طالب",
+      "Teacher": "معلم",
+      "Parent": "ولي أمر",
+      "Moderator": "مشرف"
+    }
   }
 }

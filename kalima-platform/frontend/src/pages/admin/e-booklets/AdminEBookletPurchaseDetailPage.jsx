@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { useAdminEBookletPurchases } from "@/hooks/admin/useAdminEBooklets";
 import { formatCurrency, formatOrderDate, getImageUrl } from "@/lib/storeUtils";
+import { getEBookletOrderAmount } from "@/components/e-booklets/eBookletOrderUtils";
 
 const statusTone = {
   pending: "border-amber-200 bg-amber-50 text-amber-700",
@@ -22,7 +23,7 @@ const statusTone = {
 };
 
 const prettyStatus = (status) => String(status || "").replaceAll("_", " ");
-const amount = (purchase) => purchase?.final_payable_price ?? purchase?.price ?? 0;
+const positiveAmount = (value) => (Number(value) > 0 ? value : null);
 
 function DetailRow({ label, value }) {
   return (
@@ -75,9 +76,14 @@ export default function AdminEBookletPurchaseDetailPage() {
 
   const status = String(purchase.status || "");
   const canApprovePayment = ["pending", "awaiting_payment"].includes(status);
-  const screenshotUrl = getImageUrl(purchase.payment_screenshot?.url);
+  const screenshotSource = purchase.payment_screenshot?.url || (typeof purchase.payment_screenshot === "string" ? purchase.payment_screenshot : null) || purchase.payment_screenshot_url || purchase.payment_proof_url;
+  const screenshotUrl = getImageUrl(screenshotSource);
   const requiredFields = purchase.required_fields || [];
   const instance = Array.isArray(purchase.instances) ? purchase.instances[0] : null;
+  const basePrice = positiveAmount(purchase.price) || purchase.marketing_price || purchase.student_marketing_price || purchase.total || 0;
+  const totalAmount = getEBookletOrderAmount(purchase);
+  const paymentMethod = purchase.payment_methods?.name || purchase.payment_method?.name || purchase.payment_method;
+  const paymentReference = purchase.payment_reference || purchase.numberTransferredFrom || purchase.payment_number;
   const brandingEntries = purchase.branding_json && typeof purchase.branding_json === "object"
     ? Object.entries(purchase.branding_json).filter(([, value]) => value !== undefined && value !== null && value !== "")
     : [];
@@ -178,14 +184,14 @@ export default function AdminEBookletPurchaseDetailPage() {
 
         <div className="space-y-6">
           <Card title={t("orders.details.orderSummary", { defaultValue: "Order Summary" })}>
-            <DetailRow label={t("common.price", { defaultValue: "Price" })} value={formatCurrency(purchase.price, t)} />
+            <DetailRow label={t("common.price", { defaultValue: "Price" })} value={formatCurrency(basePrice, t)} />
             <DetailRow label={t("admin.purchases.walletCredit", { defaultValue: "Wallet credit" })} value={formatCurrency(purchase.wallet_credit_applied || 0, t)} />
-            <div className="border-t pt-3 text-lg font-bold"><DetailRow label={t("orders.details.total", { defaultValue: "Total" })} value={formatCurrency(amount(purchase), t)} /></div>
+            <div className="border-t pt-3 text-lg font-bold"><DetailRow label={t("orders.details.total", { defaultValue: "Total" })} value={formatCurrency(totalAmount, t)} /></div>
           </Card>
 
           <Card title={t("orders.details.paymentInfo", { defaultValue: "Payment Info" })}>
-            <DetailRow label={t("orders.details.method", { defaultValue: "Method" })} value={purchase.payment_methods?.name || purchase.payment_method} />
-            <DetailRow label={t("admin.purchases.paymentReference", { defaultValue: "Payment reference" })} value={purchase.payment_reference} />
+            <DetailRow label={t("orders.details.method", { defaultValue: "Method" })} value={paymentMethod} />
+            <DetailRow label={t("admin.purchases.paymentReference", { defaultValue: "Payment reference" })} value={paymentReference} />
             {screenshotUrl && <a href={screenshotUrl} target="_blank" rel="noreferrer" className="mt-3 block overflow-hidden rounded-md border"><img src={screenshotUrl} alt={t("inviteAccept.paymentScreenshot", { defaultValue: "Payment screenshot" })} className="max-h-56 w-full object-cover" /></a>}
           </Card>
 
