@@ -92,6 +92,7 @@ export default function AdminEBookletInstancesPage() {
   }, { total: 0, active: 0, revoked: 0, seats: 0, quota: 0, devices: 0 }), [instances]);
 
   const teacherGroups = useMemo(() => Object.entries(grouped), [grouped]);
+  const initialLoading = loading && instances.length === 0;
 
   const formatDate = (value, withTime = false) => {
     if (!value) return t("admin.instances.noExpiry");
@@ -184,7 +185,7 @@ export default function AdminEBookletInstancesPage() {
               <option value="archived">{t("statuses.archived")}</option>
               <option value="revoked">{t("statuses.revoked")}</option>
             </select>
-            <Button variant="outline" className="rounded-xl" onClick={() => fetchInstances()} disabled={loading}>
+            <Button type="button" variant="outline" className="rounded-xl" onClick={() => fetchInstances()} disabled={loading}>
               <RefreshCcw className="h-4 w-4" />
               {t("common.refresh")}
             </Button>
@@ -198,10 +199,10 @@ export default function AdminEBookletInstancesPage() {
         </div>
       </motion.section>
 
-      {loading && <div className="rounded-2xl border bg-background p-8 text-center text-sm text-muted-foreground shadow-sm">{t("admin.instances.loading")}</div>}
-      {!loading && instances.length === 0 && <div className="rounded-2xl border bg-background p-8 text-center text-sm text-muted-foreground shadow-sm">{t("admin.instances.empty")}</div>}
+      {initialLoading && <div className="rounded-2xl border bg-background p-8 text-center text-sm text-muted-foreground shadow-sm">{t("admin.instances.loading")}</div>}
+      {!initialLoading && instances.length === 0 && <div className="rounded-2xl border bg-background p-8 text-center text-sm text-muted-foreground shadow-sm">{t("admin.instances.empty")}</div>}
 
-      {!loading && teacherGroups.length > 0 && (
+      {!initialLoading && teacherGroups.length > 0 && (
         <motion.div className="space-y-3" variants={listMotion} initial="hidden" animate="show">
           {teacherGroups.map(([teacherId, group]) => {
             const groupSeats = group.rows.reduce((sum, instance) => sum + numberValue(instance.used_invites_count, instance._count?.access_records || 0), 0);
@@ -272,13 +273,13 @@ export default function AdminEBookletInstancesPage() {
                               <div className="space-y-3 rounded-2xl border bg-background p-4">
                                 <div className="flex gap-2">
                                   <Input className="h-10 rounded-xl" type="number" min="0" value={quotaDrafts[instance.id] ?? 0} onChange={(event) => setQuotaDrafts((current) => ({ ...current, [instance.id]: event.target.value }))} />
-                                  <Button className="rounded-xl" variant="outline" onClick={() => handleQuotaSave(instance.id)} title={t("common.save")}><Save className="h-4 w-4" />{t("common.save")}</Button>
+                                  <Button type="button" className="rounded-xl" variant="outline" onClick={() => handleQuotaSave(instance.id)} title={t("common.save")}><Save className="h-4 w-4" />{t("common.save")}</Button>
                                 </div>
                                 <div className="grid gap-2 sm:grid-cols-2">
                                   <Button asChild size="sm" variant="outline" className="justify-start rounded-xl"><Link to={`/admin/e-booklets/access/${instance.id}/students`}><Users className="h-4 w-4" />{t("admin.instances.showStudents")}</Link></Button>
                                   <Button asChild size="sm" variant="outline" className="justify-start rounded-xl"><Link to={`/admin/e-booklets/access/${instance.id}/view`}><Eye className="h-4 w-4" />{t("admin.instances.adminView")}</Link></Button>
-                                  <Button size="sm" variant={accessExpanded ? "default" : "outline"} className="justify-start rounded-xl" onClick={() => toggleAccessPanel(instance)}><KeyRound className="h-4 w-4" />{t("admin.instances.accessCodes", { defaultValue: "Access codes" })}</Button>
-                                  <Button size="sm" variant="outline" className="justify-start rounded-xl text-destructive hover:text-destructive" onClick={() => handleRevoke(instance.id)} disabled={instance.status !== "active"}><ShieldOff className="h-4 w-4" />{t("admin.instances.revoke")}</Button>
+                                  <Button type="button" size="sm" variant={accessExpanded ? "default" : "outline"} className="justify-start rounded-xl" onClick={() => toggleAccessPanel(instance)}><KeyRound className="h-4 w-4" />{t("admin.instances.accessCodes", { defaultValue: "Access codes" })}</Button>
+                                  <Button type="button" size="sm" variant="outline" className="justify-start rounded-xl text-destructive hover:text-destructive" onClick={() => handleRevoke(instance.id)} disabled={instance.status !== "active"}><ShieldOff className="h-4 w-4" />{t("admin.instances.revoke")}</Button>
                                 </div>
                               </div>
                             </div>
@@ -297,7 +298,7 @@ export default function AdminEBookletInstancesPage() {
                                       <div key={student.id || devicePanelKey} className="rounded-xl border p-3 text-xs">
                                         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                                           <div className="min-w-0"><div className="truncate text-sm font-medium">{student.user?.name || student.user?.email || t("common.student", { defaultValue: "Student" })}</div><div className="truncate text-muted-foreground">{student.user?.email || `ID ${studentUserId}`}</div></div>
-                                          <Button size="sm" variant="outline" className="rounded-xl" onClick={() => setExpandedDeviceKey(devicesExpanded ? null : devicePanelKey)}><HardDrive className="h-4 w-4" />{devicesExpanded ? t("admin.instances.hideDevicesInline") : t("admin.instances.manageDevicesInline")}</Button>
+                                          <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => setExpandedDeviceKey(devicesExpanded ? null : devicePanelKey)}><HardDrive className="h-4 w-4" />{devicesExpanded ? t("admin.instances.hideDevicesInline") : t("admin.instances.manageDevicesInline")}</Button>
                                         </div>
                                         <div className="mt-2 grid gap-2 rounded-lg bg-muted/50 p-2 sm:grid-cols-3"><span>{t("admin.instances.devices", { defaultValue: "Devices" })}: {student.devices_summary?.active_count ?? 0}/{student.devices_summary?.allowed_devices ?? 1}</span><span>{t("admin.instances.viewerOpens", { defaultValue: "Viewer opens" })}: {student.analytics_summary?.viewer_opened ?? 0}</span><span>{t("admin.instances.source", { defaultValue: "Source" })}: {student.purchase_reference?.source || student.analytics_summary?.source || student.access_source || "-"}</span></div>
                                         {devicesExpanded && <AdminEBookletStudentDevicePanel instanceId={instance.id} userId={studentUserId} student={student} expanded={devicesExpanded} onSummaryRefresh={() => fetchInstances()} />}
@@ -312,9 +313,9 @@ export default function AdminEBookletInstancesPage() {
                               {accessExpanded && (
                               <motion.div className="overflow-hidden rounded-2xl border bg-background" data-testid="admin-e-booklet-access-code-panel" variants={panelMotion} initial="hidden" animate="show" exit="exit">
                               <div className="space-y-4 p-4">
-                                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-2 text-sm font-semibold"><KeyRound className="h-4 w-4 text-primary" />{t("admin.instances.accessCodes", { defaultValue: "Access codes" })}</div><Button size="sm" variant="outline" className="rounded-xl" onClick={() => loadAccessCodes(instance)}>{t("common.refresh")}</Button></div>
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-2 text-sm font-semibold"><KeyRound className="h-4 w-4 text-primary" />{t("admin.instances.accessCodes", { defaultValue: "Access codes" })}</div><Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => loadAccessCodes(instance)}>{t("common.refresh")}</Button></div>
                                 <div className="grid gap-3 md:grid-cols-5"><select className="h-10 rounded-xl border bg-background px-3 text-sm" value={accessCodeDrafts[instance.id]?.termId || ""} onChange={(event) => updateAccessCodeDraft(instance.id, "termId", event.target.value)}><option value="">{t("admin.instances.selectTerm", { defaultValue: "Select term" })}</option>{terms.map((term) => <option key={term.id} value={String(term.id)}>{term.name}</option>)}</select><select className="h-10 rounded-xl border bg-background px-3 text-sm" value={accessCodeDrafts[instance.id]?.kind || "paid"} onChange={(event) => updateAccessCodeDraft(instance.id, "kind", event.target.value)}><option value="paid">{t("admin.instances.paidCode", { defaultValue: "Paid" })}</option><option value="free">{t("admin.instances.freeCode", { defaultValue: "Free" })}</option></select><Input className="h-10 rounded-xl" type="number" min="1" max="100" value={accessCodeDrafts[instance.id]?.count || "1"} onChange={(event) => updateAccessCodeDraft(instance.id, "count", event.target.value)} placeholder={t("admin.instances.codeCount", { defaultValue: "Count" })} /><Input className="h-10 rounded-xl" type="number" min="1" value={accessCodeDrafts[instance.id]?.maxRedemptions || "1"} onChange={(event) => updateAccessCodeDraft(instance.id, "maxRedemptions", event.target.value)} placeholder={t("admin.instances.maxRedemptions", { defaultValue: "Max redemptions" })} /><Input className="h-10 rounded-xl" type="date" value={accessCodeDrafts[instance.id]?.expiresAt || ""} onChange={(event) => updateAccessCodeDraft(instance.id, "expiresAt", event.target.value)} /></div>
-                                <div className="flex flex-wrap gap-2"><Button size="sm" className="rounded-xl" onClick={() => handleGenerateAccessCodes(instance)} disabled={!accessCodeDrafts[instance.id]?.termId || !(instance.teacher?.id || instance.teacher_id)}>{t("admin.instances.generateCodes", { defaultValue: "Generate codes" })}</Button>{(generatedCodes[instance.id] || []).length > 0 && <Button size="sm" variant="outline" className="rounded-xl" onClick={() => copyGeneratedCodes(instance.id)}><Copy className="h-4 w-4" />{t("admin.instances.copyGeneratedCodes", { defaultValue: "Copy generated codes" })}</Button>}</div>
+                                <div className="flex flex-wrap gap-2"><Button type="button" size="sm" className="rounded-xl" onClick={() => handleGenerateAccessCodes(instance)} disabled={!accessCodeDrafts[instance.id]?.termId || !(instance.teacher?.id || instance.teacher_id)}>{t("admin.instances.generateCodes", { defaultValue: "Generate codes" })}</Button>{(generatedCodes[instance.id] || []).length > 0 && <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => copyGeneratedCodes(instance.id)}><Copy className="h-4 w-4" />{t("admin.instances.copyGeneratedCodes", { defaultValue: "Copy generated codes" })}</Button>}</div>
                                 {(generatedCodes[instance.id] || []).length > 0 && <div className="rounded-xl bg-muted p-3 text-xs"><div className="mb-2 font-semibold">{t("admin.instances.generatedNow", { defaultValue: "Generated now" })}</div><div className="grid gap-2 md:grid-cols-2">{generatedCodes[instance.id].map((item) => <code key={item.record?.id || item.code} className="break-all rounded-lg bg-background p-2">{item.code}</code>)}</div></div>}
                                 <div className="grid gap-2 md:grid-cols-2">{(existingCodes[instance.id] || []).slice(0, 10).map((code) => <div key={code.id} className="rounded-xl border p-3 text-xs"><div className="font-medium">{code.kind} - {code.status} - ****{code.code_hint}</div><div className="text-muted-foreground">{t("admin.instances.redemptions", { defaultValue: "Redemptions" })}: {code.redeemed_count}/{code.max_redemptions}</div></div>)}{(existingCodes[instance.id] || []).length === 0 && <div className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">{t("admin.instances.noAccessCodes", { defaultValue: "No access codes generated yet." })}</div>}</div>
                               </div>
@@ -336,9 +337,9 @@ export default function AdminEBookletInstancesPage() {
       )}
 
       <div className="flex flex-col gap-3 rounded-3xl border bg-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <Button variant="outline" className="rounded-xl" disabled={pagination.page <= 1 || loading} onClick={() => { setPage(pagination.page - 1); fetchInstances({ page: pagination.page - 1 }); }}>{t("common.previous")}</Button>
+        <Button type="button" variant="outline" className="rounded-xl" disabled={pagination.page <= 1 || loading} onClick={() => { setPage(pagination.page - 1); fetchInstances({ page: pagination.page - 1 }); }}>{t("common.previous")}</Button>
         <span className="text-center text-sm text-muted-foreground">{t("admin.instances.pagination", { page: pagination.page, total: pagination.total })}</span>
-        <Button variant="outline" className="rounded-xl" disabled={pagination.page * pagination.limit >= pagination.total || loading} onClick={() => { setPage(pagination.page + 1); fetchInstances({ page: pagination.page + 1 }); }}>{t("common.next")}</Button>
+        <Button type="button" variant="outline" className="rounded-xl" disabled={pagination.page * pagination.limit >= pagination.total || loading} onClick={() => { setPage(pagination.page + 1); fetchInstances({ page: pagination.page + 1 }); }}>{t("common.next")}</Button>
       </div>
     </motion.div>
   );

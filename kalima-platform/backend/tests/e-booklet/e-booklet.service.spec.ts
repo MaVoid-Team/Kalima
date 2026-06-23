@@ -1870,6 +1870,58 @@ describe("EBookletService", () => {
   });
 
   describe("V2 device binding", () => {
+    test.each(["pending", "customization_in_progress", "ready"])(
+      "blocks teacher viewer access while purchase is %s",
+      async (purchaseStatus) => {
+        const db = createMockDb();
+        db.e_booklet_access.findFirst.mockResolvedValue({
+          id: 9,
+          user_id: 55,
+          role: "teacher",
+          status: "active",
+          booklet_instance: {
+            id: 10,
+            purchase_id: 91,
+            status: "active",
+            access_expires_at: new Date("2026-12-31T00:00:00.000Z"),
+            purchase: { id: 91, status: purchaseStatus },
+          },
+        });
+        const service = new EBookletService(db);
+
+        await expect(service.getViewerMetadata(10, 55)).rejects.toThrow(
+          "This e-booklet is not available until payment is confirmed and customization is complete.",
+        );
+        expect(db.e_booklet_audit_logs.create).not.toHaveBeenCalled();
+      },
+    );
+
+    test("allows teacher viewer access after the purchase is delivered", async () => {
+      const db = createMockDb();
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 9,
+        user_id: 55,
+        role: "teacher",
+        status: "active",
+        booklet_instance: {
+          id: 10,
+          purchase_id: 91,
+          status: "active",
+          access_expires_at: new Date("2026-12-31T00:00:00.000Z"),
+          purchase: { id: 91, status: "delivered" },
+        },
+      });
+      const service = new EBookletService(db);
+
+      await expect(service.getViewerMetadata(10, 55)).resolves.toMatchObject({
+        id: 9,
+        booklet_instance: { id: 10, purchase: { id: 91, status: "delivered" } },
+      });
+      expect(db.e_booklet_audit_logs.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ action: "booklet_opened", entity_id: 10 }),
+      }));
+    });
+
     test("allows teacher-owned e-booklets without binding a viewer device", async () => {
       const db = createMockDb();
       db.e_booklet_access.findFirst.mockResolvedValue({
@@ -1877,7 +1929,7 @@ describe("EBookletService", () => {
         user_id: 55,
         role: "teacher",
         status: "active",
-        booklet_instance: { id: 10, status: "active", access_expires_at: new Date("2026-12-31T00:00:00.000Z") },
+        booklet_instance: { id: 10, purchase_id: 91, status: "active", access_expires_at: new Date("2026-12-31T00:00:00.000Z"), purchase: { id: 91, status: "delivered" } },
       });
       const service = new EBookletService(db);
 

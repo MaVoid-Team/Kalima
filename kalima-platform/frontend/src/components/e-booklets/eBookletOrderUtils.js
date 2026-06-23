@@ -70,9 +70,11 @@ export const canManageEBookletOrder = (status, link) => {
   );
 };
 
-export const getEBookletOrderAmount = (order) => (
-  order?.total ?? order?.price ?? order?.marketing_price ?? order?.student_marketing_price ?? 0
-);
+export const getEBookletOrderAmount = (order) => {
+  if (order?.final_payable_price !== null && order?.final_payable_price !== undefined) return order.final_payable_price;
+  if (Number(order?.price) > 0) return order.price;
+  return order?.marketing_price ?? order?.student_marketing_price ?? order?.total ?? order?.price ?? 0;
+};
 
 export const getEBookletOrderCurrency = (order) => order?.currency || "EGP";
 

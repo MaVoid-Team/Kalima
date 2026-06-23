@@ -383,6 +383,7 @@ export function useEBookletViewer({ adminMode = false, previewMode = false } = {
         params: { page: pageNumber },
         headers: { "X-E-Booklet-Page-Token": pageAccessToken },
         signal,
+        suppressErrorToast: true,
       },
     );
     return response.data;
@@ -397,6 +398,7 @@ export function useEBookletViewer({ adminMode = false, previewMode = false } = {
         responseType: "blob",
         headers: previewMode ? undefined : { "X-E-Booklet-Page-Token": pageAccessToken },
         signal,
+        suppressErrorToast: true,
       },
     );
     return URL.createObjectURL(response.data);

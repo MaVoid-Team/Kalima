@@ -78,7 +78,7 @@ export default function AdminNotificationsPage() {
             if (targetType === TARGET_TYPES.INDIVIDUAL) {
                 payload.user_ids = targetIds.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
                 if (payload.user_ids.length === 0) {
-                    toast.error('Please enter valid User IDs');
+                    toast.error(t('admin.invalid_user_ids', 'Please enter valid User IDs'));
                     setSending(false);
                     return;
                 }
@@ -166,24 +166,24 @@ export default function AdminNotificationsPage() {
                                 <div className="space-y-2">
                                     <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">{t('admin.target_role')}</label>
                                     <Select value={targetRole} onValueChange={setTargetRole}>
-                                        <SelectTrigger className="h-12 rounded-xl border-border bg-muted/30 font-bold">
+                                        <SelectTrigger className="h-12 w-full min-w-0 rounded-xl border-border bg-muted/30 font-bold">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent className="rounded-xl">
-                                            <SelectItem value="Student">Student</SelectItem>
-                                            <SelectItem value="Teacher">Teacher</SelectItem>
-                                            <SelectItem value="Parent">Parent</SelectItem>
-                                            <SelectItem value="Moderator">Moderator</SelectItem>
+                                            <SelectItem value="Student">{t('admin.roles.Student', 'Student')}</SelectItem>
+                                            <SelectItem value="Teacher">{t('admin.roles.Teacher', 'Teacher')}</SelectItem>
+                                            <SelectItem value="Parent">{t('admin.roles.Parent', 'Parent')}</SelectItem>
+                                            <SelectItem value="Moderator">{t('admin.roles.Moderator', 'Moderator')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                             )}
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
+                                <div className="min-w-0 space-y-2">
                                     <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">{t('admin.category')}</label>
                                     <Select value={category.toString()} onValueChange={(v) => setCategory(parseInt(v))}>
-                                        <SelectTrigger className="h-12 rounded-xl border-border bg-muted/30 font-bold">
+                                        <SelectTrigger className="h-12 w-full min-w-0 rounded-xl border-border bg-muted/30 font-bold">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent className="rounded-xl">
@@ -195,15 +195,15 @@ export default function AdminNotificationsPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="min-w-0 space-y-2">
                                     <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">{t('admin.message_key')}</label>
                                     <Select value={messageKey} onValueChange={setMessageKey}>
-                                        <SelectTrigger className="h-12 rounded-xl border-border bg-muted/30 font-bold">
+                                        <SelectTrigger className="h-12 w-full min-w-0 rounded-xl border-border bg-muted/30 font-bold">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="rounded-xl">
+                                        <SelectContent className="max-w-[min(22rem,calc(100vw-2rem))] rounded-xl">
                                             {MESSAGE_KEYS.map((key) => (
-                                                <SelectItem key={key} value={key}>
+                                                <SelectItem key={key} value={key} className="whitespace-normal break-words">
                                                     {t(`keys.${key}`, key)}
                                                 </SelectItem>
                                             ))}
@@ -266,7 +266,7 @@ export default function AdminNotificationsPage() {
                                                             {t(`categories.${notification.category}`)}
                                                         </span>
                                                         <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
-                                                            ID: #{notification.id}
+                                                            {t('admin.notification_id', 'ID')}: #{notification.id}
                                                         </span>
                                                     </div>
                                                     <p className="text-base font-semibold text-foreground">
@@ -278,12 +278,12 @@ export default function AdminNotificationsPage() {
                                                             {notification.user_id ? (
                                                                 <>
                                                                     <User className="h-3 w-3" />
-                                                                    User: {notification.user?.name || notification.user_id}
+                                                                    {t('admin.user_label', 'User')}: {notification.user?.name || notification.user_id}
                                                                 </>
                                                             ) : (
                                                                 <>
                                                                     <Users className="h-3 w-3" />
-                                                                    Role: {notification.role}
+                                                                    {t('admin.role_label', 'Role')}: {t(`admin.roles.${notification.role}`, notification.role)}
                                                                 </>
                                                             )}
                                                         </div>

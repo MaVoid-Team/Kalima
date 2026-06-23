@@ -76,6 +76,7 @@ const mockService = {
   acceptFreeInvite: jest.fn(),
   acceptInvitePasscode: jest.fn(),
   createStudentPurchaseLink: jest.fn(),
+  getViewerMetadata: jest.fn(),
   getViewerPage: jest.fn(),
   getAdminViewerMetadata: jest.fn(),
   getAdminViewerPage: jest.fn(),
@@ -607,6 +608,22 @@ describe("e-booklet routes", () => {
       });
 
     expect(mockService.getViewerPage).toHaveBeenCalledWith(10, 1, 55);
+  });
+
+  test("blocks teacher viewer metadata when payment or customization is not complete", async () => {
+    const error: any = new Error("This e-booklet is not available until payment is confirmed and customization is complete.");
+    error.statusCode = 403;
+    mockService.getViewerMetadata.mockRejectedValue(error);
+
+    await request(app)
+      .get("/api/v2/e-booklet-viewer/10/metadata")
+      .set("Authorization", `Bearer ${tokenFor("Teacher", 55)}`)
+      .expect(403)
+      .expect((res) => {
+        expect(res.body.message).toBe("This e-booklet is not available until payment is confirmed and customization is complete.");
+      });
+
+    expect(mockService.getViewerMetadata).toHaveBeenCalledWith(10, 55);
   });
 
   test("rejects authorized viewer PDF document requests without a page", async () => {

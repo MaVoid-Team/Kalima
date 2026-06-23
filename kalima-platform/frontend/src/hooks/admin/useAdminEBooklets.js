@@ -704,23 +704,29 @@ export function useAdminEBookletPurchases() {
 
 
 export function useAdminEBookletInstances() {
-  const { mutate: fetchApi, loading } = useApiMutation();
+  const { mutate: fetchApi } = useApiMutation();
   const [instances, setInstances] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20 });
   const [status, setStatusState] = useState("all");
+  const [loading, setLoading] = useState(false);
 
   const fetchInstances = useCallback(async (overrides = {}) => {
-    const query = new URLSearchParams();
-    query.set("page", String(overrides.page ?? pagination.page));
-    query.set("limit", String(overrides.limit ?? pagination.limit));
-    const nextStatus = overrides.status ?? status;
-    if (nextStatus && nextStatus !== "all") query.set("status", nextStatus);
-    if (overrides.teacher_id) query.set("teacher_id", String(overrides.teacher_id));
-    const response = await fetchApi({ endpoint: `/admin/e-booklet-instances?${query.toString()}`, method: "get" }, false);
-    const normalized = normalizeListResponse(response);
-    setInstances(normalized.data);
-    setPagination((current) => ({ ...current, total: normalized.total, page: normalized.page, limit: normalized.limit }));
-    return response;
+    setLoading(true);
+    try {
+      const query = new URLSearchParams();
+      query.set("page", String(overrides.page ?? pagination.page));
+      query.set("limit", String(overrides.limit ?? pagination.limit));
+      const nextStatus = overrides.status ?? status;
+      if (nextStatus && nextStatus !== "all") query.set("status", nextStatus);
+      if (overrides.teacher_id) query.set("teacher_id", String(overrides.teacher_id));
+      const response = await fetchApi({ endpoint: `/admin/e-booklet-instances?${query.toString()}`, method: "get" }, false);
+      const normalized = normalizeListResponse(response);
+      setInstances(normalized.data);
+      setPagination((current) => ({ ...current, total: normalized.total, page: normalized.page, limit: normalized.limit }));
+      return response;
+    } finally {
+      setLoading(false);
+    }
   }, [fetchApi, pagination.limit, pagination.page, status]);
 
   const setPage = useCallback((page) => setPagination((current) => ({ ...current, page })), []);

@@ -395,6 +395,7 @@ const getHotspotShapeStyle = (shape) => {
   if (shape === "rectangle") return { borderRadius: 0 };
   if (shape === "square") return { borderRadius: "0.25rem" };
   if (shape === "triangle") return { clipPath: "polygon(50% 0%, 100% 100%, 0% 100%)", borderRadius: 0 };
+  if (shape === "circle") return { borderRadius: "9999px", clipPath: "circle(50% at 50% 50%)" };
   return { borderRadius: "9999px" };
 };
 
@@ -1406,10 +1407,17 @@ export default function AdminEBookletEditorPage() {
     event.currentTarget.setPointerCapture?.(event.pointerId);
     selectHotspot(hotspot);
 
+    const rect = pageRef.current.getBoundingClientRect();
+    const geometry = normalizeHotspotGeometry(hotspot, {
+      defaultSize: 5,
+      minSize: 2,
+      maxSize: 35,
+      aspectRatio: rect.width / rect.height,
+    });
     const centerX = parseNumber(hotspot.x_percent, 50);
     const centerY = parseNumber(hotspot.y_percent, 50);
-    const width = clampHotspotSize(hotspot.width_percent || hotspot.radius_percent || 5);
-    const height = clampHotspotSize(hotspot.height_percent || hotspot.radius_percent || 5);
+    const width = clampHotspotSize(geometry.width);
+    const height = clampHotspotSize(geometry.height);
     const isLeft = handle.includes("w");
     const isTop = handle.includes("n");
     const fixedX = centerX + (isLeft ? width / 2 : -width / 2);
@@ -1443,9 +1451,9 @@ export default function AdminEBookletEditorPage() {
       let height = clampHotspotSize(Math.abs(y - dragState.fixedY));
 
       if (!["rectangle", "oval"].includes(dragState.shape)) {
-        const size = Math.max(width, height);
-        width = size;
-        height = size;
+        const sizePx = Math.max((width / 100) * rect.width, (height / 100) * rect.height);
+        width = clampHotspotSize((sizePx / rect.width) * 100);
+        height = clampHotspotSize((sizePx / rect.height) * 100);
       }
 
       const nextX = Math.min(100, Math.max(0, dragState.fixedX + (isFixedLeft ? width / 2 : -width / 2)));
@@ -2364,12 +2372,13 @@ export default function AdminEBookletEditorPage() {
                   )}
                   <div className="absolute inset-0 z-10 bg-transparent" />
                   {pageHotspots.map((hotspot) => {
-                  const Icon = hotspotIcons[hotspot.type] || CircleDot;
-                  const { shape, width: renderedWidth, height: renderedHeight } = normalizeHotspotGeometry(hotspot, {
-                    defaultSize: 5,
-                    minSize: 2,
-                    maxSize: 35,
-                  });
+                    const Icon = hotspotIcons[hotspot.type] || CircleDot;
+                    const { shape, width: renderedWidth, height: renderedHeight } = normalizeHotspotGeometry(hotspot, {
+                      defaultSize: 5,
+                      minSize: 2,
+                      maxSize: 35,
+                      aspectRatio: currentDimensions.width / currentDimensions.height,
+                    });
                   const opacity = Math.min(1, Math.max(0, parseNumber(hotspot.display_behavior?.opacity_percent, 100) / 100));
                   const isSelected = hotspotForm.id === hotspot.id;
                   return (
@@ -2430,11 +2439,12 @@ export default function AdminEBookletEditorPage() {
                 })}
                 {hasDraftHotspotPreview && !hotspotForm.id && Number(hotspotForm.page_number) === Number(selectedPage) && (() => {
                   const DraftIcon = hotspotIcons[hotspotForm.type] || CircleDot;
-                  const shape = hotspotForm.shape || "circle";
-                  const width = clampHotspotSize(hotspotForm.width_percent || hotspotForm.radius_percent || 5);
-                  const height = clampHotspotSize(hotspotForm.height_percent || hotspotForm.radius_percent || 5);
-                  const renderedWidth = shape === "circle" || shape === "square" ? Math.max(width, height) : width;
-                  const renderedHeight = shape === "circle" || shape === "square" ? Math.max(width, height) : height;
+                  const { shape, width: renderedWidth, height: renderedHeight } = normalizeHotspotGeometry(hotspotForm, {
+                    defaultSize: 5,
+                    minSize: 2,
+                    maxSize: 35,
+                    aspectRatio: currentDimensions.width / currentDimensions.height,
+                  });
                   const opacity = Math.min(1, Math.max(0.35, parseNumber(hotspotForm.display_behavior?.opacity_percent, 100) / 100));
                   const draftGlowStyle = getHotspotGlowStyle({ display_behavior: hotspotForm.display_behavior });
                   return (

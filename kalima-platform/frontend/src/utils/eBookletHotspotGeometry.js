@@ -9,6 +9,7 @@ export function normalizeHotspotGeometry(hotspot, options = {}) {
   const minSize = options.minSize ?? 2;
   const maxSize = options.maxSize ?? 40;
   const defaultSize = options.defaultSize ?? 8;
+  const aspectRatio = clamp(options.aspectRatio, 1, 0.01, 100);
   const radiusDiameter = Number.isFinite(Number(hotspot?.radius_percent))
     ? Number(hotspot.radius_percent) * 2
     : undefined;
@@ -16,14 +17,16 @@ export function normalizeHotspotGeometry(hotspot, options = {}) {
   const rawHeight = hotspot?.height_percent ?? radiusDiameter;
   const width = clamp(rawWidth, defaultSize, minSize, maxSize);
   const height = clamp(rawHeight, defaultSize, minSize, maxSize);
-  const circleSize = clamp(rawWidth, defaultSize, minSize, maxSize);
-  const squareSize = Math.max(width, height);
+  const circleWidth = clamp(rawWidth, defaultSize, minSize, Math.min(maxSize, maxSize / aspectRatio));
+  const circleHeight = circleWidth * aspectRatio;
+  const squareWidth = clamp(Math.max(width, height / aspectRatio), defaultSize, minSize, Math.min(maxSize, maxSize / aspectRatio));
+  const squareHeight = squareWidth * aspectRatio;
 
   return {
     shape,
     left: clamp(hotspot?.x_percent, 50, 0, 100),
     top: clamp(hotspot?.y_percent, 50, 0, 100),
-    width: shape === "circle" ? circleSize : shape === "square" ? squareSize : width,
-    height: shape === "circle" ? circleSize : shape === "square" ? squareSize : height,
+    width: shape === "circle" ? circleWidth : shape === "square" ? squareWidth : width,
+    height: shape === "circle" ? circleHeight : shape === "square" ? squareHeight : height,
   };
 }
