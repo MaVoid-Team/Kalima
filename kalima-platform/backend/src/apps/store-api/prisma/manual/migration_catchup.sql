@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS e_booklet_global_settings (
   require_terms_for_code_generation BOOLEAN NOT NULL DEFAULT TRUE,
   default_allowed_devices_per_student INTEGER NOT NULL DEFAULT 1,
   default_allowed_devices_per_teacher INTEGER NOT NULL DEFAULT 2,
+  preview_page_limit INTEGER NOT NULL DEFAULT 10,
   device_reset_policy TEXT,
   notify_admins_on_delivery BOOLEAN NOT NULL DEFAULT TRUE,
   notify_teacher_on_delivery BOOLEAN NOT NULL DEFAULT TRUE,
@@ -32,9 +33,23 @@ CREATE TABLE IF NOT EXISTS e_booklet_global_settings (
     AND (default_access_code_expiration_days IS NULL OR default_access_code_expiration_days >= 0)
     AND default_allowed_devices_per_student > 0
     AND default_allowed_devices_per_teacher > 0
+    AND preview_page_limit BETWEEN 1 AND 200
   ),
   CONSTRAINT ck_e_booklet_global_settings_code_kind CHECK (default_access_code_kind IN ('paid', 'free'))
 );
+
+ALTER TABLE e_booklet_global_settings
+  ADD COLUMN IF NOT EXISTS preview_page_limit INTEGER NOT NULL DEFAULT 10;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'ck_e_booklet_global_settings_preview_limit'
+  ) THEN
+    ALTER TABLE e_booklet_global_settings
+      ADD CONSTRAINT ck_e_booklet_global_settings_preview_limit CHECK (preview_page_limit BETWEEN 1 AND 200);
+  END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS e_booklet_hotspot_presets (
   id SERIAL PRIMARY KEY,

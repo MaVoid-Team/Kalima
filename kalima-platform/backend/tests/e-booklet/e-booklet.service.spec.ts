@@ -739,6 +739,81 @@ describe("EBookletService", () => {
       expect(JSON.stringify(result.data[0])).not.toContain("private-cover.png");
     });
 
+    test("public preview defaults to the first 10 pages and blocks later pages", async () => {
+      const db = createMockDb();
+      db.e_booklet_templates.findFirst.mockResolvedValue({
+        id: 3,
+        title: "Grade 5 Arabic",
+        status: "published",
+        release_at: null,
+        versions: [{ id: 8, page_count: 42, rendered_document_file_id: 99 }],
+      });
+      const service = new EBookletService(db);
+
+      await expect(service.getPublicPreviewPage(3, 11)).rejects.toThrow("first 10");
+      const page: any = await service.getPublicPreviewPage(3, 10);
+
+      expect(page.previewPageLimit).toBe(10);
+      expect(page.previewPageCount).toBe(10);
+      expect(page.totalPageCount).toBe(42);
+    });
+
+    test("public preview honors configured page limits up to the admin maximum", async () => {
+      const db = createMockDb({
+        $queryRawUnsafe: jest.fn().mockResolvedValue([{ preview_page_limit: 3 }]),
+      });
+      db.e_booklet_templates.findFirst.mockResolvedValue({
+        id: 3,
+        title: "Grade 5 Arabic",
+        status: "published",
+        release_at: null,
+        versions: [{ id: 8, page_count: 42, rendered_document_file_id: 99 }],
+      });
+      const service = new EBookletService(db);
+
+      await expect(service.getPublicPreviewPage(3, 4)).rejects.toThrow("first 3");
+      const page: any = await service.getPublicPreviewPage(3, 3);
+
+      expect(page.previewPageLimit).toBe(3);
+      expect(page.previewPageCount).toBe(3);
+    });
+
+    test("public preview hotspots expose locked markers without hotspot content or private asset ids", async () => {
+      const db = createMockDb();
+      db.e_booklet_templates.findFirst.mockResolvedValue({
+        id: 3,
+        title: "Grade 5 Arabic",
+        status: "published",
+        release_at: null,
+        versions: [{ id: 8, page_count: 42 }],
+      });
+      db.e_booklet_hotspots.findMany.mockResolvedValue([{
+        id: 77,
+        template_version_id: 8,
+        page_number: 2,
+        x_percent: 25,
+        y_percent: 35,
+        radius_percent: 4,
+        reference_number: 1,
+        type: "text",
+        title: "Answer key",
+        text_content: "Paid-only answer",
+        asset_file_id: 123,
+        content_json: { blocks: [{ type: "text", text_content: "Paid-only answer" }] },
+      }]);
+      const service = new EBookletService(db);
+      const hotspots: any = await service.getPublicPreviewPageHotspots(3, 2);
+
+      expect(hotspots[0]).toEqual(expect.objectContaining({ id: 77, is_locked: true }));
+      expect(hotspots[0].title).toBeUndefined();
+      expect(hotspots[0].text_content).toBeUndefined();
+      expect(hotspots[0].asset_file_id).toBeUndefined();
+      expect(hotspots[0].content_json).toBeUndefined();
+      expect(db.e_booklet_hotspots.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: expect.objectContaining({ template_version_id: 8, page_number: 2, is_active: true }),
+      }));
+    });
+
     test("public store detail returns one active instance and rejects unavailable instances", async () => {
       const db = createMockDb();
       db.e_booklet_instances.findFirst

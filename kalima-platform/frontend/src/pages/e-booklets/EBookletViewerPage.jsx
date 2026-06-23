@@ -435,14 +435,14 @@ function ContentBlock({ block, hotspot, viewer, t, instanceId }) {
   return <p className="text-sm text-muted-foreground">{t("viewer.unsupportedBlock", { type: block.type })}</p>;
 }
 
-export default function EBookletViewerPage() {
+export default function EBookletViewerPage({ previewMode = false }) {
   const { instanceId } = useParams();
   const location = useLocation();
   const adminMode = location.pathname.startsWith("/admin/");
   const { t, i18n } = useTranslation("eBooklets");
   const { user } = useAuth();
   const { isStudent } = useRole();
-  const viewer = useEBookletViewer({ adminMode });
+  const viewer = useEBookletViewer({ adminMode, previewMode });
   const [pageNumber, setPageNumber] = useState(1);
   const [zoom, setZoom] = useState(1);
   const [activeHotspot, setActiveHotspot] = useState(null);
@@ -464,6 +464,12 @@ export default function EBookletViewerPage() {
     setDeviceError("");
     const initializeViewer = async () => {
       try {
+        if (previewMode) {
+          if (!active) return;
+          setDeviceStatus("allowed");
+          viewer.fetchMetadata(instanceId, t("viewer.metadataLoadFailed")).catch(() => {});
+          return;
+        }
         if (adminMode) {
           if (!active) return;
           setDeviceStatus("allowed");
@@ -489,7 +495,7 @@ export default function EBookletViewerPage() {
     return () => {
       active = false;
     };
-  }, [adminMode, instanceId, t, viewer.bindDevice, viewer.fetchMetadata]);
+  }, [adminMode, instanceId, previewMode, t, viewer.bindDevice, viewer.fetchMetadata]);
 
   useEffect(() => {
     if (deviceStatus !== "allowed") return;
@@ -620,10 +626,10 @@ export default function EBookletViewerPage() {
   }).format(new Date());
   const watermark = t("viewer.watermark", {
     teacher: instance?.teacher?.name || t("common.teacher"),
-    user: user?.name || user?.email || t("common.user"),
+    user: previewMode ? t("viewer.previewUser") : user?.name || user?.email || t("common.user"),
     date: today,
   });
-  const backHref = adminMode ? "/admin/e-booklets/access" : isStudent ? "/student/e-booklets" : "/teacher/e-booklets";
+  const backHref = previewMode ? `/e-booklets/${instanceId}` : adminMode ? "/admin/e-booklets/access" : isStudent ? "/student/e-booklets" : "/teacher/e-booklets";
 
   const pageStyle = useMemo(
     () => ({
@@ -657,6 +663,11 @@ export default function EBookletViewerPage() {
     setActiveHotspot(hotspot);
     setHotspotContent(null);
     setHotspotError("");
+    if (previewMode) {
+      setHotspotError(t("viewer.previewHotspotLockedMessage"));
+      setHotspotLoading(false);
+      return;
+    }
     setHotspotLoading(true);
     try {
       const response = await viewer.fetchHotspotContent(hotspot.id, instanceId);
@@ -672,7 +683,7 @@ export default function EBookletViewerPage() {
         setHotspotLoading(false);
       }
     }
-  }, [instanceId, t, viewer]);
+  }, [instanceId, previewMode, t, viewer]);
 
   const contentHotspot = hotspotContent || activeHotspot;
   const handleDocumentRenderSuccess = useCallback(() => {
@@ -726,6 +737,12 @@ export default function EBookletViewerPage() {
                 <Badge variant="secondary" className="gap-1">
                   <Eye className="h-3 w-3" />
                   {t("admin.instances.adminView")}
+                </Badge>
+              )}
+              {previewMode && (
+                <Badge variant="secondary" className="gap-1 bg-amber-100 text-amber-900 hover:bg-amber-100">
+                  <Eye className="h-3 w-3" />
+                  {t("viewer.previewBadge", { count: pageCount })}
                 </Badge>
               )}
               <Badge variant="outline" className="gap-1">

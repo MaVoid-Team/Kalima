@@ -659,6 +659,10 @@
       "allowedTeacherDevices": "Allowed teacher devices",
       "deviceResetPolicy": "Device reset policy",
       "deviceResetPolicyPlaceholder": "Explain when admins should reset or expand device access",
+      "previewPolicy": "Preview Policy",
+      "previewPolicyDescription": "Control how many pages visitors can preview before purchase.",
+      "previewPageLimit": "Preview page limit",
+      "previewPageLimitHint": "Number of pages visible before purchase. Default is 10; maximum is 200.",
       "notificationRules": "Notification Rules",
       "notificationRulesDescription": "Choose who should be notified for key eBooklet events.",
       "notifyAdminsOnDelivery": "Notify admins on delivery",
@@ -691,6 +695,7 @@
     "cardDescription": "Interactive PDF booklet delivered by admin with teacher branding and controlled student access.",
     "accessExpires": "Expires {{value}}",
     "noExpiry": "No expiry",
+    "preview": "Preview",
     "add": "Add",
     "seatsRemaining": "{{count}} seats",
     "redeemCode": "Redeem code",
@@ -710,6 +715,7 @@
       "access": "Access"
     },
     "templatePrice": "Template price",
+    "preview": "Preview",
     "addToCart": "Add to e-booklet cart",
     "includedTitle": "What is included",
     "includedDescription": "The published template carries the reusable hotspot map. Admin delivery adds the teacher-specific PDF, branding, invite quota, and student access controls.",
@@ -851,7 +857,10 @@
     "securePagePending": "This protected page is still loading. Please wait a moment, then try again if it does not appear.",
     "renderMode": "Render mode: {{mode}}",
     "pageTokenExpires": "Page token expires: {{value}}",
-    "fileProtected": "This file is shown inside the protected viewer instead of opening a separate download tab."
+    "fileProtected": "This file is shown inside the protected viewer instead of opening a separate download tab.",
+    "previewBadge": "Preview: first {{count}} pages",
+    "previewUser": "Preview",
+    "previewHotspotLockedMessage": "Buy this eBooklet to interact with hotspots."
   },
   "inviteAccept": {
     "accessGranted": "Access granted.",

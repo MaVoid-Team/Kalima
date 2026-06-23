@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Bell, CalendarRange, KeyRound, RefreshCcw, Save, Settings, ShieldCheck, Smartphone, Truck } from "lucide-react";
+import { Bell, CalendarRange, Eye, KeyRound, RefreshCcw, Save, Settings, ShieldCheck, Smartphone, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,6 +30,7 @@ const emptyForm = {
   requireTermsForCodeGeneration: true,
   defaultAllowedDevicesPerStudent: "1",
   defaultAllowedDevicesPerTeacher: "2",
+  previewPageLimit: "10",
   deviceResetPolicy: "",
   notifyAdminsOnDelivery: true,
   notifyTeacherOnDelivery: true,
@@ -56,6 +57,7 @@ function toForm(settings) {
     requireTermsForCodeGeneration: Boolean(settings.require_terms_for_code_generation),
     defaultAllowedDevicesPerStudent: String(settings.default_allowed_devices_per_student ?? 1),
     defaultAllowedDevicesPerTeacher: String(settings.default_allowed_devices_per_teacher ?? 2),
+    previewPageLimit: String(settings.preview_page_limit ?? 10),
     deviceResetPolicy: settings.device_reset_policy || "",
     notifyAdminsOnDelivery: Boolean(settings.notify_admins_on_delivery),
     notifyTeacherOnDelivery: Boolean(settings.notify_teacher_on_delivery),
@@ -79,6 +81,7 @@ function toPayload(form) {
     requireTermsForCodeGeneration: form.requireTermsForCodeGeneration,
     defaultAllowedDevicesPerStudent: numberOrZero(form.defaultAllowedDevicesPerStudent),
     defaultAllowedDevicesPerTeacher: numberOrZero(form.defaultAllowedDevicesPerTeacher),
+    previewPageLimit: numberOrZero(form.previewPageLimit),
     deviceResetPolicy: form.deviceResetPolicy,
     notifyAdminsOnDelivery: form.notifyAdminsOnDelivery,
     notifyTeacherOnDelivery: form.notifyTeacherOnDelivery,
@@ -228,6 +231,13 @@ export default function AdminEBookletSettingsPage() {
           onClick={() => setActiveSection("devices")}
         />
         <SettingsCard
+          icon={Eye}
+          title={t("admin.settings.previewPolicy")}
+          description={t("admin.settings.previewPolicyDescription")}
+          active={activeSection === "preview"}
+          onClick={() => setActiveSection("preview")}
+        />
+        <SettingsCard
           icon={Bell}
           title={t("admin.settings.notificationRules")}
           description={t("admin.settings.notificationRulesDescription")}
@@ -307,6 +317,14 @@ export default function AdminEBookletSettingsPage() {
           </Field>
           <Field label={t("admin.settings.deviceResetPolicy")}>
             <Textarea value={form.deviceResetPolicy} onChange={(event) => updateField("deviceResetPolicy", event.target.value)} placeholder={t("admin.settings.deviceResetPolicyPlaceholder")} />
+          </Field>
+        </SettingsSection>
+      )}
+
+      {activeSection === "preview" && (
+        <SettingsSection icon={Eye} title={t("admin.settings.previewPolicy")} description={t("admin.settings.previewPolicyDescription")}>
+          <Field label={t("admin.settings.previewPageLimit")} hint={t("admin.settings.previewPageLimitHint")}>
+            <Input type="number" min="1" max="200" value={form.previewPageLimit} onChange={(event) => updateField("previewPageLimit", event.target.value)} />
           </Field>
         </SettingsSection>
       )}

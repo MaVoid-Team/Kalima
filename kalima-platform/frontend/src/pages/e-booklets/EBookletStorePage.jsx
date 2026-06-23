@@ -5,6 +5,7 @@ import {
   BookOpenCheck,
   CalendarDays,
   CircleDollarSign,
+  Eye,
   FileText,
   ImageIcon,
   LockKeyhole,
@@ -190,15 +191,23 @@ function EBookletCard({ template, featured, onAdd, t, language }) {
               {formatMoney(template.price, template.currency, language)}
             </div>
           </div>
-          <Button
-            type="button"
-            onClick={() => onAdd(template)}
-            disabled={!template.activeVersion?.id || !isReleased}
-            className="active:scale-[0.98]"
-          >
-            <ShoppingBag className="h-4 w-4" />
-            {t("store.add")}
-          </Button>
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button asChild type="button" variant="outline" disabled={!template.activeVersion?.id || !isReleased} className="active:scale-[0.98]">
+              <Link to={`/e-booklets/${template.template_id || template.id}/preview`}>
+                <Eye className="h-4 w-4" />
+                {t("store.preview")}
+              </Link>
+            </Button>
+            <Button
+              type="button"
+              onClick={() => onAdd(template)}
+              disabled={!template.activeVersion?.id || !isReleased}
+              className="active:scale-[0.98]"
+            >
+              <ShoppingBag className="h-4 w-4" />
+              {t("store.add")}
+            </Button>
+          </div>
         </div>
       </div>
     </article>

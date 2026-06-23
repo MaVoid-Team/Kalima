@@ -5,6 +5,7 @@ import {
   BookOpenCheck,
   Check,
   FileText,
+  Eye,
   ImageIcon,
   LockKeyhole,
   MousePointerClick,
@@ -213,16 +214,31 @@ export default function EBookletDetailsPage() {
                   {formatMoney(template.price, template.currency, i18n.language)}
                 </div>
               </div>
-              <Button
-                type="button"
-                size="lg"
-                onClick={handleAddToCart}
-                disabled={!activeVersion?.id || !isReleased}
-                className="w-full active:scale-[0.98] md:w-auto"
-              >
-                <ShoppingBag className="h-4 w-4" />
-                {t("details.addToCart")}
-              </Button>
+              <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
+                <Button
+                  asChild
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  disabled={!activeVersion?.id || !isReleased}
+                  className="w-full active:scale-[0.98] md:w-auto"
+                >
+                  <Link to={`/e-booklets/${template.template_id || template.id}/preview`}>
+                    <Eye className="h-4 w-4" />
+                    {t("details.preview")}
+                  </Link>
+                </Button>
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={handleAddToCart}
+                  disabled={!activeVersion?.id || !isReleased}
+                  className="w-full active:scale-[0.98] md:w-auto"
+                >
+                  <ShoppingBag className="h-4 w-4" />
+                  {t("details.addToCart")}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

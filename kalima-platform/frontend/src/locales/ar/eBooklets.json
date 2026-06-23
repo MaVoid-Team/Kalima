@@ -659,6 +659,10 @@
       "allowedTeacherDevices": "أجهزة المعلم المسموحة",
       "deviceResetPolicy": "سياسة إعادة تعيين الأجهزة",
       "deviceResetPolicyPlaceholder": "اشرح متى يجب على الإدارة إعادة تعيين أو توسيع وصول الأجهزة",
+      "previewPolicy": "سياسة المعاينة",
+      "previewPolicyDescription": "تحكم في عدد الصفحات التي يمكن للزوار معاينتها قبل الشراء.",
+      "previewPageLimit": "حد صفحات المعاينة",
+      "previewPageLimitHint": "عدد الصفحات الظاهرة قبل الشراء. الافتراضي 10 والحد الأقصى 200.",
       "notificationRules": "قواعد الإشعارات",
       "notificationRulesDescription": "اختر من يجب إشعاره بأحداث المذكرة المهمة.",
       "notifyAdminsOnDelivery": "إشعار الإدارة عند التسليم",
@@ -691,6 +695,7 @@
     "cardDescription": "مذكرة PDF تفاعلية تسلمه الإدارة مع علامة المعلم ووصول طلاب مضبوط.",
     "accessExpires": "ينتهي {{value}}",
     "noExpiry": "لا يوجد انتهاء",
+    "preview": "معاينة",
     "add": "إضافة",
     "seatsRemaining": "{{count}} مقعد",
     "redeemCode": "استرداد كود",
@@ -710,6 +715,7 @@
       "access": "الوصول"
     },
     "templatePrice": "سعر القالب",
+    "preview": "معاينة",
     "addToCart": "إضافة إلى سلة المذكرة التفاعلية",
     "includedTitle": "ما الذي يشمله",
     "includedDescription": "يحمل القالب المنشور خريطة نقاط التفاعل القابلة لإعادة الاستخدام. يضيف تسليم الإدارة ملف PDF الخاص بالمعلم والعلامة وحصة الدعوات وضوابط وصول الطلاب.",
@@ -851,7 +857,10 @@
     "securePagePending": "ما زالت هذه الصفحة المحمية قيد التحميل. انتظر قليلًا، ثم حاول مرة أخرى إذا لم تظهر.",
     "renderMode": "وضع العرض: {{mode}}",
     "pageTokenExpires": "ينتهي رمز الصفحة: {{value}}",
-    "fileProtected": "يظهر هذا الملف داخل العارض المحمي بدلًا من فتح تبويب تنزيل منفصل."
+    "fileProtected": "يظهر هذا الملف داخل العارض المحمي بدلًا من فتح تبويب تنزيل منفصل.",
+    "previewBadge": "معاينة: أول {{count}} صفحة",
+    "previewUser": "معاينة",
+    "previewHotspotLockedMessage": "اشترِ هذه المذكرة التفاعلية للتفاعل مع نقاط التفاعل."
   },
   "inviteAccept": {
     "accessGranted": "تم منح الوصول.",

@@ -178,6 +178,7 @@ const router = createBrowserRouter(
         <Route element={<RoleRoute excludedRole={["Student"]} />}>
           <Route path="/e-booklets" element={<EBookletStorePage />} />
           <Route path="/e-booklets/instances/:instanceId" element={<EBookletDetailsPage />} />
+          <Route path="/e-booklets/:instanceId/preview" element={<EBookletViewerPage previewMode />} />
           <Route path="/e-booklets/:templateId" element={<EBookletDetailsPage />} />
         </Route>
 
