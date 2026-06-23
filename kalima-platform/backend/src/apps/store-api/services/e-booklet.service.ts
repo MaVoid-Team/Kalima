@@ -31,6 +31,8 @@ type EBookletLiveNotification = {
 const E_BOOKLET_ORDER_ENTITY_TYPE = "e_booklet_purchase";
 const E_BOOKLET_ORDER_TEACHER_TARGET_LINK = "/e-booklet-orders";
 const E_BOOKLET_ORDER_ADMIN_ROLES = ["Admin", "SubAdmin", "Moderator"] as const;
+const DEFAULT_E_BOOKLET_PREVIEW_PAGE_LIMIT = 10;
+const MAX_E_BOOKLET_PREVIEW_PAGE_LIMIT = 200;
 
 export type EBookletPurchaseListFilters = {
   status?: string;
@@ -1150,6 +1152,156 @@ export class EBookletService {
     });
     if (!template) throw new NotFoundError("E-booklet template not found");
     return enrichTemplateWithReleaseInfo(template);
+  }
+
+  private normalizePreviewPageLimit(value: unknown): number {
+    const numeric = Number(value ?? DEFAULT_E_BOOKLET_PREVIEW_PAGE_LIMIT);
+    if (!Number.isInteger(numeric) || numeric < 1) return DEFAULT_E_BOOKLET_PREVIEW_PAGE_LIMIT;
+    return Math.min(numeric, MAX_E_BOOKLET_PREVIEW_PAGE_LIMIT);
+  }
+
+  private async getPreviewPageLimit(): Promise<number> {
+    if (!this.db.$queryRawUnsafe) return DEFAULT_E_BOOKLET_PREVIEW_PAGE_LIMIT;
+    try {
+      const rows = await this.db.$queryRawUnsafe(
+        "SELECT preview_page_limit FROM e_booklet_global_settings WHERE id = 1 LIMIT 1",
+      );
+      return this.normalizePreviewPageLimit(Array.isArray(rows) ? rows[0]?.preview_page_limit : undefined);
+    } catch {
+      return DEFAULT_E_BOOKLET_PREVIEW_PAGE_LIMIT;
+    }
+  }
+
+  private async getPublishedPreviewTemplate(templateId: number) {
+    const [template, previewPageLimit] = await Promise.all([
+      this.db.e_booklet_templates.findFirst({
+        where: { id: templateId, status: "published" },
+        include: {
+          cover_file: true,
+          category: { select: { id: true, title: true } },
+          ...this.templateCheckoutInclude(),
+          versions: {
+            where: { status: "active" },
+            orderBy: { version_number: "desc" },
+            take: 1,
+            include: { _count: { select: { hotspots: true } } },
+          },
+        },
+      }),
+      this.getPreviewPageLimit(),
+    ]);
+    if (!template) throw new NotFoundError("E-booklet template not found");
+    assertTemplateReleased(template);
+    const activeVersion = Array.isArray((template as any).versions) ? (template as any).versions[0] : null;
+    if (!activeVersion) throw new NotFoundError("E-booklet template version not found");
+    const totalPageCount = Number(activeVersion.page_count || 0);
+    if (!Number.isInteger(totalPageCount) || totalPageCount < 1) {
+      throw new NotFoundError("E-booklet preview is not available.");
+    }
+    return {
+      template,
+      activeVersion,
+      previewPageLimit,
+      previewPageCount: Math.min(totalPageCount, previewPageLimit),
+      totalPageCount,
+    };
+  }
+
+  private assertPreviewPageNumber(pageNumber: number, previewPageCount: number) {
+    if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > previewPageCount) {
+      throw new BadRequestError(`Preview is limited to the first ${previewPageCount} e-booklet pages.`);
+    }
+  }
+
+  private previewInstanceForTemplate(template: any, activeVersion: any) {
+    return {
+      id: template.id,
+      template_id: template.id,
+      template_version_id: activeVersion.id,
+      display_title: template.title,
+      custom_document_file_id: null,
+      template,
+      template_version: activeVersion,
+    };
+  }
+
+  private sanitizePublicPreviewHotspot(hotspot: any) {
+    return {
+      id: hotspot.id,
+      template_version_id: hotspot.template_version_id,
+      page_number: hotspot.page_number,
+      x_percent: hotspot.x_percent,
+      y_percent: hotspot.y_percent,
+      radius_percent: hotspot.radius_percent,
+      reference_number: hotspot.reference_number,
+      shape: hotspot.shape,
+      width_percent: hotspot.width_percent,
+      height_percent: hotspot.height_percent,
+      type: hotspot.type,
+      trigger_type: hotspot.trigger_type,
+      display_behavior: hotspot.display_behavior,
+      sort_order: hotspot.sort_order,
+      is_locked: true,
+    };
+  }
+
+  async getPublicPreviewMetadata(templateId: number) {
+    const { template, activeVersion, previewPageLimit, previewPageCount, totalPageCount } = await this.getPublishedPreviewTemplate(templateId);
+    const previewVersion = { ...activeVersion, page_count: previewPageCount, total_page_count: totalPageCount };
+    const safeTemplate = enrichTemplateWithReleaseInfo({ ...template, versions: [previewVersion] });
+    this.decoratePublicCover(safeTemplate);
+    return this.sanitizeViewerAccess({
+      preview_mode: true,
+      preview_page_limit: previewPageLimit,
+      preview_page_count: previewPageCount,
+      total_page_count: totalPageCount,
+      booklet_instance: this.previewInstanceForTemplate(safeTemplate, previewVersion),
+    });
+  }
+
+  async getPublicPreviewPage(templateId: number, pageNumber: number) {
+    const { template, activeVersion, previewPageLimit, previewPageCount, totalPageCount } = await this.getPublishedPreviewTemplate(templateId);
+    this.assertPreviewPageNumber(pageNumber, previewPageCount);
+    const documentAssetId = this.resolveViewerDocumentAssetId(this.previewInstanceForTemplate(template, activeVersion));
+    return {
+      pageNumber,
+      renderMode: documentAssetId ? "pdf-document" : "server-page",
+      documentAssetId,
+      pageAccessToken: null,
+      expiresAt: null,
+      cacheControl: "public, max-age=60",
+      previewMode: true,
+      previewPageLimit,
+      previewPageCount,
+      totalPageCount,
+      watermark: {
+        teacherName: null,
+        templateTitle: template.title || null,
+      },
+      message: documentAssetId
+        ? null
+        : "Page rendering pipeline is pending document renderer integration.",
+    };
+  }
+
+  async getPublicPreviewPageHotspots(templateId: number, pageNumber: number) {
+    const { activeVersion, previewPageCount } = await this.getPublishedPreviewTemplate(templateId);
+    this.assertPreviewPageNumber(pageNumber, previewPageCount);
+    const hotspots = await this.db.e_booklet_hotspots.findMany({
+      where: {
+        template_version_id: activeVersion.id,
+        page_number: pageNumber,
+        is_active: true,
+      },
+      orderBy: { sort_order: "asc" },
+    });
+    return hotspots.map((hotspot: any) => this.sanitizePublicPreviewHotspot(hotspot));
+  }
+
+  async getPublicPreviewDocumentPagePreview(templateId: number, pageNumber: number) {
+    const { template, activeVersion, previewPageCount } = await this.getPublishedPreviewTemplate(templateId);
+    this.assertPreviewPageNumber(pageNumber, previewPageCount);
+    return this.buildViewerDocumentPagePreviewResponse(this.previewInstanceForTemplate(template, activeVersion), pageNumber);
   }
 
   async getPublishedTemplateBySlug(slug: string): Promise<unknown> {

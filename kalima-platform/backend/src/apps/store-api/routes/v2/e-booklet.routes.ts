@@ -61,6 +61,10 @@ const viewerLimiter = rateLimit({
 // Store APIs - separate from normal Market products.
 router.get("/e-booklet-store", eBookletController.listStoreTemplates);
 router.get("/e-booklet-store/covers/:assetId", eBookletController.previewPublicCoverAsset);
+router.get("/e-booklet-store/:templateId/preview/metadata", viewerLimiter, eBookletController.getStorePreviewMetadata);
+router.get("/e-booklet-store/:templateId/preview/pages/:pageNumber/preview", viewerLimiter, eBookletController.getStorePreviewDocumentPagePreview);
+router.get("/e-booklet-store/:templateId/preview/pages/:pageNumber/hotspots", viewerLimiter, eBookletController.getStorePreviewPageHotspots);
+router.get("/e-booklet-store/:templateId/preview/pages/:pageNumber", viewerLimiter, eBookletController.getStorePreviewPage);
 router.get("/e-booklet-store/instances/:instanceId", eBookletController.getStoreInstance);
 router.get("/e-booklet-store/:templateId", eBookletController.getStoreTemplate);
 router.post("/e-booklet-checkout", ...teacherAuth, uploadSingleImage("paymentScreenshot"), eBookletController.createPublicCheckout);

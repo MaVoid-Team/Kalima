@@ -333,6 +333,66 @@ export const eBookletController = {
     }
   },
 
+  async getStorePreviewMetadata(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getPublicPreviewMetadata(
+        parseId(req.params.templateId, "template ID"),
+      );
+      res.set("Cache-Control", "public, max-age=60");
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getStorePreviewPage(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getPublicPreviewPage(
+        parseId(req.params.templateId, "template ID"),
+        parseId(req.params.pageNumber, "page number"),
+      );
+      res.set("Cache-Control", data.cacheControl || "public, max-age=60");
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getStorePreviewPageHotspots(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getPublicPreviewPageHotspots(
+        parseId(req.params.templateId, "template ID"),
+        parseId(req.params.pageNumber, "page number"),
+      );
+      res.set("Cache-Control", "public, max-age=60");
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getStorePreviewDocumentPagePreview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { asset, absolutePath, pageBuffer } = await getEBookletService().getPublicPreviewDocumentPagePreview(
+        parseId(req.params.templateId, "template ID"),
+        parseId(req.params.pageNumber, "page number"),
+      );
+      res.set("Cache-Control", "public, max-age=60");
+      res.type(asset.mime_type || "image/webp");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-preview-page.webp").replace(/"/g, "")}"`,
+      );
+      if (pageBuffer) {
+        res.send(pageBuffer);
+        return;
+      }
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async getStoreInstance(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await getEBookletService().getPublicInstance(

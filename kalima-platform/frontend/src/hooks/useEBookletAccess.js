@@ -258,7 +258,7 @@ export function useTeacherEBookletAnalytics() {
   return { analytics, loading, fetchAnalytics, exportCsv };
 }
 
-export function useEBookletViewer({ adminMode = false } = {}) {
+export function useEBookletViewer({ adminMode = false, previewMode = false } = {}) {
   const { mutate: fetchApi, loading } = useApiMutation();
   const [metadata, setMetadata] = useState(null);
   const [metadataError, setMetadataError] = useState("");
@@ -277,7 +277,9 @@ export function useEBookletViewer({ adminMode = false } = {}) {
       try {
         const response = await fetchApi(
           {
-            endpoint: `${viewerBase}/${instanceId}/metadata`,
+            endpoint: previewMode
+              ? `/e-booklet-store/${instanceId}/preview/metadata`
+              : `${viewerBase}/${instanceId}/metadata`,
             method: "get",
           },
           false,
@@ -294,7 +296,7 @@ export function useEBookletViewer({ adminMode = false } = {}) {
         throw error;
       }
     },
-    [fetchApi, viewerBase],
+    [fetchApi, previewMode, viewerBase],
   );
 
   const fetchPage = useCallback(
@@ -306,14 +308,18 @@ export function useEBookletViewer({ adminMode = false } = {}) {
         const [pageResponse, hotspotsResponse] = await Promise.all([
           fetchApi(
             {
-              endpoint: `${viewerBase}/${instanceId}/pages/${pageNumber}`,
+              endpoint: previewMode
+                ? `/e-booklet-store/${instanceId}/preview/pages/${pageNumber}`
+                : `${viewerBase}/${instanceId}/pages/${pageNumber}`,
               method: "get",
             },
             false,
           ),
           fetchApi(
             {
-              endpoint: `${viewerBase}/${instanceId}/pages/${pageNumber}/hotspots`,
+              endpoint: previewMode
+                ? `/e-booklet-store/${instanceId}/preview/pages/${pageNumber}/hotspots`
+                : `${viewerBase}/${instanceId}/pages/${pageNumber}/hotspots`,
               method: "get",
             },
             false,
@@ -333,11 +339,14 @@ export function useEBookletViewer({ adminMode = false } = {}) {
         throw error;
       }
     },
-    [fetchApi, viewerBase],
+    [fetchApi, previewMode, viewerBase],
   );
 
   const fetchHotspotContent = useCallback(
     (hotspotId, instanceId) => {
+      if (previewMode) {
+        return Promise.reject(new Error(i18n.t("eBooklets:viewer.previewHotspotLockedMessage")));
+      }
       const endpoint = buildHotspotContentEndpoint({ adminMode, viewerBase, instanceId, hotspotId });
       return fetchApi(
         {
@@ -347,7 +356,7 @@ export function useEBookletViewer({ adminMode = false } = {}) {
         false,
       );
     },
-    [adminMode, fetchApi, viewerBase],
+    [adminMode, fetchApi, previewMode, viewerBase],
   );
 
   const bindDevice = useCallback(
@@ -364,6 +373,9 @@ export function useEBookletViewer({ adminMode = false } = {}) {
   );
 
   const fetchViewerDocumentPageData = useCallback(async (instanceId, pageNumber, pageAccessToken, signal) => {
+    if (previewMode) {
+      throw new Error(i18n.t("eBooklets:viewer.documentUnavailable"));
+    }
     const response = await api.get(
       `${viewerBase}/${instanceId}/document`,
       {
@@ -374,28 +386,33 @@ export function useEBookletViewer({ adminMode = false } = {}) {
       },
     );
     return response.data;
-  }, [viewerBase]);
+  }, [previewMode, viewerBase]);
 
   const fetchViewerDocumentPagePreviewBlobUrl = useCallback(async (instanceId, pageNumber, pageAccessToken, signal) => {
     const response = await api.get(
-      `${viewerBase}/${instanceId}/pages/${pageNumber}/preview`,
+      previewMode
+        ? `/e-booklet-store/${instanceId}/preview/pages/${pageNumber}/preview`
+        : `${viewerBase}/${instanceId}/pages/${pageNumber}/preview`,
       {
         responseType: "blob",
-        headers: { "X-E-Booklet-Page-Token": pageAccessToken },
+        headers: previewMode ? undefined : { "X-E-Booklet-Page-Token": pageAccessToken },
         signal,
       },
     );
     return URL.createObjectURL(response.data);
-  }, [viewerBase]);
+  }, [previewMode, viewerBase]);
 
   const fetchHotspotAssetBlobUrl = useCallback(async (hotspotId, assetId, instanceId) => {
+    if (previewMode) {
+      throw new Error(i18n.t("eBooklets:viewer.previewHotspotLockedMessage"));
+    }
     const endpoint = buildHotspotAssetEndpoint({ adminMode, viewerBase, instanceId, hotspotId, assetId });
     const response = await api.get(
       endpoint,
       { responseType: "blob" },
     );
     return URL.createObjectURL(response.data);
-  }, [adminMode, viewerBase]);
+  }, [adminMode, previewMode, viewerBase]);
 
   return {
     metadata,

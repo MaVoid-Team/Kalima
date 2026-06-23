@@ -60,6 +60,10 @@ const mockService = {
   getPublicInstance: jest.fn(),
   listPublishedTemplates: jest.fn(),
   getPublishedTemplateById: jest.fn(),
+  getPublicPreviewMetadata: jest.fn(),
+  getPublicPreviewPage: jest.fn(),
+  getPublicPreviewPageHotspots: jest.fn(),
+  getPublicPreviewDocumentPagePreview: jest.fn(),
   getPublicCoverFileAsset: jest.fn(),
   createPublicCheckoutRequest: jest.fn(),
   createTemplate: jest.fn(),
@@ -184,6 +188,75 @@ describe("e-booklet routes", () => {
     expect(mockService.getPublicInstance).not.toHaveBeenCalled();
   });
 
+  test("serves public e-booklet preview metadata, pages, and locked hotspot markers without auth", async () => {
+    mockService.getPublicPreviewMetadata.mockResolvedValue({
+      preview_mode: true,
+      preview_page_limit: 10,
+      preview_page_count: 10,
+      total_page_count: 42,
+    });
+    mockService.getPublicPreviewPage.mockResolvedValue({
+      pageNumber: 2,
+      renderMode: "pdf-document",
+      previewMode: true,
+      previewPageLimit: 10,
+    });
+    mockService.getPublicPreviewPageHotspots.mockResolvedValue([
+      {
+        id: 77,
+        page_number: 2,
+        x_percent: 25,
+        y_percent: 35,
+        type: "text",
+        is_locked: true,
+      },
+    ]);
+
+    await request(app)
+      .get("/api/v2/e-booklet-store/10/preview/metadata")
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data.preview_page_limit).toBe(10);
+        expect(res.body.data.total_page_count).toBe(42);
+      });
+
+    await request(app)
+      .get("/api/v2/e-booklet-store/10/preview/pages/2")
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data.previewMode).toBe(true);
+      });
+
+    await request(app)
+      .get("/api/v2/e-booklet-store/10/preview/pages/2/hotspots")
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data[0]).toEqual(expect.objectContaining({ id: 77, is_locked: true }));
+        expect(res.body.data[0]).not.toHaveProperty("content_json");
+        expect(res.body.data[0]).not.toHaveProperty("text_content");
+        expect(res.body.data[0]).not.toHaveProperty("asset_file_id");
+      });
+
+    expect(mockService.getPublicPreviewMetadata).toHaveBeenCalledWith(10);
+    expect(mockService.getPublicPreviewPage).toHaveBeenCalledWith(10, 2);
+    expect(mockService.getPublicPreviewPageHotspots).toHaveBeenCalledWith(10, 2);
+  });
+
+  test("returns configured preview page-limit errors from public preview pages", async () => {
+    mockService.getPublicPreviewPage.mockRejectedValue(
+      Object.assign(new Error("Preview is limited to the first 10 e-booklet pages."), { statusCode: 400 }),
+    );
+
+    await request(app)
+      .get("/api/v2/e-booklet-store/10/preview/pages/11")
+      .expect(400)
+      .expect((res) => {
+        expect(res.body.message).toContain("first 10");
+      });
+
+    expect(mockService.getPublicPreviewPage).toHaveBeenCalledWith(10, 11);
+  });
+
   test("keeps legacy public e-booklet detail route by teacher instance id", async () => {
     mockService.getPublicInstance.mockResolvedValue({ id: 10, display_title: "Grade 5 Arabic with Ms Sara" });
 
@@ -285,6 +358,7 @@ describe("e-booklet routes", () => {
     expect(mockService.createPublicCheckoutRequest).toHaveBeenCalledWith(
       77,
       expect.objectContaining({ instance_id: 7, template_id: 3, template_version_id: 4, terms_accepted: true }),
+      undefined,
       undefined,
     );
   });

@@ -1,6 +1,8 @@
 import { BadRequestError } from "../../../libs/errors";
 
 const SETTINGS_ID = 1;
+const DEFAULT_PREVIEW_PAGE_LIMIT = 10;
+const MAX_PREVIEW_PAGE_LIMIT = 200;
 
 const defaults = {
   id: SETTINGS_ID,
@@ -47,6 +49,33 @@ export class EBookletSettingsService {
     return numeric;
   }
 
+  private boundedPositiveInt(value: unknown, label: string, max: number): number | undefined {
+    const numeric = this.positiveInt(value, label);
+    if (numeric !== undefined && numeric > max) throw new BadRequestError(`${label} cannot exceed ${max}.`);
+    return numeric;
+  }
+
+  private async readPreviewPageLimit(): Promise<number> {
+    if (!this.db.$queryRawUnsafe) return DEFAULT_PREVIEW_PAGE_LIMIT;
+    const rows = await this.db.$queryRawUnsafe(
+      "SELECT preview_page_limit FROM e_booklet_global_settings WHERE id = 1 LIMIT 1",
+    );
+    const value = Array.isArray(rows) ? rows[0]?.preview_page_limit : undefined;
+    const numeric = Number(value ?? DEFAULT_PREVIEW_PAGE_LIMIT);
+    return Number.isInteger(numeric) && numeric >= 1 && numeric <= MAX_PREVIEW_PAGE_LIMIT
+      ? numeric
+      : DEFAULT_PREVIEW_PAGE_LIMIT;
+  }
+
+  private async writePreviewPageLimit(value: number): Promise<number> {
+    if (!this.db.$executeRawUnsafe) return value;
+    await this.db.$executeRawUnsafe(
+      "UPDATE e_booklet_global_settings SET preview_page_limit = $1, updated_at = NOW() WHERE id = 1",
+      value,
+    );
+    return value;
+  }
+
   private money(value: unknown, label: string): number | undefined {
     if (value === undefined) return undefined;
     const numeric = Number(value);
@@ -91,6 +120,7 @@ export class EBookletSettingsService {
     set("require_terms_for_code_generation", this.optionalBoolean(input.requireTermsForCodeGeneration ?? input.require_terms_for_code_generation));
     set("default_allowed_devices_per_student", this.positiveInt(input.defaultAllowedDevicesPerStudent ?? input.default_allowed_devices_per_student, "default allowed student devices"));
     set("default_allowed_devices_per_teacher", this.positiveInt(input.defaultAllowedDevicesPerTeacher ?? input.default_allowed_devices_per_teacher, "default allowed teacher devices"));
+    const previewPageLimit = this.boundedPositiveInt(input.previewPageLimit ?? input.preview_page_limit, "preview page limit", MAX_PREVIEW_PAGE_LIMIT);
     set("device_reset_policy", this.optionalText(input.deviceResetPolicy ?? input.device_reset_policy));
     set("notify_admins_on_delivery", this.optionalBoolean(input.notifyAdminsOnDelivery ?? input.notify_admins_on_delivery));
     set("notify_teacher_on_delivery", this.optionalBoolean(input.notifyTeacherOnDelivery ?? input.notify_teacher_on_delivery));
@@ -98,23 +128,28 @@ export class EBookletSettingsService {
     set("notify_teacher_on_milestone", this.optionalBoolean(input.notifyTeacherOnMilestone ?? input.notify_teacher_on_milestone));
     set("notify_admins_on_access_code_redemption", this.optionalBoolean(input.notifyAdminsOnAccessCodeRedemption ?? input.notify_admins_on_access_code_redemption));
 
-    return data;
+    return { data, previewPageLimit };
   }
 
   async getSettings() {
-    return this.db.e_booklet_global_settings.upsert({
+    const settings = await this.db.e_booklet_global_settings.upsert({
       where: { id: SETTINGS_ID },
       create: defaults,
       update: {},
     });
+    return { ...settings, preview_page_limit: await this.readPreviewPageLimit() };
   }
 
   async updateSettings(input: SettingsInput, adminUserId: number) {
-    const data = this.normalize(input, adminUserId);
-    return this.db.e_booklet_global_settings.upsert({
+    const { data, previewPageLimit } = this.normalize(input, adminUserId);
+    const settings = await this.db.e_booklet_global_settings.upsert({
       where: { id: SETTINGS_ID },
       create: { ...defaults, ...data, id: SETTINGS_ID },
       update: data,
     });
+    const nextPreviewPageLimit = previewPageLimit === undefined
+      ? await this.readPreviewPageLimit()
+      : await this.writePreviewPageLimit(previewPageLimit);
+    return { ...settings, preview_page_limit: nextPreviewPageLimit };
   }
 }
