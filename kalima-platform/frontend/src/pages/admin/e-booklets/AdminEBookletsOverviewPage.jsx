@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { AlertCircle, ArrowRight, CheckCircle2, Clock, PackageCheck, RefreshCcw, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,40 +8,40 @@ import axiosInstance from "@/api/axios";
 const statusCards = [
   {
     key: "pending",
-    label: "Awaiting payment approval",
-    helper: "Pending teacher purchases waiting for admin review",
+    labelKey: "admin.overview.cards.pending.label",
+    helperKey: "admin.overview.cards.pending.helper",
     tone: "text-amber-600",
     icon: Clock,
     href: "/admin/e-booklets/orders?status=pending",
   },
   {
     key: "paid",
-    label: "Ready for delivery setup",
-    helper: "Paid purchases that need teacher-specific delivery details",
+    labelKey: "admin.overview.cards.paid.label",
+    helperKey: "admin.overview.cards.paid.helper",
     tone: "text-blue-600",
     icon: PackageCheck,
     href: "/admin/e-booklets/orders?status=paid",
   },
   {
     key: "customization_in_progress",
-    label: "Customization in progress",
-    helper: "Open teacher-specific template/document work",
+    labelKey: "admin.overview.cards.customization_in_progress.label",
+    helperKey: "admin.overview.cards.customization_in_progress.helper",
     tone: "text-primary",
     icon: AlertCircle,
     href: "/admin/e-booklets/orders?status=customization_in_progress",
   },
   {
     key: "ready",
-    label: "Ready to deliver",
-    helper: "Final delivery action is available",
+    labelKey: "admin.overview.cards.ready.label",
+    helperKey: "admin.overview.cards.ready.helper",
     tone: "text-emerald-600",
     icon: CheckCircle2,
     href: "/admin/e-booklets/orders?status=ready",
   },
   {
     key: "delivered",
-    label: "Delivered",
-    helper: "Teacher instances already delivered and locked from repeat delivery",
+    labelKey: "admin.overview.cards.delivered.label",
+    helperKey: "admin.overview.cards.delivered.helper",
     tone: "text-green-700",
     icon: Truck,
     href: "/admin/e-booklets/orders?status=delivered",
@@ -55,6 +56,7 @@ async function fetchPurchaseCount(status) {
 }
 
 export default function AdminEBookletsOverviewPage() {
+  const { t } = useTranslation("eBooklets");
   const [counts, setCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -69,7 +71,7 @@ export default function AdminEBookletsOverviewPage() {
       const total = await fetchPurchaseCount("");
       setCounts({ ...Object.fromEntries(entries), total });
     } catch (err) {
-      setError(err?.response?.data?.message || err?.message || "Could not load eBooklet overview.");
+      setError(err?.response?.data?.message || err?.message || t("admin.overview.loadError"));
     } finally {
       setLoading(false);
     }
@@ -94,12 +96,12 @@ export default function AdminEBookletsOverviewPage() {
               <article>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm text-muted-foreground">{card.label}</p>
+                    <p className="text-sm text-muted-foreground">{t(card.labelKey)}</p>
                     <p className="mt-2 text-3xl font-bold tracking-tight">{loading ? "…" : Number(counts[card.key] || 0).toLocaleString()}</p>
                   </div>
                   <Icon className={`h-5 w-5 ${card.tone}`} />
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground">{card.helper}</p>
+                <p className="mt-2 text-xs text-muted-foreground">{t(card.helperKey)}</p>
               </article>
             </Link>
           );
@@ -109,23 +111,26 @@ export default function AdminEBookletsOverviewPage() {
       <section className="rounded-2xl border bg-background p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Live work queue</h2>
+            <h2 className="text-lg font-semibold">{t("admin.overview.liveQueue")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {error
                 ? error
                 : loading
-                  ? "Loading active eBooklet purchase and delivery counts…"
-                  : `${activeWorkCount.toLocaleString()} active item${activeWorkCount === 1 ? "" : "s"} need admin attention out of ${Number(counts.total || 0).toLocaleString()} total eBooklet purchases.`}
+                  ? t("admin.overview.loading")
+                  : t("admin.overview.activeSummary", {
+                      active: activeWorkCount.toLocaleString(),
+                      total: Number(counts.total || 0).toLocaleString(),
+                    })}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={loadCounts} disabled={loading}>
               <RefreshCcw className="h-4 w-4" />
-              Refresh
+              {t("common.refresh")}
             </Button>
             <Button asChild>
               <Link to="/admin/e-booklets/orders">
-                Open Orders & Delivery
+                {t("admin.overview.openOrders")}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

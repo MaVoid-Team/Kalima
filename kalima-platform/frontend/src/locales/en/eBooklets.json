@@ -160,6 +160,35 @@
         "settings": "Settings"
       }
     },
+    "overview": {
+      "cards": {
+        "pending": {
+          "label": "Awaiting payment approval",
+          "helper": "Pending teacher purchases waiting for admin review"
+        },
+        "paid": {
+          "label": "Ready for delivery setup",
+          "helper": "Paid purchases that need teacher-specific delivery details"
+        },
+        "customization_in_progress": {
+          "label": "Customization in progress",
+          "helper": "Open teacher-specific template/document work"
+        },
+        "ready": {
+          "label": "Ready to deliver",
+          "helper": "Final delivery action is available"
+        },
+        "delivered": {
+          "label": "Delivered",
+          "helper": "Teacher instances already delivered and locked from repeat delivery"
+        }
+      },
+      "liveQueue": "Live work queue",
+      "loading": "Loading active eBooklet purchase and delivery counts...",
+      "activeSummary": "{{active}} active items need admin attention out of {{total}} total eBooklet purchases.",
+      "loadError": "Could not load eBooklet overview.",
+      "openOrders": "Open Orders & Delivery"
+    },
     "hotspotLibrary": {
       "title": "Hotspot Library",
       "description": "Manage reusable hotspot presets. Presets are copied into e-booklet templates and do not update existing hotspots after insertion.",
