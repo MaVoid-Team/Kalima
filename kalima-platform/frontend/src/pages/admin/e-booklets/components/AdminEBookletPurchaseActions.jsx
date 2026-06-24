@@ -31,7 +31,7 @@ export default function AdminEBookletPurchaseActions({
   const [whatsAppOpen, setWhatsAppOpen] = useState(false);
   const [editableWhatsAppMessage, setEditableWhatsAppMessage] = useState("");
   const status = String(purchase?.status || "");
-  const canApprovePayment = ["pending", "awaiting_payment"].includes(status);
+  const canApprovePayment = ["pending", "awaiting_payment", "customization_in_progress"].includes(status);
   const canWork = !["delivered", "rejected", "cancelled"].includes(status);
   const teacherPhone = purchase?.teacher?.phone?.replaceAll(/\D/g, "");
   const purchaseSerial = `#${purchase?.id ?? "-"}`;

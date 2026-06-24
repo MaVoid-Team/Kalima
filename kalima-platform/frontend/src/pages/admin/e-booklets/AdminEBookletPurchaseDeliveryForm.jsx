@@ -31,6 +31,7 @@ export default function AdminEBookletPurchaseDeliveryForm({
   loading,
   t,
   deliverPurchase,
+  markPaid,
   prepareCustomTemplate,
   updatePurchaseStatus,
   uploadTeacherDocument,
@@ -128,6 +129,12 @@ export default function AdminEBookletPurchaseDeliveryForm({
     onChanged?.();
   };
 
+  const handleApprovePayment = async () => {
+    if (!purchase || !markPaid) return;
+    await markPaid(purchase.id);
+    onChanged?.();
+  };
+
   const handleEditTeacherTemplate = async () => {
     if (!purchase) return;
     const response = await prepareCustomTemplate(purchase.id);
@@ -148,6 +155,7 @@ export default function AdminEBookletPurchaseDeliveryForm({
   }
 
   const isDelivered = String(purchase.status) === "delivered";
+  const canApprovePayment = ["pending", "awaiting_payment", "customization_in_progress"].includes(String(purchase.status));
   const canDeliver = ["paid", "ready"].includes(String(purchase.status));
   const deliverDisabled = loading || isDelivered || !canDeliver || Boolean(deliveryForm.validation_message) || !deliveryForm.custom_document_file_id || !deliveryForm.access_expires_at;
 
@@ -272,9 +280,14 @@ export default function AdminEBookletPurchaseDeliveryForm({
           </div>
         )}
         {!isDelivered && !canDeliver && (
-          <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 sm:col-span-2">
             {t("admin.purchases.approvePaymentBeforeDelivery", { defaultValue: "Approve the payment before delivering this e-booklet." })}
           </div>
+        )}
+        {!isDelivered && !canDeliver && canApprovePayment && (
+          <Button type="button" onClick={handleApprovePayment} disabled={loading} className="sm:col-span-2">
+            {t("admin.purchases.approvePaymentShort", { defaultValue: "Approve payment" })}
+          </Button>
         )}
         {!isDelivered && (
           <Button
