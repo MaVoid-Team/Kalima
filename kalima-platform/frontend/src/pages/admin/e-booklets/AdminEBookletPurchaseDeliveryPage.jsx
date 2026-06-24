@@ -16,6 +16,7 @@ export default function AdminEBookletPurchaseDeliveryPage() {
     fetchPurchase,
     updatePurchaseStatus,
     deliverPurchase,
+    markPaid,
     prepareCustomTemplate,
     uploadTeacherDocument,
   } = useAdminEBookletPurchases();
@@ -56,6 +57,7 @@ export default function AdminEBookletPurchaseDeliveryPage() {
         t={t}
         updatePurchaseStatus={updatePurchaseStatus}
         deliverPurchase={deliverPurchase}
+        markPaid={markPaid}
         prepareCustomTemplate={prepareCustomTemplate}
         uploadTeacherDocument={uploadTeacherDocument}
         onChanged={loadPurchase}

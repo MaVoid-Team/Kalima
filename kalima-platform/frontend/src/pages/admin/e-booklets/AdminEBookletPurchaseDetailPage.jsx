@@ -75,7 +75,7 @@ export default function AdminEBookletPurchaseDetailPage() {
   }
 
   const status = String(purchase.status || "");
-  const canApprovePayment = ["pending", "awaiting_payment"].includes(status);
+  const canApprovePayment = ["pending", "awaiting_payment", "customization_in_progress"].includes(status);
   const screenshotSource = purchase.payment_screenshot?.url || (typeof purchase.payment_screenshot === "string" ? purchase.payment_screenshot : null) || purchase.payment_screenshot_url || purchase.payment_proof_url;
   const screenshotUrl = getImageUrl(screenshotSource);
   const requiredFields = purchase.required_fields || [];
@@ -119,7 +119,7 @@ export default function AdminEBookletPurchaseDetailPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           {canApprovePayment && <Button onClick={approvePayment}><CheckCircle2 className="h-4 w-4" />{t("admin.purchases.approvePaymentShort", { defaultValue: "Approve payment" })}</Button>}
-          {!["delivered", "rejected", "cancelled"].includes(status) && <Button variant="outline" onClick={() => setStatus("customization_in_progress")}>{t("common.inProgress", { defaultValue: "In progress" })}</Button>}
+          {!["delivered", "rejected", "cancelled", "customization_in_progress"].includes(status) && <Button variant="outline" onClick={() => setStatus("customization_in_progress")}>{t("common.inProgress", { defaultValue: "In progress" })}</Button>}
           {status !== "rejected" && status !== "delivered" && <Button variant="outline" className="text-destructive" onClick={() => setStatus("rejected")}>{t("orders.statuses.rejected", { defaultValue: "Rejected" })}</Button>}
           <Button asChild variant="secondary"><Link to={`/admin/e-booklets/orders/${purchase.id}/delivery`}><BookOpenCheck className="h-4 w-4" />{t("admin.purchases.openDelivery", { defaultValue: "Open delivery" })}</Link></Button>
         </div>
