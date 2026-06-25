@@ -749,11 +749,6 @@ export default function EBookletViewerPage({ previewMode = false }) {
     setActiveHotspot(hotspot);
     setHotspotContent(null);
     setHotspotError("");
-    if (previewMode) {
-      setHotspotError(t("viewer.previewHotspotLockedMessage"));
-      setHotspotLoading(false);
-      return;
-    }
     setHotspotLoading(true);
     try {
       const response = await viewer.fetchHotspotContent(hotspot.id, instanceId);

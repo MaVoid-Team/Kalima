@@ -839,7 +839,7 @@ describe("EBookletService", () => {
       expect(page.previewPageCount).toBe(3);
     });
 
-    test("public preview hotspots expose locked markers without hotspot content or private asset ids", async () => {
+    test("public preview hotspots expose markers and allow content inside the preview page limit", async () => {
       const db = createMockDb();
       db.e_booklet_templates.findFirst.mockResolvedValue({
         id: 3,
@@ -862,14 +862,37 @@ describe("EBookletService", () => {
         asset_file_id: 123,
         content_json: { blocks: [{ type: "text", text_content: "Paid-only answer" }] },
       }]);
+      db.e_booklet_hotspots.findUnique.mockResolvedValue({
+        id: 77,
+        template_version_id: 8,
+        page_number: 2,
+        x_percent: 25,
+        y_percent: 35,
+        radius_percent: 4,
+        reference_number: 1,
+        type: "text",
+        title: "Answer key",
+        text_content: "Paid-only answer",
+        asset_file_id: 123,
+        content_json: { blocks: [{ type: "text", text_content: "Paid-only answer" }] },
+        asset_file: { id: 123, file_type: "document", original_filename: "answer.pdf", mime_type: "application/pdf", size_bytes: 10, visibility: "private" },
+      });
       const service = new EBookletService(db);
       const hotspots: any = await service.getPublicPreviewPageHotspots(3, 2);
+      const content: any = await service.getPublicPreviewHotspotContent(3, 77);
 
       expect(hotspots[0]).toEqual(expect.objectContaining({ id: 77, is_locked: true }));
       expect(hotspots[0].title).toBeUndefined();
       expect(hotspots[0].text_content).toBeUndefined();
       expect(hotspots[0].asset_file_id).toBeUndefined();
       expect(hotspots[0].content_json).toBeUndefined();
+      expect(content).toEqual(expect.objectContaining({
+        id: 77,
+        is_locked: false,
+        title: "Answer key",
+        asset_file_id: 123,
+      }));
+      expect(content.content_json.blocks[0]).toEqual({ type: "text", text_content: "Paid-only answer" });
       expect(db.e_booklet_hotspots.findMany).toHaveBeenCalledWith(expect.objectContaining({
         where: expect.objectContaining({ template_version_id: 8, page_number: 2, is_active: true }),
       }));
@@ -1643,6 +1666,37 @@ describe("EBookletService", () => {
         originalname: "photo.png",
         mimetype: "image/png",
       } as any, { fileType: "image" })).resolves.toEqual({ id: 78, file_type: "image" });
+    });
+
+    test("returns PDF upload metadata without eagerly rendering page previews", async () => {
+      const db = createMockDb();
+      db.e_booklet_file_assets.create.mockResolvedValue({
+        id: 79,
+        file_type: "pdf",
+        mime_type: "application/pdf",
+      });
+      const service = new EBookletService(db);
+      const generateForDocument = jest.fn();
+      (service as any).pagePreviewService = { generateForDocument };
+      const pdf = await PDFDocument.create();
+      pdf.addPage([300, 400]);
+
+      const result: any = await service.createFileAsset({
+        ...baseFile,
+        originalname: "large.pdf",
+        mimetype: "application/pdf",
+        size: 30 * 1024 * 1024,
+        buffer: Buffer.from(await pdf.save()),
+      } as any, { fileType: "document" });
+
+      expect(result).toEqual(expect.objectContaining({
+        id: 79,
+        metadata: expect.objectContaining({
+          page_count: 1,
+          page_dimensions: [{ width: 300, height: 400 }],
+        }),
+      }));
+      expect(generateForDocument).not.toHaveBeenCalled();
     });
   });
 

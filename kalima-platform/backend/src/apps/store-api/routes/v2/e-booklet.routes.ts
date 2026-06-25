@@ -64,6 +64,8 @@ router.get("/e-booklet-store/covers/:assetId", eBookletController.previewPublicC
 router.get("/e-booklet-store/:templateId/preview/metadata", viewerLimiter, eBookletController.getStorePreviewMetadata);
 router.get("/e-booklet-store/:templateId/preview/pages/:pageNumber/preview", viewerLimiter, eBookletController.getStorePreviewDocumentPagePreview);
 router.get("/e-booklet-store/:templateId/preview/pages/:pageNumber/hotspots", viewerLimiter, eBookletController.getStorePreviewPageHotspots);
+router.get("/e-booklet-store/:templateId/preview/hotspots/:hotspotId/content", viewerLimiter, eBookletController.getStorePreviewHotspotContent);
+router.get("/e-booklet-store/:templateId/preview/hotspots/:hotspotId/assets/:assetId", viewerLimiter, eBookletController.getStorePreviewHotspotAsset);
 router.get("/e-booklet-store/:templateId/preview/pages/:pageNumber", viewerLimiter, eBookletController.getStorePreviewPage);
 router.get("/e-booklet-store/instances/:instanceId", eBookletController.getStoreInstance);
 router.get("/e-booklet-store/:templateId", eBookletController.getStoreTemplate);

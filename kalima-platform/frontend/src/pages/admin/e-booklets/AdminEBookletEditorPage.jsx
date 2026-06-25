@@ -298,10 +298,17 @@ const getHotspotGlowClasses = (hotspot) => (
 const getHotspotGlowStyle = (hotspot) => {
   const glow = getHotspotGlowPercent(hotspot);
   if (glow <= 0) return {};
+  const glowRatio = glow / 100;
+  const hotspotColor = getHotspotColorRgb(hotspot);
   const blur = 8 + Math.round((glow / 100) * 18);
   const spread = Math.round((glow / 100) * 4);
-  const alpha = 0.18 + (glow / 100) * 0.22;
-  return { boxShadow: `0 0 ${blur}px ${spread}px rgb(${getHotspotColorRgb(hotspot)} / ${alpha})` };
+  const fillAlpha = 0.16 + glowRatio * 0.24;
+  const innerAlpha = 0.24 + glowRatio * 0.28;
+  const outerAlpha = 0.18 + glowRatio * 0.22;
+  return {
+    backgroundColor: `rgb(${hotspotColor} / ${fillAlpha})`,
+    boxShadow: `inset 0 0 ${blur}px ${Math.max(1, spread)}px rgb(${hotspotColor} / ${innerAlpha}), 0 0 ${blur}px ${spread}px rgb(${hotspotColor} / ${outerAlpha})`,
+  };
 };
 
 const clampHotspotSize = (value) => Math.min(

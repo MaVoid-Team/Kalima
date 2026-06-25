@@ -347,10 +347,9 @@ export function useEBookletViewer({ adminMode = false, previewMode = false } = {
 
   const fetchHotspotContent = useCallback(
     (hotspotId, instanceId) => {
-      if (previewMode) {
-        return Promise.reject(new Error(i18n.t("eBooklets:viewer.previewHotspotLockedMessage")));
-      }
-      const endpoint = buildHotspotContentEndpoint({ adminMode, viewerBase, instanceId, hotspotId });
+      const endpoint = previewMode
+        ? `/e-booklet-store/${instanceId}/preview/hotspots/${hotspotId}/content`
+        : buildHotspotContentEndpoint({ adminMode, viewerBase, instanceId, hotspotId });
       return fetchApi(
         {
           endpoint,
@@ -408,10 +407,9 @@ export function useEBookletViewer({ adminMode = false, previewMode = false } = {
   }, [previewMode, viewerBase]);
 
   const fetchHotspotAssetBlobUrl = useCallback(async (hotspotId, assetId, instanceId) => {
-    if (previewMode) {
-      throw new Error(i18n.t("eBooklets:viewer.previewHotspotLockedMessage"));
-    }
-    const endpoint = buildHotspotAssetEndpoint({ adminMode, viewerBase, instanceId, hotspotId, assetId });
+    const endpoint = previewMode
+      ? `/e-booklet-store/${instanceId}/preview/hotspots/${hotspotId}/assets/${assetId}`
+      : buildHotspotAssetEndpoint({ adminMode, viewerBase, instanceId, hotspotId, assetId });
     const response = await api.get(
       endpoint,
       { responseType: "blob" },

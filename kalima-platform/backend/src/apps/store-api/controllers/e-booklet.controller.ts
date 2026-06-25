@@ -371,6 +371,38 @@ export const eBookletController = {
     }
   },
 
+  async getStorePreviewHotspotContent(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await getEBookletService().getPublicPreviewHotspotContent(
+        parseId(req.params.templateId, "template ID"),
+        parseId(req.params.hotspotId, "hotspot ID"),
+      );
+      res.set("Cache-Control", "public, max-age=60");
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getStorePreviewHotspotAsset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { asset, absolutePath, cacheControl } = await getEBookletService().getPublicPreviewHotspotAsset(
+        parseId(req.params.templateId, "template ID"),
+        parseId(req.params.hotspotId, "hotspot ID"),
+        parseId(req.params.assetId, "asset ID"),
+      );
+      res.set("Cache-Control", cacheControl || "public, max-age=60");
+      res.type(asset.mime_type || "application/octet-stream");
+      res.set(
+        "Content-Disposition",
+        `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
+      );
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async getStorePreviewDocumentPagePreview(req: Request, res: Response, next: NextFunction) {
     try {
       const { asset, absolutePath, pageBuffer } = await getEBookletService().getPublicPreviewDocumentPagePreview(
