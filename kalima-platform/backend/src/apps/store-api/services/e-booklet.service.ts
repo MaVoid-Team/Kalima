@@ -1014,9 +1014,6 @@ export class EBookletService {
           visibility: "private",
         },
       });
-      if (file.mimetype === "application/pdf") {
-        await this.ensurePagePreviews(asset).catch(() => undefined);
-      }
       return metadata ? { ...asset, metadata } : asset;
     } catch (error) {
       await removeUploadedTempFile(file);
@@ -1385,6 +1382,85 @@ export class EBookletService {
       orderBy: { sort_order: "asc" },
     });
     return hotspots.map((hotspot: any) => this.sanitizePublicPreviewHotspot(hotspot));
+  }
+
+  async getPublicPreviewHotspotContent(templateId: number, hotspotId: number) {
+    const { activeVersion, previewPageCount } = await this.getPublishedPreviewTemplate(templateId);
+    const hotspot = await this.db.e_booklet_hotspots.findUnique({
+      where: { id: hotspotId },
+      include: { asset_file: true },
+    });
+    if (
+      !hotspot ||
+      Number(hotspot.template_version_id) !== Number(activeVersion.id) ||
+      hotspot.is_active === false ||
+      Number(hotspot.page_number) > previewPageCount
+    ) {
+      throw new NotFoundError("E-booklet hotspot not found for this preview.");
+    }
+    return {
+      id: hotspot.id,
+      template_version_id: hotspot.template_version_id,
+      page_number: hotspot.page_number,
+      x_percent: hotspot.x_percent,
+      y_percent: hotspot.y_percent,
+      radius_percent: hotspot.radius_percent,
+      type: hotspot.type,
+      title: hotspot.title,
+      text_content: hotspot.text_content,
+      asset_file_id: hotspot.asset_file_id,
+      trigger_type: hotspot.trigger_type,
+      display_behavior: hotspot.display_behavior,
+      content_json: this.normalizeLegacyHotspotContent(hotspot),
+      asset_file: hotspot.asset_file
+        ? {
+            id: hotspot.asset_file.id,
+            file_type: hotspot.asset_file.file_type,
+            original_filename: hotspot.asset_file.original_filename,
+            mime_type: hotspot.asset_file.mime_type,
+            size_bytes: hotspot.asset_file.size_bytes,
+            visibility: hotspot.asset_file.visibility,
+          }
+        : null,
+      is_locked: false,
+    };
+  }
+
+  async getPublicPreviewHotspotAsset(templateId: number, hotspotId: number, assetId: number) {
+    const { activeVersion, previewPageCount } = await this.getPublishedPreviewTemplate(templateId);
+    const hotspot = await this.db.e_booklet_hotspots.findUnique({
+      where: { id: hotspotId },
+    });
+    const referencedAssetIds = new Set<number>();
+    if (hotspot?.asset_file_id) referencedAssetIds.add(Number(hotspot.asset_file_id));
+    const blocks = Array.isArray(hotspot?.content_json?.blocks) ? hotspot.content_json.blocks : [];
+    blocks.forEach((block: any) => {
+      if (block?.asset_file_id) referencedAssetIds.add(Number(block.asset_file_id));
+    });
+    if (
+      !hotspot ||
+      Number(hotspot.template_version_id) !== Number(activeVersion.id) ||
+      hotspot.is_active === false ||
+      Number(hotspot.page_number) > previewPageCount ||
+      !referencedAssetIds.has(assetId)
+    ) {
+      throw new ForbiddenError("You do not have access to this hotspot asset.");
+    }
+    const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: assetId } });
+    if (!asset) throw new NotFoundError("E-booklet file asset not found");
+    const filename = path.basename(asset.storage_key || "");
+    return {
+      asset: {
+        id: asset.id,
+        file_type: asset.file_type,
+        original_filename: asset.original_filename,
+        mime_type: asset.mime_type,
+        size_bytes: asset.size_bytes,
+        visibility: asset.visibility,
+      },
+      absolutePath: path.join(E_BOOKLET_UPLOAD_DIR, filename),
+      cacheControl: "public, max-age=60",
+    };
   }
 
   async getPublicPreviewDocumentPagePreview(templateId: number, pageNumber: number) {

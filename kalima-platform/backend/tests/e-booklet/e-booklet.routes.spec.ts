@@ -63,6 +63,8 @@ const mockService = {
   getPublicPreviewMetadata: jest.fn(),
   getPublicPreviewPage: jest.fn(),
   getPublicPreviewPageHotspots: jest.fn(),
+  getPublicPreviewHotspotContent: jest.fn(),
+  getPublicPreviewHotspotAsset: jest.fn(),
   getPublicPreviewDocumentPagePreview: jest.fn(),
   getPublicCoverFileAsset: jest.fn(),
   createPublicCheckoutRequest: jest.fn(),
@@ -189,7 +191,7 @@ describe("e-booklet routes", () => {
     expect(mockService.getPublicInstance).not.toHaveBeenCalled();
   });
 
-  test("serves public e-booklet preview metadata, pages, and locked hotspot markers without auth", async () => {
+  test("serves public e-booklet preview metadata, pages, hotspots, and hotspot content without auth", async () => {
     mockService.getPublicPreviewMetadata.mockResolvedValue({
       preview_mode: true,
       preview_page_limit: 10,
@@ -212,6 +214,13 @@ describe("e-booklet routes", () => {
         is_locked: true,
       },
     ]);
+    mockService.getPublicPreviewHotspotContent.mockResolvedValue({
+      id: 77,
+      type: "text",
+      title: "Sample note",
+      content_json: { version: 2, blocks: [{ type: "text", text_content: "Preview answer" }] },
+      is_locked: false,
+    });
 
     await request(app)
       .get("/api/v2/e-booklet-store/10/preview/metadata")
@@ -233,14 +242,24 @@ describe("e-booklet routes", () => {
       .expect(200)
       .expect((res) => {
         expect(res.body.data[0]).toEqual(expect.objectContaining({ id: 77, is_locked: true }));
-        expect(res.body.data[0]).not.toHaveProperty("content_json");
-        expect(res.body.data[0]).not.toHaveProperty("text_content");
         expect(res.body.data[0]).not.toHaveProperty("asset_file_id");
+      });
+
+    await request(app)
+      .get("/api/v2/e-booklet-store/10/preview/hotspots/77/content")
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data).toEqual(expect.objectContaining({
+          id: 77,
+          is_locked: false,
+          content_json: { version: 2, blocks: [{ type: "text", text_content: "Preview answer" }] },
+        }));
       });
 
     expect(mockService.getPublicPreviewMetadata).toHaveBeenCalledWith(10);
     expect(mockService.getPublicPreviewPage).toHaveBeenCalledWith(10, 2);
     expect(mockService.getPublicPreviewPageHotspots).toHaveBeenCalledWith(10, 2);
+    expect(mockService.getPublicPreviewHotspotContent).toHaveBeenCalledWith(10, 77);
   });
 
   test("returns configured preview page-limit errors from public preview pages", async () => {
