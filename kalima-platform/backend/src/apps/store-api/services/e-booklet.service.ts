@@ -1238,6 +1238,18 @@ export class EBookletService {
   }
 
   private async getPreviewPageLimit(): Promise<number> {
+    if (this.db.e_booklet_global_settings?.upsert) {
+      try {
+        const settings = await this.db.e_booklet_global_settings.upsert({
+          where: { id: 1 },
+          create: { id: 1, preview_page_limit: DEFAULT_E_BOOKLET_PREVIEW_PAGE_LIMIT },
+          update: {},
+        });
+        return this.normalizePreviewPageLimit(settings?.preview_page_limit);
+      } catch {
+        // Fall through to the raw-query fallback for older generated clients.
+      }
+    }
     if (!this.db.$queryRawUnsafe) return DEFAULT_E_BOOKLET_PREVIEW_PAGE_LIMIT;
     try {
       const rows = await this.db.$queryRawUnsafe(

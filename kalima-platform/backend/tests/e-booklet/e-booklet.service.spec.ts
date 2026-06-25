@@ -819,7 +819,9 @@ describe("EBookletService", () => {
 
     test("public preview honors configured page limits up to the admin maximum", async () => {
       const db = createMockDb({
-        $queryRawUnsafe: jest.fn().mockResolvedValue([{ preview_page_limit: 3 }]),
+        e_booklet_global_settings: {
+          upsert: jest.fn().mockResolvedValue({ preview_page_limit: 3 }),
+        },
       });
       db.e_booklet_templates.findFirst.mockResolvedValue({
         id: 3,

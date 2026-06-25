@@ -18,6 +18,7 @@ const defaults = {
   require_terms_for_code_generation: true,
   default_allowed_devices_per_student: 1,
   default_allowed_devices_per_teacher: 2,
+  preview_page_limit: DEFAULT_PREVIEW_PAGE_LIMIT,
   device_reset_policy: null,
   notify_admins_on_delivery: true,
   notify_teacher_on_delivery: true,
@@ -57,23 +58,18 @@ export class EBookletSettingsService {
 
   private async readPreviewPageLimit(): Promise<number> {
     if (!this.db.$queryRawUnsafe) return DEFAULT_PREVIEW_PAGE_LIMIT;
-    const rows = await this.db.$queryRawUnsafe(
-      "SELECT preview_page_limit FROM e_booklet_global_settings WHERE id = 1 LIMIT 1",
-    );
-    const value = Array.isArray(rows) ? rows[0]?.preview_page_limit : undefined;
-    const numeric = Number(value ?? DEFAULT_PREVIEW_PAGE_LIMIT);
-    return Number.isInteger(numeric) && numeric >= 1 && numeric <= MAX_PREVIEW_PAGE_LIMIT
-      ? numeric
-      : DEFAULT_PREVIEW_PAGE_LIMIT;
-  }
-
-  private async writePreviewPageLimit(value: number): Promise<number> {
-    if (!this.db.$executeRawUnsafe) return value;
-    await this.db.$executeRawUnsafe(
-      "UPDATE e_booklet_global_settings SET preview_page_limit = $1, updated_at = NOW() WHERE id = 1",
-      value,
-    );
-    return value;
+    try {
+      const rows = await this.db.$queryRawUnsafe(
+        "SELECT preview_page_limit FROM e_booklet_global_settings WHERE id = 1 LIMIT 1",
+      );
+      const value = Array.isArray(rows) ? rows[0]?.preview_page_limit : undefined;
+      const numeric = Number(value ?? DEFAULT_PREVIEW_PAGE_LIMIT);
+      return Number.isInteger(numeric) && numeric >= 1 && numeric <= MAX_PREVIEW_PAGE_LIMIT
+        ? numeric
+        : DEFAULT_PREVIEW_PAGE_LIMIT;
+    } catch {
+      return DEFAULT_PREVIEW_PAGE_LIMIT;
+    }
   }
 
   private money(value: unknown, label: string): number | undefined {
@@ -121,6 +117,7 @@ export class EBookletSettingsService {
     set("default_allowed_devices_per_student", this.positiveInt(input.defaultAllowedDevicesPerStudent ?? input.default_allowed_devices_per_student, "default allowed student devices"));
     set("default_allowed_devices_per_teacher", this.positiveInt(input.defaultAllowedDevicesPerTeacher ?? input.default_allowed_devices_per_teacher, "default allowed teacher devices"));
     const previewPageLimit = this.boundedPositiveInt(input.previewPageLimit ?? input.preview_page_limit, "preview page limit", MAX_PREVIEW_PAGE_LIMIT);
+    set("preview_page_limit", previewPageLimit);
     set("device_reset_policy", this.optionalText(input.deviceResetPolicy ?? input.device_reset_policy));
     set("notify_admins_on_delivery", this.optionalBoolean(input.notifyAdminsOnDelivery ?? input.notify_admins_on_delivery));
     set("notify_teacher_on_delivery", this.optionalBoolean(input.notifyTeacherOnDelivery ?? input.notify_teacher_on_delivery));
@@ -137,19 +134,24 @@ export class EBookletSettingsService {
       create: defaults,
       update: {},
     });
-    return { ...settings, preview_page_limit: await this.readPreviewPageLimit() };
+    const numeric = Number(settings?.preview_page_limit);
+    const previewPageLimit = Number.isInteger(numeric) && numeric >= 1 && numeric <= MAX_PREVIEW_PAGE_LIMIT
+      ? numeric
+      : await this.readPreviewPageLimit();
+    return { ...settings, preview_page_limit: previewPageLimit };
   }
 
   async updateSettings(input: SettingsInput, adminUserId: number) {
-    const { data, previewPageLimit } = this.normalize(input, adminUserId);
+    const { data } = this.normalize(input, adminUserId);
     const settings = await this.db.e_booklet_global_settings.upsert({
       where: { id: SETTINGS_ID },
       create: { ...defaults, ...data, id: SETTINGS_ID },
       update: data,
     });
-    const nextPreviewPageLimit = previewPageLimit === undefined
-      ? await this.readPreviewPageLimit()
-      : await this.writePreviewPageLimit(previewPageLimit);
-    return { ...settings, preview_page_limit: nextPreviewPageLimit };
+    const numeric = Number(settings?.preview_page_limit ?? data.preview_page_limit);
+    const previewPageLimit = Number.isInteger(numeric) && numeric >= 1 && numeric <= MAX_PREVIEW_PAGE_LIMIT
+      ? numeric
+      : await this.readPreviewPageLimit();
+    return { ...settings, preview_page_limit: previewPageLimit };
   }
 }
