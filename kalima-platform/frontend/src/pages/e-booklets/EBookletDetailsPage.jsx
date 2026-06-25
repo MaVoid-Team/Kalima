@@ -96,6 +96,30 @@ function NotFoundState({ t }) {
   );
 }
 
+const getHotspotBlocks = (hotspot) => {
+  const blocks = hotspot?.content_json?.blocks;
+  if (Array.isArray(blocks) && blocks.length > 0) return blocks;
+  const fallback = { type: hotspot?.type || "text" };
+  if (hotspot?.text_content) fallback.text_content = hotspot.text_content;
+  if (hotspot?.asset_file_id) fallback.asset_file_id = hotspot.asset_file_id;
+  return [fallback];
+};
+
+const getHotspotText = (hotspot, t) => {
+  const textBlock = getHotspotBlocks(hotspot).find((block) =>
+    block?.text_content || block?.text || block?.question || block?.prompt || block?.label,
+  );
+  return (
+    textBlock?.text_content ||
+    textBlock?.text ||
+    textBlock?.question ||
+    textBlock?.prompt ||
+    textBlock?.label ||
+    hotspot?.text_content ||
+    t("details.hotspotDescription")
+  );
+};
+
 export default function EBookletDetailsPage() {
   const { t, i18n } = useTranslation("eBooklets");
   const { templateId, instanceId } = useParams();
@@ -137,11 +161,12 @@ export default function EBookletDetailsPage() {
   const countdownText = !isReleased
     ? formatTimeUntilRelease(template.time_until_release_ms, t)
     : null;
+  const sampleHotspots = Array.isArray(template.hotspots) ? template.hotspots : [];
   const hotspotTypes = [
-    { label: t("admin.editor.hotspots.types.text"), Icon: FileText },
-    { label: t("admin.editor.hotspots.types.image"), Icon: ImageIcon },
-    { label: t("admin.editor.hotspots.types.video"), Icon: Video },
-    { label: t("admin.editor.hotspots.types.audio"), Icon: Volume2 },
+    { label: t("admin.editor.hotspots.types.text"), icon: <FileText className="h-6 w-6 text-emerald-800" /> },
+    { label: t("admin.editor.hotspots.types.image"), icon: <ImageIcon className="h-6 w-6 text-emerald-800" /> },
+    { label: t("admin.editor.hotspots.types.video"), icon: <Video className="h-6 w-6 text-emerald-800" /> },
+    { label: t("admin.editor.hotspots.types.audio"), icon: <Volume2 className="h-6 w-6 text-emerald-800" /> },
   ];
 
   return (
@@ -189,13 +214,13 @@ export default function EBookletDetailsPage() {
 
           <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { label: t("details.stats.pages"), value: template.pageCount || "-", Icon: FileText },
-              { label: t("details.stats.hotspots"), value: template.hotspotCount || 0, Icon: MousePointerClick },
-              { label: t("details.stats.version"), value: activeVersion?.version_number || "-", Icon: ShieldCheck },
-              { label: t("details.stats.access"), value: Number.isFinite(Number(template.seatsRemaining)) ? template.seatsRemaining : t("common.invite"), Icon: Users },
-            ].map(({ label, value, Icon }) => (
+              { label: t("details.stats.pages"), value: template.pageCount || "-", icon: <FileText className="mb-3 h-5 w-5 text-emerald-800" /> },
+              { label: t("details.stats.hotspots"), value: template.hotspotCount || 0, icon: <MousePointerClick className="mb-3 h-5 w-5 text-emerald-800" /> },
+              { label: t("details.stats.version"), value: activeVersion?.version_number || "-", icon: <ShieldCheck className="mb-3 h-5 w-5 text-emerald-800" /> },
+              { label: t("details.stats.access"), value: Number.isFinite(Number(template.seatsRemaining)) ? template.seatsRemaining : t("common.invite"), icon: <Users className="mb-3 h-5 w-5 text-emerald-800" /> },
+            ].map(({ label, value, icon }) => (
               <div key={label} className="rounded-lg border border-border/70 bg-white p-4">
-                <Icon className="mb-3 h-5 w-5 text-emerald-800" />
+                {icon}
                 <div className="text-2xl font-black tracking-tight">{value}</div>
                 <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {label}
@@ -269,23 +294,66 @@ export default function EBookletDetailsPage() {
       <section className="mx-auto max-w-[1400px] px-4 pb-24 md:px-6">
         <div className="border-t border-border pt-8">
           <h2 className="text-2xl font-bold tracking-tight">{t("details.hotspotContent")}</h2>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {hotspotTypes.map(({ label, Icon }, index) => (
-              <div
-                key={label}
-                className={cn(
-                  "rounded-lg border border-border/70 bg-card p-5",
-                  index === 0 && "border-emerald-700/30 bg-emerald-50/60",
-                )}
-              >
-                <Icon className="h-6 w-6 text-emerald-800" />
-                <h3 className="mt-4 font-bold">{label}</h3>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  {t("details.hotspotDescription")}
-                </p>
-              </div>
-            ))}
-          </div>
+          {sampleHotspots.length > 0 ? (
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {sampleHotspots.map((hotspot) => (
+                <div key={hotspot.id} className="rounded-lg border border-border/70 bg-card p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <Badge variant="outline" className="rounded-md">
+                        {t("details.samplePage", {
+                          page: hotspot.page_number || 1,
+                          defaultValue: "Page {{page}}",
+                        })}
+                      </Badge>
+                      <h3 className="mt-3 font-bold">
+                        {hotspot.title || t("admin.editor.hotspots.hotspotFallback", {
+                          type: t(`admin.editor.hotspots.types.${hotspot.type}`, {
+                            defaultValue: hotspot.type || "hotspot",
+                          }),
+                        })}
+                      </h3>
+                    </div>
+                    <MousePointerClick className="h-5 w-5 shrink-0 text-emerald-800" />
+                  </div>
+                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
+                    {getHotspotText(hotspot, t)}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Badge className="rounded-md bg-emerald-800 text-white hover:bg-emerald-800">
+                      {t(`admin.editor.hotspots.types.${hotspot.type}`, { defaultValue: hotspot.type })}
+                    </Badge>
+                    {getHotspotBlocks(hotspot).length > 1 && (
+                      <Badge variant="secondary" className="rounded-md">
+                        {t("details.hotspotBlockCount", {
+                          count: getHotspotBlocks(hotspot).length,
+                          defaultValue: "{{count}} blocks",
+                        })}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {hotspotTypes.map(({ label, icon }, index) => (
+                <div
+                  key={label}
+                  className={cn(
+                    "rounded-lg border border-border/70 bg-card p-5",
+                    index === 0 && "border-emerald-700/30 bg-emerald-50/60",
+                  )}
+                >
+                  {icon}
+                  <h3 className="mt-4 font-bold">{label}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {t("details.hotspotDescription")}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="mt-10 rounded-lg border border-amber-500/30 bg-amber-50 p-5 text-sm leading-6 text-amber-950">

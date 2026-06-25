@@ -29,6 +29,7 @@ export type AggregateCoupons = {
 export type CouponsAvgAggregateOutputType = {
   id: number | null
   product_id: number | null
+  category_id: number | null
   discount_amount: runtime.Decimal | null
   discount_percentage: number | null
 }
@@ -36,6 +37,7 @@ export type CouponsAvgAggregateOutputType = {
 export type CouponsSumAggregateOutputType = {
   id: number | null
   product_id: number | null
+  category_id: number | null
   discount_amount: runtime.Decimal | null
   discount_percentage: number | null
 }
@@ -44,6 +46,8 @@ export type CouponsMinAggregateOutputType = {
   id: number | null
   code: string | null
   product_id: number | null
+  category_id: number | null
+  applicability_scope: $Enums.coupon_applicability_scope | null
   discount_amount: runtime.Decimal | null
   discount_percentage: number | null
   active: boolean | null
@@ -61,6 +65,8 @@ export type CouponsMaxAggregateOutputType = {
   id: number | null
   code: string | null
   product_id: number | null
+  category_id: number | null
+  applicability_scope: $Enums.coupon_applicability_scope | null
   discount_amount: runtime.Decimal | null
   discount_percentage: number | null
   active: boolean | null
@@ -78,6 +84,8 @@ export type CouponsCountAggregateOutputType = {
   id: number
   code: number
   product_id: number
+  category_id: number
+  applicability_scope: number
   discount_amount: number
   discount_percentage: number
   active: number
@@ -96,6 +104,7 @@ export type CouponsCountAggregateOutputType = {
 export type CouponsAvgAggregateInputType = {
   id?: true
   product_id?: true
+  category_id?: true
   discount_amount?: true
   discount_percentage?: true
 }
@@ -103,6 +112,7 @@ export type CouponsAvgAggregateInputType = {
 export type CouponsSumAggregateInputType = {
   id?: true
   product_id?: true
+  category_id?: true
   discount_amount?: true
   discount_percentage?: true
 }
@@ -111,6 +121,8 @@ export type CouponsMinAggregateInputType = {
   id?: true
   code?: true
   product_id?: true
+  category_id?: true
+  applicability_scope?: true
   discount_amount?: true
   discount_percentage?: true
   active?: true
@@ -128,6 +140,8 @@ export type CouponsMaxAggregateInputType = {
   id?: true
   code?: true
   product_id?: true
+  category_id?: true
+  applicability_scope?: true
   discount_amount?: true
   discount_percentage?: true
   active?: true
@@ -145,6 +159,8 @@ export type CouponsCountAggregateInputType = {
   id?: true
   code?: true
   product_id?: true
+  category_id?: true
+  applicability_scope?: true
   discount_amount?: true
   discount_percentage?: true
   active?: true
@@ -248,7 +264,9 @@ export type couponsGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type CouponsGroupByOutputType = {
   id: number
   code: string
-  product_id: number
+  product_id: number | null
+  category_id: number | null
+  applicability_scope: $Enums.coupon_applicability_scope
   discount_amount: runtime.Decimal | null
   discount_percentage: number | null
   active: boolean | null
@@ -288,7 +306,9 @@ export type couponsWhereInput = {
   NOT?: Prisma.couponsWhereInput | Prisma.couponsWhereInput[]
   id?: Prisma.IntFilter<"coupons"> | number
   code?: Prisma.StringFilter<"coupons"> | string
-  product_id?: Prisma.IntFilter<"coupons"> | number
+  product_id?: Prisma.IntNullableFilter<"coupons"> | number | null
+  category_id?: Prisma.IntNullableFilter<"coupons"> | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFilter<"coupons"> | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.DecimalNullableFilter<"coupons"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.IntNullableFilter<"coupons"> | number | null
   active?: Prisma.BoolNullableFilter<"coupons"> | boolean | null
@@ -300,7 +320,8 @@ export type couponsWhereInput = {
   is_deleted?: Prisma.BoolNullableFilter<"coupons"> | boolean | null
   mongo_id?: Prisma.StringNullableFilter<"coupons"> | string | null
   type?: Prisma.Enumcoupon_typeFilter<"coupons"> | $Enums.coupon_type
-  product?: Prisma.XOR<Prisma.ProductsScalarRelationFilter, Prisma.productsWhereInput>
+  product?: Prisma.XOR<Prisma.ProductsNullableScalarRelationFilter, Prisma.productsWhereInput> | null
+  category?: Prisma.XOR<Prisma.CategoriesNullableScalarRelationFilter, Prisma.categoriesWhereInput> | null
   cart_items?: Prisma.Cart_itemsListRelationFilter
   coupon_usages?: Prisma.Coupon_usagesListRelationFilter
   purchase_items?: Prisma.Purchase_itemsListRelationFilter
@@ -309,7 +330,9 @@ export type couponsWhereInput = {
 export type couponsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   code?: Prisma.SortOrder
-  product_id?: Prisma.SortOrder
+  product_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  category_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  applicability_scope?: Prisma.SortOrder
   discount_amount?: Prisma.SortOrderInput | Prisma.SortOrder
   discount_percentage?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -322,6 +345,7 @@ export type couponsOrderByWithRelationInput = {
   mongo_id?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   product?: Prisma.productsOrderByWithRelationInput
+  category?: Prisma.categoriesOrderByWithRelationInput
   cart_items?: Prisma.cart_itemsOrderByRelationAggregateInput
   coupon_usages?: Prisma.coupon_usagesOrderByRelationAggregateInput
   purchase_items?: Prisma.purchase_itemsOrderByRelationAggregateInput
@@ -334,7 +358,9 @@ export type couponsWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.couponsWhereInput | Prisma.couponsWhereInput[]
   OR?: Prisma.couponsWhereInput[]
   NOT?: Prisma.couponsWhereInput | Prisma.couponsWhereInput[]
-  product_id?: Prisma.IntFilter<"coupons"> | number
+  product_id?: Prisma.IntNullableFilter<"coupons"> | number | null
+  category_id?: Prisma.IntNullableFilter<"coupons"> | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFilter<"coupons"> | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.DecimalNullableFilter<"coupons"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.IntNullableFilter<"coupons"> | number | null
   active?: Prisma.BoolNullableFilter<"coupons"> | boolean | null
@@ -345,7 +371,8 @@ export type couponsWhereUniqueInput = Prisma.AtLeast<{
   deleted_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
   is_deleted?: Prisma.BoolNullableFilter<"coupons"> | boolean | null
   type?: Prisma.Enumcoupon_typeFilter<"coupons"> | $Enums.coupon_type
-  product?: Prisma.XOR<Prisma.ProductsScalarRelationFilter, Prisma.productsWhereInput>
+  product?: Prisma.XOR<Prisma.ProductsNullableScalarRelationFilter, Prisma.productsWhereInput> | null
+  category?: Prisma.XOR<Prisma.CategoriesNullableScalarRelationFilter, Prisma.categoriesWhereInput> | null
   cart_items?: Prisma.Cart_itemsListRelationFilter
   coupon_usages?: Prisma.Coupon_usagesListRelationFilter
   purchase_items?: Prisma.Purchase_itemsListRelationFilter
@@ -354,7 +381,9 @@ export type couponsWhereUniqueInput = Prisma.AtLeast<{
 export type couponsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   code?: Prisma.SortOrder
-  product_id?: Prisma.SortOrder
+  product_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  category_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  applicability_scope?: Prisma.SortOrder
   discount_amount?: Prisma.SortOrderInput | Prisma.SortOrder
   discount_percentage?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -379,7 +408,9 @@ export type couponsScalarWhereWithAggregatesInput = {
   NOT?: Prisma.couponsScalarWhereWithAggregatesInput | Prisma.couponsScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"coupons"> | number
   code?: Prisma.StringWithAggregatesFilter<"coupons"> | string
-  product_id?: Prisma.IntWithAggregatesFilter<"coupons"> | number
+  product_id?: Prisma.IntNullableWithAggregatesFilter<"coupons"> | number | null
+  category_id?: Prisma.IntNullableWithAggregatesFilter<"coupons"> | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeWithAggregatesFilter<"coupons"> | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.DecimalNullableWithAggregatesFilter<"coupons"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.IntNullableWithAggregatesFilter<"coupons"> | number | null
   active?: Prisma.BoolNullableWithAggregatesFilter<"coupons"> | boolean | null
@@ -395,6 +426,7 @@ export type couponsScalarWhereWithAggregatesInput = {
 
 export type couponsCreateInput = {
   code: string
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -406,7 +438,8 @@ export type couponsCreateInput = {
   is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
-  product: Prisma.productsCreateNestedOneWithoutCouponsInput
+  product?: Prisma.productsCreateNestedOneWithoutCouponsInput
+  category?: Prisma.categoriesCreateNestedOneWithoutCouponsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutCouponsInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutCouponsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutCouponsInput
@@ -415,7 +448,9 @@ export type couponsCreateInput = {
 export type couponsUncheckedCreateInput = {
   id?: number
   code: string
-  product_id: number
+  product_id?: number | null
+  category_id?: number | null
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -434,6 +469,7 @@ export type couponsUncheckedCreateInput = {
 
 export type couponsUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -445,7 +481,8 @@ export type couponsUpdateInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
-  product?: Prisma.productsUpdateOneRequiredWithoutCouponsNestedInput
+  product?: Prisma.productsUpdateOneWithoutCouponsNestedInput
+  category?: Prisma.categoriesUpdateOneWithoutCouponsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutCouponsNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutCouponsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutCouponsNestedInput
@@ -454,7 +491,9 @@ export type couponsUpdateInput = {
 export type couponsUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   code?: Prisma.StringFieldUpdateOperationsInput | string
-  product_id?: Prisma.IntFieldUpdateOperationsInput | number
+  product_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -474,7 +513,9 @@ export type couponsUncheckedUpdateInput = {
 export type couponsCreateManyInput = {
   id?: number
   code: string
-  product_id: number
+  product_id?: number | null
+  category_id?: number | null
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -490,6 +531,7 @@ export type couponsCreateManyInput = {
 
 export type couponsUpdateManyMutationInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -506,7 +548,9 @@ export type couponsUpdateManyMutationInput = {
 export type couponsUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   code?: Prisma.StringFieldUpdateOperationsInput | string
-  product_id?: Prisma.IntFieldUpdateOperationsInput | number
+  product_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -520,10 +564,22 @@ export type couponsUncheckedUpdateManyInput = {
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
 }
 
+export type CouponsListRelationFilter = {
+  every?: Prisma.couponsWhereInput
+  some?: Prisma.couponsWhereInput
+  none?: Prisma.couponsWhereInput
+}
+
+export type couponsOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type couponsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   code?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
+  category_id?: Prisma.SortOrder
+  applicability_scope?: Prisma.SortOrder
   discount_amount?: Prisma.SortOrder
   discount_percentage?: Prisma.SortOrder
   active?: Prisma.SortOrder
@@ -540,6 +596,7 @@ export type couponsCountOrderByAggregateInput = {
 export type couponsAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
+  category_id?: Prisma.SortOrder
   discount_amount?: Prisma.SortOrder
   discount_percentage?: Prisma.SortOrder
 }
@@ -548,6 +605,8 @@ export type couponsMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   code?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
+  category_id?: Prisma.SortOrder
+  applicability_scope?: Prisma.SortOrder
   discount_amount?: Prisma.SortOrder
   discount_percentage?: Prisma.SortOrder
   active?: Prisma.SortOrder
@@ -565,6 +624,8 @@ export type couponsMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   code?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
+  category_id?: Prisma.SortOrder
+  applicability_scope?: Prisma.SortOrder
   discount_amount?: Prisma.SortOrder
   discount_percentage?: Prisma.SortOrder
   active?: Prisma.SortOrder
@@ -581,6 +642,7 @@ export type couponsMinOrderByAggregateInput = {
 export type couponsSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   product_id?: Prisma.SortOrder
+  category_id?: Prisma.SortOrder
   discount_amount?: Prisma.SortOrder
   discount_percentage?: Prisma.SortOrder
 }
@@ -590,19 +652,55 @@ export type CouponsScalarRelationFilter = {
   isNot?: Prisma.couponsWhereInput
 }
 
-export type CouponsListRelationFilter = {
-  every?: Prisma.couponsWhereInput
-  some?: Prisma.couponsWhereInput
-  none?: Prisma.couponsWhereInput
-}
-
-export type couponsOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
-}
-
 export type CouponsNullableScalarRelationFilter = {
   is?: Prisma.couponsWhereInput | null
   isNot?: Prisma.couponsWhereInput | null
+}
+
+export type couponsCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.couponsCreateWithoutCategoryInput, Prisma.couponsUncheckedCreateWithoutCategoryInput> | Prisma.couponsCreateWithoutCategoryInput[] | Prisma.couponsUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.couponsCreateOrConnectWithoutCategoryInput | Prisma.couponsCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.couponsCreateManyCategoryInputEnvelope
+  connect?: Prisma.couponsWhereUniqueInput | Prisma.couponsWhereUniqueInput[]
+}
+
+export type couponsUncheckedCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.couponsCreateWithoutCategoryInput, Prisma.couponsUncheckedCreateWithoutCategoryInput> | Prisma.couponsCreateWithoutCategoryInput[] | Prisma.couponsUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.couponsCreateOrConnectWithoutCategoryInput | Prisma.couponsCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.couponsCreateManyCategoryInputEnvelope
+  connect?: Prisma.couponsWhereUniqueInput | Prisma.couponsWhereUniqueInput[]
+}
+
+export type couponsUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.couponsCreateWithoutCategoryInput, Prisma.couponsUncheckedCreateWithoutCategoryInput> | Prisma.couponsCreateWithoutCategoryInput[] | Prisma.couponsUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.couponsCreateOrConnectWithoutCategoryInput | Prisma.couponsCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.couponsUpsertWithWhereUniqueWithoutCategoryInput | Prisma.couponsUpsertWithWhereUniqueWithoutCategoryInput[]
+  createMany?: Prisma.couponsCreateManyCategoryInputEnvelope
+  set?: Prisma.couponsWhereUniqueInput | Prisma.couponsWhereUniqueInput[]
+  disconnect?: Prisma.couponsWhereUniqueInput | Prisma.couponsWhereUniqueInput[]
+  delete?: Prisma.couponsWhereUniqueInput | Prisma.couponsWhereUniqueInput[]
+  connect?: Prisma.couponsWhereUniqueInput | Prisma.couponsWhereUniqueInput[]
+  update?: Prisma.couponsUpdateWithWhereUniqueWithoutCategoryInput | Prisma.couponsUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.couponsUpdateManyWithWhereWithoutCategoryInput | Prisma.couponsUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.couponsScalarWhereInput | Prisma.couponsScalarWhereInput[]
+}
+
+export type couponsUncheckedUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.couponsCreateWithoutCategoryInput, Prisma.couponsUncheckedCreateWithoutCategoryInput> | Prisma.couponsCreateWithoutCategoryInput[] | Prisma.couponsUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.couponsCreateOrConnectWithoutCategoryInput | Prisma.couponsCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.couponsUpsertWithWhereUniqueWithoutCategoryInput | Prisma.couponsUpsertWithWhereUniqueWithoutCategoryInput[]
+  createMany?: Prisma.couponsCreateManyCategoryInputEnvelope
+  set?: Prisma.couponsWhereUniqueInput | Prisma.couponsWhereUniqueInput[]
+  disconnect?: Prisma.couponsWhereUniqueInput | Prisma.couponsWhereUniqueInput[]
+  delete?: Prisma.couponsWhereUniqueInput | Prisma.couponsWhereUniqueInput[]
+  connect?: Prisma.couponsWhereUniqueInput | Prisma.couponsWhereUniqueInput[]
+  update?: Prisma.couponsUpdateWithWhereUniqueWithoutCategoryInput | Prisma.couponsUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.couponsUpdateManyWithWhereWithoutCategoryInput | Prisma.couponsUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.couponsScalarWhereInput | Prisma.couponsScalarWhereInput[]
+}
+
+export type Enumcoupon_applicability_scopeFieldUpdateOperationsInput = {
+  set?: $Enums.coupon_applicability_scope
 }
 
 export type Enumcoupon_typeFieldUpdateOperationsInput = {
@@ -697,8 +795,9 @@ export type couponsUpdateOneWithoutPurchase_itemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.couponsUpdateToOneWithWhereWithoutPurchase_itemsInput, Prisma.couponsUpdateWithoutPurchase_itemsInput>, Prisma.couponsUncheckedUpdateWithoutPurchase_itemsInput>
 }
 
-export type couponsCreateWithoutCoupon_usagesInput = {
+export type couponsCreateWithoutCategoryInput = {
   code: string
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -710,7 +809,97 @@ export type couponsCreateWithoutCoupon_usagesInput = {
   is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
-  product: Prisma.productsCreateNestedOneWithoutCouponsInput
+  product?: Prisma.productsCreateNestedOneWithoutCouponsInput
+  cart_items?: Prisma.cart_itemsCreateNestedManyWithoutCouponsInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutCouponsInput
+  purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutCouponsInput
+}
+
+export type couponsUncheckedCreateWithoutCategoryInput = {
+  id?: number
+  code: string
+  product_id?: number | null
+  applicability_scope?: $Enums.coupon_applicability_scope
+  discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discount_percentage?: number | null
+  active?: boolean | null
+  starts_at?: Date | string | null
+  expires_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  mongo_id?: string | null
+  type?: $Enums.coupon_type
+  cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutCouponsInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutCouponsInput
+  purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutCouponsInput
+}
+
+export type couponsCreateOrConnectWithoutCategoryInput = {
+  where: Prisma.couponsWhereUniqueInput
+  create: Prisma.XOR<Prisma.couponsCreateWithoutCategoryInput, Prisma.couponsUncheckedCreateWithoutCategoryInput>
+}
+
+export type couponsCreateManyCategoryInputEnvelope = {
+  data: Prisma.couponsCreateManyCategoryInput | Prisma.couponsCreateManyCategoryInput[]
+  skipDuplicates?: boolean
+}
+
+export type couponsUpsertWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.couponsWhereUniqueInput
+  update: Prisma.XOR<Prisma.couponsUpdateWithoutCategoryInput, Prisma.couponsUncheckedUpdateWithoutCategoryInput>
+  create: Prisma.XOR<Prisma.couponsCreateWithoutCategoryInput, Prisma.couponsUncheckedCreateWithoutCategoryInput>
+}
+
+export type couponsUpdateWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.couponsWhereUniqueInput
+  data: Prisma.XOR<Prisma.couponsUpdateWithoutCategoryInput, Prisma.couponsUncheckedUpdateWithoutCategoryInput>
+}
+
+export type couponsUpdateManyWithWhereWithoutCategoryInput = {
+  where: Prisma.couponsScalarWhereInput
+  data: Prisma.XOR<Prisma.couponsUpdateManyMutationInput, Prisma.couponsUncheckedUpdateManyWithoutCategoryInput>
+}
+
+export type couponsScalarWhereInput = {
+  AND?: Prisma.couponsScalarWhereInput | Prisma.couponsScalarWhereInput[]
+  OR?: Prisma.couponsScalarWhereInput[]
+  NOT?: Prisma.couponsScalarWhereInput | Prisma.couponsScalarWhereInput[]
+  id?: Prisma.IntFilter<"coupons"> | number
+  code?: Prisma.StringFilter<"coupons"> | string
+  product_id?: Prisma.IntNullableFilter<"coupons"> | number | null
+  category_id?: Prisma.IntNullableFilter<"coupons"> | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFilter<"coupons"> | $Enums.coupon_applicability_scope
+  discount_amount?: Prisma.DecimalNullableFilter<"coupons"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discount_percentage?: Prisma.IntNullableFilter<"coupons"> | number | null
+  active?: Prisma.BoolNullableFilter<"coupons"> | boolean | null
+  starts_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
+  expires_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
+  created_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
+  updated_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
+  is_deleted?: Prisma.BoolNullableFilter<"coupons"> | boolean | null
+  mongo_id?: Prisma.StringNullableFilter<"coupons"> | string | null
+  type?: Prisma.Enumcoupon_typeFilter<"coupons"> | $Enums.coupon_type
+}
+
+export type couponsCreateWithoutCoupon_usagesInput = {
+  code: string
+  applicability_scope?: $Enums.coupon_applicability_scope
+  discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discount_percentage?: number | null
+  active?: boolean | null
+  starts_at?: Date | string | null
+  expires_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  mongo_id?: string | null
+  type?: $Enums.coupon_type
+  product?: Prisma.productsCreateNestedOneWithoutCouponsInput
+  category?: Prisma.categoriesCreateNestedOneWithoutCouponsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutCouponsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutCouponsInput
 }
@@ -718,7 +907,9 @@ export type couponsCreateWithoutCoupon_usagesInput = {
 export type couponsUncheckedCreateWithoutCoupon_usagesInput = {
   id?: number
   code: string
-  product_id: number
+  product_id?: number | null
+  category_id?: number | null
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -752,6 +943,7 @@ export type couponsUpdateToOneWithWhereWithoutCoupon_usagesInput = {
 
 export type couponsUpdateWithoutCoupon_usagesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -763,7 +955,8 @@ export type couponsUpdateWithoutCoupon_usagesInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
-  product?: Prisma.productsUpdateOneRequiredWithoutCouponsNestedInput
+  product?: Prisma.productsUpdateOneWithoutCouponsNestedInput
+  category?: Prisma.categoriesUpdateOneWithoutCouponsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutCouponsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutCouponsNestedInput
 }
@@ -771,7 +964,9 @@ export type couponsUpdateWithoutCoupon_usagesInput = {
 export type couponsUncheckedUpdateWithoutCoupon_usagesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   code?: Prisma.StringFieldUpdateOperationsInput | string
-  product_id?: Prisma.IntFieldUpdateOperationsInput | number
+  product_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -789,6 +984,7 @@ export type couponsUncheckedUpdateWithoutCoupon_usagesInput = {
 
 export type couponsCreateWithoutProductInput = {
   code: string
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -800,6 +996,7 @@ export type couponsCreateWithoutProductInput = {
   is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
+  category?: Prisma.categoriesCreateNestedOneWithoutCouponsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutCouponsInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutCouponsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutCouponsInput
@@ -808,6 +1005,8 @@ export type couponsCreateWithoutProductInput = {
 export type couponsUncheckedCreateWithoutProductInput = {
   id?: number
   code: string
+  category_id?: number | null
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -850,28 +1049,9 @@ export type couponsUpdateManyWithWhereWithoutProductInput = {
   data: Prisma.XOR<Prisma.couponsUpdateManyMutationInput, Prisma.couponsUncheckedUpdateManyWithoutProductInput>
 }
 
-export type couponsScalarWhereInput = {
-  AND?: Prisma.couponsScalarWhereInput | Prisma.couponsScalarWhereInput[]
-  OR?: Prisma.couponsScalarWhereInput[]
-  NOT?: Prisma.couponsScalarWhereInput | Prisma.couponsScalarWhereInput[]
-  id?: Prisma.IntFilter<"coupons"> | number
-  code?: Prisma.StringFilter<"coupons"> | string
-  product_id?: Prisma.IntFilter<"coupons"> | number
-  discount_amount?: Prisma.DecimalNullableFilter<"coupons"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  discount_percentage?: Prisma.IntNullableFilter<"coupons"> | number | null
-  active?: Prisma.BoolNullableFilter<"coupons"> | boolean | null
-  starts_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
-  expires_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
-  created_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
-  updated_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
-  deleted_at?: Prisma.DateTimeNullableFilter<"coupons"> | Date | string | null
-  is_deleted?: Prisma.BoolNullableFilter<"coupons"> | boolean | null
-  mongo_id?: Prisma.StringNullableFilter<"coupons"> | string | null
-  type?: Prisma.Enumcoupon_typeFilter<"coupons"> | $Enums.coupon_type
-}
-
 export type couponsCreateWithoutCart_itemsInput = {
   code: string
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -883,7 +1063,8 @@ export type couponsCreateWithoutCart_itemsInput = {
   is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
-  product: Prisma.productsCreateNestedOneWithoutCouponsInput
+  product?: Prisma.productsCreateNestedOneWithoutCouponsInput
+  category?: Prisma.categoriesCreateNestedOneWithoutCouponsInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutCouponsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutCouponsInput
 }
@@ -891,7 +1072,9 @@ export type couponsCreateWithoutCart_itemsInput = {
 export type couponsUncheckedCreateWithoutCart_itemsInput = {
   id?: number
   code: string
-  product_id: number
+  product_id?: number | null
+  category_id?: number | null
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -925,6 +1108,7 @@ export type couponsUpdateToOneWithWhereWithoutCart_itemsInput = {
 
 export type couponsUpdateWithoutCart_itemsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -936,7 +1120,8 @@ export type couponsUpdateWithoutCart_itemsInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
-  product?: Prisma.productsUpdateOneRequiredWithoutCouponsNestedInput
+  product?: Prisma.productsUpdateOneWithoutCouponsNestedInput
+  category?: Prisma.categoriesUpdateOneWithoutCouponsNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutCouponsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutCouponsNestedInput
 }
@@ -944,7 +1129,9 @@ export type couponsUpdateWithoutCart_itemsInput = {
 export type couponsUncheckedUpdateWithoutCart_itemsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   code?: Prisma.StringFieldUpdateOperationsInput | string
-  product_id?: Prisma.IntFieldUpdateOperationsInput | number
+  product_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -962,6 +1149,7 @@ export type couponsUncheckedUpdateWithoutCart_itemsInput = {
 
 export type couponsCreateWithoutPurchase_itemsInput = {
   code: string
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -973,7 +1161,8 @@ export type couponsCreateWithoutPurchase_itemsInput = {
   is_deleted?: boolean | null
   mongo_id?: string | null
   type?: $Enums.coupon_type
-  product: Prisma.productsCreateNestedOneWithoutCouponsInput
+  product?: Prisma.productsCreateNestedOneWithoutCouponsInput
+  category?: Prisma.categoriesCreateNestedOneWithoutCouponsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutCouponsInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutCouponsInput
 }
@@ -981,7 +1170,9 @@ export type couponsCreateWithoutPurchase_itemsInput = {
 export type couponsUncheckedCreateWithoutPurchase_itemsInput = {
   id?: number
   code: string
-  product_id: number
+  product_id?: number | null
+  category_id?: number | null
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -1015,6 +1206,7 @@ export type couponsUpdateToOneWithWhereWithoutPurchase_itemsInput = {
 
 export type couponsUpdateWithoutPurchase_itemsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1026,7 +1218,8 @@ export type couponsUpdateWithoutPurchase_itemsInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
-  product?: Prisma.productsUpdateOneRequiredWithoutCouponsNestedInput
+  product?: Prisma.productsUpdateOneWithoutCouponsNestedInput
+  category?: Prisma.categoriesUpdateOneWithoutCouponsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutCouponsNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutCouponsNestedInput
 }
@@ -1034,7 +1227,9 @@ export type couponsUpdateWithoutPurchase_itemsInput = {
 export type couponsUncheckedUpdateWithoutPurchase_itemsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   code?: Prisma.StringFieldUpdateOperationsInput | string
-  product_id?: Prisma.IntFieldUpdateOperationsInput | number
+  product_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1050,9 +1245,88 @@ export type couponsUncheckedUpdateWithoutPurchase_itemsInput = {
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutCouponsNestedInput
 }
 
+export type couponsCreateManyCategoryInput = {
+  id?: number
+  code: string
+  product_id?: number | null
+  applicability_scope?: $Enums.coupon_applicability_scope
+  discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discount_percentage?: number | null
+  active?: boolean | null
+  starts_at?: Date | string | null
+  expires_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  is_deleted?: boolean | null
+  mongo_id?: string | null
+  type?: $Enums.coupon_type
+}
+
+export type couponsUpdateWithoutCategoryInput = {
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
+  discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  starts_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
+  product?: Prisma.productsUpdateOneWithoutCouponsNestedInput
+  cart_items?: Prisma.cart_itemsUpdateManyWithoutCouponsNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutCouponsNestedInput
+  purchase_items?: Prisma.purchase_itemsUpdateManyWithoutCouponsNestedInput
+}
+
+export type couponsUncheckedUpdateWithoutCategoryInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  product_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
+  discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  starts_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
+  cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutCouponsNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutCouponsNestedInput
+  purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutCouponsNestedInput
+}
+
+export type couponsUncheckedUpdateManyWithoutCategoryInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  product_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
+  discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  starts_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
+}
+
 export type couponsCreateManyProductInput = {
   id?: number
   code: string
+  category_id?: number | null
+  applicability_scope?: $Enums.coupon_applicability_scope
   discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: number | null
   active?: boolean | null
@@ -1068,6 +1342,7 @@ export type couponsCreateManyProductInput = {
 
 export type couponsUpdateWithoutProductInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1079,6 +1354,7 @@ export type couponsUpdateWithoutProductInput = {
   is_deleted?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.Enumcoupon_typeFieldUpdateOperationsInput | $Enums.coupon_type
+  category?: Prisma.categoriesUpdateOneWithoutCouponsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutCouponsNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutCouponsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutCouponsNestedInput
@@ -1087,6 +1363,8 @@ export type couponsUpdateWithoutProductInput = {
 export type couponsUncheckedUpdateWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1106,6 +1384,8 @@ export type couponsUncheckedUpdateWithoutProductInput = {
 export type couponsUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   code?: Prisma.StringFieldUpdateOperationsInput | string
+  category_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  applicability_scope?: Prisma.Enumcoupon_applicability_scopeFieldUpdateOperationsInput | $Enums.coupon_applicability_scope
   discount_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   discount_percentage?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -1172,6 +1452,8 @@ export type couponsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   code?: boolean
   product_id?: boolean
+  category_id?: boolean
+  applicability_scope?: boolean
   discount_amount?: boolean
   discount_percentage?: boolean
   active?: boolean
@@ -1183,7 +1465,8 @@ export type couponsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   is_deleted?: boolean
   mongo_id?: boolean
   type?: boolean
-  product?: boolean | Prisma.productsDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.coupons$productArgs<ExtArgs>
+  category?: boolean | Prisma.coupons$categoryArgs<ExtArgs>
   cart_items?: boolean | Prisma.coupons$cart_itemsArgs<ExtArgs>
   coupon_usages?: boolean | Prisma.coupons$coupon_usagesArgs<ExtArgs>
   purchase_items?: boolean | Prisma.coupons$purchase_itemsArgs<ExtArgs>
@@ -1194,6 +1477,8 @@ export type couponsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   code?: boolean
   product_id?: boolean
+  category_id?: boolean
+  applicability_scope?: boolean
   discount_amount?: boolean
   discount_percentage?: boolean
   active?: boolean
@@ -1205,13 +1490,16 @@ export type couponsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   is_deleted?: boolean
   mongo_id?: boolean
   type?: boolean
-  product?: boolean | Prisma.productsDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.coupons$productArgs<ExtArgs>
+  category?: boolean | Prisma.coupons$categoryArgs<ExtArgs>
 }, ExtArgs["result"]["coupons"]>
 
 export type couponsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   code?: boolean
   product_id?: boolean
+  category_id?: boolean
+  applicability_scope?: boolean
   discount_amount?: boolean
   discount_percentage?: boolean
   active?: boolean
@@ -1223,13 +1511,16 @@ export type couponsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   is_deleted?: boolean
   mongo_id?: boolean
   type?: boolean
-  product?: boolean | Prisma.productsDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.coupons$productArgs<ExtArgs>
+  category?: boolean | Prisma.coupons$categoryArgs<ExtArgs>
 }, ExtArgs["result"]["coupons"]>
 
 export type couponsSelectScalar = {
   id?: boolean
   code?: boolean
   product_id?: boolean
+  category_id?: boolean
+  applicability_scope?: boolean
   discount_amount?: boolean
   discount_percentage?: boolean
   active?: boolean
@@ -1243,25 +1534,29 @@ export type couponsSelectScalar = {
   type?: boolean
 }
 
-export type couponsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "product_id" | "discount_amount" | "discount_percentage" | "active" | "starts_at" | "expires_at" | "created_at" | "updated_at" | "deleted_at" | "is_deleted" | "mongo_id" | "type", ExtArgs["result"]["coupons"]>
+export type couponsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "product_id" | "category_id" | "applicability_scope" | "discount_amount" | "discount_percentage" | "active" | "starts_at" | "expires_at" | "created_at" | "updated_at" | "deleted_at" | "is_deleted" | "mongo_id" | "type", ExtArgs["result"]["coupons"]>
 export type couponsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  product?: boolean | Prisma.productsDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.coupons$productArgs<ExtArgs>
+  category?: boolean | Prisma.coupons$categoryArgs<ExtArgs>
   cart_items?: boolean | Prisma.coupons$cart_itemsArgs<ExtArgs>
   coupon_usages?: boolean | Prisma.coupons$coupon_usagesArgs<ExtArgs>
   purchase_items?: boolean | Prisma.coupons$purchase_itemsArgs<ExtArgs>
   _count?: boolean | Prisma.CouponsCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type couponsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  product?: boolean | Prisma.productsDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.coupons$productArgs<ExtArgs>
+  category?: boolean | Prisma.coupons$categoryArgs<ExtArgs>
 }
 export type couponsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  product?: boolean | Prisma.productsDefaultArgs<ExtArgs>
+  product?: boolean | Prisma.coupons$productArgs<ExtArgs>
+  category?: boolean | Prisma.coupons$categoryArgs<ExtArgs>
 }
 
 export type $couponsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "coupons"
   objects: {
-    product: Prisma.$productsPayload<ExtArgs>
+    product: Prisma.$productsPayload<ExtArgs> | null
+    category: Prisma.$categoriesPayload<ExtArgs> | null
     cart_items: Prisma.$cart_itemsPayload<ExtArgs>[]
     coupon_usages: Prisma.$coupon_usagesPayload<ExtArgs>[]
     purchase_items: Prisma.$purchase_itemsPayload<ExtArgs>[]
@@ -1269,7 +1564,9 @@ export type $couponsPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     code: string
-    product_id: number
+    product_id: number | null
+    category_id: number | null
+    applicability_scope: $Enums.coupon_applicability_scope
     discount_amount: runtime.Decimal | null
     discount_percentage: number | null
     active: boolean | null
@@ -1675,7 +1972,8 @@ readonly fields: couponsFieldRefs;
  */
 export interface Prisma__couponsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  product<T extends Prisma.productsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.productsDefaultArgs<ExtArgs>>): Prisma.Prisma__productsClient<runtime.Types.Result.GetResult<Prisma.$productsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  product<T extends Prisma.coupons$productArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.coupons$productArgs<ExtArgs>>): Prisma.Prisma__productsClient<runtime.Types.Result.GetResult<Prisma.$productsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  category<T extends Prisma.coupons$categoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.coupons$categoryArgs<ExtArgs>>): Prisma.Prisma__categoriesClient<runtime.Types.Result.GetResult<Prisma.$categoriesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   cart_items<T extends Prisma.coupons$cart_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.coupons$cart_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$cart_itemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   coupon_usages<T extends Prisma.coupons$coupon_usagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.coupons$coupon_usagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$coupon_usagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   purchase_items<T extends Prisma.coupons$purchase_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.coupons$purchase_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchase_itemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1711,6 +2009,8 @@ export interface couponsFieldRefs {
   readonly id: Prisma.FieldRef<"coupons", 'Int'>
   readonly code: Prisma.FieldRef<"coupons", 'String'>
   readonly product_id: Prisma.FieldRef<"coupons", 'Int'>
+  readonly category_id: Prisma.FieldRef<"coupons", 'Int'>
+  readonly applicability_scope: Prisma.FieldRef<"coupons", 'coupon_applicability_scope'>
   readonly discount_amount: Prisma.FieldRef<"coupons", 'Decimal'>
   readonly discount_percentage: Prisma.FieldRef<"coupons", 'Int'>
   readonly active: Prisma.FieldRef<"coupons", 'Boolean'>
@@ -2124,6 +2424,44 @@ export type couponsDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many coupons to delete.
    */
   limit?: number
+}
+
+/**
+ * coupons.product
+ */
+export type coupons$productArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the products
+   */
+  select?: Prisma.productsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the products
+   */
+  omit?: Prisma.productsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.productsInclude<ExtArgs> | null
+  where?: Prisma.productsWhereInput
+}
+
+/**
+ * coupons.category
+ */
+export type coupons$categoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the categories
+   */
+  select?: Prisma.categoriesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the categories
+   */
+  omit?: Prisma.categoriesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.categoriesInclude<ExtArgs> | null
+  where?: Prisma.categoriesWhereInput
 }
 
 /**

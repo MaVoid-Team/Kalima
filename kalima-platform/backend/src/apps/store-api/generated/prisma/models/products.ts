@@ -624,6 +624,11 @@ export type ProductsScalarRelationFilter = {
   isNot?: Prisma.productsWhereInput
 }
 
+export type ProductsNullableScalarRelationFilter = {
+  is?: Prisma.productsWhereInput | null
+  isNot?: Prisma.productsWhereInput | null
+}
+
 export type productsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
@@ -698,11 +703,6 @@ export type productsSumOrderByAggregateInput = {
   thumbnail_id?: Prisma.SortOrder
 }
 
-export type ProductsNullableScalarRelationFilter = {
-  is?: Prisma.productsWhereInput | null
-  isNot?: Prisma.productsWhereInput | null
-}
-
 export type ProductsListRelationFilter = {
   every?: Prisma.productsWhereInput
   some?: Prisma.productsWhereInput
@@ -733,10 +733,12 @@ export type productsCreateNestedOneWithoutCouponsInput = {
   connect?: Prisma.productsWhereUniqueInput
 }
 
-export type productsUpdateOneRequiredWithoutCouponsNestedInput = {
+export type productsUpdateOneWithoutCouponsNestedInput = {
   create?: Prisma.XOR<Prisma.productsCreateWithoutCouponsInput, Prisma.productsUncheckedCreateWithoutCouponsInput>
   connectOrCreate?: Prisma.productsCreateOrConnectWithoutCouponsInput
   upsert?: Prisma.productsUpsertWithoutCouponsInput
+  disconnect?: Prisma.productsWhereInput | boolean
+  delete?: Prisma.productsWhereInput | boolean
   connect?: Prisma.productsWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.productsUpdateToOneWithWhereWithoutCouponsInput, Prisma.productsUpdateWithoutCouponsInput>, Prisma.productsUncheckedUpdateWithoutCouponsInput>
 }

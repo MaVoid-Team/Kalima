@@ -621,7 +621,7 @@
   },
   "coupons": {
     "title": "Coupons Management",
-    "subtitle": "Create, edit, and manage product coupons",
+    "subtitle": "Create, edit, and manage product and category coupons",
     "totalCoupons": "{{count}} coupons",
     "searchPlaceholder": "Search by code...",
     "empty": "No coupons found.",
@@ -645,6 +645,10 @@
         "placeholder": "Filter by product",
         "clear": "Clear"
       },
+      "category": {
+        "placeholder": "Filter by category",
+        "clear": "Clear"
+      },
       "type": {
         "label": "Type",
         "all": "All types",
@@ -662,6 +666,10 @@
       "percentage": "Percentage",
       "amount": "Amount"
     },
+    "scope": {
+      "product": "Product",
+      "category": "Category"
+    },
     "status": {
       "active": "Active",
       "inactive": "Inactive"
@@ -678,6 +686,7 @@
       "discountType": "Discount Type",
       "discountValue": "Discount Value",
       "productId": "Product ID",
+      "appliesTo": "Applies To",
       "dates": "Dates",
       "createdAt": "Created At",
       "startsAt": "Starts At",
@@ -696,8 +705,13 @@
         "percentage": "%",
         "amount": "L.E"
       },
+      "appliesTo": "Applies To",
+      "appliesToPlaceholder": "Choose coupon target",
       "productId": "Product ID",
       "productIdPlaceholder": "Please click on 'Pick Product' to select a product",
+      "categoryId": "Category",
+      "categoryIdPlaceholder": "Select a category or subcategory",
+      "categoryScopeHint": "Applies to products in this category and its subcategories.",
       "startsAt": "Starts At",
       "startsAtPlaceholder": "Pick a start date",
       "expiresAt": "Expires At",
@@ -755,6 +769,7 @@
       "codeFormat": "Code must contain only uppercase letters, numbers, and hyphens",
       "discountTypeRequired": "Discount type is required",
       "productRequired": "Product ID is required",
+      "categoryRequired": "Category is required",
       "startsAtRequired": "Start date is required",
       "startsAtBeforeExpiresAt": "Start date must be before expiration date",
       "expiresAtRequired": "Expiration date is required",

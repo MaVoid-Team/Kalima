@@ -33,6 +33,19 @@ const E_BOOKLET_ORDER_TEACHER_TARGET_LINK = "/e-booklet-orders";
 const E_BOOKLET_ORDER_ADMIN_ROLES = ["Admin", "SubAdmin", "Moderator"] as const;
 const DEFAULT_E_BOOKLET_PREVIEW_PAGE_LIMIT = 10;
 const MAX_E_BOOKLET_PREVIEW_PAGE_LIMIT = 200;
+const DEFAULT_E_BOOKLET_GLOBAL_SETTINGS = {
+  default_invite_quota: 0,
+  default_access_duration_days: null,
+  default_invite_expiration_days: null,
+  default_delivery_notes: null,
+  default_student_marketing_price: 0,
+  default_internal_price: 0,
+  default_allowed_devices_per_student: 1,
+  default_allowed_devices_per_teacher: 2,
+  device_reset_policy: null,
+  notify_admins_on_delivery: true,
+  notify_teacher_on_delivery: true,
+};
 
 export type EBookletPurchaseListFilters = {
   status?: string;
@@ -318,7 +331,11 @@ async function extractPdfMetadata(
   if (file.mimetype !== "application/pdf") return null;
 
   try {
-    const document = await PDFDocument.load(file.buffer, {
+    const buffer = file.buffer || (file.path ? await fsPromises.readFile(file.path) : undefined);
+    if (!buffer) {
+      throw new Error("Missing PDF upload buffer");
+    }
+    const document = await PDFDocument.load(buffer, {
       ignoreEncryption: true,
       updateMetadata: false,
     });
@@ -337,6 +354,15 @@ async function extractPdfMetadata(
     throw new BadRequestError(
       "The uploaded PDF could not be read. Please upload a valid PDF file.",
     );
+  }
+}
+
+async function removeUploadedTempFile(file?: Express.Multer.File): Promise<void> {
+  if (!file?.path) return;
+  try {
+    await fsPromises.unlink(file.path);
+  } catch {
+    // Best-effort cleanup only.
   }
 }
 
@@ -491,6 +517,23 @@ export class EBookletService {
 
   constructor(private readonly db: EBookletDb = resolveDefaultPrisma()) {}
 
+  private async getGlobalSettings(db: EBookletDb = this.db): Promise<any> {
+    if (!db.e_booklet_global_settings?.upsert) return DEFAULT_E_BOOKLET_GLOBAL_SETTINGS;
+    const settings = await db.e_booklet_global_settings.upsert({
+      where: { id: 1 },
+      create: { id: 1, ...DEFAULT_E_BOOKLET_GLOBAL_SETTINGS },
+      update: {},
+    });
+    return { ...DEFAULT_E_BOOKLET_GLOBAL_SETTINGS, ...settings };
+  }
+
+  private addDaysFromNow(days: unknown): Date | undefined {
+    if (days === null || days === undefined || days === "") return undefined;
+    const numeric = Number(days);
+    if (!Number.isInteger(numeric) || numeric < 0) return undefined;
+    return new Date(Date.now() + numeric * 24 * 60 * 60 * 1000);
+  }
+
   private async transaction<T>(
     callback: (tx: EBookletDb) => Promise<T>,
     options?: Record<string, unknown>,
@@ -553,6 +596,9 @@ export class EBookletService {
 
     try {
       const liveNotifications: EBookletLiveNotification[] = [];
+      const settings = await this.getGlobalSettings(db);
+      const notifyTeacher = settings.notify_teacher_on_delivery !== false;
+      const notifyAdmins = settings.notify_admins_on_delivery !== false;
       const adminTargetLink = `/admin/e-booklets/orders/${purchase.id}`;
       const teacherWhere = {
         user_id: purchase.teacher_id,
@@ -561,7 +607,7 @@ export class EBookletService {
         entity_id: purchase.id,
       };
       const existingTeacherNotification = await db.notifications.findFirst?.({ where: teacherWhere, select: { id: true } });
-      if (!existingTeacherNotification) {
+      if (notifyTeacher && !existingTeacherNotification) {
         try {
           const teacherNotification = await db.notifications.create({
             data: {
@@ -581,7 +627,7 @@ export class EBookletService {
         }
       }
 
-      const admins = await db.users?.findMany?.({
+      const admins = notifyAdmins ? await db.users?.findMany?.({
         where: {
           user_roles: {
             some: { portal: "store", role: { in: [...E_BOOKLET_ORDER_ADMIN_ROLES] } },
@@ -589,7 +635,7 @@ export class EBookletService {
           OR: [{ is_deleted: false }, { is_deleted: null }],
         },
         select: { id: true },
-      });
+      }) : [];
       const adminIds: number[] = Array.from(new Set<number>((admins ?? []).map((admin: any) => Number(admin.id)).filter((id: number) => Number.isInteger(id) && id > 0)));
       if (adminIds.length > 0) {
         const existingAdminNotifications = await db.notifications.findMany?.({
@@ -899,11 +945,13 @@ export class EBookletService {
 
     const inferredFileType = MIME_TO_FILE_TYPE[file.mimetype];
     if (input.fileType === "document" && file.mimetype !== "application/pdf") {
+      await removeUploadedTempFile(file);
       throw new BadRequestError(
         `Invalid document type: ${file.mimetype}. Allowed: PDF only`,
       );
     }
     if (!inferredFileType) {
+      await removeUploadedTempFile(file);
       throw new BadRequestError(`Unsupported e-booklet file type: ${file.mimetype}`);
     }
     const requestedFileType = input.fileType === "document" ? "pdf" : input.fileType;
@@ -915,6 +963,7 @@ export class EBookletService {
         : inferredFileType;
     const fileType = requestedFileType || inferredStorageType;
     if (fileType !== inferredStorageType) {
+      await removeUploadedTempFile(file);
       throw new BadRequestError(
         `Uploaded MIME type ${file.mimetype} must be stored as e-booklet file_type=${inferredStorageType}.`,
       );
@@ -923,6 +972,7 @@ export class EBookletService {
     const originalExt = path.extname(file.originalname).toLowerCase();
     const allowedExts = MIME_ALLOWED_EXTS[file.mimetype];
     if (allowedExts && originalExt && !allowedExts.includes(originalExt)) {
+      await removeUploadedTempFile(file);
       throw new BadRequestError(
         `File extension ${originalExt} does not match uploaded MIME type ${file.mimetype}.`,
       );
@@ -939,27 +989,44 @@ export class EBookletService {
     const uniqueId = `${Date.now()}-${crypto.randomBytes(8).toString("hex")}`;
     const filename = `${uniqueId}-${safeBase || "ebooklet"}${ext}`;
     const storageKey = `e-booklets/private/${filename}`;
+    const finalPath = path.join(E_BOOKLET_UPLOAD_DIR, filename);
 
     await this.ensureFileStorageDir();
-    const metadata = await extractPdfMetadata(file);
-    await fsPromises.writeFile(path.join(E_BOOKLET_UPLOAD_DIR, filename), file.buffer);
+    try {
+      const metadata = await extractPdfMetadata(file);
+      if (file.path) {
+        await fsPromises.rename(file.path, finalPath);
+      } else if (file.buffer) {
+        await fsPromises.writeFile(finalPath, file.buffer);
+      } else {
+        throw new BadRequestError("No e-booklet file was uploaded.");
+      }
 
-    const asset = await this.db.e_booklet_file_assets.create({
-      data: {
-        owner_type: input.ownerType || "admin",
-        owner_id: input.ownerId ?? null,
-        file_type: fileType,
-        storage_key: storageKey,
-        original_filename: file.originalname,
-        mime_type: file.mimetype,
-        size_bytes: file.size,
-        visibility: "private",
-      },
-    });
-    if (file.mimetype === "application/pdf") {
-      await this.ensurePagePreviews(asset).catch(() => undefined);
+      const asset = await this.db.e_booklet_file_assets.create({
+        data: {
+          owner_type: input.ownerType || "admin",
+          owner_id: input.ownerId ?? null,
+          file_type: fileType,
+          storage_key: storageKey,
+          original_filename: file.originalname,
+          mime_type: file.mimetype,
+          size_bytes: file.size,
+          visibility: "private",
+        },
+      });
+      if (file.mimetype === "application/pdf") {
+        await this.ensurePagePreviews(asset).catch(() => undefined);
+      }
+      return metadata ? { ...asset, metadata } : asset;
+    } catch (error) {
+      await removeUploadedTempFile(file);
+      try {
+        await fsPromises.unlink(finalPath);
+      } catch {
+        // Best-effort cleanup only.
+      }
+      throw error;
     }
-    return metadata ? { ...asset, metadata } : asset;
   }
 
   async getPrivateFileAssetForAdmin(
@@ -1146,12 +1213,22 @@ export class EBookletService {
           where: { status: "active" },
           orderBy: { version_number: "desc" },
           take: 1,
-          include: { _count: { select: { hotspots: true } } },
+          include: {
+            _count: { select: { hotspots: true } },
+            hotspots: {
+              where: { is_active: true },
+              orderBy: [
+                { page_number: "asc" },
+                { sort_order: "asc" },
+                { created_at: "asc" },
+              ],
+            },
+          },
         },
       },
     });
     if (!template) throw new NotFoundError("E-booklet template not found");
-    return enrichTemplateWithReleaseInfo(template);
+    return enrichTemplateWithReleaseInfo(this.normalizeTemplateVersionHotspots(template));
   }
 
   private normalizePreviewPageLimit(value: unknown): number {
@@ -1315,12 +1392,22 @@ export class EBookletService {
           where: { status: "active" },
           orderBy: { version_number: "desc" },
           take: 1,
-          include: { _count: { select: { hotspots: true } } },
+          include: {
+            _count: { select: { hotspots: true } },
+            hotspots: {
+              where: { is_active: true },
+              orderBy: [
+                { page_number: "asc" },
+                { sort_order: "asc" },
+                { created_at: "asc" },
+              ],
+            },
+          },
         },
       },
     });
     if (!template) throw new NotFoundError("E-booklet template not found");
-    return enrichTemplateWithReleaseInfo(template);
+    return enrichTemplateWithReleaseInfo(this.normalizeTemplateVersionHotspots(template));
   }
 
   async listAdminTemplates(filters: {
@@ -1880,6 +1967,19 @@ export class EBookletService {
     return {
       ...hotspot,
       content_json: this.normalizeLegacyHotspotContent(hotspot),
+    };
+  }
+
+  private normalizeTemplateVersionHotspots(template: any): any {
+    if (!template || !Array.isArray(template.versions)) return template;
+    return {
+      ...template,
+      versions: template.versions.map((version: any) => ({
+        ...version,
+        hotspots: Array.isArray(version.hotspots)
+          ? version.hotspots.map((hotspot: any) => this.normalizeHotspotRecord(hotspot))
+          : version.hotspots,
+      })),
     };
   }
 
@@ -2821,13 +2921,17 @@ export class EBookletService {
     if (!["paid", "ready"].includes(String(purchase.status))) {
       throw new BadRequestError("Payment must be approved before delivering the e-booklet.");
     }
-    if (!dto.access_expires_at) {
+    const settings = await this.getGlobalSettings();
+    const accessExpiresAt = dto.access_expires_at
+      ? new Date(dto.access_expires_at)
+      : this.addDaysFromNow(settings.default_access_duration_days);
+    if (!accessExpiresAt) {
       throw new BadRequestError("Access expiry is required for delivered e-booklets.");
     }
 
     const { marketingPrice, internalPrice } = this.validateInstancePricing({
-      marketing_price: dto.student_marketing_price ?? purchase.marketing_price ?? purchase.price ?? 0,
-      internal_price: dto.internal_price ?? purchase.internal_price ?? 0,
+      marketing_price: dto.student_marketing_price ?? purchase.marketing_price ?? purchase.price ?? settings.default_student_marketing_price ?? 0,
+      internal_price: dto.internal_price ?? purchase.internal_price ?? settings.default_internal_price ?? 0,
     });
 
     await this.validateTeacherDocumentForDelivery({
@@ -2848,8 +2952,8 @@ export class EBookletService {
         custom_document_file_id: dto.custom_document_file_id,
         display_title: dto.display_title,
         branding_json: purchase.branding_json,
-        invite_quota: dto.invite_quota,
-        access_expires_at: dto.access_expires_at ? new Date(dto.access_expires_at) : undefined,
+        invite_quota: dto.invite_quota ?? settings.default_invite_quota ?? 0,
+        access_expires_at: accessExpiresAt,
         student_marketing_price: marketingPrice,
         internal_price: internalPrice,
         status: "active",
@@ -2882,7 +2986,11 @@ export class EBookletService {
 
       await tx.e_booklet_purchases.update({
         where: { id: purchase.id },
-        data: { status: "delivered", updated_at: new Date() },
+        data: {
+          status: "delivered",
+          admin_notes: purchase.admin_notes ?? settings.default_delivery_notes ?? undefined,
+          updated_at: new Date(),
+        },
       });
 
       await tx.e_booklet_audit_logs.create({
@@ -2949,6 +3057,8 @@ export class EBookletService {
     uniqueInstanceIds.forEach((id) => rowsByInstance.set(id, []));
     if (uniqueInstanceIds.length === 0) return rowsByInstance;
 
+    const settings = await this.getGlobalSettings();
+    const defaultAllowedStudentDevices = Number(settings.default_allowed_devices_per_student ?? 1);
     const accessRows = await this.db.e_booklet_access.findMany({
       where: { booklet_instance_id: { in: uniqueInstanceIds }, role: "student", status: "active" },
       include: { user: { select: { id: true, name: true, email: true } } },
@@ -3030,7 +3140,7 @@ export class EBookletService {
       const analyticsSummary = analyticsByKey.get(key) || { invite_opened: 0, access_created: 0, viewer_opened: 0, page_viewed: 0, device_bound: 0, source: row.access_source ?? null, marketing_price_snapshot: null };
       rowsByInstance.get(instanceId)?.push(this.sanitizeViewerAccess({
         ...row,
-        devices_summary: { ...devicesSummary, allowed_devices: allowanceByKey.get(key) ?? 1 },
+        devices_summary: { ...devicesSummary, allowed_devices: allowanceByKey.get(key) ?? defaultAllowedStudentDevices },
         analytics_summary: analyticsSummary,
         purchase_reference: purchaseReferenceByKey.get(key) || null,
       }));
@@ -3084,6 +3194,10 @@ export class EBookletService {
       ? String(crypto.randomInt(0, 1_000_000)).padStart(6, "0")
       : undefined;
     const passcode = dto.passcode ?? generatedPasscode;
+    const settings = await this.getGlobalSettings();
+    const expiresAt = dto.expires_at
+      ? new Date(dto.expires_at)
+      : this.addDaysFromNow(settings.default_invite_expiration_days);
     const invite = await this.db.e_booklet_invites.create({
       data: {
         booklet_instance_id: instanceId,
@@ -3094,7 +3208,7 @@ export class EBookletService {
         passcode_ciphertext: passcode ? encryptInvitePasscode(passcode) : undefined,
         passcode_hint: dto.passcode_hint,
         max_uses: dto.max_uses,
-        expires_at: dto.expires_at ? new Date(dto.expires_at) : undefined,
+        expires_at: expiresAt,
         status: "active",
       },
       select: {
@@ -3310,14 +3424,7 @@ export class EBookletService {
     },
   ) {
     const access = await this.assertViewerAccess(instanceId, userId);
-    if ((access as any).role === "teacher") {
-      return {
-        booklet_instance_id: instanceId,
-        user_id: userId,
-        status: "allowed",
-        binding_exempt: true,
-      };
-    }
+    const settings = await this.getGlobalSettings();
     return this.serializableTransaction(async (tx: EBookletDb) => {
       const existing = await tx.e_booklet_devices.findFirst({
         where: {
@@ -3346,7 +3453,10 @@ export class EBookletService {
           },
         },
       });
-      const allowedDevices = Number(allowance?.allowed_devices ?? 1);
+      const defaultAllowedDevices = (access as any).role === "teacher"
+        ? settings.default_allowed_devices_per_teacher
+        : settings.default_allowed_devices_per_student;
+      const allowedDevices = Number(allowance?.allowed_devices ?? defaultAllowedDevices ?? 1);
       const activeCount = await tx.e_booklet_devices.count({
         where: { booklet_instance_id: instanceId, user_id: userId, status: "active" },
       });
@@ -3432,6 +3542,7 @@ export class EBookletService {
     reason?: string,
   ) {
     const normalizedReason = requireDeviceAdminReason(reason);
+    const settings = await this.getGlobalSettings();
     const result = await this.db.e_booklet_devices.updateMany({
       where: { booklet_instance_id: instanceId, user_id: userId, status: "active" },
       data: {
@@ -3446,7 +3557,12 @@ export class EBookletService {
       action: "viewer_devices_reset",
       entity_type: "e_booklet_instance",
       entity_id: instanceId,
-      metadata_json: { user_id: userId, reason: normalizedReason, reset_count: result?.count ?? 0 },
+      metadata_json: {
+        user_id: userId,
+        reason: normalizedReason,
+        reset_count: result?.count ?? 0,
+        device_reset_policy: settings.device_reset_policy ?? null,
+      },
     });
     return result;
   }

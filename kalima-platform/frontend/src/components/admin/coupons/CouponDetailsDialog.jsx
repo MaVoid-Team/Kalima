@@ -12,7 +12,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { getDiscountType, formatDiscount } from '@/lib/couponUtils';
+import { getDiscountType, formatDiscount, formatCouponApplicability } from '@/lib/couponUtils';
 
 const formatDateValue = (value, isRtl) => {
     if (!value) return '—';
@@ -57,8 +57,8 @@ export default function CouponDetailsDialog({ open, onOpenChange, coupon }) {
                         </div>
 
                         <div className="flex items-center justify-between rounded-md border p-2">
-                            <span className="text-muted-foreground">{t('coupons.table.productId')}</span>
-                            <span className="font-medium">{coupon.product_id || '—'}</span>
+                            <span className="text-muted-foreground">{t('coupons.table.appliesTo')}</span>
+                            <span className="font-medium">{formatCouponApplicability(coupon, t)}</span>
                         </div>
 
                         <div className="flex items-center justify-between rounded-md border p-2">

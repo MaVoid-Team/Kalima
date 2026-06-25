@@ -29,6 +29,12 @@ const getHotspotCount = (template, version) => {
   );
 };
 
+const getHotspots = (template, version) => {
+  if (Array.isArray(version?.hotspots)) return version.hotspots;
+  if (Array.isArray(template?.hotspots)) return template.hotspots;
+  return [];
+};
+
 const getInstanceTemplate = (instance) => instance?.template || instance;
 
 const getInstanceVersion = (instance, template) =>
@@ -78,6 +84,7 @@ export const normalizeEBookletTemplate = (template) => {
       0,
     ),
     hotspotCount: parseNumber(getHotspotCount(sourceTemplate, activeVersion), 0),
+    hotspots: getHotspots(sourceTemplate, activeVersion),
     price: parseNumber(template?.student_marketing_price ?? template?.price, 0),
     currency: template?.currency || sourceTemplate?.currency || "EGP",
     title: sourceTemplate?.title || template?.title,

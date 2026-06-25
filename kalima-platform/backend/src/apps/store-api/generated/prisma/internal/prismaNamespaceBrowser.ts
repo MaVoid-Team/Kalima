@@ -118,6 +118,7 @@ export const ModelName = {
   e_booklet_student_purchase_links: 'e_booklet_student_purchase_links',
   e_booklet_invite_redemptions: 'e_booklet_invite_redemptions',
   e_booklet_file_assets: 'e_booklet_file_assets',
+  e_booklet_page_previews: 'e_booklet_page_previews',
   e_booklet_audit_logs: 'e_booklet_audit_logs',
   e_booklet_analytics_events: 'e_booklet_analytics_events',
   product_gallery: 'product_gallery',
@@ -439,6 +440,8 @@ export const CouponsScalarFieldEnum = {
   id: 'id',
   code: 'code',
   product_id: 'product_id',
+  category_id: 'category_id',
+  applicability_scope: 'applicability_scope',
   discount_amount: 'discount_amount',
   discount_percentage: 'discount_percentage',
   active: 'active',
@@ -903,6 +906,7 @@ export const E_booklet_global_settingsScalarFieldEnum = {
   require_terms_for_code_generation: 'require_terms_for_code_generation',
   default_allowed_devices_per_student: 'default_allowed_devices_per_student',
   default_allowed_devices_per_teacher: 'default_allowed_devices_per_teacher',
+  preview_page_limit: 'preview_page_limit',
   device_reset_policy: 'device_reset_policy',
   notify_admins_on_delivery: 'notify_admins_on_delivery',
   notify_teacher_on_delivery: 'notify_teacher_on_delivery',
@@ -1171,6 +1175,23 @@ export const E_booklet_file_assetsScalarFieldEnum = {
 } as const
 
 export type E_booklet_file_assetsScalarFieldEnum = (typeof E_booklet_file_assetsScalarFieldEnum)[keyof typeof E_booklet_file_assetsScalarFieldEnum]
+
+
+export const E_booklet_page_previewsScalarFieldEnum = {
+  id: 'id',
+  document_file_id: 'document_file_id',
+  template_version_id: 'template_version_id',
+  page_number: 'page_number',
+  image_file_id: 'image_file_id',
+  width_px: 'width_px',
+  height_px: 'height_px',
+  format: 'format',
+  size_key: 'size_key',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_page_previewsScalarFieldEnum = (typeof E_booklet_page_previewsScalarFieldEnum)[keyof typeof E_booklet_page_previewsScalarFieldEnum]
 
 
 export const E_booklet_audit_logsScalarFieldEnum = {

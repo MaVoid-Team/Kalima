@@ -34,9 +34,11 @@ export default function CouponsPage() {
         setActive,
         setDiscountType,
         setProductFilter,
+        setCategoryFilter,
         setStartDate,
         setEndDate,
         clearProductFilter,
+        clearCategoryFilter,
         setPage,
         getCouponsStats,
         createCoupon,
@@ -117,6 +119,7 @@ export default function CouponsPage() {
             filters:{
                 active: filters.active === 'all' ? undefined : filters.active == "true" ? true : false,
                 product_id: filters.product_id || undefined,
+                category_id: filters.category_id || undefined,
                 isAmount: filters.discount_type === 'AMOUNT'
                     ? 1
                     : filters.discount_type === 'PERCENTAGE' ? 0 : undefined,
@@ -254,6 +257,8 @@ export default function CouponsPage() {
                 onProductPageChange={setProductPage}
                 onProductFilterChange={(product) => setProductFilter(getProductId(product))}
                 onProductFilterClear={clearProductFilter}
+                onCategoryFilterChange={setCategoryFilter}
+                onCategoryFilterClear={clearCategoryFilter}
             />
 
             <CouponsTable

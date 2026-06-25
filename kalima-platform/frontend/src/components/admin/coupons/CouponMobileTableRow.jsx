@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { TableCell, TableRow } from '@/components/ui/table';
 import CouponMobileActions from '@/components/admin/coupons/CouponMobileActions';
-import { getDiscountType, getCouponId, isCouponActive, formatDiscount } from '@/lib/couponUtils';
+import { getDiscountType, getCouponId, isCouponActive, formatDiscount, formatCouponApplicability } from '@/lib/couponUtils';
 
 export default function CouponMobileTableRow({ coupon, onEdit, onDelete, onToggleActivation }) {
     const { t, i18n } = useTranslation('admin');
@@ -48,7 +48,7 @@ export default function CouponMobileTableRow({ coupon, onEdit, onDelete, onToggl
                     </div>
 
                     <p className="text-[11px] text-muted-foreground truncate">
-                        {t('coupons.table.productId')}: <span className="text-foreground font-medium">{coupon.product_id || '—'}</span>
+                        {t('coupons.table.appliesTo')}: <span className="text-foreground font-medium">{formatCouponApplicability(coupon, t)}</span>
                     </p>
                 </div>
             </TableCell>

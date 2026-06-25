@@ -490,6 +490,65 @@ describe("EBookletService", () => {
       expect(db.e_booklet_invites.create.mock.calls[0][0].data.passcode_ciphertext).not.toBe("123456");
     });
 
+    test("delivery and invites use global defaults when optional values are omitted", async () => {
+      const db = createMockDb({
+        e_booklet_global_settings: {
+          upsert: jest.fn().mockResolvedValue({
+            default_invite_quota: 7,
+            default_access_duration_days: 30,
+            default_invite_expiration_days: 5,
+            default_delivery_notes: "Default delivery note",
+          }),
+        },
+      });
+      db.e_booklet_purchases.findUnique.mockResolvedValue({
+        id: 2,
+        teacher_id: 9,
+        template_id: 3,
+        template_version_id: 4,
+        branding_json: { name: "Teacher" },
+        price: 120,
+        marketing_price: 150,
+        internal_price: 70,
+        admin_notes: null,
+        status: "paid",
+        instances: [],
+      });
+      db.e_booklet_template_versions.findUnique.mockResolvedValue({ id: 4, page_count: 2, page_dimensions_json: null });
+      db.e_booklet_instances.create.mockResolvedValue({ id: 10 });
+      db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, status: "active" });
+      db.e_booklet_invites.create.mockImplementation(async (args: any) => ({
+        id: 12,
+        booklet_instance_id: 10,
+        teacher_id: 9,
+        used_count: 0,
+        status: "active",
+        created_at: new Date("2026-06-10T00:00:00.000Z"),
+        ...args.data,
+      }));
+      const service = new EBookletService(db);
+
+      await service.deliverPurchase(2, {
+        custom_document_file_id: 99,
+        display_title: "Delivered",
+        page_count: 2,
+      }, 1);
+      await service.createInvite(10, 9, {});
+
+      expect(db.e_booklet_instances.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({
+          invite_quota: 7,
+          access_expires_at: expect.any(Date),
+        }),
+      }));
+      expect(db.e_booklet_purchases.update).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ admin_notes: "Default delivery note" }),
+      }));
+      expect(db.e_booklet_invites.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ expires_at: expect.any(Date) }),
+      }));
+    });
+
     test("uses marketing price as the teacher purchase price when admin deal omits or zeroes price", async () => {
       const db = createMockDb();
       db.e_booklet_purchases.create.mockResolvedValue({ id: 2, price: 175, marketing_price: 175 });
@@ -838,6 +897,68 @@ describe("EBookletService", () => {
       expect(result.internal_price).toBeUndefined();
       await expect(service.getPublicInstance(99)).rejects.toThrow("E-booklet instance not found");
     });
+
+    test("public store template detail includes active hotspots for sample viewing", async () => {
+      const db = createMockDb();
+      db.e_booklet_templates.findFirst.mockResolvedValue({
+        id: 3,
+        title: "Grade 5 Arabic",
+        status: "published",
+        versions: [
+          {
+            id: 8,
+            status: "active",
+            page_count: 3,
+            _count: { hotspots: 1 },
+            hotspots: [
+              {
+                id: 77,
+                page_number: 2,
+                type: "text",
+                title: "Vocabulary",
+                text_content: "Read these words",
+                content_json: null,
+                is_active: true,
+              },
+            ],
+          },
+        ],
+      });
+
+      const service = new EBookletService(db);
+      const result: any = await service.getPublishedTemplateById(3);
+
+      expect(db.e_booklet_templates.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+        where: { id: 3, status: "published" },
+        include: expect.objectContaining({
+          versions: expect.objectContaining({
+            include: expect.objectContaining({
+              _count: { select: { hotspots: true } },
+              hotspots: expect.objectContaining({
+                where: { is_active: true },
+                orderBy: [
+                  { page_number: "asc" },
+                  { sort_order: "asc" },
+                  { created_at: "asc" },
+                ],
+              }),
+            }),
+          }),
+        }),
+      }));
+      expect(result.versions[0].page_count).toBe(3);
+      expect(result.versions[0].hotspots).toEqual([
+        expect.objectContaining({
+          id: 77,
+          page_number: 2,
+          content_json: {
+            version: 2,
+            blocks: [{ type: "text", text_content: "Read these words" }],
+          },
+        }),
+      ]);
+    });
+
     test("lists teacher e-booklet orders from teacher purchases, not student order links", async () => {
       const db = createMockDb();
       db.e_booklet_purchases.findMany.mockResolvedValue([
@@ -1922,8 +2043,12 @@ describe("EBookletService", () => {
       }));
     });
 
-    test("allows teacher-owned e-booklets without binding a viewer device", async () => {
-      const db = createMockDb();
+    test("teacher-owned e-booklets use the configured teacher device allowance", async () => {
+      const db = createMockDb({
+        e_booklet_global_settings: {
+          upsert: jest.fn().mockResolvedValue({ default_allowed_devices_per_teacher: 2 }),
+        },
+      });
       db.e_booklet_access.findFirst.mockResolvedValue({
         id: 9,
         user_id: 55,
@@ -1931,19 +2056,16 @@ describe("EBookletService", () => {
         status: "active",
         booklet_instance: { id: 10, purchase_id: 91, status: "active", access_expires_at: new Date("2026-12-31T00:00:00.000Z"), purchase: { id: 91, status: "delivered" } },
       });
+      db.e_booklet_devices.findFirst.mockResolvedValue(null);
+      db.e_booklet_devices.count.mockResolvedValue(1);
+      db.e_booklet_device_allowances.findUnique.mockResolvedValue(null);
+      db.e_booklet_devices.create.mockResolvedValue({ id: 2, device_fingerprint: "dev-2" });
       const service = new EBookletService(db);
 
-      await expect(service.bindViewerDevice(10, 55, { deviceFingerprint: "dev-2" })).resolves.toEqual({
-        booklet_instance_id: 10,
-        user_id: 55,
-        status: "allowed",
-        binding_exempt: true,
-      });
+      await expect(service.bindViewerDevice(10, 55, { deviceFingerprint: "dev-2" })).resolves.toEqual({ id: 2, device_fingerprint: "dev-2" });
 
-      expect(db.$transaction).not.toHaveBeenCalled();
-      expect(db.e_booklet_devices.findFirst).not.toHaveBeenCalled();
-      expect(db.e_booklet_devices.count).not.toHaveBeenCalled();
-      expect(db.e_booklet_devices.create).not.toHaveBeenCalled();
+      expect(db.$transaction).toHaveBeenCalledWith(expect.any(Function), { isolationLevel: "Serializable" });
+      expect(db.e_booklet_devices.create).toHaveBeenCalled();
     });
 
     test("allows the same active device again and can list safe active viewer devices", async () => {
@@ -1997,6 +2119,28 @@ describe("EBookletService", () => {
           metadata: expect.objectContaining({ device_label_present: false }),
         }),
       });
+    });
+
+    test("student device binding uses configured default device allowance", async () => {
+      const db = createMockDb({
+        e_booklet_global_settings: {
+          upsert: jest.fn().mockResolvedValue({ default_allowed_devices_per_student: 2 }),
+        },
+      });
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 9,
+        status: "active",
+        access_source: "offline_passcode",
+        booklet_instance: { id: 10, status: "active", access_expires_at: new Date("2026-12-31T00:00:00.000Z"), teacher_id: 9, template_id: 3 },
+      });
+      db.e_booklet_devices.findFirst.mockResolvedValue(null);
+      db.e_booklet_devices.count.mockResolvedValue(1);
+      db.e_booklet_device_allowances.findUnique.mockResolvedValue(null);
+      db.e_booklet_devices.create.mockResolvedValue({ id: 2, device_fingerprint: "dev-2" });
+      const service = new EBookletService(db);
+
+      await expect(service.bindViewerDevice(10, 55, { deviceFingerprint: "dev-2" })).resolves.toEqual({ id: 2, device_fingerprint: "dev-2" });
+      expect(db.e_booklet_devices.create).toHaveBeenCalled();
     });
 
     test("admin can reset devices and grant an additional-device allowance", async () => {

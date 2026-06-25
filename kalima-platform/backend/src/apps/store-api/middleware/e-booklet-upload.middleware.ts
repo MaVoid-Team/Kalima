@@ -1,6 +1,8 @@
 import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
 import path from "path";
+import fs from "fs";
+import crypto from "crypto";
 import { BadRequestError } from "../../../libs/errors";
 
 const DOCUMENT_MIME_TYPES = new Set([
@@ -81,7 +83,30 @@ function hasAllowedExtension(file: Express.Multer.File): boolean {
   return !allowed || !ext || allowed.includes(ext);
 }
 
-const storage = multer.memoryStorage();
+const E_BOOKLET_UPLOAD_ROOT = path.resolve(
+  process.env.E_BOOKLET_UPLOAD_DIR || process.cwd(),
+  process.env.E_BOOKLET_UPLOAD_DIR ? "" : "uploads/e-booklets/private",
+);
+const E_BOOKLET_TEMP_UPLOAD_DIR = path.join(E_BOOKLET_UPLOAD_ROOT, ".tmp");
+
+function ensureTempUploadDir(): void {
+  fs.mkdirSync(E_BOOKLET_TEMP_UPLOAD_DIR, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    try {
+      ensureTempUploadDir();
+      cb(null, E_BOOKLET_TEMP_UPLOAD_DIR);
+    } catch (error) {
+      cb(error as Error, E_BOOKLET_TEMP_UPLOAD_DIR);
+    }
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || ".upload";
+    cb(null, `${Date.now()}-${crypto.randomBytes(8).toString("hex")}${ext}`);
+  },
+});
 
 function documentFilter(
   _req: Request,

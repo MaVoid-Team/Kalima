@@ -323,6 +323,7 @@ model categories {
   created_at          DateTime?             @default(now()) @db.Timestamp(6)
   updated_at          DateTime?             @db.Timestamp(6)
   parent              categories?           @relation("categoriesTocategories", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  coupons             coupons[]
   product_categories  product_categories[]
   sub_categories      categories[]          @relation("categoriesTocategories")
   e_booklet_templates e_booklet_templates[]
@@ -339,26 +340,30 @@ model product_categories {
 }
 
 model coupons {
-  id                  Int              @id @default(autoincrement())
-  code                String           @unique @db.VarChar(50)
-  product_id          Int
-  discount_amount     Decimal?         @default(0) @db.Decimal(10, 2)
-  discount_percentage Int?             @default(0)
-  active              Boolean?         @default(true)
-  starts_at           DateTime?        @db.Timestamp(6)
-  expires_at          DateTime?        @db.Timestamp(6)
-  created_at          DateTime?        @default(now()) @db.Timestamp(6)
-  updated_at          DateTime?        @db.Timestamp(6)
-  deleted_at          DateTime?        @db.Timestamp(6)
-  is_deleted          Boolean?         @default(false)
-  mongo_id            String?          @unique
-  type                coupon_type      @default(percentage)
-  product             products         @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                  Int                        @id @default(autoincrement())
+  code                String                     @unique @db.VarChar(50)
+  product_id          Int?
+  category_id         Int?
+  applicability_scope coupon_applicability_scope @default(product)
+  discount_amount     Decimal?                   @default(0) @db.Decimal(10, 2)
+  discount_percentage Int?                       @default(0)
+  active              Boolean?                   @default(true)
+  starts_at           DateTime?                  @db.Timestamp(6)
+  expires_at          DateTime?                  @db.Timestamp(6)
+  created_at          DateTime?                  @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?                  @db.Timestamp(6)
+  deleted_at          DateTime?                  @db.Timestamp(6)
+  is_deleted          Boolean?                   @default(false)
+  mongo_id            String?                    @unique
+  type                coupon_type                @default(percentage)
+  product             products?                  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  category            categories?                @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   cart_items          cart_items[]
   coupon_usages       coupon_usages[]
   purchase_items      purchase_items[]
 
   @@index([product_id])
+  @@index([category_id])
 }
 
 model coupon_usages {
@@ -834,6 +839,11 @@ model sample_sections {
 enum coupon_type {
   percentage
   fixed
+}
+
+enum coupon_applicability_scope {
+  product
+  category
 }
 
 model images {

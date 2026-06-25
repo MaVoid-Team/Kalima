@@ -1,5 +1,10 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from "../../../libs/errors";
+import { notification_key_enum } from "../generated/prisma/client";
 import { hashEBookletAccessCode } from "./e-booklet-access-code.service";
+
+const DEFAULT_REDEMPTION_SETTINGS = {
+  notify_admins_on_access_code_redemption: false,
+};
 
 export interface RedeemCodeInput {
   termsAccepted?: boolean;
@@ -85,6 +90,46 @@ export class EBookletRedemptionService {
 
   private isUniqueConflict(error: any) {
     return error?.code === "P2002";
+  }
+
+  private async getSettings(tx: any) {
+    if (!tx.e_booklet_global_settings?.upsert) return DEFAULT_REDEMPTION_SETTINGS;
+    const settings = await tx.e_booklet_global_settings.upsert({
+      where: { id: 1 },
+      create: { id: 1, ...DEFAULT_REDEMPTION_SETTINGS },
+      update: {},
+    });
+    return { ...DEFAULT_REDEMPTION_SETTINGS, ...settings };
+  }
+
+  private async notifyAdminsOnRedemption(tx: any, redemption: any, code: any) {
+    const settings = await this.getSettings(tx);
+    if (settings.notify_admins_on_access_code_redemption !== true || !tx.notifications?.create || !tx.users?.findMany) return;
+    const admins = await tx.users.findMany({
+      where: {
+        user_roles: {
+          some: { portal: "store", role: { in: ["Admin", "SubAdmin"] } },
+        },
+        OR: [{ is_deleted: false }, { is_deleted: null }],
+      },
+      select: { id: true },
+    });
+    for (const admin of admins || []) {
+      try {
+        await tx.notifications.create({
+          data: {
+            user_id: admin.id,
+            category: 8,
+            message_key: notification_key_enum.CUSTOM,
+            entity_type: "e_booklet_access_code_redemption",
+            entity_id: redemption.id,
+            target_link: `/admin/e-booklets/access-codes?teacherId=${code.teacher_id}&bookletInstanceId=${code.booklet_instance_id}`,
+          },
+        });
+      } catch (error: any) {
+        if (error?.code !== "P2002") throw error;
+      }
+    }
   }
 
   private async grantViewerAccess(tx: any, code: any, studentId: number) {
@@ -179,6 +224,7 @@ export class EBookletRedemptionService {
             user_agent: input.userAgent,
           },
         });
+        await this.notifyAdminsOnRedemption(tx, redemption, code);
         return this.redemptionDto(redemption, access, code);
       } catch (error) {
         if (this.isUniqueConflict(error)) {

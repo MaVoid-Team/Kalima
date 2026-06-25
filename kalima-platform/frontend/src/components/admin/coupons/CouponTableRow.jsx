@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { TableCell, TableRow } from '@/components/ui/table';
 import CouponDateInfo from '@/components/admin/coupons/CouponDateInfo';
 import CouponRowActions from '@/components/admin/coupons/CouponRowActions';
-import { getDiscountType, getCouponId, isCouponActive, formatDiscount } from '@/lib/couponUtils';
+import { getDiscountType, getCouponId, isCouponActive, formatDiscount, formatCouponApplicability } from '@/lib/couponUtils';
 
 
 export default function CouponTableRow({ coupon, onEdit, onDelete, onToggleActivation, isSelected, onSelect }) {
@@ -43,7 +43,7 @@ export default function CouponTableRow({ coupon, onEdit, onDelete, onToggleActiv
             </TableCell>
 
             <TableCell numeric>{formatDiscount(coupon, t, i18n)}</TableCell>
-            <TableCell numeric>{coupon.product_id || '—'}</TableCell>
+            <TableCell truncate title={formatCouponApplicability(coupon, t)}>{formatCouponApplicability(coupon, t)}</TableCell>
 
             <TableCell date className="align-top">
                 <CouponDateInfo coupon={coupon} />

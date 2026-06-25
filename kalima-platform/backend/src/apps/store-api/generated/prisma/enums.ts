@@ -309,6 +309,14 @@ export const coupon_type = {
 export type coupon_type = (typeof coupon_type)[keyof typeof coupon_type]
 
 
+export const coupon_applicability_scope = {
+  product: 'product',
+  category: 'category'
+} as const
+
+export type coupon_applicability_scope = (typeof coupon_applicability_scope)[keyof typeof coupon_applicability_scope]
+
+
 export const notification_key_enum = {
   ORDER_STATUS_RECEIVED: 'ORDER_STATUS_RECEIVED',
   ORDER_STATUS_CONFIRMED: 'ORDER_STATUS_CONFIRMED',

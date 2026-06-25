@@ -27,10 +27,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import EditCouponDiscountFields from '@/components/admin/coupons/EditCouponDiscountFields';
-import EditCouponProductField from '@/components/admin/coupons/EditCouponProductField';
+import CouponApplicabilityField from '@/components/admin/coupons/CouponApplicabilityField';
 import EditCouponDateField from '@/components/admin/coupons/EditCouponDateField';
 import EditCouponActiveField from '@/components/admin/coupons/EditCouponActiveField';
-import { getDiscountType as inferDiscountType, getCouponId } from '@/lib/couponUtils';
+import { getDiscountType as inferDiscountType, getCouponId, getCouponApplicabilityScope } from '@/lib/couponUtils';
 
 const getProductId = (product) => product?.id || product?._id;
 const getProductPrice = (product) => {
@@ -96,7 +96,9 @@ export default function EditCouponDialog({
                     .positive(t('coupons.validation.discountValuePositive'))
                     .optional()
             ),
-            product_id: z.string().min(1, t('coupons.validation.productRequired')),
+            applicability_scope: z.enum(['product', 'category']),
+            product_id: z.string().optional(),
+            category_id: z.string().optional(),
             starts_at: z.string().optional(),
             expires_at: z.string().min(1, t('coupons.validation.expiresAtRequired')),
             active: z.boolean(),
@@ -130,18 +132,36 @@ export default function EditCouponDialog({
             }
 
             if (values.discount_type === 'AMOUNT' && values.discount_amount !== undefined) {
-                const selectedProduct = products?.find(
-                    (product) => String(getProductId(product)) === String(values.product_id)
-                );
-                const productPrice = getProductPrice(selectedProduct);
+                if (values.applicability_scope === 'product') {
+                    const selectedProduct = products?.find(
+                        (product) => String(getProductId(product)) === String(values.product_id)
+                    );
+                    const productPrice = getProductPrice(selectedProduct);
 
-                if (productPrice !== undefined && values.discount_amount > productPrice) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        path: ['discount_amount'],
-                        message: t('coupons.validation.discountAmountExceedsProductPrice'),
-                    });
+                    if (productPrice !== undefined && values.discount_amount > productPrice) {
+                        ctx.addIssue({
+                            code: z.ZodIssueCode.custom,
+                            path: ['discount_amount'],
+                            message: t('coupons.validation.discountAmountExceedsProductPrice'),
+                        });
+                    }
                 }
+            }
+
+            if (values.applicability_scope === 'product' && !values.product_id) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['product_id'],
+                    message: t('coupons.validation.productRequired'),
+                });
+            }
+
+            if (values.applicability_scope === 'category' && !values.category_id) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['category_id'],
+                    message: t('coupons.validation.categoryRequired'),
+                });
             }
 
             const startsAtDate = values.starts_at ? new Date(values.starts_at) : null;
@@ -181,7 +201,9 @@ export default function EditCouponDialog({
             discount_type: 'PERCENTAGE',
             discount_percentage: undefined,
             discount_amount: undefined,
+            applicability_scope: 'product',
             product_id: '',
+            category_id: '',
             starts_at: '',
             expires_at: '',
             active: true,
@@ -202,6 +224,7 @@ export default function EditCouponDialog({
         if (!coupon) return;
 
         const resolvedDiscountType = inferDiscountType(coupon);
+        const resolvedScope = getCouponApplicabilityScope(coupon);
 
         form.reset({
             code: coupon.code || '',
@@ -212,8 +235,12 @@ export default function EditCouponDialog({
             discount_amount: resolvedDiscountType === 'AMOUNT'
                 ? toNumberOrUndefined(coupon.discount_amount)
                 : undefined,
+            applicability_scope: resolvedScope,
             product_id: coupon.product_id !== null && coupon.product_id !== undefined
                 ? String(coupon.product_id)
+                : '',
+            category_id: coupon.category_id !== null && coupon.category_id !== undefined
+                ? String(coupon.category_id)
                 : '',
             starts_at: coupon.starts_at || coupon.startsAt || '',
             expires_at: coupon.expires_at || '',
@@ -236,7 +263,10 @@ export default function EditCouponDialog({
         const payload = {
             code: values.code,
             discount_type: values.discount_type,
-            product_id: values.product_id,
+            applicability_scope: values.applicability_scope,
+            ...(values.applicability_scope === 'product'
+                ? { product_id: values.product_id }
+                : { category_id: values.category_id }),
             is_active: values.active,
             ...(values.starts_at ? { starts_at: new Date(values.starts_at).toISOString() } : {}),
             ...(values.expires_at ? { expires_at: new Date(values.expires_at).toISOString() } : {}),
@@ -315,9 +345,10 @@ export default function EditCouponDialog({
 
                             <EditCouponDiscountFields form={form} discountType={discountType} t={t} />
 
-                            <EditCouponProductField
+                            <CouponApplicabilityField
                                 form={form}
                                 t={t}
+                                mode="edit"
                                 pickerOpen={pickerOpen}
                                 setPickerOpen={setPickerOpen}
                                 products={products}

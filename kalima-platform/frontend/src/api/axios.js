@@ -33,6 +33,13 @@ const decodeToken = (token) => {
 // Request Interceptor
 axiosInstance.interceptors.request.use(
     async (config) => {
+        if (typeof FormData !== 'undefined' && config.data instanceof FormData && config.headers) {
+            delete config.headers['Content-Type'];
+            if (typeof config.headers.delete === 'function') {
+                config.headers.delete('Content-Type');
+            }
+        }
+
         // Skip refresh logic for auth endpoints
         if (config.url?.includes('/auth/login') || config.url?.includes('/auth/refresh') || config.url?.includes('/auth/register')) {
             const accessToken = localStorage.getItem('accessToken');

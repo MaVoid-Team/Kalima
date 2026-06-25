@@ -5,6 +5,10 @@ import { emitNotificationToUser, emitNotificationToUsers } from "../../../libs/r
 
 const E_BOOKLET_MILESTONE_NOTIFICATION_CATEGORY = 8;
 const MILESTONE_ENTITY_TYPE = "e_booklet_milestone_achievement";
+const DEFAULT_MILESTONE_NOTIFICATION_SETTINGS = {
+  notify_admins_on_milestone: true,
+  notify_teacher_on_milestone: true,
+};
 
 export interface EBookletMilestoneNotificationAchievement {
   id: number;
@@ -34,6 +38,16 @@ export class EBookletMilestoneNotificationService {
     private readonly emailService: Pick<EmailService, "sendEBookletMilestoneTeacherEmail" | "sendEBookletMilestoneAdminEmail"> = getEmailService(),
   ) {}
 
+  private async getSettings() {
+    if (!this.db.e_booklet_global_settings?.upsert) return DEFAULT_MILESTONE_NOTIFICATION_SETTINGS;
+    const settings = await this.db.e_booklet_global_settings.upsert({
+      where: { id: 1 },
+      create: { id: 1, ...DEFAULT_MILESTONE_NOTIFICATION_SETTINGS },
+      update: {},
+    });
+    return { ...DEFAULT_MILESTONE_NOTIFICATION_SETTINGS, ...settings };
+  }
+
   private async ensureTeacherNotification(achievement: EBookletMilestoneNotificationAchievement, targetLink: string) {
     const where = {
       user_id: achievement.teacher_id,
@@ -61,6 +75,7 @@ export class EBookletMilestoneNotificationService {
     context: EBookletMilestoneNotificationContext = {},
   ): Promise<void> {
     if (achievements.length === 0) return;
+    const settings = await this.getSettings();
     const milestoneById = new Map((context.milestones ?? []).map((milestone) => [milestone.id, milestone]));
 
     for (const achievement of achievements) {
@@ -72,8 +87,8 @@ export class EBookletMilestoneNotificationService {
 
       const milestone = milestoneById.get(achievement.milestone_id);
       const notificationRecipients = achievement.notification_recipients ?? (milestone as any)?.notification_recipients ?? "admins";
-      const notifyTeacher = notificationRecipients === "teacher_and_admins";
-      const notifyAdmins = notificationRecipients === "admins" || notificationRecipients === "teacher_and_admins";
+      const notifyTeacher = notificationRecipients === "teacher_and_admins" && settings.notify_teacher_on_milestone !== false;
+      const notifyAdmins = (notificationRecipients === "admins" || notificationRecipients === "teacher_and_admins") && settings.notify_admins_on_milestone !== false;
       const milestoneTitle = milestone?.title ?? `Milestone #${achievement.milestone_id}`;
       const teacherTargetLink = `/teacher/e-booklets/milestones/${achievement.id}`;
       const adminTargetLink = `/admin/e-booklets/milestones/${achievement.id}`;
