@@ -30,6 +30,7 @@
     "open": "Open",
     "copy": "Copy",
     "upload": "Upload",
+    "uploading": "Uploading...",
     "replace": "Replace",
     "publish": "Publish",
     "publishVersion": "Publish Version",

@@ -363,7 +363,7 @@ export function useAdminEBookletEditor() {
   );
 
   const uploadAsset = useCallback(
-    (kind, file, data = {}) => {
+    (kind, file, data = {}, options = {}) => {
       const formData = new FormData();
       const fieldName = kind === "cover" ? "cover" : kind === "document" ? "document" : "media";
       formData.append(fieldName, file);
@@ -377,6 +377,8 @@ export function useAdminEBookletEditor() {
         endpoint: `/admin/e-booklet-files/${kind}`,
         method: "post",
         data: formData,
+        onUploadProgress: options.onUploadProgress,
+        signal: options.signal,
         defaultSuccessMessage: i18n.t("eBooklets:toasts.fileStored"),
       });
     },

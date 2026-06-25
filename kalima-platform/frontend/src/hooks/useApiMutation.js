@@ -29,10 +29,6 @@ export default function useApiMutation() {
       if (suppressErrorToast) {
         axiosConfig.suppressErrorToast = true;
       }
-      if (data instanceof FormData) {
-        axiosConfig.headers = { 'Content-Type': 'multipart/form-data' };
-      }
-
       const response = await axios(axiosConfig);
 
       const rawMessage = response.data?.message || defaultSuccessMessage;

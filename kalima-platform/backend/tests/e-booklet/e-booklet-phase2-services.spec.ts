@@ -133,6 +133,48 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     expect(db.e_booklet_access_codes.create).toHaveBeenCalledWith({ data: expect.objectContaining({ booklet_instance_id: 10, teacher_id: 9, kind: "paid", max_redemptions: 1, term_id: 1, code_hint: expect.any(String) }) });
   });
 
+  test("access code service applies global defaults for kind, expiration, and terms acceptance policy", async () => {
+    const db = createDb({
+      e_booklet_global_settings: {
+        upsert: jest.fn().mockResolvedValue({
+          default_access_code_kind: "free",
+          default_access_code_expiration_days: 7,
+          require_terms_for_code_generation: false,
+          max_bulk_access_codes: 100,
+        }),
+      },
+    });
+    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", template_id: 99 });
+    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, template_id: 99, status: "active", invite_quota: 0 });
+    db.e_booklet_access_codes.findUnique.mockResolvedValue(null);
+    db.e_booklet_access_codes.create.mockImplementation(async ({ data }: any) => ({ id: 22, ...data }));
+    const service = new EBookletAccessCodeService(db);
+
+    await service.generateCode({ bookletInstanceId: 10, teacherId: 9, termId: 1 });
+
+    expect(db.e_booklet_teacher_terms_acceptances.findFirst).not.toHaveBeenCalled();
+    expect(db.e_booklet_access_codes.aggregate).not.toHaveBeenCalled();
+    expect(db.e_booklet_access_codes.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        kind: "free",
+        max_redemptions: 999999,
+        expires_at: expect.any(Date),
+      }),
+    });
+  });
+
+  test("access code service enforces configured bulk count maximum", async () => {
+    const db = createDb({
+      e_booklet_global_settings: {
+        upsert: jest.fn().mockResolvedValue({ max_bulk_access_codes: 2 }),
+      },
+    });
+    const service = new EBookletAccessCodeService(db);
+
+    await expect(service.generateCodes({ bookletInstanceId: 10, teacherId: 9, kind: "paid", termId: 1, count: 3 })).rejects.toThrow("between 1 and 2");
+    expect(db.e_booklet_terms.findFirst).not.toHaveBeenCalled();
+  });
+
   test("access code service enforces paid seat quota and bulk-generates codes after approval", async () => {
     const db = createDb();
     db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", template_id: 99 });

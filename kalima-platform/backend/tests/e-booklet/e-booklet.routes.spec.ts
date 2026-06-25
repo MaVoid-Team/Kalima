@@ -892,8 +892,10 @@ describe("e-booklet routes", () => {
       .post("/api/v2/teacher/e-booklets/10/access-codes/bulk")
       .set("Authorization", `Bearer ${tokenFor("Teacher", 9)}`)
       .send({ kind: "paid", termId: 1, count: 101 })
-      .expect(400)
-      .expect((res) => expect(res.body.message).toContain("Invalid access code count"));
+      .expect(201);
+
+    expect(mockDomainServices.accessCodes.generateCodes).toHaveBeenCalledWith(expect.objectContaining({ teacherId: 9, kind: "paid", count: 101 }));
+    mockDomainServices.accessCodes.generateCodes.mockClear();
 
     await request(app)
       .get("/api/v2/teacher/e-booklets/10/access-codes?status=active")

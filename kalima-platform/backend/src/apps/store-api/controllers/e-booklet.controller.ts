@@ -1053,8 +1053,8 @@ export const eBookletController = {
 
   async generateAccessCode(req: Request, res: Response, next: NextFunction) {
     try {
-      const requestedKind = parseAccessCodeKind(req.body?.kind ?? "paid");
-      assertTeacherCanGenerateAccessCodeKind(requestedKind);
+      const requestedKind = req.body?.kind ? parseAccessCodeKind(req.body.kind) : undefined;
+      if (requestedKind) assertTeacherCanGenerateAccessCodeKind(requestedKind);
       const data = await domainServices().accessCodes.generateCode({
         bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
         teacherId: currentUserId(req),
@@ -1071,14 +1071,14 @@ export const eBookletController = {
 
   async generateAccessCodes(req: Request, res: Response, next: NextFunction) {
     try {
-      const requestedKind = parseAccessCodeKind(req.body?.kind ?? "paid");
-      assertTeacherCanGenerateAccessCodeKind(requestedKind);
+      const requestedKind = req.body?.kind ? parseAccessCodeKind(req.body.kind) : undefined;
+      if (requestedKind) assertTeacherCanGenerateAccessCodeKind(requestedKind);
       const data = await domainServices().accessCodes.generateCodes({
         bookletInstanceId: parseId(req.params.instanceId, "instance ID"),
         teacherId: currentUserId(req),
         kind: requestedKind,
         termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
-        count: parseOptionalPositiveInt(req.body?.count ?? req.body?.quantity, "access code count", 100) ?? 1,
+        count: parseOptionalPositiveInt(req.body?.count ?? req.body?.quantity, "access code count") ?? 1,
         expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
         maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
       });
@@ -1108,7 +1108,7 @@ export const eBookletController = {
       const data = await domainServices().accessCodes.generateCode({
         bookletInstanceId: parseRequiredPositiveInt(req.body?.bookletInstanceId ?? req.body?.booklet_instance_id, "instance ID"),
         teacherId: parseRequiredPositiveInt(req.body?.teacherId ?? req.body?.teacher_id, "teacher ID"),
-        kind: parseAccessCodeKind(req.body?.kind ?? "paid"),
+        kind: req.body?.kind ? parseAccessCodeKind(req.body.kind) : undefined,
         termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
         expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
         maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
@@ -1127,9 +1127,9 @@ export const eBookletController = {
       const data = await domainServices().accessCodes.generateCodes({
         bookletInstanceId: parseRequiredPositiveInt(req.body?.bookletInstanceId ?? req.body?.booklet_instance_id, "instance ID"),
         teacherId: parseRequiredPositiveInt(req.body?.teacherId ?? req.body?.teacher_id, "teacher ID"),
-        kind: parseAccessCodeKind(req.body?.kind ?? "paid"),
+        kind: req.body?.kind ? parseAccessCodeKind(req.body.kind) : undefined,
         termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
-        count: parseOptionalPositiveInt(req.body?.count ?? req.body?.quantity, "access code count", 100) ?? 1,
+        count: parseOptionalPositiveInt(req.body?.count ?? req.body?.quantity, "access code count") ?? 1,
         expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
         maxRedemptions: parseOptionalPositiveInt(req.body?.maxRedemptions ?? req.body?.max_redemptions, "max redemptions"),
         adminActorId: currentUserId(req),

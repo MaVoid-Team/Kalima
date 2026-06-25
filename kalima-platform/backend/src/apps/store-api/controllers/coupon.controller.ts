@@ -131,6 +131,10 @@ export const couponController = {
         ? parseInt(req.query.product_id as string, 10)
         : undefined;
 
+      const category_id = req.query.category_id
+        ? parseInt(req.query.category_id as string, 10)
+        : undefined;
+
       const search = req.query.search
         ? (req.query.search as string)
         : undefined;
@@ -139,6 +143,7 @@ export const couponController = {
         page,
         limit,
         product_id,
+        category_id,
         active,
         isAmount,
         startDate,

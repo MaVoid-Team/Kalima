@@ -629,13 +629,15 @@ class CartService {
           : Number(coupon.discount_amount);
     }
 
-    const final_price = Number(productPrice) * dto.quantity - discount;
+    const subtotal = Number(productPrice) * dto.quantity;
+    const cappedDiscount = Math.min(discount, subtotal);
+    const final_price = Math.max(0, subtotal - cappedDiscount);
 
     const updated = await this.db.cart_items.update({
       where: { id: dto.cart_item_id },
       data: {
         quantity: dto.quantity,
-        discount: discount,
+        discount: cappedDiscount,
         final_price: final_price,
       },
     });
@@ -1060,31 +1062,37 @@ class CartService {
     ];
     const couponsMap = new Map<
       number,
-      { discount_percentage: number | null }
+      { discount_percentage: number | null; discount_amount: Prisma.Decimal | number | null }
     >();
     if (couponIds.length > 0) {
       const coupons = await this.db.coupons.findMany({
         where: { id: { in: couponIds } },
-        select: { id: true, discount_percentage: true },
+        select: { id: true, discount_percentage: true, discount_amount: true },
       });
       for (const c of coupons) couponsMap.set(c.id, c);
     }
 
     // Recompute discounts and batch updates
-    const updates: { id: number; discount: number }[] = [];
+    const updates: { id: number; discount: number; final_price: number }[] = [];
     for (const item of updatedCartItems) {
       if (item.coupon_id) {
         const coupon = couponsMap.get(item.coupon_id);
-        if (coupon?.discount_percentage && coupon.discount_percentage > 0) {
-          const expectedDiscount = Math.floor(
-            Number(item.price_at_add) *
-              item.quantity *
-              (coupon.discount_percentage / 100),
-          );
+        if (coupon) {
+          const subtotal = Number(item.price_at_add) * item.quantity;
+          const rawDiscount =
+            coupon.discount_percentage && coupon.discount_percentage > 0
+              ? Math.floor(
+                  subtotal * (coupon.discount_percentage / 100),
+                )
+              : Number(coupon.discount_amount || 0);
+          const expectedDiscount = Math.min(rawDiscount, subtotal);
           if (expectedDiscount !== Number(item.discount || 0)) {
-            updates.push({ id: item.id, discount: expectedDiscount });
+            const finalPrice = Math.max(0, subtotal - expectedDiscount);
+            updates.push({ id: item.id, discount: expectedDiscount, final_price: finalPrice });
             (item as unknown as { discount?: number }).discount =
               expectedDiscount;
+            (item as unknown as { final_price?: number }).final_price =
+              finalPrice;
           }
         }
       }
@@ -1095,7 +1103,7 @@ class CartService {
         updates.map((u) =>
           this.db.cart_items.update({
             where: { id: u.id },
-            data: { discount: u.discount },
+            data: { discount: u.discount, final_price: u.final_price },
           }),
         ),
       );

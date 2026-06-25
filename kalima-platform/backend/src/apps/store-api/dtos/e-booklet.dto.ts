@@ -365,9 +365,10 @@ export class DeliverEBookletDto {
   @IsString()
   display_title!: string;
 
+  @IsOptional()
   @IsInt()
   @Min(0)
-  invite_quota!: number;
+  invite_quota?: number;
 
   @IsInt()
   page_count!: number;
@@ -376,8 +377,9 @@ export class DeliverEBookletDto {
   @IsArray()
   page_dimensions?: Array<{ width: number; height: number }>;
 
+  @IsOptional()
   @IsDateString()
-  access_expires_at!: string;
+  access_expires_at?: string;
 
   @IsOptional()
   @IsNumber()

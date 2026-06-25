@@ -145,7 +145,7 @@ export function registerAllExportResources(): void {
   });
 
   // ── Coupons ────────────────────────────────────────────────────────
-  // Filters: active (bool), product_id (int), startDate (ISO), endDate (ISO), isAmount (bool)
+  // Filters: active (bool), product_id (int), category_id (int), startDate (ISO), endDate (ISO), isAmount (bool)
   registerExportResource("coupons", {
     label: "coupons",
     mapper: couponMapper,
@@ -161,6 +161,10 @@ export function registerAllExportResources(): void {
 
       if (filters?.product_id !== undefined) {
         where.product_id = filters.product_id as number;
+      }
+
+      if (filters?.category_id !== undefined) {
+        where.category_id = filters.category_id as number;
       }
 
       if (filters?.startDate || filters?.endDate) {
@@ -181,7 +185,10 @@ export function registerAllExportResources(): void {
 
       return prisma.coupons.findMany({
         where,
-        include: { product: { select: { id: true, title: true } } },
+        include: {
+          product: { select: { id: true, title: true } },
+          category: { select: { id: true, title: true } },
+        },
         orderBy: { created_at: "desc" },
       });
     },

@@ -184,6 +184,30 @@ describe("Phase 4 e-booklet milestone notifications and emails", () => {
     expect(emailService.sendEBookletMilestoneAdminEmail).toHaveBeenCalledWith("admin@example.com", expect.any(Object));
   });
 
+  test("global milestone notification settings suppress teacher and admin milestone notifications", async () => {
+    const db = createDb({
+      e_booklet_global_settings: {
+        upsert: jest.fn().mockResolvedValue({
+          notify_teacher_on_milestone: false,
+          notify_admins_on_milestone: false,
+        }),
+      },
+    });
+    db.users.findUnique.mockResolvedValue({ id: 9, name: "Teacher One", email: "teacher@example.com" });
+    const emailService = { sendEBookletMilestoneTeacherEmail: jest.fn().mockResolvedValue(true), sendEBookletMilestoneAdminEmail: jest.fn().mockResolvedValue(true) };
+    const notifier = new EBookletMilestoneNotificationService(db, emailService as any);
+
+    await notifier.notifyMilestoneAchievements([{ id: 7, teacher_id: 9, term_id: 1, milestone_id: 2, reward_amount: 40, paid_redemptions_snapshot: 10, notification_recipients: "teacher_and_admins" }], { milestones: [{ id: 2, title: "10 paid readers" }], io: {} as any });
+
+    expect(db.notifications.create).not.toHaveBeenCalled();
+    expect(db.notifications.createMany).not.toHaveBeenCalled();
+    expect(db.users.findMany).not.toHaveBeenCalled();
+    expect(emitNotificationToUser).not.toHaveBeenCalled();
+    expect(emitNotificationToUsers).not.toHaveBeenCalled();
+    expect(emailService.sendEBookletMilestoneTeacherEmail).not.toHaveBeenCalled();
+    expect(emailService.sendEBookletMilestoneAdminEmail).not.toHaveBeenCalled();
+  });
+
   test("concurrent admin notification loser does not emit or email duplicate admin alerts", async () => {
     const db = createDb();
     db.notifications.findFirst.mockResolvedValue(null);

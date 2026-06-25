@@ -24,6 +24,11 @@ export enum DiscountType {
   PERCENTAGE = "PERCENTAGE",
 }
 
+export enum CouponApplicabilityScope {
+  PRODUCT = "product",
+  CATEGORY = "category",
+}
+
 // ============================================
 // CREATE COUPON DTO
 // ============================================
@@ -37,11 +42,21 @@ export class CreateCouponDto {
   })
   code: string;
 
+  @IsEnum(CouponApplicabilityScope)
+  @IsOptional()
+  applicability_scope?: CouponApplicabilityScope;
+
   @Type(() => Number)
   @IsInt()
   @IsPositive()
-  @IsNotEmpty()
-  product_id: number;
+  @IsOptional()
+  product_id?: number;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  category_id?: number;
 
   @IsEnum(DiscountType)
   @IsNotEmpty()
@@ -94,9 +109,19 @@ export class UpdateCouponDto {
   @IsOptional()
   product_id?: number;
 
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  category_id?: number;
+
   @IsEnum(DiscountType)
   @IsOptional()
   discount_type?: DiscountType;
+
+  @IsEnum(CouponApplicabilityScope)
+  @IsOptional()
+  applicability_scope?: CouponApplicabilityScope;
 
   @ValidateIf((o) => o.discount_type === DiscountType.AMOUNT)
   @IsNumber()
@@ -143,6 +168,12 @@ export class ValidateCouponDto {
   @IsPositive()
   @IsOptional()
   product_id?: number;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  category_id?: number;
 }
 
 export class UseCouponDto {
@@ -174,6 +205,12 @@ export class getAllCouponsDto {
   @IsPositive()
   @IsOptional()
   product_id?: number;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  category_id?: number;
 
   @Type(() => Date)
   @IsOptional()

@@ -4,6 +4,7 @@ import {
   CreateCouponDto,
   UpdateCouponDto,
   DiscountType,
+  CouponApplicabilityScope,
 } from "../dtos/coupon.dto";
 import { coupons, coupon_type } from "../generated/prisma/client";
 import {
@@ -13,11 +14,17 @@ import {
 } from "../../../libs/errors";
 import crypto from "crypto";
 
+type CouponTarget = {
+  scope: CouponApplicabilityScope;
+  product_id: number | null;
+  category_id: number | null;
+};
+
 // ============================================
 // COUPON SERVICE
 // ============================================
 
-class CouponService {
+export class CouponService {
   constructor(private db: PrismaClient = prisma) {}
 
   // ============================================
@@ -41,6 +48,117 @@ class CouponService {
     return code;
   }
 
+  private resolveCreateTarget(dto: CreateCouponDto): CouponTarget {
+    const scope =
+      dto.applicability_scope ??
+      (dto.category_id ? CouponApplicabilityScope.CATEGORY : CouponApplicabilityScope.PRODUCT);
+
+    const hasProduct = dto.product_id !== undefined && dto.product_id !== null;
+    const hasCategory = dto.category_id !== undefined && dto.category_id !== null;
+
+    if (scope === CouponApplicabilityScope.PRODUCT) {
+      if (!hasProduct || hasCategory) {
+        throw new BadRequestError(
+          "Product-scoped coupons require product_id and cannot include category_id",
+        );
+      }
+      return { scope, product_id: dto.product_id ?? null, category_id: null };
+    }
+
+    if (!hasCategory || hasProduct) {
+      throw new BadRequestError(
+        "Category-scoped coupons require category_id and cannot include product_id",
+      );
+    }
+    return { scope, product_id: null, category_id: dto.category_id ?? null };
+  }
+
+  private resolveUpdateTarget(
+    dto: UpdateCouponDto,
+    coupon: Pick<coupons, "product_id"> & {
+      category_id?: number | null;
+      applicability_scope?: string | null;
+    },
+  ): CouponTarget {
+    const existingScope =
+      (coupon.applicability_scope as CouponApplicabilityScope | undefined) ??
+      (coupon.category_id ? CouponApplicabilityScope.CATEGORY : CouponApplicabilityScope.PRODUCT);
+    const scope = dto.applicability_scope ?? existingScope;
+
+    const product_id =
+      dto.product_id !== undefined
+        ? dto.product_id
+        : scope === CouponApplicabilityScope.PRODUCT
+          ? coupon.product_id
+          : null;
+    const category_id =
+      dto.category_id !== undefined
+        ? dto.category_id
+        : scope === CouponApplicabilityScope.CATEGORY
+          ? (coupon.category_id ?? null)
+          : null;
+
+    if (scope === CouponApplicabilityScope.PRODUCT) {
+      if (!product_id || category_id) {
+        throw new BadRequestError(
+          "Product-scoped coupons require product_id and cannot include category_id",
+        );
+      }
+      return { scope, product_id, category_id: null };
+    }
+
+    if (!category_id || product_id) {
+      throw new BadRequestError(
+        "Category-scoped coupons require category_id and cannot include product_id",
+      );
+    }
+    return { scope, product_id: null, category_id };
+  }
+
+  private async validateTarget(target: CouponTarget) {
+    if (target.scope === CouponApplicabilityScope.PRODUCT) {
+      const product = await this.db.products.findFirst({
+        where: { id: target.product_id!, deleted_at: null },
+        select: { id: true, price: true, is_archived: true },
+      });
+      if (!product) {
+        throw new NotFoundError("Product not found");
+      }
+      if (product.is_archived) {
+        throw new BadRequestError("Cannot create coupon for archived product");
+      }
+      return { product, category: null };
+    }
+
+    const category = await this.db.categories.findUnique({
+      where: { id: target.category_id! },
+      select: { id: true, active: true },
+    });
+    if (!category) {
+      throw new NotFoundError("Category not found");
+    }
+    if (!category.active) {
+      throw new BadRequestError("Cannot create coupon for inactive category");
+    }
+    return { product: null, category };
+  }
+
+  private async getDescendantCategoryIds(categoryId: number): Promise<number[]> {
+    const ids = new Set<number>([categoryId]);
+    let frontier = [categoryId];
+
+    while (frontier.length > 0) {
+      const children = await this.db.categories.findMany({
+        where: { parent_id: { in: frontier } },
+        select: { id: true },
+      });
+      frontier = children.map((child) => child.id).filter((id) => !ids.has(id));
+      for (const id of frontier) ids.add(id);
+    }
+
+    return [...ids];
+  }
+
   // ============================================
   // CREATE
   // ============================================
@@ -54,17 +172,8 @@ class CouponService {
       throw new ConflictError(`Coupon code "${dto.code}" already exists`);
     }
 
-    // Validate product exists, is not deleted, and is not archived
-    const product = await this.db.products.findFirst({
-      where: { id: dto.product_id, deleted_at: null },
-      select: { id: true, price: true, is_archived: true },
-    });
-    if (!product) {
-      throw new NotFoundError("Product not found");
-    }
-    if (product.is_archived) {
-      throw new BadRequestError("Cannot create coupon for archived product");
-    }
+    const target = this.resolveCreateTarget(dto);
+    const { product } = await this.validateTarget(target);
 
     // Date sanity: starts_at must be before expires_at when both provided
     if (dto.starts_at && dto.expires_at && dto.starts_at >= dto.expires_at) {
@@ -90,8 +199,8 @@ class CouponService {
       if (dto.discount_amount <= 0) {
         throw new BadRequestError("Discount amount must be greater than 0");
       }
-      const productPrice = Number(product.price);
-      if (dto.discount_amount > productPrice) {
+      const productPrice = product ? Number(product.price) : null;
+      if (productPrice !== null && dto.discount_amount > productPrice) {
         throw new BadRequestError(
           `Discount amount (${dto.discount_amount}) cannot exceed product price (${productPrice})`,
         );
@@ -102,7 +211,9 @@ class CouponService {
     // Build data based on discount type
     const data: any = {
       code: dto.code,
-      product_id: dto.product_id,
+      product_id: target.product_id,
+      category_id: target.category_id,
+      applicability_scope: target.scope,
       starts_at: dto.starts_at ?? null,
       expires_at: dto.expires_at,
       type: couponType,
@@ -129,6 +240,7 @@ class CouponService {
     limit?: number;
     active?: boolean;
     product_id?: number;
+    category_id?: number;
     startDate?: Date;
     endDate?: Date;
     isAmount?: boolean;
@@ -153,6 +265,10 @@ class CouponService {
 
     if (filters?.product_id !== undefined) {
       where.product_id = filters.product_id;
+    }
+
+    if (filters?.category_id !== undefined) {
+      where.category_id = filters.category_id;
     }
 
     if (filters?.startDate || filters?.endDate) {
@@ -186,7 +302,10 @@ class CouponService {
         orderBy: { created_at: "desc" },
         skip,
         take: limit,
-        include: { product: { select: { id: true, title: true } } },
+        include: {
+          product: { select: { id: true, title: true } },
+          category: { select: { id: true, title: true } },
+        },
         relationLoadStrategy: "join",
       }),
       this.db.coupons.count({ where }),
@@ -202,7 +321,10 @@ class CouponService {
   async getCouponById(id: number): Promise<coupons> {
     const coupon = await this.db.coupons.findFirst({
       where: { id, deleted_at: null },
-      include: { product: { select: { id: true, title: true } } },
+      include: {
+        product: { select: { id: true, title: true } },
+        category: { select: { id: true, title: true } },
+      },
     });
     if (!coupon) {
       throw new NotFoundError("Coupon not found");
@@ -240,6 +362,7 @@ class CouponService {
       where: { id, deleted_at: null },
       include: {
         product: { select: { id: true, price: true, is_archived: true } },
+        category: { select: { id: true, active: true } },
       },
     });
     if (!coupon) {
@@ -256,25 +379,8 @@ class CouponService {
       }
     }
 
-    // If product_id is being changed, validate the new product
-    const productId = dto.product_id ?? coupon.product_id;
-    let productForPrice: { price: { toNumber?: () => number } } | null = null;
-
-    if (dto.product_id !== undefined && dto.product_id !== coupon.product_id) {
-      const newProduct = await this.db.products.findFirst({
-        where: { id: dto.product_id, deleted_at: null },
-        select: { id: true, price: true, is_archived: true },
-      });
-      if (!newProduct) {
-        throw new NotFoundError("Product not found");
-      }
-      if (newProduct.is_archived) {
-        throw new BadRequestError("Cannot assign coupon to archived product");
-      }
-      productForPrice = newProduct;
-    } else {
-      productForPrice = coupon.product;
-    }
+    const target = this.resolveUpdateTarget(dto, coupon as any);
+    const { product: productForPrice } = await this.validateTarget(target);
 
     // Date sanity
     const startsAt = dto.starts_at ?? coupon.starts_at;
@@ -284,13 +390,7 @@ class CouponService {
     }
 
     // Discount vs price check when amount discount is being set
-    const product =
-      productForPrice ??
-      (await this.db.products.findFirst({
-        where: { id: productId, deleted_at: null },
-        select: { price: true },
-      }));
-    if (product) {
+    if (productForPrice) {
       let amountToCheck: number | undefined;
       if (
         dto.discount_type === DiscountType.AMOUNT &&
@@ -303,10 +403,10 @@ class CouponService {
       if (
         amountToCheck !== undefined &&
         amountToCheck > 0 &&
-        amountToCheck > Number(product.price)
+        amountToCheck > Number(productForPrice.price)
       ) {
         throw new BadRequestError(
-          `Discount amount cannot exceed product price (${product.price})`,
+          `Discount amount cannot exceed product price (${productForPrice.price})`,
         );
       }
     }
@@ -316,7 +416,15 @@ class CouponService {
     };
 
     if (dto.code !== undefined) data.code = dto.code;
-    if (dto.product_id !== undefined) data.product_id = dto.product_id;
+    if (
+      dto.applicability_scope !== undefined ||
+      dto.product_id !== undefined ||
+      dto.category_id !== undefined
+    ) {
+      data.applicability_scope = target.scope;
+      data.product_id = target.product_id;
+      data.category_id = target.category_id;
+    }
     if (dto.starts_at !== undefined) data.starts_at = dto.starts_at;
     if (dto.expires_at !== undefined) data.expires_at = dto.expires_at;
     if (dto.is_active !== undefined) data.active = dto.is_active;
@@ -389,6 +497,8 @@ class CouponService {
         id: true,
         code: true,
         product_id: true,
+        category_id: true,
+        applicability_scope: true,
         discount_amount: true,
         discount_percentage: true,
         active: true,
@@ -416,8 +526,33 @@ class CouponService {
       throw new BadRequestError("This coupon has expired");
     }
 
-    if (product_id !== undefined && coupon.product_id !== product_id) {
-      throw new BadRequestError("This coupon is not valid for this product");
+    const scope =
+      (coupon.applicability_scope as CouponApplicabilityScope | undefined) ??
+      (coupon.category_id ? CouponApplicabilityScope.CATEGORY : CouponApplicabilityScope.PRODUCT);
+
+    if (product_id !== undefined) {
+      if (scope === CouponApplicabilityScope.PRODUCT) {
+        if (coupon.product_id !== product_id) {
+          throw new BadRequestError("This coupon is not valid for this product");
+        }
+      } else {
+        if (!coupon.category_id) {
+          throw new BadRequestError("This coupon is not valid for this product");
+        }
+
+        const categoryIds = await this.getDescendantCategoryIds(coupon.category_id);
+        const productCategory = await this.db.product_categories.findFirst({
+          where: {
+            product_id,
+            category_id: { in: categoryIds },
+          },
+          select: { id: true },
+        });
+
+        if (!productCategory) {
+          throw new BadRequestError("This coupon is not valid for this product");
+        }
+      }
     }
 
     if (user_id !== undefined) {

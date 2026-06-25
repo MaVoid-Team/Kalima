@@ -89,6 +89,75 @@ describe("CartService", () => {
   });
 
   describe("add item and recalculate totals", () => {
+    it("should apply a category-scoped fixed coupon and clamp discount to item subtotal", async () => {
+      const mockCart = {
+        id: 1,
+        user_id: 42,
+        status: "active",
+        cart_items: [],
+      };
+
+      const mockCartItem = {
+        id: 100,
+        cart_id: 1,
+        product_id: 10,
+        discount: 0,
+        created_at: new Date(),
+        updated_at: new Date(),
+        deleted_at: null,
+        products: {
+          id: 10,
+          price: 100,
+          price_after_discount: 80,
+        },
+        quantity: 1,
+        price_at_add: 80,
+        final_price: 80,
+        required_fields_filled: true,
+        coupon_id: null,
+      };
+
+      const { couponService } = require("./coupon.service");
+      couponService.validateCoupon.mockResolvedValueOnce({
+        isValid: true,
+        coupon: {
+          id: 77,
+          applicability_scope: "category",
+          category_id: 5,
+          discount_amount: 250,
+          discount_percentage: 0,
+        },
+      });
+
+      mockPrismaClient.carts.findFirst.mockResolvedValueOnce(mockCart);
+      mockPrismaClient.cart_items.findUnique.mockResolvedValueOnce(mockCartItem);
+      mockPrismaClient.cart_items.findFirst.mockResolvedValueOnce(null);
+      mockPrismaClient.cart_items.update.mockResolvedValueOnce({
+        ...mockCartItem,
+        coupon_id: 77,
+        discount: 80,
+        final_price: 0,
+      });
+      mockPrismaClient.cart_items.findMany.mockResolvedValueOnce([
+        { id: 100, cart_id: 1, product_id: 10, quantity: 1, price_at_add: 80, discount: 80, coupon_id: 77 },
+      ]);
+      mockPrismaClient.coupons.findMany.mockResolvedValueOnce([
+        { id: 77, discount_percentage: 0, discount_amount: 250 },
+      ]);
+
+      await cartService.applyCouponToCartItem(42, 100, "KLM-CAT77");
+
+      expect(couponService.validateCoupon).toHaveBeenCalledWith("KLM-CAT77", 42, 10);
+      expect(mockPrismaClient.cart_items.update).toHaveBeenCalledWith({
+        where: { id: 100 },
+        data: { coupon_id: 77, discount: 80, final_price: 0 },
+      });
+      expect(mockPrismaClient.carts.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: { subtotal: 80, discount: 80, total: 0 },
+      });
+    });
+
     it("should recalculate subtotal and total when an item is added", async () => {
       const mockCart = {
         id: 1,

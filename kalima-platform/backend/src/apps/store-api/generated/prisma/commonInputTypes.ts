@@ -348,11 +348,28 @@ export type Enumlocation_type_enumNullableWithAggregatesFilter<$PrismaModel = ne
   _max?: Prisma.NestedEnumlocation_type_enumNullableFilter<$PrismaModel>
 }
 
+export type Enumcoupon_applicability_scopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.coupon_applicability_scope | Prisma.Enumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  in?: $Enums.coupon_applicability_scope[] | Prisma.ListEnumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.coupon_applicability_scope[] | Prisma.ListEnumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumcoupon_applicability_scopeFilter<$PrismaModel> | $Enums.coupon_applicability_scope
+}
+
 export type Enumcoupon_typeFilter<$PrismaModel = never> = {
   equals?: $Enums.coupon_type | Prisma.Enumcoupon_typeFieldRefInput<$PrismaModel>
   in?: $Enums.coupon_type[] | Prisma.ListEnumcoupon_typeFieldRefInput<$PrismaModel>
   notIn?: $Enums.coupon_type[] | Prisma.ListEnumcoupon_typeFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumcoupon_typeFilter<$PrismaModel> | $Enums.coupon_type
+}
+
+export type Enumcoupon_applicability_scopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.coupon_applicability_scope | Prisma.Enumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  in?: $Enums.coupon_applicability_scope[] | Prisma.ListEnumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.coupon_applicability_scope[] | Prisma.ListEnumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumcoupon_applicability_scopeWithAggregatesFilter<$PrismaModel> | $Enums.coupon_applicability_scope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumcoupon_applicability_scopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumcoupon_applicability_scopeFilter<$PrismaModel>
 }
 
 export type Enumcoupon_typeWithAggregatesFilter<$PrismaModel = never> = {
@@ -1262,11 +1279,28 @@ export type NestedEnumlocation_type_enumNullableWithAggregatesFilter<$PrismaMode
   _max?: Prisma.NestedEnumlocation_type_enumNullableFilter<$PrismaModel>
 }
 
+export type NestedEnumcoupon_applicability_scopeFilter<$PrismaModel = never> = {
+  equals?: $Enums.coupon_applicability_scope | Prisma.Enumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  in?: $Enums.coupon_applicability_scope[] | Prisma.ListEnumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.coupon_applicability_scope[] | Prisma.ListEnumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumcoupon_applicability_scopeFilter<$PrismaModel> | $Enums.coupon_applicability_scope
+}
+
 export type NestedEnumcoupon_typeFilter<$PrismaModel = never> = {
   equals?: $Enums.coupon_type | Prisma.Enumcoupon_typeFieldRefInput<$PrismaModel>
   in?: $Enums.coupon_type[] | Prisma.ListEnumcoupon_typeFieldRefInput<$PrismaModel>
   notIn?: $Enums.coupon_type[] | Prisma.ListEnumcoupon_typeFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumcoupon_typeFilter<$PrismaModel> | $Enums.coupon_type
+}
+
+export type NestedEnumcoupon_applicability_scopeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.coupon_applicability_scope | Prisma.Enumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  in?: $Enums.coupon_applicability_scope[] | Prisma.ListEnumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.coupon_applicability_scope[] | Prisma.ListEnumcoupon_applicability_scopeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumcoupon_applicability_scopeWithAggregatesFilter<$PrismaModel> | $Enums.coupon_applicability_scope
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumcoupon_applicability_scopeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumcoupon_applicability_scopeFilter<$PrismaModel>
 }
 
 export type NestedEnumcoupon_typeWithAggregatesFilter<$PrismaModel = never> = {

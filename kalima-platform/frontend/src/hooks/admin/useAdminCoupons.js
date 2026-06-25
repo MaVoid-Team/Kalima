@@ -8,7 +8,9 @@ import { useTranslation } from 'react-i18next';
  * @property {'PERCENTAGE' | 'AMOUNT'} discount_type
  * @property {number} [discount_percentage]
  * @property {number} [discount_amount]
- * @property {string} product_id
+ * @property {'product' | 'category'} [applicability_scope]
+ * @property {string} [product_id]
+ * @property {string} [category_id]
  * @property {string} starts_at ISO-8601 date string (e.g. 2026-01-01T00:00:00.000Z)
  * @property {string} expires_at ISO-8601 date string (e.g. 2026-06-01T00:00:00.000Z)
  * @property {boolean} [is_active]
@@ -29,6 +31,7 @@ export const useAdminCoupons = ({ enableList = false } = {}) => {
         search: '',
         active: 'all',
         product_id: '',
+        category_id: '',
         discount_type: 'all',
         startDate: '',
         endDate: '',
@@ -121,6 +124,7 @@ export const useAdminCoupons = ({ enableList = false } = {}) => {
             limit: pagination.limit,
             active: filters.active === 'all' ? undefined : filters.active === 'true' ? 1 : 0,
             product_id: filters.product_id || undefined,
+            category_id: filters.category_id || undefined,
             isAmount:
                 filters.discount_type === 'AMOUNT'
                     ? 1
@@ -136,7 +140,7 @@ export const useAdminCoupons = ({ enableList = false } = {}) => {
             ...prev,
             ...(response?.pagination || {}),
         }));
-    }, [getAllCoupons, pagination.page, pagination.limit, filters.active, filters.product_id, filters.discount_type, filters.startDate, filters.endDate]);
+    }, [getAllCoupons, pagination.page, pagination.limit, filters.active, filters.product_id, filters.category_id, filters.discount_type, filters.startDate, filters.endDate]);
 
     useEffect(() => {
         if (!enableList) return;
@@ -162,6 +166,16 @@ export const useAdminCoupons = ({ enableList = false } = {}) => {
         setFilters((prev) => ({
             ...prev,
             product_id: productId !== null && productId !== undefined ? String(productId) : '',
+            category_id: '',
+        }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    }, []);
+
+    const setCategoryFilter = useCallback((categoryId) => {
+        setFilters((prev) => ({
+            ...prev,
+            category_id: categoryId !== null && categoryId !== undefined ? String(categoryId) : '',
+            product_id: '',
         }));
         setPagination((prev) => ({ ...prev, page: 1 }));
     }, []);
@@ -178,6 +192,11 @@ export const useAdminCoupons = ({ enableList = false } = {}) => {
 
     const clearProductFilter = useCallback(() => {
         setFilters((prev) => ({ ...prev, product_id: '' }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    }, []);
+
+    const clearCategoryFilter = useCallback(() => {
+        setFilters((prev) => ({ ...prev, category_id: '' }));
         setPagination((prev) => ({ ...prev, page: 1 }));
     }, []);
 
@@ -299,9 +318,11 @@ export const useAdminCoupons = ({ enableList = false } = {}) => {
         setActive,
         setDiscountType,
         setProductFilter,
+        setCategoryFilter,
         setStartDate,
         setEndDate,
         clearProductFilter,
+        clearCategoryFilter,
         setPage,
         generateCouponCode,
         getCouponsStats,

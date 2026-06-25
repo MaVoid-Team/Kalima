@@ -37,6 +37,7 @@ export type E_booklet_global_settingsAvgAggregateOutputType = {
   default_access_code_expiration_days: number | null
   default_allowed_devices_per_student: number | null
   default_allowed_devices_per_teacher: number | null
+  preview_page_limit: number | null
   updated_by: number | null
 }
 
@@ -51,6 +52,7 @@ export type E_booklet_global_settingsSumAggregateOutputType = {
   default_access_code_expiration_days: number | null
   default_allowed_devices_per_student: number | null
   default_allowed_devices_per_teacher: number | null
+  preview_page_limit: number | null
   updated_by: number | null
 }
 
@@ -68,6 +70,7 @@ export type E_booklet_global_settingsMinAggregateOutputType = {
   require_terms_for_code_generation: boolean | null
   default_allowed_devices_per_student: number | null
   default_allowed_devices_per_teacher: number | null
+  preview_page_limit: number | null
   device_reset_policy: string | null
   notify_admins_on_delivery: boolean | null
   notify_teacher_on_delivery: boolean | null
@@ -93,6 +96,7 @@ export type E_booklet_global_settingsMaxAggregateOutputType = {
   require_terms_for_code_generation: boolean | null
   default_allowed_devices_per_student: number | null
   default_allowed_devices_per_teacher: number | null
+  preview_page_limit: number | null
   device_reset_policy: string | null
   notify_admins_on_delivery: boolean | null
   notify_teacher_on_delivery: boolean | null
@@ -118,6 +122,7 @@ export type E_booklet_global_settingsCountAggregateOutputType = {
   require_terms_for_code_generation: number
   default_allowed_devices_per_student: number
   default_allowed_devices_per_teacher: number
+  preview_page_limit: number
   device_reset_policy: number
   notify_admins_on_delivery: number
   notify_teacher_on_delivery: number
@@ -142,6 +147,7 @@ export type E_booklet_global_settingsAvgAggregateInputType = {
   default_access_code_expiration_days?: true
   default_allowed_devices_per_student?: true
   default_allowed_devices_per_teacher?: true
+  preview_page_limit?: true
   updated_by?: true
 }
 
@@ -156,6 +162,7 @@ export type E_booklet_global_settingsSumAggregateInputType = {
   default_access_code_expiration_days?: true
   default_allowed_devices_per_student?: true
   default_allowed_devices_per_teacher?: true
+  preview_page_limit?: true
   updated_by?: true
 }
 
@@ -173,6 +180,7 @@ export type E_booklet_global_settingsMinAggregateInputType = {
   require_terms_for_code_generation?: true
   default_allowed_devices_per_student?: true
   default_allowed_devices_per_teacher?: true
+  preview_page_limit?: true
   device_reset_policy?: true
   notify_admins_on_delivery?: true
   notify_teacher_on_delivery?: true
@@ -198,6 +206,7 @@ export type E_booklet_global_settingsMaxAggregateInputType = {
   require_terms_for_code_generation?: true
   default_allowed_devices_per_student?: true
   default_allowed_devices_per_teacher?: true
+  preview_page_limit?: true
   device_reset_policy?: true
   notify_admins_on_delivery?: true
   notify_teacher_on_delivery?: true
@@ -223,6 +232,7 @@ export type E_booklet_global_settingsCountAggregateInputType = {
   require_terms_for_code_generation?: true
   default_allowed_devices_per_student?: true
   default_allowed_devices_per_teacher?: true
+  preview_page_limit?: true
   device_reset_policy?: true
   notify_admins_on_delivery?: true
   notify_teacher_on_delivery?: true
@@ -335,6 +345,7 @@ export type E_booklet_global_settingsGroupByOutputType = {
   require_terms_for_code_generation: boolean
   default_allowed_devices_per_student: number
   default_allowed_devices_per_teacher: number
+  preview_page_limit: number
   device_reset_policy: string | null
   notify_admins_on_delivery: boolean
   notify_teacher_on_delivery: boolean
@@ -383,6 +394,7 @@ export type e_booklet_global_settingsWhereInput = {
   require_terms_for_code_generation?: Prisma.BoolFilter<"e_booklet_global_settings"> | boolean
   default_allowed_devices_per_student?: Prisma.IntFilter<"e_booklet_global_settings"> | number
   default_allowed_devices_per_teacher?: Prisma.IntFilter<"e_booklet_global_settings"> | number
+  preview_page_limit?: Prisma.IntFilter<"e_booklet_global_settings"> | number
   device_reset_policy?: Prisma.StringNullableFilter<"e_booklet_global_settings"> | string | null
   notify_admins_on_delivery?: Prisma.BoolFilter<"e_booklet_global_settings"> | boolean
   notify_teacher_on_delivery?: Prisma.BoolFilter<"e_booklet_global_settings"> | boolean
@@ -408,6 +420,7 @@ export type e_booklet_global_settingsOrderByWithRelationInput = {
   require_terms_for_code_generation?: Prisma.SortOrder
   default_allowed_devices_per_student?: Prisma.SortOrder
   default_allowed_devices_per_teacher?: Prisma.SortOrder
+  preview_page_limit?: Prisma.SortOrder
   device_reset_policy?: Prisma.SortOrderInput | Prisma.SortOrder
   notify_admins_on_delivery?: Prisma.SortOrder
   notify_teacher_on_delivery?: Prisma.SortOrder
@@ -436,6 +449,7 @@ export type e_booklet_global_settingsWhereUniqueInput = Prisma.AtLeast<{
   require_terms_for_code_generation?: Prisma.BoolFilter<"e_booklet_global_settings"> | boolean
   default_allowed_devices_per_student?: Prisma.IntFilter<"e_booklet_global_settings"> | number
   default_allowed_devices_per_teacher?: Prisma.IntFilter<"e_booklet_global_settings"> | number
+  preview_page_limit?: Prisma.IntFilter<"e_booklet_global_settings"> | number
   device_reset_policy?: Prisma.StringNullableFilter<"e_booklet_global_settings"> | string | null
   notify_admins_on_delivery?: Prisma.BoolFilter<"e_booklet_global_settings"> | boolean
   notify_teacher_on_delivery?: Prisma.BoolFilter<"e_booklet_global_settings"> | boolean
@@ -461,6 +475,7 @@ export type e_booklet_global_settingsOrderByWithAggregationInput = {
   require_terms_for_code_generation?: Prisma.SortOrder
   default_allowed_devices_per_student?: Prisma.SortOrder
   default_allowed_devices_per_teacher?: Prisma.SortOrder
+  preview_page_limit?: Prisma.SortOrder
   device_reset_policy?: Prisma.SortOrderInput | Prisma.SortOrder
   notify_admins_on_delivery?: Prisma.SortOrder
   notify_teacher_on_delivery?: Prisma.SortOrder
@@ -494,6 +509,7 @@ export type e_booklet_global_settingsScalarWhereWithAggregatesInput = {
   require_terms_for_code_generation?: Prisma.BoolWithAggregatesFilter<"e_booklet_global_settings"> | boolean
   default_allowed_devices_per_student?: Prisma.IntWithAggregatesFilter<"e_booklet_global_settings"> | number
   default_allowed_devices_per_teacher?: Prisma.IntWithAggregatesFilter<"e_booklet_global_settings"> | number
+  preview_page_limit?: Prisma.IntWithAggregatesFilter<"e_booklet_global_settings"> | number
   device_reset_policy?: Prisma.StringNullableWithAggregatesFilter<"e_booklet_global_settings"> | string | null
   notify_admins_on_delivery?: Prisma.BoolWithAggregatesFilter<"e_booklet_global_settings"> | boolean
   notify_teacher_on_delivery?: Prisma.BoolWithAggregatesFilter<"e_booklet_global_settings"> | boolean
@@ -519,6 +535,7 @@ export type e_booklet_global_settingsCreateInput = {
   require_terms_for_code_generation?: boolean
   default_allowed_devices_per_student?: number
   default_allowed_devices_per_teacher?: number
+  preview_page_limit?: number
   device_reset_policy?: string | null
   notify_admins_on_delivery?: boolean
   notify_teacher_on_delivery?: boolean
@@ -544,6 +561,7 @@ export type e_booklet_global_settingsUncheckedCreateInput = {
   require_terms_for_code_generation?: boolean
   default_allowed_devices_per_student?: number
   default_allowed_devices_per_teacher?: number
+  preview_page_limit?: number
   device_reset_policy?: string | null
   notify_admins_on_delivery?: boolean
   notify_teacher_on_delivery?: boolean
@@ -569,6 +587,7 @@ export type e_booklet_global_settingsUpdateInput = {
   require_terms_for_code_generation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_allowed_devices_per_student?: Prisma.IntFieldUpdateOperationsInput | number
   default_allowed_devices_per_teacher?: Prisma.IntFieldUpdateOperationsInput | number
+  preview_page_limit?: Prisma.IntFieldUpdateOperationsInput | number
   device_reset_policy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notify_admins_on_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notify_teacher_on_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -594,6 +613,7 @@ export type e_booklet_global_settingsUncheckedUpdateInput = {
   require_terms_for_code_generation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_allowed_devices_per_student?: Prisma.IntFieldUpdateOperationsInput | number
   default_allowed_devices_per_teacher?: Prisma.IntFieldUpdateOperationsInput | number
+  preview_page_limit?: Prisma.IntFieldUpdateOperationsInput | number
   device_reset_policy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notify_admins_on_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notify_teacher_on_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -619,6 +639,7 @@ export type e_booklet_global_settingsCreateManyInput = {
   require_terms_for_code_generation?: boolean
   default_allowed_devices_per_student?: number
   default_allowed_devices_per_teacher?: number
+  preview_page_limit?: number
   device_reset_policy?: string | null
   notify_admins_on_delivery?: boolean
   notify_teacher_on_delivery?: boolean
@@ -644,6 +665,7 @@ export type e_booklet_global_settingsUpdateManyMutationInput = {
   require_terms_for_code_generation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_allowed_devices_per_student?: Prisma.IntFieldUpdateOperationsInput | number
   default_allowed_devices_per_teacher?: Prisma.IntFieldUpdateOperationsInput | number
+  preview_page_limit?: Prisma.IntFieldUpdateOperationsInput | number
   device_reset_policy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notify_admins_on_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notify_teacher_on_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -669,6 +691,7 @@ export type e_booklet_global_settingsUncheckedUpdateManyInput = {
   require_terms_for_code_generation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   default_allowed_devices_per_student?: Prisma.IntFieldUpdateOperationsInput | number
   default_allowed_devices_per_teacher?: Prisma.IntFieldUpdateOperationsInput | number
+  preview_page_limit?: Prisma.IntFieldUpdateOperationsInput | number
   device_reset_policy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notify_admins_on_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notify_teacher_on_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -694,6 +717,7 @@ export type e_booklet_global_settingsCountOrderByAggregateInput = {
   require_terms_for_code_generation?: Prisma.SortOrder
   default_allowed_devices_per_student?: Prisma.SortOrder
   default_allowed_devices_per_teacher?: Prisma.SortOrder
+  preview_page_limit?: Prisma.SortOrder
   device_reset_policy?: Prisma.SortOrder
   notify_admins_on_delivery?: Prisma.SortOrder
   notify_teacher_on_delivery?: Prisma.SortOrder
@@ -716,6 +740,7 @@ export type e_booklet_global_settingsAvgOrderByAggregateInput = {
   default_access_code_expiration_days?: Prisma.SortOrder
   default_allowed_devices_per_student?: Prisma.SortOrder
   default_allowed_devices_per_teacher?: Prisma.SortOrder
+  preview_page_limit?: Prisma.SortOrder
   updated_by?: Prisma.SortOrder
 }
 
@@ -733,6 +758,7 @@ export type e_booklet_global_settingsMaxOrderByAggregateInput = {
   require_terms_for_code_generation?: Prisma.SortOrder
   default_allowed_devices_per_student?: Prisma.SortOrder
   default_allowed_devices_per_teacher?: Prisma.SortOrder
+  preview_page_limit?: Prisma.SortOrder
   device_reset_policy?: Prisma.SortOrder
   notify_admins_on_delivery?: Prisma.SortOrder
   notify_teacher_on_delivery?: Prisma.SortOrder
@@ -758,6 +784,7 @@ export type e_booklet_global_settingsMinOrderByAggregateInput = {
   require_terms_for_code_generation?: Prisma.SortOrder
   default_allowed_devices_per_student?: Prisma.SortOrder
   default_allowed_devices_per_teacher?: Prisma.SortOrder
+  preview_page_limit?: Prisma.SortOrder
   device_reset_policy?: Prisma.SortOrder
   notify_admins_on_delivery?: Prisma.SortOrder
   notify_teacher_on_delivery?: Prisma.SortOrder
@@ -780,6 +807,7 @@ export type e_booklet_global_settingsSumOrderByAggregateInput = {
   default_access_code_expiration_days?: Prisma.SortOrder
   default_allowed_devices_per_student?: Prisma.SortOrder
   default_allowed_devices_per_teacher?: Prisma.SortOrder
+  preview_page_limit?: Prisma.SortOrder
   updated_by?: Prisma.SortOrder
 }
 
@@ -799,6 +827,7 @@ export type e_booklet_global_settingsSelect<ExtArgs extends runtime.Types.Extens
   require_terms_for_code_generation?: boolean
   default_allowed_devices_per_student?: boolean
   default_allowed_devices_per_teacher?: boolean
+  preview_page_limit?: boolean
   device_reset_policy?: boolean
   notify_admins_on_delivery?: boolean
   notify_teacher_on_delivery?: boolean
@@ -824,6 +853,7 @@ export type e_booklet_global_settingsSelectCreateManyAndReturn<ExtArgs extends r
   require_terms_for_code_generation?: boolean
   default_allowed_devices_per_student?: boolean
   default_allowed_devices_per_teacher?: boolean
+  preview_page_limit?: boolean
   device_reset_policy?: boolean
   notify_admins_on_delivery?: boolean
   notify_teacher_on_delivery?: boolean
@@ -849,6 +879,7 @@ export type e_booklet_global_settingsSelectUpdateManyAndReturn<ExtArgs extends r
   require_terms_for_code_generation?: boolean
   default_allowed_devices_per_student?: boolean
   default_allowed_devices_per_teacher?: boolean
+  preview_page_limit?: boolean
   device_reset_policy?: boolean
   notify_admins_on_delivery?: boolean
   notify_teacher_on_delivery?: boolean
@@ -874,6 +905,7 @@ export type e_booklet_global_settingsSelectScalar = {
   require_terms_for_code_generation?: boolean
   default_allowed_devices_per_student?: boolean
   default_allowed_devices_per_teacher?: boolean
+  preview_page_limit?: boolean
   device_reset_policy?: boolean
   notify_admins_on_delivery?: boolean
   notify_teacher_on_delivery?: boolean
@@ -885,7 +917,7 @@ export type e_booklet_global_settingsSelectScalar = {
   updated_at?: boolean
 }
 
-export type e_booklet_global_settingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "default_invite_quota" | "default_access_duration_days" | "default_invite_expiration_days" | "default_delivery_notes" | "default_student_marketing_price" | "default_internal_price" | "default_access_code_kind" | "max_bulk_access_codes" | "default_access_code_expiration_days" | "require_terms_for_code_generation" | "default_allowed_devices_per_student" | "default_allowed_devices_per_teacher" | "device_reset_policy" | "notify_admins_on_delivery" | "notify_teacher_on_delivery" | "notify_admins_on_milestone" | "notify_teacher_on_milestone" | "notify_admins_on_access_code_redemption" | "updated_by" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_global_settings"]>
+export type e_booklet_global_settingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "default_invite_quota" | "default_access_duration_days" | "default_invite_expiration_days" | "default_delivery_notes" | "default_student_marketing_price" | "default_internal_price" | "default_access_code_kind" | "max_bulk_access_codes" | "default_access_code_expiration_days" | "require_terms_for_code_generation" | "default_allowed_devices_per_student" | "default_allowed_devices_per_teacher" | "preview_page_limit" | "device_reset_policy" | "notify_admins_on_delivery" | "notify_teacher_on_delivery" | "notify_admins_on_milestone" | "notify_teacher_on_milestone" | "notify_admins_on_access_code_redemption" | "updated_by" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_global_settings"]>
 
 export type $e_booklet_global_settingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "e_booklet_global_settings"
@@ -904,6 +936,7 @@ export type $e_booklet_global_settingsPayload<ExtArgs extends runtime.Types.Exte
     require_terms_for_code_generation: boolean
     default_allowed_devices_per_student: number
     default_allowed_devices_per_teacher: number
+    preview_page_limit: number
     device_reset_policy: string | null
     notify_admins_on_delivery: boolean
     notify_teacher_on_delivery: boolean
@@ -1349,6 +1382,7 @@ export interface e_booklet_global_settingsFieldRefs {
   readonly require_terms_for_code_generation: Prisma.FieldRef<"e_booklet_global_settings", 'Boolean'>
   readonly default_allowed_devices_per_student: Prisma.FieldRef<"e_booklet_global_settings", 'Int'>
   readonly default_allowed_devices_per_teacher: Prisma.FieldRef<"e_booklet_global_settings", 'Int'>
+  readonly preview_page_limit: Prisma.FieldRef<"e_booklet_global_settings", 'Int'>
   readonly device_reset_policy: Prisma.FieldRef<"e_booklet_global_settings", 'String'>
   readonly notify_admins_on_delivery: Prisma.FieldRef<"e_booklet_global_settings", 'Boolean'>
   readonly notify_teacher_on_delivery: Prisma.FieldRef<"e_booklet_global_settings", 'Boolean'>

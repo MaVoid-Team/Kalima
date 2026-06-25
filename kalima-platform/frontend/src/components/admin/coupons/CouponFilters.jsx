@@ -2,7 +2,7 @@
 
 import { Search, Calendar as CalendarIcon, X, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { format } from 'date-fns';
 import { arSA } from 'react-day-picker/locale';
@@ -15,8 +15,16 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { formatCurrency } from '@/lib/storeUtils';
+import { useCategories } from '@/hooks/useCategories';
 
 const getProductId = (product) => product?.id || product?._id;
+const flattenCategories = (categories, depth = 0) => categories.flatMap((category) => [
+    {
+        id: String(category.id),
+        title: `${'— '.repeat(depth)}${category.title}`,
+    },
+    ...flattenCategories(Array.isArray(category.sub_categories) ? category.sub_categories : [], depth + 1),
+]);
 
 export default function CouponFilters({
     filters,
@@ -33,8 +41,11 @@ export default function CouponFilters({
     onProductPageChange,
     onProductFilterChange,
     onProductFilterClear,
+    onCategoryFilterChange,
+    onCategoryFilterClear,
 }) {
     const { t, i18n } = useTranslation('admin');
+    const { categories, loading: categoriesLoading } = useCategories();
     const [searchValue, setSearchValue] = useState(filters.search || '');
     const [productDropdownOpen, setProductDropdownOpen] = useState(false);
     const [productSearchValue, setProductSearchValue] = useState(productSearch || '');
@@ -44,6 +55,7 @@ export default function CouponFilters({
     });
     const productSearchInputRef = useRef(null);
     const isRtl = i18n.language?.startsWith('ar');
+    const categoryOptions = useMemo(() => flattenCategories(categories || []), [categories]);
 
     const selectedProduct = products?.find(
         (product) => String(getProductId(product)) === String(filters.product_id)
@@ -51,6 +63,7 @@ export default function CouponFilters({
     const selectedProductLabel = selectedProduct?.title
         ? selectedProduct.title
         : filters.product_id || null;
+    const selectedCategory = categoryOptions.find((category) => String(category.id) === String(filters.category_id));
 
     // Coupon search debounce
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -143,10 +156,10 @@ export default function CouponFilters({
     const totalPages = Math.max(1, Math.ceil((productPagination?.total || 0) / (productPagination?.limit || 1)));
 
     return (
-        <div className="flex flex-col sm:flex-row sm:flex-wrap lg:flex-nowrap items-stretch sm:items-center gap-3 mb-6 w-full min-w-0" data-testid="coupons-filters">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 mb-6 w-full min-w-0" data-testid="coupons-filters">
 
             {/* Search */}
-            <div className="relative w-full sm:flex-1 lg:min-w-[20rem]">
+            <div className="relative w-full sm:flex-[1_1_20rem] min-w-0">
                 <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                     placeholder={t('coupons.searchPlaceholder')}
@@ -159,7 +172,7 @@ export default function CouponFilters({
 
             {/* Active status */}
             <Select dir={i18n.dir()} value={filters.active || 'all'} onValueChange={onActiveChange}>
-                <SelectTrigger className="w-full sm:w-36 shrink-0" data-testid="coupons-filters-active-select-trigger">
+                <SelectTrigger className="w-full sm:w-36 sm:flex-[0_1_9rem]" data-testid="coupons-filters-active-select-trigger">
                     <SelectValue placeholder={t('coupons.filters.active.label')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -177,7 +190,7 @@ export default function CouponFilters({
 
             {/* Discount type */}
             <Select dir={i18n.dir()} value={filters.discount_type || 'all'} onValueChange={onDiscountTypeChange}>
-                <SelectTrigger className="w-full sm:w-36 shrink-0" data-testid="coupons-filters-type-select-trigger">
+                <SelectTrigger className="w-full sm:w-36 sm:flex-[0_1_9rem]" data-testid="coupons-filters-type-select-trigger">
                     <SelectValue placeholder={t('coupons.filters.type.label')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -194,7 +207,7 @@ export default function CouponFilters({
             </Select>
 
             {/* Date range — single popover with mode="range" */}
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] sm:flex items-center gap-1 min-w-0 w-full sm:w-auto sm:flex-none" data-testid="coupons-filters-date-range">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] sm:flex sm:flex-[1_1_15rem] items-center gap-1 min-w-0 w-full sm:w-auto" data-testid="coupons-filters-date-range">
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button
@@ -202,7 +215,7 @@ export default function CouponFilters({
                             variant="outline"
                             id="coupon-date-range"
                             className={cn(
-                                'w-full sm:w-56 max-w-full justify-start text-start font-normal',
+                                'w-full sm:flex-1 sm:min-w-0 max-w-full justify-start text-start font-normal',
                                 !filters.startDate && 'text-muted-foreground'
                             )}
                             data-testid="coupons-filters-date-range-button"
@@ -238,15 +251,48 @@ export default function CouponFilters({
                 </Button>
             </div>
 
-            {/* Product picker — inline dropdown with search */}
+            {/* Category filter */}
             <div className="grid grid-cols-[minmax(0,1fr)_auto] sm:flex items-center gap-1 min-w-0 w-full sm:w-auto sm:flex-none">
+                <Select
+                    dir={i18n.dir()}
+                    value={filters.category_id || ''}
+                    onValueChange={onCategoryFilterChange}
+                    disabled={categoriesLoading}
+                >
+                    <SelectTrigger className="w-full sm:w-48 shrink-0" data-testid="coupons-filters-category-select-trigger">
+                        <SelectValue placeholder={selectedCategory?.title || t('coupons.filters.category.placeholder')} />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                        {categoryOptions.map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                                {category.title}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0"
+                    onClick={() => onCategoryFilterClear?.()}
+                    disabled={!filters.category_id}
+                    data-testid="coupons-filters-category-clear-button"
+                    title={t('coupons.filters.category.clear')}
+                >
+                    <X className="h-4 w-4" />
+                </Button>
+            </div>
+
+            {/* Product picker — inline dropdown with search */}
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] sm:flex sm:flex-[1_1_13rem] items-center gap-1 min-w-0 w-full sm:w-auto">
                 <Popover open={productDropdownOpen} onOpenChange={setProductDropdownOpen}>
                     <PopoverTrigger asChild>
                         <Button
                             type="button"
                             variant="outline"
                             className={cn(
-                                'w-full sm:w-48 max-w-full justify-between text-start font-normal',
+                                'w-full sm:flex-1 sm:min-w-0 max-w-full justify-between text-start font-normal',
                                 !selectedProductLabel && 'text-muted-foreground'
                             )}
                             data-testid="coupons-product-picker-open-button"

@@ -621,7 +621,7 @@
   },
   "coupons": {
     "title": "إدارة القسائم",
-    "subtitle": "إنشاء وتعديل وإدارة قسائم المنتجات",
+    "subtitle": "إنشاء وتعديل وإدارة قسائم المنتجات والفئات",
     "totalCoupons": "{{count}} قسائم",
     "searchPlaceholder": "ابحث بالكود...",
     "empty": "لا توجد قسائم.",
@@ -645,6 +645,10 @@
         "placeholder": "تصفية حسب المنتج",
         "clear": "مسح"
       },
+      "category": {
+        "placeholder": "تصفية حسب الفئة",
+        "clear": "مسح"
+      },
       "type": {
         "label": "النوع",
         "all": "كل الأنواع",
@@ -662,6 +666,10 @@
       "percentage": "نسبة مئوية",
       "amount": "قيمة ثابتة"
     },
+    "scope": {
+      "product": "منتج",
+      "category": "فئة"
+    },
     "status": {
       "active": "نشط",
       "inactive": "غير نشط"
@@ -678,6 +686,7 @@
       "discountType": "نوع الخصم",
       "discountValue": "قيمة الخصم",
       "productId": "معرف المنتج",
+      "appliesTo": "ينطبق على",
       "dates": "التواريخ",
       "createdAt": "تاريخ الإنشاء",
       "startsAt": "تاريخ البداية",
@@ -696,8 +705,13 @@
         "percentage": "%",
         "amount": "ج.م"
       },
+      "appliesTo": "ينطبق على",
+      "appliesToPlaceholder": "اختر هدف القسيمة",
       "productId": "معرف المنتج",
       "productIdPlaceholder": "الرجاء النقر على 'اختيار منتج' لتحديد المنتج",
+      "categoryId": "الفئة",
+      "categoryIdPlaceholder": "اختر فئة أو فئة فرعية",
+      "categoryScopeHint": "تنطبق على المنتجات داخل هذه الفئة وفئاتها الفرعية.",
       "startsAt": "تاريخ البداية",
       "startsAtPlaceholder": "اختر تاريخ البداية",
       "expiresAt": "تاريخ الانتهاء",
@@ -755,6 +769,7 @@
       "codeFormat": "يجب أن يحتوي الكود على أحرف إنجليزية كبيرة وأرقام وشرطات فقط",
       "discountTypeRequired": "نوع الخصم مطلوب",
       "productRequired": "معرف المنتج مطلوب",
+      "categoryRequired": "الفئة مطلوبة",
       "startsAtRequired": "تاريخ البداية مطلوب",
       "startsAtBeforeExpiresAt": "يجب أن يكون تاريخ البداية قبل تاريخ الانتهاء",
       "expiresAtRequired": "تاريخ الانتهاء مطلوب",

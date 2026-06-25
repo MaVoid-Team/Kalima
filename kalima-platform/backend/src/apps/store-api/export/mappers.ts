@@ -80,19 +80,22 @@ export const categoryMapper: ExportMapper = {
 
 export const couponMapper: ExportMapper = {
   columns: [
-    "id", "code", "product_id", "product_title", "discount_amount",
+    "id", "code", "applicability_scope", "product_id", "product_title", "category_id", "category_title", "discount_amount",
     "discount_percentage", "active", "starts_at", "expires_at", "created_at",
   ],
   headers: [
-    "ID", "Code", "Product ID", "Product Title", "Discount Amount",
+    "ID", "Code", "Applies To", "Product ID", "Product Title", "Category ID", "Category Title", "Discount Amount",
     "Discount %", "Active", "Starts At", "Expires At", "Created At",
   ],
   toRow(r: any) {
     return {
       id: r.id,
       code: r.code ?? "",
+      applicability_scope: r.applicability_scope ?? (r.category_id ? "category" : "product"),
       product_id: r.product_id ?? "",
       product_title: r.product?.title ?? "",
+      category_id: r.category_id ?? "",
+      category_title: r.category?.title ?? "",
       discount_amount: r.discount_amount != null ? Number(r.discount_amount) : "",
       discount_percentage: r.discount_percentage ?? "",
       active: r.active ? "Yes" : "No",

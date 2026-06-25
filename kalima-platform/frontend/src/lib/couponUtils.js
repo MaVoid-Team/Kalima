@@ -38,6 +38,24 @@ export const getCouponId = (coupon) => coupon?.id || coupon?._id;
 
 export const isCouponActive = (coupon) => coupon?.is_active ?? coupon?.active ?? false;
 
+export const getCouponApplicabilityScope = (coupon) => (
+    coupon?.applicability_scope || (coupon?.category_id ? 'category' : 'product')
+);
+
+export const formatCouponApplicability = (coupon, t) => {
+    const scope = getCouponApplicabilityScope(coupon);
+    if (scope === 'category') {
+        const label = coupon?.category?.title || coupon?.category_title || coupon?.category_id;
+        return label
+            ? `${t('coupons.scope.category')}: ${label}`
+            : t('coupons.scope.category');
+    }
+
+    const label = coupon?.product?.title || coupon?.product_title || coupon?.product_id;
+    return label
+        ? `${t('coupons.scope.product')}: ${label}`
+        : t('coupons.scope.product');
+};
 
 export const formatDiscount = (coupon, t, i18n) => {
     if (getDiscountType(coupon) === 'PERCENTAGE') {
@@ -46,4 +64,3 @@ export const formatDiscount = (coupon, t, i18n) => {
 
     return `${coupon?.discount_amount ?? '—'} ${t('coupons.form.units.amount')}`;
 };
-

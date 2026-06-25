@@ -37,6 +37,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -102,6 +103,13 @@ const COLOR_CLASS_MAP = {
   amber: "bg-amber-600 text-white ring-amber-600/30",
   violet: "bg-violet-600 text-white ring-violet-600/30",
 };
+const COLOR_RING_CLASS_MAP = {
+  red: "ring-red-600/30",
+  blue: "ring-blue-600/30",
+  green: "ring-green-600/30",
+  amber: "ring-amber-600/30",
+  violet: "ring-violet-600/30",
+};
 const HOTSPOT_COLOR_STORAGE_KEY = "kalima_hotspot_color";
 const DEFAULT_HOTSPOT_COLOR = "blue";
 const contentBlockTypes = ["text", "image", "video", "audio", "file", "link", "question_answer"];
@@ -121,6 +129,13 @@ const getHotspotColorClasses = (hotspot) => {
     ? hotspot.display_behavior.color
     : DEFAULT_HOTSPOT_COLOR;
   return COLOR_CLASS_MAP[color];
+};
+
+const getHotspotRingClasses = (hotspot) => {
+  const color = hotspotColors.includes(hotspot?.display_behavior?.color)
+    ? hotspot.display_behavior.color
+    : DEFAULT_HOTSPOT_COLOR;
+  return COLOR_RING_CLASS_MAP[color];
 };
 
 const getHotspotColorRgb = (hotspot) => {
@@ -490,6 +505,8 @@ export default function AdminEBookletEditorPage() {
   const [hotspotLibraryReplaceOpen, setHotspotLibraryReplaceOpen] = useState(false);
   const [pendingInsertPreset, setPendingInsertPreset] = useState(null);
   const [presetForm, setPresetForm] = useState({ name: "", description: "", tags: "" });
+  const [documentUploadProgress, setDocumentUploadProgress] = useState(0);
+  const [documentUploading, setDocumentUploading] = useState(false);
 
   latestHotspotFormRef.current = hotspotForm;
 
@@ -1148,27 +1165,46 @@ export default function AdminEBookletEditorPage() {
   const handleDocumentUpload = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const response = await editor.uploadAsset("document", file, {
-      owner_type: "template",
-      owner_id: templateId || "",
-    });
-    const assetId = normalizeAssetId(response);
-    const metadata = normalizeMetadata(response);
-    if (assetId) {
-      if (!metadata?.page_count || !metadata?.page_dimensions?.length) {
-        toast.error(t("admin.editor.file.uploadRequired"));
-        return;
+    setDocumentUploading(true);
+    setDocumentUploadProgress(0);
+    try {
+      const response = await editor.uploadAsset(
+        "document",
+        file,
+        {
+          owner_type: "template",
+          owner_id: templateId || "",
+        },
+        {
+          onUploadProgress: (progressEvent) => {
+            if (!progressEvent.total) return;
+            setDocumentUploadProgress(
+              Math.min(99, Math.round((progressEvent.loaded * 100) / progressEvent.total)),
+            );
+          },
+        },
+      );
+      const assetId = normalizeAssetId(response);
+      const metadata = normalizeMetadata(response);
+      if (assetId) {
+        if (!metadata?.page_count || !metadata?.page_dimensions?.length) {
+          toast.error(t("admin.editor.file.uploadRequired"));
+          return;
+        }
+        setSelectedVersion(null);
+        setSelectedPage(1);
+        setVersionForm((current) => ({
+          ...current,
+          base_document_file_id: String(assetId),
+          page_count: String(metadata.page_count),
+          page_dimensions: metadata.page_dimensions,
+          document_filename: file.name,
+        }));
+        setDocumentUploadProgress(100);
+        toast.success(t("toasts.pdfDetected", { count: metadata.page_count }));
       }
-      setSelectedVersion(null);
-      setSelectedPage(1);
-      setVersionForm((current) => ({
-        ...current,
-        base_document_file_id: String(assetId),
-        page_count: String(metadata.page_count),
-        page_dimensions: metadata.page_dimensions,
-        document_filename: file.name,
-      }));
-      toast.success(t("toasts.pdfDetected", { count: metadata.page_count }));
+    } finally {
+      setDocumentUploading(false);
     }
   };
 
@@ -2059,18 +2095,28 @@ export default function AdminEBookletEditorPage() {
                       })
                     : t("admin.editor.file.empty")}
                 </div>
-                <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-3 text-sm font-medium hover:bg-accent">
+                <label
+                  className={`inline-flex h-9 items-center justify-center gap-2 rounded-md border bg-background px-3 text-sm font-medium hover:bg-accent ${
+                    documentUploading ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                  }`}
+                >
                   <Upload className="h-4 w-4" />
-                  {versionForm.base_document_file_id ? t("common.replace") : t("common.upload")}
+                  {documentUploading
+                    ? `${t("common.uploading")} ${documentUploadProgress}%`
+                    : versionForm.base_document_file_id
+                      ? t("common.replace")
+                      : t("common.upload")}
                   <input
                     type="file"
                     accept=".pdf,application/pdf"
                     className="hidden"
+                    disabled={documentUploading}
                     onChange={handleDocumentUpload}
                     data-testid="ebooklet-document-upload-input"
                   />
                 </label>
               </div>
+              {documentUploading && <Progress value={documentUploadProgress} className="h-2" />}
             </div>
             <div className="rounded-md border bg-muted/20 p-3 text-sm">
               <div className="text-xs font-semibold uppercase text-muted-foreground">
@@ -2381,6 +2427,7 @@ export default function AdminEBookletEditorPage() {
                     });
                   const opacity = Math.min(1, Math.max(0, parseNumber(hotspot.display_behavior?.opacity_percent, 100) / 100));
                   const isSelected = hotspotForm.id === hotspot.id;
+                  const shapeStyle = getHotspotShapeStyle(shape);
                   return (
                     <button
                       type="button"
@@ -2390,7 +2437,7 @@ export default function AdminEBookletEditorPage() {
                         event.stopPropagation();
                         selectHotspot(hotspot);
                       }}
-                      className={`absolute z-20 flex cursor-grab items-center justify-center border-2 border-white active:cursor-grabbing ${getHotspotGlowClasses(hotspot)} ${getHotspotColorClasses(hotspot)}`}
+                      className={`absolute z-20 flex cursor-grab items-center justify-center active:cursor-grabbing ${getHotspotGlowClasses(hotspot)} ${getHotspotRingClasses(hotspot)}`}
                       style={{
                         left: `${hotspot.x_percent}%`,
                         top: `${hotspot.y_percent}%`,
@@ -2398,9 +2445,8 @@ export default function AdminEBookletEditorPage() {
                         height: `${renderedHeight}%`,
                         minWidth: 16,
                         minHeight: 16,
-                        opacity,
                         transform: "translate(-50%, -50%)",
-                        ...getHotspotShapeStyle(shape),
+                        ...shapeStyle,
                         ...getHotspotGlowStyle(hotspot),
                       }}
                       title={
@@ -2414,10 +2460,17 @@ export default function AdminEBookletEditorPage() {
                         type: t(`admin.editor.hotspots.types.${hotspot.type}`, { defaultValue: hotspot.type }),
                       })}
                     >
-                      <span className="absolute -right-2 -top-2 rounded-full bg-background px-1 text-[10px] font-bold text-foreground shadow">
+                      <span
+                        className={`absolute inset-0 border-2 border-white ${getHotspotColorClasses(hotspot)}`}
+                        style={{ opacity, ...shapeStyle }}
+                      />
+                      <span
+                        className="absolute -right-2 -top-2 z-10 rounded-full bg-background px-1 text-[10px] font-bold text-foreground shadow"
+                        style={{ opacity }}
+                      >
                         {hotspot.reference_number || hotspot.id}
                       </span>
-                      <Icon className="h-3.5 w-3.5" />
+                      <Icon className="relative z-10 h-3.5 w-3.5 text-white" style={{ opacity }} />
                       {isSelected && resizeHandles.map((handle) => {
                         const positionClass = {
                           nw: "-left-1.5 -top-1.5 cursor-nwse-resize",
@@ -2445,11 +2498,12 @@ export default function AdminEBookletEditorPage() {
                     maxSize: 35,
                     aspectRatio: currentDimensions.width / currentDimensions.height,
                   });
-                  const opacity = Math.min(1, Math.max(0.35, parseNumber(hotspotForm.display_behavior?.opacity_percent, 100) / 100));
+                  const opacity = Math.min(1, Math.max(0, parseNumber(hotspotForm.display_behavior?.opacity_percent, 100) / 100));
                   const draftGlowStyle = getHotspotGlowStyle({ display_behavior: hotspotForm.display_behavior });
+                  const shapeStyle = getHotspotShapeStyle(shape);
                   return (
                     <div
-                      className="pointer-events-none absolute z-20 flex animate-pulse items-center justify-center border-2 border-dashed border-primary bg-primary/25 text-primary shadow-lg ring-4 ring-primary/20"
+                      className="pointer-events-none absolute z-20 flex animate-pulse items-center justify-center text-primary shadow-lg ring-4 ring-primary/20"
                       style={{
                         left: `${hotspotForm.x_percent}%`,
                         top: `${hotspotForm.y_percent}%`,
@@ -2457,18 +2511,24 @@ export default function AdminEBookletEditorPage() {
                         height: `${renderedHeight}%`,
                         minWidth: 18,
                         minHeight: 18,
-                        opacity,
                         transform: "translate(-50%, -50%)",
-                        ...getHotspotShapeStyle(shape),
+                        ...shapeStyle,
                         ...draftGlowStyle,
                       }}
                       data-testid="admin-e-booklet-draft-hotspot-preview"
                       aria-label={t("admin.editor.hotspots.draftPreview")}
                     >
-                      <span className="absolute -right-2 -top-2 rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow">
+                      <span
+                        className="absolute inset-0 border-2 border-dashed border-primary bg-primary/25"
+                        style={{ opacity, ...shapeStyle }}
+                      />
+                      <span
+                        className="absolute -right-2 -top-2 z-10 rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow"
+                        style={{ opacity }}
+                      >
                         {t("admin.editor.hotspots.draftPreviewShort")}
                       </span>
-                      <DraftIcon className="h-3.5 w-3.5" />
+                      <DraftIcon className="relative z-10 h-3.5 w-3.5" style={{ opacity }} />
                     </div>
                   );
                 })()}

@@ -50,6 +50,13 @@ const VIEWER_COLOR_CLASS_MAP = {
   amber: "bg-amber-600 ring-amber-600/30",
   violet: "bg-violet-600 ring-violet-600/30",
 };
+const VIEWER_RING_CLASS_MAP = {
+  red: "ring-red-600/30",
+  blue: "ring-blue-600/30",
+  green: "ring-green-600/30",
+  amber: "ring-amber-600/30",
+  violet: "ring-violet-600/30",
+};
 const VIEWER_COLOR_RGB_MAP = {
   red: "220 38 38",
   blue: "37 99 235",
@@ -73,6 +80,12 @@ const getHotspotColorClass = (hotspot) => {
   const color = hotspot?.display_behavior?.color;
   if (!color) return VIEWER_COLOR_CLASS_MAP[DEFAULT_HOTSPOT_COLOR];
   return VIEWER_COLOR_CLASS_MAP[color] || null;
+};
+
+const getHotspotRingClass = (hotspot) => {
+  const color = hotspot?.display_behavior?.color;
+  if (!color) return VIEWER_RING_CLASS_MAP[DEFAULT_HOTSPOT_COLOR];
+  return VIEWER_RING_CLASS_MAP[color] || "";
 };
 
 const getHotspotColorRgb = (hotspot) => {
@@ -213,11 +226,11 @@ function HotspotMarker({ hotspot, active, onOpen, t, pageDimensions }) {
     top: `${top}%`,
     width: `${width}%`,
     height: `${height}%`,
-    opacity,
     transform: "translate(-50%, -50%)",
   };
 
   if (shape === "triangle") {
+    const triangleStyle = { clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)" };
     return (
       <button
         type="button"
@@ -227,12 +240,17 @@ function HotspotMarker({ hotspot, active, onOpen, t, pageDimensions }) {
         aria-label={getHotspotLabel(hotspot, t)}
       >
         <span
-          className={`absolute inset-0 ${active ? "opacity-95" : "opacity-80"}`}
-          style={{ clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)", ...glowStyle }}
+          className={`absolute inset-0 ${glow > 0 ? "ring-4" : ""} ${getHotspotRingClass(hotspot)}`}
+          style={{ ...triangleStyle, ...glowStyle }}
+        />
+        <span
+          className={`absolute inset-0 ${colorClass}`}
+          style={{ ...triangleStyle, opacity }}
+        />
+        <span
+          className="relative z-10 flex h-7 min-w-7 items-center justify-center rounded-full border border-white bg-black/55 px-1 text-xs font-bold text-white shadow"
+          style={{ opacity }}
         >
-          <span className={`block h-full w-full ${colorClass}`} />
-        </span>
-        <span className="relative z-10 flex h-7 min-w-7 items-center justify-center rounded-full border border-white bg-black/55 px-1 text-xs font-bold text-white shadow">
           {getReference(hotspot)}
         </span>
       </button>
@@ -244,12 +262,16 @@ function HotspotMarker({ hotspot, active, onOpen, t, pageDimensions }) {
     <button
       type="button"
       onClick={() => onOpen(hotspot)}
-      className={`absolute flex items-center justify-center border-2 border-white text-white transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${glow > 0 ? "shadow-lg ring-4" : "shadow-md"} ${roundedClass} ${colorClass} ${active ? "scale-105 ring-offset-2" : ""}`}
+      className={`absolute flex items-center justify-center text-white transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${glow > 0 ? "shadow-lg ring-4" : "shadow-md"} ${roundedClass} ${getHotspotRingClass(hotspot)} ${active ? "scale-105 ring-offset-2" : ""}`}
       style={{ ...baseStyle, ...(shape === "circle" ? { clipPath: "circle(50% at 50% 50%)" } : {}), ...glowStyle }}
       aria-label={getHotspotLabel(hotspot, t)}
     >
-      <Icon className="h-4 w-4 opacity-90" />
-      <span className="ms-1 text-xs font-bold">{getReference(hotspot)}</span>
+      <span
+        className={`absolute inset-0 border-2 border-white ${roundedClass} ${colorClass}`}
+        style={{ opacity }}
+      />
+      <Icon className="relative z-10 h-4 w-4 opacity-90" style={{ opacity }} />
+      <span className="relative z-10 ms-1 text-xs font-bold" style={{ opacity }}>{getReference(hotspot)}</span>
     </button>
   );
 }
