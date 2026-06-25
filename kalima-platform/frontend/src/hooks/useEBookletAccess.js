@@ -13,6 +13,7 @@ export function useTeacherEBooklets() {
   const [milestones, setMilestones] = useState([]);
   const [wallet, setWallet] = useState(null);
   const [walletLedger, setWalletLedger] = useState([]);
+  const [walletRewardLots, setWalletRewardLots] = useState([]);
   const [currentTerms, setCurrentTerms] = useState(null);
 
   const fetchTeacherEBooklets = useCallback(async () => {
@@ -163,6 +164,7 @@ export function useTeacherEBooklets() {
     );
     setWallet(response?.data?.wallet || null);
     setWalletLedger(Array.isArray(response?.data?.ledger) ? response.data.ledger : []);
+    setWalletRewardLots(Array.isArray(response?.data?.rewardLots) ? response.data.rewardLots : []);
     return response;
   }, [fetchApi]);
 
@@ -184,6 +186,7 @@ export function useTeacherEBooklets() {
     milestones,
     wallet,
     walletLedger,
+    walletRewardLots,
     currentTerms,
     loading,
     fetchTeacherEBooklets,

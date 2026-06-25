@@ -22,6 +22,7 @@ export default function TeacherEBookletsPage() {
     items,
     milestones,
     wallet,
+    walletRewardLots,
     currentTerms,
     loading,
     fetchTeacherEBooklets,
@@ -44,6 +45,9 @@ export default function TeacherEBookletsPage() {
   const remainingToNext = nextMilestone ? Math.max(0, milestoneTarget(nextMilestone) - paidCount) : 0;
   const claimableMilestone = sortedMilestones.find((milestone) => milestoneAchievementId(milestone) && !milestone?.claimed_at && !milestone?.achievement?.claimed_at);
   const walletBalance = numberOrFallback(wallet?.balance);
+  const nearestExpiringRewardLot = [...walletRewardLots]
+    .filter((lot) => numberOrFallback(lot?.remaining_amount) > 0 && lot?.expires_at)
+    .sort((a, b) => new Date(a.expires_at) - new Date(b.expires_at))[0];
   const claimableRewardValue = claimableMilestone ? milestoneReward(claimableMilestone) : 0;
   const nextMilestoneTarget = nextMilestone ? milestoneTarget(nextMilestone) : paidCount;
   const milestoneProgressPercent = nextMilestoneTarget > 0 ? Math.min(100, Math.round((paidCount / nextMilestoneTarget) * 100)) : 100;
@@ -179,6 +183,14 @@ export default function TeacherEBookletsPage() {
               <span>{t("teacher.milestones.paidProgress")}: {paidCount}</span>
               <span>{nextMilestone ? `${t("teacher.milestones.nextRemaining")}: ${remainingToNext}` : t("teacher.milestones.allDone")}</span>
             </div>
+            {nearestExpiringRewardLot && (
+              <div className="mt-3 rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-xs text-white/85">
+                {t("teacher.wallet.nearestExpiry", {
+                  value: formatMoney(nearestExpiringRewardLot.remaining_amount),
+                  date: formatDate(nearestExpiringRewardLot.expires_at),
+                })}
+              </div>
+            )}
           </div>
 
           <p className="relative mt-4 rounded-xl border border-white/10 bg-red-950/25 p-3 text-sm text-white/85 backdrop-blur">{t("teacher.wallet.noStacking")}</p>

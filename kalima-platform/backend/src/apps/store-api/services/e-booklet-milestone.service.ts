@@ -11,6 +11,7 @@ type EBookletMilestoneEvaluationContext = {
 };
 
 const MILESTONE_NOTIFICATION_RECIPIENTS = new Set(["admins", "teacher_and_admins"]);
+const DEFAULT_REWARD_EXPIRY_DAYS = 120;
 
 export class EBookletMilestoneService {
   constructor(private readonly db: any, private readonly options: EBookletMilestoneServiceOptions = {}) {}
@@ -51,6 +52,16 @@ export class EBookletMilestoneService {
     const n = Number(value);
     if (!Number.isInteger(n) || n <= 0) throw new BadRequestError(`Invalid ${label}.`);
     return n;
+  }
+
+  private rewardExpiryDays(value: any): number {
+    return this.positiveInt(value ?? DEFAULT_REWARD_EXPIRY_DAYS, "reward expiry days");
+  }
+
+  private addDays(value: Date, days: number): Date {
+    const next = new Date(value);
+    next.setUTCDate(next.getUTCDate() + days);
+    return next;
   }
 
   private nonNegativeNumber(value: any, label: string, required = false): number | null {
@@ -145,6 +156,7 @@ export class EBookletMilestoneService {
     const milestonePrice = this.nonNegativeNumber(input.milestonePrice ?? input.milestone_price, "milestone price", true);
     const previousPriceSnapshot = this.nonNegativeNumber(input.previousPriceSnapshot ?? input.previous_price_snapshot, "previous price");
     const rewardAmountSnapshot = this.nonNegativeNumber(input.rewardAmountSnapshot ?? input.reward_amount_snapshot, "reward amount", true);
+    const rewardExpiryDays = this.rewardExpiryDays(input.rewardExpiryDays ?? input.reward_expiry_days);
     const title = this.nonEmptyString(input.title, "milestone title");
     const sortOrder = this.finiteInt(input.sortOrder ?? input.sort_order ?? 0, "sort order");
     const active = input.active === undefined ? true : this.strictBoolean(input.active, "active flag");
@@ -158,6 +170,7 @@ export class EBookletMilestoneService {
         milestone_price: milestonePrice,
         previous_price_snapshot: previousPriceSnapshot,
         reward_amount_snapshot: rewardAmountSnapshot,
+        reward_expiry_days: rewardExpiryDays,
         notification_recipients: this.notificationRecipients(input.notificationRecipients ?? input.notification_recipients),
         sort_order: sortOrder,
         active,
@@ -176,6 +189,7 @@ export class EBookletMilestoneService {
     if (input.milestonePrice !== undefined || input.milestone_price !== undefined) data.milestone_price = this.nonNegativeNumber(input.milestonePrice ?? input.milestone_price, "milestone price", true);
     if (input.previousPriceSnapshot !== undefined || input.previous_price_snapshot !== undefined) data.previous_price_snapshot = this.nonNegativeNumber(input.previousPriceSnapshot ?? input.previous_price_snapshot, "previous price");
     if (input.rewardAmountSnapshot !== undefined || input.reward_amount_snapshot !== undefined) data.reward_amount_snapshot = this.nonNegativeNumber(input.rewardAmountSnapshot ?? input.reward_amount_snapshot, "reward amount", true);
+    if (input.rewardExpiryDays !== undefined || input.reward_expiry_days !== undefined) data.reward_expiry_days = this.rewardExpiryDays(input.rewardExpiryDays ?? input.reward_expiry_days);
     if (input.notificationRecipients !== undefined || input.notification_recipients !== undefined) data.notification_recipients = this.notificationRecipients(input.notificationRecipients ?? input.notification_recipients);
     if (input.sortOrder !== undefined || input.sort_order !== undefined) data.sort_order = this.finiteInt(input.sortOrder ?? input.sort_order, "sort order");
     if (input.active !== undefined) data.active = this.strictBoolean(input.active, "active flag");
@@ -281,11 +295,14 @@ export class EBookletMilestoneService {
         return { claimed: true, alreadyClaimed: true, achievement };
       }
 
+      const claimedAt = new Date();
+      const rewardExpiresAt = this.addDays(claimedAt, this.rewardExpiryDays(achievement.reward_expiry_days_snapshot));
       const claimUpdate = await tx.e_booklet_milestone_achievements.updateMany({
         where: { id: achievement.id, teacher_id: teacherId, claimed_at: null },
         data: {
-          reward_terms_accepted_at: new Date(),
-          claimed_at: new Date(),
+          reward_terms_accepted_at: claimedAt,
+          claimed_at: claimedAt,
+          reward_expires_at: rewardExpiresAt,
         },
       });
       if (claimUpdate.count !== 1) {
@@ -326,13 +343,16 @@ export class EBookletMilestoneService {
         where: { id: milestoneAchievementId, teacher_id: teacherId },
       }) ?? {
         ...achievement,
-        reward_terms_accepted_at: new Date(),
-        claimed_at: new Date(),
+        reward_terms_accepted_at: claimedAt,
+        claimed_at: claimedAt,
+        reward_expires_at: rewardExpiresAt,
       };
       const walletCredit = await new TeacherWalletService(tx).creditMilestone({
         teacherId,
         amount: this.number(achievement.reward_amount),
         milestoneAchievementId: achievement.id,
+        rewardExpiryDays: this.rewardExpiryDays(achievement.reward_expiry_days_snapshot),
+        claimedAt: updatedAchievement.claimed_at ?? new Date(),
         notes: `E-booklet milestone reward claim ${achievement.id}`,
       });
       return { claimed: true, alreadyClaimed: false, achievement: updatedAchievement, walletCredit };
@@ -388,6 +408,7 @@ export class EBookletMilestoneService {
             previous_price_snapshot: milestone.previous_price_snapshot ?? 0,
             milestone_price_snapshot: milestone.milestone_price,
             reward_amount: rewardAmount,
+            reward_expiry_days_snapshot: this.rewardExpiryDays(milestone.reward_expiry_days),
           },
         });
         awarded.push(achievement);

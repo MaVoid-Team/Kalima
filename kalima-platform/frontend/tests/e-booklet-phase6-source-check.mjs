@@ -16,6 +16,7 @@ const backendController = backendRead('src/apps/store-api/controllers/e-booklet.
 const milestoneService = backendRead('src/apps/store-api/services/e-booklet-milestone.service.ts');
 const prismaSchema = backendRead('src/apps/store-api/prisma/schema.prisma');
 const migration = backendRead('src/apps/store-api/prisma/migrations/20260614180000_e_booklet_terms_milestones_wallet/migration.sql');
+const rewardExpiryMigration = backendRead('src/apps/store-api/prisma/migrations/20260625143000_teacher_wallet_reward_expiry/migration.sql');
 
 assert.match(app, /AdminEBookletTermsMilestonesPage/, 'admin terms/milestones page must be lazy loaded');
 assert.match(app, /\/admin\/e-booklet-terms-milestones/, 'admin terms/milestones route must be registered');
@@ -37,7 +38,11 @@ assert.match(milestoneService, /includeInactive = false/, 'milestone service mus
 assert.match(milestoneService, /includeInactive \? \{\} : \{ active: true \}/, 'milestone service must allow admin listing inactive milestones');
 assert.match(milestoneService, /notification_recipients/, 'milestone service must persist notification recipient setting');
 assert.match(prismaSchema, /notification_recipients\s+String/, 'Prisma schema must persist notification recipients');
+assert.match(prismaSchema, /reward_expiry_days\s+Int\s+@default\(120\)/, 'Prisma schema must persist milestone reward expiry days');
+assert.match(prismaSchema, /model teacher_wallet_credit_lots/, 'Prisma schema must track wallet reward credit lots');
 assert.match(migration, /"notification_recipients" VARCHAR\(50\) NOT NULL DEFAULT 'admins'/, 'migration must create persisted notification recipients column');
+assert.match(rewardExpiryMigration, /"reward_expiry_days" INTEGER NOT NULL DEFAULT 120/, 'reward expiry migration must default milestone reward expiry to 120 days');
+assert.match(rewardExpiryMigration, /CREATE TABLE "teacher_wallet_credit_lots"/, 'reward expiry migration must create wallet credit lots table');
 
 assert.match(page, /data-testid="admin-e-booklet-terms-table"/, 'page must render admin terms table');
 assert.match(page, /data-testid="admin-e-booklet-term-form"/, 'page must render create/edit term form');
@@ -55,9 +60,12 @@ assert.match(page, /data-testid="admin-e-booklet-reward-enabled"/, 'page must re
 assert.match(page, /checked=\{milestoneForm\.rewardEnabled\}/, 'reward-enabled control must bind to milestone form state');
 assert.match(page, /onCheckedChange=\{\(value\) => updateMilestoneField\("rewardEnabled", Boolean\(value\)\)\}/, 'reward-enabled control must update milestone form state');
 assert.match(page, /rewardAmountSnapshot: milestoneForm\.rewardEnabled \? Number\(milestoneForm\.rewardAmountSnapshot \|\| 0\) : 0/, 'disabled rewards must submit an explicit zero reward amount');
+assert.match(page, /rewardExpiryDays/, 'milestone form must include reward expiry days');
+assert.match(page, /rewardExpiryDays: Number\(milestoneForm\.rewardExpiryDays \|\| 120\)/, 'milestone form must submit reward expiry days with 120 day default');
 assert.match(page, /disabled=\{!milestoneForm\.rewardEnabled\}/, 'reward amount input must be disabled when rewards are disabled');
 assert.match(milestoneService, /rewardAmountSnapshot[\s\S]*nonNegativeNumber/, 'backend create milestone contract must accept zero reward amount');
 assert.match(milestoneService, /data\.reward_amount_snapshot[\s\S]*nonNegativeNumber/, 'backend update milestone contract must accept zero reward amount');
+assert.match(milestoneService, /rewardExpiryDays[\s\S]*reward_expiry_days/, 'backend milestone contract must accept reward expiry days');
 assert.doesNotMatch(milestoneService, /rewardAmountSnapshot[\s\S]{0,120}positiveNumber/, 'backend create milestone contract must not reject zero reward amount');
 assert.match(migration, /"reward_amount_snapshot" IS NOT NULL AND "reward_amount_snapshot" >= 0/, 'DB milestone reward constraint must allow explicit zero reward amount');
 assert.match(migration, /"reward_amount" >= 0/, 'DB achievement reward constraint must allow zero rewards generated from disabled milestones');
@@ -72,6 +80,7 @@ for (const [localeName, locale] of [['en', en], ['ar', ar]]) {
   assert.match(locale, /termsMilestones/, `${localeName} locale must include terms/milestones admin copy`);
   assert.match(locale, /notificationRecipients/, `${localeName} locale must include notification-recipient copy`);
   assert.match(locale, /rewardEnabled/, `${localeName} locale must include reward-enabled copy`);
+  assert.match(locale, /rewardExpiryDays/, `${localeName} locale must include reward-expiry-days copy`);
 }
 
 console.log('Phase 6 admin frontend source contract passed');

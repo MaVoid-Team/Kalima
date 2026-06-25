@@ -1247,11 +1247,13 @@ export const eBookletController = {
 
   async getTeacherWallet(req: Request, res: Response, next: NextFunction) {
     try {
-      const [wallet, ledger] = await Promise.all([
-        domainServices().wallet.getWallet(currentUserId(req)),
-        domainServices().wallet.listLedger(currentUserId(req)),
+      const teacherId = currentUserId(req);
+      const [wallet, ledger, rewardLots] = await Promise.all([
+        domainServices().wallet.getWallet(teacherId),
+        domainServices().wallet.listLedger(teacherId),
+        domainServices().wallet.listRewardLots(teacherId),
       ]);
-      res.status(200).json({ success: true, data: { wallet, ledger } });
+      res.status(200).json({ success: true, data: { wallet, ledger, rewardLots } });
     } catch (error) {
       next(error);
     }

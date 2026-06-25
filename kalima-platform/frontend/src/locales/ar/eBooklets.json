@@ -641,6 +641,7 @@
       "previousPrice": "سعر الشريحة السابقة",
       "milestonePrice": "سعر المرحلة",
       "rewardAmount": "قيمة مكافأة المحفظة",
+      "rewardExpiryDays": "مدة انتهاء المكافأة بالأيام",
       "notificationRecipients": "مستلمو الإشعارات",
       "recipientAdmins": "الإدارة فقط",
       "recipientTeacherAdmins": "المعلم والإدارة",
@@ -1082,7 +1083,7 @@
       "empty": "لا توجد مراحل نشطة حاليا.",
       "claimCta": "تحصيل رصيد المحفظة",
       "rewardTermsTitle": "قبول شروط المكافأة",
-      "rewardTermsDescription": "التحصيل يضيف رصيد محفظة لا ينتهي. يمكن استخدامه في مشتريات كلمة ولا يجتمع مع الكوبونات.",
+      "rewardTermsDescription": "التحصيل يضيف رصيد محفظة بتاريخ انتهاء خاص بهذه المكافأة. يمكن استخدامه في مشتريات كلمة ولا يجتمع مع الكوبونات.",
       "activeTerm": "الفترة النشطة",
       "noActiveTerm": "لا توجد فترة نشطة",
       "termRange": "{{start}} – {{end}}",
@@ -1091,6 +1092,7 @@
     "wallet": {
       "title": "محفظة المعلم",
       "balance": "المحفظة: {{value}}",
+      "nearestExpiry": "{{value}} ينتهي في {{date}}",
       "noStacking": "رصيد المحفظة يحتفظ بالمتبقي ولا يمكن دمجه مع كوبون أو كود خصم."
     }
   },

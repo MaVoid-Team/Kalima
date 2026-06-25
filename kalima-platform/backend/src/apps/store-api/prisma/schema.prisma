@@ -107,6 +107,8 @@ model users {
   e_booklet_milestone_achievements    e_booklet_milestone_achievements[]    @relation("EBookletMilestoneAchievementTeacher")
   teacher_wallet                      teacher_wallets?                      @relation("TeacherWalletOwner")
   teacher_wallet_ledger               teacher_wallet_ledger[]               @relation("TeacherWalletLedgerTeacher")
+  teacher_wallet_credit_lots          teacher_wallet_credit_lots[]          @relation("TeacherWalletCreditLotTeacher")
+  teacher_wallet_spend_allocations    teacher_wallet_spend_allocations[]    @relation("TeacherWalletSpendAllocationTeacher")
   teacher_terms_acceptances           e_booklet_teacher_terms_acceptances[] @relation("EBookletTeacherTermsAcceptanceTeacher")
   e_booklet_invites                   e_booklet_invites[]                   @relation("EBookletInviteTeacher")
   e_booklet_invite_redemptions        e_booklet_invite_redemptions[]        @relation("EBookletInviteRedemptionStudent")
@@ -1211,6 +1213,7 @@ model e_booklet_milestones {
   milestone_price         Decimal   @db.Decimal(10, 2)
   previous_price_snapshot Decimal?  @db.Decimal(10, 2)
   reward_amount_snapshot  Decimal?  @db.Decimal(10, 2)
+  reward_expiry_days      Int       @default(120)
   notification_recipients String    @default("admins") @db.VarChar(50)
   sort_order              Int       @default(0)
   active                  Boolean   @default(true)
@@ -1226,22 +1229,25 @@ model e_booklet_milestones {
 }
 
 model e_booklet_milestone_achievements {
-  id                        Int       @id @default(autoincrement())
-  teacher_id                Int
-  term_id                   Int
-  milestone_id              Int
-  paid_redemptions_snapshot Int
-  previous_price_snapshot   Decimal   @db.Decimal(10, 2)
-  milestone_price_snapshot  Decimal   @db.Decimal(10, 2)
-  reward_amount             Decimal   @db.Decimal(10, 2)
-  achieved_at               DateTime? @default(now()) @db.Timestamp(6)
-  reward_terms_accepted_at  DateTime? @db.Timestamp(6)
-  claimed_at                DateTime? @db.Timestamp(6)
+  id                          Int       @id @default(autoincrement())
+  teacher_id                  Int
+  term_id                     Int
+  milestone_id                Int
+  paid_redemptions_snapshot   Int
+  previous_price_snapshot     Decimal   @db.Decimal(10, 2)
+  milestone_price_snapshot    Decimal   @db.Decimal(10, 2)
+  reward_amount               Decimal   @db.Decimal(10, 2)
+  reward_expiry_days_snapshot Int?
+  reward_expires_at           DateTime? @db.Timestamp(6)
+  achieved_at                 DateTime? @default(now()) @db.Timestamp(6)
+  reward_terms_accepted_at    DateTime? @db.Timestamp(6)
+  claimed_at                  DateTime? @db.Timestamp(6)
 
   teacher               users                                 @relation("EBookletMilestoneAchievementTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   term                  e_booklet_terms                       @relation(fields: [term_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   milestone             e_booklet_milestones                  @relation(fields: [milestone_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   wallet_ledger_entries teacher_wallet_ledger[]
+  wallet_credit_lots    teacher_wallet_credit_lots[]
   terms_acceptances     e_booklet_teacher_terms_acceptances[]
 
   @@unique([teacher_id, term_id, milestone_id])
@@ -1280,8 +1286,10 @@ model teacher_wallets {
   created_at DateTime? @default(now()) @db.Timestamp(6)
   updated_at DateTime? @db.Timestamp(6)
 
-  teacher        users                   @relation("TeacherWalletOwner", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  ledger_entries teacher_wallet_ledger[]
+  teacher           users                              @relation("TeacherWalletOwner", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  ledger_entries    teacher_wallet_ledger[]
+  credit_lots       teacher_wallet_credit_lots[]
+  spend_allocations teacher_wallet_spend_allocations[]
 
   @@index([teacher_id], map: "ix_teacher_wallets_teacher")
 }
@@ -1300,11 +1308,13 @@ model teacher_wallet_ledger {
   notes                    String?                           @db.Text
   created_at               DateTime?                         @default(now()) @db.Timestamp(6)
 
-  wallet                teacher_wallets                   @relation(fields: [wallet_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  teacher               users                             @relation("TeacherWalletLedgerTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  milestone_achievement e_booklet_milestone_achievements? @relation(fields: [milestone_achievement_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  purchase              purchases?                        @relation(fields: [purchase_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  e_booklet_purchase    e_booklet_purchases?              @relation("TeacherWalletLedgerEBookletPurchase", fields: [e_booklet_purchase_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  wallet                teacher_wallets                    @relation(fields: [wallet_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  teacher               users                              @relation("TeacherWalletLedgerTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  milestone_achievement e_booklet_milestone_achievements?  @relation(fields: [milestone_achievement_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  purchase              purchases?                         @relation(fields: [purchase_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  e_booklet_purchase    e_booklet_purchases?               @relation("TeacherWalletLedgerEBookletPurchase", fields: [e_booklet_purchase_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  credit_lot            teacher_wallet_credit_lots?
+  spend_allocations     teacher_wallet_spend_allocations[] @relation("TeacherWalletSpendAllocationDebitLedger")
   // Partial unique index ux_teacher_wallet_ledger_one_milestone_reward_credit is defined in SQL migration.
 
   @@index([wallet_id, created_at], map: "ix_teacher_wallet_ledger_wallet_created")
@@ -1313,6 +1323,48 @@ model teacher_wallet_ledger {
   @@index([milestone_achievement_id], map: "ix_teacher_wallet_ledger_achievement")
   @@index([purchase_id], map: "ix_teacher_wallet_ledger_purchase")
   @@index([e_booklet_purchase_id], map: "ix_teacher_wallet_ledger_e_booklet_purchase")
+}
+
+model teacher_wallet_credit_lots {
+  id                       Int       @id @default(autoincrement())
+  wallet_id                Int
+  teacher_id               Int
+  credit_ledger_id         Int       @unique
+  milestone_achievement_id Int?
+  original_amount          Decimal   @db.Decimal(12, 2)
+  remaining_amount         Decimal   @db.Decimal(12, 2)
+  expires_at               DateTime  @db.Timestamp(6)
+  created_at               DateTime? @default(now()) @db.Timestamp(6)
+  updated_at               DateTime? @db.Timestamp(6)
+
+  wallet                teacher_wallets                    @relation(fields: [wallet_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  teacher               users                              @relation("TeacherWalletCreditLotTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  credit_ledger         teacher_wallet_ledger              @relation(fields: [credit_ledger_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  milestone_achievement e_booklet_milestone_achievements?  @relation(fields: [milestone_achievement_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  spend_allocations     teacher_wallet_spend_allocations[]
+
+  @@index([teacher_id, expires_at], map: "ix_teacher_wallet_credit_lots_teacher_expires")
+  @@index([wallet_id, expires_at], map: "ix_teacher_wallet_credit_lots_wallet_expires")
+  @@index([milestone_achievement_id], map: "ix_teacher_wallet_credit_lots_achievement")
+}
+
+model teacher_wallet_spend_allocations {
+  id              Int       @id @default(autoincrement())
+  wallet_id       Int
+  teacher_id      Int
+  credit_lot_id   Int
+  debit_ledger_id Int
+  amount          Decimal   @db.Decimal(12, 2)
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+
+  wallet       teacher_wallets            @relation(fields: [wallet_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  teacher      users                      @relation("TeacherWalletSpendAllocationTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  credit_lot   teacher_wallet_credit_lots @relation(fields: [credit_lot_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  debit_ledger teacher_wallet_ledger      @relation("TeacherWalletSpendAllocationDebitLedger", fields: [debit_ledger_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([teacher_id, created_at], map: "ix_teacher_wallet_spend_alloc_teacher_created")
+  @@index([credit_lot_id], map: "ix_teacher_wallet_spend_alloc_lot")
+  @@index([debit_ledger_id], map: "ix_teacher_wallet_spend_alloc_debit")
 }
 
 model e_booklet_access_codes {
@@ -1534,9 +1586,9 @@ model e_booklet_page_previews {
   created_at          DateTime? @default(now()) @db.Timestamp(6)
   updated_at          DateTime? @db.Timestamp(6)
 
-  document_file    e_booklet_file_assets       @relation("EBookletPagePreviewSourceDocument", fields: [document_file_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  document_file    e_booklet_file_assets        @relation("EBookletPagePreviewSourceDocument", fields: [document_file_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   template_version e_booklet_template_versions? @relation(fields: [template_version_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  image_file       e_booklet_file_assets       @relation("EBookletPagePreviewImage", fields: [image_file_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  image_file       e_booklet_file_assets        @relation("EBookletPagePreviewImage", fields: [image_file_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([document_file_id, page_number, size_key], map: "ux_e_booklet_page_previews_document_page_size")
   @@index([template_version_id, page_number], map: "ix_e_booklet_page_previews_version_page")
