@@ -26,6 +26,7 @@ export default function TeacherInviteManagementPage() {
     students,
     milestones,
     wallet,
+    walletRewardLots,
     currentTerms,
     loading,
     fetchTeacherEBooklets,
@@ -107,6 +108,11 @@ export default function TeacherInviteManagementPage() {
     return achievementId && !milestone?.claimed_at && !milestone?.achievement?.claimed_at;
   });
   const claimableAchievementId = claimableMilestone?.achievement?.id ?? claimableMilestone?.achievement_id ?? claimableMilestone?.milestone_achievement_id;
+  const nearestExpiringRewardLot = useMemo(() => {
+    return [...walletRewardLots]
+      .filter((lot) => numberOrFallback(lot?.remaining_amount) > 0 && lot?.expires_at)
+      .sort((a, b) => new Date(a.expires_at) - new Date(b.expires_at))[0] || null;
+  }, [walletRewardLots]);
 
   const instanceExpiry = instance?.access_expires_at || instance?.expires_at || instance?.valid_until || null;
   const currency = instance?.currency || instance?.template?.currency || "EGP";
@@ -229,6 +235,14 @@ export default function TeacherInviteManagementPage() {
         <div className="rounded-lg border bg-background p-4" data-testid="teacher-wallet-balance">
           <div className="text-xs uppercase text-muted-foreground">{t("teacher.wallet.title")}</div>
           <div className="mt-2 text-2xl font-semibold">{formatMoney(wallet?.balance)}</div>
+          {nearestExpiringRewardLot && (
+            <div className="mt-2 text-xs text-muted-foreground">
+              {t("teacher.wallet.nearestExpiry", {
+                value: formatMoney(nearestExpiringRewardLot.remaining_amount),
+                date: formatDate(nearestExpiringRewardLot.expires_at),
+              })}
+            </div>
+          )}
         </div>
         <div className="rounded-lg border bg-background p-4">
           <div className="text-xs uppercase text-muted-foreground">{t("teacher.invites.activeStudents")}</div>

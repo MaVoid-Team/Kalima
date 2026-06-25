@@ -43,6 +43,7 @@ const emptyMilestoneForm = {
   milestonePrice: "",
   previousPriceSnapshot: "",
   rewardAmountSnapshot: "",
+  rewardExpiryDays: "120",
   sortOrder: "0",
   active: true,
   rewardEnabled: true,
@@ -199,6 +200,7 @@ export default function AdminEBookletTermsMilestonesPage() {
       milestonePrice: String(milestone.milestone_price ?? ""),
       previousPriceSnapshot: String(milestone.previous_price_snapshot ?? ""),
       rewardAmountSnapshot: String(milestone.reward_amount_snapshot ?? ""),
+      rewardExpiryDays: String(milestone.reward_expiry_days ?? 120),
       sortOrder: String(milestone.sort_order ?? 0),
       active: Boolean(milestone.active),
       rewardEnabled: Number(milestone.reward_amount_snapshot ?? 0) > 0,
@@ -221,6 +223,7 @@ export default function AdminEBookletTermsMilestonesPage() {
       milestonePrice: Number(milestoneForm.milestonePrice || 0),
       previousPriceSnapshot: milestoneForm.previousPriceSnapshot === "" ? null : Number(milestoneForm.previousPriceSnapshot),
       rewardAmountSnapshot: milestoneForm.rewardEnabled ? Number(milestoneForm.rewardAmountSnapshot || 0) : 0,
+      rewardExpiryDays: Number(milestoneForm.rewardExpiryDays || 120),
       sortOrder: Number(milestoneForm.sortOrder || 0),
       active: milestoneForm.active,
       notificationRecipients: milestoneForm.notificationRecipients,
@@ -438,7 +441,7 @@ export default function AdminEBookletTermsMilestonesPage() {
                 <div className="overflow-hidden rounded-lg border" data-testid="admin-e-booklet-milestones-table">
                   <div className="hidden md:block">
                     <Table className="min-w-[900px]">
-                      <TableHeader><TableRow><TableHead>{t("admin.termsMilestones.milestone")}</TableHead><TableHead numeric>{t("admin.termsMilestones.target")}</TableHead><TableHead numeric>{t("admin.termsMilestones.pricing")}</TableHead><TableHead numeric>{t("admin.termsMilestones.reward")}</TableHead><TableHead>{t("common.status")}</TableHead><TableHead actions>{t("common.actions")}</TableHead></TableRow></TableHeader>
+                      <TableHeader><TableRow><TableHead>{t("admin.termsMilestones.milestone")}</TableHead><TableHead numeric>{t("admin.termsMilestones.target")}</TableHead><TableHead numeric>{t("admin.termsMilestones.pricing")}</TableHead><TableHead numeric>{t("admin.termsMilestones.reward")}</TableHead><TableHead numeric>{t("admin.termsMilestones.rewardExpiryDays")}</TableHead><TableHead>{t("common.status")}</TableHead><TableHead actions>{t("common.actions")}</TableHead></TableRow></TableHeader>
                       <TableBody>
                         {scopedMilestones.map((milestone) => (
                           <TableRow key={milestone.id}>
@@ -446,11 +449,12 @@ export default function AdminEBookletTermsMilestonesPage() {
                             <TableCell numeric>{milestone.target_paid_redemptions}</TableCell>
                             <TableCell numeric className="whitespace-nowrap">{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</TableCell>
                             <TableCell numeric>{money(milestone.reward_amount_snapshot)}</TableCell>
+                            <TableCell numeric>{milestone.reward_expiry_days ?? 120}</TableCell>
                             <TableCell status><Badge variant={milestone.active ? "default" : "outline"}>{milestone.active ? t("common.active") : t("statuses.disabled")}</Badge></TableCell>
                             <TableCell actions className="whitespace-nowrap"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button><Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button><Button size="sm" variant="destructive" onClick={() => removeMilestone(milestone)} disabled={actionLoading} data-testid="admin-e-booklet-delete-milestone"><Trash2 className="h-4 w-4" />{t("common.delete", { defaultValue: "Delete" })}</Button></div></TableCell>
                           </TableRow>
                         ))}
-                        {scopedMilestones.length === 0 && (<TableRow><TableCell colSpan={6} className="h-20 text-center text-muted-foreground">{t("admin.termsMilestones.emptyMilestones")}</TableCell></TableRow>)}
+                        {scopedMilestones.length === 0 && (<TableRow><TableCell colSpan={7} className="h-20 text-center text-muted-foreground">{t("admin.termsMilestones.emptyMilestones")}</TableCell></TableRow>)}
                       </TableBody>
                     </Table>
                   </div>
@@ -464,6 +468,7 @@ export default function AdminEBookletTermsMilestonesPage() {
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.target")}</span>{milestone.target_paid_redemptions}</div>
                           <div><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.reward")}</span>{money(milestone.reward_amount_snapshot)}</div>
+                          <div><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.rewardExpiryDays")}</span>{milestone.reward_expiry_days ?? 120}</div>
                           <div className="col-span-2"><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.pricing")}</span>{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</div>
                         </div>
                         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -501,6 +506,7 @@ export default function AdminEBookletTermsMilestonesPage() {
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.previousPrice")}</Label><Input type="number" value={milestoneForm.previousPriceSnapshot} onChange={(e) => updateMilestoneField("previousPriceSnapshot", e.target.value)} /></div>
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.milestonePrice")}</Label><Input name="milestonePrice" type="number" value={milestoneForm.milestonePrice} onChange={(e) => updateMilestoneField("milestonePrice", e.target.value)} /></div>
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.rewardAmount")}</Label><Input type="number" value={milestoneForm.rewardAmountSnapshot} onChange={(e) => updateMilestoneField("rewardAmountSnapshot", e.target.value)} disabled={!milestoneForm.rewardEnabled} /></div>
+                  <div className="space-y-2"><Label>{t("admin.termsMilestones.rewardExpiryDays")}</Label><Input type="number" min="1" value={milestoneForm.rewardExpiryDays} onChange={(e) => updateMilestoneField("rewardExpiryDays", e.target.value)} disabled={!milestoneForm.rewardEnabled} /></div>
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.notificationRecipients")}</Label><Select value={milestoneForm.notificationRecipients} onValueChange={(value) => updateMilestoneField("notificationRecipients", value)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="admins">{t("admin.termsMilestones.recipientAdmins")}</SelectItem><SelectItem value="teacher_and_admins">{t("admin.termsMilestones.recipientTeacherAdmins")}</SelectItem></SelectContent></Select></div>
                 </div>
                 <div className="grid gap-2 rounded-lg border p-3">

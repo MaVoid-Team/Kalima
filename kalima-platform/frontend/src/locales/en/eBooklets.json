@@ -641,6 +641,7 @@
       "previousPrice": "Previous tier price",
       "milestonePrice": "Milestone price",
       "rewardAmount": "Wallet reward amount",
+      "rewardExpiryDays": "Reward expiry days",
       "notificationRecipients": "Notification recipients",
       "recipientAdmins": "Admins only",
       "recipientTeacherAdmins": "Teacher and admins",
@@ -1082,7 +1083,7 @@
       "empty": "No active milestones are configured yet.",
       "claimCta": "Claim wallet credit",
       "rewardTermsTitle": "Accept reward terms",
-      "rewardTermsDescription": "Claiming adds non-expiring wallet credit. It can be used on Kalima purchases and cannot stack with coupons.",
+      "rewardTermsDescription": "Claiming adds wallet credit with its own reward expiry date. It can be used on Kalima purchases and cannot stack with coupons.",
       "activeTerm": "Active term",
       "noActiveTerm": "No active term",
       "termRange": "{{start}} – {{end}}",
@@ -1091,6 +1092,7 @@
     "wallet": {
       "title": "Teacher wallet",
       "balance": "Wallet: {{value}}",
+      "nearestExpiry": "{{value}} expires on {{date}}",
       "noStacking": "Wallet credit keeps leftover balance and cannot be combined with coupon or promo codes."
     }
   },
