@@ -18,6 +18,17 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ): void {
+  if (err.name === "MulterError") {
+    res.status(400).json({
+      success: false,
+      message:
+        (err as any).code === "LIMIT_FILE_SIZE"
+          ? "Uploaded file exceeds the allowed size limit."
+          : err.message,
+    });
+    return;
+  }
+
   // --- Validation errors (422) include the `errors` array ---
   if (err instanceof ValidationError) {
     res.status(err.statusCode).json({

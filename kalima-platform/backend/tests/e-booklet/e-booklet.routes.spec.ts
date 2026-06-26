@@ -46,6 +46,7 @@ const mockDomainServices = {
   wallet: {
     getWallet: jest.fn(),
     listLedger: jest.fn(),
+    listRewardLots: jest.fn(),
     previewPurchase: jest.fn(),
     applyToPurchase: jest.fn(),
   },
@@ -402,6 +403,52 @@ describe("e-booklet routes", () => {
     expect(mockService.createFileAsset).toHaveBeenCalledTimes(2);
     expect(mockService.createFileAsset).toHaveBeenLastCalledWith(
       expect.any(Object),
+      expect.objectContaining({ fileType: "file" }),
+    );
+  });
+
+  test("accepts supported hotspot video uploads and passes file_type=video", async () => {
+    mockService.createFileAsset.mockResolvedValue({ id: 88, file_type: "video" });
+
+    await request(app)
+      .post("/api/v2/admin/e-booklet-files/hotspot-media")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .field("file_type", "video")
+      .attach("media", Buffer.from("video"), {
+        filename: "clip.m4v",
+        contentType: "video/x-m4v",
+      })
+      .expect(201);
+
+    expect(mockService.createFileAsset).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fieldname: "media",
+        originalname: "clip.m4v",
+        mimetype: "video/x-m4v",
+      }),
+      expect.objectContaining({ fileType: "video" }),
+    );
+  });
+
+  test("accepts safe hotspot uploads with browser fallback MIME values", async () => {
+    mockService.createFileAsset.mockResolvedValue({ id: 89, file_type: "file" });
+
+    await request(app)
+      .post("/api/v2/admin/e-booklet-files/hotspot-media")
+      .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
+      .field("file_type", "file")
+      .attach("media", Buffer.from("xlsx"), {
+        filename: "worksheet.xlsx",
+        contentType: "application/octet-stream",
+      })
+      .expect(201);
+
+    expect(mockService.createFileAsset).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fieldname: "media",
+        originalname: "worksheet.xlsx",
+        mimetype: "application/octet-stream",
+      }),
       expect.objectContaining({ fileType: "file" }),
     );
   });
@@ -948,6 +995,7 @@ describe("e-booklet routes", () => {
     mockDomainServices.milestones.evaluateTeacherMilestones.mockResolvedValue({ termId: 1, paidFirstAccessCount: 12, awarded: [] });
     mockDomainServices.wallet.getWallet.mockResolvedValue({ id: 5, balance: 100 });
     mockDomainServices.wallet.listLedger.mockResolvedValue([{ id: 6, amount: 100 }]);
+    mockDomainServices.wallet.listRewardLots.mockResolvedValue([{ id: 7, remaining_amount: 100 }]);
     mockDomainServices.wallet.previewPurchase.mockResolvedValue({ balance: 100, walletCreditApplied: 40, finalTotal: 160, canApply: true });
     mockDomainServices.wallet.applyToPurchase.mockResolvedValue({ purchase: { id: 500, total: 160 }, walletCreditApplied: 40, finalTotal: 160 });
 

@@ -196,12 +196,48 @@ const MIME_TO_FILE_TYPE: Record<string, string> = {
   "video/mp4": "video",
   "video/webm": "video",
   "video/quicktime": "video",
+  "video/x-m4v": "video",
+  "video/ogg": "video",
   "audio/mpeg": "audio",
   "audio/mp3": "audio",
   "audio/wav": "audio",
   "audio/webm": "audio",
   "audio/ogg": "audio",
   "audio/mp4": "audio",
+};
+
+const FALLBACK_MIME_TYPES = new Set([
+  "application/octet-stream",
+  "application/zip",
+  "application/x-zip-compressed",
+]);
+
+const EXTENSION_TO_FILE_TYPE: Record<string, string> = {
+  ".pdf": "file",
+  ".doc": "file",
+  ".docx": "file",
+  ".xls": "file",
+  ".xlsx": "file",
+  ".ppt": "file",
+  ".pptx": "file",
+  ".txt": "file",
+  ".csv": "file",
+  ".jpg": "image",
+  ".jpeg": "image",
+  ".png": "image",
+  ".webp": "image",
+  ".gif": "image",
+  ".avif": "image",
+  ".mp4": "video",
+  ".webm": "video",
+  ".mov": "video",
+  ".qt": "video",
+  ".m4v": "video",
+  ".ogv": "video",
+  ".ogg": "audio",
+  ".mp3": "audio",
+  ".wav": "audio",
+  ".m4a": "audio",
 };
 
 const MIME_TO_EXT: Record<string, string> = {
@@ -223,6 +259,8 @@ const MIME_TO_EXT: Record<string, string> = {
   "video/mp4": ".mp4",
   "video/webm": ".webm",
   "video/quicktime": ".mov",
+  "video/x-m4v": ".m4v",
+  "video/ogg": ".ogv",
   "audio/mpeg": ".mp3",
   "audio/mp3": ".mp3",
   "audio/wav": ".wav",
@@ -249,6 +287,8 @@ const MIME_ALLOWED_EXTS: Record<string, string[]> = {
   "video/mp4": [".mp4"],
   "video/webm": [".webm"],
   "video/quicktime": [".mov", ".qt"],
+  "video/x-m4v": [".m4v", ".mp4"],
+  "video/ogg": [".ogv", ".ogg"],
   "audio/mpeg": [".mp3"],
   "audio/mp3": [".mp3"],
   "audio/wav": [".wav"],
@@ -256,6 +296,14 @@ const MIME_ALLOWED_EXTS: Record<string, string[]> = {
   "audio/ogg": [".ogg"],
   "audio/mp4": [".m4a", ".mp4"],
 };
+
+function inferEBookletFileType(file: Express.Multer.File): string | undefined {
+  const mimeFileType = MIME_TO_FILE_TYPE[file.mimetype];
+  if (mimeFileType) return mimeFileType;
+  if (!FALLBACK_MIME_TYPES.has(file.mimetype)) return undefined;
+  const ext = path.extname(file.originalname).toLowerCase();
+  return ext ? EXTENSION_TO_FILE_TYPE[ext] : undefined;
+}
 
 export interface PageDimensions {
   width: number;
@@ -943,7 +991,7 @@ export class EBookletService {
       throw new BadRequestError("No e-booklet file was uploaded.");
     }
 
-    const inferredFileType = MIME_TO_FILE_TYPE[file.mimetype];
+    const inferredFileType = inferEBookletFileType(file);
     if (input.fileType === "document" && file.mimetype !== "application/pdf") {
       await removeUploadedTempFile(file);
       throw new BadRequestError(

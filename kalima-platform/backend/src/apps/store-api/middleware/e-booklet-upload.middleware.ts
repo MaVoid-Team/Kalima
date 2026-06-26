@@ -21,6 +21,8 @@ const VIDEO_MIME_TYPES = new Set([
   "video/mp4",
   "video/webm",
   "video/quicktime",
+  "video/x-m4v",
+  "video/ogg",
 ]);
 
 const AUDIO_MIME_TYPES = new Set([
@@ -51,6 +53,12 @@ const HOTSPOT_MEDIA_MIME_TYPES = new Set([
   ...SAFE_ATTACHMENT_MIME_TYPES,
 ]);
 
+const FALLBACK_MIME_TYPES = new Set([
+  "application/octet-stream",
+  "application/zip",
+  "application/x-zip-compressed",
+]);
+
 const MIME_ALLOWED_EXTS: Record<string, string[]> = {
   "application/pdf": [".pdf"],
   "application/msword": [".doc"],
@@ -69,6 +77,8 @@ const MIME_ALLOWED_EXTS: Record<string, string[]> = {
   "video/mp4": [".mp4"],
   "video/webm": [".webm"],
   "video/quicktime": [".mov", ".qt"],
+  "video/x-m4v": [".m4v", ".mp4"],
+  "video/ogg": [".ogv", ".ogg"],
   "audio/mpeg": [".mp3"],
   "audio/mp3": [".mp3"],
   "audio/wav": [".wav"],
@@ -77,10 +87,20 @@ const MIME_ALLOWED_EXTS: Record<string, string[]> = {
   "audio/mp4": [".m4a", ".mp4"],
 };
 
+const HOTSPOT_FALLBACK_EXTS = new Set(
+  Object.values(MIME_ALLOWED_EXTS).flat(),
+);
+
 function hasAllowedExtension(file: Express.Multer.File): boolean {
   const ext = path.extname(file.originalname).toLowerCase();
   const allowed = MIME_ALLOWED_EXTS[file.mimetype];
   return !allowed || !ext || allowed.includes(ext);
+}
+
+function hasAllowedFallbackExtension(file: Express.Multer.File): boolean {
+  if (!FALLBACK_MIME_TYPES.has(file.mimetype)) return false;
+  const ext = path.extname(file.originalname).toLowerCase();
+  return Boolean(ext && HOTSPOT_FALLBACK_EXTS.has(ext));
 }
 
 const E_BOOKLET_UPLOAD_ROOT = path.resolve(
@@ -147,7 +167,10 @@ function hotspotMediaFilter(
   file: Express.Multer.File,
   cb: FileFilterCallback,
 ): void {
-  if (HOTSPOT_MEDIA_MIME_TYPES.has(file.mimetype) && hasAllowedExtension(file)) {
+  if (
+    (HOTSPOT_MEDIA_MIME_TYPES.has(file.mimetype) && hasAllowedExtension(file)) ||
+    hasAllowedFallbackExtension(file)
+  ) {
     cb(null, true);
     return;
   }

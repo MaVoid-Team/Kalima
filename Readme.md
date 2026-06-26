@@ -1,32 +1,101 @@
-**Project Documentation (How To Guide )** <br>
+# Kalima
 
-1- clone or pull latest update from the repository <br>
-2- open the project in your prefered IDE <br>
-3- cd kalima-platform <br>
-4- npm install <br>
-5- npm start for default website development. <br>
-6- npm run build for production <br>
+Local development uses a Vite React frontend and an Express backend inside `kalima-platform`.
 
-**Testing for android** <br>
-<br>
-1- Download Android Studio and install <br>
-2- Download Java JDK 21 from oracle.com <br>
-3- Configure environment variables for %ANDROID_HOME% and %JAVA_HOME% <br>
-4- npm run build. <br>
-5- npx cap sync. <br>
-6- npx cap run android. <br>
-**How to configure environment variables** <br>
-<br>
-1- After installing Android Studio, go to search bar and type "environment variables". <br>
-2- Click on "Edit the system environment variables" <br>
-3- Click on "Environment Variables" <br>
-4- Click on "New" <br>
-5- Type "ANDROID_HOME" in the "Variable name" field and "C:\Users\<username>\AppData\Local\Android\Sdk" in the "Variable value" field with username being your device username. <br>
-6- Click on "New" <br>
-7- Type "JAVA_HOME" in the "Variable name" field and "C:\Program Files\Java\jdk-21" in the "Variable value" field. <br>
-8- Click on "OK" <br>
-9- restart your IDE and terminal. <br>
-10- in cmd prompt or powershell as admin, run the following commands : <br>
-    - setx JAVA_HOME "C:\Program Files\Java\jdk-17" <br>
-    - setx PATH "%PATH%;%JAVA_HOME%\bin" <br>
-10- to verify, open cmd prompt as administrator and type echo %ANDROID_HOME% and echo %JAVA_HOME% and it should show you the locations of both the variables.
+## Local Setup
+
+Install dependencies from the repo root:
+
+```bash
+npm install
+npm --prefix kalima-platform/frontend install
+npm --prefix kalima-platform/backend install
+```
+
+Create local environment files if they do not already exist:
+
+```bash
+cp kalima-platform/.env.example kalima-platform/.env
+cp kalima-platform/frontend/.env.example kalima-platform/frontend/.env.local
+cp kalima-platform/backend/.env.example kalima-platform/backend/.env
+```
+
+Update the env files with the local database, Redis, Firebase, and service credentials required by the backend.
+
+## Run Locally
+
+Start the frontend and backend together from the repo root:
+
+```bash
+npm run dev
+```
+
+This runs:
+
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:5000`
+
+The Vite dev server proxies frontend requests for `/api` to the backend on `http://localhost:5000`.
+
+## Run Services Separately
+
+Frontend only:
+
+```bash
+npm --prefix kalima-platform/frontend run dev -- --host 0.0.0.0
+```
+
+Backend only:
+
+```bash
+PORT=5000 npm --prefix kalima-platform/backend run dev
+```
+
+## Android Testing
+
+1. Download and install Android Studio.
+2. Download Java JDK 21.
+3. Configure environment variables for `ANDROID_HOME` and `JAVA_HOME`.
+4. Run the production build:
+
+```bash
+cd kalima-platform
+npm run build
+```
+
+5. Sync Capacitor:
+
+```bash
+npx cap sync
+```
+
+6. Run Android:
+
+```bash
+npx cap run android
+```
+
+## Android Environment Variables
+
+After installing Android Studio:
+
+1. Open system environment variables.
+2. Add `ANDROID_HOME` with the Android SDK path, for example:
+
+```text
+C:\Users\<username>\AppData\Local\Android\Sdk
+```
+
+3. Add `JAVA_HOME` with the JDK path, for example:
+
+```text
+C:\Program Files\Java\jdk-21
+```
+
+4. Restart your IDE and terminal.
+5. Verify with:
+
+```powershell
+echo %ANDROID_HOME%
+echo %JAVA_HOME%
+```
