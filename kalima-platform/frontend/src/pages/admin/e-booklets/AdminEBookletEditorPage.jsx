@@ -513,6 +513,7 @@ export default function AdminEBookletEditorPage() {
   const [pendingInsertPreset, setPendingInsertPreset] = useState(null);
   const [presetForm, setPresetForm] = useState({ name: "", description: "", tags: "" });
   const [documentUploadProgress, setDocumentUploadProgress] = useState(0);
+  const [documentUploadPhase, setDocumentUploadPhase] = useState("idle");
   const [documentUploading, setDocumentUploading] = useState(false);
 
   latestHotspotFormRef.current = hotspotForm;
@@ -1173,6 +1174,7 @@ export default function AdminEBookletEditorPage() {
     const file = event.target.files?.[0];
     if (!file) return;
     setDocumentUploading(true);
+    setDocumentUploadPhase("uploading");
     setDocumentUploadProgress(0);
     try {
       const response = await editor.uploadAsset(
@@ -1185,9 +1187,11 @@ export default function AdminEBookletEditorPage() {
         {
           onUploadProgress: (progressEvent) => {
             if (!progressEvent.total) return;
-            setDocumentUploadProgress(
-              Math.min(99, Math.round((progressEvent.loaded * 100) / progressEvent.total)),
-            );
+            const nextProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setDocumentUploadProgress(Math.min(100, nextProgress));
+            if (nextProgress >= 100) {
+              setDocumentUploadPhase("processing");
+            }
           },
         },
       );
@@ -1212,6 +1216,7 @@ export default function AdminEBookletEditorPage() {
       }
     } finally {
       setDocumentUploading(false);
+      setDocumentUploadPhase("idle");
     }
   };
 
@@ -2109,7 +2114,9 @@ export default function AdminEBookletEditorPage() {
                 >
                   <Upload className="h-4 w-4" />
                   {documentUploading
-                    ? `${t("common.uploading")} ${documentUploadProgress}%`
+                    ? documentUploadPhase === "processing"
+                      ? t("common.processingPdf")
+                      : `${t("common.uploading")} ${documentUploadProgress}%`
                     : versionForm.base_document_file_id
                       ? t("common.replace")
                       : t("common.upload")}

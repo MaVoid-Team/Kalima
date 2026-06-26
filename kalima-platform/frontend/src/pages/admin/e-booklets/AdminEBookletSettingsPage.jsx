@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Bell, CalendarRange, Eye, KeyRound, RefreshCcw, Save, Settings, ShieldCheck, Smartphone, Truck } from "lucide-react";
+import { AlertCircle, Bell, CalendarRange, CheckCircle2, Gift, Eye, KeyRound, RefreshCcw, Save, Settings, ShieldCheck, Smartphone, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +31,7 @@ const emptyForm = {
   defaultAllowedDevicesPerStudent: "1",
   defaultAllowedDevicesPerTeacher: "2",
   previewPageLimit: "10",
+  defaultRewardExpiryDays: "120",
   deviceResetPolicy: "",
   notifyAdminsOnDelivery: true,
   notifyTeacherOnDelivery: true,
@@ -58,6 +59,7 @@ function toForm(settings) {
     defaultAllowedDevicesPerStudent: String(settings.default_allowed_devices_per_student ?? 1),
     defaultAllowedDevicesPerTeacher: String(settings.default_allowed_devices_per_teacher ?? 2),
     previewPageLimit: String(settings.preview_page_limit ?? 10),
+    defaultRewardExpiryDays: String(settings.default_reward_expiry_days ?? 120),
     deviceResetPolicy: settings.device_reset_policy || "",
     notifyAdminsOnDelivery: Boolean(settings.notify_admins_on_delivery),
     notifyTeacherOnDelivery: Boolean(settings.notify_teacher_on_delivery),
@@ -82,6 +84,7 @@ function toPayload(form) {
     defaultAllowedDevicesPerStudent: numberOrZero(form.defaultAllowedDevicesPerStudent),
     defaultAllowedDevicesPerTeacher: numberOrZero(form.defaultAllowedDevicesPerTeacher),
     previewPageLimit: numberOrZero(form.previewPageLimit),
+    defaultRewardExpiryDays: numberOrZero(form.defaultRewardExpiryDays),
     deviceResetPolicy: form.deviceResetPolicy,
     notifyAdminsOnDelivery: form.notifyAdminsOnDelivery,
     notifyTeacherOnDelivery: form.notifyTeacherOnDelivery,
@@ -159,6 +162,8 @@ export default function AdminEBookletSettingsPage() {
   const { settings, loading, fetchSettings, updateSettings } = useAdminEBookletSettings();
   const [form, setForm] = useState(emptyForm);
   const [activeSection, setActiveSection] = useState("delivery");
+  const [saveState, setSaveState] = useState("idle");
+  const [lastSavedAt, setLastSavedAt] = useState(null);
 
   useEffect(() => {
     fetchSettings();
@@ -168,11 +173,24 @@ export default function AdminEBookletSettingsPage() {
     setForm(toForm(settings));
   }, [settings]);
 
-  const updateField = (field, value) => setForm((current) => ({ ...current, [field]: value }));
+  const isDirty = JSON.stringify(form) !== JSON.stringify(toForm(settings));
+
+  const updateField = (field, value) => {
+    setForm((current) => ({ ...current, [field]: value }));
+    setSaveState("idle");
+  };
 
   const submit = async (event) => {
     event.preventDefault();
-    await updateSettings(toPayload(form));
+    setSaveState("saving");
+    try {
+      await updateSettings(toPayload(form));
+      setSaveState("saved");
+      setLastSavedAt(new Date());
+    } catch (error) {
+      setSaveState("error");
+      throw error;
+    }
   };
 
   return (
@@ -188,15 +206,43 @@ export default function AdminEBookletSettingsPage() {
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="outline" onClick={fetchSettings} disabled={loading}>
-              <RefreshCcw className="me-2 h-4 w-4" />
-              {t("admin.settings.refresh")}
-            </Button>
-            <Button type="submit" disabled={loading}>
-              <Save className="me-2 h-4 w-4" />
-              {t("admin.settings.save")}
-            </Button>
+          <div className="flex flex-col items-start gap-2 sm:items-end">
+            <div className="min-h-6 text-sm">
+              {saveState === "saved" && (
+                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 font-medium text-emerald-800">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {t("admin.settings.savedStatus", {
+                    time: lastSavedAt?.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                    defaultValue: "Saved at {{time}}",
+                  })}
+                </span>
+              )}
+              {saveState === "error" && (
+                <span className="inline-flex items-center gap-2 rounded-full border border-destructive/20 bg-destructive/10 px-3 py-1 font-medium text-destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  {t("admin.settings.saveFailedStatus", { defaultValue: "Save failed. Try again." })}
+                </span>
+              )}
+              {isDirty && saveState !== "saving" && saveState !== "error" && (
+                <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 font-medium text-amber-900">
+                  {t("admin.settings.unsavedStatus", { defaultValue: "Unsaved changes" })}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" variant="outline" onClick={fetchSettings} disabled={loading}>
+                <RefreshCcw className="me-2 h-4 w-4" />
+                {t("admin.settings.refresh")}
+              </Button>
+              <Button type="submit" disabled={loading}>
+                <Save className="me-2 h-4 w-4" />
+                {saveState === "saving"
+                  ? t("admin.settings.saving", { defaultValue: "Saving..." })
+                  : saveState === "saved" && !isDirty
+                    ? t("admin.settings.saved", { defaultValue: "Saved" })
+                    : t("admin.settings.save")}
+              </Button>
+            </div>
           </div>
         </div>
       </section>
@@ -236,6 +282,13 @@ export default function AdminEBookletSettingsPage() {
           description={t("admin.settings.previewPolicyDescription")}
           active={activeSection === "preview"}
           onClick={() => setActiveSection("preview")}
+        />
+        <SettingsCard
+          icon={Gift}
+          title={t("admin.settings.rewardPolicy")}
+          description={t("admin.settings.rewardPolicyDescription")}
+          active={activeSection === "rewards"}
+          onClick={() => setActiveSection("rewards")}
         />
         <SettingsCard
           icon={Bell}
@@ -325,6 +378,14 @@ export default function AdminEBookletSettingsPage() {
         <SettingsSection icon={Eye} title={t("admin.settings.previewPolicy")} description={t("admin.settings.previewPolicyDescription")}>
           <Field label={t("admin.settings.previewPageLimit")} hint={t("admin.settings.previewPageLimitHint")}>
             <Input type="number" min="1" max="200" value={form.previewPageLimit} onChange={(event) => updateField("previewPageLimit", event.target.value)} />
+          </Field>
+        </SettingsSection>
+      )}
+
+      {activeSection === "rewards" && (
+        <SettingsSection icon={Gift} title={t("admin.settings.rewardPolicy")} description={t("admin.settings.rewardPolicyDescription")}>
+          <Field label={t("admin.settings.defaultRewardExpiryDays")} hint={t("admin.settings.defaultRewardExpiryDaysHint")}>
+            <Input type="number" min="1" value={form.defaultRewardExpiryDays} onChange={(event) => updateField("defaultRewardExpiryDays", event.target.value)} />
           </Field>
         </SettingsSection>
       )}

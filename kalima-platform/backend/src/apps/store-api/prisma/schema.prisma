@@ -1155,6 +1155,7 @@ model e_booklet_global_settings {
   default_allowed_devices_per_student     Int       @default(1)
   default_allowed_devices_per_teacher     Int       @default(2)
   preview_page_limit                      Int       @default(10)
+  default_reward_expiry_days              Int       @default(120)
   device_reset_policy                     String?   @db.Text
   notify_admins_on_delivery               Boolean   @default(true)
   notify_teacher_on_delivery              Boolean   @default(true)

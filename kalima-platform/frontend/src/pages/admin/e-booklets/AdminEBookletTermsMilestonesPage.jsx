@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAdminEBookletTermsMilestones } from "@/hooks/admin/useAdminEBooklets";
+import { useAdminEBookletSettings, useAdminEBookletTermsMilestones } from "@/hooks/admin/useAdminEBooklets";
 import { cn } from "@/lib/utils";
 
 const emptyTermForm = {
@@ -49,6 +49,8 @@ const emptyMilestoneForm = {
   rewardEnabled: true,
   notificationRecipients: "admins",
 };
+
+const rewardExpiryDaysFromSettings = (settings) => String(settings?.default_reward_expiry_days ?? 120);
 
 const toDateInput = (value) => (value ? String(value).slice(0, 10) : "");
 const money = (value, fallback = "—") => {
@@ -99,6 +101,10 @@ function WorkspaceButton({ active, icon, title, detail, onClick }) {
 export default function AdminEBookletTermsMilestonesPage() {
   const { t, i18n } = useTranslation("eBooklets");
   const {
+    settings,
+    fetchSettings,
+  } = useAdminEBookletSettings();
+  const {
     terms,
     milestones,
     progress,
@@ -121,6 +127,7 @@ export default function AdminEBookletTermsMilestonesPage() {
   const [termForm, setTermForm] = useState(emptyTermForm);
   const [milestoneForm, setMilestoneForm] = useState(emptyMilestoneForm);
   const [activePanel, setActivePanel] = useState("milestones");
+  const defaultRewardExpiryDays = rewardExpiryDaysFromSettings(settings);
 
   const activeTerms = useMemo(() => terms.filter((term) => term.status === "active"), [terms]);
   const selectedTerm = useMemo(
@@ -134,14 +141,22 @@ export default function AdminEBookletTermsMilestonesPage() {
   }, [milestones, selectedTerm, selectedTermId]);
 
   const reload = useCallback(async () => {
-    await fetchTerms();
+    await Promise.all([fetchTerms(), fetchSettings()]);
     const termId = selectedTermId === "all" ? undefined : selectedTermId;
     await Promise.all([fetchMilestones(termId), fetchProgress(termId)]);
-  }, [fetchMilestones, fetchProgress, fetchTerms, selectedTermId]);
+  }, [fetchMilestones, fetchProgress, fetchSettings, fetchTerms, selectedTermId]);
 
   useEffect(() => {
     reload();
   }, [reload]);
+
+  useEffect(() => {
+    if (editingMilestoneId || !settings?.default_reward_expiry_days) return;
+    setMilestoneForm((current) => {
+      if (current.rewardExpiryDays && current.rewardExpiryDays !== emptyMilestoneForm.rewardExpiryDays) return current;
+      return { ...current, rewardExpiryDays: defaultRewardExpiryDays };
+    });
+  }, [defaultRewardExpiryDays, editingMilestoneId, settings?.default_reward_expiry_days]);
 
   const effectiveMilestoneTermId = milestoneForm.termId || (selectedTerm?.id ? String(selectedTerm.id) : "");
 
@@ -210,7 +225,7 @@ export default function AdminEBookletTermsMilestonesPage() {
 
   const resetMilestoneForm = () => {
     setEditingMilestoneId(null);
-    setMilestoneForm({ ...emptyMilestoneForm, termId: selectedTerm?.id ? String(selectedTerm.id) : "" });
+    setMilestoneForm({ ...emptyMilestoneForm, rewardExpiryDays: defaultRewardExpiryDays, termId: selectedTerm?.id ? String(selectedTerm.id) : "" });
   };
 
   const submitMilestone = async (event) => {
@@ -223,7 +238,7 @@ export default function AdminEBookletTermsMilestonesPage() {
       milestonePrice: Number(milestoneForm.milestonePrice || 0),
       previousPriceSnapshot: milestoneForm.previousPriceSnapshot === "" ? null : Number(milestoneForm.previousPriceSnapshot),
       rewardAmountSnapshot: milestoneForm.rewardEnabled ? Number(milestoneForm.rewardAmountSnapshot || 0) : 0,
-      rewardExpiryDays: Number(milestoneForm.rewardExpiryDays || 120),
+      rewardExpiryDays: Number(milestoneForm.rewardExpiryDays || defaultRewardExpiryDays),
       sortOrder: Number(milestoneForm.sortOrder || 0),
       active: milestoneForm.active,
       notificationRecipients: milestoneForm.notificationRecipients,
