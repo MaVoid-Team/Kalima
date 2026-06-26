@@ -299,10 +299,17 @@ const getHotspotGlowClasses = (hotspot) => (
 const getHotspotGlowStyle = (hotspot) => {
   const glow = getHotspotGlowPercent(hotspot);
   if (glow <= 0) return {};
+  const glowRatio = glow / 100;
+  const hotspotColor = getHotspotColorRgb(hotspot);
   const blur = 8 + Math.round((glow / 100) * 18);
   const spread = Math.round((glow / 100) * 4);
-  const alpha = 0.18 + (glow / 100) * 0.22;
-  return { boxShadow: `0 0 ${blur}px ${spread}px rgb(${getHotspotColorRgb(hotspot)} / ${alpha})` };
+  const fillAlpha = 0.16 + glowRatio * 0.24;
+  const innerAlpha = 0.24 + glowRatio * 0.28;
+  const outerAlpha = 0.18 + glowRatio * 0.22;
+  return {
+    backgroundColor: `rgb(${hotspotColor} / ${fillAlpha})`,
+    boxShadow: `inset 0 0 ${blur}px ${Math.max(1, spread)}px rgb(${hotspotColor} / ${innerAlpha}), 0 0 ${blur}px ${spread}px rgb(${hotspotColor} / ${outerAlpha})`,
+  };
 };
 
 const clampHotspotSize = (value) => Math.min(
@@ -507,6 +514,7 @@ export default function AdminEBookletEditorPage() {
   const [pendingInsertPreset, setPendingInsertPreset] = useState(null);
   const [presetForm, setPresetForm] = useState({ name: "", description: "", tags: "" });
   const [documentUploadProgress, setDocumentUploadProgress] = useState(0);
+  const [documentUploadPhase, setDocumentUploadPhase] = useState("idle");
   const [documentUploading, setDocumentUploading] = useState(false);
 
   latestHotspotFormRef.current = hotspotForm;
@@ -1167,6 +1175,7 @@ export default function AdminEBookletEditorPage() {
     const file = event.target.files?.[0];
     if (!file) return;
     setDocumentUploading(true);
+    setDocumentUploadPhase("uploading");
     setDocumentUploadProgress(0);
     try {
       const response = await editor.uploadAsset(
@@ -1179,9 +1188,11 @@ export default function AdminEBookletEditorPage() {
         {
           onUploadProgress: (progressEvent) => {
             if (!progressEvent.total) return;
-            setDocumentUploadProgress(
-              Math.min(99, Math.round((progressEvent.loaded * 100) / progressEvent.total)),
-            );
+            const nextProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setDocumentUploadProgress(Math.min(100, nextProgress));
+            if (nextProgress >= 100) {
+              setDocumentUploadPhase("processing");
+            }
           },
         },
       );
@@ -1206,6 +1217,7 @@ export default function AdminEBookletEditorPage() {
       }
     } finally {
       setDocumentUploading(false);
+      setDocumentUploadPhase("idle");
     }
   };
 
@@ -2118,7 +2130,9 @@ export default function AdminEBookletEditorPage() {
                 >
                   <Upload className="h-4 w-4" />
                   {documentUploading
-                    ? `${t("common.uploading")} ${documentUploadProgress}%`
+                    ? documentUploadPhase === "processing"
+                      ? t("common.processingPdf")
+                      : `${t("common.uploading")} ${documentUploadProgress}%`
                     : versionForm.base_document_file_id
                       ? t("common.replace")
                       : t("common.upload")}

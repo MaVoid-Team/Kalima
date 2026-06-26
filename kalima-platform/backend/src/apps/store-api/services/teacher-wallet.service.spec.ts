@@ -216,4 +216,26 @@ describe("TeacherWalletService reward expiry lots", () => {
     expect(db.teacher_wallet_credit_lots.create).not.toHaveBeenCalled();
     expect(db.__state.lots).toHaveLength(1);
   });
+
+  it("creates a milestone credit lot with an immutable expiry from the claim date", async () => {
+    const claimedAt = new Date("2026-06-01T10:00:00.000Z");
+    const db = createMockDb({
+      wallets: [{ id: 1, teacher_id: 10, balance: 0, currency: "EGP" }],
+      ledger: [],
+      lots: [],
+    });
+
+    const service = new TeacherWalletService(db);
+    await service.creditMilestone({ teacherId: 10, amount: 25, milestoneAchievementId: 99, rewardExpiryDays: 45, claimedAt });
+
+    expect(db.teacher_wallet_credit_lots.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        teacher_id: 10,
+        milestone_achievement_id: 99,
+        original_amount: 25,
+        remaining_amount: 25,
+        expires_at: daysFrom(claimedAt, 45),
+      }),
+    });
+  });
 });

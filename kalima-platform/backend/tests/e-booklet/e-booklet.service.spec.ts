@@ -181,6 +181,7 @@ function hmacPasscode(passcode: string): string {
 describe("EBookletService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    delete process.env.E_BOOKLET_PDFINFO_BIN;
   });
 
   async function writeTestPdf(filename: string) {
@@ -819,7 +820,9 @@ describe("EBookletService", () => {
 
     test("public preview honors configured page limits up to the admin maximum", async () => {
       const db = createMockDb({
-        $queryRawUnsafe: jest.fn().mockResolvedValue([{ preview_page_limit: 3 }]),
+        e_booklet_global_settings: {
+          upsert: jest.fn().mockResolvedValue({ preview_page_limit: 3 }),
+        },
       });
       db.e_booklet_templates.findFirst.mockResolvedValue({
         id: 3,
@@ -837,7 +840,7 @@ describe("EBookletService", () => {
       expect(page.previewPageCount).toBe(3);
     });
 
-    test("public preview hotspots expose locked markers without hotspot content or private asset ids", async () => {
+    test("public preview hotspots expose markers and allow content inside the preview page limit", async () => {
       const db = createMockDb();
       db.e_booklet_templates.findFirst.mockResolvedValue({
         id: 3,
@@ -860,14 +863,37 @@ describe("EBookletService", () => {
         asset_file_id: 123,
         content_json: { blocks: [{ type: "text", text_content: "Paid-only answer" }] },
       }]);
+      db.e_booklet_hotspots.findUnique.mockResolvedValue({
+        id: 77,
+        template_version_id: 8,
+        page_number: 2,
+        x_percent: 25,
+        y_percent: 35,
+        radius_percent: 4,
+        reference_number: 1,
+        type: "text",
+        title: "Answer key",
+        text_content: "Paid-only answer",
+        asset_file_id: 123,
+        content_json: { blocks: [{ type: "text", text_content: "Paid-only answer" }] },
+        asset_file: { id: 123, file_type: "document", original_filename: "answer.pdf", mime_type: "application/pdf", size_bytes: 10, visibility: "private" },
+      });
       const service = new EBookletService(db);
       const hotspots: any = await service.getPublicPreviewPageHotspots(3, 2);
+      const content: any = await service.getPublicPreviewHotspotContent(3, 77);
 
       expect(hotspots[0]).toEqual(expect.objectContaining({ id: 77, is_locked: true }));
       expect(hotspots[0].title).toBeUndefined();
       expect(hotspots[0].text_content).toBeUndefined();
       expect(hotspots[0].asset_file_id).toBeUndefined();
       expect(hotspots[0].content_json).toBeUndefined();
+      expect(content).toEqual(expect.objectContaining({
+        id: 77,
+        is_locked: false,
+        title: "Answer key",
+        asset_file_id: 123,
+      }));
+      expect(content.content_json.blocks[0]).toEqual({ type: "text", text_content: "Paid-only answer" });
       expect(db.e_booklet_hotspots.findMany).toHaveBeenCalledWith(expect.objectContaining({
         where: expect.objectContaining({ template_version_id: 8, page_number: 2, is_active: true }),
       }));
@@ -1685,6 +1711,88 @@ describe("EBookletService", () => {
         data: expect.objectContaining({ file_type: "video", mime_type: "application/octet-stream" }),
       }));
     });
+
+    test("returns PDF upload metadata without eagerly rendering page previews", async () => {
+      const db = createMockDb();
+      db.e_booklet_file_assets.create.mockResolvedValue({
+        id: 79,
+        file_type: "pdf",
+        mime_type: "application/pdf",
+      });
+      const service = new EBookletService(db);
+      const generateForDocument = jest.fn();
+      (service as any).pagePreviewService = { generateForDocument };
+      const pdf = await PDFDocument.create();
+      pdf.addPage([300, 400]);
+
+      const result: any = await service.createFileAsset({
+        ...baseFile,
+        originalname: "large.pdf",
+        mimetype: "application/pdf",
+        size: 30 * 1024 * 1024,
+        buffer: Buffer.from(await pdf.save()),
+      } as any, { fileType: "document" });
+
+      expect(result).toEqual(expect.objectContaining({
+        id: 79,
+        metadata: expect.objectContaining({
+          page_count: 1,
+          page_dimensions: [{ width: 300, height: 400 }],
+        }),
+      }));
+      expect(generateForDocument).not.toHaveBeenCalled();
+    });
+
+    test("uses pdfinfo for disk-backed PDF upload metadata without loading the full PDF in Node", async () => {
+      const db = createMockDb();
+      db.e_booklet_file_assets.create.mockResolvedValue({
+        id: 80,
+        file_type: "pdf",
+        mime_type: "application/pdf",
+      });
+      const mockPdfInfoBin = path.resolve(
+        process.cwd(),
+        "uploads/e-booklets/private/mock-pdfinfo.sh",
+      );
+      await fs.mkdir(path.dirname(mockPdfInfoBin), { recursive: true });
+      await fs.writeFile(mockPdfInfoBin, [
+        "#!/bin/sh",
+        "cat <<'EOF'",
+          "Pages:           2",
+          "Page    1 size:  300 x 400 pts",
+          "Page    2 size:  612 x 792 pts (letter)",
+        "EOF",
+      ].join("\n"));
+      await fs.chmod(mockPdfInfoBin, 0o755);
+      process.env.E_BOOKLET_PDFINFO_BIN = mockPdfInfoBin;
+      const loadSpy = jest.spyOn(PDFDocument, "load");
+      const service = new EBookletService(db);
+      const generateForDocument = jest.fn();
+      (service as any).pagePreviewService = { generateForDocument };
+      const sourcePath = await writeTestPdf("pdfinfo-upload-source.pdf");
+
+      const result: any = await service.createFileAsset({
+        ...baseFile,
+        path: sourcePath,
+        buffer: undefined,
+        originalname: "large.pdf",
+        mimetype: "application/pdf",
+        size: 100 * 1024 * 1024,
+      } as any, { fileType: "document" });
+
+      expect(result).toEqual(expect.objectContaining({
+        id: 80,
+        metadata: {
+          page_count: 2,
+          page_dimensions: [
+            { width: 300, height: 400 },
+            { width: 612, height: 792 },
+          ],
+        },
+      }));
+      expect(loadSpy).not.toHaveBeenCalled();
+      expect(generateForDocument).not.toHaveBeenCalled();
+    }, 30000);
   });
 
   describe("hotspot preset library", () => {
