@@ -113,6 +113,7 @@ const COLOR_RING_CLASS_MAP = {
 const HOTSPOT_COLOR_STORAGE_KEY = "kalima_hotspot_color";
 const DEFAULT_HOTSPOT_COLOR = "blue";
 const contentBlockTypes = ["text", "image", "video", "audio", "file", "link", "question_answer"];
+const hotspotVideoAccept = ".mp4,.m4v,.mov,.qt,.webm,.ogv,.ogg,video/mp4,video/x-m4v,video/quicktime,video/webm,video/ogg";
 const textFontOptions = ["Inter", "Arial", "Georgia", "Times New Roman", "Courier New"];
 const arabicTextFontOptions = ["Cairo", "Arial", "Tahoma", "Times New Roman", "Amiri", "Noto Naskh Arabic"];
 const getStoredHotspotColor = () => {
@@ -1217,15 +1218,30 @@ export default function AdminEBookletEditorPage() {
 
   const handleHotspotMediaUpload = async (file, blockIndex = 0) => {
     if (!file) return;
-    const blockType = hotspotForm.content_json?.blocks?.[blockIndex]?.type || hotspotForm.type;
+    const currentForm = latestHotspotFormRef.current || hotspotForm;
+    const blockType = currentForm.content_json?.blocks?.[blockIndex]?.type || currentForm.type;
     const response = await editor.uploadAsset("hotspot-media", file, {
       owner_type: "hotspot",
       file_type: blockType,
     });
     const assetId = normalizeAssetId(response);
     if (assetId) {
-      updateContentBlock(blockIndex, "asset_file_id", String(assetId));
-      if (blockIndex === 0) updateHotspotField("asset_file_id", String(assetId));
+      const blocks = currentForm.content_json?.blocks?.length
+        ? currentForm.content_json.blocks
+        : [createDefaultBlock(currentForm.type)];
+      const nextBlocks = blocks.map((block, index) =>
+        index === blockIndex ? { ...block, asset_file_id: String(assetId) } : block,
+      );
+      const nextForm = {
+        ...currentForm,
+        ...(blockIndex === 0 ? { asset_file_id: String(assetId) } : {}),
+        content_json: { version: 2, blocks: nextBlocks },
+      };
+      latestHotspotFormRef.current = nextForm;
+      setHotspotForm(nextForm);
+      if (activeStep === "hotspots" && activeVersionId && (nextForm.id || hasDraftHotspotPreview)) {
+        await saveHotspot({ resetAfterSave: false, showToast: false });
+      }
     }
   };
 
@@ -1719,7 +1735,7 @@ export default function AdminEBookletEditorPage() {
                 <label className="inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-md border bg-background px-2 text-xs font-medium hover:bg-accent">
                   <Upload className="h-3.5 w-3.5" />
                   {block.asset_file_id ? t("common.replace") : t("common.upload")}
-                  <input type="file" accept="video/*" className="hidden" onChange={(event) => handleHotspotMediaUpload(event.target.files?.[0], index)} />
+                  <input type="file" accept={hotspotVideoAccept} className="hidden" onChange={(event) => handleHotspotMediaUpload(event.target.files?.[0], index)} />
                 </label>
               </div>
             )}
