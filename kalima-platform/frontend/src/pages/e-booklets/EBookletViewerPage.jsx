@@ -177,37 +177,6 @@ const getSafeExternalUrl = (url) => {
   }
 };
 
-const buildDeviceFingerprint = async () => {
-  const storageKey = "kalima:e-booklet-device-fingerprint:v1";
-  const existing = window.localStorage.getItem(storageKey);
-  if (existing) return existing;
-
-  const randomPart = window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`;
-  const raw = [
-    navigator.userAgent,
-    navigator.language,
-    navigator.platform,
-    screen.width,
-    screen.height,
-    screen.colorDepth,
-    Intl.DateTimeFormat().resolvedOptions().timeZone,
-    randomPart,
-  ].join("|");
-
-  let fingerprint = raw;
-  if (window.crypto?.subtle) {
-    const digest = await window.crypto.subtle.digest(
-      "SHA-256",
-      new TextEncoder().encode(raw),
-    );
-    fingerprint = Array.from(new Uint8Array(digest))
-      .map((byte) => byte.toString(16).padStart(2, "0"))
-      .join("");
-  }
-  window.localStorage.setItem(storageKey, fingerprint);
-  return fingerprint;
-};
-
 function HotspotMarker({ hotspot, active, onOpen, t, pageDimensions }) {
   const typeMeta = HOTSPOT_TYPES[hotspot.type] || HOTSPOT_TYPES.text;
   const Icon = typeMeta.icon;
@@ -550,24 +519,12 @@ export default function EBookletViewerPage({ previewMode = false }) {
     setDeviceError("");
     const initializeViewer = async () => {
       try {
-        if (previewMode) {
+        if (previewMode || adminMode) {
           if (!active) return;
           setDeviceStatus("allowed");
           viewer.fetchMetadata(instanceId, t("viewer.metadataLoadFailed")).catch(() => {});
           return;
         }
-        if (adminMode) {
-          if (!active) return;
-          setDeviceStatus("allowed");
-          viewer.fetchMetadata(instanceId, t("viewer.metadataLoadFailed")).catch(() => {});
-          return;
-        }
-        const fingerprint = await buildDeviceFingerprint();
-        if (!active) return;
-        await viewer.bindDevice(instanceId, {
-          deviceFingerprint: fingerprint,
-          deviceLabel: navigator.platform || navigator.userAgent?.slice(0, 80) || "Browser",
-        });
         if (!active) return;
         setDeviceStatus("allowed");
         viewer.fetchMetadata(instanceId, t("viewer.metadataLoadFailed")).catch(() => {});
@@ -581,7 +538,7 @@ export default function EBookletViewerPage({ previewMode = false }) {
     return () => {
       active = false;
     };
-  }, [adminMode, instanceId, previewMode, t, viewer.bindDevice, viewer.fetchMetadata]);
+  }, [adminMode, instanceId, previewMode, t, viewer.fetchMetadata]);
 
   useEffect(() => {
     if (deviceStatus !== "allowed") return;
@@ -749,11 +706,6 @@ export default function EBookletViewerPage({ previewMode = false }) {
     setActiveHotspot(hotspot);
     setHotspotContent(null);
     setHotspotError("");
-    if (previewMode) {
-      setHotspotError(t("viewer.previewHotspotLockedMessage"));
-      setHotspotLoading(false);
-      return;
-    }
     setHotspotLoading(true);
     try {
       const response = await viewer.fetchHotspotContent(hotspot.id, instanceId);

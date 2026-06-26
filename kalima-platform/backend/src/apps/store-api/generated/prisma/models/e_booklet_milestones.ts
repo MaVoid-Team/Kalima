@@ -33,6 +33,7 @@ export type E_booklet_milestonesAvgAggregateOutputType = {
   milestone_price: runtime.Decimal | null
   previous_price_snapshot: runtime.Decimal | null
   reward_amount_snapshot: runtime.Decimal | null
+  reward_expiry_days: number | null
   sort_order: number | null
 }
 
@@ -43,6 +44,7 @@ export type E_booklet_milestonesSumAggregateOutputType = {
   milestone_price: runtime.Decimal | null
   previous_price_snapshot: runtime.Decimal | null
   reward_amount_snapshot: runtime.Decimal | null
+  reward_expiry_days: number | null
   sort_order: number | null
 }
 
@@ -55,6 +57,7 @@ export type E_booklet_milestonesMinAggregateOutputType = {
   milestone_price: runtime.Decimal | null
   previous_price_snapshot: runtime.Decimal | null
   reward_amount_snapshot: runtime.Decimal | null
+  reward_expiry_days: number | null
   notification_recipients: string | null
   sort_order: number | null
   active: boolean | null
@@ -71,6 +74,7 @@ export type E_booklet_milestonesMaxAggregateOutputType = {
   milestone_price: runtime.Decimal | null
   previous_price_snapshot: runtime.Decimal | null
   reward_amount_snapshot: runtime.Decimal | null
+  reward_expiry_days: number | null
   notification_recipients: string | null
   sort_order: number | null
   active: boolean | null
@@ -87,6 +91,7 @@ export type E_booklet_milestonesCountAggregateOutputType = {
   milestone_price: number
   previous_price_snapshot: number
   reward_amount_snapshot: number
+  reward_expiry_days: number
   notification_recipients: number
   sort_order: number
   active: number
@@ -103,6 +108,7 @@ export type E_booklet_milestonesAvgAggregateInputType = {
   milestone_price?: true
   previous_price_snapshot?: true
   reward_amount_snapshot?: true
+  reward_expiry_days?: true
   sort_order?: true
 }
 
@@ -113,6 +119,7 @@ export type E_booklet_milestonesSumAggregateInputType = {
   milestone_price?: true
   previous_price_snapshot?: true
   reward_amount_snapshot?: true
+  reward_expiry_days?: true
   sort_order?: true
 }
 
@@ -125,6 +132,7 @@ export type E_booklet_milestonesMinAggregateInputType = {
   milestone_price?: true
   previous_price_snapshot?: true
   reward_amount_snapshot?: true
+  reward_expiry_days?: true
   notification_recipients?: true
   sort_order?: true
   active?: true
@@ -141,6 +149,7 @@ export type E_booklet_milestonesMaxAggregateInputType = {
   milestone_price?: true
   previous_price_snapshot?: true
   reward_amount_snapshot?: true
+  reward_expiry_days?: true
   notification_recipients?: true
   sort_order?: true
   active?: true
@@ -157,6 +166,7 @@ export type E_booklet_milestonesCountAggregateInputType = {
   milestone_price?: true
   previous_price_snapshot?: true
   reward_amount_snapshot?: true
+  reward_expiry_days?: true
   notification_recipients?: true
   sort_order?: true
   active?: true
@@ -260,6 +270,7 @@ export type E_booklet_milestonesGroupByOutputType = {
   milestone_price: runtime.Decimal
   previous_price_snapshot: runtime.Decimal | null
   reward_amount_snapshot: runtime.Decimal | null
+  reward_expiry_days: number
   notification_recipients: string
   sort_order: number
   active: boolean
@@ -299,6 +310,7 @@ export type e_booklet_milestonesWhereInput = {
   milestone_price?: Prisma.DecimalFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.DecimalNullableFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.DecimalNullableFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFilter<"e_booklet_milestones"> | number
   notification_recipients?: Prisma.StringFilter<"e_booklet_milestones"> | string
   sort_order?: Prisma.IntFilter<"e_booklet_milestones"> | number
   active?: Prisma.BoolFilter<"e_booklet_milestones"> | boolean
@@ -317,6 +329,7 @@ export type e_booklet_milestonesOrderByWithRelationInput = {
   milestone_price?: Prisma.SortOrder
   previous_price_snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   reward_amount_snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
+  reward_expiry_days?: Prisma.SortOrder
   notification_recipients?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   active?: Prisma.SortOrder
@@ -339,6 +352,7 @@ export type e_booklet_milestonesWhereUniqueInput = Prisma.AtLeast<{
   milestone_price?: Prisma.DecimalFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.DecimalNullableFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.DecimalNullableFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFilter<"e_booklet_milestones"> | number
   notification_recipients?: Prisma.StringFilter<"e_booklet_milestones"> | string
   sort_order?: Prisma.IntFilter<"e_booklet_milestones"> | number
   active?: Prisma.BoolFilter<"e_booklet_milestones"> | boolean
@@ -357,6 +371,7 @@ export type e_booklet_milestonesOrderByWithAggregationInput = {
   milestone_price?: Prisma.SortOrder
   previous_price_snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   reward_amount_snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
+  reward_expiry_days?: Prisma.SortOrder
   notification_recipients?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   active?: Prisma.SortOrder
@@ -381,6 +396,7 @@ export type e_booklet_milestonesScalarWhereWithAggregatesInput = {
   milestone_price?: Prisma.DecimalWithAggregatesFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.DecimalNullableWithAggregatesFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.DecimalNullableWithAggregatesFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntWithAggregatesFilter<"e_booklet_milestones"> | number
   notification_recipients?: Prisma.StringWithAggregatesFilter<"e_booklet_milestones"> | string
   sort_order?: Prisma.IntWithAggregatesFilter<"e_booklet_milestones"> | number
   active?: Prisma.BoolWithAggregatesFilter<"e_booklet_milestones"> | boolean
@@ -395,6 +411,7 @@ export type e_booklet_milestonesCreateInput = {
   milestone_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: number
   notification_recipients?: string
   sort_order?: number
   active?: boolean
@@ -413,6 +430,7 @@ export type e_booklet_milestonesUncheckedCreateInput = {
   milestone_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: number
   notification_recipients?: string
   sort_order?: number
   active?: boolean
@@ -428,6 +446,7 @@ export type e_booklet_milestonesUpdateInput = {
   milestone_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFieldUpdateOperationsInput | number
   notification_recipients?: Prisma.StringFieldUpdateOperationsInput | string
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -446,6 +465,7 @@ export type e_booklet_milestonesUncheckedUpdateInput = {
   milestone_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFieldUpdateOperationsInput | number
   notification_recipients?: Prisma.StringFieldUpdateOperationsInput | string
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -463,6 +483,7 @@ export type e_booklet_milestonesCreateManyInput = {
   milestone_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: number
   notification_recipients?: string
   sort_order?: number
   active?: boolean
@@ -477,6 +498,7 @@ export type e_booklet_milestonesUpdateManyMutationInput = {
   milestone_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFieldUpdateOperationsInput | number
   notification_recipients?: Prisma.StringFieldUpdateOperationsInput | string
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -493,6 +515,7 @@ export type e_booklet_milestonesUncheckedUpdateManyInput = {
   milestone_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFieldUpdateOperationsInput | number
   notification_recipients?: Prisma.StringFieldUpdateOperationsInput | string
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -524,6 +547,7 @@ export type e_booklet_milestonesCountOrderByAggregateInput = {
   milestone_price?: Prisma.SortOrder
   previous_price_snapshot?: Prisma.SortOrder
   reward_amount_snapshot?: Prisma.SortOrder
+  reward_expiry_days?: Prisma.SortOrder
   notification_recipients?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   active?: Prisma.SortOrder
@@ -538,6 +562,7 @@ export type e_booklet_milestonesAvgOrderByAggregateInput = {
   milestone_price?: Prisma.SortOrder
   previous_price_snapshot?: Prisma.SortOrder
   reward_amount_snapshot?: Prisma.SortOrder
+  reward_expiry_days?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
 }
 
@@ -550,6 +575,7 @@ export type e_booklet_milestonesMaxOrderByAggregateInput = {
   milestone_price?: Prisma.SortOrder
   previous_price_snapshot?: Prisma.SortOrder
   reward_amount_snapshot?: Prisma.SortOrder
+  reward_expiry_days?: Prisma.SortOrder
   notification_recipients?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   active?: Prisma.SortOrder
@@ -566,6 +592,7 @@ export type e_booklet_milestonesMinOrderByAggregateInput = {
   milestone_price?: Prisma.SortOrder
   previous_price_snapshot?: Prisma.SortOrder
   reward_amount_snapshot?: Prisma.SortOrder
+  reward_expiry_days?: Prisma.SortOrder
   notification_recipients?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
   active?: Prisma.SortOrder
@@ -580,6 +607,7 @@ export type e_booklet_milestonesSumOrderByAggregateInput = {
   milestone_price?: Prisma.SortOrder
   previous_price_snapshot?: Prisma.SortOrder
   reward_amount_snapshot?: Prisma.SortOrder
+  reward_expiry_days?: Prisma.SortOrder
   sort_order?: Prisma.SortOrder
 }
 
@@ -651,6 +679,7 @@ export type e_booklet_milestonesCreateWithoutTermInput = {
   milestone_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: number
   notification_recipients?: string
   sort_order?: number
   active?: boolean
@@ -667,6 +696,7 @@ export type e_booklet_milestonesUncheckedCreateWithoutTermInput = {
   milestone_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: number
   notification_recipients?: string
   sort_order?: number
   active?: boolean
@@ -713,6 +743,7 @@ export type e_booklet_milestonesScalarWhereInput = {
   milestone_price?: Prisma.DecimalFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.DecimalNullableFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.DecimalNullableFilter<"e_booklet_milestones"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFilter<"e_booklet_milestones"> | number
   notification_recipients?: Prisma.StringFilter<"e_booklet_milestones"> | string
   sort_order?: Prisma.IntFilter<"e_booklet_milestones"> | number
   active?: Prisma.BoolFilter<"e_booklet_milestones"> | boolean
@@ -727,6 +758,7 @@ export type e_booklet_milestonesCreateWithoutAchievementsInput = {
   milestone_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: number
   notification_recipients?: string
   sort_order?: number
   active?: boolean
@@ -744,6 +776,7 @@ export type e_booklet_milestonesUncheckedCreateWithoutAchievementsInput = {
   milestone_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: number
   notification_recipients?: string
   sort_order?: number
   active?: boolean
@@ -774,6 +807,7 @@ export type e_booklet_milestonesUpdateWithoutAchievementsInput = {
   milestone_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFieldUpdateOperationsInput | number
   notification_recipients?: Prisma.StringFieldUpdateOperationsInput | string
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -791,6 +825,7 @@ export type e_booklet_milestonesUncheckedUpdateWithoutAchievementsInput = {
   milestone_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFieldUpdateOperationsInput | number
   notification_recipients?: Prisma.StringFieldUpdateOperationsInput | string
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -806,6 +841,7 @@ export type e_booklet_milestonesCreateManyTermInput = {
   milestone_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: number
   notification_recipients?: string
   sort_order?: number
   active?: boolean
@@ -820,6 +856,7 @@ export type e_booklet_milestonesUpdateWithoutTermInput = {
   milestone_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFieldUpdateOperationsInput | number
   notification_recipients?: Prisma.StringFieldUpdateOperationsInput | string
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -836,6 +873,7 @@ export type e_booklet_milestonesUncheckedUpdateWithoutTermInput = {
   milestone_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFieldUpdateOperationsInput | number
   notification_recipients?: Prisma.StringFieldUpdateOperationsInput | string
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -852,6 +890,7 @@ export type e_booklet_milestonesUncheckedUpdateManyWithoutTermInput = {
   milestone_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   previous_price_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   reward_amount_snapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reward_expiry_days?: Prisma.IntFieldUpdateOperationsInput | number
   notification_recipients?: Prisma.StringFieldUpdateOperationsInput | string
   sort_order?: Prisma.IntFieldUpdateOperationsInput | number
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -899,6 +938,7 @@ export type e_booklet_milestonesSelect<ExtArgs extends runtime.Types.Extensions.
   milestone_price?: boolean
   previous_price_snapshot?: boolean
   reward_amount_snapshot?: boolean
+  reward_expiry_days?: boolean
   notification_recipients?: boolean
   sort_order?: boolean
   active?: boolean
@@ -918,6 +958,7 @@ export type e_booklet_milestonesSelectCreateManyAndReturn<ExtArgs extends runtim
   milestone_price?: boolean
   previous_price_snapshot?: boolean
   reward_amount_snapshot?: boolean
+  reward_expiry_days?: boolean
   notification_recipients?: boolean
   sort_order?: boolean
   active?: boolean
@@ -935,6 +976,7 @@ export type e_booklet_milestonesSelectUpdateManyAndReturn<ExtArgs extends runtim
   milestone_price?: boolean
   previous_price_snapshot?: boolean
   reward_amount_snapshot?: boolean
+  reward_expiry_days?: boolean
   notification_recipients?: boolean
   sort_order?: boolean
   active?: boolean
@@ -952,6 +994,7 @@ export type e_booklet_milestonesSelectScalar = {
   milestone_price?: boolean
   previous_price_snapshot?: boolean
   reward_amount_snapshot?: boolean
+  reward_expiry_days?: boolean
   notification_recipients?: boolean
   sort_order?: boolean
   active?: boolean
@@ -959,7 +1002,7 @@ export type e_booklet_milestonesSelectScalar = {
   updated_at?: boolean
 }
 
-export type e_booklet_milestonesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "term_id" | "title" | "description" | "target_paid_redemptions" | "milestone_price" | "previous_price_snapshot" | "reward_amount_snapshot" | "notification_recipients" | "sort_order" | "active" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_milestones"]>
+export type e_booklet_milestonesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "term_id" | "title" | "description" | "target_paid_redemptions" | "milestone_price" | "previous_price_snapshot" | "reward_amount_snapshot" | "reward_expiry_days" | "notification_recipients" | "sort_order" | "active" | "created_at" | "updated_at", ExtArgs["result"]["e_booklet_milestones"]>
 export type e_booklet_milestonesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   term?: boolean | Prisma.e_booklet_termsDefaultArgs<ExtArgs>
   achievements?: boolean | Prisma.e_booklet_milestones$achievementsArgs<ExtArgs>
@@ -987,6 +1030,7 @@ export type $e_booklet_milestonesPayload<ExtArgs extends runtime.Types.Extension
     milestone_price: runtime.Decimal
     previous_price_snapshot: runtime.Decimal | null
     reward_amount_snapshot: runtime.Decimal | null
+    reward_expiry_days: number
     notification_recipients: string
     sort_order: number
     active: boolean
@@ -1425,6 +1469,7 @@ export interface e_booklet_milestonesFieldRefs {
   readonly milestone_price: Prisma.FieldRef<"e_booklet_milestones", 'Decimal'>
   readonly previous_price_snapshot: Prisma.FieldRef<"e_booklet_milestones", 'Decimal'>
   readonly reward_amount_snapshot: Prisma.FieldRef<"e_booklet_milestones", 'Decimal'>
+  readonly reward_expiry_days: Prisma.FieldRef<"e_booklet_milestones", 'Int'>
   readonly notification_recipients: Prisma.FieldRef<"e_booklet_milestones", 'String'>
   readonly sort_order: Prisma.FieldRef<"e_booklet_milestones", 'Int'>
   readonly active: Prisma.FieldRef<"e_booklet_milestones", 'Boolean'>

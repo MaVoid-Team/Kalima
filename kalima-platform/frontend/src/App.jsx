@@ -173,6 +173,7 @@ const router = createBrowserRouter(
         <Route path="/" element={<LandingPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="/delete-my-data" element={<DeleteMyDataPage />} />
+        <Route path="/e-booklet-viewer/:instanceId" element={<EBookletViewerPage />} />
 
         {/* E-booklet storefront is public to visitors/teachers; students redeem private URLs/codes only. */}
         <Route element={<RoleRoute excludedRole={["Student"]} />}>

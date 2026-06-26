@@ -64,6 +64,8 @@ const mockService = {
   getPublicPreviewMetadata: jest.fn(),
   getPublicPreviewPage: jest.fn(),
   getPublicPreviewPageHotspots: jest.fn(),
+  getPublicPreviewHotspotContent: jest.fn(),
+  getPublicPreviewHotspotAsset: jest.fn(),
   getPublicPreviewDocumentPagePreview: jest.fn(),
   getPublicCoverFileAsset: jest.fn(),
   createPublicCheckoutRequest: jest.fn(),
@@ -77,8 +79,13 @@ const mockService = {
   acceptFreeInvite: jest.fn(),
   acceptInvitePasscode: jest.fn(),
   createStudentPurchaseLink: jest.fn(),
-  getViewerMetadata: jest.fn(),
-  getViewerPage: jest.fn(),
+  getPublicViewerMetadata: jest.fn(),
+  getPublicViewerPage: jest.fn(),
+  getPublicViewerPageHotspots: jest.fn(),
+  getPublicHotspotContent: jest.fn(),
+  getPublicHotspotAsset: jest.fn(),
+  getPublicAuthorizedViewerDocument: jest.fn(),
+  getPublicAuthorizedViewerDocumentPagePreview: jest.fn(),
   getAdminViewerMetadata: jest.fn(),
   getAdminViewerPage: jest.fn(),
   getAdminViewerPageHotspots: jest.fn(),
@@ -90,8 +97,6 @@ const mockService = {
   resetViewerDevices: jest.fn(),
   addDeviceAllowance: jest.fn(),
   approveStudentPurchaseLink: jest.fn(),
-  getAuthorizedHotspotAsset: jest.fn(),
-  getAuthorizedViewerDocument: jest.fn(),
   createFileAsset: jest.fn(),
   restoreHotspotPreset: jest.fn(),
   recordInviteOpen: jest.fn(),
@@ -190,7 +195,7 @@ describe("e-booklet routes", () => {
     expect(mockService.getPublicInstance).not.toHaveBeenCalled();
   });
 
-  test("serves public e-booklet preview metadata, pages, and locked hotspot markers without auth", async () => {
+  test("serves public e-booklet preview metadata, pages, hotspots, and hotspot content without auth", async () => {
     mockService.getPublicPreviewMetadata.mockResolvedValue({
       preview_mode: true,
       preview_page_limit: 10,
@@ -213,6 +218,13 @@ describe("e-booklet routes", () => {
         is_locked: true,
       },
     ]);
+    mockService.getPublicPreviewHotspotContent.mockResolvedValue({
+      id: 77,
+      type: "text",
+      title: "Sample note",
+      content_json: { version: 2, blocks: [{ type: "text", text_content: "Preview answer" }] },
+      is_locked: false,
+    });
 
     await request(app)
       .get("/api/v2/e-booklet-store/10/preview/metadata")
@@ -234,14 +246,24 @@ describe("e-booklet routes", () => {
       .expect(200)
       .expect((res) => {
         expect(res.body.data[0]).toEqual(expect.objectContaining({ id: 77, is_locked: true }));
-        expect(res.body.data[0]).not.toHaveProperty("content_json");
-        expect(res.body.data[0]).not.toHaveProperty("text_content");
         expect(res.body.data[0]).not.toHaveProperty("asset_file_id");
+      });
+
+    await request(app)
+      .get("/api/v2/e-booklet-store/10/preview/hotspots/77/content")
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data).toEqual(expect.objectContaining({
+          id: 77,
+          is_locked: false,
+          content_json: { version: 2, blocks: [{ type: "text", text_content: "Preview answer" }] },
+        }));
       });
 
     expect(mockService.getPublicPreviewMetadata).toHaveBeenCalledWith(10);
     expect(mockService.getPublicPreviewPage).toHaveBeenCalledWith(10, 2);
     expect(mockService.getPublicPreviewPageHotspots).toHaveBeenCalledWith(10, 2);
+    expect(mockService.getPublicPreviewHotspotContent).toHaveBeenCalledWith(10, 77);
   });
 
   test("returns configured preview page-limit errors from public preview pages", async () => {
@@ -638,7 +660,7 @@ describe("e-booklet routes", () => {
   });
 
   test("marks viewer page responses as private no-store", async () => {
-    mockService.getViewerPage.mockResolvedValue({
+    mockService.getPublicViewerPage.mockResolvedValue({
       pageNumber: 1,
       pageAccessToken: "short-lived-token",
     });
@@ -654,13 +676,13 @@ describe("e-booklet routes", () => {
         expect(res.body.data.pageAccessToken).toBe("short-lived-token");
       });
 
-    expect(mockService.getViewerPage).toHaveBeenCalledWith(10, 1, 55);
+    expect(mockService.getPublicViewerPage).toHaveBeenCalledWith(10, 1);
   });
 
-  test("blocks teacher viewer metadata when payment or customization is not complete", async () => {
+  test("propagates public viewer metadata availability errors", async () => {
     const error: any = new Error("This e-booklet is not available until payment is confirmed and customization is complete.");
     error.statusCode = 403;
-    mockService.getViewerMetadata.mockRejectedValue(error);
+    mockService.getPublicViewerMetadata.mockRejectedValue(error);
 
     await request(app)
       .get("/api/v2/e-booklet-viewer/10/metadata")
@@ -670,7 +692,7 @@ describe("e-booklet routes", () => {
         expect(res.body.message).toBe("This e-booklet is not available until payment is confirmed and customization is complete.");
       });
 
-    expect(mockService.getViewerMetadata).toHaveBeenCalledWith(10, 55);
+    expect(mockService.getPublicViewerMetadata).toHaveBeenCalledWith(10);
   });
 
   test("rejects authorized viewer PDF document requests without a page", async () => {
@@ -680,11 +702,11 @@ describe("e-booklet routes", () => {
       .expect(400)
       .expect((res) => expect(res.body.message).toContain("document page is required"));
 
-    expect(mockService.getAuthorizedViewerDocument).not.toHaveBeenCalled();
+    expect(mockService.getPublicAuthorizedViewerDocument).not.toHaveBeenCalled();
   });
 
   test("passes requested PDF page number to the authorized viewer document service", async () => {
-    mockService.getAuthorizedViewerDocument.mockResolvedValue({
+    mockService.getPublicAuthorizedViewerDocument.mockResolvedValue({
       asset: { original_filename: "lesson-page-2.pdf", mime_type: "application/pdf" },
       absolutePath: "/not-used-for-page-buffer.pdf",
       pageBuffer: Buffer.from("%PDF-1.4\n%page-2\n"),
@@ -700,11 +722,11 @@ describe("e-booklet routes", () => {
       .expect("Content-Type", /application\/pdf/)
       .expect("Content-Disposition", /inline; filename="lesson-page-2.pdf"/);
 
-    expect(mockService.getAuthorizedViewerDocument).toHaveBeenCalledWith(10, 55, 2, "page-token");
+    expect(mockService.getPublicAuthorizedViewerDocument).toHaveBeenCalledWith(10, 2, "page-token");
   });
 
   test("does not accept viewer page tokens from query parameters", async () => {
-    mockService.getAuthorizedViewerDocument.mockResolvedValue({
+    mockService.getPublicAuthorizedViewerDocument.mockResolvedValue({
       asset: { original_filename: "lesson-page-2.pdf", mime_type: "application/pdf" },
       absolutePath: "/not-used-for-page-buffer.pdf",
       pageBuffer: Buffer.from("%PDF-1.4\n%page-2\n"),
@@ -716,7 +738,7 @@ describe("e-booklet routes", () => {
       .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
       .expect(200);
 
-    expect(mockService.getAuthorizedViewerDocument).toHaveBeenCalledWith(10, 55, 2, "");
+    expect(mockService.getPublicAuthorizedViewerDocument).toHaveBeenCalledWith(10, 2, "");
   });
 
   test("passes requested admin PDF page token to the authorized viewer document service", async () => {
@@ -835,7 +857,7 @@ describe("e-booklet routes", () => {
   });
 
   test("serves authorized hotspot assets with private no-store headers", async () => {
-    mockService.getAuthorizedHotspotAsset.mockResolvedValue({
+    mockService.getPublicHotspotAsset.mockResolvedValue({
       asset: {
         id: 123,
         mime_type: "audio/mpeg",
@@ -855,7 +877,7 @@ describe("e-booklet routes", () => {
       .expect("Expires", "0")
       .expect("Content-Type", /audio\/mpeg/);
 
-    expect(mockService.getAuthorizedHotspotAsset).toHaveBeenCalledWith(10, 77, 123, 55);
+    expect(mockService.getPublicHotspotAsset).toHaveBeenCalledWith(10, 77, 123);
   });
 
   test("returns a deliberate upgrade response for deprecated unscoped viewer hotspot routes", async () => {

@@ -58,6 +58,16 @@ export class EBookletMilestoneService {
     return this.positiveInt(value ?? DEFAULT_REWARD_EXPIRY_DAYS, "reward expiry days");
   }
 
+  private hasRewardExpiryDays(input: any): boolean {
+    return input.rewardExpiryDays !== undefined || input.reward_expiry_days !== undefined;
+  }
+
+  private async defaultRewardExpiryDays(): Promise<number> {
+    if (!this.db.e_booklet_global_settings?.findUnique) return DEFAULT_REWARD_EXPIRY_DAYS;
+    const settings = await this.db.e_booklet_global_settings.findUnique({ where: { id: 1 } });
+    return this.rewardExpiryDays(settings?.default_reward_expiry_days);
+  }
+
   private addDays(value: Date, days: number): Date {
     const next = new Date(value);
     next.setUTCDate(next.getUTCDate() + days);
@@ -146,6 +156,8 @@ export class EBookletMilestoneService {
         claimed_at: achievement?.claimed_at ?? null,
         reward_terms_accepted_at: achievement?.reward_terms_accepted_at ?? null,
         reward_amount: achievement?.reward_amount ?? milestone.reward_amount_snapshot ?? null,
+        reward_expiry_days_snapshot: achievement?.reward_expiry_days_snapshot ?? milestone.reward_expiry_days ?? DEFAULT_REWARD_EXPIRY_DAYS,
+        reward_expires_at: achievement?.reward_expires_at ?? null,
       };
     });
   }
@@ -156,7 +168,9 @@ export class EBookletMilestoneService {
     const milestonePrice = this.nonNegativeNumber(input.milestonePrice ?? input.milestone_price, "milestone price", true);
     const previousPriceSnapshot = this.nonNegativeNumber(input.previousPriceSnapshot ?? input.previous_price_snapshot, "previous price");
     const rewardAmountSnapshot = this.nonNegativeNumber(input.rewardAmountSnapshot ?? input.reward_amount_snapshot, "reward amount", true);
-    const rewardExpiryDays = this.rewardExpiryDays(input.rewardExpiryDays ?? input.reward_expiry_days);
+    const rewardExpiryDays = this.hasRewardExpiryDays(input)
+      ? this.rewardExpiryDays(input.rewardExpiryDays ?? input.reward_expiry_days)
+      : await this.defaultRewardExpiryDays();
     const title = this.nonEmptyString(input.title, "milestone title");
     const sortOrder = this.finiteInt(input.sortOrder ?? input.sort_order ?? 0, "sort order");
     const active = input.active === undefined ? true : this.strictBoolean(input.active, "active flag");

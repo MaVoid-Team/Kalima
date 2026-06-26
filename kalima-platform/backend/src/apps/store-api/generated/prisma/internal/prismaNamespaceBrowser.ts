@@ -109,6 +109,8 @@ export const ModelName = {
   e_booklet_teacher_terms_acceptances: 'e_booklet_teacher_terms_acceptances',
   teacher_wallets: 'teacher_wallets',
   teacher_wallet_ledger: 'teacher_wallet_ledger',
+  teacher_wallet_credit_lots: 'teacher_wallet_credit_lots',
+  teacher_wallet_spend_allocations: 'teacher_wallet_spend_allocations',
   e_booklet_access_codes: 'e_booklet_access_codes',
   e_booklet_access_code_redemptions: 'e_booklet_access_code_redemptions',
   e_booklet_access: 'e_booklet_access',
@@ -907,6 +909,7 @@ export const E_booklet_global_settingsScalarFieldEnum = {
   default_allowed_devices_per_student: 'default_allowed_devices_per_student',
   default_allowed_devices_per_teacher: 'default_allowed_devices_per_teacher',
   preview_page_limit: 'preview_page_limit',
+  default_reward_expiry_days: 'default_reward_expiry_days',
   device_reset_policy: 'device_reset_policy',
   notify_admins_on_delivery: 'notify_admins_on_delivery',
   notify_teacher_on_delivery: 'notify_teacher_on_delivery',
@@ -954,6 +957,7 @@ export const E_booklet_milestonesScalarFieldEnum = {
   milestone_price: 'milestone_price',
   previous_price_snapshot: 'previous_price_snapshot',
   reward_amount_snapshot: 'reward_amount_snapshot',
+  reward_expiry_days: 'reward_expiry_days',
   notification_recipients: 'notification_recipients',
   sort_order: 'sort_order',
   active: 'active',
@@ -973,6 +977,8 @@ export const E_booklet_milestone_achievementsScalarFieldEnum = {
   previous_price_snapshot: 'previous_price_snapshot',
   milestone_price_snapshot: 'milestone_price_snapshot',
   reward_amount: 'reward_amount',
+  reward_expiry_days_snapshot: 'reward_expiry_days_snapshot',
+  reward_expires_at: 'reward_expires_at',
   achieved_at: 'achieved_at',
   reward_terms_accepted_at: 'reward_terms_accepted_at',
   claimed_at: 'claimed_at'
@@ -1025,6 +1031,35 @@ export const Teacher_wallet_ledgerScalarFieldEnum = {
 } as const
 
 export type Teacher_wallet_ledgerScalarFieldEnum = (typeof Teacher_wallet_ledgerScalarFieldEnum)[keyof typeof Teacher_wallet_ledgerScalarFieldEnum]
+
+
+export const Teacher_wallet_credit_lotsScalarFieldEnum = {
+  id: 'id',
+  wallet_id: 'wallet_id',
+  teacher_id: 'teacher_id',
+  credit_ledger_id: 'credit_ledger_id',
+  milestone_achievement_id: 'milestone_achievement_id',
+  original_amount: 'original_amount',
+  remaining_amount: 'remaining_amount',
+  expires_at: 'expires_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Teacher_wallet_credit_lotsScalarFieldEnum = (typeof Teacher_wallet_credit_lotsScalarFieldEnum)[keyof typeof Teacher_wallet_credit_lotsScalarFieldEnum]
+
+
+export const Teacher_wallet_spend_allocationsScalarFieldEnum = {
+  id: 'id',
+  wallet_id: 'wallet_id',
+  teacher_id: 'teacher_id',
+  credit_lot_id: 'credit_lot_id',
+  debit_ledger_id: 'debit_ledger_id',
+  amount: 'amount',
+  created_at: 'created_at'
+} as const
+
+export type Teacher_wallet_spend_allocationsScalarFieldEnum = (typeof Teacher_wallet_spend_allocationsScalarFieldEnum)[keyof typeof Teacher_wallet_spend_allocationsScalarFieldEnum]
 
 
 export const E_booklet_access_codesScalarFieldEnum = {
