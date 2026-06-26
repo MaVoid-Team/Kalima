@@ -234,6 +234,8 @@ export type teacher_walletsWhereInput = {
   updated_at?: Prisma.DateTimeNullableFilter<"teacher_wallets"> | Date | string | null
   teacher?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   ledger_entries?: Prisma.Teacher_wallet_ledgerListRelationFilter
+  credit_lots?: Prisma.Teacher_wallet_credit_lotsListRelationFilter
+  spend_allocations?: Prisma.Teacher_wallet_spend_allocationsListRelationFilter
 }
 
 export type teacher_walletsOrderByWithRelationInput = {
@@ -245,6 +247,8 @@ export type teacher_walletsOrderByWithRelationInput = {
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   teacher?: Prisma.usersOrderByWithRelationInput
   ledger_entries?: Prisma.teacher_wallet_ledgerOrderByRelationAggregateInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsOrderByRelationAggregateInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsOrderByRelationAggregateInput
 }
 
 export type teacher_walletsWhereUniqueInput = Prisma.AtLeast<{
@@ -259,6 +263,8 @@ export type teacher_walletsWhereUniqueInput = Prisma.AtLeast<{
   updated_at?: Prisma.DateTimeNullableFilter<"teacher_wallets"> | Date | string | null
   teacher?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   ledger_entries?: Prisma.Teacher_wallet_ledgerListRelationFilter
+  credit_lots?: Prisma.Teacher_wallet_credit_lotsListRelationFilter
+  spend_allocations?: Prisma.Teacher_wallet_spend_allocationsListRelationFilter
 }, "id" | "teacher_id">
 
 export type teacher_walletsOrderByWithAggregationInput = {
@@ -294,6 +300,8 @@ export type teacher_walletsCreateInput = {
   updated_at?: Date | string | null
   teacher: Prisma.usersCreateNestedOneWithoutTeacher_walletInput
   ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutWalletInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsCreateNestedManyWithoutWalletInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsCreateNestedManyWithoutWalletInput
 }
 
 export type teacher_walletsUncheckedCreateInput = {
@@ -304,6 +312,8 @@ export type teacher_walletsUncheckedCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutWalletInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedManyWithoutWalletInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedCreateNestedManyWithoutWalletInput
 }
 
 export type teacher_walletsUpdateInput = {
@@ -313,6 +323,8 @@ export type teacher_walletsUpdateInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   teacher?: Prisma.usersUpdateOneRequiredWithoutTeacher_walletNestedInput
   ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutWalletNestedInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUpdateManyWithoutWalletNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUpdateManyWithoutWalletNestedInput
 }
 
 export type teacher_walletsUncheckedUpdateInput = {
@@ -323,6 +335,8 @@ export type teacher_walletsUncheckedUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutWalletNestedInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateManyWithoutWalletNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedUpdateManyWithoutWalletNestedInput
 }
 
 export type teacher_walletsCreateManyInput = {
@@ -445,12 +459,42 @@ export type teacher_walletsUpdateOneRequiredWithoutLedger_entriesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.teacher_walletsUpdateToOneWithWhereWithoutLedger_entriesInput, Prisma.teacher_walletsUpdateWithoutLedger_entriesInput>, Prisma.teacher_walletsUncheckedUpdateWithoutLedger_entriesInput>
 }
 
+export type teacher_walletsCreateNestedOneWithoutCredit_lotsInput = {
+  create?: Prisma.XOR<Prisma.teacher_walletsCreateWithoutCredit_lotsInput, Prisma.teacher_walletsUncheckedCreateWithoutCredit_lotsInput>
+  connectOrCreate?: Prisma.teacher_walletsCreateOrConnectWithoutCredit_lotsInput
+  connect?: Prisma.teacher_walletsWhereUniqueInput
+}
+
+export type teacher_walletsUpdateOneRequiredWithoutCredit_lotsNestedInput = {
+  create?: Prisma.XOR<Prisma.teacher_walletsCreateWithoutCredit_lotsInput, Prisma.teacher_walletsUncheckedCreateWithoutCredit_lotsInput>
+  connectOrCreate?: Prisma.teacher_walletsCreateOrConnectWithoutCredit_lotsInput
+  upsert?: Prisma.teacher_walletsUpsertWithoutCredit_lotsInput
+  connect?: Prisma.teacher_walletsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.teacher_walletsUpdateToOneWithWhereWithoutCredit_lotsInput, Prisma.teacher_walletsUpdateWithoutCredit_lotsInput>, Prisma.teacher_walletsUncheckedUpdateWithoutCredit_lotsInput>
+}
+
+export type teacher_walletsCreateNestedOneWithoutSpend_allocationsInput = {
+  create?: Prisma.XOR<Prisma.teacher_walletsCreateWithoutSpend_allocationsInput, Prisma.teacher_walletsUncheckedCreateWithoutSpend_allocationsInput>
+  connectOrCreate?: Prisma.teacher_walletsCreateOrConnectWithoutSpend_allocationsInput
+  connect?: Prisma.teacher_walletsWhereUniqueInput
+}
+
+export type teacher_walletsUpdateOneRequiredWithoutSpend_allocationsNestedInput = {
+  create?: Prisma.XOR<Prisma.teacher_walletsCreateWithoutSpend_allocationsInput, Prisma.teacher_walletsUncheckedCreateWithoutSpend_allocationsInput>
+  connectOrCreate?: Prisma.teacher_walletsCreateOrConnectWithoutSpend_allocationsInput
+  upsert?: Prisma.teacher_walletsUpsertWithoutSpend_allocationsInput
+  connect?: Prisma.teacher_walletsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.teacher_walletsUpdateToOneWithWhereWithoutSpend_allocationsInput, Prisma.teacher_walletsUpdateWithoutSpend_allocationsInput>, Prisma.teacher_walletsUncheckedUpdateWithoutSpend_allocationsInput>
+}
+
 export type teacher_walletsCreateWithoutTeacherInput = {
   balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
   currency?: string
   created_at?: Date | string | null
   updated_at?: Date | string | null
   ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutWalletInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsCreateNestedManyWithoutWalletInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsCreateNestedManyWithoutWalletInput
 }
 
 export type teacher_walletsUncheckedCreateWithoutTeacherInput = {
@@ -460,6 +504,8 @@ export type teacher_walletsUncheckedCreateWithoutTeacherInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutWalletInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedManyWithoutWalletInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedCreateNestedManyWithoutWalletInput
 }
 
 export type teacher_walletsCreateOrConnectWithoutTeacherInput = {
@@ -484,6 +530,8 @@ export type teacher_walletsUpdateWithoutTeacherInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutWalletNestedInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUpdateManyWithoutWalletNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUpdateManyWithoutWalletNestedInput
 }
 
 export type teacher_walletsUncheckedUpdateWithoutTeacherInput = {
@@ -493,6 +541,8 @@ export type teacher_walletsUncheckedUpdateWithoutTeacherInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutWalletNestedInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateManyWithoutWalletNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedUpdateManyWithoutWalletNestedInput
 }
 
 export type teacher_walletsCreateWithoutLedger_entriesInput = {
@@ -501,6 +551,8 @@ export type teacher_walletsCreateWithoutLedger_entriesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   teacher: Prisma.usersCreateNestedOneWithoutTeacher_walletInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsCreateNestedManyWithoutWalletInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsCreateNestedManyWithoutWalletInput
 }
 
 export type teacher_walletsUncheckedCreateWithoutLedger_entriesInput = {
@@ -510,6 +562,8 @@ export type teacher_walletsUncheckedCreateWithoutLedger_entriesInput = {
   currency?: string
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedManyWithoutWalletInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedCreateNestedManyWithoutWalletInput
 }
 
 export type teacher_walletsCreateOrConnectWithoutLedger_entriesInput = {
@@ -534,6 +588,8 @@ export type teacher_walletsUpdateWithoutLedger_entriesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   teacher?: Prisma.usersUpdateOneRequiredWithoutTeacher_walletNestedInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUpdateManyWithoutWalletNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUpdateManyWithoutWalletNestedInput
 }
 
 export type teacher_walletsUncheckedUpdateWithoutLedger_entriesInput = {
@@ -543,6 +599,124 @@ export type teacher_walletsUncheckedUpdateWithoutLedger_entriesInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateManyWithoutWalletNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedUpdateManyWithoutWalletNestedInput
+}
+
+export type teacher_walletsCreateWithoutCredit_lotsInput = {
+  balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  teacher: Prisma.usersCreateNestedOneWithoutTeacher_walletInput
+  ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutWalletInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsCreateNestedManyWithoutWalletInput
+}
+
+export type teacher_walletsUncheckedCreateWithoutCredit_lotsInput = {
+  id?: number
+  teacher_id: number
+  balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutWalletInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedCreateNestedManyWithoutWalletInput
+}
+
+export type teacher_walletsCreateOrConnectWithoutCredit_lotsInput = {
+  where: Prisma.teacher_walletsWhereUniqueInput
+  create: Prisma.XOR<Prisma.teacher_walletsCreateWithoutCredit_lotsInput, Prisma.teacher_walletsUncheckedCreateWithoutCredit_lotsInput>
+}
+
+export type teacher_walletsUpsertWithoutCredit_lotsInput = {
+  update: Prisma.XOR<Prisma.teacher_walletsUpdateWithoutCredit_lotsInput, Prisma.teacher_walletsUncheckedUpdateWithoutCredit_lotsInput>
+  create: Prisma.XOR<Prisma.teacher_walletsCreateWithoutCredit_lotsInput, Prisma.teacher_walletsUncheckedCreateWithoutCredit_lotsInput>
+  where?: Prisma.teacher_walletsWhereInput
+}
+
+export type teacher_walletsUpdateToOneWithWhereWithoutCredit_lotsInput = {
+  where?: Prisma.teacher_walletsWhereInput
+  data: Prisma.XOR<Prisma.teacher_walletsUpdateWithoutCredit_lotsInput, Prisma.teacher_walletsUncheckedUpdateWithoutCredit_lotsInput>
+}
+
+export type teacher_walletsUpdateWithoutCredit_lotsInput = {
+  balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  teacher?: Prisma.usersUpdateOneRequiredWithoutTeacher_walletNestedInput
+  ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutWalletNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUpdateManyWithoutWalletNestedInput
+}
+
+export type teacher_walletsUncheckedUpdateWithoutCredit_lotsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutWalletNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedUpdateManyWithoutWalletNestedInput
+}
+
+export type teacher_walletsCreateWithoutSpend_allocationsInput = {
+  balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  teacher: Prisma.usersCreateNestedOneWithoutTeacher_walletInput
+  ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutWalletInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsCreateNestedManyWithoutWalletInput
+}
+
+export type teacher_walletsUncheckedCreateWithoutSpend_allocationsInput = {
+  id?: number
+  teacher_id: number
+  balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: string
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutWalletInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedManyWithoutWalletInput
+}
+
+export type teacher_walletsCreateOrConnectWithoutSpend_allocationsInput = {
+  where: Prisma.teacher_walletsWhereUniqueInput
+  create: Prisma.XOR<Prisma.teacher_walletsCreateWithoutSpend_allocationsInput, Prisma.teacher_walletsUncheckedCreateWithoutSpend_allocationsInput>
+}
+
+export type teacher_walletsUpsertWithoutSpend_allocationsInput = {
+  update: Prisma.XOR<Prisma.teacher_walletsUpdateWithoutSpend_allocationsInput, Prisma.teacher_walletsUncheckedUpdateWithoutSpend_allocationsInput>
+  create: Prisma.XOR<Prisma.teacher_walletsCreateWithoutSpend_allocationsInput, Prisma.teacher_walletsUncheckedCreateWithoutSpend_allocationsInput>
+  where?: Prisma.teacher_walletsWhereInput
+}
+
+export type teacher_walletsUpdateToOneWithWhereWithoutSpend_allocationsInput = {
+  where?: Prisma.teacher_walletsWhereInput
+  data: Prisma.XOR<Prisma.teacher_walletsUpdateWithoutSpend_allocationsInput, Prisma.teacher_walletsUncheckedUpdateWithoutSpend_allocationsInput>
+}
+
+export type teacher_walletsUpdateWithoutSpend_allocationsInput = {
+  balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  teacher?: Prisma.usersUpdateOneRequiredWithoutTeacher_walletNestedInput
+  ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutWalletNestedInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUpdateManyWithoutWalletNestedInput
+}
+
+export type teacher_walletsUncheckedUpdateWithoutSpend_allocationsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutWalletNestedInput
+  credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateManyWithoutWalletNestedInput
 }
 
 
@@ -552,10 +726,14 @@ export type teacher_walletsUncheckedUpdateWithoutLedger_entriesInput = {
 
 export type Teacher_walletsCountOutputType = {
   ledger_entries: number
+  credit_lots: number
+  spend_allocations: number
 }
 
 export type Teacher_walletsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ledger_entries?: boolean | Teacher_walletsCountOutputTypeCountLedger_entriesArgs
+  credit_lots?: boolean | Teacher_walletsCountOutputTypeCountCredit_lotsArgs
+  spend_allocations?: boolean | Teacher_walletsCountOutputTypeCountSpend_allocationsArgs
 }
 
 /**
@@ -575,6 +753,20 @@ export type Teacher_walletsCountOutputTypeCountLedger_entriesArgs<ExtArgs extend
   where?: Prisma.teacher_wallet_ledgerWhereInput
 }
 
+/**
+ * Teacher_walletsCountOutputType without action
+ */
+export type Teacher_walletsCountOutputTypeCountCredit_lotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.teacher_wallet_credit_lotsWhereInput
+}
+
+/**
+ * Teacher_walletsCountOutputType without action
+ */
+export type Teacher_walletsCountOutputTypeCountSpend_allocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.teacher_wallet_spend_allocationsWhereInput
+}
+
 
 export type teacher_walletsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -585,6 +777,8 @@ export type teacher_walletsSelect<ExtArgs extends runtime.Types.Extensions.Inter
   updated_at?: boolean
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   ledger_entries?: boolean | Prisma.teacher_wallets$ledger_entriesArgs<ExtArgs>
+  credit_lots?: boolean | Prisma.teacher_wallets$credit_lotsArgs<ExtArgs>
+  spend_allocations?: boolean | Prisma.teacher_wallets$spend_allocationsArgs<ExtArgs>
   _count?: boolean | Prisma.Teacher_walletsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["teacher_wallets"]>
 
@@ -621,6 +815,8 @@ export type teacher_walletsOmit<ExtArgs extends runtime.Types.Extensions.Interna
 export type teacher_walletsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   ledger_entries?: boolean | Prisma.teacher_wallets$ledger_entriesArgs<ExtArgs>
+  credit_lots?: boolean | Prisma.teacher_wallets$credit_lotsArgs<ExtArgs>
+  spend_allocations?: boolean | Prisma.teacher_wallets$spend_allocationsArgs<ExtArgs>
   _count?: boolean | Prisma.Teacher_walletsCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type teacher_walletsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -635,6 +831,8 @@ export type $teacher_walletsPayload<ExtArgs extends runtime.Types.Extensions.Int
   objects: {
     teacher: Prisma.$usersPayload<ExtArgs>
     ledger_entries: Prisma.$teacher_wallet_ledgerPayload<ExtArgs>[]
+    credit_lots: Prisma.$teacher_wallet_credit_lotsPayload<ExtArgs>[]
+    spend_allocations: Prisma.$teacher_wallet_spend_allocationsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1039,6 +1237,8 @@ export interface Prisma__teacher_walletsClient<T, Null = never, ExtArgs extends 
   readonly [Symbol.toStringTag]: "PrismaPromise"
   teacher<T extends Prisma.usersDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.usersDefaultArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   ledger_entries<T extends Prisma.teacher_wallets$ledger_entriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teacher_wallets$ledger_entriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$teacher_wallet_ledgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  credit_lots<T extends Prisma.teacher_wallets$credit_lotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teacher_wallets$credit_lotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$teacher_wallet_credit_lotsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  spend_allocations<T extends Prisma.teacher_wallets$spend_allocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teacher_wallets$spend_allocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$teacher_wallet_spend_allocationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1500,6 +1700,54 @@ export type teacher_wallets$ledger_entriesArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.Teacher_wallet_ledgerScalarFieldEnum | Prisma.Teacher_wallet_ledgerScalarFieldEnum[]
+}
+
+/**
+ * teacher_wallets.credit_lots
+ */
+export type teacher_wallets$credit_lotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the teacher_wallet_credit_lots
+   */
+  select?: Prisma.teacher_wallet_credit_lotsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the teacher_wallet_credit_lots
+   */
+  omit?: Prisma.teacher_wallet_credit_lotsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.teacher_wallet_credit_lotsInclude<ExtArgs> | null
+  where?: Prisma.teacher_wallet_credit_lotsWhereInput
+  orderBy?: Prisma.teacher_wallet_credit_lotsOrderByWithRelationInput | Prisma.teacher_wallet_credit_lotsOrderByWithRelationInput[]
+  cursor?: Prisma.teacher_wallet_credit_lotsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Teacher_wallet_credit_lotsScalarFieldEnum | Prisma.Teacher_wallet_credit_lotsScalarFieldEnum[]
+}
+
+/**
+ * teacher_wallets.spend_allocations
+ */
+export type teacher_wallets$spend_allocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the teacher_wallet_spend_allocations
+   */
+  select?: Prisma.teacher_wallet_spend_allocationsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the teacher_wallet_spend_allocations
+   */
+  omit?: Prisma.teacher_wallet_spend_allocationsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.teacher_wallet_spend_allocationsInclude<ExtArgs> | null
+  where?: Prisma.teacher_wallet_spend_allocationsWhereInput
+  orderBy?: Prisma.teacher_wallet_spend_allocationsOrderByWithRelationInput | Prisma.teacher_wallet_spend_allocationsOrderByWithRelationInput[]
+  cursor?: Prisma.teacher_wallet_spend_allocationsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Teacher_wallet_spend_allocationsScalarFieldEnum | Prisma.Teacher_wallet_spend_allocationsScalarFieldEnum[]
 }
 
 /**
