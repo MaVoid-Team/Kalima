@@ -13,9 +13,17 @@ function createDb(overrides: Record<string, unknown> = {}) {
     e_booklet_access_code_redemptions: { findFirst: jest.fn(), findMany: jest.fn(), create: jest.fn(), update: jest.fn(), count: jest.fn() },
     e_booklet_access: { findFirst: jest.fn(), create: jest.fn(), upsert: jest.fn() },
     e_booklet_milestones: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), findFirst: jest.fn() },
+    e_booklet_global_settings: { findUnique: jest.fn() },
     e_booklet_milestone_achievements: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn(), updateMany: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
     teacher_wallets: { findUnique: jest.fn(), upsert: jest.fn(), update: jest.fn(), updateMany: jest.fn() },
     teacher_wallet_ledger: { create: jest.fn(), aggregate: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
+    teacher_wallet_credit_lots: {
+      findMany: jest.fn().mockResolvedValue([]),
+      updateMany: jest.fn(),
+      create: jest.fn(),
+      findUnique: jest.fn().mockResolvedValue(null),
+    },
+    teacher_wallet_spend_allocations: { createMany: jest.fn() },
     purchases: { findFirst: jest.fn(), update: jest.fn() },
     e_booklet_purchases: { findFirst: jest.fn(), update: jest.fn() },
     purchase_items: { findMany: jest.fn() },
@@ -458,6 +466,29 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     expect(db.teacher_wallet_ledger.create).not.toHaveBeenCalled();
   });
 
+  test("milestone creation uses global default reward expiry days when omitted", async () => {
+    const db = createDb();
+    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1 });
+    db.e_booklet_global_settings.findUnique.mockResolvedValue({ id: 1, default_reward_expiry_days: 45 });
+    db.e_booklet_milestones.create.mockResolvedValue({ id: 1, reward_expiry_days: 45 });
+    const service = new EBookletMilestoneService(db);
+
+    await expect(service.createMilestone({ termId: 1, title: "Milestone", targetPaidRedemptions: 10, milestonePrice: 200, rewardAmountSnapshot: 25 }, 1)).resolves.toEqual(expect.objectContaining({ reward_expiry_days: 45 }));
+    expect(db.e_booklet_milestones.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ reward_expiry_days: 45 }) }));
+  });
+
+  test("milestone creation keeps explicit reward expiry days over global default", async () => {
+    const db = createDb();
+    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1 });
+    db.e_booklet_global_settings.findUnique.mockResolvedValue({ id: 1, default_reward_expiry_days: 45 });
+    db.e_booklet_milestones.create.mockResolvedValue({ id: 1, reward_expiry_days: 90 });
+    const service = new EBookletMilestoneService(db);
+
+    await expect(service.createMilestone({ termId: 1, title: "Milestone", targetPaidRedemptions: 10, milestonePrice: 200, rewardAmountSnapshot: 25, rewardExpiryDays: 90 }, 1)).resolves.toEqual(expect.objectContaining({ reward_expiry_days: 90 }));
+    expect(db.e_booklet_global_settings.findUnique).not.toHaveBeenCalled();
+    expect(db.e_booklet_milestones.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ reward_expiry_days: 90 }) }));
+  });
+
   test("milestone evaluation uses only currently effective active terms", async () => {
     const db = createDb();
     db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", starts_at: new Date("2027-01-01T00:00:00.000Z"), ends_at: null });
@@ -609,7 +640,7 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
 
   test("claim reward accepts terms once and then credits wallet idempotently", async () => {
     const db = createDb();
-    const achievement = { id: 6, teacher_id: 9, term_id: 1, reward_amount: 75, claimed_at: null, reward_terms_accepted_at: null };
+    const achievement = { id: 6, teacher_id: 9, term_id: 1, reward_amount: 75, reward_expiry_days_snapshot: 30, claimed_at: null, reward_terms_accepted_at: null };
     db.e_booklet_milestone_achievements.findFirst
       .mockResolvedValueOnce(achievement)
       .mockResolvedValueOnce({ ...achievement, claimed_at: new Date(), reward_terms_accepted_at: new Date() })
@@ -629,6 +660,7 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     expect(db.teacher_wallet_ledger.create).toHaveBeenCalledTimes(1);
     expect(db.e_booklet_teacher_terms_acceptances.create).toHaveBeenCalledWith({ data: expect.objectContaining({ acceptance_type: "reward_claim", terms_snapshot: "Reward claim terms v1" }) });
     expect(db.e_booklet_milestone_achievements.updateMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 6, teacher_id: 9, claimed_at: null } }));
+    expect(db.e_booklet_milestone_achievements.updateMany).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ reward_expires_at: expect.any(Date) }) }));
     expect(db.$transaction).toHaveBeenCalledWith(expect.any(Function), { isolationLevel: "Serializable" });
   });
 
@@ -673,13 +705,15 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
 
   test("teacher wallet applies to e-booklet purchases using server purchase price and is idempotent per e-booklet purchase", async () => {
     const db = createDb();
-    db.teacher_wallets.findUnique.mockResolvedValue({ id: 11, teacher_id: 9, balance: 100 });
+    db.teacher_wallets.upsert.mockResolvedValue({ id: 11, teacher_id: 9, balance: 100 });
     db.e_booklet_purchases.findFirst
       .mockResolvedValueOnce({ id: 500, teacher_id: 9, price: 200, wallet_credit_applied: 0, final_payable_price: 200, status: "pending" })
       .mockResolvedValueOnce({ id: 500, teacher_id: 9, price: 200, wallet_credit_applied: 40, final_payable_price: 160, status: "pending" });
     db.teacher_wallet_ledger.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 22, amount: -40, e_booklet_purchase_id: 500 });
-    db.teacher_wallets.updateMany.mockResolvedValue({ count: 1 });
+    db.teacher_wallet_credit_lots.findMany.mockResolvedValue([{ id: 31, teacher_id: 9, wallet_id: 11, remaining_amount: 100, expires_at: new Date("2026-12-01T00:00:00.000Z") }]);
+    db.teacher_wallet_credit_lots.updateMany.mockResolvedValue({ count: 1 });
     db.teacher_wallet_ledger.create.mockResolvedValue({ id: 22, amount: -40, type: "debit", source: "order_spend", balance_after: 60 });
+    db.teacher_wallets.update.mockResolvedValue({ id: 11, teacher_id: 9, balance: 60 });
     db.e_booklet_purchases.update.mockResolvedValue({ id: 500, price: 200, wallet_credit_applied: 40, final_payable_price: 160 });
     const service = new TeacherWalletService(db);
 
@@ -689,8 +723,10 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     expect(db.e_booklet_purchases.findFirst).toHaveBeenCalledWith({ where: { id: 500, teacher_id: 9 } });
     expect(db.purchases.findFirst).not.toHaveBeenCalled();
     expect(db.coupon_usages.findFirst).not.toHaveBeenCalled();
-    expect(db.teacher_wallets.updateMany).toHaveBeenCalledWith({ where: { teacher_id: 9, balance: { gte: 40 } }, data: { balance: { decrement: 40 } } });
+    expect(db.teacher_wallet_credit_lots.updateMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ id: 31, remaining_amount: { gte: 40 } }) }));
     expect(db.teacher_wallet_ledger.create).toHaveBeenCalledWith({ data: expect.objectContaining({ teacher_id: 9, wallet_id: 11, amount: -40, e_booklet_purchase_id: 500, type: "debit", source: "order_spend", balance_after: 60 }) });
+    expect(db.teacher_wallet_spend_allocations.createMany).toHaveBeenCalledWith({ data: [expect.objectContaining({ credit_lot_id: 31, amount: 40 })] });
+    expect(db.teacher_wallets.update).toHaveBeenCalledWith({ where: { id: 11 }, data: { balance: 60, updated_at: expect.any(Date) } });
     expect(db.e_booklet_purchases.update).toHaveBeenCalledWith({ where: { id: 500 }, data: { wallet_credit_applied: 40, final_payable_price: 160, admin_notes: "Wallet credit applied: 40" } });
     expect(db.$transaction).toHaveBeenCalled();
   });
@@ -707,9 +743,10 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
 
   test("teacher wallet rejects unowned e-booklet purchases and failed atomic debit", async () => {
     const db = createDb();
-    db.teacher_wallets.findUnique.mockResolvedValue({ id: 11, teacher_id: 9, balance: 100 });
+    db.teacher_wallets.upsert.mockResolvedValue({ id: 11, teacher_id: 9, balance: 100 });
     db.e_booklet_purchases.findFirst.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 500, teacher_id: 9, price: 200, status: "pending" });
-    db.teacher_wallets.updateMany.mockResolvedValue({ count: 0 });
+    db.teacher_wallet_credit_lots.findMany.mockResolvedValue([{ id: 31, teacher_id: 9, wallet_id: 11, remaining_amount: 100, expires_at: new Date("2026-12-01T00:00:00.000Z") }]);
+    db.teacher_wallet_credit_lots.updateMany.mockResolvedValue({ count: 0 });
     const service = new TeacherWalletService(db);
 
     await expect(service.applyToPurchase({ teacherId: 9, purchaseId: 999, purchaseTotal: 200, requestedAmount: 40 })).rejects.toThrow("E-booklet purchase not found");

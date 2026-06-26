@@ -108,6 +108,10 @@ export default function TeacherInviteManagementPage() {
     return achievementId && !milestone?.claimed_at && !milestone?.achievement?.claimed_at;
   });
   const claimableAchievementId = claimableMilestone?.achievement?.id ?? claimableMilestone?.achievement_id ?? claimableMilestone?.milestone_achievement_id;
+  const rewardTermsMilestone = milestones.find((milestone) => {
+    const achievementId = milestone?.achievement?.id ?? milestone?.achievement_id ?? milestone?.milestone_achievement_id;
+    return String(achievementId || "") === String(rewardTermsAchievement || "");
+  });
   const nearestExpiringRewardLot = useMemo(() => {
     return [...walletRewardLots]
       .filter((lot) => numberOrFallback(lot?.remaining_amount) > 0 && lot?.expires_at)
@@ -125,6 +129,12 @@ export default function TeacherInviteManagementPage() {
   };
 
   const formatMoney = (value) => new Intl.NumberFormat(i18n.language, { style: "currency", currency, maximumFractionDigits: 2 }).format(numberOrFallback(value));
+  const rewardExpiryPreviewDate = (milestone) => {
+    const days = numberOrFallback(milestone?.reward_expiry_days_snapshot ?? milestone?.achievement?.reward_expiry_days_snapshot ?? milestone?.reward_expiry_days, 120);
+    const date = new Date();
+    date.setUTCDate(date.getUTCDate() + Math.max(1, days));
+    return formatDate(date);
+  };
 
   const copyText = async (text, toastKey = "toasts.accessCodeCopied") => {
     await navigator.clipboard.writeText(text);
@@ -390,6 +400,11 @@ export default function TeacherInviteManagementPage() {
           <div className="max-w-lg rounded-lg border bg-background p-5 shadow-lg">
             <h2 className="text-lg font-semibold">{t("teacher.milestones.rewardTermsTitle")}</h2>
             <p className="mt-2 text-sm text-muted-foreground">{currentTerms?.reward_claim_terms || t("teacher.milestones.rewardTermsDescription")}</p>
+            <div className="mt-3 rounded-md border bg-muted/40 p-3 text-sm font-medium">
+              {t("teacher.milestones.rewardExpiryPreview", {
+                date: rewardExpiryPreviewDate(rewardTermsMilestone),
+              })}
+            </div>
             <div className="mt-5 flex justify-end gap-2">
               <Button variant="outline" onClick={() => setRewardTermsAchievement(null)}>{t("common.close")}</Button>
               <Button onClick={claimRewardAfterTerms}>{t("teacher.milestones.claimCta")}</Button>

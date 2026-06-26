@@ -539,7 +539,6 @@ router.get(
 router.get(
   "/e-booklet-viewer/:instanceId/metadata",
   viewerLimiter,
-  ...viewerAuth,
   eBookletController.getViewerMetadata,
 );
 router.post(
@@ -551,25 +550,21 @@ router.post(
 router.get(
   "/e-booklet-viewer/:instanceId/document",
   viewerLimiter,
-  ...viewerAuth,
   eBookletController.getAuthorizedViewerDocument,
 );
 router.get(
   "/e-booklet-viewer/:instanceId/pages/:pageNumber/preview",
   viewerLimiter,
-  ...viewerAuth,
   eBookletController.getAuthorizedViewerDocumentPagePreview,
 );
 router.get(
   "/e-booklet-viewer/:instanceId/pages/:pageNumber",
   viewerLimiter,
-  ...viewerAuth,
   eBookletController.getViewerPage,
 );
 router.get(
   "/e-booklet-viewer/:instanceId/pages/:pageNumber/hotspots",
   viewerLimiter,
-  ...viewerAuth,
   eBookletController.getViewerPageHotspots,
 );
 router.get(
@@ -593,13 +588,11 @@ router.get(
 router.get(
   "/e-booklet-viewer/:instanceId/hotspots/:hotspotId/content",
   viewerLimiter,
-  ...viewerAuth,
   eBookletController.getHotspotContent,
 );
 router.get(
   "/e-booklet-viewer/:instanceId/hotspots/:hotspotId/assets/:assetId",
   viewerLimiter,
-  ...viewerAuth,
   eBookletController.getAuthorizedHotspotAsset,
 );
 

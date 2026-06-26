@@ -1,6 +1,8 @@
 import path from "path";
 import { promises as fsPromises } from "fs";
 import crypto from "crypto";
+import { execFile } from "child_process";
+import { promisify } from "util";
 import { PDFDocument } from "pdf-lib";
 import type { Server as SocketIOServer } from "socket.io";
 import type { PrismaClient } from "../../../libs/db/prisma";
@@ -15,6 +17,7 @@ import { EBookletPagePreviewService } from "./e-booklet-page-preview.service";
 import { emitNotificationToUser } from "../../../libs/redis/socketNotificationEmitter";
 
 type EBookletDb = PrismaClient | any;
+const execFileAsync = promisify(execFile);
 type EBookletLiveNotification = {
   userId: number;
   notification: {
@@ -331,6 +334,13 @@ async function extractPdfMetadata(
   if (file.mimetype !== "application/pdf") return null;
 
   try {
+    if (file.path) {
+      const pdfInfoMetadata = await extractPdfMetadataWithPdfInfo(file.path);
+      if (!pdfInfoMetadata) {
+        throw new Error("PDF metadata extraction failed");
+      }
+      return pdfInfoMetadata;
+    }
     const buffer = file.buffer || (file.path ? await fsPromises.readFile(file.path) : undefined);
     if (!buffer) {
       throw new Error("Missing PDF upload buffer");
@@ -354,6 +364,34 @@ async function extractPdfMetadata(
     throw new BadRequestError(
       "The uploaded PDF could not be read. Please upload a valid PDF file.",
     );
+  }
+}
+
+async function extractPdfMetadataWithPdfInfo(pdfPath: string): Promise<PdfMetadata | null> {
+  try {
+    const { stdout } = await execFileAsync(
+      process.env.E_BOOKLET_PDFINFO_BIN || "pdfinfo",
+      ["-box", "-f", "1", "-l", "1000000", pdfPath],
+      { maxBuffer: 10 * 1024 * 1024, timeout: 30_000 },
+    );
+    const pageCountMatch = stdout.match(/^Pages:\s+(\d+)$/m);
+    const pageCount = pageCountMatch ? Number(pageCountMatch[1]) : 0;
+    const dimensions = new Map<number, { width: number; height: number }>();
+    const sizePattern = /^Page\s+(\d+)\s+size:\s+([\d.]+)\s+x\s+([\d.]+)\s+pts\b/gm;
+    let match: RegExpExecArray | null;
+    while ((match = sizePattern.exec(stdout)) !== null) {
+      dimensions.set(Number(match[1]), {
+        width: Number(Number(match[2]).toFixed(2)),
+        height: Number(Number(match[3]).toFixed(2)),
+      });
+    }
+    if (!pageCount || dimensions.size !== pageCount) return null;
+    return {
+      page_count: pageCount,
+      page_dimensions: Array.from({ length: pageCount }, (_, index) => dimensions.get(index + 1)!),
+    };
+  } catch {
+    return null;
   }
 }
 
@@ -3720,6 +3758,32 @@ export class EBookletService {
     });
   }
 
+  private async getPublicViewerAccess(instanceId: number) {
+    const instance = await this.db.e_booklet_instances.findUnique({
+      where: { id: instanceId },
+      include: {
+        template: true,
+        template_version: true,
+        teacher: { select: { id: true, name: true } },
+      },
+    });
+    if (!instance || instance.status !== "active") {
+      throw new NotFoundError("E-booklet instance not found.");
+    }
+    return this.sanitizeViewerAccess({
+      id: 0,
+      status: "active",
+      access_source: "public_view",
+      public_view_mode: true,
+      booklet_instance_id: instanceId,
+      booklet_instance: instance,
+    });
+  }
+
+  async getPublicViewerMetadata(instanceId: number) {
+    return this.getPublicViewerAccess(instanceId);
+  }
+
   async getAdminViewerMetadata(instanceId: number, adminUserId: number) {
     const access = await this.getAdminViewerAccess(instanceId);
     await this.db.e_booklet_audit_logs.create({
@@ -3982,6 +4046,18 @@ export class EBookletService {
     return this.buildViewerDocumentPagePreviewResponse(access.booklet_instance, pageNumber);
   }
 
+  async getPublicAuthorizedViewerDocument(instanceId: number, pageNumber: number, pageAccessToken: string) {
+    verifyViewerPageToken({ token: pageAccessToken, instanceId, pageNumber, userId: 0 });
+    const access: any = await this.getPublicViewerAccess(instanceId);
+    return this.buildViewerDocumentResponse(access.booklet_instance, pageNumber);
+  }
+
+  async getPublicAuthorizedViewerDocumentPagePreview(instanceId: number, pageNumber: number, pageAccessToken: string) {
+    verifyViewerPageToken({ token: pageAccessToken, instanceId, pageNumber, userId: 0 });
+    const access: any = await this.getPublicViewerAccess(instanceId);
+    return this.buildViewerDocumentPagePreviewResponse(access.booklet_instance, pageNumber);
+  }
+
   async getAuthorizedViewerDocument(instanceId: number, userId: number, pageNumber: number, pageAccessToken: string) {
     verifyViewerPageToken({ token: pageAccessToken, instanceId, pageNumber, userId });
     const access: any = await this.assertViewerAccess(instanceId, userId);
@@ -4014,6 +4090,31 @@ export class EBookletService {
       source: (access as any).access_source,
     });
     return access;
+  }
+
+  async getPublicViewerPage(instanceId: number, pageNumber: number) {
+    const access: any = await this.getPublicViewerAccess(instanceId);
+    const pageCount = Number(access.booklet_instance?.template_version?.page_count || 0);
+    if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pageCount) {
+      throw new BadRequestError("Invalid e-booklet page number.");
+    }
+    const expiresAt = new Date(Date.now() + VIEWER_PAGE_TOKEN_TTL_MS);
+    const documentAssetId = this.resolveViewerDocumentAssetId(access.booklet_instance);
+    return {
+      pageNumber,
+      renderMode: documentAssetId ? "pdf-document" : "server-page",
+      documentAssetId,
+      pageAccessToken: createViewerPageToken({ instanceId, pageNumber, userId: 0, expiresAt }),
+      expiresAt,
+      cacheControl: "private, no-store",
+      watermark: {
+        teacherName: access.booklet_instance?.teacher?.name || null,
+        templateTitle: access.booklet_instance?.template?.title || null,
+      },
+      message: documentAssetId
+        ? null
+        : "Page rendering pipeline is pending document renderer integration.",
+    };
   }
 
   async getViewerPage(instanceId: number, pageNumber: number, userId: number) {
@@ -4085,6 +4186,19 @@ export class EBookletService {
     return hotspots.map((hotspot: any) => this.normalizeHotspotRecord(hotspot));
   }
 
+  async getPublicViewerPageHotspots(instanceId: number, pageNumber: number) {
+    const access: any = await this.getPublicViewerAccess(instanceId);
+    const hotspots = await this.db.e_booklet_hotspots.findMany({
+      where: {
+        template_version_id: access.booklet_instance.template_version_id,
+        page_number: pageNumber,
+        is_active: true,
+      },
+      orderBy: { sort_order: "asc" },
+    });
+    return hotspots.map((hotspot: any) => this.normalizeHotspotRecord(hotspot));
+  }
+
   async getAuthorizedHotspotAsset(instanceId: number, hotspotId: number, assetId: number, userId: number) {
     const access: any = await this.assertViewerAccess(instanceId, userId);
     const hotspot = await this.db.e_booklet_hotspots.findUnique({
@@ -4122,6 +4236,49 @@ export class EBookletService {
         metadata_json: { asset_id: assetId, booklet_instance_id: instanceId },
       },
     });
+
+    const filename = path.basename(asset.storage_key || "");
+    return {
+      asset: {
+        id: asset.id,
+        file_type: asset.file_type,
+        original_filename: asset.original_filename,
+        mime_type: asset.mime_type,
+        size_bytes: asset.size_bytes,
+        visibility: asset.visibility,
+      },
+      absolutePath: path.join(E_BOOKLET_UPLOAD_DIR, filename),
+      cacheControl: "private, no-store",
+    };
+  }
+
+  async getPublicHotspotAsset(instanceId: number, hotspotId: number, assetId: number) {
+    const access: any = await this.getPublicViewerAccess(instanceId);
+    const hotspot = await this.db.e_booklet_hotspots.findUnique({
+      where: { id: hotspotId },
+    });
+    const referencedAssetIds = new Set<number>();
+    if (hotspot?.asset_file_id) referencedAssetIds.add(Number(hotspot.asset_file_id));
+    const blocks = Array.isArray(hotspot?.content_json?.blocks)
+      ? hotspot.content_json.blocks
+      : [];
+    blocks.forEach((block: any) => {
+      if (block?.asset_file_id) referencedAssetIds.add(Number(block.asset_file_id));
+    });
+
+    if (
+      !hotspot ||
+      Number(hotspot.template_version_id) !== Number(access.booklet_instance?.template_version_id) ||
+      hotspot.is_active === false ||
+      !referencedAssetIds.has(assetId)
+    ) {
+      throw new ForbiddenError("You do not have access to this hotspot asset.");
+    }
+
+    const asset = await this.db.e_booklet_file_assets.findUnique({
+      where: { id: assetId },
+    });
+    if (!asset) throw new NotFoundError("E-booklet file asset not found");
 
     const filename = path.basename(asset.storage_key || "");
     return {
@@ -4177,6 +4334,49 @@ export class EBookletService {
             visibility: hotspot.asset_file.visibility,
           }
         : null,
+    };
+  }
+
+  async getPublicHotspotContent(instanceId: number, hotspotId: number) {
+    const access: any = await this.getPublicViewerAccess(instanceId);
+    const hotspot = await this.db.e_booklet_hotspots.findUnique({
+      where: { id: hotspotId },
+      include: {
+        asset_file: true,
+      },
+    });
+    if (
+      !hotspot ||
+      Number(hotspot.template_version_id) !== Number(access.booklet_instance?.template_version_id) ||
+      hotspot.is_active === false
+    ) {
+      throw new ForbiddenError("You do not have access to this hotspot.");
+    }
+    return {
+      id: hotspot.id,
+      template_version_id: hotspot.template_version_id,
+      page_number: hotspot.page_number,
+      x_percent: hotspot.x_percent,
+      y_percent: hotspot.y_percent,
+      radius_percent: hotspot.radius_percent,
+      type: hotspot.type,
+      title: hotspot.title,
+      text_content: hotspot.text_content,
+      asset_file_id: hotspot.asset_file_id,
+      trigger_type: hotspot.trigger_type,
+      display_behavior: hotspot.display_behavior,
+      content_json: this.normalizeLegacyHotspotContent(hotspot),
+      asset_file: hotspot.asset_file
+        ? {
+            id: hotspot.asset_file.id,
+            file_type: hotspot.asset_file.file_type,
+            original_filename: hotspot.asset_file.original_filename,
+            mime_type: hotspot.asset_file.mime_type,
+            size_bytes: hotspot.asset_file.size_bytes,
+            visibility: hotspot.asset_file.visibility,
+          }
+        : null,
+      is_locked: false,
     };
   }
 

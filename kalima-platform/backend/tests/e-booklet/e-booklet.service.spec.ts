@@ -181,6 +181,7 @@ function hmacPasscode(passcode: string): string {
 describe("EBookletService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    delete process.env.E_BOOKLET_PDFINFO_BIN;
   });
 
   async function writeTestPdf(filename: string) {
@@ -1696,6 +1697,57 @@ describe("EBookletService", () => {
           page_dimensions: [{ width: 300, height: 400 }],
         }),
       }));
+      expect(generateForDocument).not.toHaveBeenCalled();
+    });
+
+    test("uses pdfinfo for disk-backed PDF upload metadata without loading the full PDF in Node", async () => {
+      const db = createMockDb();
+      db.e_booklet_file_assets.create.mockResolvedValue({
+        id: 80,
+        file_type: "pdf",
+        mime_type: "application/pdf",
+      });
+      const mockPdfInfoBin = path.resolve(
+        process.cwd(),
+        "uploads/e-booklets/private/mock-pdfinfo.js",
+      );
+      await fs.mkdir(path.dirname(mockPdfInfoBin), { recursive: true });
+      await fs.writeFile(mockPdfInfoBin, [
+        "#!/usr/bin/env node",
+        "console.log(`" + [
+          "Pages:           2",
+          "Page    1 size:  300 x 400 pts",
+          "Page    2 size:  612 x 792 pts (letter)",
+        ].join("\\n") + "`);",
+      ].join("\n"));
+      await fs.chmod(mockPdfInfoBin, 0o755);
+      process.env.E_BOOKLET_PDFINFO_BIN = mockPdfInfoBin;
+      const loadSpy = jest.spyOn(PDFDocument, "load");
+      const service = new EBookletService(db);
+      const generateForDocument = jest.fn();
+      (service as any).pagePreviewService = { generateForDocument };
+      const sourcePath = await writeTestPdf("pdfinfo-upload-source.pdf");
+
+      const result: any = await service.createFileAsset({
+        ...baseFile,
+        path: sourcePath,
+        buffer: undefined,
+        originalname: "large.pdf",
+        mimetype: "application/pdf",
+        size: 100 * 1024 * 1024,
+      } as any, { fileType: "document" });
+
+      expect(result).toEqual(expect.objectContaining({
+        id: 80,
+        metadata: {
+          page_count: 2,
+          page_dimensions: [
+            { width: 300, height: 400 },
+            { width: 612, height: 792 },
+          ],
+        },
+      }));
+      expect(loadSpy).not.toHaveBeenCalled();
       expect(generateForDocument).not.toHaveBeenCalled();
     });
   });

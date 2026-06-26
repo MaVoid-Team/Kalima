@@ -3,6 +3,7 @@ import { BadRequestError } from "../../../libs/errors";
 const SETTINGS_ID = 1;
 const DEFAULT_PREVIEW_PAGE_LIMIT = 10;
 const MAX_PREVIEW_PAGE_LIMIT = 200;
+const DEFAULT_REWARD_EXPIRY_DAYS = 120;
 
 const defaults = {
   id: SETTINGS_ID,
@@ -19,6 +20,7 @@ const defaults = {
   default_allowed_devices_per_student: 1,
   default_allowed_devices_per_teacher: 2,
   preview_page_limit: DEFAULT_PREVIEW_PAGE_LIMIT,
+  default_reward_expiry_days: DEFAULT_REWARD_EXPIRY_DAYS,
   device_reset_policy: null,
   notify_admins_on_delivery: true,
   notify_teacher_on_delivery: true,
@@ -54,6 +56,11 @@ export class EBookletSettingsService {
     const numeric = this.positiveInt(value, label);
     if (numeric !== undefined && numeric > max) throw new BadRequestError(`${label} cannot exceed ${max}.`);
     return numeric;
+  }
+
+  private rewardExpiryDays(value: unknown): number {
+    const numeric = Number(value ?? DEFAULT_REWARD_EXPIRY_DAYS);
+    return Number.isInteger(numeric) && numeric > 0 ? numeric : DEFAULT_REWARD_EXPIRY_DAYS;
   }
 
   private async readPreviewPageLimit(): Promise<number> {
@@ -118,6 +125,7 @@ export class EBookletSettingsService {
     set("default_allowed_devices_per_teacher", this.positiveInt(input.defaultAllowedDevicesPerTeacher ?? input.default_allowed_devices_per_teacher, "default allowed teacher devices"));
     const previewPageLimit = this.boundedPositiveInt(input.previewPageLimit ?? input.preview_page_limit, "preview page limit", MAX_PREVIEW_PAGE_LIMIT);
     set("preview_page_limit", previewPageLimit);
+    set("default_reward_expiry_days", this.positiveInt(input.defaultRewardExpiryDays ?? input.default_reward_expiry_days, "default reward expiry days"));
     set("device_reset_policy", this.optionalText(input.deviceResetPolicy ?? input.device_reset_policy));
     set("notify_admins_on_delivery", this.optionalBoolean(input.notifyAdminsOnDelivery ?? input.notify_admins_on_delivery));
     set("notify_teacher_on_delivery", this.optionalBoolean(input.notifyTeacherOnDelivery ?? input.notify_teacher_on_delivery));
@@ -138,7 +146,7 @@ export class EBookletSettingsService {
     const previewPageLimit = Number.isInteger(numeric) && numeric >= 1 && numeric <= MAX_PREVIEW_PAGE_LIMIT
       ? numeric
       : await this.readPreviewPageLimit();
-    return { ...settings, preview_page_limit: previewPageLimit };
+    return { ...settings, preview_page_limit: previewPageLimit, default_reward_expiry_days: this.rewardExpiryDays(settings?.default_reward_expiry_days) };
   }
 
   async updateSettings(input: SettingsInput, adminUserId: number) {
@@ -152,6 +160,6 @@ export class EBookletSettingsService {
     const previewPageLimit = Number.isInteger(numeric) && numeric >= 1 && numeric <= MAX_PREVIEW_PAGE_LIMIT
       ? numeric
       : await this.readPreviewPageLimit();
-    return { ...settings, preview_page_limit: previewPageLimit };
+    return { ...settings, preview_page_limit: previewPageLimit, default_reward_expiry_days: this.rewardExpiryDays(settings?.default_reward_expiry_days ?? data.default_reward_expiry_days) };
   }
 }
