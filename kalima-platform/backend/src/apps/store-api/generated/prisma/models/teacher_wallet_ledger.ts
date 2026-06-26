@@ -305,6 +305,8 @@ export type teacher_wallet_ledgerWhereInput = {
   milestone_achievement?: Prisma.XOR<Prisma.E_booklet_milestone_achievementsNullableScalarRelationFilter, Prisma.e_booklet_milestone_achievementsWhereInput> | null
   purchase?: Prisma.XOR<Prisma.PurchasesNullableScalarRelationFilter, Prisma.purchasesWhereInput> | null
   e_booklet_purchase?: Prisma.XOR<Prisma.E_booklet_purchasesNullableScalarRelationFilter, Prisma.e_booklet_purchasesWhereInput> | null
+  credit_lot?: Prisma.XOR<Prisma.Teacher_wallet_credit_lotsNullableScalarRelationFilter, Prisma.teacher_wallet_credit_lotsWhereInput> | null
+  spend_allocations?: Prisma.Teacher_wallet_spend_allocationsListRelationFilter
 }
 
 export type teacher_wallet_ledgerOrderByWithRelationInput = {
@@ -325,6 +327,8 @@ export type teacher_wallet_ledgerOrderByWithRelationInput = {
   milestone_achievement?: Prisma.e_booklet_milestone_achievementsOrderByWithRelationInput
   purchase?: Prisma.purchasesOrderByWithRelationInput
   e_booklet_purchase?: Prisma.e_booklet_purchasesOrderByWithRelationInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsOrderByWithRelationInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsOrderByRelationAggregateInput
 }
 
 export type teacher_wallet_ledgerWhereUniqueInput = Prisma.AtLeast<{
@@ -348,6 +352,8 @@ export type teacher_wallet_ledgerWhereUniqueInput = Prisma.AtLeast<{
   milestone_achievement?: Prisma.XOR<Prisma.E_booklet_milestone_achievementsNullableScalarRelationFilter, Prisma.e_booklet_milestone_achievementsWhereInput> | null
   purchase?: Prisma.XOR<Prisma.PurchasesNullableScalarRelationFilter, Prisma.purchasesWhereInput> | null
   e_booklet_purchase?: Prisma.XOR<Prisma.E_booklet_purchasesNullableScalarRelationFilter, Prisma.e_booklet_purchasesWhereInput> | null
+  credit_lot?: Prisma.XOR<Prisma.Teacher_wallet_credit_lotsNullableScalarRelationFilter, Prisma.teacher_wallet_credit_lotsWhereInput> | null
+  spend_allocations?: Prisma.Teacher_wallet_spend_allocationsListRelationFilter
 }, "id">
 
 export type teacher_wallet_ledgerOrderByWithAggregationInput = {
@@ -400,6 +406,8 @@ export type teacher_wallet_ledgerCreateInput = {
   milestone_achievement?: Prisma.e_booklet_milestone_achievementsCreateNestedOneWithoutWallet_ledger_entriesInput
   purchase?: Prisma.purchasesCreateNestedOneWithoutTeacher_wallet_ledgerInput
   e_booklet_purchase?: Prisma.e_booklet_purchasesCreateNestedOneWithoutWallet_ledger_entriesInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerUncheckedCreateInput = {
@@ -415,6 +423,8 @@ export type teacher_wallet_ledgerUncheckedCreateInput = {
   e_booklet_purchase_id?: number | null
   notes?: string | null
   created_at?: Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerUpdateInput = {
@@ -429,6 +439,8 @@ export type teacher_wallet_ledgerUpdateInput = {
   milestone_achievement?: Prisma.e_booklet_milestone_achievementsUpdateOneWithoutWallet_ledger_entriesNestedInput
   purchase?: Prisma.purchasesUpdateOneWithoutTeacher_wallet_ledgerNestedInput
   e_booklet_purchase?: Prisma.e_booklet_purchasesUpdateOneWithoutWallet_ledger_entriesNestedInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerUncheckedUpdateInput = {
@@ -444,6 +456,8 @@ export type teacher_wallet_ledgerUncheckedUpdateInput = {
   e_booklet_purchase_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerCreateManyInput = {
@@ -560,6 +574,11 @@ export type teacher_wallet_ledgerSumOrderByAggregateInput = {
   milestone_achievement_id?: Prisma.SortOrder
   purchase_id?: Prisma.SortOrder
   e_booklet_purchase_id?: Prisma.SortOrder
+}
+
+export type Teacher_wallet_ledgerScalarRelationFilter = {
+  is?: Prisma.teacher_wallet_ledgerWhereInput
+  isNot?: Prisma.teacher_wallet_ledgerWhereInput
 }
 
 export type teacher_wallet_ledgerCreateNestedManyWithoutTeacherInput = {
@@ -780,6 +799,34 @@ export type Enumteacher_wallet_ledger_source_enumFieldUpdateOperationsInput = {
   set?: $Enums.teacher_wallet_ledger_source_enum
 }
 
+export type teacher_wallet_ledgerCreateNestedOneWithoutCredit_lotInput = {
+  create?: Prisma.XOR<Prisma.teacher_wallet_ledgerCreateWithoutCredit_lotInput, Prisma.teacher_wallet_ledgerUncheckedCreateWithoutCredit_lotInput>
+  connectOrCreate?: Prisma.teacher_wallet_ledgerCreateOrConnectWithoutCredit_lotInput
+  connect?: Prisma.teacher_wallet_ledgerWhereUniqueInput
+}
+
+export type teacher_wallet_ledgerUpdateOneRequiredWithoutCredit_lotNestedInput = {
+  create?: Prisma.XOR<Prisma.teacher_wallet_ledgerCreateWithoutCredit_lotInput, Prisma.teacher_wallet_ledgerUncheckedCreateWithoutCredit_lotInput>
+  connectOrCreate?: Prisma.teacher_wallet_ledgerCreateOrConnectWithoutCredit_lotInput
+  upsert?: Prisma.teacher_wallet_ledgerUpsertWithoutCredit_lotInput
+  connect?: Prisma.teacher_wallet_ledgerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.teacher_wallet_ledgerUpdateToOneWithWhereWithoutCredit_lotInput, Prisma.teacher_wallet_ledgerUpdateWithoutCredit_lotInput>, Prisma.teacher_wallet_ledgerUncheckedUpdateWithoutCredit_lotInput>
+}
+
+export type teacher_wallet_ledgerCreateNestedOneWithoutSpend_allocationsInput = {
+  create?: Prisma.XOR<Prisma.teacher_wallet_ledgerCreateWithoutSpend_allocationsInput, Prisma.teacher_wallet_ledgerUncheckedCreateWithoutSpend_allocationsInput>
+  connectOrCreate?: Prisma.teacher_wallet_ledgerCreateOrConnectWithoutSpend_allocationsInput
+  connect?: Prisma.teacher_wallet_ledgerWhereUniqueInput
+}
+
+export type teacher_wallet_ledgerUpdateOneRequiredWithoutSpend_allocationsNestedInput = {
+  create?: Prisma.XOR<Prisma.teacher_wallet_ledgerCreateWithoutSpend_allocationsInput, Prisma.teacher_wallet_ledgerUncheckedCreateWithoutSpend_allocationsInput>
+  connectOrCreate?: Prisma.teacher_wallet_ledgerCreateOrConnectWithoutSpend_allocationsInput
+  upsert?: Prisma.teacher_wallet_ledgerUpsertWithoutSpend_allocationsInput
+  connect?: Prisma.teacher_wallet_ledgerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.teacher_wallet_ledgerUpdateToOneWithWhereWithoutSpend_allocationsInput, Prisma.teacher_wallet_ledgerUpdateWithoutSpend_allocationsInput>, Prisma.teacher_wallet_ledgerUncheckedUpdateWithoutSpend_allocationsInput>
+}
+
 export type teacher_wallet_ledgerCreateWithoutTeacherInput = {
   type: $Enums.teacher_wallet_ledger_type_enum
   source: $Enums.teacher_wallet_ledger_source_enum
@@ -791,6 +838,8 @@ export type teacher_wallet_ledgerCreateWithoutTeacherInput = {
   milestone_achievement?: Prisma.e_booklet_milestone_achievementsCreateNestedOneWithoutWallet_ledger_entriesInput
   purchase?: Prisma.purchasesCreateNestedOneWithoutTeacher_wallet_ledgerInput
   e_booklet_purchase?: Prisma.e_booklet_purchasesCreateNestedOneWithoutWallet_ledger_entriesInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerUncheckedCreateWithoutTeacherInput = {
@@ -805,6 +854,8 @@ export type teacher_wallet_ledgerUncheckedCreateWithoutTeacherInput = {
   e_booklet_purchase_id?: number | null
   notes?: string | null
   created_at?: Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerCreateOrConnectWithoutTeacherInput = {
@@ -862,6 +913,8 @@ export type teacher_wallet_ledgerCreateWithoutPurchaseInput = {
   teacher: Prisma.usersCreateNestedOneWithoutTeacher_wallet_ledgerInput
   milestone_achievement?: Prisma.e_booklet_milestone_achievementsCreateNestedOneWithoutWallet_ledger_entriesInput
   e_booklet_purchase?: Prisma.e_booklet_purchasesCreateNestedOneWithoutWallet_ledger_entriesInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerUncheckedCreateWithoutPurchaseInput = {
@@ -876,6 +929,8 @@ export type teacher_wallet_ledgerUncheckedCreateWithoutPurchaseInput = {
   e_booklet_purchase_id?: number | null
   notes?: string | null
   created_at?: Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerCreateOrConnectWithoutPurchaseInput = {
@@ -915,6 +970,8 @@ export type teacher_wallet_ledgerCreateWithoutE_booklet_purchaseInput = {
   teacher: Prisma.usersCreateNestedOneWithoutTeacher_wallet_ledgerInput
   milestone_achievement?: Prisma.e_booklet_milestone_achievementsCreateNestedOneWithoutWallet_ledger_entriesInput
   purchase?: Prisma.purchasesCreateNestedOneWithoutTeacher_wallet_ledgerInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerUncheckedCreateWithoutE_booklet_purchaseInput = {
@@ -929,6 +986,8 @@ export type teacher_wallet_ledgerUncheckedCreateWithoutE_booklet_purchaseInput =
   purchase_id?: number | null
   notes?: string | null
   created_at?: Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerCreateOrConnectWithoutE_booklet_purchaseInput = {
@@ -968,6 +1027,8 @@ export type teacher_wallet_ledgerCreateWithoutMilestone_achievementInput = {
   teacher: Prisma.usersCreateNestedOneWithoutTeacher_wallet_ledgerInput
   purchase?: Prisma.purchasesCreateNestedOneWithoutTeacher_wallet_ledgerInput
   e_booklet_purchase?: Prisma.e_booklet_purchasesCreateNestedOneWithoutWallet_ledger_entriesInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerUncheckedCreateWithoutMilestone_achievementInput = {
@@ -982,6 +1043,8 @@ export type teacher_wallet_ledgerUncheckedCreateWithoutMilestone_achievementInpu
   e_booklet_purchase_id?: number | null
   notes?: string | null
   created_at?: Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerCreateOrConnectWithoutMilestone_achievementInput = {
@@ -1021,6 +1084,8 @@ export type teacher_wallet_ledgerCreateWithoutWalletInput = {
   milestone_achievement?: Prisma.e_booklet_milestone_achievementsCreateNestedOneWithoutWallet_ledger_entriesInput
   purchase?: Prisma.purchasesCreateNestedOneWithoutTeacher_wallet_ledgerInput
   e_booklet_purchase?: Prisma.e_booklet_purchasesCreateNestedOneWithoutWallet_ledger_entriesInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerUncheckedCreateWithoutWalletInput = {
@@ -1035,6 +1100,8 @@ export type teacher_wallet_ledgerUncheckedCreateWithoutWalletInput = {
   e_booklet_purchase_id?: number | null
   notes?: string | null
   created_at?: Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedOneWithoutCredit_ledgerInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedCreateNestedManyWithoutDebit_ledgerInput
 }
 
 export type teacher_wallet_ledgerCreateOrConnectWithoutWalletInput = {
@@ -1063,6 +1130,162 @@ export type teacher_wallet_ledgerUpdateManyWithWhereWithoutWalletInput = {
   data: Prisma.XOR<Prisma.teacher_wallet_ledgerUpdateManyMutationInput, Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutWalletInput>
 }
 
+export type teacher_wallet_ledgerCreateWithoutCredit_lotInput = {
+  type: $Enums.teacher_wallet_ledger_type_enum
+  source: $Enums.teacher_wallet_ledger_source_enum
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  balance_after: runtime.Decimal | runtime.DecimalJsLike | number | string
+  notes?: string | null
+  created_at?: Date | string | null
+  wallet: Prisma.teacher_walletsCreateNestedOneWithoutLedger_entriesInput
+  teacher: Prisma.usersCreateNestedOneWithoutTeacher_wallet_ledgerInput
+  milestone_achievement?: Prisma.e_booklet_milestone_achievementsCreateNestedOneWithoutWallet_ledger_entriesInput
+  purchase?: Prisma.purchasesCreateNestedOneWithoutTeacher_wallet_ledgerInput
+  e_booklet_purchase?: Prisma.e_booklet_purchasesCreateNestedOneWithoutWallet_ledger_entriesInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsCreateNestedManyWithoutDebit_ledgerInput
+}
+
+export type teacher_wallet_ledgerUncheckedCreateWithoutCredit_lotInput = {
+  id?: number
+  wallet_id: number
+  teacher_id: number
+  type: $Enums.teacher_wallet_ledger_type_enum
+  source: $Enums.teacher_wallet_ledger_source_enum
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  balance_after: runtime.Decimal | runtime.DecimalJsLike | number | string
+  milestone_achievement_id?: number | null
+  purchase_id?: number | null
+  e_booklet_purchase_id?: number | null
+  notes?: string | null
+  created_at?: Date | string | null
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedCreateNestedManyWithoutDebit_ledgerInput
+}
+
+export type teacher_wallet_ledgerCreateOrConnectWithoutCredit_lotInput = {
+  where: Prisma.teacher_wallet_ledgerWhereUniqueInput
+  create: Prisma.XOR<Prisma.teacher_wallet_ledgerCreateWithoutCredit_lotInput, Prisma.teacher_wallet_ledgerUncheckedCreateWithoutCredit_lotInput>
+}
+
+export type teacher_wallet_ledgerUpsertWithoutCredit_lotInput = {
+  update: Prisma.XOR<Prisma.teacher_wallet_ledgerUpdateWithoutCredit_lotInput, Prisma.teacher_wallet_ledgerUncheckedUpdateWithoutCredit_lotInput>
+  create: Prisma.XOR<Prisma.teacher_wallet_ledgerCreateWithoutCredit_lotInput, Prisma.teacher_wallet_ledgerUncheckedCreateWithoutCredit_lotInput>
+  where?: Prisma.teacher_wallet_ledgerWhereInput
+}
+
+export type teacher_wallet_ledgerUpdateToOneWithWhereWithoutCredit_lotInput = {
+  where?: Prisma.teacher_wallet_ledgerWhereInput
+  data: Prisma.XOR<Prisma.teacher_wallet_ledgerUpdateWithoutCredit_lotInput, Prisma.teacher_wallet_ledgerUncheckedUpdateWithoutCredit_lotInput>
+}
+
+export type teacher_wallet_ledgerUpdateWithoutCredit_lotInput = {
+  type?: Prisma.Enumteacher_wallet_ledger_type_enumFieldUpdateOperationsInput | $Enums.teacher_wallet_ledger_type_enum
+  source?: Prisma.Enumteacher_wallet_ledger_source_enumFieldUpdateOperationsInput | $Enums.teacher_wallet_ledger_source_enum
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  balance_after?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wallet?: Prisma.teacher_walletsUpdateOneRequiredWithoutLedger_entriesNestedInput
+  teacher?: Prisma.usersUpdateOneRequiredWithoutTeacher_wallet_ledgerNestedInput
+  milestone_achievement?: Prisma.e_booklet_milestone_achievementsUpdateOneWithoutWallet_ledger_entriesNestedInput
+  purchase?: Prisma.purchasesUpdateOneWithoutTeacher_wallet_ledgerNestedInput
+  e_booklet_purchase?: Prisma.e_booklet_purchasesUpdateOneWithoutWallet_ledger_entriesNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUpdateManyWithoutDebit_ledgerNestedInput
+}
+
+export type teacher_wallet_ledgerUncheckedUpdateWithoutCredit_lotInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  wallet_id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.Enumteacher_wallet_ledger_type_enumFieldUpdateOperationsInput | $Enums.teacher_wallet_ledger_type_enum
+  source?: Prisma.Enumteacher_wallet_ledger_source_enumFieldUpdateOperationsInput | $Enums.teacher_wallet_ledger_source_enum
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  balance_after?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  milestone_achievement_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  purchase_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  e_booklet_purchase_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedUpdateManyWithoutDebit_ledgerNestedInput
+}
+
+export type teacher_wallet_ledgerCreateWithoutSpend_allocationsInput = {
+  type: $Enums.teacher_wallet_ledger_type_enum
+  source: $Enums.teacher_wallet_ledger_source_enum
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  balance_after: runtime.Decimal | runtime.DecimalJsLike | number | string
+  notes?: string | null
+  created_at?: Date | string | null
+  wallet: Prisma.teacher_walletsCreateNestedOneWithoutLedger_entriesInput
+  teacher: Prisma.usersCreateNestedOneWithoutTeacher_wallet_ledgerInput
+  milestone_achievement?: Prisma.e_booklet_milestone_achievementsCreateNestedOneWithoutWallet_ledger_entriesInput
+  purchase?: Prisma.purchasesCreateNestedOneWithoutTeacher_wallet_ledgerInput
+  e_booklet_purchase?: Prisma.e_booklet_purchasesCreateNestedOneWithoutWallet_ledger_entriesInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsCreateNestedOneWithoutCredit_ledgerInput
+}
+
+export type teacher_wallet_ledgerUncheckedCreateWithoutSpend_allocationsInput = {
+  id?: number
+  wallet_id: number
+  teacher_id: number
+  type: $Enums.teacher_wallet_ledger_type_enum
+  source: $Enums.teacher_wallet_ledger_source_enum
+  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  balance_after: runtime.Decimal | runtime.DecimalJsLike | number | string
+  milestone_achievement_id?: number | null
+  purchase_id?: number | null
+  e_booklet_purchase_id?: number | null
+  notes?: string | null
+  created_at?: Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedOneWithoutCredit_ledgerInput
+}
+
+export type teacher_wallet_ledgerCreateOrConnectWithoutSpend_allocationsInput = {
+  where: Prisma.teacher_wallet_ledgerWhereUniqueInput
+  create: Prisma.XOR<Prisma.teacher_wallet_ledgerCreateWithoutSpend_allocationsInput, Prisma.teacher_wallet_ledgerUncheckedCreateWithoutSpend_allocationsInput>
+}
+
+export type teacher_wallet_ledgerUpsertWithoutSpend_allocationsInput = {
+  update: Prisma.XOR<Prisma.teacher_wallet_ledgerUpdateWithoutSpend_allocationsInput, Prisma.teacher_wallet_ledgerUncheckedUpdateWithoutSpend_allocationsInput>
+  create: Prisma.XOR<Prisma.teacher_wallet_ledgerCreateWithoutSpend_allocationsInput, Prisma.teacher_wallet_ledgerUncheckedCreateWithoutSpend_allocationsInput>
+  where?: Prisma.teacher_wallet_ledgerWhereInput
+}
+
+export type teacher_wallet_ledgerUpdateToOneWithWhereWithoutSpend_allocationsInput = {
+  where?: Prisma.teacher_wallet_ledgerWhereInput
+  data: Prisma.XOR<Prisma.teacher_wallet_ledgerUpdateWithoutSpend_allocationsInput, Prisma.teacher_wallet_ledgerUncheckedUpdateWithoutSpend_allocationsInput>
+}
+
+export type teacher_wallet_ledgerUpdateWithoutSpend_allocationsInput = {
+  type?: Prisma.Enumteacher_wallet_ledger_type_enumFieldUpdateOperationsInput | $Enums.teacher_wallet_ledger_type_enum
+  source?: Prisma.Enumteacher_wallet_ledger_source_enumFieldUpdateOperationsInput | $Enums.teacher_wallet_ledger_source_enum
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  balance_after?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wallet?: Prisma.teacher_walletsUpdateOneRequiredWithoutLedger_entriesNestedInput
+  teacher?: Prisma.usersUpdateOneRequiredWithoutTeacher_wallet_ledgerNestedInput
+  milestone_achievement?: Prisma.e_booklet_milestone_achievementsUpdateOneWithoutWallet_ledger_entriesNestedInput
+  purchase?: Prisma.purchasesUpdateOneWithoutTeacher_wallet_ledgerNestedInput
+  e_booklet_purchase?: Prisma.e_booklet_purchasesUpdateOneWithoutWallet_ledger_entriesNestedInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUpdateOneWithoutCredit_ledgerNestedInput
+}
+
+export type teacher_wallet_ledgerUncheckedUpdateWithoutSpend_allocationsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  wallet_id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.Enumteacher_wallet_ledger_type_enumFieldUpdateOperationsInput | $Enums.teacher_wallet_ledger_type_enum
+  source?: Prisma.Enumteacher_wallet_ledger_source_enumFieldUpdateOperationsInput | $Enums.teacher_wallet_ledger_source_enum
+  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  balance_after?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  milestone_achievement_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  purchase_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  e_booklet_purchase_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateOneWithoutCredit_ledgerNestedInput
+}
+
 export type teacher_wallet_ledgerCreateManyTeacherInput = {
   id?: number
   wallet_id: number
@@ -1088,6 +1311,8 @@ export type teacher_wallet_ledgerUpdateWithoutTeacherInput = {
   milestone_achievement?: Prisma.e_booklet_milestone_achievementsUpdateOneWithoutWallet_ledger_entriesNestedInput
   purchase?: Prisma.purchasesUpdateOneWithoutTeacher_wallet_ledgerNestedInput
   e_booklet_purchase?: Prisma.e_booklet_purchasesUpdateOneWithoutWallet_ledger_entriesNestedInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerUncheckedUpdateWithoutTeacherInput = {
@@ -1102,6 +1327,8 @@ export type teacher_wallet_ledgerUncheckedUpdateWithoutTeacherInput = {
   e_booklet_purchase_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerUncheckedUpdateManyWithoutTeacherInput = {
@@ -1143,6 +1370,8 @@ export type teacher_wallet_ledgerUpdateWithoutPurchaseInput = {
   teacher?: Prisma.usersUpdateOneRequiredWithoutTeacher_wallet_ledgerNestedInput
   milestone_achievement?: Prisma.e_booklet_milestone_achievementsUpdateOneWithoutWallet_ledger_entriesNestedInput
   e_booklet_purchase?: Prisma.e_booklet_purchasesUpdateOneWithoutWallet_ledger_entriesNestedInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerUncheckedUpdateWithoutPurchaseInput = {
@@ -1157,6 +1386,8 @@ export type teacher_wallet_ledgerUncheckedUpdateWithoutPurchaseInput = {
   e_booklet_purchase_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerUncheckedUpdateManyWithoutPurchaseInput = {
@@ -1198,6 +1429,8 @@ export type teacher_wallet_ledgerUpdateWithoutE_booklet_purchaseInput = {
   teacher?: Prisma.usersUpdateOneRequiredWithoutTeacher_wallet_ledgerNestedInput
   milestone_achievement?: Prisma.e_booklet_milestone_achievementsUpdateOneWithoutWallet_ledger_entriesNestedInput
   purchase?: Prisma.purchasesUpdateOneWithoutTeacher_wallet_ledgerNestedInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerUncheckedUpdateWithoutE_booklet_purchaseInput = {
@@ -1212,6 +1445,8 @@ export type teacher_wallet_ledgerUncheckedUpdateWithoutE_booklet_purchaseInput =
   purchase_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerUncheckedUpdateManyWithoutE_booklet_purchaseInput = {
@@ -1253,6 +1488,8 @@ export type teacher_wallet_ledgerUpdateWithoutMilestone_achievementInput = {
   teacher?: Prisma.usersUpdateOneRequiredWithoutTeacher_wallet_ledgerNestedInput
   purchase?: Prisma.purchasesUpdateOneWithoutTeacher_wallet_ledgerNestedInput
   e_booklet_purchase?: Prisma.e_booklet_purchasesUpdateOneWithoutWallet_ledger_entriesNestedInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerUncheckedUpdateWithoutMilestone_achievementInput = {
@@ -1267,6 +1504,8 @@ export type teacher_wallet_ledgerUncheckedUpdateWithoutMilestone_achievementInpu
   e_booklet_purchase_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerUncheckedUpdateManyWithoutMilestone_achievementInput = {
@@ -1308,6 +1547,8 @@ export type teacher_wallet_ledgerUpdateWithoutWalletInput = {
   milestone_achievement?: Prisma.e_booklet_milestone_achievementsUpdateOneWithoutWallet_ledger_entriesNestedInput
   purchase?: Prisma.purchasesUpdateOneWithoutTeacher_wallet_ledgerNestedInput
   e_booklet_purchase?: Prisma.e_booklet_purchasesUpdateOneWithoutWallet_ledger_entriesNestedInput
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerUncheckedUpdateWithoutWalletInput = {
@@ -1322,6 +1563,8 @@ export type teacher_wallet_ledgerUncheckedUpdateWithoutWalletInput = {
   e_booklet_purchase_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  credit_lot?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateOneWithoutCredit_ledgerNestedInput
+  spend_allocations?: Prisma.teacher_wallet_spend_allocationsUncheckedUpdateManyWithoutDebit_ledgerNestedInput
 }
 
 export type teacher_wallet_ledgerUncheckedUpdateManyWithoutWalletInput = {
@@ -1338,6 +1581,35 @@ export type teacher_wallet_ledgerUncheckedUpdateManyWithoutWalletInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
+
+/**
+ * Count Type Teacher_wallet_ledgerCountOutputType
+ */
+
+export type Teacher_wallet_ledgerCountOutputType = {
+  spend_allocations: number
+}
+
+export type Teacher_wallet_ledgerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  spend_allocations?: boolean | Teacher_wallet_ledgerCountOutputTypeCountSpend_allocationsArgs
+}
+
+/**
+ * Teacher_wallet_ledgerCountOutputType without action
+ */
+export type Teacher_wallet_ledgerCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Teacher_wallet_ledgerCountOutputType
+   */
+  select?: Prisma.Teacher_wallet_ledgerCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * Teacher_wallet_ledgerCountOutputType without action
+ */
+export type Teacher_wallet_ledgerCountOutputTypeCountSpend_allocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.teacher_wallet_spend_allocationsWhereInput
+}
 
 
 export type teacher_wallet_ledgerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1358,6 +1630,9 @@ export type teacher_wallet_ledgerSelect<ExtArgs extends runtime.Types.Extensions
   milestone_achievement?: boolean | Prisma.teacher_wallet_ledger$milestone_achievementArgs<ExtArgs>
   purchase?: boolean | Prisma.teacher_wallet_ledger$purchaseArgs<ExtArgs>
   e_booklet_purchase?: boolean | Prisma.teacher_wallet_ledger$e_booklet_purchaseArgs<ExtArgs>
+  credit_lot?: boolean | Prisma.teacher_wallet_ledger$credit_lotArgs<ExtArgs>
+  spend_allocations?: boolean | Prisma.teacher_wallet_ledger$spend_allocationsArgs<ExtArgs>
+  _count?: boolean | Prisma.Teacher_wallet_ledgerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["teacher_wallet_ledger"]>
 
 export type teacher_wallet_ledgerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1422,6 +1697,9 @@ export type teacher_wallet_ledgerInclude<ExtArgs extends runtime.Types.Extension
   milestone_achievement?: boolean | Prisma.teacher_wallet_ledger$milestone_achievementArgs<ExtArgs>
   purchase?: boolean | Prisma.teacher_wallet_ledger$purchaseArgs<ExtArgs>
   e_booklet_purchase?: boolean | Prisma.teacher_wallet_ledger$e_booklet_purchaseArgs<ExtArgs>
+  credit_lot?: boolean | Prisma.teacher_wallet_ledger$credit_lotArgs<ExtArgs>
+  spend_allocations?: boolean | Prisma.teacher_wallet_ledger$spend_allocationsArgs<ExtArgs>
+  _count?: boolean | Prisma.Teacher_wallet_ledgerCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type teacher_wallet_ledgerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   wallet?: boolean | Prisma.teacher_walletsDefaultArgs<ExtArgs>
@@ -1446,6 +1724,8 @@ export type $teacher_wallet_ledgerPayload<ExtArgs extends runtime.Types.Extensio
     milestone_achievement: Prisma.$e_booklet_milestone_achievementsPayload<ExtArgs> | null
     purchase: Prisma.$purchasesPayload<ExtArgs> | null
     e_booklet_purchase: Prisma.$e_booklet_purchasesPayload<ExtArgs> | null
+    credit_lot: Prisma.$teacher_wallet_credit_lotsPayload<ExtArgs> | null
+    spend_allocations: Prisma.$teacher_wallet_spend_allocationsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1859,6 +2139,8 @@ export interface Prisma__teacher_wallet_ledgerClient<T, Null = never, ExtArgs ex
   milestone_achievement<T extends Prisma.teacher_wallet_ledger$milestone_achievementArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teacher_wallet_ledger$milestone_achievementArgs<ExtArgs>>): Prisma.Prisma__e_booklet_milestone_achievementsClient<runtime.Types.Result.GetResult<Prisma.$e_booklet_milestone_achievementsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   purchase<T extends Prisma.teacher_wallet_ledger$purchaseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teacher_wallet_ledger$purchaseArgs<ExtArgs>>): Prisma.Prisma__purchasesClient<runtime.Types.Result.GetResult<Prisma.$purchasesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   e_booklet_purchase<T extends Prisma.teacher_wallet_ledger$e_booklet_purchaseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teacher_wallet_ledger$e_booklet_purchaseArgs<ExtArgs>>): Prisma.Prisma__e_booklet_purchasesClient<runtime.Types.Result.GetResult<Prisma.$e_booklet_purchasesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  credit_lot<T extends Prisma.teacher_wallet_ledger$credit_lotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teacher_wallet_ledger$credit_lotArgs<ExtArgs>>): Prisma.Prisma__teacher_wallet_credit_lotsClient<runtime.Types.Result.GetResult<Prisma.$teacher_wallet_credit_lotsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  spend_allocations<T extends Prisma.teacher_wallet_ledger$spend_allocationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teacher_wallet_ledger$spend_allocationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$teacher_wallet_spend_allocationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2359,6 +2641,49 @@ export type teacher_wallet_ledger$e_booklet_purchaseArgs<ExtArgs extends runtime
    */
   include?: Prisma.e_booklet_purchasesInclude<ExtArgs> | null
   where?: Prisma.e_booklet_purchasesWhereInput
+}
+
+/**
+ * teacher_wallet_ledger.credit_lot
+ */
+export type teacher_wallet_ledger$credit_lotArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the teacher_wallet_credit_lots
+   */
+  select?: Prisma.teacher_wallet_credit_lotsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the teacher_wallet_credit_lots
+   */
+  omit?: Prisma.teacher_wallet_credit_lotsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.teacher_wallet_credit_lotsInclude<ExtArgs> | null
+  where?: Prisma.teacher_wallet_credit_lotsWhereInput
+}
+
+/**
+ * teacher_wallet_ledger.spend_allocations
+ */
+export type teacher_wallet_ledger$spend_allocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the teacher_wallet_spend_allocations
+   */
+  select?: Prisma.teacher_wallet_spend_allocationsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the teacher_wallet_spend_allocations
+   */
+  omit?: Prisma.teacher_wallet_spend_allocationsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.teacher_wallet_spend_allocationsInclude<ExtArgs> | null
+  where?: Prisma.teacher_wallet_spend_allocationsWhereInput
+  orderBy?: Prisma.teacher_wallet_spend_allocationsOrderByWithRelationInput | Prisma.teacher_wallet_spend_allocationsOrderByWithRelationInput[]
+  cursor?: Prisma.teacher_wallet_spend_allocationsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Teacher_wallet_spend_allocationsScalarFieldEnum | Prisma.Teacher_wallet_spend_allocationsScalarFieldEnum[]
 }
 
 /**

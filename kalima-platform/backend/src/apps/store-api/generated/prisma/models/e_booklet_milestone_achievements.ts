@@ -35,6 +35,7 @@ export type E_booklet_milestone_achievementsAvgAggregateOutputType = {
   previous_price_snapshot: runtime.Decimal | null
   milestone_price_snapshot: runtime.Decimal | null
   reward_amount: runtime.Decimal | null
+  reward_expiry_days_snapshot: number | null
 }
 
 export type E_booklet_milestone_achievementsSumAggregateOutputType = {
@@ -46,6 +47,7 @@ export type E_booklet_milestone_achievementsSumAggregateOutputType = {
   previous_price_snapshot: runtime.Decimal | null
   milestone_price_snapshot: runtime.Decimal | null
   reward_amount: runtime.Decimal | null
+  reward_expiry_days_snapshot: number | null
 }
 
 export type E_booklet_milestone_achievementsMinAggregateOutputType = {
@@ -57,6 +59,8 @@ export type E_booklet_milestone_achievementsMinAggregateOutputType = {
   previous_price_snapshot: runtime.Decimal | null
   milestone_price_snapshot: runtime.Decimal | null
   reward_amount: runtime.Decimal | null
+  reward_expiry_days_snapshot: number | null
+  reward_expires_at: Date | null
   achieved_at: Date | null
   reward_terms_accepted_at: Date | null
   claimed_at: Date | null
@@ -71,6 +75,8 @@ export type E_booklet_milestone_achievementsMaxAggregateOutputType = {
   previous_price_snapshot: runtime.Decimal | null
   milestone_price_snapshot: runtime.Decimal | null
   reward_amount: runtime.Decimal | null
+  reward_expiry_days_snapshot: number | null
+  reward_expires_at: Date | null
   achieved_at: Date | null
   reward_terms_accepted_at: Date | null
   claimed_at: Date | null
@@ -85,6 +91,8 @@ export type E_booklet_milestone_achievementsCountAggregateOutputType = {
   previous_price_snapshot: number
   milestone_price_snapshot: number
   reward_amount: number
+  reward_expiry_days_snapshot: number
+  reward_expires_at: number
   achieved_at: number
   reward_terms_accepted_at: number
   claimed_at: number
@@ -101,6 +109,7 @@ export type E_booklet_milestone_achievementsAvgAggregateInputType = {
   previous_price_snapshot?: true
   milestone_price_snapshot?: true
   reward_amount?: true
+  reward_expiry_days_snapshot?: true
 }
 
 export type E_booklet_milestone_achievementsSumAggregateInputType = {
@@ -112,6 +121,7 @@ export type E_booklet_milestone_achievementsSumAggregateInputType = {
   previous_price_snapshot?: true
   milestone_price_snapshot?: true
   reward_amount?: true
+  reward_expiry_days_snapshot?: true
 }
 
 export type E_booklet_milestone_achievementsMinAggregateInputType = {
@@ -123,6 +133,8 @@ export type E_booklet_milestone_achievementsMinAggregateInputType = {
   previous_price_snapshot?: true
   milestone_price_snapshot?: true
   reward_amount?: true
+  reward_expiry_days_snapshot?: true
+  reward_expires_at?: true
   achieved_at?: true
   reward_terms_accepted_at?: true
   claimed_at?: true
@@ -137,6 +149,8 @@ export type E_booklet_milestone_achievementsMaxAggregateInputType = {
   previous_price_snapshot?: true
   milestone_price_snapshot?: true
   reward_amount?: true
+  reward_expiry_days_snapshot?: true
+  reward_expires_at?: true
   achieved_at?: true
   reward_terms_accepted_at?: true
   claimed_at?: true
@@ -151,6 +165,8 @@ export type E_booklet_milestone_achievementsCountAggregateInputType = {
   previous_price_snapshot?: true
   milestone_price_snapshot?: true
   reward_amount?: true
+  reward_expiry_days_snapshot?: true
+  reward_expires_at?: true
   achieved_at?: true
   reward_terms_accepted_at?: true
   claimed_at?: true
@@ -252,6 +268,8 @@ export type E_booklet_milestone_achievementsGroupByOutputType = {
   previous_price_snapshot: runtime.Decimal
   milestone_price_snapshot: runtime.Decimal
   reward_amount: runtime.Decimal
+  reward_expiry_days_snapshot: number | null
+  reward_expires_at: Date | null
   achieved_at: Date | null
   reward_terms_accepted_at: Date | null
   claimed_at: Date | null
@@ -289,6 +307,8 @@ export type e_booklet_milestone_achievementsWhereInput = {
   previous_price_snapshot?: Prisma.DecimalFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.IntNullableFilter<"e_booklet_milestone_achievements"> | number | null
+  reward_expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
   achieved_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
   reward_terms_accepted_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
   claimed_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
@@ -296,6 +316,7 @@ export type e_booklet_milestone_achievementsWhereInput = {
   term?: Prisma.XOR<Prisma.E_booklet_termsScalarRelationFilter, Prisma.e_booklet_termsWhereInput>
   milestone?: Prisma.XOR<Prisma.E_booklet_milestonesScalarRelationFilter, Prisma.e_booklet_milestonesWhereInput>
   wallet_ledger_entries?: Prisma.Teacher_wallet_ledgerListRelationFilter
+  wallet_credit_lots?: Prisma.Teacher_wallet_credit_lotsListRelationFilter
   terms_acceptances?: Prisma.E_booklet_teacher_terms_acceptancesListRelationFilter
 }
 
@@ -308,6 +329,8 @@ export type e_booklet_milestone_achievementsOrderByWithRelationInput = {
   previous_price_snapshot?: Prisma.SortOrder
   milestone_price_snapshot?: Prisma.SortOrder
   reward_amount?: Prisma.SortOrder
+  reward_expiry_days_snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
+  reward_expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
   achieved_at?: Prisma.SortOrderInput | Prisma.SortOrder
   reward_terms_accepted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   claimed_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -315,6 +338,7 @@ export type e_booklet_milestone_achievementsOrderByWithRelationInput = {
   term?: Prisma.e_booklet_termsOrderByWithRelationInput
   milestone?: Prisma.e_booklet_milestonesOrderByWithRelationInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerOrderByRelationAggregateInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsOrderByRelationAggregateInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesOrderByRelationAggregateInput
 }
 
@@ -331,6 +355,8 @@ export type e_booklet_milestone_achievementsWhereUniqueInput = Prisma.AtLeast<{
   previous_price_snapshot?: Prisma.DecimalFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.IntNullableFilter<"e_booklet_milestone_achievements"> | number | null
+  reward_expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
   achieved_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
   reward_terms_accepted_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
   claimed_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
@@ -338,6 +364,7 @@ export type e_booklet_milestone_achievementsWhereUniqueInput = Prisma.AtLeast<{
   term?: Prisma.XOR<Prisma.E_booklet_termsScalarRelationFilter, Prisma.e_booklet_termsWhereInput>
   milestone?: Prisma.XOR<Prisma.E_booklet_milestonesScalarRelationFilter, Prisma.e_booklet_milestonesWhereInput>
   wallet_ledger_entries?: Prisma.Teacher_wallet_ledgerListRelationFilter
+  wallet_credit_lots?: Prisma.Teacher_wallet_credit_lotsListRelationFilter
   terms_acceptances?: Prisma.E_booklet_teacher_terms_acceptancesListRelationFilter
 }, "id" | "teacher_id_term_id_milestone_id">
 
@@ -350,6 +377,8 @@ export type e_booklet_milestone_achievementsOrderByWithAggregationInput = {
   previous_price_snapshot?: Prisma.SortOrder
   milestone_price_snapshot?: Prisma.SortOrder
   reward_amount?: Prisma.SortOrder
+  reward_expiry_days_snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
+  reward_expires_at?: Prisma.SortOrderInput | Prisma.SortOrder
   achieved_at?: Prisma.SortOrderInput | Prisma.SortOrder
   reward_terms_accepted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   claimed_at?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -372,6 +401,8 @@ export type e_booklet_milestone_achievementsScalarWhereWithAggregatesInput = {
   previous_price_snapshot?: Prisma.DecimalWithAggregatesFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalWithAggregatesFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalWithAggregatesFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.IntNullableWithAggregatesFilter<"e_booklet_milestone_achievements"> | number | null
+  reward_expires_at?: Prisma.DateTimeNullableWithAggregatesFilter<"e_booklet_milestone_achievements"> | Date | string | null
   achieved_at?: Prisma.DateTimeNullableWithAggregatesFilter<"e_booklet_milestone_achievements"> | Date | string | null
   reward_terms_accepted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"e_booklet_milestone_achievements"> | Date | string | null
   claimed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"e_booklet_milestone_achievements"> | Date | string | null
@@ -382,6 +413,8 @@ export type e_booklet_milestone_achievementsCreateInput = {
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
@@ -389,6 +422,7 @@ export type e_booklet_milestone_achievementsCreateInput = {
   term: Prisma.e_booklet_termsCreateNestedOneWithoutMilestone_achievementsInput
   milestone: Prisma.e_booklet_milestonesCreateNestedOneWithoutAchievementsInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutMilestone_achievementInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsCreateNestedManyWithoutMilestone_achievementInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutMilestone_achievementInput
 }
 
@@ -401,10 +435,13 @@ export type e_booklet_milestone_achievementsUncheckedCreateInput = {
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutMilestone_achievementInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedManyWithoutMilestone_achievementInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutMilestone_achievementInput
 }
 
@@ -413,6 +450,8 @@ export type e_booklet_milestone_achievementsUpdateInput = {
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -420,6 +459,7 @@ export type e_booklet_milestone_achievementsUpdateInput = {
   term?: Prisma.e_booklet_termsUpdateOneRequiredWithoutMilestone_achievementsNestedInput
   milestone?: Prisma.e_booklet_milestonesUpdateOneRequiredWithoutAchievementsNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutMilestone_achievementNestedInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUpdateManyWithoutMilestone_achievementNestedInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutMilestone_achievementNestedInput
 }
 
@@ -432,10 +472,13 @@ export type e_booklet_milestone_achievementsUncheckedUpdateInput = {
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutMilestone_achievementNestedInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateManyWithoutMilestone_achievementNestedInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutMilestone_achievementNestedInput
 }
 
@@ -448,6 +491,8 @@ export type e_booklet_milestone_achievementsCreateManyInput = {
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
@@ -458,6 +503,8 @@ export type e_booklet_milestone_achievementsUpdateManyMutationInput = {
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -472,6 +519,8 @@ export type e_booklet_milestone_achievementsUncheckedUpdateManyInput = {
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -502,6 +551,8 @@ export type e_booklet_milestone_achievementsCountOrderByAggregateInput = {
   previous_price_snapshot?: Prisma.SortOrder
   milestone_price_snapshot?: Prisma.SortOrder
   reward_amount?: Prisma.SortOrder
+  reward_expiry_days_snapshot?: Prisma.SortOrder
+  reward_expires_at?: Prisma.SortOrder
   achieved_at?: Prisma.SortOrder
   reward_terms_accepted_at?: Prisma.SortOrder
   claimed_at?: Prisma.SortOrder
@@ -516,6 +567,7 @@ export type e_booklet_milestone_achievementsAvgOrderByAggregateInput = {
   previous_price_snapshot?: Prisma.SortOrder
   milestone_price_snapshot?: Prisma.SortOrder
   reward_amount?: Prisma.SortOrder
+  reward_expiry_days_snapshot?: Prisma.SortOrder
 }
 
 export type e_booklet_milestone_achievementsMaxOrderByAggregateInput = {
@@ -527,6 +579,8 @@ export type e_booklet_milestone_achievementsMaxOrderByAggregateInput = {
   previous_price_snapshot?: Prisma.SortOrder
   milestone_price_snapshot?: Prisma.SortOrder
   reward_amount?: Prisma.SortOrder
+  reward_expiry_days_snapshot?: Prisma.SortOrder
+  reward_expires_at?: Prisma.SortOrder
   achieved_at?: Prisma.SortOrder
   reward_terms_accepted_at?: Prisma.SortOrder
   claimed_at?: Prisma.SortOrder
@@ -541,6 +595,8 @@ export type e_booklet_milestone_achievementsMinOrderByAggregateInput = {
   previous_price_snapshot?: Prisma.SortOrder
   milestone_price_snapshot?: Prisma.SortOrder
   reward_amount?: Prisma.SortOrder
+  reward_expiry_days_snapshot?: Prisma.SortOrder
+  reward_expires_at?: Prisma.SortOrder
   achieved_at?: Prisma.SortOrder
   reward_terms_accepted_at?: Prisma.SortOrder
   claimed_at?: Prisma.SortOrder
@@ -555,6 +611,7 @@ export type e_booklet_milestone_achievementsSumOrderByAggregateInput = {
   previous_price_snapshot?: Prisma.SortOrder
   milestone_price_snapshot?: Prisma.SortOrder
   reward_amount?: Prisma.SortOrder
+  reward_expiry_days_snapshot?: Prisma.SortOrder
 }
 
 export type E_booklet_milestone_achievementsNullableScalarRelationFilter = {
@@ -720,17 +777,36 @@ export type e_booklet_milestone_achievementsUpdateOneWithoutWallet_ledger_entrie
   update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_milestone_achievementsUpdateToOneWithWhereWithoutWallet_ledger_entriesInput, Prisma.e_booklet_milestone_achievementsUpdateWithoutWallet_ledger_entriesInput>, Prisma.e_booklet_milestone_achievementsUncheckedUpdateWithoutWallet_ledger_entriesInput>
 }
 
+export type e_booklet_milestone_achievementsCreateNestedOneWithoutWallet_credit_lotsInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_milestone_achievementsCreateWithoutWallet_credit_lotsInput, Prisma.e_booklet_milestone_achievementsUncheckedCreateWithoutWallet_credit_lotsInput>
+  connectOrCreate?: Prisma.e_booklet_milestone_achievementsCreateOrConnectWithoutWallet_credit_lotsInput
+  connect?: Prisma.e_booklet_milestone_achievementsWhereUniqueInput
+}
+
+export type e_booklet_milestone_achievementsUpdateOneWithoutWallet_credit_lotsNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_milestone_achievementsCreateWithoutWallet_credit_lotsInput, Prisma.e_booklet_milestone_achievementsUncheckedCreateWithoutWallet_credit_lotsInput>
+  connectOrCreate?: Prisma.e_booklet_milestone_achievementsCreateOrConnectWithoutWallet_credit_lotsInput
+  upsert?: Prisma.e_booklet_milestone_achievementsUpsertWithoutWallet_credit_lotsInput
+  disconnect?: Prisma.e_booklet_milestone_achievementsWhereInput | boolean
+  delete?: Prisma.e_booklet_milestone_achievementsWhereInput | boolean
+  connect?: Prisma.e_booklet_milestone_achievementsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_milestone_achievementsUpdateToOneWithWhereWithoutWallet_credit_lotsInput, Prisma.e_booklet_milestone_achievementsUpdateWithoutWallet_credit_lotsInput>, Prisma.e_booklet_milestone_achievementsUncheckedUpdateWithoutWallet_credit_lotsInput>
+}
+
 export type e_booklet_milestone_achievementsCreateWithoutTeacherInput = {
   paid_redemptions_snapshot: number
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
   term: Prisma.e_booklet_termsCreateNestedOneWithoutMilestone_achievementsInput
   milestone: Prisma.e_booklet_milestonesCreateNestedOneWithoutAchievementsInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutMilestone_achievementInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsCreateNestedManyWithoutMilestone_achievementInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutMilestone_achievementInput
 }
 
@@ -742,10 +818,13 @@ export type e_booklet_milestone_achievementsUncheckedCreateWithoutTeacherInput =
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutMilestone_achievementInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedManyWithoutMilestone_achievementInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutMilestone_achievementInput
 }
 
@@ -787,6 +866,8 @@ export type e_booklet_milestone_achievementsScalarWhereInput = {
   previous_price_snapshot?: Prisma.DecimalFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFilter<"e_booklet_milestone_achievements"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.IntNullableFilter<"e_booklet_milestone_achievements"> | number | null
+  reward_expires_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
   achieved_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
   reward_terms_accepted_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
   claimed_at?: Prisma.DateTimeNullableFilter<"e_booklet_milestone_achievements"> | Date | string | null
@@ -797,12 +878,15 @@ export type e_booklet_milestone_achievementsCreateWithoutTermInput = {
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_milestone_achievementsInput
   milestone: Prisma.e_booklet_milestonesCreateNestedOneWithoutAchievementsInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutMilestone_achievementInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsCreateNestedManyWithoutMilestone_achievementInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutMilestone_achievementInput
 }
 
@@ -814,10 +898,13 @@ export type e_booklet_milestone_achievementsUncheckedCreateWithoutTermInput = {
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutMilestone_achievementInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedManyWithoutMilestone_achievementInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutMilestone_achievementInput
 }
 
@@ -852,12 +939,15 @@ export type e_booklet_milestone_achievementsCreateWithoutMilestoneInput = {
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_milestone_achievementsInput
   term: Prisma.e_booklet_termsCreateNestedOneWithoutMilestone_achievementsInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutMilestone_achievementInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsCreateNestedManyWithoutMilestone_achievementInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutMilestone_achievementInput
 }
 
@@ -869,10 +959,13 @@ export type e_booklet_milestone_achievementsUncheckedCreateWithoutMilestoneInput
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutMilestone_achievementInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedManyWithoutMilestone_achievementInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutMilestone_achievementInput
 }
 
@@ -907,6 +1000,8 @@ export type e_booklet_milestone_achievementsCreateWithoutTerms_acceptancesInput 
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
@@ -914,6 +1009,7 @@ export type e_booklet_milestone_achievementsCreateWithoutTerms_acceptancesInput 
   term: Prisma.e_booklet_termsCreateNestedOneWithoutMilestone_achievementsInput
   milestone: Prisma.e_booklet_milestonesCreateNestedOneWithoutAchievementsInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutMilestone_achievementInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsCreateNestedManyWithoutMilestone_achievementInput
 }
 
 export type e_booklet_milestone_achievementsUncheckedCreateWithoutTerms_acceptancesInput = {
@@ -925,10 +1021,13 @@ export type e_booklet_milestone_achievementsUncheckedCreateWithoutTerms_acceptan
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutMilestone_achievementInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedManyWithoutMilestone_achievementInput
 }
 
 export type e_booklet_milestone_achievementsCreateOrConnectWithoutTerms_acceptancesInput = {
@@ -952,6 +1051,8 @@ export type e_booklet_milestone_achievementsUpdateWithoutTerms_acceptancesInput 
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -959,6 +1060,7 @@ export type e_booklet_milestone_achievementsUpdateWithoutTerms_acceptancesInput 
   term?: Prisma.e_booklet_termsUpdateOneRequiredWithoutMilestone_achievementsNestedInput
   milestone?: Prisma.e_booklet_milestonesUpdateOneRequiredWithoutAchievementsNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutMilestone_achievementNestedInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUpdateManyWithoutMilestone_achievementNestedInput
 }
 
 export type e_booklet_milestone_achievementsUncheckedUpdateWithoutTerms_acceptancesInput = {
@@ -970,10 +1072,13 @@ export type e_booklet_milestone_achievementsUncheckedUpdateWithoutTerms_acceptan
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutMilestone_achievementNestedInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateManyWithoutMilestone_achievementNestedInput
 }
 
 export type e_booklet_milestone_achievementsCreateWithoutWallet_ledger_entriesInput = {
@@ -981,12 +1086,15 @@ export type e_booklet_milestone_achievementsCreateWithoutWallet_ledger_entriesIn
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
   teacher: Prisma.usersCreateNestedOneWithoutE_booklet_milestone_achievementsInput
   term: Prisma.e_booklet_termsCreateNestedOneWithoutMilestone_achievementsInput
   milestone: Prisma.e_booklet_milestonesCreateNestedOneWithoutAchievementsInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsCreateNestedManyWithoutMilestone_achievementInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutMilestone_achievementInput
 }
 
@@ -999,9 +1107,12 @@ export type e_booklet_milestone_achievementsUncheckedCreateWithoutWallet_ledger_
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedCreateNestedManyWithoutMilestone_achievementInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutMilestone_achievementInput
 }
 
@@ -1026,12 +1137,15 @@ export type e_booklet_milestone_achievementsUpdateWithoutWallet_ledger_entriesIn
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_milestone_achievementsNestedInput
   term?: Prisma.e_booklet_termsUpdateOneRequiredWithoutMilestone_achievementsNestedInput
   milestone?: Prisma.e_booklet_milestonesUpdateOneRequiredWithoutAchievementsNestedInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUpdateManyWithoutMilestone_achievementNestedInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutMilestone_achievementNestedInput
 }
 
@@ -1044,9 +1158,98 @@ export type e_booklet_milestone_achievementsUncheckedUpdateWithoutWallet_ledger_
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateManyWithoutMilestone_achievementNestedInput
+  terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutMilestone_achievementNestedInput
+}
+
+export type e_booklet_milestone_achievementsCreateWithoutWallet_credit_lotsInput = {
+  paid_redemptions_snapshot: number
+  previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
+  milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
+  achieved_at?: Date | string | null
+  reward_terms_accepted_at?: Date | string | null
+  claimed_at?: Date | string | null
+  teacher: Prisma.usersCreateNestedOneWithoutE_booklet_milestone_achievementsInput
+  term: Prisma.e_booklet_termsCreateNestedOneWithoutMilestone_achievementsInput
+  milestone: Prisma.e_booklet_milestonesCreateNestedOneWithoutAchievementsInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerCreateNestedManyWithoutMilestone_achievementInput
+  terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutMilestone_achievementInput
+}
+
+export type e_booklet_milestone_achievementsUncheckedCreateWithoutWallet_credit_lotsInput = {
+  id?: number
+  teacher_id: number
+  term_id: number
+  milestone_id: number
+  paid_redemptions_snapshot: number
+  previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
+  milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
+  achieved_at?: Date | string | null
+  reward_terms_accepted_at?: Date | string | null
+  claimed_at?: Date | string | null
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedCreateNestedManyWithoutMilestone_achievementInput
+  terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutMilestone_achievementInput
+}
+
+export type e_booklet_milestone_achievementsCreateOrConnectWithoutWallet_credit_lotsInput = {
+  where: Prisma.e_booklet_milestone_achievementsWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_milestone_achievementsCreateWithoutWallet_credit_lotsInput, Prisma.e_booklet_milestone_achievementsUncheckedCreateWithoutWallet_credit_lotsInput>
+}
+
+export type e_booklet_milestone_achievementsUpsertWithoutWallet_credit_lotsInput = {
+  update: Prisma.XOR<Prisma.e_booklet_milestone_achievementsUpdateWithoutWallet_credit_lotsInput, Prisma.e_booklet_milestone_achievementsUncheckedUpdateWithoutWallet_credit_lotsInput>
+  create: Prisma.XOR<Prisma.e_booklet_milestone_achievementsCreateWithoutWallet_credit_lotsInput, Prisma.e_booklet_milestone_achievementsUncheckedCreateWithoutWallet_credit_lotsInput>
+  where?: Prisma.e_booklet_milestone_achievementsWhereInput
+}
+
+export type e_booklet_milestone_achievementsUpdateToOneWithWhereWithoutWallet_credit_lotsInput = {
+  where?: Prisma.e_booklet_milestone_achievementsWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_milestone_achievementsUpdateWithoutWallet_credit_lotsInput, Prisma.e_booklet_milestone_achievementsUncheckedUpdateWithoutWallet_credit_lotsInput>
+}
+
+export type e_booklet_milestone_achievementsUpdateWithoutWallet_credit_lotsInput = {
+  paid_redemptions_snapshot?: Prisma.IntFieldUpdateOperationsInput | number
+  previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_milestone_achievementsNestedInput
+  term?: Prisma.e_booklet_termsUpdateOneRequiredWithoutMilestone_achievementsNestedInput
+  milestone?: Prisma.e_booklet_milestonesUpdateOneRequiredWithoutAchievementsNestedInput
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutMilestone_achievementNestedInput
+  terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutMilestone_achievementNestedInput
+}
+
+export type e_booklet_milestone_achievementsUncheckedUpdateWithoutWallet_credit_lotsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  teacher_id?: Prisma.IntFieldUpdateOperationsInput | number
+  term_id?: Prisma.IntFieldUpdateOperationsInput | number
+  milestone_id?: Prisma.IntFieldUpdateOperationsInput | number
+  paid_redemptions_snapshot?: Prisma.IntFieldUpdateOperationsInput | number
+  previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutMilestone_achievementNestedInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutMilestone_achievementNestedInput
 }
 
@@ -1058,6 +1261,8 @@ export type e_booklet_milestone_achievementsCreateManyTeacherInput = {
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
@@ -1068,12 +1273,15 @@ export type e_booklet_milestone_achievementsUpdateWithoutTeacherInput = {
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   term?: Prisma.e_booklet_termsUpdateOneRequiredWithoutMilestone_achievementsNestedInput
   milestone?: Prisma.e_booklet_milestonesUpdateOneRequiredWithoutAchievementsNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutMilestone_achievementNestedInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUpdateManyWithoutMilestone_achievementNestedInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutMilestone_achievementNestedInput
 }
 
@@ -1085,10 +1293,13 @@ export type e_booklet_milestone_achievementsUncheckedUpdateWithoutTeacherInput =
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutMilestone_achievementNestedInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateManyWithoutMilestone_achievementNestedInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutMilestone_achievementNestedInput
 }
 
@@ -1100,6 +1311,8 @@ export type e_booklet_milestone_achievementsUncheckedUpdateManyWithoutTeacherInp
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1113,6 +1326,8 @@ export type e_booklet_milestone_achievementsCreateManyTermInput = {
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
@@ -1123,12 +1338,15 @@ export type e_booklet_milestone_achievementsUpdateWithoutTermInput = {
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_milestone_achievementsNestedInput
   milestone?: Prisma.e_booklet_milestonesUpdateOneRequiredWithoutAchievementsNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutMilestone_achievementNestedInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUpdateManyWithoutMilestone_achievementNestedInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutMilestone_achievementNestedInput
 }
 
@@ -1140,10 +1358,13 @@ export type e_booklet_milestone_achievementsUncheckedUpdateWithoutTermInput = {
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutMilestone_achievementNestedInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateManyWithoutMilestone_achievementNestedInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutMilestone_achievementNestedInput
 }
 
@@ -1155,6 +1376,8 @@ export type e_booklet_milestone_achievementsUncheckedUpdateManyWithoutTermInput 
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1168,6 +1391,8 @@ export type e_booklet_milestone_achievementsCreateManyMilestoneInput = {
   previous_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: number | null
+  reward_expires_at?: Date | string | null
   achieved_at?: Date | string | null
   reward_terms_accepted_at?: Date | string | null
   claimed_at?: Date | string | null
@@ -1178,12 +1403,15 @@ export type e_booklet_milestone_achievementsUpdateWithoutMilestoneInput = {
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   teacher?: Prisma.usersUpdateOneRequiredWithoutE_booklet_milestone_achievementsNestedInput
   term?: Prisma.e_booklet_termsUpdateOneRequiredWithoutMilestone_achievementsNestedInput
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUpdateManyWithoutMilestone_achievementNestedInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUpdateManyWithoutMilestone_achievementNestedInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutMilestone_achievementNestedInput
 }
 
@@ -1195,10 +1423,13 @@ export type e_booklet_milestone_achievementsUncheckedUpdateWithoutMilestoneInput
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wallet_ledger_entries?: Prisma.teacher_wallet_ledgerUncheckedUpdateManyWithoutMilestone_achievementNestedInput
+  wallet_credit_lots?: Prisma.teacher_wallet_credit_lotsUncheckedUpdateManyWithoutMilestone_achievementNestedInput
   terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutMilestone_achievementNestedInput
 }
 
@@ -1210,6 +1441,8 @@ export type e_booklet_milestone_achievementsUncheckedUpdateManyWithoutMilestoneI
   previous_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   milestone_price_snapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reward_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reward_expiry_days_snapshot?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  reward_expires_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   achieved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reward_terms_accepted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   claimed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1222,11 +1455,13 @@ export type e_booklet_milestone_achievementsUncheckedUpdateManyWithoutMilestoneI
 
 export type E_booklet_milestone_achievementsCountOutputType = {
   wallet_ledger_entries: number
+  wallet_credit_lots: number
   terms_acceptances: number
 }
 
 export type E_booklet_milestone_achievementsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   wallet_ledger_entries?: boolean | E_booklet_milestone_achievementsCountOutputTypeCountWallet_ledger_entriesArgs
+  wallet_credit_lots?: boolean | E_booklet_milestone_achievementsCountOutputTypeCountWallet_credit_lotsArgs
   terms_acceptances?: boolean | E_booklet_milestone_achievementsCountOutputTypeCountTerms_acceptancesArgs
 }
 
@@ -1250,6 +1485,13 @@ export type E_booklet_milestone_achievementsCountOutputTypeCountWallet_ledger_en
 /**
  * E_booklet_milestone_achievementsCountOutputType without action
  */
+export type E_booklet_milestone_achievementsCountOutputTypeCountWallet_credit_lotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.teacher_wallet_credit_lotsWhereInput
+}
+
+/**
+ * E_booklet_milestone_achievementsCountOutputType without action
+ */
 export type E_booklet_milestone_achievementsCountOutputTypeCountTerms_acceptancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.e_booklet_teacher_terms_acceptancesWhereInput
 }
@@ -1264,6 +1506,8 @@ export type e_booklet_milestone_achievementsSelect<ExtArgs extends runtime.Types
   previous_price_snapshot?: boolean
   milestone_price_snapshot?: boolean
   reward_amount?: boolean
+  reward_expiry_days_snapshot?: boolean
+  reward_expires_at?: boolean
   achieved_at?: boolean
   reward_terms_accepted_at?: boolean
   claimed_at?: boolean
@@ -1271,6 +1515,7 @@ export type e_booklet_milestone_achievementsSelect<ExtArgs extends runtime.Types
   term?: boolean | Prisma.e_booklet_termsDefaultArgs<ExtArgs>
   milestone?: boolean | Prisma.e_booklet_milestonesDefaultArgs<ExtArgs>
   wallet_ledger_entries?: boolean | Prisma.e_booklet_milestone_achievements$wallet_ledger_entriesArgs<ExtArgs>
+  wallet_credit_lots?: boolean | Prisma.e_booklet_milestone_achievements$wallet_credit_lotsArgs<ExtArgs>
   terms_acceptances?: boolean | Prisma.e_booklet_milestone_achievements$terms_acceptancesArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_milestone_achievementsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["e_booklet_milestone_achievements"]>
@@ -1284,6 +1529,8 @@ export type e_booklet_milestone_achievementsSelectCreateManyAndReturn<ExtArgs ex
   previous_price_snapshot?: boolean
   milestone_price_snapshot?: boolean
   reward_amount?: boolean
+  reward_expiry_days_snapshot?: boolean
+  reward_expires_at?: boolean
   achieved_at?: boolean
   reward_terms_accepted_at?: boolean
   claimed_at?: boolean
@@ -1301,6 +1548,8 @@ export type e_booklet_milestone_achievementsSelectUpdateManyAndReturn<ExtArgs ex
   previous_price_snapshot?: boolean
   milestone_price_snapshot?: boolean
   reward_amount?: boolean
+  reward_expiry_days_snapshot?: boolean
+  reward_expires_at?: boolean
   achieved_at?: boolean
   reward_terms_accepted_at?: boolean
   claimed_at?: boolean
@@ -1318,17 +1567,20 @@ export type e_booklet_milestone_achievementsSelectScalar = {
   previous_price_snapshot?: boolean
   milestone_price_snapshot?: boolean
   reward_amount?: boolean
+  reward_expiry_days_snapshot?: boolean
+  reward_expires_at?: boolean
   achieved_at?: boolean
   reward_terms_accepted_at?: boolean
   claimed_at?: boolean
 }
 
-export type e_booklet_milestone_achievementsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "teacher_id" | "term_id" | "milestone_id" | "paid_redemptions_snapshot" | "previous_price_snapshot" | "milestone_price_snapshot" | "reward_amount" | "achieved_at" | "reward_terms_accepted_at" | "claimed_at", ExtArgs["result"]["e_booklet_milestone_achievements"]>
+export type e_booklet_milestone_achievementsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "teacher_id" | "term_id" | "milestone_id" | "paid_redemptions_snapshot" | "previous_price_snapshot" | "milestone_price_snapshot" | "reward_amount" | "reward_expiry_days_snapshot" | "reward_expires_at" | "achieved_at" | "reward_terms_accepted_at" | "claimed_at", ExtArgs["result"]["e_booklet_milestone_achievements"]>
 export type e_booklet_milestone_achievementsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teacher?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   term?: boolean | Prisma.e_booklet_termsDefaultArgs<ExtArgs>
   milestone?: boolean | Prisma.e_booklet_milestonesDefaultArgs<ExtArgs>
   wallet_ledger_entries?: boolean | Prisma.e_booklet_milestone_achievements$wallet_ledger_entriesArgs<ExtArgs>
+  wallet_credit_lots?: boolean | Prisma.e_booklet_milestone_achievements$wallet_credit_lotsArgs<ExtArgs>
   terms_acceptances?: boolean | Prisma.e_booklet_milestone_achievements$terms_acceptancesArgs<ExtArgs>
   _count?: boolean | Prisma.E_booklet_milestone_achievementsCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1350,6 +1602,7 @@ export type $e_booklet_milestone_achievementsPayload<ExtArgs extends runtime.Typ
     term: Prisma.$e_booklet_termsPayload<ExtArgs>
     milestone: Prisma.$e_booklet_milestonesPayload<ExtArgs>
     wallet_ledger_entries: Prisma.$teacher_wallet_ledgerPayload<ExtArgs>[]
+    wallet_credit_lots: Prisma.$teacher_wallet_credit_lotsPayload<ExtArgs>[]
     terms_acceptances: Prisma.$e_booklet_teacher_terms_acceptancesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1361,6 +1614,8 @@ export type $e_booklet_milestone_achievementsPayload<ExtArgs extends runtime.Typ
     previous_price_snapshot: runtime.Decimal
     milestone_price_snapshot: runtime.Decimal
     reward_amount: runtime.Decimal
+    reward_expiry_days_snapshot: number | null
+    reward_expires_at: Date | null
     achieved_at: Date | null
     reward_terms_accepted_at: Date | null
     claimed_at: Date | null
@@ -1762,6 +2017,7 @@ export interface Prisma__e_booklet_milestone_achievementsClient<T, Null = never,
   term<T extends Prisma.e_booklet_termsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_termsDefaultArgs<ExtArgs>>): Prisma.Prisma__e_booklet_termsClient<runtime.Types.Result.GetResult<Prisma.$e_booklet_termsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   milestone<T extends Prisma.e_booklet_milestonesDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_milestonesDefaultArgs<ExtArgs>>): Prisma.Prisma__e_booklet_milestonesClient<runtime.Types.Result.GetResult<Prisma.$e_booklet_milestonesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   wallet_ledger_entries<T extends Prisma.e_booklet_milestone_achievements$wallet_ledger_entriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_milestone_achievements$wallet_ledger_entriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$teacher_wallet_ledgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  wallet_credit_lots<T extends Prisma.e_booklet_milestone_achievements$wallet_credit_lotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_milestone_achievements$wallet_credit_lotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$teacher_wallet_credit_lotsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   terms_acceptances<T extends Prisma.e_booklet_milestone_achievements$terms_acceptancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_milestone_achievements$terms_acceptancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_teacher_terms_acceptancesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1800,6 +2056,8 @@ export interface e_booklet_milestone_achievementsFieldRefs {
   readonly previous_price_snapshot: Prisma.FieldRef<"e_booklet_milestone_achievements", 'Decimal'>
   readonly milestone_price_snapshot: Prisma.FieldRef<"e_booklet_milestone_achievements", 'Decimal'>
   readonly reward_amount: Prisma.FieldRef<"e_booklet_milestone_achievements", 'Decimal'>
+  readonly reward_expiry_days_snapshot: Prisma.FieldRef<"e_booklet_milestone_achievements", 'Int'>
+  readonly reward_expires_at: Prisma.FieldRef<"e_booklet_milestone_achievements", 'DateTime'>
   readonly achieved_at: Prisma.FieldRef<"e_booklet_milestone_achievements", 'DateTime'>
   readonly reward_terms_accepted_at: Prisma.FieldRef<"e_booklet_milestone_achievements", 'DateTime'>
   readonly claimed_at: Prisma.FieldRef<"e_booklet_milestone_achievements", 'DateTime'>
@@ -2229,6 +2487,30 @@ export type e_booklet_milestone_achievements$wallet_ledger_entriesArgs<ExtArgs e
   take?: number
   skip?: number
   distinct?: Prisma.Teacher_wallet_ledgerScalarFieldEnum | Prisma.Teacher_wallet_ledgerScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_milestone_achievements.wallet_credit_lots
+ */
+export type e_booklet_milestone_achievements$wallet_credit_lotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the teacher_wallet_credit_lots
+   */
+  select?: Prisma.teacher_wallet_credit_lotsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the teacher_wallet_credit_lots
+   */
+  omit?: Prisma.teacher_wallet_credit_lotsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.teacher_wallet_credit_lotsInclude<ExtArgs> | null
+  where?: Prisma.teacher_wallet_credit_lotsWhereInput
+  orderBy?: Prisma.teacher_wallet_credit_lotsOrderByWithRelationInput | Prisma.teacher_wallet_credit_lotsOrderByWithRelationInput[]
+  cursor?: Prisma.teacher_wallet_credit_lotsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Teacher_wallet_credit_lotsScalarFieldEnum | Prisma.Teacher_wallet_credit_lotsScalarFieldEnum[]
 }
 
 /**
