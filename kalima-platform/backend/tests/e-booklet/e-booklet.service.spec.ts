@@ -1642,6 +1642,49 @@ describe("EBookletService", () => {
         mimetype: "image/png",
       } as any, { fileType: "image" })).resolves.toEqual({ id: 78, file_type: "image" });
     });
+
+    test("stores browser-playable m4v hotspot uploads as video assets", async () => {
+      const db = createMockDb();
+      db.e_booklet_file_assets.create.mockResolvedValue({ id: 79, file_type: "video" });
+      const service = new EBookletService(db);
+
+      await expect(service.createFileAsset({
+        ...baseFile,
+        originalname: "clip.m4v",
+        mimetype: "video/x-m4v",
+      } as any, { fileType: "video" })).resolves.toEqual({ id: 79, file_type: "video" });
+
+      expect(db.e_booklet_file_assets.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ file_type: "video", mime_type: "video/x-m4v" }),
+      }));
+    });
+
+    test("accepts browser fallback MIME values when the hotspot extension is safe", async () => {
+      const db = createMockDb();
+      db.e_booklet_file_assets.create
+        .mockResolvedValueOnce({ id: 80, file_type: "file" })
+        .mockResolvedValueOnce({ id: 81, file_type: "video" });
+      const service = new EBookletService(db);
+
+      await expect(service.createFileAsset({
+        ...baseFile,
+        originalname: "worksheet.xlsx",
+        mimetype: "application/octet-stream",
+      } as any, { fileType: "file" })).resolves.toEqual({ id: 80, file_type: "file" });
+
+      await expect(service.createFileAsset({
+        ...baseFile,
+        originalname: "clip.mp4",
+        mimetype: "application/octet-stream",
+      } as any, { fileType: "video" })).resolves.toEqual({ id: 81, file_type: "video" });
+
+      expect(db.e_booklet_file_assets.create).toHaveBeenNthCalledWith(1, expect.objectContaining({
+        data: expect.objectContaining({ file_type: "file", mime_type: "application/octet-stream" }),
+      }));
+      expect(db.e_booklet_file_assets.create).toHaveBeenNthCalledWith(2, expect.objectContaining({
+        data: expect.objectContaining({ file_type: "video", mime_type: "application/octet-stream" }),
+      }));
+    });
   });
 
   describe("hotspot preset library", () => {

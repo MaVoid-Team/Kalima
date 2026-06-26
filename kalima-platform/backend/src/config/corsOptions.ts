@@ -1,7 +1,15 @@
 import { CorsOptions } from "cors";
 // import allowedOrigins from "./allowedOrigins";
 
-const allowedOrigins: string[] = [
+const configuredOrigins = [
+  process.env.APP_URL,
+  process.env.FRONTEND_URL,
+  ...(process.env.CORS_ORIGINS || "").split(","),
+]
+  .map((origin) => origin?.trim())
+  .filter((origin): origin is string => Boolean(origin));
+
+const allowedOrigins: string[] = Array.from(new Set([
   "capacitor://localhost", // iOS
   "http://localhost", // Android HTTP
   "https://localhost", // Android HTTPS
@@ -10,7 +18,8 @@ const allowedOrigins: string[] = [
   "http://localhost:3000",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
-];
+  ...configuredOrigins,
+]));
 
 export const corsOptions: CorsOptions = {
   origin: allowedOrigins,

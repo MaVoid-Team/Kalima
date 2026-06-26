@@ -2,8 +2,6 @@ const fs = require("fs");
 const net = require("net");
 const path = require("path");
 
-const EmbeddedPostgres = require("embedded-postgres").default || require("embedded-postgres");
-
 const port = Number(process.env.LOCAL_POSTGRES_PORT || 55432);
 const user = process.env.LOCAL_POSTGRES_USER || "postgres";
 const password = process.env.LOCAL_POSTGRES_PASSWORD || "postgres";
@@ -20,6 +18,8 @@ const waitForPort = () => new Promise((resolve) => {
 });
 
 async function main() {
+  const { default: EmbeddedPostgres } = await import("embedded-postgres");
+
   if (await waitForPort()) {
     console.log(`Local Postgres is already listening on 127.0.0.1:${port}.`);
     return;
