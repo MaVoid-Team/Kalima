@@ -32,6 +32,7 @@
     "@prisma/adapter-pg": "^7.4.0",
     "@prisma/client": "^7.4.0",
     "@sendgrid/mail": "^8.1.5",
+    "@sentry/node": "^10.62.0",
     "axios": "^1.8.4",
     "baileys": "^7.0.0-rc.9",
     "bcrypt": "^5.1.1",
