@@ -2458,6 +2458,7 @@ export default function AdminEBookletEditorPage() {
                   const opacity = Math.min(1, Math.max(0, parseNumber(hotspot.display_behavior?.opacity_percent, 100) / 100));
                   const isSelected = hotspotForm.id === hotspot.id;
                   const shapeStyle = getHotspotShapeStyle(shape);
+                  const buttonShapeStyle = isSelected ? { borderRadius: shapeStyle.borderRadius } : shapeStyle;
                   return (
                     <button
                       type="button"
@@ -2476,7 +2477,7 @@ export default function AdminEBookletEditorPage() {
                         minWidth: 16,
                         minHeight: 16,
                         transform: "translate(-50%, -50%)",
-                        ...shapeStyle,
+                        ...buttonShapeStyle,
                         ...getHotspotGlowStyle(hotspot),
                       }}
                       title={
@@ -2503,16 +2504,16 @@ export default function AdminEBookletEditorPage() {
                       <Icon className="relative z-10 h-3.5 w-3.5 text-white" style={{ opacity }} />
                       {isSelected && resizeHandles.map((handle) => {
                         const positionClass = {
-                          nw: "-left-1.5 -top-1.5 cursor-nwse-resize",
-                          ne: "-right-1.5 -top-1.5 cursor-nesw-resize",
-                          sw: "-bottom-1.5 -left-1.5 cursor-nesw-resize",
-                          se: "-bottom-1.5 -right-1.5 cursor-nwse-resize",
+                          nw: "-left-3 -top-3 cursor-nwse-resize",
+                          ne: "-right-3 -top-3 cursor-nesw-resize",
+                          sw: "-bottom-3 -left-3 cursor-nesw-resize",
+                          se: "-bottom-3 -right-3 cursor-nwse-resize",
                         }[handle];
                         return (
                           <span
                             key={handle}
                             role="presentation"
-                            className={`absolute h-3 w-3 rounded-sm border border-primary bg-background shadow ${positionClass}`}
+                            className={`absolute z-30 h-6 w-6 touch-none rounded-sm border-2 border-primary bg-background shadow-md ${positionClass}`}
                             onPointerDown={(event) => startHotspotResize(event, hotspot, handle)}
                           />
                         );
