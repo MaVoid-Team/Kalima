@@ -904,7 +904,8 @@
     "securePagePending": "ما زالت هذه الصفحة المحمية قيد التحميل. انتظر قليلًا، ثم حاول مرة أخرى إذا لم تظهر.",
     "renderMode": "وضع العرض: {{mode}}",
     "pageTokenExpires": "ينتهي رمز الصفحة: {{value}}",
-    "fileProtected": "يظهر هذا الملف داخل العارض المحمي بدلًا من فتح تبويب تنزيل منفصل.",
+    "fileDownloadPrompt": "لا تتم معاينة هذا المرفق هنا. نزّله لفتحه على جهازك.",
+    "downloadAttachment": "تنزيل المرفق",
     "previewBadge": "معاينة: أول {{count}} صفحة",
     "previewUser": "معاينة",
     "previewHotspotLockedMessage": "اشترِ هذه المذكرة التفاعلية للتفاعل مع نقاط التفاعل."
