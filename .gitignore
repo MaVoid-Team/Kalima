@@ -66,6 +66,7 @@ kalima-platform/backend/src/uploads/
 # Config and secrets
 .env
 .env.*
+kalima-platform/.env
 **/.env
 **/.env.*
 !.env.example
@@ -160,3 +161,7 @@ eval-artifacts/
 eval-results/
 benchmark-results/
 artifacts/last-harness*.txt
+.DS_Store
+kalima-platform/.DS_Store
+kalima-platform/tmp-upload-fixtures/kalima-e2e-100mb-dense.pdf
+kalima-platform/tmp-upload-fixtures/kalima-e2e-100mb.pdf
