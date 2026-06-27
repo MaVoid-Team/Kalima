@@ -904,7 +904,8 @@
     "securePagePending": "This protected page is still loading. Please wait a moment, then try again if it does not appear.",
     "renderMode": "Render mode: {{mode}}",
     "pageTokenExpires": "Page token expires: {{value}}",
-    "fileProtected": "This file is shown inside the protected viewer instead of opening a separate download tab.",
+    "fileDownloadPrompt": "This attachment is not previewed. Download it to open it on your device.",
+    "downloadAttachment": "Download attachment",
     "previewBadge": "Preview: first {{count}} pages",
     "previewUser": "Preview",
     "previewHotspotLockedMessage": "Buy this eBooklet to interact with hotspots."

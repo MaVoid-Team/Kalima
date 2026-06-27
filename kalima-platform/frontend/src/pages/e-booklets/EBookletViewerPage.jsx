@@ -337,21 +337,23 @@ function AssetBlock({ block, hotspot, viewer, t, instanceId }) {
     );
   }
 
+  const fileName = block.filename || hotspot.asset_file?.original_filename || t("common.file");
+
   return (
     <div className="space-y-3 rounded-md border bg-background p-3">
       <div className="flex items-center gap-2 text-sm font-medium">
         <FileText className="h-4 w-4" />
-        {block.filename || hotspot.asset_file?.original_filename || t("common.file")}
+        {fileName}
       </div>
-      <div className="overflow-hidden rounded-md border bg-muted/30">
-        <iframe
-          src={assetUrl}
-          title={block.filename || hotspot.asset_file?.original_filename || t("common.file")}
-          className="h-72 w-full border-0"
-          sandbox=""
-        />
+      <div className="rounded-md border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
+        {t("viewer.fileDownloadPrompt")}
       </div>
-      <p className="text-xs text-muted-foreground">{t("viewer.fileProtected")}</p>
+      <Button asChild className="w-full" data-testid="hotspot-file-download-button">
+        <a href={assetUrl} download={fileName}>
+          <Download className="h-4 w-4" />
+          {t("viewer.downloadAttachment")}
+        </a>
+      </Button>
     </div>
   );
 }
