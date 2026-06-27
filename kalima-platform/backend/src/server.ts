@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import "./config/loadEnv";
+import * as Sentry from "@sentry/node";
 import { closeRedis } from "./libs/redis/client";
 import { baileysClient } from "./libs/whatsapp/client";
 import path from "path";
@@ -16,6 +17,12 @@ import { emitStorePurchaseToAdmins } from "./libs/redis/socketNotificationEmitte
 import cors from "cors";
 import corsOptions from "./config/corsOptions";
 import { registerAllExportResources } from "./apps/store-api/export";
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN || "https://048ba305ef0a02edfe7c9a2b46b16b50@o4511636173488128.ingest.de.sentry.io/4511636192100432",
+  environment: process.env.NODE_ENV || "development",
+  tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || "0.1"),
+});
 
 const app = express();
 const uploadsRoot = path.join(__dirname, "../uploads");
@@ -63,6 +70,7 @@ app.use("/api/v2", storeV2Routes);
 app.use("/api/v2/auth", authRoutes);
 app.use("/api/v2/admin", adminRoutes);
 
+Sentry.setupExpressErrorHandler(app);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
