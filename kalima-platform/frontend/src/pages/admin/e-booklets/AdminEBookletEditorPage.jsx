@@ -237,6 +237,11 @@ const toDatetimeLocalValue = (value) => {
 };
 
 const clampPercent = (value, fallback = 100) => Math.min(100, Math.max(0, parseNumber(value, fallback)));
+const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+const getHotspotMediaUploadKey = (form, blockIndex) => {
+  const blockId = form?.content_json?.blocks?.[blockIndex]?.id;
+  return `${blockId || form?.id || "draft"}:${blockIndex}`;
+};
 
 const normalizeAsset = (response) => response?.data || response || null;
 const normalizeAssetId = (response) => normalizeAsset(response)?.id || "";
@@ -516,6 +521,12 @@ export default function AdminEBookletEditorPage() {
   const [documentUploadProgress, setDocumentUploadProgress] = useState(0);
   const [documentUploadPhase, setDocumentUploadPhase] = useState("idle");
   const [documentUploading, setDocumentUploading] = useState(false);
+  const [hotspotMediaUpload, setHotspotMediaUpload] = useState({
+    key: "",
+    phase: "idle",
+    progress: 0,
+    fileName: "",
+  });
 
   latestHotspotFormRef.current = hotspotForm;
 
@@ -1224,29 +1235,74 @@ export default function AdminEBookletEditorPage() {
   const handleHotspotMediaUpload = async (file, blockIndex = 0) => {
     if (!file) return;
     const currentForm = latestHotspotFormRef.current || hotspotForm;
+    const uploadKey = getHotspotMediaUploadKey(currentForm, blockIndex);
     const blockType = currentForm.content_json?.blocks?.[blockIndex]?.type || currentForm.type;
-    const response = await editor.uploadAsset("hotspot-media", file, {
-      owner_type: "hotspot",
-      file_type: blockType,
+    let uploadedAssetId = "";
+    setHotspotMediaUpload({
+      key: uploadKey,
+      phase: "uploading",
+      progress: 0,
+      fileName: file.name,
     });
-    const assetId = normalizeAssetId(response);
-    if (assetId) {
+    try {
+      const response = await editor.uploadAsset(
+        "hotspot-media",
+        file,
+        {
+          owner_type: "hotspot",
+          file_type: blockType,
+        },
+        {
+          showToast: false,
+          onUploadProgress: (progressEvent) => {
+            if (!progressEvent.total) return;
+            const nextProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setHotspotMediaUpload((current) => (
+              current.key === uploadKey
+                ? { ...current, progress: Math.min(100, nextProgress) }
+                : current
+            ));
+          },
+        },
+      );
+      const assetId = normalizeAssetId(response);
+      if (!assetId) {
+        throw new Error("Hotspot media upload did not return an asset ID.");
+      }
+      uploadedAssetId = String(assetId);
+      setHotspotMediaUpload((current) => (
+        current.key === uploadKey
+          ? { ...current, phase: "saving", progress: 100 }
+          : current
+      ));
       const blocks = currentForm.content_json?.blocks?.length
         ? currentForm.content_json.blocks
         : [createDefaultBlock(currentForm.type)];
       const nextBlocks = blocks.map((block, index) =>
-        index === blockIndex ? { ...block, asset_file_id: String(assetId) } : block,
+        index === blockIndex ? { ...block, asset_file_id: uploadedAssetId } : block,
       );
       const nextForm = {
         ...currentForm,
-        ...(blockIndex === 0 ? { asset_file_id: String(assetId) } : {}),
+        ...(blockIndex === 0 ? { asset_file_id: uploadedAssetId } : {}),
         content_json: { version: 2, blocks: nextBlocks },
       };
       latestHotspotFormRef.current = nextForm;
       setHotspotForm(nextForm);
       if (activeStep === "hotspots" && activeVersionId && (nextForm.id || hasDraftHotspotPreview)) {
-        await saveHotspot({ resetAfterSave: false, showToast: false });
+        await saveHotspotAfterMediaUpload();
       }
+      toast.success(t("admin.editor.hotspots.mediaUploadSaved"));
+    } catch (error) {
+      if (uploadedAssetId) {
+        toast.error(t("admin.editor.hotspots.mediaSaveFailed"));
+      }
+      throw error;
+    } finally {
+      setHotspotMediaUpload((current) => (
+        current.key === uploadKey
+          ? { key: "", phase: "idle", progress: 0, fileName: "" }
+          : current
+      ));
     }
   };
 
@@ -1317,7 +1373,46 @@ export default function AdminEBookletEditorPage() {
     setHotspotForm(nextForm);
   };
 
-  const saveHotspot = async ({ resetAfterSave = true, showToast = true } = {}) => {
+  const mergeSavedHotspotIntoList = (savedHotspot) => {
+    if (!savedHotspot?.id) return;
+    setHotspots((current) => {
+      const index = current.findIndex((item) => item.id === savedHotspot.id);
+      if (index === -1) return [...current, savedHotspot];
+      return current.map((item) => (item.id === savedHotspot.id ? savedHotspot : item));
+    });
+  };
+
+  const flushPendingHotspotAutosave = async () => {
+    while (pendingHotspotAutosaveRef.current) {
+      pendingHotspotAutosaveRef.current = false;
+      const latestForm = latestHotspotFormRef.current;
+      if (!latestForm || (!latestForm.id && !hasDraftHotspotPreview)) return;
+      if (getHotspotAutosaveSnapshot(latestForm) === lastSavedHotspotSnapshotRef.current) return;
+      hotspotSaveInFlightRef.current = true;
+      try {
+        await saveHotspot({
+          resetAfterSave: false,
+          showToast: false,
+          refreshList: false,
+          suppressErrorToast: true,
+        });
+      } catch {
+        return;
+      } finally {
+        hotspotSaveInFlightRef.current = false;
+      }
+    }
+  };
+
+  const waitForHotspotSaveIdle = async () => {
+    for (let attempts = 0; attempts < 80; attempts += 1) {
+      if (!hotspotSaveInFlightRef.current) return true;
+      await wait(100);
+    }
+    return false;
+  };
+
+  const saveHotspot = async ({ resetAfterSave = true, showToast = true, refreshList = true, suppressErrorToast = false } = {}) => {
     setHotspotSaveState("saving");
     try {
       const version = activeVersionId ? { id: activeVersionId } : await saveVersion();
@@ -1331,13 +1426,17 @@ export default function AdminEBookletEditorPage() {
       let savedHotspot = null;
 
       if (savingForm.id) {
-        const response = await editor.updateHotspot(savingForm.id, payload, { showToast });
+        const response = await editor.updateHotspot(savingForm.id, payload, { showToast, suppressErrorToast });
         savedHotspot = response?.data || null;
       } else {
-        const response = await editor.createHotspot(version.id, payload, { showToast });
+        const response = await editor.createHotspot(version.id, payload, { showToast, suppressErrorToast });
         savedHotspot = response?.data || null;
       }
-      await loadHotspots(version.id);
+      if (refreshList) {
+        await loadHotspots(version.id);
+      } else {
+        mergeSavedHotspotIntoList(savedHotspot);
+      }
       setHasDraftHotspotPreview(false);
       if (resetAfterSave) {
         setHotspotForm({
@@ -1367,6 +1466,25 @@ export default function AdminEBookletEditorPage() {
     } catch (error) {
       setHotspotSaveState("idle");
       throw error;
+    }
+  };
+
+  const saveHotspotAfterMediaUpload = async () => {
+    const wasIdle = await waitForHotspotSaveIdle();
+    if (!wasIdle) {
+      throw new Error("Timed out waiting for the previous hotspot save to finish.");
+    }
+    hotspotSaveInFlightRef.current = true;
+    try {
+      return await saveHotspot({
+        resetAfterSave: false,
+        showToast: false,
+        refreshList: false,
+        suppressErrorToast: true,
+      });
+    } finally {
+      hotspotSaveInFlightRef.current = false;
+      await flushPendingHotspotAutosave();
     }
   };
 
@@ -1601,9 +1719,15 @@ export default function AdminEBookletEditorPage() {
 
   const renderContentBlockFields = (block, index) => {
     const isPrimary = index === 0;
+    const blockUploadKey = getHotspotMediaUploadKey(hotspotForm, index);
+    const isBlockUploading = hotspotMediaUpload.key === blockUploadKey;
+    const isAnyBlockUploading = hotspotMediaUpload.phase !== "idle";
     const blockAssetLabel = block.asset_file_id
       ? t("admin.editor.hotspots.mediaUploaded", { id: block.asset_file_id })
       : t("admin.editor.hotspots.mediaEmpty");
+    const uploadPhaseLabel = hotspotMediaUpload.phase === "saving"
+      ? t("admin.editor.hotspots.mediaSaving")
+      : t("admin.editor.hotspots.mediaUploading");
     return (
       <div key={block.id || index} className="space-y-2 rounded-md border bg-muted/10 p-2">
         <div className="flex items-center justify-between gap-2">
@@ -1674,17 +1798,31 @@ export default function AdminEBookletEditorPage() {
               <div className="min-h-8 flex-1 rounded-md border bg-background px-2 py-1.5 text-xs text-muted-foreground">
                 {blockAssetLabel}
               </div>
-              <label className="inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-md border bg-background px-2 text-xs font-medium hover:bg-accent">
-                <Upload className="h-3.5 w-3.5" />
+              <label className={`inline-flex h-8 items-center justify-center gap-1.5 rounded-md border bg-background px-2 text-xs font-medium hover:bg-accent ${isAnyBlockUploading ? "pointer-events-none cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
+                {isBlockUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
                 {block.asset_file_id ? t("common.replace") : t("common.upload")}
                 <input
                   type="file"
                   accept={block.type === "image" ? "image/*" : block.type === "audio" ? "audio/*" : undefined}
                   className="hidden"
-                  onChange={(event) => handleHotspotMediaUpload(event.target.files?.[0], index)}
+                  disabled={isAnyBlockUploading}
+                  onChange={(event) => {
+                    const selectedFile = event.target.files?.[0];
+                    event.target.value = "";
+                    handleHotspotMediaUpload(selectedFile, index).catch(() => {});
+                  }}
                 />
               </label>
             </div>
+            {isBlockUploading && (
+              <div className="space-y-1">
+                <Progress value={hotspotMediaUpload.progress} className="h-1.5" />
+                <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+                  <span className="truncate">{uploadPhaseLabel}</span>
+                  <span className="shrink-0">{hotspotMediaUpload.progress}%</span>
+                </div>
+              </div>
+            )}
             {block.type === "audio" && isPrimary && (
               <label className="flex items-center gap-2 text-xs">
                 <input
@@ -1735,13 +1873,34 @@ export default function AdminEBookletEditorPage() {
                 placeholder="https://www.youtube.com/watch?v=..."
               />
             ) : (
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="min-h-8 flex-1 rounded-md border bg-background px-2 py-1.5 text-xs text-muted-foreground">{blockAssetLabel}</div>
-                <label className="inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-md border bg-background px-2 text-xs font-medium hover:bg-accent">
-                  <Upload className="h-3.5 w-3.5" />
-                  {block.asset_file_id ? t("common.replace") : t("common.upload")}
-                  <input type="file" accept={hotspotVideoAccept} className="hidden" onChange={(event) => handleHotspotMediaUpload(event.target.files?.[0], index)} />
-                </label>
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="min-h-8 flex-1 rounded-md border bg-background px-2 py-1.5 text-xs text-muted-foreground">{blockAssetLabel}</div>
+                  <label className={`inline-flex h-8 items-center justify-center gap-1.5 rounded-md border bg-background px-2 text-xs font-medium hover:bg-accent ${isAnyBlockUploading ? "pointer-events-none cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
+                    {isBlockUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+                    {block.asset_file_id ? t("common.replace") : t("common.upload")}
+                    <input
+                      type="file"
+                      accept={hotspotVideoAccept}
+                      className="hidden"
+                      disabled={isAnyBlockUploading}
+                      onChange={(event) => {
+                        const selectedFile = event.target.files?.[0];
+                        event.target.value = "";
+                        handleHotspotMediaUpload(selectedFile, index).catch(() => {});
+                      }}
+                    />
+                  </label>
+                </div>
+                {isBlockUploading && (
+                  <div className="space-y-1">
+                    <Progress value={hotspotMediaUpload.progress} className="h-1.5" />
+                    <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+                      <span className="truncate">{uploadPhaseLabel}</span>
+                      <span className="shrink-0">{hotspotMediaUpload.progress}%</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
