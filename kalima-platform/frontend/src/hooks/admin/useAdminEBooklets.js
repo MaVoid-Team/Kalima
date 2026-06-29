@@ -337,6 +337,7 @@ export function useAdminEBookletEditor() {
         method: "post",
         data: { ...data, template_version_id: versionId },
         defaultSuccessMessage: i18n.t("eBooklets:toasts.hotspotSaved"),
+        suppressErrorToast: options.suppressErrorToast,
       }, options.showToast !== false),
     [fetchApi],
   );
@@ -348,6 +349,7 @@ export function useAdminEBookletEditor() {
         method: "patch",
         data,
         defaultSuccessMessage: i18n.t("eBooklets:toasts.hotspotUpdated"),
+        suppressErrorToast: options.suppressErrorToast,
       }, options.showToast !== false),
     [fetchApi],
   );
@@ -379,8 +381,9 @@ export function useAdminEBookletEditor() {
         data: formData,
         onUploadProgress: options.onUploadProgress,
         signal: options.signal,
+        suppressErrorToast: options.suppressErrorToast,
         defaultSuccessMessage: i18n.t("eBooklets:toasts.fileStored"),
-      });
+      }, options.showToast !== false);
     },
     [fetchApi],
   );
