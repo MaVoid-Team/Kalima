@@ -41,6 +41,8 @@ export default function LoginPage() {
     const from = location.state?.from?.pathname || "/";
     const { login, loginWithFirebase, loading } = useLogin();
     const [showPassword, setShowPassword] = useState(false);
+    const [firebaseLoginInFlight, setFirebaseLoginInFlight] = useState(false);
+    const firebaseLoginInFlightRef = React.useRef(false);
 
     const containerVariants = {
         hidden: { opacity: 0, y: 28 },
@@ -108,6 +110,9 @@ export default function LoginPage() {
     };
 
     const handleFirebaseLogin = async (provider) => {
+        if (firebaseLoginInFlightRef.current) return;
+        firebaseLoginInFlightRef.current = true;
+        setFirebaseLoginInFlight(true);
         try {
             const result = await signInWithPopup(auth, provider);
             const idToken = await result.user.getIdToken();
@@ -117,6 +122,9 @@ export default function LoginPage() {
             console.error("Firebase Login failed:", error);
             // We don't toast here anymore because the global axios interceptor in src/api/axios.js 
             // already handles error toasting with translated messages.
+        } finally {
+            firebaseLoginInFlightRef.current = false;
+            setFirebaseLoginInFlight(false);
         }
     };
 
@@ -257,7 +265,7 @@ export default function LoginPage() {
                                         <motion.div variants={itemVariants}>
                                             <SocialLoginButtons
                                                 onProviderSelect={handleFirebaseLogin}
-                                                isLoading={loading}
+                                                isLoading={loading || firebaseLoginInFlight}
                                                 textGoogle={t("login.google", "Google")}
                                             />
                                         </motion.div>

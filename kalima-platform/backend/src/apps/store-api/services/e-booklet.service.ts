@@ -36,6 +36,7 @@ const E_BOOKLET_ORDER_TEACHER_TARGET_LINK = "/e-booklet-orders";
 const E_BOOKLET_ORDER_ADMIN_ROLES = ["Admin", "SubAdmin", "Moderator"] as const;
 const DEFAULT_E_BOOKLET_PREVIEW_PAGE_LIMIT = 10;
 const MAX_E_BOOKLET_PREVIEW_PAGE_LIMIT = 200;
+const E_BOOKLET_INSTANCE_STATUSES = new Set(["active", "suspended", "archived"]);
 const DEFAULT_E_BOOKLET_GLOBAL_SETTINGS = {
   default_invite_quota: 0,
   default_access_duration_days: null,
@@ -83,6 +84,13 @@ const E_BOOKLET_PURCHASE_STATUSES = new Set([
   "cancelled",
   "unknown",
 ]);
+
+const normalizeEBookletInstanceStatus = (status?: string): string | undefined => {
+  const normalized = String(status || "").trim().toLowerCase();
+  if (!normalized || normalized === "all") return undefined;
+  if (normalized === "revoked") return "suspended";
+  return E_BOOKLET_INSTANCE_STATUSES.has(normalized) ? normalized : undefined;
+};
 
 function parseFilterDate(value: unknown, label: string, boundary?: "start" | "end"): Date | undefined {
   if (value === undefined || value === null || value === "") return undefined;
@@ -3192,7 +3200,8 @@ export class EBookletService {
     const skip = (page - 1) * limit;
     const where: Record<string, unknown> = {};
     if (filters.teacherId) where.teacher_id = filters.teacherId;
-    if (filters.status) where.status = filters.status;
+    const status = normalizeEBookletInstanceStatus(filters.status);
+    if (status) where.status = status;
 
     const [data, total] = await Promise.all([
       this.db.e_booklet_instances.findMany({

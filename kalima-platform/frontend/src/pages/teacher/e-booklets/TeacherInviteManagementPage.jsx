@@ -170,10 +170,14 @@ export default function TeacherInviteManagementPage() {
   };
 
   const confirmTermsAndRun = async () => {
-    const response = await acceptCodeGenerationTerms(templateId);
-    const acceptedTermId = response?.data?.term_id || response?.data?.terms?.id || termId;
-    setPendingAction(null);
-    if (pendingAction) await pendingAction(acceptedTermId);
+    try {
+      const response = await acceptCodeGenerationTerms(templateId);
+      const acceptedTermId = response?.data?.term_id || response?.data?.terms?.id || termId;
+      setPendingAction(null);
+      if (pendingAction) await pendingAction(acceptedTermId);
+    } catch {
+      // The shared API layer already shows the translated error toast.
+    }
   };
 
   const generatePaidMessageCode = () => requireTermsFor((acceptedTermId) => runCodeGeneration("message", acceptedTermId));
@@ -201,18 +205,26 @@ export default function TeacherInviteManagementPage() {
   });
 
   const claimRewardAfterTerms = async () => {
-    if (!rewardTermsAchievement) return;
-    const response = await claimMilestoneReward(rewardTermsAchievement);
-    setRewardTermsAchievement(null);
-    await fetchTeacherWallet();
-    await fetchTeacherMilestones(termId);
-    toast.success(t("toasts.rewardClaimed"));
-    return response;
+    try {
+      if (!rewardTermsAchievement) return;
+      const response = await claimMilestoneReward(rewardTermsAchievement);
+      setRewardTermsAchievement(null);
+      await fetchTeacherWallet();
+      await fetchTeacherMilestones(termId);
+      toast.success(t("toasts.rewardClaimed"));
+      return response;
+    } catch {
+      // The shared API layer already shows the translated error toast.
+    }
   };
 
   const handleRevokeStudent = async (studentId) => {
-    await revokeStudent(instanceId, studentId);
-    fetchStudents(instanceId);
+    try {
+      await revokeStudent(instanceId, studentId);
+      fetchStudents(instanceId).catch(() => {});
+    } catch {
+      // The shared API layer already shows the translated error toast.
+    }
   };
 
   return (

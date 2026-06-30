@@ -1521,7 +1521,7 @@ export default function AdminEBookletEditorPage() {
       const file = new File([blob], `hotspot-recording-${Date.now()}.webm`, {
         type: "audio/webm",
       });
-      await handleHotspotMediaUpload(file);
+      handleHotspotMediaUpload(file).catch(() => {});
     };
     mediaRecorderRef.current = recorder;
     recorder.start();
@@ -1675,9 +1675,8 @@ export default function AdminEBookletEditorPage() {
       try {
         await editor.updateHotspot(dragState.hotspotId, payload, { showToast: false });
         setHotspotSaveState("saved");
-      } catch (error) {
+      } catch {
         setHotspotSaveState("idle");
-        throw error;
       }
     }
   };
@@ -2499,7 +2498,7 @@ export default function AdminEBookletEditorPage() {
                       type="button"
                       size="icon-sm"
                       className="bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-emerald-600/60 dark:bg-emerald-600 dark:hover:bg-emerald-500"
-                      onClick={saveHotspot}
+                      onClick={() => { saveHotspot().catch(() => {}); }}
                       disabled={editor.loading || isHotspotSaving || !activeVersionId}
                       title={t("common.save")}
                       aria-label={t("common.save")}
@@ -2518,7 +2517,7 @@ export default function AdminEBookletEditorPage() {
                       type="button"
                       variant="outline"
                       size="icon-sm"
-                      onClick={deleteCurrentHotspot}
+                      onClick={() => { deleteCurrentHotspot().catch(() => {}); }}
                       disabled={!hotspotForm.id || editor.loading}
                       title={t("common.delete")}
                       aria-label={t("common.delete")}
@@ -2539,10 +2538,10 @@ export default function AdminEBookletEditorPage() {
               >
                 <div
                   ref={pageRef}
-                  onClick={handlePageClick}
+                  onClick={(event) => { handlePageClick(event).catch(() => {}); }}
                   onPointerMove={handleHotspotDragMove}
-                  onPointerUp={stopHotspotDrag}
-                  onPointerLeave={stopHotspotDrag}
+                  onPointerUp={() => { stopHotspotDrag().catch(() => {}); }}
+                  onPointerLeave={() => { stopHotspotDrag().catch(() => {}); }}
                   className="relative overflow-hidden rounded-md border bg-white shadow-sm"
                   style={{ aspectRatio: pageAspectRatio }}
                   data-testid="admin-e-booklet-hotspot-page"
@@ -2898,7 +2897,7 @@ export default function AdminEBookletEditorPage() {
                 </div>
 
                 {primaryBlock.type === "audio" && (
-                  <Button type="button" variant="outline" size="sm" onClick={recording ? stopAudioRecording : startAudioRecording} className="h-8 w-full text-xs">
+                  <Button type="button" variant="outline" size="sm" onClick={recording ? stopAudioRecording : () => { startAudioRecording().catch(() => {}); }} className="h-8 w-full text-xs">
                     {recording ? <Save className="h-3.5 w-3.5" /> : <MousePointerClick className="h-3.5 w-3.5" />}
                     {recording ? t("admin.editor.hotspots.stopRecording") : t("admin.editor.hotspots.recordAudio")}
                   </Button>
@@ -2913,7 +2912,7 @@ export default function AdminEBookletEditorPage() {
               <Button type="button" variant="outline" size="icon-sm" onClick={applyCopiedHotspotConfiguration} disabled={editor.loading || !copiedHotspotConfiguration} title={t("admin.editor.hotspots.applyConfiguration")} aria-label={t("admin.editor.hotspots.applyConfiguration")}>
                 <ClipboardPaste className="h-4 w-4" />
               </Button>
-              <Button size="icon-sm" onClick={saveHotspot} disabled={editor.loading || isHotspotSaving || !activeVersionId} title={t("common.save")} aria-label={t("common.save")}>
+              <Button size="icon-sm" onClick={() => { saveHotspot().catch(() => {}); }} disabled={editor.loading || isHotspotSaving || !activeVersionId} title={t("common.save")} aria-label={t("common.save")}>
                 {isHotspotSaving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : hotspotSaveState === "saved" ? (
@@ -2922,7 +2921,7 @@ export default function AdminEBookletEditorPage() {
                   <Save className="h-4 w-4" />
                 )}
               </Button>
-              <Button variant="outline" size="icon-sm" onClick={deleteCurrentHotspot} disabled={!hotspotForm.id || editor.loading} title={t("common.delete")} aria-label={t("common.delete")}>
+              <Button variant="outline" size="icon-sm" onClick={() => { deleteCurrentHotspot().catch(() => {}); }} disabled={!hotspotForm.id || editor.loading} title={t("common.delete")} aria-label={t("common.delete")}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>

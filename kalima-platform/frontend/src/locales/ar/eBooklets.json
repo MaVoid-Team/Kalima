@@ -82,6 +82,7 @@
     "cancelled": "ملغي",
     "rejected": "مرفوض",
     "active": "نشط",
+    "suspended": "معلق",
     "disabled": "معطل",
     "revoked": "ملغى الوصول"
   },

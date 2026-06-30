@@ -82,6 +82,7 @@
     "cancelled": "Cancelled",
     "rejected": "Rejected",
     "active": "Active",
+    "suspended": "Suspended",
     "disabled": "Disabled",
     "revoked": "Revoked"
   },
