@@ -29,6 +29,7 @@ import useAuth from "@/hooks/auth/useAuth";
 import useRole from "@/hooks/useRole";
 import { useEBookletViewer } from "@/hooks/useEBookletAccess";
 import { normalizeHotspotGeometry } from "@/utils/eBookletHotspotGeometry";
+import { DEFAULT_E_BOOKLET_HOTSPOT_COLOR, getHotspotGlowLayerStyle } from "@/utils/eBookletHotspotStyle";
 import { useTranslation } from "react-i18next";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc ||= pdfWorkerUrl;
@@ -57,14 +58,7 @@ const VIEWER_RING_CLASS_MAP = {
   amber: "ring-amber-600/30",
   violet: "ring-violet-600/30",
 };
-const VIEWER_COLOR_RGB_MAP = {
-  red: "220 38 38",
-  blue: "37 99 235",
-  green: "22 163 74",
-  amber: "217 119 6",
-  violet: "124 58 237",
-};
-const DEFAULT_HOTSPOT_COLOR = "blue";
+const DEFAULT_HOTSPOT_COLOR = DEFAULT_E_BOOKLET_HOTSPOT_COLOR;
 const CONFETTI_PIECES = [
   { x: -130, y: -96, rotate: -95, color: "bg-rose-500", delay: 0.02, size: "h-2 w-5" },
   { x: -92, y: -128, rotate: 82, color: "bg-amber-400", delay: 0.08, size: "h-2 w-2" },
@@ -88,11 +82,6 @@ const getHotspotRingClass = (hotspot) => {
   return VIEWER_RING_CLASS_MAP[color] || "";
 };
 
-const getHotspotColorRgb = (hotspot) => {
-  const color = hotspot?.display_behavior?.color;
-  return VIEWER_COLOR_RGB_MAP[color] || VIEWER_COLOR_RGB_MAP[DEFAULT_HOTSPOT_COLOR];
-};
-
 const getDimensions = (metadata, pageNumber) => {
   const dimensions =
     metadata?.booklet_instance?.template_version?.page_dimensions_json || [];
@@ -103,17 +92,6 @@ const clamp = (value, fallback, min, max) => {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.min(max, Math.max(min, parsed));
-};
-
-const getHotspotGlowPercent = (hotspot) => clamp(hotspot.display_behavior?.glow_percent, 100, 0, 100);
-
-const getHotspotGlowStyle = (hotspot) => {
-  const glow = getHotspotGlowPercent(hotspot);
-  if (glow <= 0) return {};
-  const blur = 8 + Math.round((glow / 100) * 18);
-  const spread = Math.round((glow / 100) * 4);
-  const alpha = 0.18 + (glow / 100) * 0.22;
-  return { boxShadow: `0 0 ${blur}px ${spread}px rgb(${getHotspotColorRgb(hotspot)} / ${alpha})` };
 };
 
 const getBlocks = (hotspot) => {
@@ -182,14 +160,13 @@ function HotspotMarker({ hotspot, active, onOpen, t, pageDimensions }) {
   const Icon = typeMeta.icon;
   const colorClass = getHotspotColorClass(hotspot) || typeMeta.className;
   const { shape, width, height, left, top } = normalizeHotspotGeometry(hotspot, {
-    defaultSize: 4,
-    minSize: 3,
-    maxSize: 8,
+    defaultSize: 5,
+    minSize: 2,
+    maxSize: 35,
     aspectRatio: pageDimensions.width / pageDimensions.height,
   });
   const opacity = clamp(hotspot.display_behavior?.opacity_percent, 100, 0, 100) / 100;
-  const glow = getHotspotGlowPercent(hotspot);
-  const glowStyle = getHotspotGlowStyle(hotspot);
+  const glowStyle = getHotspotGlowLayerStyle(hotspot);
   const baseStyle = {
     left: `${left}%`,
     top: `${top}%`,
@@ -204,20 +181,20 @@ function HotspotMarker({ hotspot, active, onOpen, t, pageDimensions }) {
       <button
         type="button"
         onClick={() => onOpen(hotspot)}
-        className="absolute flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className="pointer-events-none absolute flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         style={baseStyle}
         aria-label={getHotspotLabel(hotspot, t)}
       >
         <span
-          className={`absolute inset-0 ${glow > 0 ? "ring-4" : ""} ${getHotspotRingClass(hotspot)}`}
+          className="pointer-events-none absolute inset-0"
           style={{ ...triangleStyle, ...glowStyle }}
         />
         <span
-          className={`absolute inset-0 ${colorClass}`}
+          className={`pointer-events-auto absolute inset-0 z-10 ${colorClass}`}
           style={{ ...triangleStyle, opacity }}
         />
         <span
-          className="relative z-10 flex h-7 min-w-7 items-center justify-center rounded-full border border-white bg-black/55 px-1 text-xs font-bold text-white shadow"
+          className="pointer-events-none relative z-20 flex h-7 min-w-7 items-center justify-center rounded-full border border-white bg-black/55 px-1 text-xs font-bold text-white shadow"
           style={{ opacity }}
         >
           {getReference(hotspot)}
@@ -231,16 +208,20 @@ function HotspotMarker({ hotspot, active, onOpen, t, pageDimensions }) {
     <button
       type="button"
       onClick={() => onOpen(hotspot)}
-      className={`absolute flex items-center justify-center text-white transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${glow > 0 ? "shadow-lg ring-4" : "shadow-md"} ${roundedClass} ${getHotspotRingClass(hotspot)} ${active ? "scale-105 ring-offset-2" : ""}`}
-      style={{ ...baseStyle, ...(shape === "circle" ? { clipPath: "circle(50% at 50% 50%)" } : {}), ...glowStyle }}
+      className={`pointer-events-none absolute flex items-center justify-center text-white transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${roundedClass} ${getHotspotRingClass(hotspot)} ${active ? "scale-105 ring-offset-2" : ""}`}
+      style={baseStyle}
       aria-label={getHotspotLabel(hotspot, t)}
     >
       <span
-        className={`absolute inset-0 border-2 border-white ${roundedClass} ${colorClass}`}
+        className={`pointer-events-none absolute inset-0 ${roundedClass}`}
+        style={glowStyle}
+      />
+      <span
+        className={`pointer-events-auto absolute inset-0 z-10 border-2 border-white ${roundedClass} ${colorClass}`}
         style={{ opacity }}
       />
-      <Icon className="relative z-10 h-4 w-4 opacity-90" style={{ opacity }} />
-      <span className="relative z-10 ms-1 text-xs font-bold" style={{ opacity }}>{getReference(hotspot)}</span>
+      <Icon className="pointer-events-none relative z-20 h-4 w-4 opacity-90" style={{ opacity }} />
+      <span className="pointer-events-none relative z-20 ms-1 text-xs font-bold" style={{ opacity }}>{getReference(hotspot)}</span>
     </button>
   );
 }

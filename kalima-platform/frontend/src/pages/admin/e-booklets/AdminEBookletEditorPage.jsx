@@ -51,6 +51,7 @@ import { useAdminPaymentMethods } from "@/hooks/admin/useAdminPaymentMethods";
 import useAdminRequiredFields from "@/hooks/admin/useAdminRequiredFields";
 import HotspotLibraryPickerDialog from "@/components/admin/e-booklets/HotspotLibraryPickerDialog";
 import { normalizeHotspotGeometry } from "@/utils/eBookletHotspotGeometry";
+import { getHotspotGlowLayerStyle } from "@/utils/eBookletHotspotStyle";
 import { useTranslation } from "react-i18next";
 
 const steps = [
@@ -88,13 +89,6 @@ const COLOR_BG_MAP = {
   green: "bg-green-600",
   amber: "bg-amber-600",
   violet: "bg-violet-600",
-};
-const COLOR_RGB_MAP = {
-  red: "220 38 38",
-  blue: "37 99 235",
-  green: "22 163 74",
-  amber: "217 119 6",
-  violet: "124 58 237",
 };
 const COLOR_CLASS_MAP = {
   red: "bg-red-600 text-white ring-red-600/30",
@@ -137,13 +131,6 @@ const getHotspotRingClasses = (hotspot) => {
     ? hotspot.display_behavior.color
     : DEFAULT_HOTSPOT_COLOR;
   return COLOR_RING_CLASS_MAP[color];
-};
-
-const getHotspotColorRgb = (hotspot) => {
-  const color = hotspotColors.includes(hotspot?.display_behavior?.color)
-    ? hotspot.display_behavior.color
-    : DEFAULT_HOTSPOT_COLOR;
-  return COLOR_RGB_MAP[color];
 };
 
 const createDefaultBlock = (type = "text") => ({
@@ -294,28 +281,6 @@ const normalizeDisplayBehaviorForForm = (hotspot) => ({
     ? hotspot.display_behavior.color
     : DEFAULT_HOTSPOT_COLOR,
 });
-
-const getHotspotGlowPercent = (hotspot) => clampPercent(hotspot?.display_behavior?.glow_percent, 100);
-
-const getHotspotGlowClasses = (hotspot) => (
-  getHotspotGlowPercent(hotspot) > 0 ? "shadow-lg ring-4" : "shadow-md"
-);
-
-const getHotspotGlowStyle = (hotspot) => {
-  const glow = getHotspotGlowPercent(hotspot);
-  if (glow <= 0) return {};
-  const glowRatio = glow / 100;
-  const hotspotColor = getHotspotColorRgb(hotspot);
-  const blur = 8 + Math.round((glow / 100) * 18);
-  const spread = Math.round((glow / 100) * 4);
-  const fillAlpha = 0.16 + glowRatio * 0.24;
-  const innerAlpha = 0.24 + glowRatio * 0.28;
-  const outerAlpha = 0.18 + glowRatio * 0.22;
-  return {
-    backgroundColor: `rgb(${hotspotColor} / ${fillAlpha})`,
-    boxShadow: `inset 0 0 ${blur}px ${Math.max(1, spread)}px rgb(${hotspotColor} / ${innerAlpha}), 0 0 ${blur}px ${spread}px rgb(${hotspotColor} / ${outerAlpha})`,
-  };
-};
 
 const clampHotspotSize = (value) => Math.min(
   MAX_HOTSPOT_SIZE_PERCENT,
@@ -2617,7 +2582,7 @@ export default function AdminEBookletEditorPage() {
                   const opacity = Math.min(1, Math.max(0, parseNumber(hotspot.display_behavior?.opacity_percent, 100) / 100));
                   const isSelected = hotspotForm.id === hotspot.id;
                   const shapeStyle = getHotspotShapeStyle(shape);
-                  const buttonShapeStyle = isSelected ? { borderRadius: shapeStyle.borderRadius } : shapeStyle;
+                  const buttonShapeStyle = { borderRadius: shapeStyle.borderRadius };
                   return (
                     <button
                       type="button"
@@ -2627,7 +2592,7 @@ export default function AdminEBookletEditorPage() {
                         event.stopPropagation();
                         selectHotspot(hotspot);
                       }}
-                      className={`absolute z-20 flex cursor-grab items-center justify-center active:cursor-grabbing ${getHotspotGlowClasses(hotspot)} ${getHotspotRingClasses(hotspot)}`}
+                      className="pointer-events-none absolute z-20 flex cursor-grab items-center justify-center active:cursor-grabbing"
                       style={{
                         left: `${hotspot.x_percent}%`,
                         top: `${hotspot.y_percent}%`,
@@ -2637,7 +2602,6 @@ export default function AdminEBookletEditorPage() {
                         minHeight: 16,
                         transform: "translate(-50%, -50%)",
                         ...buttonShapeStyle,
-                        ...getHotspotGlowStyle(hotspot),
                       }}
                       title={
                         hotspot.title ||
@@ -2651,16 +2615,20 @@ export default function AdminEBookletEditorPage() {
                       })}
                     >
                       <span
-                        className={`absolute inset-0 border-2 border-white ${getHotspotColorClasses(hotspot)}`}
+                        className="pointer-events-none absolute inset-0"
+                        style={{ ...shapeStyle, ...getHotspotGlowLayerStyle(hotspot) }}
+                      />
+                      <span
+                        className={`pointer-events-auto absolute inset-0 z-10 cursor-grab touch-none border-2 border-white active:cursor-grabbing ${getHotspotColorClasses(hotspot)}`}
                         style={{ opacity, ...shapeStyle }}
                       />
                       <span
-                        className="absolute -right-2 -top-2 z-10 rounded-full bg-background px-1 text-[10px] font-bold text-foreground shadow"
+                        className="pointer-events-none absolute -right-2 -top-2 z-20 rounded-full bg-background px-1 text-[10px] font-bold text-foreground shadow"
                         style={{ opacity }}
                       >
                         {hotspot.reference_number || hotspot.id}
                       </span>
-                      <Icon className="relative z-10 h-3.5 w-3.5 text-white" style={{ opacity }} />
+                      <Icon className="pointer-events-none relative z-20 h-3.5 w-3.5 text-white" style={{ opacity }} />
                       {isSelected && resizeHandles.map((handle) => {
                         const positionClass = {
                           nw: "-left-3 -top-3 cursor-nwse-resize",
@@ -2672,7 +2640,7 @@ export default function AdminEBookletEditorPage() {
                           <span
                             key={handle}
                             role="presentation"
-                            className={`absolute z-30 h-6 w-6 touch-none rounded-sm border-2 border-primary bg-background shadow-md ${positionClass}`}
+                            className={`pointer-events-auto absolute z-30 h-6 w-6 touch-none rounded-sm border-2 border-primary bg-background shadow-md ${positionClass}`}
                             onPointerDown={(event) => startHotspotResize(event, hotspot, handle)}
                           />
                         );
@@ -2689,11 +2657,11 @@ export default function AdminEBookletEditorPage() {
                     aspectRatio: currentDimensions.width / currentDimensions.height,
                   });
                   const opacity = Math.min(1, Math.max(0, parseNumber(hotspotForm.display_behavior?.opacity_percent, 100) / 100));
-                  const draftGlowStyle = getHotspotGlowStyle({ display_behavior: hotspotForm.display_behavior });
+                  const draftHotspot = { display_behavior: hotspotForm.display_behavior };
                   const shapeStyle = getHotspotShapeStyle(shape);
                   return (
                     <div
-                      className="pointer-events-none absolute z-20 flex animate-pulse items-center justify-center text-primary shadow-lg ring-4 ring-primary/20"
+                      className="pointer-events-none absolute z-20 flex animate-pulse items-center justify-center text-primary"
                       style={{
                         left: `${hotspotForm.x_percent}%`,
                         top: `${hotspotForm.y_percent}%`,
@@ -2702,23 +2670,26 @@ export default function AdminEBookletEditorPage() {
                         minWidth: 18,
                         minHeight: 18,
                         transform: "translate(-50%, -50%)",
-                        ...shapeStyle,
-                        ...draftGlowStyle,
+                        borderRadius: shapeStyle.borderRadius,
                       }}
                       data-testid="admin-e-booklet-draft-hotspot-preview"
                       aria-label={t("admin.editor.hotspots.draftPreview")}
                     >
                       <span
-                        className="absolute inset-0 border-2 border-dashed border-primary bg-primary/25"
+                        className="pointer-events-none absolute inset-0"
+                        style={{ ...shapeStyle, ...getHotspotGlowLayerStyle(draftHotspot) }}
+                      />
+                      <span
+                        className="absolute inset-0 z-10 border-2 border-dashed border-primary bg-primary/25"
                         style={{ opacity, ...shapeStyle }}
                       />
                       <span
-                        className="absolute -right-2 -top-2 z-10 rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow"
+                        className="absolute -right-2 -top-2 z-20 rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow"
                         style={{ opacity }}
                       >
                         {t("admin.editor.hotspots.draftPreviewShort")}
                       </span>
-                      <DraftIcon className="relative z-10 h-3.5 w-3.5" style={{ opacity }} />
+                      <DraftIcon className="relative z-20 h-3.5 w-3.5" style={{ opacity }} />
                     </div>
                   );
                 })()}
