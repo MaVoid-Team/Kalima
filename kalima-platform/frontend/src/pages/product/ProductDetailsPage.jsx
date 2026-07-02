@@ -30,9 +30,16 @@ export default function ProductDetailsPage() {
   }, []);
 
   const { product: productProps, media, loading, notFound } = useProducts(id);
-  const primarySampleId = Array.isArray(productProps?.samples)
-    ? (productProps.samples.find((sample) => !sample?.is_archived)?.id ?? productProps.samples[0]?.id ?? null)
-    : (productProps?.samples?.id ?? null);
+  const primarySample = Array.isArray(productProps?.samples)
+    ? (productProps.samples.find((sample) => !sample?.is_archived) ?? productProps.samples[0] ?? null)
+    : (productProps?.samples ?? null);
+  const primarySampleId = primarySample?.id ?? null;
+  const primarySampleSectionId = primarySample?.section_id ?? null;
+  const hasPrimarySampleDownload = Boolean(
+    primarySampleId &&
+    primarySampleSectionId &&
+    primarySample?.low_quality_url,
+  );
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) {
@@ -135,8 +142,9 @@ export default function ProductDetailsPage() {
               <ProductActions
                 price={productProps.price_after_discount}
                 productId={productProps.id}
-                sampleUrl={productProps.sample_url}
                 sampleId={primarySampleId}
+                sampleSectionId={primarySampleSectionId}
+                hasSampleDownload={hasPrimarySampleDownload}
                 title={productProps.title}
                 serial={productProps.serial}
                 isReleased={productProps.is_released ?? true}
@@ -167,4 +175,3 @@ export default function ProductDetailsPage() {
     </div>
   );
 }
-
