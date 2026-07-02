@@ -430,32 +430,6 @@ export default function SamplePage() {
                                 />
                             </div>
 
-                            {/* Action Buttons */}
-                            <div className="flex flex-col sm:flex-row gap-3" data-testid="sample-page-action-buttons">
-                                {hasHighQuality && !isProtectedPdf && ['image'].includes(mediaType?.toLowerCase()) && (
-                                    <Button variant="default" className="flex-1 gap-2" asChild data-testid="sample-page-full-preview-button">
-                                        <a href={previewUrl} target="_blank" rel="noopener noreferrer">
-                                            <Eye className="h-4 w-4" />
-                                            {t('samplePage.fullPreview', 'Full Preview')}
-                                            <ExternalLink className="h-4 w-4" />
-                                        </a>
-                                    </Button>
-                                )}
-
-                                {hasLowQuality && (
-                                    <Button variant="outline" className="flex-1 gap-2" asChild data-testid="sample-page-download-lq-button">
-                                        <a href={downloadUrl} target="_blank" rel="noopener noreferrer" download>
-                                            <Download className="h-4 w-4" />
-                                            {t('samplePage.download', 'Download')}
-                                            {sample?.low_quality_size > 0 && (
-                                                <span className="text-xs text-muted-foreground">
-                                                    ({formatFileSize(sample.low_quality_size)})
-                                                </span>
-                                            )}
-                                        </a>
-                                    </Button>
-                                )}
-                            </div>
                         </div>
                     </motion.div>
 
@@ -497,6 +471,33 @@ export default function SamplePage() {
                                         </Badge>
                                     )}
                                 </div> */}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col gap-3" data-testid="sample-page-action-buttons">
+                                {hasHighQuality && !isProtectedPdf && ['image'].includes(mediaType?.toLowerCase()) && (
+                                    <Button variant="default" className="w-full gap-2" asChild data-testid="sample-page-full-preview-button">
+                                        <a href={previewUrl} target="_blank" rel="noopener noreferrer">
+                                            <Eye className="h-4 w-4" />
+                                            {t('samplePage.fullPreview', 'Full Preview')}
+                                            <ExternalLink className="h-4 w-4" />
+                                        </a>
+                                    </Button>
+                                )}
+
+                                {hasLowQuality && (
+                                    <Button variant="outline" className="w-full gap-2" asChild data-testid="sample-page-download-lq-button">
+                                        <a href={downloadUrl} target="_blank" rel="noopener noreferrer" download>
+                                            <Download className="h-4 w-4" />
+                                            {t('samplePage.download', 'Download')}
+                                            {sample?.low_quality_size > 0 && (
+                                                <span className="text-xs text-muted-foreground">
+                                                    ({formatFileSize(sample.low_quality_size)})
+                                                </span>
+                                            )}
+                                        </a>
+                                    </Button>
+                                )}
                             </div>
 
                             {/* Sample Details */}
