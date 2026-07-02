@@ -245,16 +245,15 @@ export class SampleService {
   }
 
   private getDownloadFileName(originalName: string, filePath: string): string {
-    const fileExt = path.extname(filePath);
-    if (!fileExt) return originalName;
-
+    const fileExt = path.extname(filePath) || path.extname(originalName);
     const originalExt = path.extname(originalName);
-    if (originalExt.toLowerCase() === fileExt.toLowerCase()) {
-      return originalName;
-    }
-
     const originalBase = path.basename(originalName, originalExt) || "sample";
-    return `${originalBase}${fileExt}`;
+    const lowQualityBase = originalBase
+      .replace(/[-_\s]*high[-_\s]*quality/gi, "")
+      .replace(/[-_\s]*low[-_\s]*quality/gi, "")
+      .trim() || "sample";
+
+    return `${lowQualityBase}-low-quality${fileExt}`;
   }
 
   // ============================================
