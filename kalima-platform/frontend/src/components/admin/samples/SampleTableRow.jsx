@@ -19,7 +19,10 @@ const getIconForType = (mediaType) => {
 export default function SampleTableRow({ sample, sectionId, onEdit, onDelete, loading }) {
     const { t } = useTranslation('admin');
     const apiUrl = import.meta.env.VITE_API_URL || '/api/v2';
-    const downloadUrl = `${apiUrl}/sample-sections/${sectionId}/samples/${sample.id}/download`;
+    const effectiveSectionId = sample.section_id ?? sectionId;
+    const downloadUrl = effectiveSectionId
+        ? `${apiUrl}/sample-sections/${effectiveSectionId}/samples/${sample.id}/download`
+        : null;
     const thumbnailUrl = getImageUrl(sample.thumbnail_url);
 
     return (
@@ -105,7 +108,7 @@ export default function SampleTableRow({ sample, sectionId, onEdit, onDelete, lo
                         >
                         <Link
                             to={`/samples/${sample.id}/preview?${new URLSearchParams({
-                                section_id: sectionId,
+                                section_id: effectiveSectionId || '',
                                 media_type: sample.media_type,
                                 mime_type: sample.mime_type || '',
                                 original_name: sample.original_name || '',
@@ -125,7 +128,7 @@ export default function SampleTableRow({ sample, sectionId, onEdit, onDelete, lo
                     )}
 
                     {/* Download LQ */}
-                    {sample.low_quality_url && (
+                    {sample.low_quality_url && downloadUrl && (
                         <Button
                             variant="ghost"
                             size="icon"

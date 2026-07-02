@@ -81,6 +81,10 @@ const MIME_TO_EXT: Record<string, string> = {
     ".pptx",
 };
 
+const EXT_TO_MIME = Object.fromEntries(
+  Object.entries(MIME_TO_EXT).map(([mimeType, ext]) => [ext, mimeType]),
+) as Record<string, string>;
+
 const DISPLAYABLE_MEDIA_TYPES = new Set<sample_media_type_enum>([
   sample_media_type_enum.pdf,
   sample_media_type_enum.image,
@@ -233,6 +237,24 @@ export class SampleService {
       : normalizedUrl;
 
     return path.resolve(UPLOAD_ROOT, uploadRelativePath);
+  }
+
+  private getMimeTypeForFile(filePath: string, fallbackMimeType: string): string {
+    const ext = path.extname(filePath).toLowerCase();
+    return EXT_TO_MIME[ext] || fallbackMimeType;
+  }
+
+  private getDownloadFileName(originalName: string, filePath: string): string {
+    const fileExt = path.extname(filePath);
+    if (!fileExt) return originalName;
+
+    const originalExt = path.extname(originalName);
+    if (originalExt.toLowerCase() === fileExt.toLowerCase()) {
+      return originalName;
+    }
+
+    const originalBase = path.basename(originalName, originalExt) || "sample";
+    return `${originalBase}${fileExt}`;
   }
 
   // ============================================
@@ -719,8 +741,8 @@ export class SampleService {
 
     return {
       path: absolutePath,
-      mimeType: sample.mime_type,
-      originalName: sample.original_name,
+      mimeType: this.getMimeTypeForFile(absolutePath, sample.mime_type),
+      originalName: this.getDownloadFileName(sample.original_name, absolutePath),
     };
   }
 

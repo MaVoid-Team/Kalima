@@ -347,7 +347,7 @@ export default function SamplePage() {
     const isProtectedPdf = sampleIsProtectedPdf;
 
     const hasHighQuality = Boolean(sample?.high_quality_url || highQualityUrl);
-    const hasLowQuality = !isProtectedPdf && Boolean(sample?.low_quality_url || downloadUrl);
+    const hasLowQuality = Boolean(sample?.low_quality_url || downloadUrl);
 
     const formattedDate = sample?.created_at
         ? new Date(sample.created_at).toLocaleDateString(i18n.language, { year: 'numeric', month: 'long', day: 'numeric' })
