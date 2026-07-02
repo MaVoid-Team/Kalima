@@ -25,7 +25,9 @@ Sentry.init({
 });
 
 const app = express();
-const uploadsRoot = path.join(__dirname, "../uploads");
+const uploadsRoot = process.env.UPLOADS_DIR
+  ? path.resolve(process.env.UPLOADS_DIR)
+  : path.resolve(process.cwd(), "uploads");
 
 registerAllExportResources();
 

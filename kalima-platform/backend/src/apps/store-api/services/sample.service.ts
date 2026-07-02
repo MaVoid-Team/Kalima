@@ -14,7 +14,10 @@ import { NotFoundError, BadRequestError } from "../../../libs/errors";
 // CONSTANTS
 // ============================================
 
-const UPLOAD_DIR = path.resolve(__dirname, "../../../../uploads/samples");
+const UPLOAD_ROOT = process.env.UPLOADS_DIR
+  ? path.resolve(process.env.UPLOADS_DIR)
+  : path.resolve(process.cwd(), "uploads");
+const UPLOAD_DIR = path.join(UPLOAD_ROOT, "samples");
 
 const SAMPLE_MIME_TYPES = new Set([
   "application/pdf",
@@ -224,11 +227,12 @@ export class SampleService {
 
   /** Resolve URL to absolute filesystem path */
   urlToAbsolutePath(url: string): string {
-    return path.resolve(
-      __dirname,
-      "../../../..",
-      url.startsWith("/") ? url.slice(1) : url,
-    );
+    const normalizedUrl = url.startsWith("/") ? url.slice(1) : url;
+    const uploadRelativePath = normalizedUrl.startsWith("uploads/")
+      ? normalizedUrl.slice("uploads/".length)
+      : normalizedUrl;
+
+    return path.resolve(UPLOAD_ROOT, uploadRelativePath);
   }
 
   // ============================================
