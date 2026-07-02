@@ -31,6 +31,7 @@ const PURCHASE_INCLUDE = {
           serial: true,
           type: true,
           price: true,
+          price_after_discount: true,
           thumbnail_image: { select: { id: true, url: true } },
         },
       },

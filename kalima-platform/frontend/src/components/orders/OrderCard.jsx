@@ -10,6 +10,40 @@ import { cn } from '@/lib/utils';
 
 const ORDER_TRACKING_WHATSAPP_NUMBER = '201044067113';
 
+const toAmount = (value) => {
+    const amount = Number.parseFloat(value);
+    return Number.isFinite(amount) ? amount : 0;
+};
+
+const getOrderPricing = (order) => {
+    const items = (order?.purchase_items || []).filter((item) => !item?.is_deleted && !item?.deleted_at);
+    const total = toAmount(order?.total);
+    const persistedDiscount = toAmount(order?.discount);
+    const persistedSubtotal = toAmount(order?.subtotal);
+    const itemOriginalSubtotal = items.reduce((sum, item) => {
+        const quantity = Math.max(1, toAmount(item?.quantity) || 1);
+        const productPrice = toAmount(item?.products?.price);
+        const itemUnitPrice = toAmount(item?.price_at_purchase);
+        const originalUnitPrice = productPrice > 0 ? productPrice : itemUnitPrice;
+
+        return sum + originalUnitPrice * quantity;
+    }, 0);
+    const beforeDiscount = Math.max(
+        itemOriginalSubtotal,
+        persistedSubtotal + persistedDiscount,
+        total + persistedDiscount,
+        total
+    );
+    const discount = Math.max(0, beforeDiscount - total);
+
+    return {
+        beforeDiscount,
+        discount,
+        total,
+        hasDiscount: discount > 0.005 && beforeDiscount > total,
+    };
+};
+
 const OrderCard = ({ order }) => {
     const { t, i18n } = useTranslation('admin');
 
@@ -36,6 +70,7 @@ const OrderCard = ({ order }) => {
     const orderNumber = order.purchase_serial || `#${order.id}`;
     const trackingMessage = `مرحباً، رقم طلبي المميز هو ${orderNumber} وأرغب في معرفة حالة الطلب`;
     const trackingLink = buildWhatsAppLink(ORDER_TRACKING_WHATSAPP_NUMBER, trackingMessage);
+    const pricing = getOrderPricing(order);
 
     return (
         <div
@@ -77,10 +112,29 @@ const OrderCard = ({ order }) => {
                 </div>
 
                 <div className="flex flex-col items-start sm:items-end gap-1">
-                    <span className="text-sm text-muted-foreground">{t('orders.total', 'Total')}</span>
-                    <span className="text-lg font-bold text-foreground">
-                        {formatCurrency(order.total, t)}
-                    </span>
+                    {pricing.hasDiscount ? (
+                        <div className="grid grid-cols-[auto_auto] gap-x-3 gap-y-1 text-sm sm:text-end" data-testid={`orders-pricing-breakdown-${order.id}`}>
+                            <span className="text-muted-foreground">{t('orders.priceBeforeDiscount', 'Before discount')}</span>
+                            <span className="font-medium text-muted-foreground line-through">
+                                {formatCurrency(pricing.beforeDiscount, t)}
+                            </span>
+                            <span className="text-muted-foreground">{t('orders.discount', 'Discount')}</span>
+                            <span className="font-semibold text-success">
+                                -{formatCurrency(pricing.discount, t)}
+                            </span>
+                            <span className="text-muted-foreground">{t('orders.priceAfterDiscount', 'After discount')}</span>
+                            <span className="text-lg font-bold text-foreground">
+                                {formatCurrency(pricing.total, t)}
+                            </span>
+                        </div>
+                    ) : (
+                        <>
+                            <span className="text-sm text-muted-foreground">{t('orders.total', 'Total')}</span>
+                            <span className="text-lg font-bold text-foreground">
+                                {formatCurrency(pricing.total, t)}
+                            </span>
+                        </>
+                    )}
                     <div className="flex flex-col sm:items-end gap-2 pt-1">
                         <OrderDetailsDialog order={order} />
                         {!isDeleted && (
@@ -93,7 +147,7 @@ const OrderCard = ({ order }) => {
                             >
                                 <a href={trackingLink} target="_blank" rel="noopener noreferrer">
                                     <MessageCircle className="h-4 w-4" />
-                                    {t('orders.trackOrder', 'Track Your Order')}
+                                    {t('orders.trackOrder', 'Track your order')}
                                 </a>
                             </Button>
                         )}
