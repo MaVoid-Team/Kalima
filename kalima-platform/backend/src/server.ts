@@ -17,6 +17,7 @@ import { emitStorePurchaseToAdmins } from "./libs/redis/socketNotificationEmitte
 import cors from "cors";
 import corsOptions from "./config/corsOptions";
 import { registerAllExportResources } from "./apps/store-api/export";
+import { isProtectedSampleStaticPath } from "./libs/sampleStaticAccess";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN || "https://048ba305ef0a02edfe7c9a2b46b16b50@o4511636173488128.ingest.de.sentry.io/4511636192100432",
@@ -37,10 +38,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   "/uploads/samples",
   (req, res, next) => {
-    if (req.path.toLowerCase().endsWith(".pdf")) {
+    if (isProtectedSampleStaticPath(req.path)) {
       res.status(403).json({
         success: false,
-        message: "Protected PDF samples cannot be downloaded directly",
+        message: "Protected samples cannot be downloaded directly",
       });
       return;
     }
