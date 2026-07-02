@@ -122,6 +122,36 @@ describe("SampleService", () => {
     expect(result.mimeType).toBe(
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     );
-    expect(result.originalName).toBe("Teacher sample.docx");
+    expect(result.originalName).toBe("Teacher sample-low-quality.docx");
+  });
+
+  it("labels same-extension low-quality downloads without preserving high-quality names", async () => {
+    const db = createMockDb();
+    const sampleService = new SampleService(db as any);
+
+    db.samples.findFirst.mockResolvedValue({
+      id: 8,
+      section_id: 2,
+      product_id: 12,
+      title: "Teacher sample",
+      is_archived: false,
+      media_type: "pdf",
+      thumbnail_url: null,
+      high_quality_url: "/uploads/samples/123-high_quality.pdf",
+      low_quality_url: "/uploads/samples/456-low_quality.pdf",
+      original_name: "Teacher sample high quality.pdf",
+      mime_type: "application/pdf",
+      size: 2048,
+      created_at: new Date(),
+      updated_at: null,
+      products: null,
+      sample_sections: { id: 2, title: "Samples" },
+    });
+
+    const result = await sampleService.getDownloadPath(8, 2);
+
+    expect(result.path).toContain("/uploads/samples/456-low_quality.pdf");
+    expect(result.mimeType).toBe("application/pdf");
+    expect(result.originalName).toBe("Teacher sample-low-quality.pdf");
   });
 });
