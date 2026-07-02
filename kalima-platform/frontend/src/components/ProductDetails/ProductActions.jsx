@@ -1,9 +1,9 @@
 import { useState, useRef } from "react";
-import { ShoppingCart, Eye, Zap, Clock, ShieldAlert, ChevronUp, ChevronDown } from "lucide-react";
+import { ShoppingCart, Eye, Download, Zap, Clock, ShieldAlert, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { formatPrice, getImageUrl } from "@/lib/storeUtils";
+import { formatPrice } from "@/lib/storeUtils";
 import { useCart } from "@/contexts/CartContext";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { useFastBuy } from "@/hooks/useFastBuy";
@@ -21,12 +21,22 @@ import { cn } from "@/lib/utils";
  * Props:
  *   - price: number
  *   - productId: string | number
- *   - sampleUrl: string | null   (legacy fallback — external URL)
- *   - sampleId: number | null    (preferred — links to /samples/:id)
+ *   - sampleId: number | null    (links to /samples/:id)
+ *   - sampleSectionId: number | null
+ *   - hasSampleDownload: boolean
  *   - title: string
  *   - serial: string
  */
-export default function ProductActions({ price, productId, sampleUrl, sampleId, title, serial, isReleased = true }) {
+export default function ProductActions({
+  price,
+  productId,
+  sampleId,
+  sampleSectionId,
+  hasSampleDownload = false,
+  title,
+  serial,
+  isReleased = true,
+}) {
   const { t } = useTranslation("product");
   const { isAuthenticated } = useAuth();
   const { isConfirmed, hasAdminAccess, hasStoreAccess } = useRole();
@@ -46,6 +56,13 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
   const { startFastBuy, loading: fastBuyLoading } = useFastBuy();
 
   const formattedPrice = formatPrice(price);
+  const apiUrl = import.meta.env.VITE_API_URL || "/api/v2";
+  const samplePath = sampleId ? `/samples/${sampleId}` : null;
+  const sampleDownloadUrl =
+    sampleId && sampleSectionId && hasSampleDownload
+      ? `${apiUrl}/sample-sections/${sampleSectionId}/samples/${sampleId}/download`
+      : null;
+  const hasSampleActions = Boolean(samplePath || sampleDownloadUrl);
 
   // Draggable Sheet State
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -222,7 +239,7 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
             )}
 
             <div className="grid grid-cols-2 gap-2">
-              {(sampleId || sampleUrl) && (
+              {samplePath && (
                 <Button
                   variant="ghost"
                   className="h-12 rounded-xl border border-border/40 bg-muted/30 hover:bg-muted/50 gap-1.5 transition-all active:scale-95 px-2"
@@ -230,17 +247,25 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
                   asChild
                   data-testid="product-actions-mobile-view-sample-button"
                 >
-                  {sampleId ? (
-                    <Link to={`/samples/${sampleId}`} state={{ cameFromAdmin: false }}>
-                      <Eye className="h-4 w-4 shrink-0" />
-                      <span className="text-[10px] font-black uppercase tracking-wider truncate">{t("actions.viewSample")}</span>
-                    </Link>
-                  ) : (
-                    <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
-                      <Eye className="h-4 w-4 shrink-0" />
-                      <span className="text-[10px] font-black uppercase tracking-wider truncate">{t("actions.viewSample")}</span>
-                    </a>
-                  )}
+                  <Link to={samplePath} state={{ cameFromAdmin: false }}>
+                    <Eye className="h-4 w-4 shrink-0" />
+                    <span className="text-[10px] font-black uppercase tracking-wider truncate">{t("actions.viewSample")}</span>
+                  </Link>
+                </Button>
+              )}
+
+              {sampleDownloadUrl && (
+                <Button
+                  variant="ghost"
+                  className="h-12 rounded-xl border border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 gap-1.5 transition-all active:scale-95 px-2"
+                  size="sm"
+                  asChild
+                  data-testid="product-actions-mobile-download-sample-button"
+                >
+                  <a href={sampleDownloadUrl} download>
+                    <Download className="h-4 w-4 shrink-0" />
+                    <span className="text-[10px] font-black uppercase tracking-wider truncate">{t("actions.downloadSample", "Download")}</span>
+                  </a>
                 </Button>
               )}
 
@@ -248,7 +273,8 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
                 variant="ghost"
                 className={cn(
                   "h-12 rounded-xl border border-success/20 bg-success/5 text-success hover:bg-success/10 gap-1.5 transition-all active:scale-95 px-2",
-                  !(sampleId || sampleUrl) && "col-span-2"
+                  !hasSampleActions && "col-span-2",
+                  samplePath && sampleDownloadUrl && "col-span-2"
                 )}
                 size="sm"
                 onClick={handleWhatsApp}
@@ -317,47 +343,66 @@ export default function ProductActions({ price, productId, sampleUrl, sampleId, 
         )}
 
         {/* View Sample (Keep separate so it stays if buttons are hidden) */}
-        {(sampleId || sampleUrl) && hasAdminAccess && (
+        {hasSampleActions && hasAdminAccess && (
           <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="text-sm flex-1"
-              size="lg"
-              asChild
-              data-testid="product-actions-desktop-view-sample-button"
-            >
-              {sampleId ? (
-                <Link to={`/samples/${sampleId}`} state={{ cameFromAdmin: false }}>
+            {samplePath && (
+              <Button
+                variant="outline"
+                className="text-sm flex-1"
+                size="lg"
+                asChild
+                data-testid="product-actions-desktop-view-sample-button"
+              >
+                <Link to={samplePath} state={{ cameFromAdmin: false }}>
                   {t("actions.viewSample")}
                 </Link>
-              ) : (
-                <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
-                  {t("actions.viewSample")}
+              </Button>
+            )}
+            {sampleDownloadUrl && (
+              <Button
+                variant="outline"
+                className="text-sm flex-1"
+                size="lg"
+                asChild
+                data-testid="product-actions-desktop-download-sample-button"
+              >
+                <a href={sampleDownloadUrl} download>
+                  {t("actions.downloadSample", "Download Sample")}
                 </a>
-              )}
-            </Button>
+              </Button>
+            )}
           </div>
         )}
 
         {/* Desktop Sample Button (Inside flex if not admin) */}
-        {(sampleId || sampleUrl) && !hasAdminAccess && (
+        {hasSampleActions && !hasAdminAccess && (
           <div className="flex gap-3 -mt-1">
-             <Button
-              variant="outline"
-              className="text-sm flex-1"
-              size="lg"
-              asChild
-            >
-              {sampleId ? (
-                <Link to={`/samples/${sampleId}`} state={{ cameFromAdmin: false }}>
+            {samplePath && (
+              <Button
+                variant="outline"
+                className="text-sm flex-1"
+                size="lg"
+                asChild
+                data-testid="product-actions-desktop-view-sample-button"
+              >
+                <Link to={samplePath} state={{ cameFromAdmin: false }}>
                   {t("actions.viewSample")}
                 </Link>
-              ) : (
-                <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
-                  {t("actions.viewSample")}
+              </Button>
+            )}
+            {sampleDownloadUrl && (
+              <Button
+                variant="outline"
+                className="text-sm flex-1"
+                size="lg"
+                asChild
+                data-testid="product-actions-desktop-download-sample-button"
+              >
+                <a href={sampleDownloadUrl} download>
+                  {t("actions.downloadSample", "Download Sample")}
                 </a>
-              )}
-            </Button>
+              </Button>
+            )}
           </div>
         )}
         <Button
