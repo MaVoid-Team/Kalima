@@ -123,7 +123,6 @@ export default function SamplesDirectoryPage() {
                                                         const thumbnailUrl = uploadedThumbnailUrl || previewThumbnailUrl;
                                                         const hasMediaPreview = !uploadedThumbnailUrl && sample.high_quality_url && (mt === 'image' || mt === 'video');
                                                         const hasThumbnail = Boolean(uploadedThumbnailUrl || hasMediaPreview);
-                                                        const isProtectedPdf = mt === 'pdf' || sample.mime_type === 'application/pdf';
 
                                                         return (
                                                             <div
@@ -206,7 +205,7 @@ export default function SamplesDirectoryPage() {
                                                                             </Link>
                                                                         </Button>
 
-                                                                        {sample.low_quality_url && !isProtectedPdf && (
+                                                                        {sample.low_quality_url && (
                                                                             <Button
                                                                                 variant="outline"
                                                                                 className="flex-1"

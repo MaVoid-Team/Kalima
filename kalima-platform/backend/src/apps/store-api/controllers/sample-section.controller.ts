@@ -8,7 +8,7 @@ import {
   CreateSampleBodyDto,
   UpdateSampleBodyDto,
 } from "../dtos/sample.dto";
-import { ValidationError, BadRequestError, ForbiddenError } from "../../../libs/errors";
+import { ValidationError, BadRequestError } from "../../../libs/errors";
 import fs from "fs";
 
 // ============================================
@@ -390,10 +390,6 @@ export const sampleSectionController = {
 
       const { path: filePath, mimeType, originalName } =
         await sampleService.getDownloadPath(sampleId, sectionId);
-
-      if (mimeType === "application/pdf") {
-        throw new ForbiddenError("Protected PDF samples cannot be downloaded");
-      }
 
       if (!fs.existsSync(filePath)) {
         res.status(404).json({ success: false, message: "File not found" });
