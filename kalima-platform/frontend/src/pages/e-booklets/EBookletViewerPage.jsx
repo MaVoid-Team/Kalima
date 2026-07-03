@@ -24,6 +24,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import useAuth from "@/hooks/auth/useAuth";
 import useRole from "@/hooks/useRole";
@@ -482,6 +483,7 @@ export default function EBookletViewerPage({ previewMode = false }) {
   const { isStudent } = useRole();
   const viewer = useEBookletViewer({ adminMode, previewMode });
   const [pageNumber, setPageNumber] = useState(1);
+  const [pageInputValue, setPageInputValue] = useState("1");
   const [zoom, setZoom] = useState(1);
   const [activeHotspot, setActiveHotspot] = useState(null);
   const [hotspotContent, setHotspotContent] = useState(null);
@@ -657,6 +659,37 @@ export default function EBookletViewerPage({ previewMode = false }) {
   });
   const backHref = previewMode ? `/e-booklets/${instanceId}` : adminMode ? "/admin/e-booklets/access" : isStudent ? "/student/e-booklets" : "/teacher/e-booklets";
 
+  const goToPage = useCallback((value) => {
+    const nextPage = clamp(value, pageNumber, 1, pageCount);
+    setPageNumber(nextPage);
+    setPageInputValue(String(nextPage));
+  }, [pageCount, pageNumber]);
+
+  const handlePageInputChange = useCallback((event) => {
+    setPageInputValue(event.target.value.replace(/[^0-9]/g, ""));
+  }, []);
+
+  const commitPageInput = useCallback(() => {
+    goToPage(pageInputValue || pageNumber);
+  }, [goToPage, pageInputValue, pageNumber]);
+
+  const handlePageInputKeyDown = useCallback((event) => {
+    if (event.key === "Enter") {
+      commitPageInput();
+      event.currentTarget.blur();
+    }
+  }, [commitPageInput]);
+
+  useEffect(() => {
+    setPageInputValue(String(pageNumber));
+  }, [pageNumber]);
+
+  useEffect(() => {
+    if (pageNumber > pageCount) {
+      setPageNumber(pageCount);
+    }
+  }, [pageCount, pageNumber]);
+
   const pageStyle = useMemo(
     () => ({
       aspectRatio: `${dimensions.width} / ${dimensions.height}`,
@@ -783,11 +816,27 @@ export default function EBookletViewerPage({ previewMode = false }) {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setPageNumber((page) => Math.max(1, page - 1))} disabled={pageNumber <= 1}>
+            <Button variant="outline" size="sm" onClick={() => goToPage(pageNumber - 1)} disabled={pageNumber <= 1}>
               <ChevronLeft className="h-4 w-4" />
               {t("common.previous")}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setPageNumber((page) => Math.min(pageCount, page + 1))} disabled={pageNumber >= pageCount}>
+            <div className="flex h-9 items-center gap-1 rounded-md border bg-background px-2 text-sm">
+              <Input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                min="1"
+                max={pageCount}
+                value={pageInputValue}
+                onChange={handlePageInputChange}
+                onBlur={commitPageInput}
+                onKeyDown={handlePageInputKeyDown}
+                className="h-7 w-14 border-0 px-1 text-center shadow-none focus-visible:ring-1"
+                aria-label={t("admin.editor.hotspots.goToPage", { defaultValue: "Go to page" })}
+              />
+              <span className="whitespace-nowrap text-muted-foreground">/ {pageCount}</span>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => goToPage(pageNumber + 1)} disabled={pageNumber >= pageCount}>
               {t("common.next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
