@@ -6,6 +6,12 @@ export function resolveUploadsRoot(): string {
     : path.resolve(process.cwd(), "uploads");
 }
 
+export function resolveEBookletUploadRoot(): string {
+  return process.env.E_BOOKLET_UPLOAD_DIR
+    ? path.resolve(process.env.E_BOOKLET_UPLOAD_DIR)
+    : path.join(resolveUploadsRoot(), "e-booklets/private");
+}
+
 export function resolveUploadPath(...segments: string[]): string {
   return path.join(resolveUploadsRoot(), ...segments);
 }
@@ -17,4 +23,12 @@ export function resolveUploadedUrlPath(url: string): string {
     : normalizedUrl;
 
   return path.resolve(resolveUploadsRoot(), uploadRelativePath);
+}
+
+export function resolveEBookletStoragePath(storageKey: string): string {
+  if (storageKey.startsWith("e-booklets/private/")) {
+    return path.join(resolveUploadsRoot(), storageKey);
+  }
+
+  return path.join(resolveEBookletUploadRoot(), storageKey);
 }

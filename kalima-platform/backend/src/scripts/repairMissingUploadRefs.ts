@@ -1,7 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { prisma } from "../libs/db/prisma";
-import { resolveUploadsRoot } from "../libs/uploadsRoot";
+import {
+  resolveEBookletStoragePath,
+  resolveEBookletUploadRoot,
+  resolveUploadsRoot,
+} from "../libs/uploadsRoot";
 
 function uploadPathExists(url: string | null | undefined): boolean {
   if (!url || /^https?:\/\//i.test(url)) return true;
@@ -11,6 +15,11 @@ function uploadPathExists(url: string | null | undefined): boolean {
   const relativePath = normalizedUrl.slice(uploadIndex + "uploads/".length);
   if (!relativePath || relativePath.includes("..")) return false;
   return fs.existsSync(path.join(resolveUploadsRoot(), relativePath));
+}
+
+function eBookletStoragePathExists(storageKey: string | null | undefined): boolean {
+  if (!storageKey || storageKey.includes("..")) return false;
+  return fs.existsSync(resolveEBookletStoragePath(storageKey));
 }
 
 async function main(): Promise<void> {
@@ -60,10 +69,19 @@ async function main(): Promise<void> {
         sample.thumbnail_url === null,
     );
 
+  const eBookletAssets = await prisma.e_booklet_file_assets.findMany({
+    select: { id: true, storage_key: true },
+  });
+  const missingEBookletAssetIds = eBookletAssets
+    .filter((asset) => !eBookletStoragePathExists(asset.storage_key))
+    .map((asset) => asset.id);
+
   const report = {
     apply,
     uploadRoot: resolveUploadsRoot(),
+    eBookletUploadRoot: resolveEBookletUploadRoot(),
     missingImageIds,
+    missingEBookletAssetIds,
     usersWithMissingProfilePics: usersWithMissingProfilePics.map((user) => ({
       id: user.id,
       profile_pic_url: user.profile_pic_url,
@@ -100,6 +118,12 @@ async function main(): Promise<void> {
 
     if (missingImageIds.length) {
       await tx.images.deleteMany({ where: { id: { in: missingImageIds } } });
+    }
+
+    if (missingEBookletAssetIds.length) {
+      await tx.e_booklet_file_assets.deleteMany({
+        where: { id: { in: missingEBookletAssetIds } },
+      });
     }
   });
 

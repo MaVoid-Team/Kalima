@@ -5,15 +5,13 @@ import { spawn } from "child_process";
 import { promises as fsPromises } from "fs";
 import sharp from "sharp";
 import { PDFDocument } from "pdf-lib";
+import { resolveEBookletUploadRoot } from "../../../libs/uploadsRoot";
 
 type EBookletDb = any;
 
 const DEFAULT_MAX_PREVIEW_WIDTH = 1600;
 
-const E_BOOKLET_UPLOAD_DIR = path.resolve(
-  process.env.E_BOOKLET_UPLOAD_DIR || process.cwd(),
-  process.env.E_BOOKLET_UPLOAD_DIR ? "" : "uploads/e-booklets/private",
-);
+const E_BOOKLET_UPLOAD_DIR = resolveEBookletUploadRoot();
 
 function runCommand(command: string, args: string[]): Promise<void> {
   return new Promise((resolve, reject) => {

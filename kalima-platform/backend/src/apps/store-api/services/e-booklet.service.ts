@@ -15,6 +15,7 @@ import {
 import { generateInviteToken, hashInviteToken } from "../utils/e-booklet-token";
 import { EBookletPagePreviewService } from "./e-booklet-page-preview.service";
 import { emitNotificationToUser } from "../../../libs/redis/socketNotificationEmitter";
+import { resolveEBookletUploadRoot } from "../../../libs/uploadsRoot";
 
 type EBookletDb = PrismaClient | any;
 const execFileAsync = promisify(execFile);
@@ -163,10 +164,7 @@ function assertTemplateReleased(template: { release_at?: Date | string | null; t
   }
 }
 
-const E_BOOKLET_UPLOAD_DIR = path.resolve(
-  process.env.E_BOOKLET_UPLOAD_DIR || process.cwd(),
-  process.env.E_BOOKLET_UPLOAD_DIR ? "" : "uploads/e-booklets/private",
-);
+const E_BOOKLET_UPLOAD_DIR = resolveEBookletUploadRoot();
 const PASSCODE_BLOCK_MESSAGE = "Invalid e-booklet invite passcode.";
 const PASSCODE_MAX_FAILURES = 5;
 const PASSCODE_WINDOW_MS = 10 * 60 * 1000;

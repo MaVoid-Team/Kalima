@@ -1,5 +1,7 @@
 import path from "path";
 import {
+  resolveEBookletStoragePath,
+  resolveEBookletUploadRoot,
   resolveUploadedUrlPath,
   resolveUploadPath,
   resolveUploadsRoot,
@@ -7,12 +9,18 @@ import {
 
 describe("uploadsRoot", () => {
   const originalUploadsDir = process.env.UPLOADS_DIR;
+  const originalEBookletUploadDir = process.env.E_BOOKLET_UPLOAD_DIR;
 
   afterEach(() => {
     if (originalUploadsDir === undefined) {
       delete process.env.UPLOADS_DIR;
     } else {
       process.env.UPLOADS_DIR = originalUploadsDir;
+    }
+    if (originalEBookletUploadDir === undefined) {
+      delete process.env.E_BOOKLET_UPLOAD_DIR;
+    } else {
+      process.env.E_BOOKLET_UPLOAD_DIR = originalEBookletUploadDir;
     }
   });
 
@@ -39,6 +47,32 @@ describe("uploadsRoot", () => {
 
     expect(resolveUploadedUrlPath("/uploads/images/example.webp")).toBe(
       path.resolve("custom-uploads/images/example.webp"),
+    );
+  });
+
+  it("defaults private e-booklet uploads under the upload root", () => {
+    process.env.UPLOADS_DIR = "custom-uploads";
+    delete process.env.E_BOOKLET_UPLOAD_DIR;
+
+    expect(resolveEBookletUploadRoot()).toBe(
+      path.resolve("custom-uploads/e-booklets/private"),
+    );
+  });
+
+  it("uses an explicit private e-booklet upload root when configured", () => {
+    process.env.E_BOOKLET_UPLOAD_DIR = "private-ebooks";
+
+    expect(resolveEBookletUploadRoot()).toBe(path.resolve("private-ebooks"));
+  });
+
+  it("resolves private e-booklet storage keys with and without legacy prefixes", () => {
+    process.env.UPLOADS_DIR = "custom-uploads";
+
+    expect(resolveEBookletStoragePath("asset.pdf")).toBe(
+      path.resolve("custom-uploads/e-booklets/private/asset.pdf"),
+    );
+    expect(resolveEBookletStoragePath("e-booklets/private/asset.pdf")).toBe(
+      path.resolve("custom-uploads/e-booklets/private/asset.pdf"),
     );
   });
 });
