@@ -6,16 +6,14 @@ import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
 import { images, image_mime_type_enum } from "../generated/prisma/client";
 import { NotFoundError, BadRequestError } from "../../../libs/errors";
+import { resolveUploadedUrlPath, resolveUploadPath } from "../../../libs/uploadsRoot";
 
 // ============================================
 // CONSTANTS
 // ============================================
 
 /** All images go into a single flat folder */
-const UPLOAD_ROOT = process.env.UPLOADS_DIR
-  ? path.resolve(process.env.UPLOADS_DIR)
-  : path.resolve(process.cwd(), "uploads");
-const UPLOAD_DIR = path.join(UPLOAD_ROOT, "images");
+const UPLOAD_DIR = resolveUploadPath("images");
 
 /** Maps browser mime types → our DB enum */
 const MIME_TO_ENUM: Record<string, image_mime_type_enum> = {
@@ -190,8 +188,7 @@ class ImageService {
    * Does not throw if the file doesn't exist (already cleaned up).
    */
   removeFileFromDisk(url: string): void {
-    const relativePath = url.replace(/^\/?uploads\//, "");
-    const absolutePath = path.resolve(UPLOAD_ROOT, relativePath);
+    const absolutePath = resolveUploadedUrlPath(url);
     void fsPromises.unlink(absolutePath).catch(() => {});
   }
 
