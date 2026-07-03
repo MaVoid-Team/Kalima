@@ -466,7 +466,7 @@ export default function CreateProductPage() {
             try {
                 const sampleRes = await createSample(sampleSectionId, sampleFD, (ev) => {
                     if (ev.total) setUploadProgress(Math.round((ev.loaded * 100) / ev.total));
-                });
+                }, abortCtrl.signal);
                 if (sampleRes?.success) {
                     toast.success(t('products.create.sampleSuccess'));
                 } else {
