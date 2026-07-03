@@ -243,7 +243,7 @@ export function useAdminSampleSections() {
 
             return createRes;
         } catch (error) {
-            if (createdSample?.id && error?.name !== 'AbortError' && error?.code !== 'ERR_CANCELED') {
+            if (createdSample?.id) {
                 await apiMutate({
                     endpoint: `/sample-sections/${sectionId}/samples/${createdSample.id}`,
                     method: 'delete',
