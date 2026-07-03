@@ -220,9 +220,12 @@ describe("e-booklet routes", () => {
     ]);
     mockService.getPublicPreviewHotspotContent.mockResolvedValue({
       id: 77,
-      type: "text",
-      title: "Sample note",
-      content_json: { version: 2, blocks: [{ type: "text", text_content: "Preview answer" }] },
+      type: "video",
+      title: "Sample video",
+      content_json: {
+        version: 2,
+        blocks: [{ type: "video", source: "youtube", provider: "youtube", video_id: "dQw4w9WgXcQ" }],
+      },
       is_locked: false,
     });
 
@@ -256,8 +259,13 @@ describe("e-booklet routes", () => {
         expect(res.body.data).toEqual(expect.objectContaining({
           id: 77,
           is_locked: false,
-          content_json: { version: 2, blocks: [{ type: "text", text_content: "Preview answer" }] },
+          content_json: {
+            version: 2,
+            blocks: [{ type: "video", source: "youtube", provider: "youtube", video_id: "dQw4w9WgXcQ" }],
+          },
         }));
+        expect(JSON.stringify(res.body.data)).not.toContain("youtube.com");
+        expect(JSON.stringify(res.body.data)).not.toContain("youtube_url");
       });
 
     expect(mockService.getPublicPreviewMetadata).toHaveBeenCalledWith(10);
@@ -679,6 +687,37 @@ describe("e-booklet routes", () => {
     expect(mockService.getPublicViewerPage).toHaveBeenCalledWith(10, 1);
   });
 
+  test("marks viewer hotspot content as private no-store and returns sanitized YouTube blocks", async () => {
+    mockService.getPublicHotspotContent.mockResolvedValue({
+      id: 77,
+      type: "video",
+      content_json: {
+        version: 2,
+        blocks: [{ type: "video", source: "youtube", provider: "youtube", video_id: "dQw4w9WgXcQ" }],
+      },
+    });
+
+    await request(app)
+      .get("/api/v2/e-booklet-viewer/10/hotspots/77/content")
+      .set("Authorization", `Bearer ${tokenFor("Student", 55)}`)
+      .expect(200)
+      .expect("Cache-Control", "private, no-store")
+      .expect("Pragma", "no-cache")
+      .expect("Expires", "0")
+      .expect((res) => {
+        expect(res.body.data.content_json.blocks[0]).toEqual({
+          type: "video",
+          source: "youtube",
+          provider: "youtube",
+          video_id: "dQw4w9WgXcQ",
+        });
+        expect(JSON.stringify(res.body.data)).not.toContain("youtube.com");
+        expect(JSON.stringify(res.body.data)).not.toContain("youtube_url");
+      });
+
+    expect(mockService.getPublicHotspotContent).toHaveBeenCalledWith(10, 77);
+  });
+
   test("propagates public viewer metadata availability errors", async () => {
     const error: any = new Error("This e-booklet is not available until payment is confirmed and customization is complete.");
     error.statusCode = 403;
@@ -779,7 +818,14 @@ describe("e-booklet routes", () => {
     mockService.getAdminViewerMetadata.mockResolvedValue({ admin_view_mode: true, booklet_instance_id: 10 });
     mockService.getAdminViewerPage.mockResolvedValue({ pageNumber: 1, adminViewMode: true });
     mockService.getAdminViewerPageHotspots.mockResolvedValue([{ id: 77, title: "Intro" }]);
-    mockService.getAdminHotspotContent.mockResolvedValue({ id: 77, title: "Intro" });
+    mockService.getAdminHotspotContent.mockResolvedValue({
+      id: 77,
+      title: "Intro",
+      content_json: {
+        version: 2,
+        blocks: [{ type: "video", source: "youtube", provider: "youtube", video_id: "dQw4w9WgXcQ" }],
+      },
+    });
 
     await request(app)
       .get("/api/v2/admin/e-booklet-viewer/10/metadata")
@@ -801,7 +847,18 @@ describe("e-booklet routes", () => {
     await request(app)
       .get("/api/v2/admin/e-booklet-viewer/10/hotspots/77/content")
       .set("Authorization", `Bearer ${tokenFor("Admin", 1)}`)
-      .expect(200);
+      .expect(200)
+      .expect("Cache-Control", "private, no-store")
+      .expect((res) => {
+        expect(res.body.data.content_json.blocks[0]).toEqual({
+          type: "video",
+          source: "youtube",
+          provider: "youtube",
+          video_id: "dQw4w9WgXcQ",
+        });
+        expect(JSON.stringify(res.body.data)).not.toContain("youtube.com");
+        expect(JSON.stringify(res.body.data)).not.toContain("youtube_url");
+      });
 
     await request(app)
       .get("/api/v2/admin/e-booklet-viewer/10/hotspots/77/content")
