@@ -55,13 +55,16 @@ function addPrivateEBookletRef(
   storageKey: string | null | undefined,
 ): void {
   if (!storageKey || storageKey.includes("..")) return;
+  const absolutePath = storageKey.startsWith("e-booklets/private/")
+    ? path.join(resolveUploadsRoot(), storageKey)
+    : path.join(resolveEBookletUploadRoot(), storageKey);
 
   refs.push({
     area: "e_booklet_file_assets.private",
     id: String(id),
     url: storageKey,
     relativePath: storageKey,
-    absolutePath: path.join(resolveEBookletUploadRoot(), storageKey),
+    absolutePath,
   });
 }
 
