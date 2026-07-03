@@ -6,6 +6,7 @@
  *
  * Query params accepted:
  *   format  – "csv" | "xlsx" (required)
+ *   lang    – "ar" | "en" (optional, controls localized headers)
  *   ids     – comma-separated integers (optional, for selected rows)
  *   *       – any other query params are forwarded as dynamic filters
  *            (each resource defines which filters it supports)
@@ -39,7 +40,7 @@ function parseIds(raw: unknown): number[] | undefined {
 function parseQueryFilters(
   query: Record<string, unknown>,
 ): Record<string, unknown> {
-  const reserved = new Set(["format", "ids"]);
+  const reserved = new Set(["format", "ids", "lang", "rtl"]);
   const filters: Record<string, unknown> = {};
 
   for (const [key, raw] of Object.entries(query)) {
@@ -84,12 +85,15 @@ export function makeExportHandler(resourceName: string) {
 
       const ids = parseIds(req.query.ids);
       const filters = parseQueryFilters(req.query as Record<string, unknown>);
+      const lang = typeof req.query.lang === "string" ? req.query.lang : undefined;
+      const rtl = req.query.rtl === "true" || lang?.toLowerCase().startsWith("ar");
 
       const result = await exportResource(
         resourceName,
         format as ExportFormat,
         ids,
         filters,
+        { locale: lang, rtl },
       );
 
       res.setHeader("Content-Type", result.contentType);

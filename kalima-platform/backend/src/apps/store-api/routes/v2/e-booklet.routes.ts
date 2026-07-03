@@ -251,6 +251,11 @@ router.get(
   ...adminAuth,
   eBookletController.listInstances,
 );
+router.get(
+  "/admin/e-booklet-instances/export",
+  ...adminAuth,
+  makeExportHandler("admin/e-booklet-instances"),
+);
 router.post(
   "/admin/e-booklet-instances/:id/update-quota",
   ...adminAuth,

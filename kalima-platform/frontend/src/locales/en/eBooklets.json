@@ -561,7 +561,10 @@
       "copyGeneratedCodes": "Copy generated codes",
       "generatedNow": "Generated now",
       "redemptions": "Redemptions",
-      "noAccessCodes": "No access codes generated yet."
+      "noAccessCodes": "No access codes generated yet.",
+      "exportExcel": "Export Excel",
+      "exportArabicRtl": "Arabic RTL Excel",
+      "exportEnglish": "English Excel"
     },
     "students": {
       "title": "E-Booklet Students",
@@ -657,6 +660,10 @@
       "teacherId": "Teacher #{{id}}",
       "claimed": "Claimed",
       "unclaimed": "Unclaimed",
+      "loadError": "Could not load e-booklet terms and milestones. Check that the backend API is running and reachable.",
+      "loadErrorStatus": "Request failed with HTTP {{status}} from {{server}}.",
+      "loadErrorNetwork": "The request did not receive a response from the backend.",
+      "unknownServer": "unknown server",
       "deleteMilestoneConfirm": "Delete this milestone? This cannot be undone."
     },
     "settings": {

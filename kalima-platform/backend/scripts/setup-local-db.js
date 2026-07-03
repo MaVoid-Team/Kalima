@@ -43,6 +43,9 @@ async function main() {
 
   console.log("Creating local admin...");
   run("node", ["scripts/seed-local-admin.js"]);
+
+  console.log("Creating local e-booklet terms...");
+  run("node", ["scripts/seed-local-e-booklet-terms.js"]);
 }
 
 main().catch((error) => {

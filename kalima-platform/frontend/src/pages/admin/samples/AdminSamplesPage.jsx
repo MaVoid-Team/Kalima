@@ -1,10 +1,24 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Folder, Plus, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Download, Folder, Plus, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -16,6 +30,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
+import useExport from '@/hooks/useExport';
 import SampleSectionDialog from '@/components/admin/samples/SampleSectionDialog';
 import SampleDialog from '@/components/admin/samples/SampleDialog';
 import { toast } from 'sonner';
@@ -23,9 +38,11 @@ import { toast } from 'sonner';
 export default function AdminSamplesPage() {
     const { t, i18n } = useTranslation('admin');
     const { sections, loading, fetchSections, createSection, updateSection, deleteSection, createSample } = useAdminSampleSections();
+    const { exportData, loading: exportLoading, exportProgress } = useExport();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingSection, setEditingSection] = useState(null);
+    const [exportLanguage, setExportLanguage] = useState(i18n.language?.startsWith('en') ? 'en' : 'ar');
 
     const [isSampleDialogOpen, setIsSampleDialogOpen] = useState(false);
 
@@ -82,6 +99,15 @@ export default function AdminSamplesPage() {
         return false;
     };
 
+    const handleExport = (format) => {
+        exportData({
+            resource: 'samples',
+            format,
+            lang: exportLanguage,
+            rtl: exportLanguage === 'ar',
+        });
+    };
+
     return (
         <div className="space-y-6" data-testid="admin-sample-sections-page">
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
@@ -89,7 +115,32 @@ export default function AdminSamplesPage() {
                     <h1 className="text-2xl font-bold tracking-tight">{t('samples.sections.title', 'Sample Sections')}</h1>
                     <p className="text-muted-foreground text-sm mt-1">{t('samples.sections.subtitle', 'Manage sample sections to organize your samples.')}</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
+                    <Select value={exportLanguage} onValueChange={setExportLanguage} dir={i18n.dir()}>
+                        <SelectTrigger className="h-9 min-w-[124px]" data-testid="samples-export-language">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent align="end">
+                            <SelectItem value="ar">{t('samples.sections.exportArabic', 'Arabic')}</SelectItem>
+                            <SelectItem value="en">{t('samples.sections.exportEnglish', 'English')}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <DropdownMenu dir={i18n.dir()}>
+                        <DropdownMenuTrigger asChild>
+                            <Button disabled={exportLoading} variant="outline" data-testid="samples-export-button">
+                                <Download className="me-2 h-4 w-4" />
+                                {t('samples.sections.export', 'Export')}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleExport('csv')} disabled={exportLoading} data-testid="samples-export-csv">
+                                {t('samples.sections.exportCsv', 'Export as CSV')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleExport('xlsx')} disabled={exportLoading} data-testid="samples-export-excel">
+                                {t('samples.sections.exportXlsx', 'Export as Excel')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     <Button variant="outline" onClick={() => setIsSampleDialogOpen(true)} data-testid="samples-add-button">
                         <Plus className="me-2 h-4 w-4" />
                         {t('samples.sections.addSample', 'Add Sample')}
@@ -100,6 +151,16 @@ export default function AdminSamplesPage() {
                     </Button>
                 </div>
             </div>
+
+            {exportLoading && exportProgress > 0 && (
+                <div>
+                    <div className="flex justify-between text-sm mb-1 text-muted-foreground">
+                        <span>{exportProgress < 100 ? t('export.exporting', 'Exporting...') : t('export.processing', 'Processing...')}</span>
+                        <span>{exportProgress}%</span>
+                    </div>
+                    <Progress value={exportProgress} />
+                </div>
+            )}
 
             {loading && sections.length === 0 ? (
                 <div className="space-y-3">

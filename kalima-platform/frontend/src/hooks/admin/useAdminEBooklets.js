@@ -767,25 +767,37 @@ export function useAdminEBookletTermsMilestones() {
     }
   }, []);
 
-  const fetchTerms = useCallback(async (filters = {}) => {
+  const fetchTerms = useCallback(async (filters = {}, options = {}) => {
     const query = new URLSearchParams();
     if (filters.status && filters.status !== "all") query.set("status", filters.status);
     if (filters.templateId !== undefined) query.set("template_id", filters.templateId === null ? "null" : String(filters.templateId));
-    const response = await fetchApi({ endpoint: `/admin/e-booklet-terms${query.toString() ? `?${query.toString()}` : ""}`, method: "get" }, false);
+    const response = await fetchApi({
+      endpoint: `/admin/e-booklet-terms${query.toString() ? `?${query.toString()}` : ""}`,
+      method: "get",
+      suppressErrorToast: Boolean(options.suppressErrorToast),
+    }, false);
     setTerms(Array.isArray(response?.data) ? response.data : []);
     return response;
   }, [fetchApi]);
 
-  const fetchMilestones = useCallback(async (termId) => {
+  const fetchMilestones = useCallback(async (termId, options = {}) => {
     const query = termId ? `?term_id=${termId}` : "";
-    const response = await fetchApi({ endpoint: `/admin/e-booklet-milestones${query}`, method: "get" }, false);
+    const response = await fetchApi({
+      endpoint: `/admin/e-booklet-milestones${query}`,
+      method: "get",
+      suppressErrorToast: Boolean(options.suppressErrorToast),
+    }, false);
     setMilestones(Array.isArray(response?.data) ? response.data : []);
     return response;
   }, [fetchApi]);
 
-  const fetchProgress = useCallback(async (termId) => {
+  const fetchProgress = useCallback(async (termId, options = {}) => {
     const query = termId ? `?term_id=${termId}` : "";
-    const response = await fetchApi({ endpoint: `/admin/e-booklet-progress${query}`, method: "get" }, false);
+    const response = await fetchApi({
+      endpoint: `/admin/e-booklet-progress${query}`,
+      method: "get",
+      suppressErrorToast: Boolean(options.suppressErrorToast),
+    }, false);
     setProgress(response?.data || { paidRedemptions: 0, achievements: [] });
     return response;
   }, [fetchApi]);
@@ -821,8 +833,12 @@ export function useAdminEBookletSettings() {
   const { mutate: fetchApi, loading } = useApiMutation();
   const [settings, setSettings] = useState(null);
 
-  const fetchSettings = useCallback(async () => {
-    const response = await fetchApi({ endpoint: "/admin/e-booklet-settings", method: "get" }, false);
+  const fetchSettings = useCallback(async (options = {}) => {
+    const response = await fetchApi({
+      endpoint: "/admin/e-booklet-settings",
+      method: "get",
+      suppressErrorToast: Boolean(options.suppressErrorToast),
+    }, false);
     setSettings(response?.data || null);
     return response;
   }, [fetchApi]);

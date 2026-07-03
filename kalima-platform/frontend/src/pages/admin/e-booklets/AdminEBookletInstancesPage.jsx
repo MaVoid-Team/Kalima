@@ -1,11 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { BookOpenCheck, ChevronDown, ChevronRight, Copy, Eye, HardDrive, KeyRound, RefreshCcw, Save, ShieldOff, Users } from "lucide-react";
+import { BookOpenCheck, ChevronRight, Copy, Download, Eye, HardDrive, KeyRound, RefreshCcw, Save, ShieldOff, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAdminEBookletInstances, useAdminEBookletTermsMilestones } from "@/hooks/admin/useAdminEBooklets";
+import useExport from "@/hooks/useExport";
 import { useTranslation } from "react-i18next";
 import AdminEBookletStudentDevicePanel from "./AdminEBookletStudentDevicePanel";
 
@@ -19,6 +27,8 @@ const optionalNumberValue = (value) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 };
+
+const getEBookletTitle = (instance, fallback) => instance.template?.title || instance.display_title || fallback;
 
 const pageMotion = {
   hidden: { opacity: 0, y: 8 },
@@ -45,6 +55,7 @@ export default function AdminEBookletInstancesPage() {
   const { t, i18n } = useTranslation("eBooklets");
   const { instances, pagination, status, loading, fetchInstances, setStatus, setPage, updateQuota, revokeTeacherAccess, listAccessCodes, generateAccessCodes } = useAdminEBookletInstances();
   const { terms, fetchTerms } = useAdminEBookletTermsMilestones();
+  const { exportData, loading: exportLoading, exportProgress } = useExport();
   const [quotaDrafts, setQuotaDrafts] = useState({});
   const [expandedInstanceKey, setExpandedInstanceKey] = useState(null);
   const [expandedDeviceKey, setExpandedDeviceKey] = useState(null);
@@ -166,6 +177,16 @@ export default function AdminEBookletInstancesPage() {
     await navigator.clipboard?.writeText(text);
   };
 
+  const handleExport = (lang = "ar") => {
+    exportData({
+      resource: "admin/e-booklet-instances",
+      format: "xlsx",
+      filters: status && status !== "all" ? { status } : {},
+      lang,
+      rtl: lang === "ar",
+    });
+  };
+
 
   return (
     <motion.div className="space-y-4" data-testid="admin-e-booklet-instances-page" variants={pageMotion} initial="hidden" animate="show">
@@ -185,12 +206,37 @@ export default function AdminEBookletInstancesPage() {
               <option value="archived">{t("statuses.archived")}</option>
               <option value="revoked">{t("statuses.revoked")}</option>
             </select>
+            <DropdownMenu dir={i18n.dir()}>
+              <DropdownMenuTrigger asChild>
+                <Button type="button" variant="outline" className="rounded-xl" disabled={exportLoading} data-testid="admin-e-booklet-access-export-button">
+                  <Download className="h-4 w-4" />
+                  {t("admin.instances.exportExcel", { defaultValue: "Export Excel" })}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleExport("ar")} disabled={exportLoading} data-testid="admin-e-booklet-access-export-ar">
+                  {t("admin.instances.exportArabicRtl", { defaultValue: "Arabic RTL Excel" })}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport("en")} disabled={exportLoading} data-testid="admin-e-booklet-access-export-en">
+                  {t("admin.instances.exportEnglish", { defaultValue: "English Excel" })}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button type="button" variant="outline" className="rounded-xl" onClick={() => fetchInstances()} disabled={loading}>
               <RefreshCcw className="h-4 w-4" />
               {t("common.refresh")}
             </Button>
           </div>
         </div>
+        {exportLoading && exportProgress > 0 && (
+          <div className="mt-4">
+            <div className="mb-1 flex justify-between text-sm text-muted-foreground">
+              <span>{t("export.exporting", { defaultValue: "Exporting..." })}</span>
+              <span>{exportProgress}%</span>
+            </div>
+            <Progress value={exportProgress} />
+          </div>
+        )}
         <div className="mt-4 grid gap-2 sm:grid-cols-4">
           <div className="rounded-xl bg-muted/50 px-3 py-2 text-sm"><span className="font-semibold">{summary.total}</span> {t("admin.instances.totalAccess", { defaultValue: "total access" })}</div>
           <div className="rounded-xl bg-muted/50 px-3 py-2 text-sm"><span className="font-semibold text-emerald-600">{summary.active}</span> {t("statuses.active")}</div>
@@ -230,6 +276,7 @@ export default function AdminEBookletInstancesPage() {
                     const quotaPercent = quota > 0 ? Math.min(100, Math.round((usedSeats / quota) * 100)) : 0;
                     const accessExpanded = expandedAccessKey === instance.id;
                     const instanceExpanded = expandedInstanceKey === instance.id;
+                    const eBookletTitle = getEBookletTitle(instance, t("common.eBooklet"));
 
                     return (
                       <motion.article key={instance.id} className="bg-card" variants={rowMotion} layout="position">
@@ -239,7 +286,7 @@ export default function AdminEBookletInstancesPage() {
                               <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                             </motion.span>
                             <div className="min-w-0">
-                              <div className="truncate text-sm font-semibold">{instance.display_title || instance.template?.title || t("common.eBooklet")}</div>
+                              <div className="truncate text-sm font-semibold" title={eBookletTitle}>{eBookletTitle}</div>
                               <div className="truncate text-xs text-muted-foreground">{instance.template_version?.version_label || instance.template_version?.version_number || t("common.version")}</div>
                             </div>
                           </div>

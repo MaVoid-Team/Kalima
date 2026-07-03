@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CalendarRange, CheckCircle2, FileText, GripVertical, ListChecks, Medal, RefreshCcw, Save, ShieldCheck, Trash2 } from "lucide-react";
+import { AlertCircle, CalendarRange, CheckCircle2, FileText, GripVertical, ListChecks, Medal, RefreshCcw, Save, ShieldCheck, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -127,6 +129,7 @@ export default function AdminEBookletTermsMilestonesPage() {
   const [termForm, setTermForm] = useState(emptyTermForm);
   const [milestoneForm, setMilestoneForm] = useState(emptyMilestoneForm);
   const [activePanel, setActivePanel] = useState("milestones");
+  const [loadError, setLoadError] = useState(null);
   const defaultRewardExpiryDays = rewardExpiryDaysFromSettings(settings);
 
   const activeTerms = useMemo(() => terms.filter((term) => term.status === "active"), [terms]);
@@ -141,10 +144,31 @@ export default function AdminEBookletTermsMilestonesPage() {
   }, [milestones, selectedTerm, selectedTermId]);
 
   const reload = useCallback(async () => {
-    await Promise.all([fetchTerms(), fetchSettings()]);
-    const termId = selectedTermId === "all" ? undefined : selectedTermId;
-    await Promise.all([fetchMilestones(termId), fetchProgress(termId)]);
-  }, [fetchMilestones, fetchProgress, fetchSettings, fetchTerms, selectedTermId]);
+    const silentLoadOptions = { suppressErrorToast: true };
+    try {
+      setLoadError(null);
+      await Promise.all([fetchTerms({}, silentLoadOptions), fetchSettings(silentLoadOptions)]);
+      const termId = selectedTermId === "all" ? undefined : selectedTermId;
+      await Promise.all([fetchMilestones(termId, silentLoadOptions), fetchProgress(termId, silentLoadOptions)]);
+    } catch (error) {
+      const status = error?.response?.status;
+      const server = error?.response?.headers?.server;
+      const message = t("admin.termsMilestones.loadError", {
+        defaultValue: "Could not load e-booklet terms and milestones. Check that the backend API is running and reachable.",
+      });
+      const detail = status
+        ? t("admin.termsMilestones.loadErrorStatus", {
+          status,
+          server: server || t("admin.termsMilestones.unknownServer", { defaultValue: "unknown server" }),
+          defaultValue: "Request failed with HTTP {{status}} from {{server}}.",
+        })
+        : t("admin.termsMilestones.loadErrorNetwork", {
+          defaultValue: "The request did not receive a response from the backend.",
+        });
+      setLoadError({ message, detail });
+      toast.error(message, { description: detail });
+    }
+  }, [fetchMilestones, fetchProgress, fetchSettings, fetchTerms, selectedTermId, t]);
 
   useEffect(() => {
     reload();
@@ -301,6 +325,14 @@ export default function AdminEBookletTermsMilestonesPage() {
           </Button>
         </div>
       </section>
+
+      {loadError && (
+        <Alert variant="destructive" data-testid="admin-e-booklet-terms-milestones-load-error">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>{loadError.message}</AlertTitle>
+          <AlertDescription>{loadError.detail}</AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid gap-3 md:grid-cols-3">
         <SummaryMetric icon={CalendarRange} label={t("admin.termsMilestones.activeTerms")} value={activeTerms.length} />

@@ -26,7 +26,12 @@ function joinList(items: { title?: string; name?: string }[]): string {
 export interface ExportMapper<T = any> {
   columns: string[];
   headers: string[];
+  headersByLocale?: Record<string, string[]>;
   toRow: (record: T) => Record<string, unknown>;
+  localizeRow?: (
+    row: Record<string, unknown>,
+    locale?: string,
+  ) => Record<string, unknown>;
 }
 
 // ─── Products ──────────────────────────────────────────────────────────
@@ -194,27 +199,189 @@ export const eBookletPurchaseMapper: ExportMapper = {
   },
 };
 
+// ─── E-booklet Teacher Access ─────────────────────────────────────────
+
+export const eBookletAccessMapper: ExportMapper = {
+  columns: [
+    "teacher_id", "teacher_name", "teacher_email", "teacher_phone",
+    "instance_id", "instance_status", "e_booklet_title", "template_title",
+    "version", "purchase_id", "purchase_status", "teacher_price",
+    "student_marketing_price", "internal_price", "currency", "payment_method",
+    "payment_reference", "invite_quota", "used_student_seats",
+    "active_instance_devices", "access_expires_at", "instance_created_at",
+    "student_access_id", "student_id", "student_name", "student_email",
+    "student_phone", "student_access_status", "student_access_source",
+    "student_granted_at", "student_revoked_at", "student_terms_accepted_at",
+    "allowed_devices", "active_student_devices", "total_student_devices",
+    "student_last_seen_at", "viewer_opens", "pages_viewed", "device_binds",
+    "invite_redemption_id", "access_code_redemption_id", "redemption_source",
+    "redemption_purchase_id", "redemption_counted_for_progress",
+    "redemption_redeemed_at", "active_invites", "total_invites",
+    "invite_uses", "active_access_codes", "total_access_codes",
+    "paid_access_codes", "free_access_codes", "access_code_redemptions",
+    "access_code_hints", "required_fields", "admin_notes",
+  ],
+  headers: [
+    "Teacher ID", "Teacher Name", "Teacher Email", "Teacher Phone",
+    "Instance ID", "Instance Status", "E-booklet Title", "Template Title",
+    "Version", "Purchase ID", "Purchase Status", "Teacher Price",
+    "Student Marketing Price", "Internal Price", "Currency", "Payment Method",
+    "Payment Reference", "Invite Quota", "Used Student Seats",
+    "Active Instance Devices", "Access Expires At", "Instance Created At",
+    "Student Access ID", "Student ID", "Student Name", "Student Email",
+    "Student Phone", "Student Access Status", "Student Access Source",
+    "Student Granted At", "Student Revoked At", "Student Terms Accepted At",
+    "Allowed Devices", "Active Student Devices", "Total Student Devices",
+    "Student Last Seen At", "Viewer Opens", "Pages Viewed", "Device Binds",
+    "Invite Redemption ID", "Access Code Redemption ID", "Redemption Source",
+    "Redemption Purchase ID", "Redemption Counted For Progress",
+    "Redemption Redeemed At", "Active Invites", "Total Invites",
+    "Invite Uses", "Active Access Codes", "Total Access Codes",
+    "Paid Access Codes", "Free Access Codes", "Access Code Redemptions",
+    "Access Code Hints", "Required Fields", "Admin Notes",
+  ],
+  headersByLocale: {
+    ar: [
+      "معرف المعلم", "اسم المعلم", "بريد المعلم", "هاتف المعلم",
+      "معرف النسخة", "حالة النسخة", "عنوان المذكرة", "عنوان القالب",
+      "الإصدار", "معرف الطلب", "حالة الطلب", "سعر المعلم",
+      "سعر الطالب التسويقي", "السعر الداخلي", "العملة", "طريقة الدفع",
+      "مرجع الدفع", "حصة الدعوات", "مقاعد الطلاب المستخدمة",
+      "أجهزة النسخة النشطة", "انتهاء الوصول", "تاريخ إنشاء النسخة",
+      "معرف وصول الطالب", "معرف الطالب", "اسم الطالب", "بريد الطالب",
+      "هاتف الطالب", "حالة وصول الطالب", "مصدر وصول الطالب",
+      "تاريخ منح الوصول", "تاريخ إلغاء الوصول", "تاريخ قبول الشروط",
+      "الأجهزة المسموحة", "أجهزة الطالب النشطة", "إجمالي أجهزة الطالب",
+      "آخر ظهور للطالب", "مرات فتح العارض", "الصفحات المعروضة", "مرات ربط الجهاز",
+      "معرف استرداد الدعوة", "معرف استرداد كود الوصول", "مصدر الاسترداد",
+      "معرف طلب الاسترداد", "محسوب للتقدم",
+      "تاريخ الاسترداد", "الدعوات النشطة", "إجمالي الدعوات",
+      "استخدامات الدعوات", "أكواد الوصول النشطة", "إجمالي أكواد الوصول",
+      "أكواد مدفوعة", "أكواد مجانية", "استردادات أكواد الوصول",
+      "تلميحات الأكواد", "الحقول المطلوبة", "ملاحظات الإدارة",
+    ],
+    en: [
+      "Teacher ID", "Teacher Name", "Teacher Email", "Teacher Phone",
+      "Instance ID", "Instance Status", "E-booklet Title", "Template Title",
+      "Version", "Purchase ID", "Purchase Status", "Teacher Price",
+      "Student Marketing Price", "Internal Price", "Currency", "Payment Method",
+      "Payment Reference", "Invite Quota", "Used Student Seats",
+      "Active Instance Devices", "Access Expires At", "Instance Created At",
+      "Student Access ID", "Student ID", "Student Name", "Student Email",
+      "Student Phone", "Student Access Status", "Student Access Source",
+      "Student Granted At", "Student Revoked At", "Student Terms Accepted At",
+      "Allowed Devices", "Active Student Devices", "Total Student Devices",
+      "Student Last Seen At", "Viewer Opens", "Pages Viewed", "Device Binds",
+      "Invite Redemption ID", "Access Code Redemption ID", "Redemption Source",
+      "Redemption Purchase ID", "Redemption Counted For Progress",
+      "Redemption Redeemed At", "Active Invites", "Total Invites",
+      "Invite Uses", "Active Access Codes", "Total Access Codes",
+      "Paid Access Codes", "Free Access Codes", "Access Code Redemptions",
+      "Access Code Hints", "Required Fields", "Admin Notes",
+    ],
+  },
+  toRow(r: any) {
+    return r;
+  },
+  localizeRow(row, locale) {
+    if (locale?.toLowerCase().split("-")[0] !== "ar") return row;
+    const yesNo = (value: unknown) => {
+      if (value === "Yes") return "نعم";
+      if (value === "No") return "لا";
+      return value;
+    };
+    return {
+      ...row,
+      redemption_counted_for_progress: yesNo(row.redemption_counted_for_progress),
+    };
+  },
+};
+
 // ─── Samples ───────────────────────────────────────────────────────────
 
 export const sampleMapper: ExportMapper = {
   columns: [
-    "id", "product_id", "product_title", "url", "original_name",
-    "mime_type", "size", "created_at",
+    "id", "title", "section_id", "section_title", "section_active",
+    "product_id", "product_title", "product_serial", "product_type",
+    "media_type", "original_name", "mime_type", "size_bytes",
+    "is_archived", "is_displayable", "thumbnail_url", "high_quality_url",
+    "low_quality_url", "created_at", "updated_at",
   ],
   headers: [
-    "ID", "Product ID", "Product Title", "URL", "Original Name",
-    "MIME Type", "Size (bytes)", "Created At",
+    "ID", "Title", "Section ID", "Section Title", "Section Active",
+    "Product ID", "Product Title", "Product Serial", "Product Type",
+    "Media Type", "Original Name", "MIME Type", "Size (bytes)",
+    "Archived", "Displayable", "Thumbnail URL", "High Quality URL",
+    "Low Quality URL", "Created At", "Updated At",
   ],
+  headersByLocale: {
+    ar: [
+      "المعرف", "عنوان العينة", "معرف القسم", "اسم القسم", "القسم نشط",
+      "معرف المنتج", "اسم المنتج", "كود المنتج", "نوع المنتج",
+      "نوع الوسائط", "اسم الملف الأصلي", "نوع MIME", "الحجم بالبايت",
+      "مؤرشف", "قابل للعرض", "رابط الصورة المصغرة", "رابط الجودة العالية",
+      "رابط الجودة المنخفضة", "تاريخ الإنشاء", "تاريخ التحديث",
+    ],
+    en: [
+      "ID", "Title", "Section ID", "Section Title", "Section Active",
+      "Product ID", "Product Title", "Product Serial", "Product Type",
+      "Media Type", "Original Name", "MIME Type", "Size (bytes)",
+      "Archived", "Displayable", "Thumbnail URL", "High Quality URL",
+      "Low Quality URL", "Created At", "Updated At",
+    ],
+  },
   toRow(r: any) {
+    const displayableTypes = new Set(["pdf", "image", "video"]);
+    const mediaType = r.media_type ?? "";
     return {
       id: r.id,
+      title: r.title ?? "",
+      section_id: r.section_id ?? "",
+      section_title: r.sample_sections?.title ?? "",
+      section_active: r.sample_sections?.active ? "Yes" : "No",
       product_id: r.product_id ?? "",
       product_title: r.products?.title ?? "",
-      url: r.url ?? "",
+      product_serial: r.products?.serial ?? "",
+      product_type: r.products?.type ?? "",
+      media_type: mediaType,
       original_name: r.original_name ?? "",
       mime_type: r.mime_type ?? "",
-      size: r.size ?? "",
+      size_bytes: r.size ?? "",
+      is_archived: r.is_archived ? "Yes" : "No",
+      is_displayable: displayableTypes.has(mediaType) ? "Yes" : "No",
+      thumbnail_url: r.thumbnail_url ?? "",
+      high_quality_url: r.high_quality_url ?? "",
+      low_quality_url: r.low_quality_url ?? "",
       created_at: iso(r.created_at),
+      updated_at: iso(r.updated_at),
+    };
+  },
+  localizeRow(row, locale) {
+    if (locale?.toLowerCase().split("-")[0] !== "ar") return row;
+
+    const yesNo = (value: unknown) => {
+      if (value === "Yes") return "نعم";
+      if (value === "No") return "لا";
+      return value;
+    };
+
+    const mediaTypes: Record<string, string> = {
+      pdf: "ملف PDF",
+      image: "صورة",
+      video: "فيديو",
+      word: "ملف Word",
+      powerpoint: "ملف PowerPoint",
+      audio: "ملف صوتي",
+    };
+
+    return {
+      ...row,
+      section_active: yesNo(row.section_active),
+      media_type: typeof row.media_type === "string"
+        ? mediaTypes[row.media_type] ?? row.media_type
+        : row.media_type,
+      is_archived: yesNo(row.is_archived),
+      is_displayable: yesNo(row.is_displayable),
     };
   },
 };

@@ -392,7 +392,15 @@
       "uploading": "جاري رفع الوسائط...",
       "processing": "جاري المعالجة...",
       "sampleUploading": "جاري رفع العينة...",
-      "sampleSuccess": "تم رفع العينة بنجاح!"
+      "sampleSuccess": "تم رفع العينة بنجاح!",
+      "status": {
+        "complete": "مكتمل",
+        "required": "مطلوب",
+        "selected": "تم الاختيار",
+        "optional": "اختياري",
+        "added": "تمت الإضافة",
+        "enabled": "مفعل"
+      }
     },
     "edit": {
       "dialogTitle": "تعديل المنتج",
@@ -603,6 +611,11 @@
       "notFound": "قسم العينة غير موجود.",
       "backToSections": "العودة للأقسام",
       "manageSamples": "العينات",
+      "export": "تصدير",
+      "exportCsv": "تصدير كـ CSV",
+      "exportXlsx": "تصدير كـ Excel",
+      "exportArabic": "العربية",
+      "exportEnglish": "الإنجليزية",
       "sampleRemoved": "تمت إزالة العينة بنجاح",
       "sampleAdded": "تمت إضافة العينة بنجاح",
       "sampleUpdated": "تم تحديث العينة بنجاح",

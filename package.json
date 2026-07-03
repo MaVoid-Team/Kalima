@@ -1,8 +1,8 @@
 {
   "scripts": {
     "dev": "concurrently -n backend,frontend -c blue,green \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "PORT=5000 npm --prefix kalima-platform/backend run dev",
-    "dev:frontend": "npm --prefix kalima-platform/frontend run dev -- --host 0.0.0.0"
+    "dev:backend": "npm --prefix kalima-platform/backend run dev:local",
+    "dev:frontend": "VITE_API_URL=/api/v2 VITE_API_PROXY_TARGET=http://localhost:5001 npm --prefix kalima-platform/frontend run dev -- --host 0.0.0.0"
   },
   "dependencies": {
     "date-fns": "^4.1.0"
