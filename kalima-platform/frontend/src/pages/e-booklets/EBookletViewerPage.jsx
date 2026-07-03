@@ -15,6 +15,7 @@ import {
   Link as LinkIcon,
   Lock,
   Maximize2,
+  Minimize2,
   Music,
   PlaySquare,
   HelpCircle,
@@ -32,6 +33,13 @@ import { useEBookletViewer } from "@/hooks/useEBookletAccess";
 import { normalizeHotspotGeometry } from "@/utils/eBookletHotspotGeometry";
 import { DEFAULT_E_BOOKLET_HOTSPOT_COLOR, getHotspotGlowLayerStyle } from "@/utils/eBookletHotspotStyle";
 import { useTranslation } from "react-i18next";
+import { MediaPlayer, MediaProvider } from "@vidstack/react";
+import {
+  DefaultVideoLayout,
+  defaultLayoutIcons,
+} from "@vidstack/react/player/layouts/default";
+import "@vidstack/react/player/styles/default/theme.css";
+import "@vidstack/react/player/styles/default/layouts/video.css";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc ||= pdfWorkerUrl;
 
@@ -70,6 +78,8 @@ const CONFETTI_PIECES = [
   { x: 92, y: -102, rotate: -112, color: "bg-orange-400", delay: 0.06, size: "h-2 w-5" },
   { x: 126, y: -130, rotate: 76, color: "bg-cyan-400", delay: 0.03, size: "h-2 w-2" },
 ];
+const HOTSPOT_YOUTUBE_IFRAME_ALLOW =
+  "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
 
 const getHotspotColorClass = (hotspot) => {
   const color = hotspot?.display_behavior?.color;
@@ -133,17 +143,60 @@ const renderMixedFontText = (text, arabicFontFamily) => {
   });
 };
 
-const getYouTubeEmbedUrl = (url) => {
-  if (!url) return "";
+const getYouTubeVideoId = (value) => {
+  if (!value || typeof value !== "string") return "";
+  const trimmed = value.trim();
+  if (/^[a-zA-Z0-9_-]{6,}$/.test(trimmed) && !trimmed.includes("/")) return trimmed;
   try {
-    const parsed = new URL(url);
-    const videoId = parsed.hostname.includes("youtu.be")
-      ? parsed.pathname.replace("/", "")
-      : parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop();
-    return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : "";
+    const parsed = new URL(trimmed);
+    const host = parsed.hostname.toLowerCase();
+    if (!["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be", "www.youtube-nocookie.com"].includes(host)) return "";
+    if (host === "youtu.be") return parsed.pathname.split("/").filter(Boolean)[0] || "";
+    const queryVideoId = parsed.searchParams.get("v");
+    if (queryVideoId) return queryVideoId;
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    const videoPathIndex = parts.findIndex((part) => ["embed", "shorts", "live"].includes(part));
+    return videoPathIndex >= 0 ? parts[videoPathIndex + 1] || "" : parts[parts.length - 1] || "";
   } catch {
     return "";
   }
+};
+
+const disableYouTubeIframeFullscreen = (iframe) => {
+  if (!iframe || iframe.tagName !== "IFRAME" || !iframe.classList.contains("vds-youtube")) return;
+  if (iframe.getAttribute("allow") !== HOTSPOT_YOUTUBE_IFRAME_ALLOW) {
+    iframe.setAttribute("allow", HOTSPOT_YOUTUBE_IFRAME_ALLOW);
+  }
+  if (iframe.hasAttribute("allowfullscreen")) iframe.removeAttribute("allowfullscreen");
+  if (iframe.allowFullscreen) iframe.allowFullscreen = false;
+};
+
+const isDocumentFullscreenActive = () =>
+  Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+
+const requestDocumentFullscreen = async (element) => {
+  if (!element) return false;
+  if (typeof element.requestFullscreen === "function") {
+    await element.requestFullscreen();
+    return true;
+  }
+  if (typeof element.webkitRequestFullscreen === "function") {
+    await element.webkitRequestFullscreen();
+    return true;
+  }
+  return false;
+};
+
+const exitDocumentFullscreen = async () => {
+  if (document.fullscreenElement && typeof document.exitFullscreen === "function") {
+    await document.exitFullscreen();
+    return true;
+  }
+  if (document.webkitFullscreenElement && typeof document.webkitExitFullscreen === "function") {
+    await document.webkitExitFullscreen();
+    return true;
+  }
+  return false;
 };
 
 const getSafeExternalUrl = (url) => {
@@ -340,6 +393,146 @@ function AssetBlock({ block, hotspot, viewer, t, instanceId }) {
   );
 }
 
+function YoutubeHotspotPlayer({ block, t }) {
+  const playerRef = useRef(null);
+  const containerRef = useRef(null);
+  const [fallbackFullscreen, setFallbackFullscreen] = useState(false);
+  const [nativeFullscreen, setNativeFullscreen] = useState(false);
+  const videoId = getYouTubeVideoId(block.video_id || block.youtube_url);
+  const isFullscreen = fallbackFullscreen || nativeFullscreen || isDocumentFullscreenActive();
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !videoId) return undefined;
+
+    const updateYouTubeIframe = () => {
+      container
+        .querySelectorAll("iframe.vds-youtube")
+        .forEach((iframe) => disableYouTubeIframeFullscreen(iframe));
+    };
+
+    updateYouTubeIframe();
+    const observer = new MutationObserver(updateYouTubeIframe);
+    observer.observe(container, {
+      attributes: true,
+      attributeFilter: ["allow", "allowfullscreen", "src"],
+      childList: true,
+      subtree: true,
+    });
+
+    return () => observer.disconnect();
+  }, [videoId]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setNativeFullscreen(isDocumentFullscreenActive());
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!fallbackFullscreen) return undefined;
+
+    document.documentElement.classList.add("e-booklet-pseudo-fullscreen-root");
+    document.body.classList.add("e-booklet-pseudo-fullscreen-root");
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setFallbackFullscreen(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.documentElement.classList.remove("e-booklet-pseudo-fullscreen-root");
+      document.body.classList.remove("e-booklet-pseudo-fullscreen-root");
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [fallbackFullscreen]);
+
+  const toggleFullscreen = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (isFullscreen) {
+      if (fallbackFullscreen) {
+        setFallbackFullscreen(false);
+        return;
+      }
+      await exitDocumentFullscreen();
+      setNativeFullscreen(false);
+      return;
+    }
+
+    try {
+      if (typeof playerRef.current?.enterFullscreen === "function") {
+        await playerRef.current.enterFullscreen("prefer-media", event.nativeEvent || event);
+        setNativeFullscreen(true);
+        return;
+      }
+    } catch {
+      // Fall back to document fullscreen below.
+    }
+
+    try {
+      const enteredDocumentFullscreen = await requestDocumentFullscreen(containerRef.current);
+      if (enteredDocumentFullscreen) {
+        setNativeFullscreen(true);
+        return;
+      }
+    } catch {
+      // Fall back to CSS fullscreen below.
+    }
+
+    setFallbackFullscreen(true);
+  };
+
+  if (!videoId) {
+    return <p className="text-sm text-muted-foreground">{t("viewer.assetUnavailable")}</p>;
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className={`e-booklet-youtube-hotspot-player relative overflow-hidden rounded-md border border-white/10 bg-black ${fallbackFullscreen ? "e-booklet-youtube-hotspot-player--fullscreen-fallback" : ""}`}
+    >
+      <div className="e-booklet-youtube-hotspot-frame">
+        <MediaPlayer
+          ref={playerRef}
+          className="e-booklet-youtube-hotspot-media h-full w-full"
+          title={block.title || t("admin.editor.hotspots.types.video")}
+          src={`youtube/${videoId}`}
+          playsInline
+          autoPlay={false}
+          aspectRatio="16/9"
+          fullscreenOrientation="landscape"
+        >
+          <MediaProvider
+            iframeProps={{
+              allow: HOTSPOT_YOUTUBE_IFRAME_ALLOW,
+              allowFullScreen: false,
+            }}
+          />
+          <DefaultVideoLayout icons={defaultLayoutIcons} />
+          <button
+            type="button"
+            className="e-booklet-youtube-hotspot-fullscreen-button"
+            aria-label={isFullscreen ? t("common.exitFullscreen", { defaultValue: "Exit fullscreen" }) : t("common.fullscreen", { defaultValue: "Fullscreen" })}
+            title={isFullscreen ? t("common.exitFullscreen", { defaultValue: "Exit fullscreen" }) : t("common.fullscreen", { defaultValue: "Fullscreen" })}
+            onClick={toggleFullscreen}
+          >
+            {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+          </button>
+        </MediaPlayer>
+      </div>
+    </div>
+  );
+}
+
 function CorrectAnswerCelebration({ burstKey, t }) {
   return (
     <AnimatePresence>
@@ -440,21 +633,7 @@ function ContentBlock({ block, hotspot, viewer, t, instanceId }) {
     return <AssetBlock block={block} hotspot={hotspot} viewer={viewer} t={t} instanceId={instanceId} />;
   }
   if (block.type === "video" && block.source === "youtube") {
-    const embedUrl = getYouTubeEmbedUrl(block.youtube_url);
-    if (!embedUrl) {
-      return <p className="text-sm text-muted-foreground">{t("viewer.assetUnavailable")}</p>;
-    }
-    return (
-      <div className="overflow-hidden rounded-md border bg-black">
-        <iframe
-          src={embedUrl}
-          title={block.title || t("admin.editor.hotspots.types.video")}
-          className="aspect-video w-full border-0"
-          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
-      </div>
-    );
+    return <YoutubeHotspotPlayer block={block} t={t} />;
   }
   if (block.type === "link") {
     const safeUrl = getSafeExternalUrl(block.url);

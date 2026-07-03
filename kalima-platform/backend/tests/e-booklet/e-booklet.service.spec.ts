@@ -899,6 +899,49 @@ describe("EBookletService", () => {
       }));
     });
 
+    test("public preview hotspot content returns only YouTube video IDs for YouTube blocks", async () => {
+      const db = createMockDb();
+      db.e_booklet_templates.findFirst.mockResolvedValue({
+        id: 3,
+        title: "Sample booklet",
+        status: "published",
+        release_at: null,
+        versions: [{ id: 8, page_count: 10 }],
+      });
+      db.e_booklet_hotspots.findUnique.mockResolvedValue({
+        id: 77,
+        template_version_id: 8,
+        page_number: 2,
+        x_percent: 25,
+        y_percent: 35,
+        radius_percent: 4,
+        type: "video",
+        title: "Watch",
+        content_json: {
+          blocks: [{
+            type: "video",
+            source: "youtube",
+            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          }],
+        },
+      });
+
+      const service = new EBookletService(db);
+      const content: any = await service.getPublicPreviewHotspotContent(3, 77);
+      const serialized = JSON.stringify(content);
+
+      expect(content.content_json.blocks[0]).toEqual({
+        type: "video",
+        source: "youtube",
+        provider: "youtube",
+        video_id: "dQw4w9WgXcQ",
+      });
+      expect(serialized).not.toContain("youtube_url");
+      expect(serialized).not.toContain("youtube.com");
+      expect(serialized).not.toContain("youtu.be");
+    });
+
     test("public store detail returns one active instance and rejects unavailable instances", async () => {
       const db = createMockDb();
       db.e_booklet_instances.findFirst
@@ -3158,6 +3201,48 @@ describe("EBookletService", () => {
     });
 
     test("checks active viewer access including expiry before returning hotspot content", async () => {
+    test("does not expose raw YouTube URLs from viewer hotspot content", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspots.findUnique.mockResolvedValue({
+        id: 77,
+        template_version_id: 22,
+        page_number: 2,
+        x_percent: 42.5,
+        y_percent: 67.2,
+        radius_percent: 1.8,
+        type: "video",
+        title: "Watch",
+        trigger_type: "click",
+        display_behavior: "popover",
+        content_json: {
+          blocks: [{
+            type: "video",
+            source: "youtube",
+            url: "https://youtu.be/dQw4w9WgXcQ",
+            youtube_url: "https://youtu.be/dQw4w9WgXcQ",
+          }],
+        },
+      });
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 1,
+        booklet_instance: { id: 10, status: "active", template_version_id: 22 },
+      });
+
+      const service = new EBookletService(db);
+      const result: any = await service.getHotspotContent(10, 77, 55);
+      const serialized = JSON.stringify(result);
+
+      expect(result.content_json.blocks[0]).toEqual({
+        type: "video",
+        source: "youtube",
+        provider: "youtube",
+        video_id: "dQw4w9WgXcQ",
+      });
+      expect(serialized).not.toContain("youtube_url");
+      expect(serialized).not.toContain("youtube.com");
+      expect(serialized).not.toContain("youtu.be");
+    });
+
       const db = createMockDb();
       db.e_booklet_hotspots.findUnique.mockResolvedValue({
         id: 77,
@@ -3292,6 +3377,45 @@ describe("EBookletService", () => {
       expect(db.e_booklet_file_assets.findUnique).not.toHaveBeenCalled();
     });
   });
+
+    test("does not expose raw YouTube URLs from admin viewer hotspot content", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspots.findUnique.mockResolvedValue({
+        id: 77,
+        template_version_id: 22,
+        page_number: 2,
+        x_percent: 42.5,
+        y_percent: 67.2,
+        radius_percent: 1.8,
+        type: "video",
+        title: "Watch",
+        trigger_type: "click",
+        display_behavior: "popover",
+        content_json: {
+          blocks: [{
+            type: "video",
+            source: "youtube",
+            url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            youtube_url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+          }],
+        },
+        template_version: { instances: [{ id: 10 }] },
+      });
+
+      const service = new EBookletService(db);
+      const result: any = await service.getAdminHotspotContent(10, 77);
+      const serialized = JSON.stringify(result);
+
+      expect(result.content_json.blocks[0]).toEqual({
+        type: "video",
+        source: "youtube",
+        provider: "youtube",
+        video_id: "dQw4w9WgXcQ",
+      });
+      expect(serialized).not.toContain("youtube_url");
+      expect(serialized).not.toContain("youtube.com");
+      expect(serialized).not.toContain("youtu.be");
+    });
 
   describe("revokeStudentAccess", () => {
     test("requires the acting teacher to own the e-booklet instance", async () => {
