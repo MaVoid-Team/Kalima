@@ -1,6 +1,116 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+.e-booklet-youtube-hotspot-frame {
+  aspect-ratio: 16 / 9;
+  width: min(92vw, 56rem);
+  max-width: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+.e-booklet-youtube-hotspot-media {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: #000;
+}
+
+.e-booklet-pseudo-fullscreen-root {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+.e-booklet-youtube-hotspot-player--fullscreen-fallback {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483645 !important;
+  display: flex !important;
+  width: 100dvw !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  background: #000 !important;
+}
+
+.e-booklet-youtube-hotspot-player--fullscreen-fallback .e-booklet-youtube-hotspot-frame {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+}
+
+.e-booklet-youtube-hotspot-frame [data-media-player],
+.e-booklet-youtube-hotspot-frame media-player,
+.e-booklet-youtube-hotspot-frame iframe,
+.e-booklet-youtube-hotspot-frame video {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: inherit;
+}
+
+.e-booklet-youtube-hotspot-frame iframe.vds-youtube[data-no-controls] {
+  height: 1000% !important;
+  max-height: none;
+}
+
+.e-booklet-youtube-hotspot-player:fullscreen,
+.e-booklet-youtube-hotspot-player:-webkit-full-screen,
+.e-booklet-youtube-hotspot-media:fullscreen,
+.e-booklet-youtube-hotspot-media:-webkit-full-screen,
+.e-booklet-youtube-hotspot-media[data-fullscreen] {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+  background: #000 !important;
+}
+
+.e-booklet-youtube-hotspot-player:fullscreen .e-booklet-youtube-hotspot-frame,
+.e-booklet-youtube-hotspot-player:-webkit-full-screen .e-booklet-youtube-hotspot-frame,
+.e-booklet-youtube-hotspot-media:fullscreen .e-booklet-youtube-hotspot-frame,
+.e-booklet-youtube-hotspot-media:-webkit-full-screen .e-booklet-youtube-hotspot-frame,
+.e-booklet-youtube-hotspot-media[data-fullscreen] .e-booklet-youtube-hotspot-frame {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+}
+
+.e-booklet-youtube-hotspot-fullscreen-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 70;
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.62);
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(10px);
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.e-booklet-youtube-hotspot-fullscreen-button:hover {
+  background: rgba(17, 24, 39, 0.8);
+  transform: translateY(-1px);
+}
+
+.e-booklet-youtube-hotspot-fullscreen-button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.86);
+  outline-offset: 3px;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

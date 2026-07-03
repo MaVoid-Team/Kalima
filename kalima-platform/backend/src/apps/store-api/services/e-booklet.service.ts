@@ -1492,32 +1492,7 @@ export class EBookletService {
     ) {
       throw new NotFoundError("E-booklet hotspot not found for this preview.");
     }
-    return {
-      id: hotspot.id,
-      template_version_id: hotspot.template_version_id,
-      page_number: hotspot.page_number,
-      x_percent: hotspot.x_percent,
-      y_percent: hotspot.y_percent,
-      radius_percent: hotspot.radius_percent,
-      type: hotspot.type,
-      title: hotspot.title,
-      text_content: hotspot.text_content,
-      asset_file_id: hotspot.asset_file_id,
-      trigger_type: hotspot.trigger_type,
-      display_behavior: hotspot.display_behavior,
-      content_json: this.normalizeLegacyHotspotContent(hotspot),
-      asset_file: hotspot.asset_file
-        ? {
-            id: hotspot.asset_file.id,
-            file_type: hotspot.asset_file.file_type,
-            original_filename: hotspot.asset_file.original_filename,
-            mime_type: hotspot.asset_file.mime_type,
-            size_bytes: hotspot.asset_file.size_bytes,
-            visibility: hotspot.asset_file.visibility,
-          }
-        : null,
-      is_locked: false,
-    };
+    return this.serializeHotspotContent(hotspot, { is_locked: false });
   }
 
   async getPublicPreviewHotspotAsset(templateId: number, hotspotId: number, assetId: number) {
@@ -2142,6 +2117,67 @@ export class EBookletService {
     if (input.content_json?.answers) block.answers = input.content_json.answers;
 
     return { version: 2, blocks: [block] };
+  }
+
+  private getYoutubeVideoId(value?: string): string | null {
+    if (!this.isYoutubeUrl(value)) return null;
+    const parsed = new URL(value as string);
+    const host = parsed.hostname.toLowerCase();
+    if (host === "youtu.be") {
+      return parsed.pathname.split("/").filter(Boolean)[0] || null;
+    }
+    const queryVideoId = parsed.searchParams.get("v");
+    if (queryVideoId) return queryVideoId;
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    const videoPathIndex = parts.findIndex((part) => ["embed", "shorts", "live"].includes(part));
+    return videoPathIndex >= 0 ? parts[videoPathIndex + 1] || null : parts[parts.length - 1] || null;
+  }
+
+  private sanitizeViewerHotspotContentJson(input: HotspotContentInput): NormalizedHotspotContent {
+    const normalized = this.normalizeLegacyHotspotContent(input);
+    return {
+      ...normalized,
+      version: 2,
+      blocks: normalized.blocks.map((block: any) => {
+        if (block?.type !== "video" || block?.source !== "youtube") return { ...block };
+        const { youtube_url: _youtubeUrl, url: _url, ...safeBlock } = block;
+        return {
+          ...safeBlock,
+          source: "youtube",
+          provider: "youtube",
+          video_id: this.getYoutubeVideoId(block.youtube_url),
+        };
+      }),
+    };
+  }
+
+  private serializeHotspotContent(hotspot: any, extra: Record<string, unknown> = {}) {
+    return {
+      id: hotspot.id,
+      template_version_id: hotspot.template_version_id,
+      page_number: hotspot.page_number,
+      x_percent: hotspot.x_percent,
+      y_percent: hotspot.y_percent,
+      radius_percent: hotspot.radius_percent,
+      type: hotspot.type,
+      title: hotspot.title,
+      text_content: hotspot.text_content,
+      asset_file_id: hotspot.asset_file_id,
+      trigger_type: hotspot.trigger_type,
+      display_behavior: hotspot.display_behavior,
+      content_json: this.sanitizeViewerHotspotContentJson(hotspot),
+      asset_file: hotspot.asset_file
+        ? {
+            id: hotspot.asset_file.id,
+            file_type: hotspot.asset_file.file_type,
+            original_filename: hotspot.asset_file.original_filename,
+            mime_type: hotspot.asset_file.mime_type,
+            size_bytes: hotspot.asset_file.size_bytes,
+            visibility: hotspot.asset_file.visibility,
+          }
+        : null,
+      ...extra,
+    };
   }
 
   private normalizeHotspotRecord(hotspot: any): any {
@@ -3937,31 +3973,7 @@ export class EBookletService {
     if (!hotspot || hotspot.is_active === false || !hotspot.template_version.instances.length) {
       throw new NotFoundError("E-booklet hotspot not found for this instance.");
     }
-    return {
-      id: hotspot.id,
-      template_version_id: hotspot.template_version_id,
-      page_number: hotspot.page_number,
-      x_percent: hotspot.x_percent,
-      y_percent: hotspot.y_percent,
-      radius_percent: hotspot.radius_percent,
-      type: hotspot.type,
-      title: hotspot.title,
-      text_content: hotspot.text_content,
-      asset_file_id: hotspot.asset_file_id,
-      trigger_type: hotspot.trigger_type,
-      display_behavior: hotspot.display_behavior,
-      content_json: this.normalizeLegacyHotspotContent(hotspot),
-      asset_file: hotspot.asset_file
-        ? {
-            id: hotspot.asset_file.id,
-            file_type: hotspot.asset_file.file_type,
-            original_filename: hotspot.asset_file.original_filename,
-            mime_type: hotspot.asset_file.mime_type,
-            size_bytes: hotspot.asset_file.size_bytes,
-            visibility: hotspot.asset_file.visibility,
-          }
-        : null,
-    };
+    return this.serializeHotspotContent(hotspot);
   }
 
   async getAdminAuthorizedHotspotAsset(instanceId: number, hotspotId: number, assetId: number) {
@@ -4367,31 +4379,7 @@ export class EBookletService {
     ) {
       throw new ForbiddenError("You do not have access to this hotspot.");
     }
-    return {
-      id: hotspot.id,
-      template_version_id: hotspot.template_version_id,
-      page_number: hotspot.page_number,
-      x_percent: hotspot.x_percent,
-      y_percent: hotspot.y_percent,
-      radius_percent: hotspot.radius_percent,
-      type: hotspot.type,
-      title: hotspot.title,
-      text_content: hotspot.text_content,
-      asset_file_id: hotspot.asset_file_id,
-      trigger_type: hotspot.trigger_type,
-      display_behavior: hotspot.display_behavior,
-      content_json: this.normalizeLegacyHotspotContent(hotspot),
-      asset_file: hotspot.asset_file
-        ? {
-            id: hotspot.asset_file.id,
-            file_type: hotspot.asset_file.file_type,
-            original_filename: hotspot.asset_file.original_filename,
-            mime_type: hotspot.asset_file.mime_type,
-            size_bytes: hotspot.asset_file.size_bytes,
-            visibility: hotspot.asset_file.visibility,
-          }
-        : null,
-    };
+    return this.serializeHotspotContent(hotspot);
   }
 
   async getPublicHotspotContent(instanceId: number, hotspotId: number) {
@@ -4409,32 +4397,7 @@ export class EBookletService {
     ) {
       throw new ForbiddenError("You do not have access to this hotspot.");
     }
-    return {
-      id: hotspot.id,
-      template_version_id: hotspot.template_version_id,
-      page_number: hotspot.page_number,
-      x_percent: hotspot.x_percent,
-      y_percent: hotspot.y_percent,
-      radius_percent: hotspot.radius_percent,
-      type: hotspot.type,
-      title: hotspot.title,
-      text_content: hotspot.text_content,
-      asset_file_id: hotspot.asset_file_id,
-      trigger_type: hotspot.trigger_type,
-      display_behavior: hotspot.display_behavior,
-      content_json: this.normalizeLegacyHotspotContent(hotspot),
-      asset_file: hotspot.asset_file
-        ? {
-            id: hotspot.asset_file.id,
-            file_type: hotspot.asset_file.file_type,
-            original_filename: hotspot.asset_file.original_filename,
-            mime_type: hotspot.asset_file.mime_type,
-            size_bytes: hotspot.asset_file.size_bytes,
-            visibility: hotspot.asset_file.visibility,
-          }
-        : null,
-      is_locked: false,
-    };
+    return this.serializeHotspotContent(hotspot, { is_locked: false });
   }
 
   async validateTeacherDocumentForDelivery(
