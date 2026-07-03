@@ -18,6 +18,7 @@ import cors from "cors";
 import corsOptions from "./config/corsOptions";
 import { registerAllExportResources } from "./apps/store-api/export";
 import { isProtectedSampleStaticPath } from "./libs/sampleStaticAccess";
+import { resolveUploadsRoot } from "./libs/uploadsRoot";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN || "https://048ba305ef0a02edfe7c9a2b46b16b50@o4511636173488128.ingest.de.sentry.io/4511636192100432",
@@ -26,9 +27,7 @@ Sentry.init({
 });
 
 const app = express();
-const uploadsRoot = process.env.UPLOADS_DIR
-  ? path.resolve(process.env.UPLOADS_DIR)
-  : path.resolve(process.cwd(), "uploads");
+const uploadsRoot = resolveUploadsRoot();
 
 registerAllExportResources();
 
