@@ -12,7 +12,10 @@ import { NotFoundError, BadRequestError } from "../../../libs/errors";
 // ============================================
 
 /** All images go into a single flat folder */
-const UPLOAD_DIR = path.resolve(__dirname, "../../../../uploads/images");
+const UPLOAD_ROOT = process.env.UPLOADS_DIR
+  ? path.resolve(process.env.UPLOADS_DIR)
+  : path.resolve(process.cwd(), "uploads");
+const UPLOAD_DIR = path.join(UPLOAD_ROOT, "images");
 
 /** Maps browser mime types → our DB enum */
 const MIME_TO_ENUM: Record<string, image_mime_type_enum> = {
@@ -187,11 +190,8 @@ class ImageService {
    * Does not throw if the file doesn't exist (already cleaned up).
    */
   removeFileFromDisk(url: string): void {
-    const absolutePath = path.resolve(
-      __dirname,
-      "../../../..",
-      url.startsWith("/") ? url.slice(1) : url,
-    );
+    const relativePath = url.replace(/^\/?uploads\//, "");
+    const absolutePath = path.resolve(UPLOAD_ROOT, relativePath);
     void fsPromises.unlink(absolutePath).catch(() => {});
   }
 
