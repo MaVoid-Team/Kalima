@@ -5,7 +5,20 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { ChevronLeft, X, Package, PlusCircle, Calendar as CalendarIcon, CircleHelp } from 'lucide-react';
+import {
+    ChevronLeft,
+    X,
+    Package,
+    PlusCircle,
+    Calendar as CalendarIcon,
+    CircleHelp,
+    Info,
+    Tags,
+    ListChecks,
+    ImagePlus,
+    TicketPercent,
+    Save,
+} from 'lucide-react';
 import { format, startOfDay } from 'date-fns';
 import { arSA } from 'react-day-picker/locale';
 
@@ -18,6 +31,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from '@/components/ui/accordion';
 import {
     Form,
     FormControl,
@@ -116,6 +135,7 @@ export default function CreateProductPage() {
     const [sampleTitle, setSampleTitle] = useState('');
     const [sampleSectionId, setSampleSectionId] = useState('');
     const [mediaType, setMediaType] = useState('pdf');
+    const [activeSection, setActiveSection] = useState('core');
 
     // Category picker state — single category only (up to 3 levels)
     const [selectedRootId, setSelectedRootId] = useState('');
@@ -488,6 +508,24 @@ export default function CreateProductPage() {
 
     // ─── Render ───────────────────────────────────────────────────────────────
 
+    const sectionStatus = {
+        core: form.watch('title') && form.watch('price') ? t('products.create.status.complete') : t('products.create.status.required'),
+        category: pickedCategory ? t('products.create.status.selected') : t('products.create.status.optional'),
+        fields: pickedFields.length > 0 ? `${pickedFields.length}` : t('products.create.status.optional'),
+        media: thumbnail || pendingGalleryImages.length || pendingGalleryVideo || externalVideoUrl || hqSample || lqSample
+            ? t('products.create.status.added')
+            : t('products.create.status.optional'),
+        coupon: quickCouponEnabled ? t('products.create.status.enabled') : t('products.create.status.optional'),
+    };
+
+    const sectionCards = [
+        { id: 'core', icon: Info, title: t('products.detail.info'), status: sectionStatus.core },
+        { id: 'category', icon: Tags, title: t('products.detail.categories'), status: sectionStatus.category },
+        { id: 'fields', icon: ListChecks, title: t('products.detail.requiredFields'), status: sectionStatus.fields },
+        { id: 'media', icon: ImagePlus, title: t('products.detail.media'), status: sectionStatus.media },
+        { id: 'coupon', icon: TicketPercent, title: t('products.quickCoupon.title'), status: sectionStatus.coupon },
+    ];
+
     return (
         <div className="space-y-6 min-w-0 overflow-hidden" data-testid="create-product-page">
 
@@ -520,14 +558,96 @@ export default function CreateProductPage() {
                             e.preventDefault();
                         }
                     }}
-                    className="space-y-6"
+                    className="space-y-4"
                     data-testid="create-product-form"
                 >
+                    <div className="min-w-0 space-y-4">
+                    <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
+                        {sectionCards.map(({ id, icon: Icon, title, status }) => {
+                            const isActive = activeSection === id;
+                            return (
+                                <button
+                                    key={id}
+                                    type="button"
+                                    onClick={() => setActiveSection(id)}
+                                    className={cn(
+                                        'flex min-h-16 min-w-0 items-center gap-2 rounded-md border p-2 text-start transition-colors',
+                                        isActive
+                                            ? 'border-primary bg-primary/10 text-primary'
+                                            : 'border-border bg-background hover:bg-muted/60'
+                                    )}
+                                >
+                                    <span className={cn(
+                                        'flex h-8 w-8 shrink-0 items-center justify-center rounded-md border',
+                                        isActive ? 'border-primary/30 bg-background' : 'bg-muted/40'
+                                    )}>
+                                        <Icon className="h-4 w-4" />
+                                    </span>
+                                    <span className="min-w-0 flex-1">
+                                        <span className="block text-xs font-semibold leading-tight text-foreground sm:text-[13px]">{title}</span>
+                                        <span className={cn(
+                                            'mt-1 block max-w-full truncate text-[10px] font-medium leading-none sm:text-[11px]',
+                                            isActive ? 'text-primary/75' : 'text-muted-foreground'
+                                        )}>
+                                            {status}
+                                        </span>
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    <div className="flex flex-col gap-3 rounded-xl border border-border bg-background p-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="min-w-0">
+                            <p className="text-sm font-semibold">{t('products.create.dialogTitle')}</p>
+                            <p className="truncate text-xs text-muted-foreground">
+                                {form.watch('title') || t('products.form.titlePlaceholder')}
+                            </p>
+                        </div>
+                        <div className="flex shrink-0 gap-2">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => navigate('/admin/products')}
+                                data-testid="create-product-cancel-button"
+                            >
+                                {t('common.cancel')}
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={actionLoading || couponLoading}
+                                data-testid="create-product-submit-button"
+                            >
+                                {actionLoading
+                                    ? <><LoadingSpinner className="h-4 w-4 text-primary-foreground" />{t('products.create.creating')}</>
+                                    : <><Save className="me-2 h-4 w-4" />{t('products.create.submit')}</>
+                                }
+                            </Button>
+                        </div>
+                    </div>
+
+                    <FileUploadProgress
+                        progress={uploadProgress}
+                        isUploading={isUploading}
+                        fileName={uploadFileName}
+                        error={uploadError}
+                        onCancel={handleCancelUpload}
+                    />
+
+                    <Accordion
+                        type="single"
+                        collapsible={false}
+                        value={activeSection}
+                        onValueChange={(value) => {
+                            if (value) setActiveSection(value);
+                        }}
+                        className="min-w-0"
+                    >
 
                     {/* ── Section: Core Details ── */}
-                    <div className="rounded-xl border border-border p-5 space-y-4">
-                        <h2 className="font-semibold text-foreground">{t('products.detail.info')}</h2>
-                        <Separator />
+                    <AccordionItem value="core" className="rounded-xl border border-border px-5">
+                        <AccordionTrigger className="sr-only">{t('products.detail.info')}</AccordionTrigger>
+                        <AccordionContent className="space-y-4 pb-5 pt-5">
 
                         {/* Title */}
                         <FormField
@@ -764,12 +884,13 @@ export default function CreateProductPage() {
                                 </FormItem>
                             )}
                         />
-                    </div>
+                        </AccordionContent>
+                    </AccordionItem>
 
                     {/* ── Section: Category ── */}
-                    <div className="rounded-xl border border-border p-5 space-y-4">
-                        <h2 className="font-semibold text-foreground">{t('products.detail.categories')}</h2>
-                        <Separator />
+                    <AccordionItem value="category" className="rounded-xl border border-border px-5">
+                        <AccordionTrigger className="sr-only">{t('products.detail.categories')}</AccordionTrigger>
+                        <AccordionContent className="space-y-4 pb-5 pt-5">
 
                         {/* Selected category badge */}
                         {pickedCategory && (
@@ -866,12 +987,13 @@ export default function CreateProductPage() {
                                 ) : null
                             )}
                         </div>
-                    </div>
+                        </AccordionContent>
+                    </AccordionItem>
 
                     {/* ── Section: Required Fields ── */}
-                    <div className="rounded-xl border border-border p-5 space-y-4">
-                        <h2 className="font-semibold text-foreground">{t('products.detail.requiredFields')}</h2>
-                        <Separator />
+                    <AccordionItem value="fields" className="rounded-xl border border-border px-5">
+                        <AccordionTrigger className="sr-only">{t('products.detail.requiredFields')}</AccordionTrigger>
+                        <AccordionContent className="space-y-4 pb-5 pt-5">
 
                         {/* Picked field tags */}
                         {pickedFields.length > 0 ? (
@@ -942,12 +1064,13 @@ export default function CreateProductPage() {
                                 </Button>
                             </div>
                         )}
-                    </div>
+                        </AccordionContent>
+                    </AccordionItem>
 
                     {/* ── Section: Media ── */}
-                    <div className="rounded-xl border border-border p-5 space-y-4">
-                        <h2 className="font-semibold text-foreground">{t('products.detail.media')}</h2>
-                        <Separator />
+                    <AccordionItem value="media" className="rounded-xl border border-border px-5">
+                        <AccordionTrigger className="sr-only">{t('products.detail.media')}</AccordionTrigger>
+                        <AccordionContent className="space-y-4 pb-5 pt-5">
 
                         <div className="grid grid-cols-1 gap-6">
                             {/* Thumbnail */}
@@ -1155,21 +1278,13 @@ export default function CreateProductPage() {
                                 {t('products.form.sampleFormats', 'Supported: images, videos, PDF, Word, PowerPoint')}
                             </p>
                         </div>
-                    </div>
+                        </AccordionContent>
+                    </AccordionItem>
 
-                    {/* ── Upload Progress ── */}
-                    <FileUploadProgress
-                        progress={uploadProgress}
-                        isUploading={isUploading}
-                        fileName={uploadFileName}
-                        error={uploadError}
-                        onCancel={handleCancelUpload}
-                    />
                     {/* ── Section: Quick Coupon ── */}
-                    <div className="rounded-xl border border-border p-5 space-y-4">
-                        <h2 className="font-semibold text-foreground">{t('products.quickCoupon.title')}</h2>
-                        <p className="text-sm text-muted-foreground">{t('products.quickCoupon.description')}</p>
-                        <Separator />
+                    <AccordionItem value="coupon" className="rounded-xl border border-border px-5">
+                        <AccordionTrigger className="sr-only">{t('products.quickCoupon.title')}</AccordionTrigger>
+                        <AccordionContent className="space-y-4 pb-5 pt-5">
 
                         <div className="flex items-center justify-between gap-3">
                             <label htmlFor="create-product-quick-coupon-switch" className="text-sm font-medium">
@@ -1283,28 +1398,9 @@ export default function CreateProductPage() {
                                 </div>
                             </div>
                         )}
-                    </div>
-
-                    {/* ── Action Buttons ── */}
-                    <div className="flex justify-end gap-3 pb-4">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => navigate('/admin/products')}
-                            data-testid="create-product-cancel-button"
-                        >
-                            {t('common.cancel')}
-                        </Button>
-                        <Button
-                            type="submit"
-                            disabled={actionLoading || couponLoading}
-                            data-testid="create-product-submit-button"
-                        >
-                            {actionLoading
-                                ? <><LoadingSpinner className="h-4 w-4 text-primary-foreground" />{t('products.create.creating')}</>
-                                : t('products.create.submit')
-                            }
-                        </Button>
+                        </AccordionContent>
+                    </AccordionItem>
+                    </Accordion>
                     </div>
 
                 </form>

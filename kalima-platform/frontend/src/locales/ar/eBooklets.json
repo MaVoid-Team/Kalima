@@ -561,7 +561,10 @@
       "copyGeneratedCodes": "نسخ الأكواد المنشأة",
       "generatedNow": "تم الإنشاء الآن",
       "redemptions": "الاستردادات",
-      "noAccessCodes": "لم يتم إنشاء أكواد وصول بعد."
+      "noAccessCodes": "لم يتم إنشاء أكواد وصول بعد.",
+      "exportExcel": "تصدير Excel",
+      "exportArabicRtl": "Excel عربي من اليمين لليسار",
+      "exportEnglish": "Excel إنجليزي"
     },
     "students": {
       "title": "طلاب المذكرة التفاعلية",
@@ -657,6 +660,10 @@
       "teacherId": "المعلم #{{id}}",
       "claimed": "تم التحصيل",
       "unclaimed": "غير محصلة",
+      "loadError": "تعذر تحميل شروط ومراحل المذكرة التفاعلية. تأكد أن واجهة API الخلفية تعمل ويمكن الوصول إليها.",
+      "loadErrorStatus": "فشل الطلب برمز HTTP {{status}} من {{server}}.",
+      "loadErrorNetwork": "لم يتلق الطلب استجابة من الواجهة الخلفية.",
+      "unknownServer": "خادم غير معروف",
       "deleteMilestoneConfirm": "حذف هذه المرحلة؟ لا يمكن التراجع عن هذا الإجراء."
     },
     "settings": {

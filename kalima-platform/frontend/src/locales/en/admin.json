@@ -392,7 +392,15 @@
       "uploading": "Uploading Media...",
       "processing": "Processing...",
       "sampleUploading": "Uploading Sample...",
-      "sampleSuccess": "Sample uploaded successfully!"
+      "sampleSuccess": "Sample uploaded successfully!",
+      "status": {
+        "complete": "Complete",
+        "required": "Required",
+        "selected": "Selected",
+        "optional": "Optional",
+        "added": "Added",
+        "enabled": "Enabled"
+      }
     },
     "edit": {
       "dialogTitle": "Edit Product",
@@ -603,6 +611,11 @@
       "notFound": "Sample section not found.",
       "backToSections": "Back to Sections",
       "manageSamples": "Samples",
+      "export": "Export",
+      "exportCsv": "Export as CSV",
+      "exportXlsx": "Export as Excel",
+      "exportArabic": "Arabic",
+      "exportEnglish": "English",
       "sampleRemoved": "Sample removed successfully",
       "sampleAdded": "Sample added successfully",
       "sampleUpdated": "Sample updated successfully",

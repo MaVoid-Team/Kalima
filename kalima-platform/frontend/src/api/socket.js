@@ -1,6 +1,12 @@
 import { io } from 'socket.io-client';
 
-const socketURL = import.meta.env.VITE_API_URL?.replace('/api/v2', '').replace('https', 'wss') || 'http://localhost:5000';
+const resolveSocketURL = () => {
+    const target = import.meta.env.VITE_API_PROXY_TARGET || import.meta.env.VITE_API_URL || '';
+    if (!/^https?:\/\//.test(target)) return undefined;
+    return target.replace(/\/api\/v\d+\/?$/, '').replace('https', 'wss');
+};
+
+const socketURL = resolveSocketURL();
 console.log('Socket URL initialized:', socketURL);
 
 const socket = io(socketURL, {
@@ -47,4 +53,3 @@ export const disconnectSocket = () => {
 };
 
 export default socket;
-

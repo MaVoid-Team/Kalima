@@ -9,7 +9,7 @@ export const useExport = () => {
     const [exportProgress, setExportProgress] = useState(0);
     const { t } = useTranslation('common');
 
-    const exportData = async ({ resource, format = 'csv', ids = [], filters = {}, serializedFilters = false }) => {
+    const exportData = async ({ resource, format = 'csv', ids = [], filters = {}, serializedFilters = false, lang, rtl }) => {
         setLoading(true);
         setExportProgress(0);
         try {
@@ -20,6 +20,12 @@ export const useExport = () => {
 
             // Expected by backend
             params.set('format', format);
+            if (lang) {
+                params.set('lang', lang);
+            }
+            if (rtl !== undefined) {
+                params.set('rtl', rtl ? 'true' : 'false');
+            }
 
             console.log('filters:', filters);
             console.log('params:', params.toString());

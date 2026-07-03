@@ -3,13 +3,22 @@ import path from "path"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js"
-import { defineConfig } from "vite"
+import { defineConfig, loadEnv } from "vite"
+
+const normalizeProxyTarget = (value) => {
+  const target = String(value || "")
+  if (!/^https?:\/\//.test(target)) return "http://localhost:5001"
+  return target.replace(/\/api\/v\d+\/?$/, "").replace(/\/$/, "")
+}
 
 // https://vite.dev/config/
-export default defineConfig(({ command }) => {
+export default defineConfig(({ command, mode }) => {
   if (command === "serve" && process.env.NODE_ENV !== "development") {
     process.env.NODE_ENV = "development"
   }
+
+  const env = loadEnv(mode, process.cwd(), "")
+  const apiProxyTarget = normalizeProxyTarget(env.VITE_API_PROXY_TARGET || process.env.VITE_API_PROXY_TARGET)
 
   return {
     plugins: [react(), tailwindcss(), cssInjectedByJsPlugin()],
@@ -21,7 +30,7 @@ export default defineConfig(({ command }) => {
     server: {
       proxy: {
         '/api': {
-          target: 'http://localhost:5000',
+          target: apiProxyTarget,
           changeOrigin: true,
           secure: false,
         },

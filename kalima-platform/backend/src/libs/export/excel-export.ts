@@ -10,6 +10,8 @@ export interface ExcelOptions {
   columns?: string[];
   /** Human-readable header labels (same order as `columns`). Defaults to column keys. */
   headers?: string[];
+  /** Hint spreadsheet apps to open the workbook in right-to-left mode. */
+  rtl?: boolean;
 }
 
 /**
@@ -51,6 +53,14 @@ export function toExcel(
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+  if (opts?.rtl) {
+    ws["!dir"] = "rtl";
+    wb.Workbook = {
+      ...(wb.Workbook || {}),
+      Views: [{ RTL: true }],
+    };
+  }
 
   return Buffer.from(
     XLSX.write(wb, { type: "buffer", bookType: "xlsx" }) as ArrayBuffer,

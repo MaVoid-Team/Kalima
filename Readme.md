@@ -33,9 +33,9 @@ npm run dev
 This runs:
 
 - Frontend: `http://localhost:5173`
-- Backend: `http://localhost:5000`
+- Backend: `http://localhost:5001`
 
-The Vite dev server proxies frontend requests for `/api` to the backend on `http://localhost:5000`.
+The Vite dev server proxies frontend requests for `/api` to the backend on `http://localhost:5001` by default. Override it with `VITE_API_PROXY_TARGET` or `VITE_API_URL` if you run the backend elsewhere.
 
 ## Run Services Separately
 
@@ -48,7 +48,7 @@ npm --prefix kalima-platform/frontend run dev -- --host 0.0.0.0
 Backend only:
 
 ```bash
-PORT=5000 npm --prefix kalima-platform/backend run dev
+npm --prefix kalima-platform/backend run dev:local
 ```
 
 ## Android Testing

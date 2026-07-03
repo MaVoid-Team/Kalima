@@ -29,6 +29,11 @@ export interface ResourceExportConfig<T = any> {
   label: string;
 }
 
+export interface ExportOptions {
+  locale?: string;
+  rtl?: boolean;
+}
+
 // ─── Registry ──────────────────────────────────────────────────────────
 
 const registry = new Map<string, ResourceExportConfig>();
@@ -53,6 +58,7 @@ export async function exportResource(
   format: ExportFormat,
   ids?: number[],
   filters?: Record<string, unknown>,
+  options?: ExportOptions,
 ): Promise<ExportResult> {
   const config = registry.get(resourceName);
   if (!config) {
@@ -67,8 +73,17 @@ export async function exportResource(
     );
   }
 
-  const rows = records.map(config.mapper.toRow);
-  const { columns, headers } = config.mapper;
+  const locale = options?.locale?.toLowerCase().split("-")[0];
+  const rows = records.map((record) => {
+    const row = config.mapper.toRow(record);
+    return config.mapper.localizeRow
+      ? config.mapper.localizeRow(row, locale)
+      : row;
+  });
+  const { columns } = config.mapper;
+  const headers = locale && config.mapper.headersByLocale?.[locale]
+    ? config.mapper.headersByLocale[locale]
+    : config.mapper.headers;
   const timestamp = new Date().toISOString().split("T")[0];
 
   if (format === "csv") {
@@ -84,6 +99,7 @@ export async function exportResource(
     sheetName: config.label,
     columns,
     headers,
+    rtl: options?.rtl,
   } satisfies ExcelOptions);
   return {
     buffer: xlsxBuf,
