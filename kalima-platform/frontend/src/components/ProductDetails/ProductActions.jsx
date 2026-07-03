@@ -115,9 +115,46 @@ export default function ProductActions({
         </div>
       )}
 
+      <AnimatePresence>
+        {isCollapsed && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 18, scale: 0.98 }}
+            transition={{ duration: 0.18 }}
+            onClick={() => setIsCollapsed(false)}
+            className={cn(
+              "fixed bottom-4 left-4 right-4 z-50 md:hidden",
+              "flex items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-background/95 px-4 py-3 text-start shadow-[0_-8px_24px_rgba(0,0,0,0.16)] backdrop-blur-xl",
+              "pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
+            )}
+            aria-expanded={!isCollapsed}
+            aria-controls="product-actions-mobile-sheet"
+            data-testid="product-actions-mobile-reopen-button"
+          >
+            <span className="flex min-w-0 items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <ShoppingCart className="h-5 w-5" />
+              </span>
+              <span className="flex min-w-0 flex-col">
+                <span className="text-[11px] font-black uppercase tracking-widest text-primary">
+                  {t("actions.viewOptions", "View Options")}
+                </span>
+                <span className="truncate text-sm font-black text-foreground">
+                  {formattedPrice}{t("info.currency")}
+                </span>
+              </span>
+            </span>
+            <ChevronUp className="h-5 w-5 shrink-0 text-primary" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* Mobile Sticky Bar - Draggable Bottom Sheet */}
       <AnimatePresence>
         <motion.div
+          id="product-actions-mobile-sheet"
           ref={sheetRef}
           drag="y"
           dragConstraints={{ top: 0, bottom: 260 }}
