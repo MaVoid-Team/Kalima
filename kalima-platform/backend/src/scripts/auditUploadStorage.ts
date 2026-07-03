@@ -1,7 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { prisma } from "../libs/db/prisma";
-import { resolveUploadsRoot } from "../libs/uploadsRoot";
+import {
+  resolveEBookletStoragePath,
+  resolveEBookletUploadRoot,
+  resolveUploadsRoot,
+} from "../libs/uploadsRoot";
 
 type UploadRef = {
   area: string;
@@ -10,13 +14,6 @@ type UploadRef = {
   relativePath: string;
   absolutePath: string;
 };
-
-function resolveEBookletUploadRoot(): string {
-  return path.resolve(
-    process.env.E_BOOKLET_UPLOAD_DIR || process.cwd(),
-    process.env.E_BOOKLET_UPLOAD_DIR ? "" : "uploads/e-booklets/private",
-  );
-}
 
 function getUploadRelativePath(url: string | null | undefined): string | null {
   if (!url || /^https?:\/\//i.test(url)) return null;
@@ -55,16 +52,12 @@ function addPrivateEBookletRef(
   storageKey: string | null | undefined,
 ): void {
   if (!storageKey || storageKey.includes("..")) return;
-  const absolutePath = storageKey.startsWith("e-booklets/private/")
-    ? path.join(resolveUploadsRoot(), storageKey)
-    : path.join(resolveEBookletUploadRoot(), storageKey);
-
   refs.push({
     area: "e_booklet_file_assets.private",
     id: String(id),
     url: storageKey,
     relativePath: storageKey,
-    absolutePath,
+    absolutePath: resolveEBookletStoragePath(storageKey),
   });
 }
 
