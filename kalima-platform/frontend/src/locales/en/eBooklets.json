@@ -404,6 +404,7 @@
         "stopRecording": "Stop recording",
         "recordAudio": "Record audio",
         "audioAutoplay": "Autoplay audio when opened",
+        "videoAutoplay": "Autoplay video when opened",
         "imageAutoExpand": "Auto-expand image",
         "imageExpandOnClick": "Expand image on click",
         "videoUploaded": "Uploaded video",

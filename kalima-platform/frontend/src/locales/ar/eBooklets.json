@@ -404,6 +404,7 @@
         "stopRecording": "إيقاف التسجيل",
         "recordAudio": "تسجيل صوت",
         "audioAutoplay": "تشغيل الصوت تلقائيًا عند الفتح",
+        "videoAutoplay": "تشغيل الفيديو تلقائيًا عند الفتح",
         "imageAutoExpand": "توسيع الصورة تلقائيًا",
         "imageExpandOnClick": "توسيع الصورة عند الضغط",
         "videoUploaded": "فيديو مرفوع",

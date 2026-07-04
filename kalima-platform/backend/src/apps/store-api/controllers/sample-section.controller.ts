@@ -8,6 +8,7 @@ import {
   CreateSampleBodyDto,
   UpdateSampleBodyDto,
 } from "../dtos/sample.dto";
+import { buildContentDisposition } from "../utils/filename";
 import { ValidationError, BadRequestError, ForbiddenError } from "../../../libs/errors";
 import fs from "fs";
 
@@ -364,7 +365,7 @@ export const sampleSectionController = {
       }
 
       res.setHeader("Content-Type", mimeType);
-      res.setHeader("Content-Disposition", `inline; filename="${originalName}"`);
+      res.setHeader("Content-Disposition", buildContentDisposition("inline", originalName, "sample-file"));
       res.setHeader("Cache-Control", "no-store, private");
       res.setHeader("Pragma", "no-cache");
       res.setHeader("X-Download-Options", "noopen");
@@ -403,7 +404,7 @@ export const sampleSectionController = {
       res.setHeader("Content-Type", mimeType);
       res.setHeader(
         "Content-Disposition",
-        `attachment; filename="${originalName}"`,
+        buildContentDisposition("attachment", originalName, "sample-file"),
       );
       res.sendFile(filePath);
     } catch (error) {

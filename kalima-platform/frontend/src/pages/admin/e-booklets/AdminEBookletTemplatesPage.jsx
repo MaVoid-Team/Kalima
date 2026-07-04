@@ -248,9 +248,9 @@ export default function AdminEBookletTemplatesPage() {
                             <FilePenLine className="h-4 w-4" />
                           </Link>
                         </Button>
-                        {template.slug && (
+                        {template.id && status === "published" && latestVersion?.id && (
                           <Button asChild size="sm" variant="outline">
-                            <Link to={`/e-booklets/${template.slug}`}>
+                            <Link to={`/e-booklets/${template.id}/preview`}>
                               <Eye className="h-4 w-4" />
                             </Link>
                           </Button>

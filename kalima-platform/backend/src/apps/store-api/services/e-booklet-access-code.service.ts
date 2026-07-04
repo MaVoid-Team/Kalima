@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../../../libs/errors";
 
 export type EBookletAccessCodeKind = "paid" | "free";
+const ACCESS_CODE_FORMATTING_CHARS = /[\u200B-\u200F\u202A-\u202E\u2066-\u2069]/g;
 const DEFAULT_ACCESS_CODE_SETTINGS = {
   default_access_code_kind: "paid" as EBookletAccessCodeKind,
   max_bulk_access_codes: 100,
@@ -19,7 +20,10 @@ function getAccessCodeSecret(): string {
 }
 
 export function hashEBookletAccessCode(code: string): string {
-  return crypto.createHmac("sha256", getAccessCodeSecret()).update(code.trim().toUpperCase()).digest("hex");
+  return crypto
+    .createHmac("sha256", getAccessCodeSecret())
+    .update(code.replace(ACCESS_CODE_FORMATTING_CHARS, "").trim().toUpperCase())
+    .digest("hex");
 }
 
 function generatePlainCode(): string {
@@ -35,8 +39,12 @@ function redemptionUrl(): string {
   return `${base}/e-booklet-code`;
 }
 
+function isolateLtr(value: string): string {
+  return `\u2066${value}\u2069`;
+}
+
 function arabicWhatsAppMessage(code: string, url: string): string {
-  return `رابط المذكرة التفاعلية: ${url}\nكود الدخول: ${code}\nافتح الرابط ثم أدخل الكود مرة واحدة لتفعيل الوصول.`;
+  return `رابط المذكرة التفاعلية: ${isolateLtr(url)}\nكود الدخول: ${isolateLtr(code)}\nافتح الرابط ثم أدخل الكود مرة واحدة لتفعيل الوصول.`;
 }
 
 export class EBookletAccessCodeService {

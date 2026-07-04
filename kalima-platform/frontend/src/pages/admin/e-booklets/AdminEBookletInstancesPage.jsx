@@ -20,6 +20,16 @@ const optionalNumberValue = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const isGeneratedEBookletTitle = (value) => /^Teacher e-booklet #\d+$/i.test(String(value || "").trim());
+
+const getInstanceDisplayTitle = (instance, fallback) => {
+  const templateTitle = instance.template?.title?.trim?.();
+  if (templateTitle) return templateTitle;
+  const displayTitle = instance.display_title?.trim?.();
+  if (displayTitle && !isGeneratedEBookletTitle(displayTitle)) return displayTitle;
+  return fallback;
+};
+
 const pageMotion = {
   hidden: { opacity: 0, y: 8 },
   show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: [0.2, 0, 0, 1] } },
@@ -239,7 +249,7 @@ export default function AdminEBookletInstancesPage() {
                               <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                             </motion.span>
                             <div className="min-w-0">
-                              <div className="truncate text-sm font-semibold">{instance.display_title || instance.template?.title || t("common.eBooklet")}</div>
+                              <div className="truncate text-sm font-semibold">{getInstanceDisplayTitle(instance, t("common.eBooklet"))}</div>
                               <div className="truncate text-xs text-muted-foreground">{instance.template_version?.version_label || instance.template_version?.version_number || t("common.version")}</div>
                             </div>
                           </div>

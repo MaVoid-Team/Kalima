@@ -13,6 +13,7 @@ import {
   NotFoundError,
 } from "../../../libs/errors";
 import { generateInviteToken, hashInviteToken } from "../utils/e-booklet-token";
+import { normalizeOriginalFilename } from "../utils/filename";
 import { EBookletPagePreviewService } from "./e-booklet-page-preview.service";
 import { emitNotificationToUser } from "../../../libs/redis/socketNotificationEmitter";
 
@@ -36,6 +37,7 @@ const E_BOOKLET_ORDER_TEACHER_TARGET_LINK = "/e-booklet-orders";
 const E_BOOKLET_ORDER_ADMIN_ROLES = ["Admin", "SubAdmin", "Moderator"] as const;
 const DEFAULT_E_BOOKLET_PREVIEW_PAGE_LIMIT = 10;
 const MAX_E_BOOKLET_PREVIEW_PAGE_LIMIT = 200;
+const E_BOOKLET_HOTSPOT_REFERENCE_LOCK_NAMESPACE = 42_618;
 const E_BOOKLET_INSTANCE_STATUSES = new Set(["active", "suspended", "archived"]);
 const DEFAULT_E_BOOKLET_GLOBAL_SETTINGS = {
   default_invite_quota: 0,
@@ -654,6 +656,11 @@ export class EBookletService {
     throw new ForbiddenError("Unable to bind viewer device safely.");
   }
 
+  private async lockHotspotReferenceSequence(db: EBookletDb, templateVersionId: number): Promise<void> {
+    if (typeof db.$executeRaw !== "function") return;
+    await db.$executeRaw`SELECT pg_advisory_xact_lock(${E_BOOKLET_HOTSPOT_REFERENCE_LOCK_NAMESPACE}, ${templateVersionId})`;
+  }
+
   private async auditSafely(db: EBookletDb, data: Record<string, unknown>) {
     try {
       await db.e_booklet_audit_logs.create({ data });
@@ -1055,7 +1062,7 @@ export class EBookletService {
       (file.mimetype === "application/pdf" || file.mimetype.startsWith("application/") || file.mimetype.startsWith("text/"))
         ? "file"
         : inferredFileType;
-    const fileType = requestedFileType || inferredStorageType;
+    const fileType = requestedSafeAttachment ? inferredStorageType : requestedFileType || inferredStorageType;
     if (fileType !== inferredStorageType) {
       await removeUploadedTempFile(file);
       throw new BadRequestError(
@@ -1063,7 +1070,8 @@ export class EBookletService {
       );
     }
 
-    const originalExt = path.extname(file.originalname).toLowerCase();
+    const originalFilename = normalizeOriginalFilename(file.originalname, "e-booklet-file");
+    const originalExt = path.extname(originalFilename).toLowerCase();
     const allowedExts = MIME_ALLOWED_EXTS[file.mimetype];
     if (allowedExts && originalExt && !allowedExts.includes(originalExt)) {
       await removeUploadedTempFile(file);
@@ -1074,10 +1082,10 @@ export class EBookletService {
 
     const ext =
       MIME_TO_EXT[file.mimetype] ||
-      path.extname(file.originalname).toLowerCase() ||
+      path.extname(originalFilename).toLowerCase() ||
       ".bin";
     const safeBase = path
-      .basename(file.originalname, path.extname(file.originalname))
+      .basename(originalFilename, path.extname(originalFilename))
       .replace(/[^a-zA-Z0-9._-]+/g, "-")
       .slice(0, 80);
     const uniqueId = `${Date.now()}-${crypto.randomBytes(8).toString("hex")}`;
@@ -1102,7 +1110,7 @@ export class EBookletService {
           owner_id: input.ownerId ?? null,
           file_type: fileType,
           storage_key: storageKey,
-          original_filename: file.originalname,
+          original_filename: originalFilename,
           mime_type: file.mimetype,
           size_bytes: file.size,
           visibility: "private",
@@ -1988,11 +1996,6 @@ export class EBookletService {
     }
 
     return this.transaction(async (tx: EBookletDb) => {
-      const lastReference = await tx.e_booklet_hotspots.findFirst({
-        where: { template_version_id: templateVersionId },
-        orderBy: { reference_number: "desc" },
-        select: { reference_number: true },
-      });
       const normalizedContent = this.normalizeLegacyHotspotContent(preset);
       const hotspot = await tx.e_booklet_hotspots.create({
         data: {
@@ -2001,7 +2004,7 @@ export class EBookletService {
           x_percent: xPercent,
           y_percent: yPercent,
           radius_percent: preset.radius_percent,
-          reference_number: Number(lastReference?.reference_number ?? 0) + 1,
+          reference_number: null,
           shape: preset.shape || "circle",
           width_percent: preset.width_percent,
           height_percent: preset.height_percent,
@@ -2025,7 +2028,11 @@ export class EBookletService {
           used_by: adminUserId,
         },
       });
-      return this.normalizeHotspotRecord(hotspot);
+      const referenceNumbers = await this.normalizeActiveHotspotReferenceNumbers(tx, templateVersionId);
+      return this.normalizeHotspotRecord({
+        ...hotspot,
+        reference_number: referenceNumbers.get(Number(hotspot.id)) ?? hotspot.reference_number,
+      });
     });
   }
 
@@ -2056,38 +2063,76 @@ export class EBookletService {
   async createHotspot(dto: any, adminUserId: number): Promise<unknown> {
     this.validateHotspotContent(dto);
     const normalizedContent = this.normalizeLegacyHotspotContent(dto);
-    const lastReference = dto.reference_number
-      ? null
-      : await this.db.e_booklet_hotspots.findFirst({
-          where: { template_version_id: dto.template_version_id },
-          orderBy: { reference_number: "desc" },
-          select: { reference_number: true },
-        });
-    const referenceNumber =
-      dto.reference_number ?? Number(lastReference?.reference_number ?? 0) + 1;
-
-    return this.db.e_booklet_hotspots.create({
-      data: {
-        template_version_id: dto.template_version_id,
-        page_number: dto.page_number,
-        x_percent: dto.x_percent,
-        y_percent: dto.y_percent,
-        radius_percent: dto.radius_percent,
-        reference_number: referenceNumber,
-        shape: dto.shape || "circle",
-        width_percent: dto.width_percent,
-        height_percent: dto.height_percent,
-        type: dto.type,
-        title: dto.title,
-        text_content: dto.text_content,
-        asset_file_id: dto.asset_file_id,
-        trigger_type: dto.trigger_type || "click",
-        display_behavior: dto.display_behavior,
-        content_json: normalizedContent,
-        interaction_json: dto.interaction_json,
-        created_by: adminUserId,
-      },
+    return this.transaction(async (tx: EBookletDb) => {
+      const hotspot = await tx.e_booklet_hotspots.create({
+        data: {
+          template_version_id: dto.template_version_id,
+          page_number: dto.page_number,
+          x_percent: dto.x_percent,
+          y_percent: dto.y_percent,
+          radius_percent: dto.radius_percent,
+          reference_number: null,
+          shape: dto.shape || "circle",
+          width_percent: dto.width_percent,
+          height_percent: dto.height_percent,
+          type: dto.type,
+          title: dto.title,
+          text_content: dto.text_content,
+          asset_file_id: dto.asset_file_id,
+          trigger_type: dto.trigger_type || "click",
+          display_behavior: dto.display_behavior,
+          content_json: normalizedContent,
+          interaction_json: dto.interaction_json,
+          created_by: adminUserId,
+        },
+      });
+      const referenceNumbers = await this.normalizeActiveHotspotReferenceNumbers(tx, dto.template_version_id);
+      return this.normalizeHotspotRecord({
+        ...hotspot,
+        reference_number: referenceNumbers.get(Number(hotspot.id)) ?? hotspot.reference_number,
+      });
     });
+  }
+
+  private async normalizeActiveHotspotReferenceNumbers(
+    db: EBookletDb,
+    templateVersionId: number,
+  ): Promise<Map<number, number>> {
+    await this.lockHotspotReferenceSequence(db, templateVersionId);
+
+    const activeHotspots = await db.e_booklet_hotspots.findMany({
+      where: { template_version_id: templateVersionId, is_active: true },
+      orderBy: [{ created_at: "asc" }, { id: "asc" }],
+      select: { id: true },
+    });
+
+    await db.e_booklet_hotspots.updateMany({
+      where: {
+        template_version_id: templateVersionId,
+        is_active: false,
+        reference_number: { not: null },
+      },
+      data: { reference_number: null },
+    });
+
+    await Promise.all(activeHotspots.map((hotspot: any, index: number) =>
+      db.e_booklet_hotspots.update({
+        where: { id: hotspot.id },
+        data: { reference_number: -1_000_000 - index },
+      }),
+    ));
+
+    const referenceNumbers = new Map<number, number>();
+    await Promise.all(activeHotspots.map((hotspot: any, index: number) => {
+      const referenceNumber = index + 1;
+      referenceNumbers.set(Number(hotspot.id), referenceNumber);
+      return db.e_booklet_hotspots.update({
+        where: { id: hotspot.id },
+        data: { reference_number: referenceNumber },
+      });
+    }));
+
+    return referenceNumbers;
   }
 
   normalizeLegacyHotspotContent(input: HotspotContentInput): NormalizedHotspotContent {
@@ -2340,18 +2385,19 @@ export class EBookletService {
     dto: any,
     adminUserId: number,
   ): Promise<unknown> {
+    const { reference_number: _referenceNumber, ...updateDto } = dto;
     let normalizedContent = dto.content_json;
     if (dto.content_json !== undefined || dto.type !== undefined || dto.asset_file_id !== undefined || dto.text_content !== undefined) {
       const existing = await this.db.e_booklet_hotspots.findUnique({ where: { id: hotspotId } });
       if (!existing) throw new NotFoundError("E-booklet hotspot not found");
-      const validationInput = { ...existing, ...dto };
+      const validationInput = { ...existing, ...updateDto };
       this.validateHotspotContent(validationInput);
       normalizedContent = this.normalizeLegacyHotspotContent(validationInput);
     }
     return this.db.e_booklet_hotspots.update({
       where: { id: hotspotId },
       data: {
-        ...dto,
+        ...updateDto,
         ...(normalizedContent !== undefined ? { content_json: normalizedContent } : {}),
         updated_by: adminUserId,
         updated_at: new Date(),
@@ -2360,13 +2406,18 @@ export class EBookletService {
   }
 
   async deleteHotspot(hotspotId: number, adminUserId: number): Promise<unknown> {
-    return this.db.e_booklet_hotspots.update({
-      where: { id: hotspotId },
-      data: {
-        is_active: false,
-        updated_by: adminUserId,
-        updated_at: new Date(),
-      },
+    return this.transaction(async (tx: EBookletDb) => {
+      const deletedHotspot = await tx.e_booklet_hotspots.update({
+        where: { id: hotspotId },
+        data: {
+          is_active: false,
+          reference_number: null,
+          updated_by: adminUserId,
+          updated_at: new Date(),
+        },
+      });
+      await this.normalizeActiveHotspotReferenceNumbers(tx, deletedHotspot.template_version_id);
+      return { ...deletedHotspot, reference_number: null };
     });
   }
 
@@ -3073,7 +3124,7 @@ export class EBookletService {
 
     const purchase = await this.db.e_booklet_purchases.findUnique({
       where: { id },
-      include: { instances: true },
+      include: { instances: true, template: { select: { title: true } } },
     });
     if (!purchase) throw new NotFoundError("E-booklet purchase not found");
 
@@ -3089,7 +3140,7 @@ export class EBookletService {
             teacher_id: purchase.teacher_id,
             template_id: purchase.template_id,
             template_version_id: purchase.template_version_id,
-            display_title: `Teacher e-booklet #${purchase.id}`,
+            display_title: purchase.template?.title || `Teacher e-booklet #${purchase.id}`,
             branding_json: purchase.branding_json,
             invite_quota: 0,
             access_expires_at: purchase.access_expires_at ?? undefined,

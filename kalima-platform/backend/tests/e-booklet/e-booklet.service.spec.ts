@@ -18,6 +18,7 @@ jest.mock("../../src/libs/redis/socketNotificationEmitter", () => ({
 
 import { EBookletService } from "../../src/apps/store-api/services/e-booklet.service";
 import { hashInviteToken } from "../../src/apps/store-api/utils/e-booklet-token";
+import { buildContentDisposition, normalizeOriginalFilename } from "../../src/apps/store-api/utils/filename";
 import { emitNotificationToUser } from "../../src/libs/redis/socketNotificationEmitter";
 
 function createViewerPageToken(input: {
@@ -57,6 +58,7 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
       findFirst: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
+      updateMany: jest.fn(),
     },
     e_booklet_hotspot_presets: {
       findMany: jest.fn(),
@@ -161,6 +163,7 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     ...overrides,
   };
 
+  db.$executeRaw = jest.fn();
   db.$transaction = jest.fn(async (callback: (tx: any) => Promise<unknown>) => {
     return callback(db);
   });
@@ -182,6 +185,23 @@ describe("EBookletService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     delete process.env.E_BOOKLET_PDFINFO_BIN;
+  });
+
+  describe("filename utilities", () => {
+    test("decodes common Arabic mojibake and keeps valid Arabic filenames unchanged", () => {
+      const arabicFilename = "مراجعة.pptx";
+      const mojibakeFilename = Buffer.from(arabicFilename, "utf8").toString("latin1");
+
+      expect(normalizeOriginalFilename(mojibakeFilename)).toBe(arabicFilename);
+      expect(normalizeOriginalFilename(arabicFilename)).toBe(arabicFilename);
+    });
+
+    test("builds Content-Disposition with an ASCII fallback and UTF-8 filename", () => {
+      const header = buildContentDisposition("inline", "مراجعة.pptx", "file");
+
+      expect(header).toContain('inline; filename="_.pptx"');
+      expect(header).toContain("filename*=UTF-8''%D9%85%D8%B1%D8%A7%D8%AC%D8%B9%D8%A9.pptx");
+    });
   });
 
   async function writeTestPdf(filename: string) {
@@ -1208,6 +1228,7 @@ describe("EBookletService", () => {
         marketing_price: 150,
         internal_price: 0,
         status: "pending",
+        template: { title: "Grade 6 Science Revision" },
         instances: [],
       });
       db.e_booklet_instances.create.mockResolvedValue({ id: 10, purchase_id: 91, teacher_id: 55, status: "active" });
@@ -1224,7 +1245,7 @@ describe("EBookletService", () => {
           template_id: 3,
           template_version_id: 8,
           branding_json: { teacherName: "Sara" },
-          display_title: "Teacher e-booklet #91",
+          display_title: "Grade 6 Science Revision",
           invite_quota: 0,
           status: "active",
         }),
@@ -1728,6 +1749,24 @@ describe("EBookletService", () => {
       }));
     });
 
+    test("normalizes Arabic mojibake original filenames when storing e-booklet assets", async () => {
+      const db = createMockDb();
+      db.e_booklet_file_assets.create.mockResolvedValue({ id: 82, file_type: "file" });
+      const service = new EBookletService(db);
+      const arabicFilename = "مراجعة.pptx";
+      const mojibakeFilename = Buffer.from(arabicFilename, "utf8").toString("latin1");
+
+      await expect(service.createFileAsset({
+        ...baseFile,
+        originalname: mojibakeFilename,
+        mimetype: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      } as any, { fileType: "file" })).resolves.toEqual({ id: 82, file_type: "file" });
+
+      expect(db.e_booklet_file_assets.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ original_filename: arabicFilename }),
+      }));
+    });
+
     test("accepts browser fallback MIME values when the hotspot extension is safe", async () => {
       const db = createMockDb();
       db.e_booklet_file_assets.create
@@ -1956,20 +1995,23 @@ describe("EBookletService", () => {
       const db = createMockDb();
       db.e_booklet_template_versions.findUnique.mockResolvedValue({ id: 8, template_id: 3 });
       db.e_booklet_hotspot_presets.findUnique.mockResolvedValue({ ...sourceHotspot, id: 1, is_active: true, default_page_number: 2, default_x_percent: 10, default_y_percent: 20 });
-      db.e_booklet_hotspots.findFirst.mockResolvedValue({ reference_number: 12 });
       db.e_booklet_hotspots.create.mockImplementation(async ({ data }: any) => ({ id: 99, ...data }));
+      db.e_booklet_hotspots.findMany.mockResolvedValue([{ id: 44 }, { id: 99 }]);
+      db.e_booklet_hotspots.update.mockImplementation(async ({ where, data }: any) => ({ id: where.id, ...data }));
+      db.e_booklet_hotspots.updateMany.mockResolvedValue({ count: 0 });
       db.e_booklet_hotspot_preset_usages.create.mockResolvedValue({ id: 5 });
       const service = new EBookletService(db);
 
       const result: any = await service.createHotspotFromPreset(8, { preset_id: 1, page_number: 5, x_percent: 44, y_percent: 66 }, 9);
 
+      expect(db.$executeRaw).toHaveBeenCalledTimes(1);
       expect(db.e_booklet_hotspots.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           template_version_id: 8,
           page_number: 5,
           x_percent: 44,
           y_percent: 66,
-          reference_number: 13,
+          reference_number: null,
           type: "question_answer",
           created_by: 9,
         }),
@@ -1984,6 +2026,7 @@ describe("EBookletService", () => {
         }),
       });
       expect(result.id).toBe(99);
+      expect(result.reference_number).toBe(2);
     });
 
     test("deletes unused presets and archives used presets", async () => {
@@ -2117,10 +2160,12 @@ describe("EBookletService", () => {
       ).not.toThrow();
     });
 
-    test("auto-assigns the next stable reference number when creating hotspots", async () => {
+    test("normalizes active hotspot references after creating hotspots", async () => {
       const db = createMockDb();
-      db.e_booklet_hotspots.findFirst.mockResolvedValue({ reference_number: 7 });
-      db.e_booklet_hotspots.create.mockResolvedValue({ id: 99, reference_number: 8 });
+      db.e_booklet_hotspots.create.mockImplementation(async ({ data }: any) => ({ id: 99, ...data }));
+      db.e_booklet_hotspots.findMany.mockResolvedValue([{ id: 11 }, { id: 99 }]);
+      db.e_booklet_hotspots.update.mockImplementation(async ({ where, data }: any) => ({ id: where.id, ...data }));
+      db.e_booklet_hotspots.updateMany.mockResolvedValue({ count: 1 });
       const service = new EBookletService(db);
       const result = await service.createHotspot(
         {
@@ -2134,13 +2179,42 @@ describe("EBookletService", () => {
         },
         1,
       );
-      expect(db.e_booklet_hotspots.findFirst).toHaveBeenCalledWith({
-        where: { template_version_id: 22 },
-        orderBy: { reference_number: "desc" },
-        select: { reference_number: true },
+      expect(db.$executeRaw).toHaveBeenCalledTimes(1);
+      expect(db.e_booklet_hotspots.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ reference_number: null }) }));
+      expect(db.e_booklet_hotspots.updateMany).toHaveBeenCalledWith({
+        where: { template_version_id: 22, is_active: false, reference_number: { not: null } },
+        data: { reference_number: null },
       });
-      expect(db.e_booklet_hotspots.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ reference_number: 8 }) }));
-      expect(result).toEqual({ id: 99, reference_number: 8 });
+      expect(db.e_booklet_hotspots.update).toHaveBeenCalledWith({ where: { id: 11 }, data: { reference_number: -1000000 } });
+      expect(db.e_booklet_hotspots.update).toHaveBeenCalledWith({ where: { id: 99 }, data: { reference_number: 2 } });
+      expect(result).toEqual(expect.objectContaining({ id: 99, reference_number: 2 }));
+    });
+
+    test("renumbers active hotspots and clears inactive references after deletion", async () => {
+      const db = createMockDb();
+      db.e_booklet_hotspots.update.mockImplementation(async ({ where, data }: any) => ({
+        id: where.id,
+        template_version_id: 22,
+        ...data,
+      }));
+      db.e_booklet_hotspots.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }, { id: 4 }, { id: 5 }]);
+      db.e_booklet_hotspots.updateMany.mockResolvedValue({ count: 1 });
+      const service = new EBookletService(db);
+
+      const result = await service.deleteHotspot(3, 9);
+
+      expect(db.$executeRaw).toHaveBeenCalledTimes(1);
+      expect(db.e_booklet_hotspots.update).toHaveBeenNthCalledWith(1, {
+        where: { id: 3 },
+        data: expect.objectContaining({ is_active: false, reference_number: null, updated_by: 9 }),
+      });
+      expect(db.e_booklet_hotspots.updateMany).toHaveBeenCalledWith({
+        where: { template_version_id: 22, is_active: false, reference_number: { not: null } },
+        data: { reference_number: null },
+      });
+      expect(db.e_booklet_hotspots.update).toHaveBeenCalledWith({ where: { id: 4 }, data: { reference_number: 3 } });
+      expect(db.e_booklet_hotspots.update).toHaveBeenCalledWith({ where: { id: 5 }, data: { reference_number: 4 } });
+      expect(result).toEqual(expect.objectContaining({ id: 3, is_active: false, reference_number: null }));
     });
 
     test("normalizes legacy text and asset hotspots to the V2 content shape on reads", async () => {
@@ -2179,15 +2253,16 @@ describe("EBookletService", () => {
 
     test("preserves and validates multi-block V2 hotspot content on create and update", async () => {
       const db = createMockDb();
-      db.e_booklet_hotspots.findFirst.mockResolvedValue(null);
-      db.e_booklet_hotspots.create.mockResolvedValue({ id: 100 });
+      db.e_booklet_hotspots.create.mockImplementation(async ({ data }: any) => ({ id: 100, ...data }));
+      db.e_booklet_hotspots.findMany.mockResolvedValue([{ id: 100 }]);
+      db.e_booklet_hotspots.update.mockImplementation(async ({ where, data }: any) => ({ id: where.id, ...data }));
+      db.e_booklet_hotspots.updateMany.mockResolvedValue({ count: 0 });
       db.e_booklet_hotspots.findUnique.mockResolvedValue({
         id: 100,
         type: "audio",
         asset_file_id: 123,
         content_json: { blocks: [{ type: "audio", asset_file_id: 123 }] },
       });
-      db.e_booklet_hotspots.update.mockResolvedValue({ id: 100 });
       const service = new EBookletService(db);
 
       await service.createHotspot(
@@ -3200,7 +3275,6 @@ describe("EBookletService", () => {
       );
     });
 
-    test("checks active viewer access including expiry before returning hotspot content", async () => {
     test("does not expose raw YouTube URLs from viewer hotspot content", async () => {
       const db = createMockDb();
       db.e_booklet_hotspots.findUnique.mockResolvedValue({
@@ -3243,6 +3317,7 @@ describe("EBookletService", () => {
       expect(serialized).not.toContain("youtu.be");
     });
 
+    test("checks active viewer access including expiry before returning hotspot content", async () => {
       const db = createMockDb();
       db.e_booklet_hotspots.findUnique.mockResolvedValue({
         id: 77,
@@ -3376,7 +3451,6 @@ describe("EBookletService", () => {
       await expect(service.getAdminAuthorizedHotspotAsset(10, 77, 123)).rejects.toThrow("You do not have access to this hotspot asset.");
       expect(db.e_booklet_file_assets.findUnique).not.toHaveBeenCalled();
     });
-  });
 
     test("does not expose raw YouTube URLs from admin viewer hotspot content", async () => {
       const db = createMockDb();
@@ -3416,6 +3490,7 @@ describe("EBookletService", () => {
       expect(serialized).not.toContain("youtube.com");
       expect(serialized).not.toContain("youtu.be");
     });
+  });
 
   describe("revokeStudentAccess", () => {
     test("requires the acting teacher to own the e-booklet instance", async () => {
