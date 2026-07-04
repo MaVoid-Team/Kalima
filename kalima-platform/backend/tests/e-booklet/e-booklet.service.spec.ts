@@ -201,6 +201,8 @@ describe("EBookletService", () => {
         id: 22,
         page_count: 32,
         page_dimensions_json: [{ width: 800, height: 1100 }],
+        base_document_file_id: 99,
+        rendered_document_file_id: null,
       });
 
       const service = new EBookletService(db);
@@ -225,6 +227,8 @@ describe("EBookletService", () => {
           { width: 800, height: 1100 },
           { width: 800, height: 1100 },
         ],
+        base_document_file_id: 99,
+        rendered_document_file_id: null,
       });
 
       const service = new EBookletService(db);
@@ -242,6 +246,28 @@ describe("EBookletService", () => {
       expect(result.warnings).toEqual([
         "This file has the same page count, but some page dimensions differ from the template. Hotspot positions may not align correctly.",
       ]);
+    });
+
+    test("blocks delivery validation when neither custom nor template PDF exists", async () => {
+      const db = createMockDb();
+      db.e_booklet_template_versions.findUnique.mockResolvedValue({
+        id: 22,
+        page_count: 32,
+        page_dimensions_json: [{ width: 800, height: 1100 }],
+        base_document_file_id: null,
+        rendered_document_file_id: null,
+      });
+
+      const service = new EBookletService(db);
+
+      await expect(
+        service.validateTeacherDocumentForDelivery({
+          templateVersionId: 22,
+          deliveredDocumentAssetId: null,
+          uploadedPageCount: 32,
+          uploadedPageDimensions: [{ width: 800, height: 1100 }],
+        }),
+      ).rejects.toThrow("A PDF document is required before delivering this e-booklet.");
     });
   });
 
@@ -777,6 +803,7 @@ describe("EBookletService", () => {
         where: expect.objectContaining({
           status: "active",
           access_expires_at: { gt: expect.any(Date) },
+          purchase: { status: "delivered" },
           template: expect.objectContaining({ category_id: 4 }),
         }),
       }));
@@ -3031,6 +3058,61 @@ describe("EBookletService", () => {
       );
     });
 
+    test("fails the viewer page request instead of returning a permanent loading placeholder when no document is attached", async () => {
+      const db = createMockDb();
+      db.e_booklet_access.findFirst.mockResolvedValue({
+        id: 1,
+        booklet_instance_id: 10,
+        user_id: 55,
+        status: "active",
+        access_source: "offline_passcode",
+        booklet_instance: {
+          id: 10,
+          status: "active",
+          template_version_id: 22,
+          teacher_id: 99,
+          template_id: 7,
+          teacher: { id: 99, name: "Ms. Sara" },
+          template: { id: 7, title: "Grade 5 Arabic" },
+          custom_document_file_id: null,
+          template_version: {
+            id: 22,
+            page_count: 3,
+            base_document_file_id: null,
+            rendered_document_file_id: null,
+          },
+        },
+      });
+
+      const service = new EBookletService(db);
+
+      await expect(service.getViewerPage(10, 1, 55)).rejects.toThrow(
+        "E-booklet document is not available.",
+      );
+    });
+
+    test("blocks public viewer pages for paid but undelivered teacher instances", async () => {
+      const db = createMockDb();
+      db.e_booklet_instances.findUnique.mockResolvedValue({
+        id: 10,
+        status: "active",
+        custom_document_file_id: 99,
+        template_version: {
+          id: 22,
+          page_count: 3,
+          base_document_file_id: null,
+          rendered_document_file_id: null,
+        },
+        purchase: { id: 91, status: "ready" },
+      });
+
+      const service = new EBookletService(db);
+
+      await expect(service.getPublicViewerPage(10, 1)).rejects.toThrow(
+        "E-booklet instance not found.",
+      );
+    });
+
     test("returns a controlled error when the authorized viewer PDF file is missing", async () => {
       const db = createMockDb();
       db.e_booklet_access.findFirst.mockResolvedValue({
@@ -3200,7 +3282,6 @@ describe("EBookletService", () => {
       );
     });
 
-    test("checks active viewer access including expiry before returning hotspot content", async () => {
     test("does not expose raw YouTube URLs from viewer hotspot content", async () => {
       const db = createMockDb();
       db.e_booklet_hotspots.findUnique.mockResolvedValue({
@@ -3243,6 +3324,7 @@ describe("EBookletService", () => {
       expect(serialized).not.toContain("youtu.be");
     });
 
+    test("checks active viewer access including expiry before returning hotspot content", async () => {
       const db = createMockDb();
       db.e_booklet_hotspots.findUnique.mockResolvedValue({
         id: 77,
