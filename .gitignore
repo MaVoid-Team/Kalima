@@ -132,6 +132,12 @@ kalima-platform/backend/baileys_auth/
 kalima-platform/.local-workdocs/
 kalima-platform/CONTEXT.md
 .codegraph/
+.opencode/node_modules/
+.playwright-cli/
+kalima-platform/.playwright-cli/
+
+# Local backups
+.backups/
 
 # AI/model/evaluation local artifacts — do not commit generated weights, caches, or harness output
 *.gguf
