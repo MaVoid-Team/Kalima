@@ -98,6 +98,9 @@ public/ # (only if needed)
 # Testing
 coverage/
 **/coverage/
+.screenshots/
+kalima-platform/reports/e-booklet-viewer-screenshots.html
+kalima-platform/reports/e-booklet-viewer-screenshots/
 
 # Editor directories and files
 .vscode-test
