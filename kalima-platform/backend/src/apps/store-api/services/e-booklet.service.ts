@@ -318,6 +318,7 @@ export interface PdfMetadata {
 
 export interface ValidateTeacherDocumentInput {
   templateVersionId: number;
+  deliveredDocumentAssetId?: number | null;
   uploadedPageCount: number;
   uploadedPageDimensions?: PageDimensions[];
 }
@@ -2452,6 +2453,7 @@ export class EBookletService {
     const where: any = {
       status: "active",
       access_expires_at: { gt: now },
+      purchase: { status: "delivered" },
     };
 
     if (filters.categoryId) {
@@ -2517,6 +2519,7 @@ export class EBookletService {
         id: instanceId,
         status: "active",
         access_expires_at: { gt: now },
+        purchase: { status: "delivered" },
       },
       include: {
         teacher: { select: { id: true, name: true } },
@@ -3144,6 +3147,7 @@ export class EBookletService {
 
     await this.validateTeacherDocumentForDelivery({
       templateVersionId: purchase.template_version_id,
+      deliveredDocumentAssetId: dto.custom_document_file_id,
       uploadedPageCount: dto.page_count,
       uploadedPageDimensions: dto.page_dimensions,
     });
@@ -3847,18 +3851,20 @@ export class EBookletService {
         template: true,
         template_version: true,
         teacher: { select: { id: true, name: true } },
+        purchase: { select: { id: true, status: true } },
       },
     });
-    if (!instance || instance.status !== "active") {
+    if (!instance || instance.status !== "active" || instance.purchase?.status !== "delivered") {
       throw new NotFoundError("E-booklet instance not found.");
     }
+    const { purchase: _purchase, ...safeInstance } = instance as any;
     return this.sanitizeViewerAccess({
       id: 0,
       status: "active",
       access_source: "public_view",
       public_view_mode: true,
       booklet_instance_id: instanceId,
-      booklet_instance: instance,
+      booklet_instance: safeInstance,
     });
   }
 
@@ -3905,6 +3911,9 @@ export class EBookletService {
       throw new BadRequestError("Invalid e-booklet page number.");
     }
     const documentAssetId = this.resolveViewerDocumentAssetId(access.booklet_instance);
+    if (!documentAssetId) {
+      throw new NotFoundError("E-booklet document is not available.");
+    }
     const expiresAt = new Date(Date.now() + VIEWER_PAGE_TOKEN_TTL_MS);
     await this.db.e_booklet_audit_logs.create({
       data: {
@@ -3917,7 +3926,7 @@ export class EBookletService {
     });
     return {
       pageNumber,
-      renderMode: documentAssetId ? "pdf-document" : "server-page",
+      renderMode: "pdf-document",
       documentAssetId,
       pageAccessToken: createViewerPageToken({ instanceId, pageNumber, userId: adminUserId, expiresAt }),
       expiresAt,
@@ -4158,9 +4167,12 @@ export class EBookletService {
     }
     const expiresAt = new Date(Date.now() + VIEWER_PAGE_TOKEN_TTL_MS);
     const documentAssetId = this.resolveViewerDocumentAssetId(access.booklet_instance);
+    if (!documentAssetId) {
+      throw new NotFoundError("E-booklet document is not available.");
+    }
     return {
       pageNumber,
-      renderMode: documentAssetId ? "pdf-document" : "server-page",
+      renderMode: "pdf-document",
       documentAssetId,
       pageAccessToken: createViewerPageToken({ instanceId, pageNumber, userId: 0, expiresAt }),
       expiresAt,
@@ -4169,9 +4181,7 @@ export class EBookletService {
         teacherName: access.booklet_instance?.teacher?.name || null,
         templateTitle: access.booklet_instance?.template?.title || null,
       },
-      message: documentAssetId
-        ? null
-        : "Page rendering pipeline is pending document renderer integration.",
+      message: null,
     };
   }
 
@@ -4205,9 +4215,12 @@ export class EBookletService {
       metadata: { page_number: pageNumber },
     });
     const documentAssetId = this.resolveViewerDocumentAssetId(access.booklet_instance);
+    if (!documentAssetId) {
+      throw new NotFoundError("E-booklet document is not available.");
+    }
     return {
       pageNumber,
-      renderMode: documentAssetId ? "pdf-document" : "server-page",
+      renderMode: "pdf-document",
       documentAssetId,
       pageAccessToken: createViewerPageToken({
         instanceId,
@@ -4221,9 +4234,7 @@ export class EBookletService {
         teacherName: access.booklet_instance?.teacher?.name || null,
         templateTitle: access.booklet_instance?.template?.title || null,
       },
-      message: documentAssetId
-        ? null
-        : "Page rendering pipeline is pending document renderer integration.",
+      message: null,
     };
   }
 
@@ -4398,11 +4409,22 @@ export class EBookletService {
         id: true,
         page_count: true,
         page_dimensions_json: true,
+        base_document_file_id: true,
+        rendered_document_file_id: true,
       },
     });
 
     if (!templateVersion) {
       throw new NotFoundError("E-booklet template version not found");
+    }
+
+    const documentAssetId =
+      input.deliveredDocumentAssetId ??
+      templateVersion.rendered_document_file_id ??
+      templateVersion.base_document_file_id ??
+      null;
+    if (!documentAssetId) {
+      throw new BadRequestError("A PDF document is required before delivering this e-booklet.");
     }
 
     if (templateVersion.page_count !== input.uploadedPageCount) {
