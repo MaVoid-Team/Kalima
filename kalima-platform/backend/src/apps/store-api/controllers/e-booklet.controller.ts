@@ -4,6 +4,7 @@ import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { getEBookletService } from "../services/e-booklet.service";
 import { getEBookletDomainServices } from "../services/e-booklet-domain.service";
+import { buildContentDisposition } from "../utils/filename";
 import {
   AcceptEBookletInviteDto,
   CreateEBookletTemplateDto,
@@ -218,6 +219,10 @@ function setPrivateNoStore(res: Response) {
   res.set("Expires", "0");
 }
 
+function setInlineFilename(res: Response, filename: unknown, fallback: string) {
+  res.set("Content-Disposition", buildContentDisposition("inline", filename, fallback));
+}
+
 export const eBookletController = {
   async uploadFileAsset(req: Request, res: Response, next: NextFunction) {
     try {
@@ -253,10 +258,7 @@ export const eBookletController = {
             );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/octet-stream");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
-      );
+      setInlineFilename(res, asset.original_filename, "e-booklet-file");
       if (pageBuffer) {
         res.send(pageBuffer);
         return;
@@ -275,10 +277,7 @@ export const eBookletController = {
       );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "image/webp");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="${String(asset.original_filename || "e-booklet-page.webp").replace(/"/g, "")}"`,
-      );
+      setInlineFilename(res, asset.original_filename, "e-booklet-page.webp");
       if (pageBuffer) {
         res.send(pageBuffer);
         return;
@@ -297,10 +296,7 @@ export const eBookletController = {
         );
       res.set("Cache-Control", "public, max-age=300");
       res.type(asset.mime_type || "image/*");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="${String(asset.original_filename || "e-booklet-cover").replace(/"/g, "")}"`,
-      );
+      setInlineFilename(res, asset.original_filename, "e-booklet-cover");
       res.sendFile(absolutePath);
     } catch (error) {
       next(error);
@@ -393,10 +389,7 @@ export const eBookletController = {
       );
       res.set("Cache-Control", cacheControl || "public, max-age=60");
       res.type(asset.mime_type || "application/octet-stream");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
-      );
+      setInlineFilename(res, asset.original_filename, "e-booklet-file");
       res.sendFile(absolutePath);
     } catch (error) {
       next(error);
@@ -411,10 +404,7 @@ export const eBookletController = {
       );
       res.set("Cache-Control", "public, max-age=60");
       res.type(asset.mime_type || "image/webp");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="${String(asset.original_filename || "e-booklet-preview-page.webp").replace(/"/g, "")}"`,
-      );
+      setInlineFilename(res, asset.original_filename, "e-booklet-preview-page.webp");
       if (pageBuffer) {
         res.send(pageBuffer);
         return;
@@ -1549,10 +1539,7 @@ export const eBookletController = {
       );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/pdf");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="${String(asset.original_filename || "e-booklet-document.pdf").replace(/"/g, "")}"`,
-      );
+      setInlineFilename(res, asset.original_filename, "e-booklet-document.pdf");
       if (pageBuffer) {
         res.send(pageBuffer);
         return;
@@ -1574,10 +1561,7 @@ export const eBookletController = {
       );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "image/webp");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="${String(asset.original_filename || "e-booklet-page.webp").replace(/"/g, "")}"`,
-      );
+      setInlineFilename(res, asset.original_filename, "e-booklet-page.webp");
       if (pageBuffer) {
         res.send(pageBuffer);
         return;
@@ -1601,10 +1585,7 @@ export const eBookletController = {
       );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/pdf");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="${String(asset.original_filename || "e-booklet-document.pdf").replace(/"/g, "")}"`,
-      );
+      setInlineFilename(res, asset.original_filename, "e-booklet-document.pdf");
       if (pageBuffer) {
         res.send(pageBuffer);
         return;
@@ -1627,10 +1608,7 @@ export const eBookletController = {
       );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "image/webp");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="${String(asset.original_filename || "e-booklet-page.webp").replace(/"/g, "")}"`,
-      );
+      setInlineFilename(res, asset.original_filename, "e-booklet-page.webp");
       if (pageBuffer) {
         res.send(pageBuffer);
         return;
@@ -1650,10 +1628,7 @@ export const eBookletController = {
       );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/octet-stream");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
-      );
+      setInlineFilename(res, asset.original_filename, "e-booklet-file");
       res.sendFile(absolutePath);
     } catch (error) {
       next(error);
@@ -1669,10 +1644,7 @@ export const eBookletController = {
       );
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/octet-stream");
-      res.set(
-        "Content-Disposition",
-        `inline; filename="${String(asset.original_filename || "e-booklet-file").replace(/"/g, "")}"`,
-      );
+      setInlineFilename(res, asset.original_filename, "e-booklet-file");
       res.sendFile(absolutePath);
     } catch (error) {
       next(error);

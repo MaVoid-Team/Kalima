@@ -28,7 +28,15 @@ const optionalNumberValue = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
-const getEBookletTitle = (instance, fallback) => instance.template?.title || instance.display_title || fallback;
+const isGeneratedEBookletTitle = (value) => /^Teacher e-booklet #\d+$/i.test(String(value || "").trim());
+
+const getEBookletTitle = (instance, fallback) => {
+  const templateTitle = instance.template?.title?.trim?.();
+  if (templateTitle) return templateTitle;
+  const displayTitle = instance.display_title?.trim?.();
+  if (displayTitle && !isGeneratedEBookletTitle(displayTitle)) return displayTitle;
+  return fallback;
+};
 
 const pageMotion = {
   hidden: { opacity: 0, y: 8 },
@@ -94,13 +102,13 @@ export default function AdminEBookletInstancesPage() {
   const summary = useMemo(() => instances.reduce((acc, instance) => {
     acc.total += 1;
     acc.active += instance.status === "active" ? 1 : 0;
-    acc.revoked += instance.status === "revoked" ? 1 : 0;
+    acc.suspended += instance.status === "suspended" ? 1 : 0;
     acc.seats += numberValue(instance.used_invites_count, instance._count?.access_records || 0);
     acc.quota += numberValue(instance.invite_quota);
     const devices = optionalNumberValue(instance.used_devices_count ?? instance.active_devices_count ?? instance.devices_count);
     acc.devices += devices || 0;
     return acc;
-  }, { total: 0, active: 0, revoked: 0, seats: 0, quota: 0, devices: 0 }), [instances]);
+  }, { total: 0, active: 0, suspended: 0, seats: 0, quota: 0, devices: 0 }), [instances]);
 
   const teacherGroups = useMemo(() => Object.entries(grouped), [grouped]);
   const initialLoading = loading && instances.length === 0;
@@ -204,7 +212,7 @@ export default function AdminEBookletInstancesPage() {
               <option value="all">{t("statuses.all")}</option>
               <option value="active">{t("statuses.active")}</option>
               <option value="archived">{t("statuses.archived")}</option>
-              <option value="revoked">{t("statuses.revoked")}</option>
+              <option value="suspended">{t("statuses.suspended")}</option>
             </select>
             <DropdownMenu dir={i18n.dir()}>
               <DropdownMenuTrigger asChild>

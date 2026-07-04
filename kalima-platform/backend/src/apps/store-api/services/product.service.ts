@@ -22,6 +22,7 @@ import {
   NotFoundError,
   ConflictError,
 } from "../../../libs/errors";
+import { normalizeOriginalFilename } from "../utils/filename";
 import { reviewService } from "./review.service";
 import { sampleService as defaultSampleService } from "./sample.service";
 
@@ -758,7 +759,7 @@ class ProductService {
         product_id: productId,
         url,
         source_type: video_source_type_enum.upload,
-        original_name: file.originalname,
+        original_name: normalizeOriginalFilename(file.originalname, "video"),
         mime_type: file.mimetype,
         size: file.buffer.length,
         sort_order: sortOrder,

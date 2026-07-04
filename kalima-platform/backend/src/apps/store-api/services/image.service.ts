@@ -5,6 +5,7 @@ import sharp from "sharp";
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
 import { images, image_mime_type_enum } from "../generated/prisma/client";
+import { normalizeOriginalFilename } from "../utils/filename";
 import { NotFoundError, BadRequestError } from "../../../libs/errors";
 import { resolveUploadedUrlPath, resolveUploadPath } from "../../../libs/uploadsRoot";
 
@@ -124,7 +125,7 @@ class ImageService {
     const image = await this.db.images.create({
       data: {
         url,
-        original_name: file.originalname,
+        original_name: normalizeOriginalFilename(file.originalname, "image"),
         mime_type: finalMime,
         size: finalBuffer.length,
       },

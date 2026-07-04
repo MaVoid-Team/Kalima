@@ -8,6 +8,7 @@ import {
   sample_sections,
   sample_media_type_enum,
 } from "../generated/prisma/client";
+import { normalizeOriginalFilename } from "../utils/filename";
 import { NotFoundError, BadRequestError } from "../../../libs/errors";
 import { resolveUploadedUrlPath, resolveUploadPath } from "../../../libs/uploadsRoot";
 
@@ -500,7 +501,7 @@ export class SampleService {
       : lowQualityFile!;
     const mediaType =
       MIME_TO_MEDIA_TYPE[primaryFile.mimetype] ?? sample_media_type_enum.pdf;
-    const originalName = primaryFile.originalname;
+    const originalName = normalizeOriginalFilename(primaryFile.originalname, "sample-file");
     const mimeType = primaryFile.mimetype;
     const size = primaryFile.buffer!.length;
 
@@ -590,7 +591,7 @@ export class SampleService {
         highQualityFile.mimetype,
         "high_quality",
       );
-      originalName = highQualityFile.originalname;
+      originalName = normalizeOriginalFilename(highQualityFile.originalname, originalName);
       mimeType = highQualityFile.mimetype;
       size = highQualityFile.buffer.length;
     }
@@ -611,6 +612,11 @@ export class SampleService {
         lowQualityFile.mimetype,
         "low_quality",
       );
+      if (!highQualityUrl) {
+        originalName = normalizeOriginalFilename(lowQualityFile.originalname, originalName);
+        mimeType = lowQualityFile.mimetype;
+        size = lowQualityFile.buffer.length;
+      }
     }
 
     if (thumbnailFile?.buffer) {

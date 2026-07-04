@@ -108,6 +108,12 @@ const HOTSPOT_COLOR_STORAGE_KEY = "kalima_hotspot_color";
 const DEFAULT_HOTSPOT_COLOR = "blue";
 const contentBlockTypes = ["text", "image", "video", "audio", "file", "link", "question_answer"];
 const hotspotVideoAccept = ".mp4,.m4v,.mov,.qt,.webm,.ogv,.ogg,video/mp4,video/x-m4v,video/quicktime,video/webm,video/ogg";
+const hotspotFileAccept = [
+  ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv",
+  ".jpg,.jpeg,.png,.webp,.gif,.avif,image/*",
+  ".mp3,.wav,.m4a,.ogg,.webm,audio/*",
+  ".mp4,.m4v,.mov,.qt,.ogv,.webm,video/*",
+].join(",");
 const textFontOptions = ["Inter", "Arial", "Georgia", "Times New Roman", "Courier New"];
 const arabicTextFontOptions = ["Cairo", "Arial", "Tahoma", "Times New Roman", "Amiri", "Noto Naskh Arabic"];
 const getStoredHotspotColor = () => {
@@ -142,6 +148,7 @@ const createDefaultBlock = (type = "text") => ({
   url: "",
   source: type === "video" ? "uploaded" : undefined,
   youtube_url: "",
+  autoplay: ["audio", "video"].includes(type) ? false : undefined,
   font_family: textFontOptions[0],
   arabic_font_family: arabicTextFontOptions[0],
   answers: [
@@ -258,7 +265,19 @@ const normalizeContentForForm = (hotspot) => {
       ];
   return {
     version: 2,
-    blocks: blocks.map((block, index) => coerceBlockForForm(block, index === 0 ? hotspot?.type : "text")),
+    blocks: blocks.map((block, index) => {
+      const hasBlockAutoplay = Object.prototype.hasOwnProperty.call(block || {}, "autoplay");
+      const coercedBlock = coerceBlockForForm(block, index === 0 ? hotspot?.type : "text");
+      if (
+        index === 0 &&
+        coercedBlock.type === "audio" &&
+        !hasBlockAutoplay &&
+        hotspot?.interaction_json?.audio?.autoplay !== undefined
+      ) {
+        return { ...coercedBlock, autoplay: Boolean(hotspot.interaction_json.audio.autoplay) };
+      }
+      return coercedBlock;
+    }),
   };
 };
 
@@ -304,6 +323,9 @@ const buildContentJsonPayload = (form) => ({
     if (["image", "audio", "file"].includes(block.type) && block.asset_file_id) {
       payload.asset_file_id = Number(block.asset_file_id);
     }
+    if (["audio", "video"].includes(block.type)) {
+      payload.autoplay = Boolean(block.autoplay);
+    }
     if (block.type === "video") {
       payload.source = block.source || "uploaded";
       if (payload.source === "youtube") payload.youtube_url = block.youtube_url?.trim() || "";
@@ -330,9 +352,6 @@ const buildHotspotPayload = (form) => {
     x_percent: parseNumber(form.x_percent, 50),
     y_percent: parseNumber(form.y_percent, 50),
     radius_percent: parseNumber(form.radius_percent, 1.8),
-    reference_number: form.reference_number === ""
-      ? null
-      : Number(form.reference_number),
     shape: form.shape || "circle",
     width_percent: parseNumber(form.width_percent, 5),
     height_percent: parseNumber(form.height_percent, 5),
@@ -448,6 +467,7 @@ export default function AdminEBookletEditorPage() {
   const pendingHotspotAutosaveRef = useRef(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const hotspotListItemRefs = useRef(new Map());
 
   const editor = useAdminEBookletEditor();
   const hotspotLibrary = useAdminEBookletHotspotLibrary();
@@ -908,6 +928,31 @@ export default function AdminEBookletEditorPage() {
     }));
   };
 
+  const updateMediaAutoplay = (blockIndex, value) => {
+    setHotspotForm((current) => {
+      const blocks = current.content_json?.blocks?.length
+        ? current.content_json.blocks
+        : [createDefaultBlock(current.type)];
+      const nextBlocks = blocks.map((block, index) =>
+        index === blockIndex ? { ...block, autoplay: value } : block,
+      );
+      const primaryBlock = nextBlocks[0] || {};
+      return {
+        ...current,
+        content_json: { version: 2, blocks: nextBlocks },
+        interaction_json: primaryBlock.type === "audio"
+          ? {
+              ...current.interaction_json,
+              audio: {
+                ...(current.interaction_json?.audio || {}),
+                autoplay: Boolean(primaryBlock.autoplay),
+              },
+            }
+          : current.interaction_json,
+      };
+    });
+  };
+
   const copyHotspotConfiguration = () => {
     setCopiedHotspotConfiguration(createHotspotConfigurationSnapshot(hotspotForm));
     toast.success(t("toasts.hotspotConfigurationCopied"));
@@ -1313,6 +1358,13 @@ export default function AdminEBookletEditorPage() {
 
   const selectHotspot = (hotspot) => {
     setHasDraftHotspotPreview(false);
+    setCollapsedHotspotPages((current) => {
+      const pageNumber = Number(hotspot.page_number);
+      if (!current.has(pageNumber)) return current;
+      const next = new Set(current);
+      next.delete(pageNumber);
+      return next;
+    });
     const contentJson = normalizeContentForForm(hotspot);
     const firstBlock = contentJson.blocks[0] || createDefaultBlock(hotspot.type || "text");
     const nextForm = {
@@ -1336,6 +1388,12 @@ export default function AdminEBookletEditorPage() {
     };
     lastSavedHotspotSnapshotRef.current = getHotspotAutosaveSnapshot(nextForm);
     setHotspotForm(nextForm);
+    window.setTimeout(() => {
+      hotspotListItemRefs.current.get(hotspot.id)?.scrollIntoView({
+        block: "nearest",
+        inline: "nearest",
+      });
+    }, 0);
   };
 
   const mergeSavedHotspotIntoList = (savedHotspot) => {
@@ -1521,7 +1579,7 @@ export default function AdminEBookletEditorPage() {
       const file = new File([blob], `hotspot-recording-${Date.now()}.webm`, {
         type: "audio/webm",
       });
-      await handleHotspotMediaUpload(file);
+      handleHotspotMediaUpload(file).catch(() => {});
     };
     mediaRecorderRef.current = recorder;
     recorder.start();
@@ -1675,9 +1733,8 @@ export default function AdminEBookletEditorPage() {
       try {
         await editor.updateHotspot(dragState.hotspotId, payload, { showToast: false });
         setHotspotSaveState("saved");
-      } catch (error) {
+      } catch {
         setHotspotSaveState("idle");
-        throw error;
       }
     }
   };
@@ -1768,7 +1825,7 @@ export default function AdminEBookletEditorPage() {
                 {block.asset_file_id ? t("common.replace") : t("common.upload")}
                 <input
                   type="file"
-                  accept={block.type === "image" ? "image/*" : block.type === "audio" ? "audio/*" : undefined}
+                  accept={block.type === "image" ? "image/*" : block.type === "audio" ? "audio/*" : hotspotFileAccept}
                   className="hidden"
                   disabled={isAnyBlockUploading}
                   onChange={(event) => {
@@ -1788,12 +1845,12 @@ export default function AdminEBookletEditorPage() {
                 </div>
               </div>
             )}
-            {block.type === "audio" && isPrimary && (
+            {block.type === "audio" && (
               <label className="flex items-center gap-2 text-xs">
                 <input
                   type="checkbox"
-                  checked={Boolean(hotspotForm.interaction_json?.audio?.autoplay)}
-                  onChange={(event) => updateInteractionField("audio", "autoplay", event.target.checked)}
+                  checked={Boolean(block.autoplay ?? (isPrimary && hotspotForm.interaction_json?.audio?.autoplay))}
+                  onChange={(event) => updateMediaAutoplay(index, event.target.checked)}
                 />
                 {t("admin.editor.hotspots.audioAutoplay")}
               </label>
@@ -1868,6 +1925,14 @@ export default function AdminEBookletEditorPage() {
                 )}
               </div>
             )}
+            <label className="flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={Boolean(block.autoplay)}
+                onChange={(event) => updateMediaAutoplay(index, event.target.checked)}
+              />
+              {t("admin.editor.hotspots.videoAutoplay", { defaultValue: t("admin.editor.hotspots.audioAutoplay") })}
+            </label>
           </div>
         )}
 
@@ -2499,7 +2564,7 @@ export default function AdminEBookletEditorPage() {
                       type="button"
                       size="icon-sm"
                       className="bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-emerald-600/60 dark:bg-emerald-600 dark:hover:bg-emerald-500"
-                      onClick={saveHotspot}
+                      onClick={() => { saveHotspot().catch(() => {}); }}
                       disabled={editor.loading || isHotspotSaving || !activeVersionId}
                       title={t("common.save")}
                       aria-label={t("common.save")}
@@ -2518,7 +2583,7 @@ export default function AdminEBookletEditorPage() {
                       type="button"
                       variant="outline"
                       size="icon-sm"
-                      onClick={deleteCurrentHotspot}
+                      onClick={() => { deleteCurrentHotspot().catch(() => {}); }}
                       disabled={!hotspotForm.id || editor.loading}
                       title={t("common.delete")}
                       aria-label={t("common.delete")}
@@ -2539,10 +2604,10 @@ export default function AdminEBookletEditorPage() {
               >
                 <div
                   ref={pageRef}
-                  onClick={handlePageClick}
+                  onClick={(event) => { handlePageClick(event).catch(() => {}); }}
                   onPointerMove={handleHotspotDragMove}
-                  onPointerUp={stopHotspotDrag}
-                  onPointerLeave={stopHotspotDrag}
+                  onPointerUp={() => { stopHotspotDrag().catch(() => {}); }}
+                  onPointerLeave={() => { stopHotspotDrag().catch(() => {}); }}
                   className="relative overflow-hidden rounded-md border bg-white shadow-sm"
                   style={{ aspectRatio: pageAspectRatio }}
                   data-testid="admin-e-booklet-hotspot-page"
@@ -2771,7 +2836,9 @@ export default function AdminEBookletEditorPage() {
                       </div>
                       <div className="space-y-1.5">
                         <HotspotSettingLabel label={t("admin.editor.hotspots.referenceInput")} tooltip={t("admin.editor.hotspots.settingTooltips.referenceInput")} />
-                        <Input className="h-8 text-sm" type="number" min="1" value={hotspotForm.reference_number} onChange={(event) => updateHotspotField("reference_number", event.target.value)} placeholder={t("admin.editor.hotspots.referenceAuto")} />
+                        <div className="flex h-8 items-center rounded-md border bg-muted px-3 text-sm text-muted-foreground">
+                          {hotspotForm.reference_number || t("admin.editor.hotspots.referenceAuto")}
+                        </div>
                       </div>
                     </>
                   )}
@@ -2898,7 +2965,7 @@ export default function AdminEBookletEditorPage() {
                 </div>
 
                 {primaryBlock.type === "audio" && (
-                  <Button type="button" variant="outline" size="sm" onClick={recording ? stopAudioRecording : startAudioRecording} className="h-8 w-full text-xs">
+                  <Button type="button" variant="outline" size="sm" onClick={recording ? stopAudioRecording : () => { startAudioRecording().catch(() => {}); }} className="h-8 w-full text-xs">
                     {recording ? <Save className="h-3.5 w-3.5" /> : <MousePointerClick className="h-3.5 w-3.5" />}
                     {recording ? t("admin.editor.hotspots.stopRecording") : t("admin.editor.hotspots.recordAudio")}
                   </Button>
@@ -2913,7 +2980,7 @@ export default function AdminEBookletEditorPage() {
               <Button type="button" variant="outline" size="icon-sm" onClick={applyCopiedHotspotConfiguration} disabled={editor.loading || !copiedHotspotConfiguration} title={t("admin.editor.hotspots.applyConfiguration")} aria-label={t("admin.editor.hotspots.applyConfiguration")}>
                 <ClipboardPaste className="h-4 w-4" />
               </Button>
-              <Button size="icon-sm" onClick={saveHotspot} disabled={editor.loading || isHotspotSaving || !activeVersionId} title={t("common.save")} aria-label={t("common.save")}>
+              <Button size="icon-sm" onClick={() => { saveHotspot().catch(() => {}); }} disabled={editor.loading || isHotspotSaving || !activeVersionId} title={t("common.save")} aria-label={t("common.save")}>
                 {isHotspotSaving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : hotspotSaveState === "saved" ? (
@@ -2922,7 +2989,7 @@ export default function AdminEBookletEditorPage() {
                   <Save className="h-4 w-4" />
                 )}
               </Button>
-              <Button variant="outline" size="icon-sm" onClick={deleteCurrentHotspot} disabled={!hotspotForm.id || editor.loading} title={t("common.delete")} aria-label={t("common.delete")}>
+              <Button variant="outline" size="icon-sm" onClick={() => { deleteCurrentHotspot().catch(() => {}); }} disabled={!hotspotForm.id || editor.loading} title={t("common.delete")} aria-label={t("common.delete")}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -2962,15 +3029,31 @@ export default function AdminEBookletEditorPage() {
                           </Button>
                         </div>
                       </div>
-                      {!isPageCollapsed && pageHotspotItems.map((hotspot) => (
-                        <button key={hotspot.id} type="button" onClick={() => { setSelectedPage(Number(hotspot.page_number)); selectHotspot(hotspot); }} className="flex w-full items-start justify-between gap-2 border-b px-2 py-2 text-start text-xs last:border-b-0 hover:bg-muted/50">
-                          <span className="min-w-0">
-                            <span className="block truncate font-medium">#{hotspot.reference_number || hotspot.id} {hotspot.title || t("common.untitled")}</span>
-                            <span className="block text-xs text-muted-foreground">{t(`admin.editor.hotspots.types.${hotspot.type}`, { defaultValue: hotspot.type })}</span>
-                          </span>
-                          <span className="shrink-0 text-xs text-muted-foreground">{Number(hotspot.x_percent).toFixed(1)}, {Number(hotspot.y_percent).toFixed(1)}</span>
-                        </button>
-                      ))}
+                      {!isPageCollapsed && pageHotspotItems.map((hotspot) => {
+                        const isSelected = Number(hotspotForm.id) === Number(hotspot.id);
+                        return (
+                          <button
+                            key={hotspot.id}
+                            ref={(node) => {
+                              if (node) hotspotListItemRefs.current.set(hotspot.id, node);
+                              else hotspotListItemRefs.current.delete(hotspot.id);
+                            }}
+                            type="button"
+                            onClick={() => { setSelectedPage(Number(hotspot.page_number)); selectHotspot(hotspot); }}
+                            className={`flex w-full items-start justify-between gap-2 border-b px-2 py-2 text-start text-xs last:border-b-0 hover:bg-muted/50 ${
+                              isSelected
+                                ? "bg-primary/10 text-primary ring-1 ring-inset ring-primary/30 hover:bg-primary/15"
+                                : ""
+                            }`}
+                          >
+                            <span className="min-w-0">
+                              <span className="block truncate font-medium">#{hotspot.reference_number || hotspot.id} {hotspot.title || t("common.untitled")}</span>
+                              <span className={`block text-xs ${isSelected ? "text-primary/80" : "text-muted-foreground"}`}>{t(`admin.editor.hotspots.types.${hotspot.type}`, { defaultValue: hotspot.type })}</span>
+                            </span>
+                            <span className={`shrink-0 text-xs ${isSelected ? "text-primary/80" : "text-muted-foreground"}`}>{Number(hotspot.x_percent).toFixed(1)}, {Number(hotspot.y_percent).toFixed(1)}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   );
                 })}

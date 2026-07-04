@@ -287,6 +287,7 @@ function AssetBlock({ block, hotspot, viewer, t, instanceId }) {
   const assetId = block.asset_file_id || hotspot.asset_file_id;
   const interaction = hotspot.interaction_json || {};
   const imageInteraction = interaction.image || {};
+  const shouldAutoplayMedia = block.autoplay ?? (block.type === "audio" ? interaction.audio?.autoplay : false);
   const shouldAutoExpand = block.type === "image" && imageInteraction.autoExpand;
   const canExpandOnClick = block.type === "image" && imageInteraction.expandOnClick !== false;
 
@@ -355,7 +356,7 @@ function AssetBlock({ block, hotspot, viewer, t, instanceId }) {
         src={assetUrl}
         controls
         controlsList="nodownload noplaybackrate"
-        autoPlay={Boolean(interaction.audio?.autoplay)}
+        autoPlay={Boolean(shouldAutoplayMedia)}
         className="w-full"
       />
     );
@@ -367,6 +368,7 @@ function AssetBlock({ block, hotspot, viewer, t, instanceId }) {
         src={assetUrl}
         controls
         controlsList="nodownload noplaybackrate"
+        autoPlay={Boolean(block.autoplay)}
         className="max-h-[84vh] w-full rounded-md bg-black"
       />
     );
@@ -507,7 +509,7 @@ function YoutubeHotspotPlayer({ block, t }) {
           title={block.title || t("admin.editor.hotspots.types.video")}
           src={`youtube/${videoId}`}
           playsInline
-          autoPlay={false}
+          autoPlay={Boolean(block.autoplay)}
           aspectRatio="16/9"
           fullscreenOrientation="landscape"
         >
@@ -1132,17 +1134,27 @@ export default function EBookletViewerPage({ previewMode = false }) {
                 />
               ))}
               {canShowHotspots && contentHotspot && (
-                <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-950/25 p-3 sm:p-6">
-                  <div className={hotspotPopupClassName}>
+                <div
+                  className="absolute inset-0 z-20 flex items-center justify-center bg-slate-950/25 p-3 sm:p-6"
+                  onPointerDown={(event) => {
+                    if (event.target === event.currentTarget) closeHotspot();
+                  }}
+                >
+                  <div
+                    className={hotspotPopupClassName}
+                    role="dialog"
+                    aria-modal="true"
+                    onPointerDown={(event) => event.stopPropagation()}
+                  >
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute end-2 top-2 z-10 h-8 w-8 rounded-full bg-black/65 text-white shadow-sm hover:bg-black/80 hover:text-white"
+                      className="absolute end-3 top-3 z-30 h-11 w-11 rounded-full bg-black/70 text-white shadow-sm touch-manipulation hover:bg-black/85 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                       onClick={closeHotspot}
                       aria-label={t("common.close", { defaultValue: "Close" })}
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-5 w-5" />
                     </Button>
                     <div className={hotspotBodyClassName}>
                       {hotspotLoading ? (

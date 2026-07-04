@@ -134,6 +134,8 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     expect(result.redeemUrl).toMatch(/\/e-booklet-code$/);
     expect(result.whatsappMessage).toContain(result.code);
     expect(result.whatsappMessage).toContain(result.redeemUrl);
+    expect(result.whatsappMessage).toContain(`\u2066${result.redeemUrl}\u2069`);
+    expect(result.whatsappMessage).toContain(`\u2066${result.code}\u2069`);
     expect(result.record.code_hash).toBeUndefined();
     expect(result.record.code_plaintext).toBeUndefined();
     expect(db.e_booklet_audit_logs.create).not.toHaveBeenCalled();
@@ -352,6 +354,21 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
       create: expect.objectContaining({ booklet_instance_id: 10, user_id: 55, access_source: "teacher_code", status: "active" }),
     }));
     expect(db.e_booklet_access_code_redemptions.create).toHaveBeenCalledWith({ data: expect.objectContaining({ counted_for_progress: false, access_id: 88, paid_redemption_guard: null }) });
+  });
+
+  test("redemption accepts codes pasted with invisible RTL formatting characters", async () => {
+    const db = createDb();
+    db.e_booklet_access_codes.findUnique.mockResolvedValue({ id: 4, booklet_instance_id: 10, teacher_id: 9, kind: "free", max_redemptions: 999999, redeemed_count: 0, status: "active", expires_at: null, bound_student_id: null, term_id: 1 });
+    db.e_booklet_access_code_redemptions.findFirst.mockResolvedValue(null);
+    db.e_booklet_access.upsert.mockResolvedValue({ id: 88, user_id: 55, booklet_instance_id: 10, access_source: "teacher_code" });
+    db.e_booklet_access_code_redemptions.create.mockResolvedValue({ id: 40, access_id: 88, student_id: 55, counted_for_progress: false });
+    db.e_booklet_access_codes.updateMany.mockResolvedValue({ count: 1 });
+    const service = new EBookletRedemptionService(db);
+
+    await expect(service.redeemCode("\u2066KLM-FREECODE123\u2069", 55, { termsAccepted: true })).resolves.toEqual(expect.objectContaining({ id: 40, bookletInstanceId: 10, accessId: 88 }));
+    expect(db.e_booklet_access_codes.findUnique).toHaveBeenCalledWith({
+      where: { code_hash: hashEBookletAccessCode("KLM-FREECODE123") },
+    });
   });
 
   test("shared redemption checks the same student first and atomically reserves capacity", async () => {

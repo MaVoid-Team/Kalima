@@ -65,64 +65,74 @@ export default function AdminEBookletStudentDevicePanel({
   };
 
   return (
-    <section className="mt-3 rounded-lg border bg-muted/20 p-3" data-testid="admin-e-booklet-student-device-panel">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h4 className="flex items-center gap-2 text-sm font-semibold">
+    <section className="mt-4 overflow-hidden rounded-xl border bg-background" data-testid="admin-e-booklet-student-device-panel">
+      <div className="flex flex-col gap-3 border-b bg-muted/30 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0">
+          <h4 className="flex min-w-0 items-center gap-2 text-sm font-semibold">
             <HardDrive className="h-4 w-4 text-primary" />
-            {t("admin.devices.inlineTitle", { name: studentName })}
+            <span className="truncate">{t("admin.devices.inlineTitle", { name: studentName })}</span>
           </h4>
-          <p className="text-xs text-muted-foreground">{t("admin.devices.inlineHint", { defaultValue: "Manage device allowance and resets without exposing raw device metadata." })}</p>
+          <p className="mt-1 max-w-2xl text-xs leading-5 text-muted-foreground">{t("admin.devices.inlineHint", { defaultValue: "Manage device allowance and resets without exposing raw device metadata." })}</p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex shrink-0 flex-wrap gap-2">
           {showFullPageLink && (
-            <Button asChild size="sm" variant="outline">
+            <Button asChild size="sm" variant="outline" className="h-8">
               <Link to={`/admin/e-booklets/access/${instanceId}/devices?userId=${resolvedUserId}`}>
                 <ExternalLink className="h-4 w-4" />{t("admin.instances.openFullDevicesPage")}
               </Link>
             </Button>
           )}
-          <Button size="sm" variant="outline" onClick={refreshDevices} disabled={!instanceId || !resolvedUserId || loading}>
+          <Button size="sm" variant="outline" className="h-8" onClick={refreshDevices} disabled={!instanceId || !resolvedUserId || loading}>
             <RefreshCcw className="h-4 w-4" />{t("common.refresh")}
           </Button>
         </div>
       </div>
 
-      <div className="mt-3 grid gap-3 rounded-md border bg-background p-3 lg:grid-cols-[1fr_180px_auto]">
-        <div className="space-y-1">
-          <Label>{t("admin.devices.reason")}</Label>
-          <Input value={reason} onChange={(event) => setReason(event.target.value)} placeholder={t("admin.devices.reasonPlaceholder")} />
-          {reasonRequired && <p className="text-[11px] text-muted-foreground">{t("admin.devices.reasonRequired", { defaultValue: "A reason is required before allowance or reset actions." })}</p>}
-        </div>
-        <div className="space-y-1">
-          <Label>{t("admin.devices.allowedDevices")}</Label>
-          <Input type="number" min="1" value={allowedDevices} onChange={(event) => setAllowedDevices(event.target.value)} />
-        </div>
-        <div className="flex items-end gap-2">
-          <Button variant="outline" onClick={handleAllowance} disabled={actionsDisabled}>
-            <ShieldPlus className="h-4 w-4" />{t("admin.devices.allow")}
-          </Button>
-          <Button variant="outline" onClick={handleReset} disabled={actionsDisabled}>
-            <RotateCcw className="h-4 w-4" />{t("admin.devices.reset")}
-          </Button>
-        </div>
-      </div>
-
-      {loading && <div className="mt-3 rounded-md border bg-background p-4 text-center text-sm text-muted-foreground">{t("admin.devices.loading")}</div>}
-      {!loading && sortedDevices.length === 0 && <div className="mt-3 rounded-md border bg-background p-4 text-center text-sm text-muted-foreground">{t("admin.devices.emptyInline")}</div>}
-      <div className="mt-3 grid gap-2">
-        {sortedDevices.map((device) => (
-          <div key={device.id} className="rounded-md border bg-background p-3 text-xs">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="font-medium">{device.device_label || t("admin.devices.unnamed")}</div>
-              <Badge variant="outline">{t(`statuses.${device.status}`, { defaultValue: device.status })}</Badge>
+      <div className="grid gap-4 px-4 py-4 xl:grid-cols-[minmax(0,1fr)_minmax(320px,420px)]">
+        <div className="space-y-2">
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_8rem]">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">{t("admin.devices.reason")}</Label>
+              <Input value={reason} onChange={(event) => setReason(event.target.value)} placeholder={t("admin.devices.reasonPlaceholder")} />
             </div>
-            <div className="mt-2 grid gap-1 text-muted-foreground sm:grid-cols-2">
-              <span>{t("admin.devices.lastSeen", { value: formatDate(device.last_seen_at) })}</span>
-              <span>{t("admin.devices.bound", { value: formatDate(device.first_seen_at || device.created_at) })}</span>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">{t("admin.devices.allowedDevices")}</Label>
+              <Input type="number" min="1" value={allowedDevices} onChange={(event) => setAllowedDevices(event.target.value)} />
             </div>
           </div>
-        ))}
+          {reasonRequired && <p className="text-[11px] text-muted-foreground">{t("admin.devices.reasonRequired", { defaultValue: "A reason is required before allowance or reset actions." })}</p>}
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button variant="outline" size="sm" onClick={handleAllowance} disabled={actionsDisabled}>
+              <ShieldPlus className="h-4 w-4" />{t("admin.devices.allow")}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleReset} disabled={actionsDisabled}>
+              <RotateCcw className="h-4 w-4" />{t("admin.devices.reset")}
+            </Button>
+          </div>
+        </div>
+
+        <div className="rounded-lg border bg-muted/20">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 border-b px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            <span>{t("admin.devices.device", { defaultValue: "Device" })}</span>
+            <span>{t("admin.devices.status", { defaultValue: "Status" })}</span>
+          </div>
+          <div className="divide-y">
+            {loading && <div className="px-3 py-5 text-center text-sm text-muted-foreground">{t("admin.devices.loading")}</div>}
+            {!loading && sortedDevices.length === 0 && <div className="px-3 py-5 text-center text-sm text-muted-foreground">{t("admin.devices.emptyInline")}</div>}
+            {!loading && sortedDevices.map((device) => (
+              <div key={device.id} className="grid gap-3 px-3 py-3 text-xs sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium text-foreground">{device.device_label || t("admin.devices.unnamed")}</div>
+                  <div className="mt-1 grid gap-1 text-muted-foreground md:grid-cols-2">
+                    <span className="min-w-0 truncate">{t("admin.devices.lastSeen", { value: formatDate(device.last_seen_at) })}</span>
+                    <span className="min-w-0 truncate">{t("admin.devices.bound", { value: formatDate(device.first_seen_at || device.created_at) })}</span>
+                  </div>
+                </div>
+                <Badge variant="outline" className="w-fit justify-self-start sm:justify-self-end">{t(`statuses.${device.status}`, { defaultValue: device.status })}</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -40,7 +40,7 @@ describe("sampleSectionController.serveDownload", () => {
     expect(res.setHeader).toHaveBeenCalledWith("Content-Type", "application/pdf");
     expect(res.setHeader).toHaveBeenCalledWith(
       "Content-Disposition",
-      'attachment; filename="Sample.pdf"',
+      "attachment; filename=\"Sample.pdf\"; filename*=UTF-8''Sample.pdf",
     );
     expect(res.sendFile).toHaveBeenCalledWith("/uploads/samples/low-quality.pdf");
     expect(next).not.toHaveBeenCalled();
