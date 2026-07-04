@@ -9,7 +9,7 @@
     "collapseSidebar": "طي القائمة الجانبية",
     "closeSidebar": "إغلاق القائمة الجانبية",
     "profile": "ملفي الشخصي",
-    "eBooklets": "مذكراتي",
+    "eBooklets": "مذكراتي التفاعلية",
     "orders": "طلباتي",
     "settings": "الإعدادات",
     "themeToggle": "تبديل المظهر",
@@ -18,7 +18,7 @@
     "backToStore": "العودة للمتجر",
     "logout": "تسجيل الخروج",
     "eBookletAnalytics": "تحليلات المذكرات التفاعلية",
-    "eBookletOrders": "طلبات المذكرة"
+    "eBookletOrders": "طلبات المتجر"
   },
   "settings": {
     "title": "إعدادات الحساب",

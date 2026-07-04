@@ -60,6 +60,6 @@ assert.ok(!/activated immediately|student access is activated/i.test(en.checkout
 assert.equal(landingEn.navbar.eBookletOrders, 'E-Booklet Orders');
 assert.equal(landingAr.navbar.eBookletOrders, 'طلبات المذكرة');
 assert.equal(teacherEn.nav.eBookletOrders, 'E-Booklet Orders');
-assert.equal(teacherAr.nav.eBookletOrders, 'طلبات المذكرة');
+assert.equal(teacherAr.nav.eBookletOrders, 'طلبات المتجر');
 
 console.log('Build Order 13 copy/navigation contract checks passed');
