@@ -1168,11 +1168,6 @@ export default function EBookletViewerPage({ previewMode = false }) {
                               className={contentHotspotBlocks.length > 1 ? "rounded-md border bg-background/80 p-3" : ""}
                               key={`${block.type}-${block.asset_file_id || index}`}
                             >
-                              {contentHotspotBlocks.length > 1 && (
-                                <div className="mb-2 text-xs font-medium text-muted-foreground">
-                                  {t("admin.editor.hotspots.blockNumber", { number: index + 1 })}
-                                </div>
-                              )}
                               <ContentBlock block={block} hotspot={contentHotspot} viewer={viewer} t={t} instanceId={instanceId} />
                               {block.supplementary_text && (
                                 <p className="mt-2 whitespace-pre-wrap text-xs text-muted-foreground">{block.supplementary_text}</p>
