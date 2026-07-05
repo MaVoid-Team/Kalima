@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle, ExternalLink, MessageSquare, LogOut, RefreshCw } from 'lucide-react';
+import { ChevronLeft, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle, ExternalLink, MessageSquare, LogOut, RefreshCw, Copy } from 'lucide-react';
+import { toast } from 'sonner';
 import useOrders from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -116,6 +117,40 @@ export default function OrderDetailPage() {
     const whatsappHref = whatsappPhone
         ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(editableWhatsAppMessage || whatsappMessage)}`
         : '#';
+
+    const buildTransferMemoText = () => {
+        const valueOrDash = (value) => {
+            const nextValue = String(value ?? '').trim();
+            return nextValue || '-';
+        };
+
+        const requiredFieldLines = (order.purchase_items ?? []).flatMap((item) => {
+            return (item.purchase_item_required_fields ?? [])
+                .filter((field) => {
+                    const fieldType = field.required_field_definitions?.field_type;
+                    return fieldType !== 'file' && fieldType !== 'image';
+                })
+                .map((field) => {
+                    const label = field.required_field_definitions?.label || t('orders.details.field', 'Field');
+                    return `${label}: ${valueOrDash(formatPhone(field.value))}`;
+                });
+        });
+
+        return [
+            ...requiredFieldLines,
+            `اسم الاكونت: ${valueOrDash(order.users?.name)}`,
+            `ايميل الأكونت: ${valueOrDash(order.users?.email)}`,
+        ].join('\n');
+    };
+
+    const copyTransferMemoText = async () => {
+        try {
+            await navigator.clipboard.writeText(buildTransferMemoText());
+            toast.success(t('orders.messages.transferMemoCopied', 'Transfer memo details copied'));
+        } catch (error) {
+            toast.error(t('orders.messages.transferMemoCopyFailed', 'Could not copy transfer memo details'));
+        }
+    };
 
     const openWhatsAppDialog = () => {
         if (whatsappStatus !== 'ready') {
@@ -357,6 +392,16 @@ export default function OrderDetailPage() {
                             {t('orders.actions.return')}
                         </Button>
                     )}
+
+                    <Button
+                        variant="outline"
+                        onClick={copyTransferMemoText}
+                        className="border-primary/20 text-primary hover:bg-primary/10"
+                        data-testid="order-detail-copy-transfer-memo-button"
+                    >
+                        <Copy className="me-2 h-4 w-4" />
+                        {t('orders.actions.copyTransferMemo', 'Copy transfer memo')}
+                    </Button>
 
                     <Button
                         variant="destructive"
