@@ -30,7 +30,7 @@ export default function StudentSettingsPage() {
                 <ProfileSection ns="student" editable={false} />
                 <PasswordSection ns="student" />
                 <AccountSection ns="student" />
-                <SecuritySection ns="student" />
+                <SecuritySection ns="student" showDeleteAccount={false} />
                 <SessionSection ns="student" />
             </div>
         </div>

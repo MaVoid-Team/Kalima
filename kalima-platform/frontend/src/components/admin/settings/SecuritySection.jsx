@@ -11,7 +11,7 @@ import useAuth from '@/hooks/auth/useAuth';
 import useDeleteAccount from '@/hooks/auth/useDeleteAccount';
 import ConfirmDeleteAccountDialog from './ConfirmDeleteAccountDialog';
 
-export default function SecuritySection({ ns = 'admin' }) {
+export default function SecuritySection({ ns = 'admin', showDeleteAccount = true }) {
     const { t, i18n } = useTranslation(ns);
     const { user } = useAuth();
     const { sendVerification, resendVerification, loading } = useEmailVerification();
@@ -25,7 +25,7 @@ export default function SecuritySection({ ns = 'admin' }) {
         try {
             await deleteAccount();
             window.location.href = '/login';
-        } catch (error) {
+        } catch {
             // Error handled by hook
         }
     };
@@ -47,7 +47,7 @@ export default function SecuritySection({ ns = 'admin' }) {
             await sendVerification();
             setLastSentTime(new Date());
             localStorage.setItem('lastVerificationSent', new Date().toISOString());
-        } catch (error) {
+        } catch {
             // Error handled by hook
         } finally {
             setIsSending(false);
@@ -60,7 +60,7 @@ export default function SecuritySection({ ns = 'admin' }) {
             await resendVerification(user?.email);
             setLastSentTime(new Date());
             localStorage.setItem('lastVerificationSent', new Date().toISOString());
-        } catch (error) {
+        } catch {
             // Error handled by hook
         } finally {
             setIsSending(false);
@@ -211,52 +211,56 @@ export default function SecuritySection({ ns = 'admin' }) {
                     </div>
                 </div>
 
-                <Separator />
+                {showDeleteAccount && (
+                    <>
+                        <Separator />
 
-                {/* Danger Zone */}
-                <div className="space-y-4 pt-2">
-                    <h3 
-                        className="text-sm font-medium text-destructive flex items-center gap-2"
-                        data-search-content={`${t('settings.account.dangerZone', { lng: 'en' })} ${t('settings.account.dangerZone', { lng: 'ar' })}`}
-                    >
-                        <AlertTriangle className="h-4 w-4" />
-                        {t('settings.account.dangerZone', 'Danger Zone')}
-                    </h3>
-                    
-                    <div className="p-4 border border-destructive/20 bg-destructive/5 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div>
-                            <h4 
-                                className="font-medium text-destructive"
-                                data-search-content={`${t('settings.account.deleteAccount', { lng: 'en' })} ${t('settings.account.deleteAccount', { lng: 'ar' })}`}
+                        {/* Danger Zone */}
+                        <div className="space-y-4 pt-2">
+                            <h3 
+                                className="text-sm font-medium text-destructive flex items-center gap-2"
+                                data-search-content={`${t('settings.account.dangerZone', { lng: 'en' })} ${t('settings.account.dangerZone', { lng: 'ar' })}`}
                             >
-                                {t('settings.account.deleteAccount')}
-                            </h4>
-                            <p 
-                                className="text-sm text-muted-foreground mt-1"
-                                data-search-content={`${t('settings.account.deleteAccountDesc', { lng: 'en' })} ${t('settings.account.deleteAccountDesc', { lng: 'ar' })}`}
-                            >
-                                {t('settings.account.deleteAccountDesc', 'Permanently remove your account and all associated data. This action is irreversible.')}
-                            </p>
+                                <AlertTriangle className="h-4 w-4" />
+                                {t('settings.account.dangerZone', 'Danger Zone')}
+                            </h3>
+                            
+                            <div className="p-4 border border-destructive/20 bg-destructive/5 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                    <h4 
+                                        className="font-medium text-destructive"
+                                        data-search-content={`${t('settings.account.deleteAccount', { lng: 'en' })} ${t('settings.account.deleteAccount', { lng: 'ar' })}`}
+                                    >
+                                        {t('settings.account.deleteAccount')}
+                                    </h4>
+                                    <p 
+                                        className="text-sm text-muted-foreground mt-1"
+                                        data-search-content={`${t('settings.account.deleteAccountDesc', { lng: 'en' })} ${t('settings.account.deleteAccountDesc', { lng: 'ar' })}`}
+                                    >
+                                        {t('settings.account.deleteAccountDesc', 'Permanently remove your account and all associated data. This action is irreversible.')}
+                                    </p>
+                                </div>
+                                <Button
+                                    variant="destructive"
+                                    onClick={() => setShowDeleteDialog(true)}
+                                    disabled={deletingAccount}
+                                    className="whitespace-nowrap"
+                                >
+                                    {deletingAccount ? t('common.loading') : t('settings.account.deleteAccountBtn', 'Delete Account')}
+                                </Button>
+                            </div>
                         </div>
-                        <Button
-                            variant="destructive"
-                            onClick={() => setShowDeleteDialog(true)}
-                            disabled={deletingAccount}
-                            className="whitespace-nowrap"
-                        >
-                            {deletingAccount ? t('common.loading') : t('settings.account.deleteAccountBtn', 'Delete Account')}
-                        </Button>
-                    </div>
-                </div>
 
-                {/* Delete Account Dialog */}
-                <ConfirmDeleteAccountDialog
-                    open={showDeleteDialog}
-                    onOpenChange={setShowDeleteDialog}
-                    onConfirm={handleDeleteAccount}
-                    loading={deletingAccount}
-                    ns={ns}
-                />
+                        {/* Delete Account Dialog */}
+                        <ConfirmDeleteAccountDialog
+                            open={showDeleteDialog}
+                            onOpenChange={setShowDeleteDialog}
+                            onConfirm={handleDeleteAccount}
+                            loading={deletingAccount}
+                            ns={ns}
+                        />
+                    </>
+                )}
             </CardContent>
         </Card>
     );

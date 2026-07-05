@@ -30,7 +30,7 @@ export default function TeacherSettingsPage() {
                 <ProfileSection ns="teacher" editable={false} />
                 <PasswordSection ns="teacher" />
                 <AccountSection ns="teacher" />
-                <SecuritySection ns="teacher" />
+                <SecuritySection ns="teacher" showDeleteAccount={false} />
                 <SessionSection ns="teacher" />
             </div>
         </div>
