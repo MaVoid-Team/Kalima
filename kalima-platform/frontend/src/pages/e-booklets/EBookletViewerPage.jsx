@@ -1119,8 +1119,10 @@ export default function EBookletViewerPage({ previewMode = false }) {
                   <div className="absolute inset-x-10 bottom-14 h-24 rounded border border-dashed border-slate-200 bg-slate-50" />
                 </>
               )}
-              <div className="pointer-events-none absolute inset-0 flex rotate-[-24deg] items-center justify-center text-center text-sm font-semibold uppercase tracking-wide text-slate-400/70">
-                {watermark}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
+                <span className="max-w-[72%] rotate-[-24deg] break-words text-center text-[clamp(1.75rem,4vw,3.5rem)] font-semibold uppercase leading-tight tracking-wide text-slate-400/70">
+                  {watermark}
+                </span>
               </div>
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,transparent_60%,rgba(255,255,255,0.02)_100%)]" />
               {canShowHotspots && viewer.hotspots.map((hotspot) => (
