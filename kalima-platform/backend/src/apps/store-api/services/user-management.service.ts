@@ -1430,12 +1430,19 @@ class UserManagementService {
   }
 
   private isTeacherSerialUniqueConflict(error: unknown): boolean {
+    const code = (error as any)?.code;
+    const target = (error as any)?.meta?.target;
     const errorText = `${(error as any)?.message ?? ""} ${JSON.stringify(
       (error as any)?.meta ?? {},
-    )}`;
+    )}`.toLowerCase();
     return (
-      errorText.includes("UniqueConstraintViolation") &&
-      (errorText.includes("teachers") || errorText.includes("serial"))
+      (code === "P2002" ||
+        errorText.includes("uniqueconstraintviolation") ||
+        errorText.includes("unique constraint")) &&
+      (errorText.includes("teacher") ||
+        errorText.includes("serial") ||
+        (Array.isArray(target) && target.includes("serial")) ||
+        target === "serial")
     );
   }
 

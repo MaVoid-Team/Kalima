@@ -75,7 +75,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
             if (!firebaseToken) {
                 if (!data.name) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t("validation.required"), path: ["name"] });
                 if (!data.email) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t("validation.required"), path: ["email"] });
-                if (!data.password || data.password.length < 6) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t("validation.passwordMin"), path: ["password"] });
+                if (!data.password || data.password.length < 8) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t("validation.passwordMin"), path: ["password"] });
                 if (data.password !== data.confirmPassword) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t("validation.passwordMismatch"), path: ["confirmPassword"] });
             }
         });

@@ -44,8 +44,9 @@ describe("UserManagementService teacher serial generation", () => {
         create: jest
           .fn()
           .mockRejectedValueOnce({
-            message: "UniqueConstraintViolation on teachers serial",
-            meta: { target: "teachers_serial_key" },
+            code: "P2002",
+            message: "Unique constraint failed on the fields: (`serial`)",
+            meta: { target: ["serial"] },
           })
           .mockResolvedValueOnce(createdUser),
       },
