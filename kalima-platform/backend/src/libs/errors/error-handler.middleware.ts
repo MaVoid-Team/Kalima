@@ -1,6 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import { ApiError, ValidationError } from "./api-error";
 
+function friendlyConflictField(field: unknown): string {
+  if (typeof field !== "string") return "field";
+  const labels: Record<string, string> = {
+    email: "Email",
+    phone: "Phone number",
+    serial: "Teacher serial",
+  };
+  return labels[field] || field.replace(/_/g, " ");
+}
+
 /**
  * Global Express error-handler middleware.
  *
@@ -21,13 +31,15 @@ export function errorHandler(
   if ((err as any)?.code === "P2002") {
     const target = (err as any)?.meta?.target;
     const fields = Array.isArray(target) ? target : target ? [target] : [];
-    const fieldLabel = fields.length ? fields.join(", ") : "field";
+    const primaryField = fields[0];
+    const fieldLabel = friendlyConflictField(primaryField);
+    const message = `${fieldLabel} already in use`;
     res.status(409).json({
       success: false,
-      message: `${fieldLabel} already exists`,
-      errors: fields.map((field) => ({
+      message,
+      errors: (fields.length ? fields : [undefined]).map((field) => ({
         field,
-        message: `${field} already exists`,
+        message,
       })),
     });
     return;
@@ -56,9 +68,11 @@ export function errorHandler(
 
   // --- Known operational API errors ---
   if (err instanceof ApiError) {
+    const errorDetails = (err as any).errors;
     res.status(err.statusCode).json({
       success: false,
       message: err.message,
+      ...(errorDetails ? { errors: errorDetails } : {}),
     });
     return;
   }

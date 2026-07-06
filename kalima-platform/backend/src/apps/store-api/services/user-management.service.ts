@@ -1387,7 +1387,9 @@ class UserManagementService {
     });
 
     if (existing) {
-      throw new ConflictError("Email already in use");
+      throw new ConflictError("Email already in use", [
+        { field: "email", message: "Email already in use" },
+      ]);
     }
   }
 

@@ -131,10 +131,12 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
             const errors = errData?.errors || errData?.details;
             const fallbackMessage = errData?.message || error?.message || t("errors.default", "An unexpected error occurred. Please try again.");
             const unmappedMessages = [];
+            let mappedFieldErrors = 0;
 
             const applyServerError = (field, message) => {
                 if (field && form.getValues(field) !== undefined) {
                     form.setError(field, { type: "server", message });
+                    mappedFieldErrors += 1;
                     return true;
                 }
                 unmappedMessages.push(message);
@@ -158,7 +160,8 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                 }
             }
 
-            setFormError(unmappedMessages.filter(Boolean).join("\n") || fallbackMessage);
+            const topLevelMessage = unmappedMessages.filter(Boolean).join("\n");
+            setFormError(topLevelMessage || (mappedFieldErrors > 0 ? null : fallbackMessage));
         } finally {
             setIsLoading(false);
         }

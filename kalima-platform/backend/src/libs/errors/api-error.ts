@@ -60,8 +60,11 @@ export class NotFoundError extends ApiError {
 
 /** 409 — The request conflicts with the current state (e.g. duplicate). */
 export class ConflictError extends ApiError {
-  constructor(message = "Conflict") {
+  public readonly errors?: Array<{ field?: string; message: string }>;
+
+  constructor(message = "Conflict", errors?: Array<{ field?: string; message: string }>) {
     super(409, message);
+    this.errors = errors;
   }
 }
 
