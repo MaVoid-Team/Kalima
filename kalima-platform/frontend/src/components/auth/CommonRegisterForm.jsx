@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
@@ -23,6 +23,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
     Select,
     SelectContent,
@@ -38,6 +39,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [firebaseToken, setFirebaseToken] = useState(null);
+    const [formError, setFormError] = useState(null);
     const isRTL = i18n.dir() === "rtl";
 
     const containerVariants = {
@@ -96,6 +98,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
 
     const handleFirebaseLogin = async (provider) => {
         try {
+            setFormError(null);
             const result = await signInWithPopup(auth, provider);
             const idToken = await result.user.getIdToken();
             setFirebaseToken(idToken);
@@ -113,6 +116,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
 
     const handleSubmit = async (values) => {
         setIsLoading(true);
+        setFormError(null);
         try {
             if (onSubmit) {
                 await onSubmit(values, firebaseToken);
@@ -125,18 +129,36 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
             console.error("Form submission error:", error);
             const errData = error?.response?.data;
             const errors = errData?.errors || errData?.details;
+            const fallbackMessage = errData?.message || error?.message || t("errors.default", "An unexpected error occurred. Please try again.");
+            const unmappedMessages = [];
+
+            const applyServerError = (field, message) => {
+                if (field && form.getValues(field) !== undefined) {
+                    form.setError(field, { type: "server", message });
+                    return true;
+                }
+                unmappedMessages.push(message);
+                return false;
+            };
+
             if (errors) {
                 if (Array.isArray(errors)) {
                     errors.forEach(err => {
-                        const path = err.path || err.field || err.param;
-                        if (path) form.setError(path, { type: "server", message: err.message || err.msg });
+                        if (typeof err === "string") {
+                            unmappedMessages.push(err);
+                            return;
+                        }
+                        const path = err?.path || err?.field || err?.param;
+                        applyServerError(path, err?.message || err?.msg || fallbackMessage);
                     });
                 } else if (typeof errors === 'object') {
                     Object.entries(errors).forEach(([field, msg]) => {
-                        form.setError(field, { type: "server", message: Array.isArray(msg) ? msg[0] : msg });
+                        applyServerError(field, Array.isArray(msg) ? msg[0] : msg);
                     });
                 }
             }
+
+            setFormError(unmappedMessages.filter(Boolean).join("\n") || fallbackMessage);
         } finally {
             setIsLoading(false);
         }
@@ -162,6 +184,26 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
 
             <Form {...form}>
                 <motion.form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4" noValidate variants={containerVariants}>
+                    <AnimatePresence mode="wait">
+                        {formError && (
+                            <motion.div
+                                key="register-error"
+                                variants={itemVariants}
+                                initial="hidden"
+                                animate="show"
+                                exit={{ opacity: 0, y: -8 }}
+                            >
+                                <Alert variant="destructive" data-testid="auth-register-error-alert">
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertTitle>{t("errors.registrationFailed", "Registration failed")}</AlertTitle>
+                                    <AlertDescription className="whitespace-pre-line">
+                                        {formError}
+                                    </AlertDescription>
+                                </Alert>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     {!firebaseToken && (
                         <>
                             <motion.div variants={itemVariants}>

@@ -67,9 +67,12 @@ export class ConflictError extends ApiError {
 
 /** 422 — Validation failed. Carries an `errors` array with details. */
 export class ValidationError extends ApiError {
-  public readonly errors: string[];
+  public readonly errors: Array<string | { field?: string; message: string }>;
 
-  constructor(errors: string[], message = "Validation failed") {
+  constructor(
+    errors: Array<string | { field?: string; message: string }>,
+    message = "Validation failed",
+  ) {
     super(422, message);
     this.errors = errors;
   }

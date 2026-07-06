@@ -18,6 +18,21 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ): void {
+  if ((err as any)?.code === "P2002") {
+    const target = (err as any)?.meta?.target;
+    const fields = Array.isArray(target) ? target : target ? [target] : [];
+    const fieldLabel = fields.length ? fields.join(", ") : "field";
+    res.status(409).json({
+      success: false,
+      message: `${fieldLabel} already exists`,
+      errors: fields.map((field) => ({
+        field,
+        message: `${field} already exists`,
+      })),
+    });
+    return;
+  }
+
   if (err.name === "MulterError") {
     res.status(400).json({
       success: false,

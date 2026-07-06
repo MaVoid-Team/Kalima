@@ -131,8 +131,8 @@ axiosInstance.interceptors.response.use(
             if (!rawErrors) return '';
 
             if (Array.isArray(rawErrors)) {
-                const detail = extractErrorMessage(rawErrors[0]);
-                if (detail) return detail;
+                const details = rawErrors.map(extractErrorMessage).filter(Boolean);
+                if (details.length) return details.slice(0, 3).join('\n');
             }
 
             const detail = extractErrorMessage(rawErrors);
@@ -144,6 +144,12 @@ axiosInstance.interceptors.response.use(
                 case 400:
                     // Handle validation errors or bad requests
                     errorMessage = response.data.message || i18n.t('auth:validation.required', "هذا الحقل مطلوب"); // Fallback
+                    break;
+                case 409:
+                    errorMessage = response.data.message || i18n.t('auth:errors.conflict', "This information is already in use.");
+                    break;
+                case 422:
+                    errorMessage = response.data.message || i18n.t('auth:errors.validation_failed', "Please fix the highlighted fields and try again.");
                     break;
                 case 401:
                     if (error.config && error.config.url && error.config.url.includes('/auth/login')) {

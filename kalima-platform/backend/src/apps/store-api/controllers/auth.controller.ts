@@ -49,7 +49,10 @@ async function validateDto<T extends object>(
 
   if (validationErrors.length > 0) {
     const errors = validationErrors.flatMap((err) =>
-      Object.values(err.constraints || {}),
+      Object.values(err.constraints || {}).map((message) => ({
+        field: err.property,
+        message,
+      })),
     );
     throw new ValidationError(errors);
   }
