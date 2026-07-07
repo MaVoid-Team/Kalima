@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { Move, Maximize2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Crosshair, Maximize2, Move, SlidersHorizontal } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -19,15 +20,25 @@ export const DEFAULT_PRINT_TEMPLATE_LAYOUT = {
   },
 };
 
-const FIELD_LABELS = {
-  qr: "رمز QR",
-  codeNumber: "رقم الكود",
-  teacherImage: "صورة المدرس",
-  registrationMethod: "طريقة التسجيل",
-  gradeClass: "الصف",
-  price: "السعر",
-  redCustomText: "النص الأحمر",
+const FIELD_LABEL_DEFAULTS = {
+  qr: "QR code",
+  codeNumber: "Code number",
+  teacherImage: "Teacher image",
+  registrationMethod: "Registration method",
+  gradeClass: "Grade/class",
+  price: "Price",
+  redCustomText: "Red custom text",
 };
+
+const FIELD_SETTING_LABEL_DEFAULTS = {
+  x: "X",
+  y: "Y",
+  width: "Width",
+  height: "Height",
+  fontSize: "Font size",
+};
+
+const FIELD_ORDER = ["qr", "codeNumber", "teacherImage", "registrationMethod", "gradeClass", "price", "redCustomText"];
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const numberValue = (value, fallback) => {
@@ -36,13 +47,22 @@ const numberValue = (value, fallback) => {
 };
 
 export default function PrintTemplateLayoutEditor({ value, onChange }) {
+  const { t } = useTranslation("eBooklets");
   const layout = value || DEFAULT_PRINT_TEMPLATE_LAYOUT;
   const fields = layout.fields || {};
-  const fieldKeys = Object.keys(fields);
+  const fieldKeys = useMemo(() => {
+    const keys = Object.keys(fields);
+    return [...FIELD_ORDER.filter((key) => keys.includes(key)), ...keys.filter((key) => !FIELD_ORDER.includes(key))];
+  }, [fields]);
   const [selectedKey, setSelectedKey] = useState(fieldKeys[0] || "qr");
   const [dragState, setDragState] = useState(null);
   const previewRef = useRef(null);
   const selected = fields[selectedKey] || {};
+  const getFieldLabel = (fieldKey) => t(`admin.instances.printEditor.fields.${fieldKey}`, { defaultValue: FIELD_LABEL_DEFAULTS[fieldKey] || fieldKey });
+  const getSettingLabel = (settingKey) => t(`admin.instances.printEditor.settings.${settingKey}`, { defaultValue: FIELD_SETTING_LABEL_DEFAULTS[settingKey] || settingKey });
+  const selectedLabel = getFieldLabel(selectedKey);
+  const selectedHasTextControls = selected.fontSize !== undefined || selected.color !== undefined || selected.direction || selected.align;
+  const numberFields = selectedHasTextControls ? ["x", "y", "width", "height", "fontSize"] : ["x", "y", "width", "height"];
 
   const updateField = (fieldKey, patch) => {
     const current = fields[fieldKey] || {};
@@ -104,8 +124,36 @@ export default function PrintTemplateLayoutEditor({ value, onChange }) {
   };
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_280px]" data-testid="print-template-layout-editor">
-      <div className="space-y-2">
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]" data-testid="print-template-layout-editor">
+      <div className="min-w-0 rounded-2xl border bg-background p-3 shadow-sm">
+        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <Crosshair className="h-4 w-4 text-primary" />
+              {t("admin.instances.printEditor.canvasTitle", { defaultValue: "Layout canvas" })}
+            </div>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              {t("admin.instances.printEditor.canvasDescription", { defaultValue: "Drag each variable layer on the exact print card size." })}
+            </p>
+          </div>
+          <div className="shrink-0 rounded-full border bg-muted/50 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+            {PRINT_CARD_WIDTH_PX} x {PRINT_CARD_HEIGHT_PX} px
+          </div>
+        </div>
+        <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
+          {fieldKeys.map((fieldKey) => (
+            <Button
+              key={fieldKey}
+              type="button"
+              size="sm"
+              variant={selectedKey === fieldKey ? "default" : "outline"}
+              className="h-8 shrink-0 rounded-full px-3 text-xs"
+              onClick={() => setSelectedKey(fieldKey)}
+            >
+              {getFieldLabel(fieldKey)}
+            </Button>
+          ))}
+        </div>
         <div
           ref={previewRef}
           className="relative w-full overflow-hidden rounded-xl border bg-white shadow-inner"
@@ -129,32 +177,70 @@ export default function PrintTemplateLayoutEditor({ value, onChange }) {
                 onPointerDown={(event) => beginDrag(event, fieldKey, "move")}
                 onClick={() => setSelectedKey(fieldKey)}
               >
-                <span className="truncate px-1">{FIELD_LABELS[fieldKey] || fieldKey}</span>
-                <span className="absolute bottom-0 right-0 flex h-4 w-4 translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border bg-background" onPointerDown={(event) => beginDrag(event, fieldKey, "resize")}>
+                <span className="truncate px-1">{getFieldLabel(fieldKey)}</span>
+                <span
+                  className="absolute bottom-0 right-0 flex h-5 w-5 translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border bg-background shadow-sm"
+                  onPointerDown={(event) => beginDrag(event, fieldKey, "resize")}
+                  aria-hidden="true"
+                >
                   <Maximize2 className="h-2.5 w-2.5" />
                 </span>
               </button>
             );
           })}
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground"><Move className="h-3.5 w-3.5" />اسحب المربعات للتحريك واسحب الزاوية لتغيير الحجم.</div>
-      </div>
-      <div className="space-y-3 rounded-xl border bg-background p-3">
-        <div className="grid grid-cols-2 gap-2">
-          {fieldKeys.map((fieldKey) => (
-            <Button key={fieldKey} type="button" size="sm" variant={selectedKey === fieldKey ? "default" : "outline"} className="justify-start rounded-xl text-xs" onClick={() => setSelectedKey(fieldKey)}>
-              {FIELD_LABELS[fieldKey] || fieldKey}
-            </Button>
-          ))}
+        <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+          <Move className="h-3.5 w-3.5" />
+          {t("admin.instances.printEditor.dragHint", { defaultValue: "Drag a layer to move it. Drag the lower corner to resize." })}
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          {["x", "y", "width", "height", "fontSize"].map((key) => (
+      </div>
+      <div className="min-w-0 rounded-2xl border bg-muted/20 p-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <SlidersHorizontal className="h-4 w-4 text-primary" />
+            {t("admin.instances.printEditor.selectedField", { defaultValue: "Selected field" })}
+          </div>
+          <p className="text-xs leading-5 text-muted-foreground">{selectedLabel}</p>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          {numberFields.map((key) => (
             <label key={key} className="grid gap-1 text-xs font-medium text-muted-foreground">
-              <span>{key}</span>
+              <span>{getSettingLabel(key)}</span>
               <Input className="h-9 rounded-xl text-foreground" type="number" value={selected[key] ?? ""} onChange={(event) => setNumber(key, event.target.value)} />
             </label>
           ))}
         </div>
+        {selectedHasTextControls && (
+          <div className="mt-3 grid gap-2">
+            {selected.color !== undefined && (
+              <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                <span>{t("admin.instances.printEditor.textColor", { defaultValue: "Text color" })}</span>
+                <Input className="h-9 rounded-xl text-foreground" type="text" value={selected.color || ""} onChange={(event) => updateField(selectedKey, { color: event.target.value })} />
+              </label>
+            )}
+            <div className="grid grid-cols-2 gap-2">
+              {selected.direction && (
+                <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                  <span>{t("admin.instances.printEditor.direction", { defaultValue: "Direction" })}</span>
+                  <select className="h-9 rounded-xl border bg-background px-3 text-sm text-foreground" value={selected.direction || "rtl"} onChange={(event) => updateField(selectedKey, { direction: event.target.value })}>
+                    <option value="rtl">RTL</option>
+                    <option value="ltr">LTR</option>
+                  </select>
+                </label>
+              )}
+              {selected.align && (
+                <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                  <span>{t("admin.instances.printEditor.align", { defaultValue: "Align" })}</span>
+                  <select className="h-9 rounded-xl border bg-background px-3 text-sm text-foreground" value={selected.align || "center"} onChange={(event) => updateField(selectedKey, { align: event.target.value })}>
+                    <option value="start">{t("admin.instances.printEditor.alignStart", { defaultValue: "Start" })}</option>
+                    <option value="center">{t("admin.instances.printEditor.alignCenter", { defaultValue: "Center" })}</option>
+                    <option value="end">{t("admin.instances.printEditor.alignEnd", { defaultValue: "End" })}</option>
+                  </select>
+                </label>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

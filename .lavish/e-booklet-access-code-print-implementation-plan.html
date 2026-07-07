@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kalima Access Code Print Implementation Plan</title>
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --bg: #f8fafc;
+      --panel: #fff;
+      --red: #b91c1c;
+      --red-soft: #fee2e2;
+      --green: #047857;
+      --amber: #b45309;
+      --blue: #1d4ed8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 20px 56px;
+    }
+
+    header, section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    header {
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+
+    section {
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      max-width: 860px;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 14px;
+      font-size: 20px;
+    }
+
+    h3 {
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .lead {
+      max-width: 850px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .chip {
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: #374151;
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-12 { grid-column: span 12; }
+
+    .metric strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f9fafb;
+      color: #374151;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    .warn {
+      padding: 12px;
+      border: 1px solid #fcd34d;
+      border-radius: 8px;
+      background: #fffbeb;
+      color: #78350f;
+    }
+
+    .ok { color: var(--green); font-weight: 700; }
+    .risk { color: var(--amber); font-weight: 700; }
+    .owner { color: var(--blue); font-weight: 700; }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: #f3f4f6;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    @media (max-width: 860px) {
+      .span-3, .span-4, .span-6 { grid-column: span 12; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="chips">
+        <span class="chip">Implementation plan</span>
+        <span class="chip">Subagent orchestration</span>
+        <span class="chip">Backend first</span>
+        <span class="chip">Admin-only v1</span>
+      </div>
+      <h1>E-Booklet Access Code Print Batches</h1>
+      <p class="lead">A build plan for moving from the approved spec to a verified Kalima implementation with clear subagent boundaries and integration gates.</p>
+    </header>
+
+    <section class="grid">
+      <article class="card span-3 metric">
+        <strong>10 phases</strong>
+        <span>Baseline through rollout.</span>
+      </article>
+      <article class="card span-3 metric">
+        <strong>7 subagents</strong>
+        <span>Schema, services, PDF, admin UI, redemption UI, QA, security.</span>
+      </article>
+      <article class="card span-3 metric">
+        <strong>5 slices</strong>
+        <span>Schema first, UI after contracts.</span>
+      </article>
+      <article class="card span-3 metric">
+        <strong>1 owner</strong>
+        <span>Main agent integrates and verifies everything.</span>
+      </article>
+    </section>
+
+    <section>
+      <h2>Build Sequence</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Phase</th>
+            <th>Owner</th>
+            <th>Output</th>
+            <th>Gate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>0 Baseline</td>
+            <td class="owner">Main agent</td>
+            <td>Current diffs, tests, access-code routes, seat behavior, terms behavior.</td>
+            <td class="ok">No user work overwritten.</td>
+          </tr>
+          <tr>
+            <td>1 Schema</td>
+            <td class="owner">Backend schema subagent</td>
+            <td>Templates, presets, batches, batch-code links, migrations.</td>
+            <td class="ok">Migration reviewed and tests pass.</td>
+          </tr>
+          <tr>
+            <td>2 Backend APIs</td>
+            <td class="owner">Backend services subagent</td>
+            <td>Template, preset, batch, QR, and redemption endpoints.</td>
+            <td class="ok">Focused backend tests pass.</td>
+          </tr>
+          <tr>
+            <td>3 PDF Renderer</td>
+            <td class="owner">PDF renderer subagent</td>
+            <td>Preview and full PDF rendering with Arabic support.</td>
+            <td class="ok">Generated PDF dimensions verified.</td>
+          </tr>
+          <tr>
+            <td>4 Admin UI</td>
+            <td class="owner">Frontend admin subagent</td>
+            <td>Templates, presets, generator, preview, batches, download.</td>
+            <td class="ok">Browser UI proof captured.</td>
+          </tr>
+          <tr>
+            <td>5 Redemption UI</td>
+            <td class="owner">Frontend redemption subagent</td>
+            <td>Login-preserving scan route and confirmation screen.</td>
+            <td class="ok">Scan to redeem E2E passes.</td>
+          </tr>
+          <tr>
+            <td>6 QA</td>
+            <td class="owner">QA subagent</td>
+            <td>Test matrix and regression coverage.</td>
+            <td class="ok">Critical paths pass.</td>
+          </tr>
+          <tr>
+            <td>7 Security</td>
+            <td class="owner">Security review subagent</td>
+            <td>Review of QR, permissions, private assets, audit, snapshots.</td>
+            <td class="ok">No high severity findings remain.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="grid">
+      <article class="card span-6">
+        <h2>Subagent Rules</h2>
+        <ul>
+          <li>Subagents should not edit overlapping files at the same time.</li>
+          <li>Each subagent returns changed files, tests run, risks, and unresolved questions.</li>
+          <li>The main agent reviews all patches before applying or committing them.</li>
+          <li>The main agent owns migrations, final contracts, and final verification.</li>
+        </ul>
+      </article>
+      <article class="card span-6">
+        <h2>First Coding Slice</h2>
+        <ol>
+          <li>Run Phase 0 baseline.</li>
+          <li>Add schema and migrations.</li>
+          <li>Add service skeletons.</li>
+          <li>Add focused tests for template deletion and batch snapshots.</li>
+          <li>Do not build UI until contracts are stable.</li>
+        </ol>
+      </article>
+    </section>
+
+    <section>
+      <h2>Non-Negotiable Risks</h2>
+      <div class="warn">Generated codes do not reserve seats, so redemption can fail later if seats are exhausted. The admin UI and batch status must warn about this.</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Risk</th>
+            <th>Mitigation</th>
+            <th>Proof Required</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="risk">Arabic rendering fails in production PDF runtime.</td>
+            <td>Bundle or configure an Arabic-capable font.</td>
+            <td>Generated PDF visual proof.</td>
+          </tr>
+          <tr>
+            <td class="risk">QR URL tampering changes entitlement context.</td>
+            <td>Use signed opaque references.</td>
+            <td>Tamper rejection tests.</td>
+          </tr>
+          <tr>
+            <td class="risk">Private print assets leak through public URLs.</td>
+            <td>Use private e-booklet file assets and admin-only download endpoints.</td>
+            <td>Permission tests.</td>
+          </tr>
+          <tr>
+            <td class="risk">Old batch history disagrees with edited templates.</td>
+            <td>Snapshot template layout and batch values at generation time.</td>
+            <td>Snapshot immutability tests.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
