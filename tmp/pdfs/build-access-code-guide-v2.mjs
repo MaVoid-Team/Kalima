@@ -192,7 +192,7 @@ const html = `<!doctype html>
         <div class="section soft"><h3>ما هي دفعة PDF؟</h3><p>هي ملف PDF يحتوي على بطاقات جاهزة للتوزيع. كل بطاقة تمثل كود وصول لطالب واحد عند استخدام الإعداد الافتراضي الآمن.</p></div>
       </div>
       ${shot(assets.adminTemplates, "تبويب وصول المعلمين وفيه قوالب الطباعة ولوحة ضبط الحقول", "tall")}
-      <div class="footer"><span>Kalima Access Code Guide</span><span>1</span></div>
+      <div class="footer"><span>دليل أكواد الوصول في كليمة</span><span>1</span></div>
     </section>
 
     <section class="page">
@@ -219,7 +219,7 @@ const html = `<!doctype html>
         </table>
       </div>
       <div class="note">يمكن تحريك الحقول بالسحب أو بإدخال قيم X و Y والعرض والارتفاع وحجم الخط من لوحة الحقل المحدد.</div>
-      <div class="footer"><span>Template</span><span>2</span></div>
+      <div class="footer"><span>القالب</span><span>2</span></div>
     </section>
 
     <section class="page">
@@ -229,7 +229,7 @@ const html = `<!doctype html>
         <p>من نفس البطاقة يمكن فتح الطلاب، عرض الإدارة، أكواد الوصول، أو إلغاء الوصول حسب الصلاحيات.</p>
       </div>
       ${shot(assets.instanceControls, "نسخة مذكرة مفتوحة وبها زر أكواد الوصول وبيانات المقاعد والطلاب", "tall")}
-      <div class="footer"><span>Teacher Copy</span><span>3</span></div>
+      <div class="footer"><span>نسخة المعلم</span><span>3</span></div>
     </section>
 
     <section class="page">
@@ -246,7 +246,7 @@ const html = `<!doctype html>
         </ol>
       </div>
       ${shot(assets.accessCodes, "قسم أكواد الوصول: الشروط، نوع الكود، عدد الأكواد، الاستردادات، وتاريخ الانتهاء", "tall")}
-      <div class="footer"><span>Access Codes</span><span>4</span></div>
+      <div class="footer"><span>أكواد الوصول</span><span>4</span></div>
     </section>
 
     <section class="page">
@@ -263,7 +263,7 @@ const html = `<!doctype html>
         </ol>
       </div>
       ${shot(assets.printableBatch, "قسم دفعة PDF جاهزة للطباعة وفيه القالب والنصوص والصورة وزر إنشاء PDF للطباعة", "tall")}
-      <div class="footer"><span>Printable PDF</span><span>5</span></div>
+      <div class="footer"><span>دفعة PDF جاهزة للطباعة</span><span>5</span></div>
     </section>
 
     <section class="page">
@@ -282,7 +282,7 @@ const html = `<!doctype html>
           <li>لا ترسل لقطة شاشة عامة يظهر فيها كود وصول كامل.</li>
         </ul>
       </div>
-      <div class="footer"><span>Sharing</span><span>6</span></div>
+      <div class="footer"><span>المشاركة</span><span>6</span></div>
     </section>
 
     <section class="page">
@@ -298,7 +298,7 @@ const html = `<!doctype html>
       </div>
       ${shot(assets.studentManual, "صفحة استرداد كود المذكرة التفاعلية بالعربية", "tall")}
       <div class="note">بعد الاسترداد يرتبط الوصول بحساب الطالب وبسياسة الأجهزة المطبقة على المذكرة.</div>
-      <div class="footer"><span>Student Use</span><span>7</span></div>
+      <div class="footer"><span>استرداد الطالب</span><span>7</span></div>
     </section>
 
     <section class="page">
@@ -312,7 +312,7 @@ const html = `<!doctype html>
         <div class="card"><h3>بعد تسجيل الدخول</h3><p>تظهر بيانات المعلم والمذكرة والصف وطريقة التسجيل والكود، ثم يضغط الطالب استرداد الكود بعد قبول الشروط.</p></div>
       </div>
       <div class="note">مهم: يجب ألا يغطي أي نص أو صورة رمز QR داخل القالب. إذا كان QR لا يمسح بسهولة، ارجع إلى قالب الطباعة وزد مساحة QR أو انقله بعيدا عن النصوص.</div>
-      <div class="footer"><span>QR Use</span><span>8</span></div>
+      <div class="footer"><span>استخدام QR</span><span>8</span></div>
     </section>
 
     <section class="page">
@@ -336,7 +336,7 @@ const html = `<!doctype html>
           <tr><td>صورة المدرس لا تظهر</td><td>لم ترفع الصورة داخل الدفعة.</td><td>ارفع الصورة من قسم دفعة PDF أو أدخل معرّف الأصل الصحيح.</td></tr>
         </table>
       </div>
-      <div class="footer"><span>Support</span><span>9</span></div>
+      <div class="footer"><span>الدعم</span><span>9</span></div>
     </section>
 
     <section class="page">
@@ -353,7 +353,7 @@ const html = `<!doctype html>
         <p>ابدأ بقالب طباعة مضبوط، ثم افتح نسخة المعلم، اضبط أكواد الوصول، أنشئ دفعة PDF جاهزة للطباعة، ووزع بطاقة واحدة لكل طالب. الطالب يسترد الكود من صفحة استرداد كود المذكرة التفاعلية أو عبر QR.</p>
       </div>
       <div class="brand" style="margin-top: 24px;"><img src="${assets.logo}" alt="كلمة"><strong>كلمة</strong></div>
-      <div class="footer"><span>End</span><span>10</span></div>
+      <div class="footer"><span>النهاية</span><span>10</span></div>
     </section>
   </main>
 </body>
