@@ -1,4 +1,3 @@
-import { PDFViewer } from '@embedpdf/react-pdf-viewer';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import {
@@ -31,6 +30,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import useApiMutation from '@/hooks/useApiMutation';
 import { getImageUrl, formatFileSize, formatPrice } from '@/lib/storeUtils';
 import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
+import LazyPDFViewer from '@/components/pdf/LazyPDFViewer';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 // ── Media Viewer ──────────────────────────────────────────────────────────────
@@ -108,7 +108,7 @@ function MediaViewer({ sample, previewUrl, downloadUrl, viewerI18n, dir, t }) {
     // Document — PDF viewer or word download prompt
     if ((isPdf || mediaType === 'pdf') && previewUrl) {
         return (
-            <PDFViewer
+            <LazyPDFViewer
                 config={{
                     src: previewUrl,
                     theme: { preference: 'system' },

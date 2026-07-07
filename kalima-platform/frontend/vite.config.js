@@ -2,7 +2,6 @@
 import path from "path"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
-import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js"
 import { defineConfig, loadEnv } from "vite"
 
 const normalizeProxyTarget = (value) => {
@@ -21,7 +20,7 @@ export default defineConfig(({ command, mode }) => {
   const apiProxyTarget = normalizeProxyTarget(env.VITE_API_PROXY_TARGET || process.env.VITE_API_PROXY_TARGET)
 
   return {
-    plugins: [react(), tailwindcss(), cssInjectedByJsPlugin()],
+    plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
@@ -41,6 +40,11 @@ export default defineConfig(({ command, mode }) => {
       chunkSizeWarningLimit: 1600,
       cssMinify: true,
       cssCodeSplit: true,
+      modulePreload: {
+        resolveDependencies(_filename, deps) {
+          return deps.filter((dep) => !dep.includes('embedpdf-'));
+        },
+      },
       rollupOptions: {
         output: {
           manualChunks(id) {
@@ -51,24 +55,6 @@ export default defineConfig(({ command, mode }) => {
             }
             if (id.includes('/pdfjs-dist/')) {
               return 'pdfjs';
-            }
-            if (id.includes('/@embedpdf/engines/') || id.includes('/@embedpdf/pdfium/') || id.includes('/@embedpdf/fonts-')) {
-              return 'embedpdf-engine';
-            }
-            if (id.includes('/@embedpdf/plugin-')) {
-              return 'embedpdf-plugins';
-            }
-            if (id.includes('/@embedpdf/react-pdf-viewer/')) {
-              return 'embedpdf-react';
-            }
-            if (id.includes('/@embedpdf/core/')) {
-              return 'embedpdf-core';
-            }
-            if (id.includes('/@embedpdf/models/')) {
-              return 'embedpdf-models';
-            }
-            if (id.includes('/@embedpdf/utils/')) {
-              return 'embedpdf-utils';
             }
             if (
               id.includes('/node_modules/react/') ||

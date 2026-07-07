@@ -12,6 +12,14 @@
   "new_notification": "New notification received",
   "marked_all_read": "All notifications marked as read",
   "view": "View",
+  "desktop": {
+    "title": "Kalima",
+    "enable": "Enable desktop notifications",
+    "enabled": "Desktop notifications enabled",
+    "denied": "Desktop notifications are blocked. Enable them from your browser settings.",
+    "unsupported": "Desktop notifications are not available in this browser or connection.",
+    "dismissed": "Desktop notification permission was not enabled."
+  },
   "keys": {
     "ORDER_STATUS_RECEIVED": "Your order has been received by our team",
     "ORDER_STATUS_CONFIRMED": "Your order has been confirmed",

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Banknote, BookOpenCheck, CalendarClock, Coins, Link2, Play, BarChart3, Trophy, WalletCards } from "lucide-react";
+import { ArrowRight, Banknote, BookOpenCheck, CalendarClock, Coins, Play, BarChart3, Trophy, WalletCards } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useTeacherEBooklets } from "@/hooks/useEBookletAccess";
@@ -266,7 +266,6 @@ export default function TeacherEBookletsPage() {
 
               <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 {expired ? <Button disabled><Play className="h-4 w-4" />{t("common.open")}</Button> : <Button asChild><Link to={`/teacher/e-booklets/${instance.id}`}><Play className="h-4 w-4" />{t("common.open")}</Link></Button>}
-                {expired ? <Button variant="outline" disabled><Link2 className="h-4 w-4" />{t("teacher.manageAccessCodes")}</Button> : <Button asChild variant="outline"><Link to={`/teacher/e-booklets/${instance.id}/invites`}><Link2 className="h-4 w-4" />{t("teacher.manageAccessCodes")}</Link></Button>}
               </div>
               </div>
             </article>

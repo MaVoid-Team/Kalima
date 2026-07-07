@@ -29,11 +29,8 @@ export class EBookletRedemptionService {
     }
   }
 
-  private assertCodeExistsAndRedeemable(code: any, studentId: number, now = new Date()) {
+  private assertCodeExistsAndRedeemable(code: any, studentId: number) {
     if (!code) throw new NotFoundError("Invalid e-booklet access code.");
-    if (code.expires_at && new Date(code.expires_at) <= now) {
-      throw new ForbiddenError("This e-booklet access code has expired.");
-    }
     if (code.status === "active") return;
     const isSameStudentPaidRedemption =
       code.status === "redeemed" &&
@@ -191,6 +188,9 @@ export class EBookletRedemptionService {
           });
         }
         return this.redemptionDto(existingForStudent, access, code);
+      }
+      if (code.expires_at && new Date(code.expires_at) <= new Date()) {
+        throw new ForbiddenError("This e-booklet access code has expired.");
       }
 
       const isPaid = code.kind === "paid";

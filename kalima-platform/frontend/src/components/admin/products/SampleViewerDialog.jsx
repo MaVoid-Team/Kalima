@@ -1,5 +1,5 @@
-import { PDFViewer } from '@embedpdf/react-pdf-viewer';
 import { useTranslation } from 'react-i18next';
+import LazyPDFViewer from '@/components/pdf/LazyPDFViewer';
 import {
     Dialog,
     DialogContent,
@@ -22,7 +22,7 @@ export default function SampleViewerDialog({ open, onOpenChange, sampleUrl, samp
                     </DialogTitle>
                 </DialogHeader>
                 <div className="flex-1 overflow-hidden" data-testid="sample-viewer-dialog-content">
-                    <PDFViewer
+                    <LazyPDFViewer
                         config={{
                             src: sampleUrl,
                             theme: { preference: 'system' },

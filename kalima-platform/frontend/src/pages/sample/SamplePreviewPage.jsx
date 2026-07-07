@@ -1,4 +1,3 @@
-import { PDFViewer } from '@embedpdf/react-pdf-viewer';
 import { useEffect, useMemo } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Download, AlertCircle, FileText, Music } from 'lucide-react';
@@ -6,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { getPdfViewerI18nConfig } from '@/lib/pdfViewerI18n';
 import { getImageUrl } from '@/lib/storeUtils';
+import LazyPDFViewer from '@/components/pdf/LazyPDFViewer';
 
 const PROTECTED_PDF_DISABLED_CATEGORIES = [
     'annotation',
@@ -161,7 +161,7 @@ export default function SamplePreviewPage() {
                 {/* PDF Document */}
                 {isPdf && previewUrl && (
                     <div className="w-full h-full max-w-6xl mx-auto">
-                        <PDFViewer
+                        <LazyPDFViewer
                             config={{
                                 src: previewUrl,
                                 theme: { preference: 'system' },
@@ -194,4 +194,3 @@ export default function SamplePreviewPage() {
         </div>
     );
 }
-

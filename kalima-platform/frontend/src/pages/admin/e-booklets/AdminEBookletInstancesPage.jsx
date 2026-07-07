@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { BookOpenCheck, ChevronRight, Copy, Download, Eye, HardDrive, KeyRound, RefreshCcw, Save, ShieldOff, Users } from "lucide-react";
+import { BookOpenCheck, ChevronRight, Copy, Download, Eye, HardDrive, HelpCircle, KeyRound, RefreshCcw, Save, ShieldOff, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,6 +59,29 @@ const panelMotion = {
   show: { height: "auto", opacity: 1, transition: { duration: 0.22, ease: [0.2, 0, 0, 1] } },
   exit: { height: 0, opacity: 0, transition: { duration: 0.16, ease: [0.4, 0, 1, 1] } },
 };
+
+function AccessCodeFieldLabel({ children, tooltip }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span>{children}</span>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span
+            className="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            role="button"
+            tabIndex={0}
+            aria-label={tooltip}
+          >
+            <HelpCircle className="h-3.5 w-3.5" aria-hidden="true" />
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top" sideOffset={6} className="max-w-[240px] text-center leading-5">
+          {tooltip}
+        </TooltipContent>
+      </Tooltip>
+    </span>
+  );
+}
 
 export default function AdminEBookletInstancesPage() {
   const { t, i18n } = useTranslation("eBooklets");
@@ -369,7 +393,30 @@ export default function AdminEBookletInstancesPage() {
                               <motion.div className="overflow-hidden rounded-2xl border bg-background" data-testid="admin-e-booklet-access-code-panel" variants={panelMotion} initial="hidden" animate="show" exit="exit">
                               <div className="space-y-4 p-4">
                                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-2 text-sm font-semibold"><KeyRound className="h-4 w-4 text-primary" />{t("admin.instances.accessCodes", { defaultValue: "Access codes" })}</div><Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => loadAccessCodes(instance)}>{t("common.refresh")}</Button></div>
-                                <div className="grid gap-3 md:grid-cols-5"><select className="h-10 rounded-xl border bg-background px-3 text-sm" value={accessCodeDrafts[instance.id]?.termId || ""} onChange={(event) => updateAccessCodeDraft(instance.id, "termId", event.target.value)}><option value="">{t("admin.instances.selectTerm", { defaultValue: "Select term" })}</option>{terms.map((term) => <option key={term.id} value={String(term.id)}>{term.name}</option>)}</select><select className="h-10 rounded-xl border bg-background px-3 text-sm" value={accessCodeDrafts[instance.id]?.kind || "paid"} onChange={(event) => updateAccessCodeDraft(instance.id, "kind", event.target.value)}><option value="paid">{t("admin.instances.paidCode", { defaultValue: "Paid" })}</option><option value="free">{t("admin.instances.freeCode", { defaultValue: "Free" })}</option></select><Input className="h-10 rounded-xl" type="number" min="1" max="100" value={accessCodeDrafts[instance.id]?.count || "1"} onChange={(event) => updateAccessCodeDraft(instance.id, "count", event.target.value)} placeholder={t("admin.instances.codeCount", { defaultValue: "Count" })} /><Input className="h-10 rounded-xl" type="number" min="1" value={accessCodeDrafts[instance.id]?.maxRedemptions || "1"} onChange={(event) => updateAccessCodeDraft(instance.id, "maxRedemptions", event.target.value)} placeholder={t("admin.instances.maxRedemptions", { defaultValue: "Max redemptions" })} /><Input className="h-10 rounded-xl" type="date" value={accessCodeDrafts[instance.id]?.expiresAt || ""} onChange={(event) => updateAccessCodeDraft(instance.id, "expiresAt", event.target.value)} /></div>
+                                <TooltipProvider delayDuration={150}>
+                                <div className="grid gap-3 md:grid-cols-5">
+                                  <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                    <AccessCodeFieldLabel tooltip={t("admin.instances.selectTermTooltip", { defaultValue: "Choose the active term or policy these codes belong to. Milestones and rewards are calculated under that term." })}>{t("admin.instances.selectTerm", { defaultValue: "Select term" })}</AccessCodeFieldLabel>
+                                    <select className="h-10 rounded-xl border bg-background px-3 text-sm text-foreground" value={accessCodeDrafts[instance.id]?.termId || ""} onChange={(event) => updateAccessCodeDraft(instance.id, "termId", event.target.value)}><option value="">{t("admin.instances.selectTerm", { defaultValue: "Select term" })}</option>{terms.map((term) => <option key={term.id} value={String(term.id)}>{term.name}</option>)}</select>
+                                  </label>
+                                  <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                    <AccessCodeFieldLabel tooltip={t("admin.instances.codeTypeTooltip", { defaultValue: "Paid codes count toward paid redemptions and milestones. Free codes grant access without counting as paid." })}>{t("admin.instances.codeType", { defaultValue: "Code type" })}</AccessCodeFieldLabel>
+                                    <select className="h-10 rounded-xl border bg-background px-3 text-sm text-foreground" value={accessCodeDrafts[instance.id]?.kind || "paid"} onChange={(event) => updateAccessCodeDraft(instance.id, "kind", event.target.value)}><option value="paid">{t("admin.instances.paidCode", { defaultValue: "Paid" })}</option><option value="free">{t("admin.instances.freeCode", { defaultValue: "Free" })}</option></select>
+                                  </label>
+                                  <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                    <AccessCodeFieldLabel tooltip={t("admin.instances.codeCountTooltip", { defaultValue: "How many unique access codes to create in this batch." })}>{t("admin.instances.codeCount", { defaultValue: "Code count" })}</AccessCodeFieldLabel>
+                                    <Input className="h-10 rounded-xl text-foreground" type="number" min="1" max="100" value={accessCodeDrafts[instance.id]?.count || "1"} onChange={(event) => updateAccessCodeDraft(instance.id, "count", event.target.value)} />
+                                  </label>
+                                  <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                    <AccessCodeFieldLabel tooltip={t("admin.instances.maxRedemptionsTooltip", { defaultValue: "How many students can use each individual code. Use 1 when every student should receive a private code." })}>{t("admin.instances.maxRedemptions", { defaultValue: "Max redemptions" })}</AccessCodeFieldLabel>
+                                    <Input className="h-10 rounded-xl text-foreground" type="number" min="1" value={accessCodeDrafts[instance.id]?.maxRedemptions || "1"} onChange={(event) => updateAccessCodeDraft(instance.id, "maxRedemptions", event.target.value)} />
+                                  </label>
+                                  <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                    <span>{t("admin.instances.expiresAt", { defaultValue: "Expiry date" })}</span>
+                                    <Input className="h-10 rounded-xl text-foreground" type="date" value={accessCodeDrafts[instance.id]?.expiresAt || ""} onChange={(event) => updateAccessCodeDraft(instance.id, "expiresAt", event.target.value)} />
+                                  </label>
+                                </div>
+                                </TooltipProvider>
                                 <div className="flex flex-wrap gap-2"><Button type="button" size="sm" className="rounded-xl" onClick={() => handleGenerateAccessCodes(instance)} disabled={!accessCodeDrafts[instance.id]?.termId || !(instance.teacher?.id || instance.teacher_id)}>{t("admin.instances.generateCodes", { defaultValue: "Generate codes" })}</Button>{(generatedCodes[instance.id] || []).length > 0 && <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => copyGeneratedCodes(instance.id)}><Copy className="h-4 w-4" />{t("admin.instances.copyGeneratedCodes", { defaultValue: "Copy generated codes" })}</Button>}</div>
                                 {(generatedCodes[instance.id] || []).length > 0 && <div className="rounded-xl bg-muted p-3 text-xs"><div className="mb-2 font-semibold">{t("admin.instances.generatedNow", { defaultValue: "Generated now" })}</div><div className="grid gap-2 md:grid-cols-2">{generatedCodes[instance.id].map((item) => <code key={item.record?.id || item.code} className="break-all rounded-lg bg-background p-2">{item.code}</code>)}</div></div>}
                                 <div className="grid gap-2 md:grid-cols-2">{(existingCodes[instance.id] || []).slice(0, 10).map((code) => <div key={code.id} className="rounded-xl border p-3 text-xs"><div className="font-medium">{code.kind} - {code.status} - ****{code.code_hint}</div><div className="text-muted-foreground">{t("admin.instances.redemptions", { defaultValue: "Redemptions" })}: {code.redeemed_count}/{code.max_redemptions}</div></div>)}{(existingCodes[instance.id] || []).length === 0 && <div className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">{t("admin.instances.noAccessCodes", { defaultValue: "No access codes generated yet." })}</div>}</div>

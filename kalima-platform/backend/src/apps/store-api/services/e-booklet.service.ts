@@ -951,7 +951,11 @@ export class EBookletService {
       const requiredFields = this.normalizeTemplateRequiredFields(dto.required_fields);
       if (requiredFields.length > 0) {
         const activeCount = await tx.required_field_definitions.count({
-          where: { id: { in: requiredFields.map((field) => field.field_definition_id) }, active: true, is_deleted: false },
+          where: {
+            id: { in: requiredFields.map((field) => field.field_definition_id) },
+            active: { not: false },
+            is_deleted: { not: true },
+          },
         });
         if (activeCount !== requiredFields.length) {
           throw new BadRequestError("One or more selected required fields are inactive or invalid.");

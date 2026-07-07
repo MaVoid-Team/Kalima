@@ -103,6 +103,13 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     payment_methods: {
       findFirst: jest.fn().mockResolvedValue({ id: 1, phone_number: "01000000000", name: "Wallet" }),
     },
+    required_field_definitions: {
+      count: jest.fn(),
+    },
+    e_booklet_template_required_fields: {
+      deleteMany: jest.fn(),
+      createMany: jest.fn(),
+    },
     users: {
       findMany: jest.fn().mockResolvedValue([]),
     },
@@ -468,6 +475,40 @@ describe("EBookletService", () => {
           data: expect.objectContaining({ slug: "my-template-3" }),
         }),
       );
+    });
+
+    test("accepts multiple selected required fields unless they are explicitly inactive or deleted", async () => {
+      const db = createMockDb();
+      db.e_booklet_templates.findUnique
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({ id: 4, required_fields: [] });
+      db.e_booklet_templates.create.mockResolvedValue({ id: 4 });
+      db.required_field_definitions.count.mockResolvedValue(2);
+
+      const service = new EBookletService(db);
+      await service.createTemplate({
+        title: "Template",
+        price: 100,
+        required_fields: [
+          { field_definition_id: 12, is_required: true },
+          { field_definition_id: 13, is_required: true },
+        ],
+      }, 1);
+
+      expect(db.required_field_definitions.count).toHaveBeenCalledWith({
+        where: {
+          id: { in: [12, 13] },
+          active: { not: false },
+          is_deleted: { not: true },
+        },
+      });
+      expect(db.e_booklet_template_required_fields.createMany).toHaveBeenCalledWith({
+        data: [
+          { template_id: 4, field_definition_id: 12, is_required: true, active: true },
+          { template_id: 4, field_definition_id: 13, is_required: true, active: true },
+        ],
+        skipDuplicates: true,
+      });
     });
 
     test("persists template, purchase, delivery pricing/expiry, and invite passcode fields", async () => {

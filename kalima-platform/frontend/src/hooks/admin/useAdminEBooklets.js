@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import axiosInstance from "@/api/axios";
 import i18n from "@/i18n";
 import useApiMutation from "../useApiMutation";
@@ -757,6 +757,7 @@ export function useAdminEBookletTermsMilestones() {
   const [milestones, setMilestones] = useState([]);
   const [progress, setProgress] = useState({ paidRedemptions: 0, achievements: [] });
   const [actionLoading, setActionLoading] = useState(false);
+  const deletedMilestoneIds = useRef(new Set());
 
   const runAction = useCallback(async (action) => {
     setActionLoading(true);
@@ -787,7 +788,8 @@ export function useAdminEBookletTermsMilestones() {
       method: "get",
       suppressErrorToast: Boolean(options.suppressErrorToast),
     }, false);
-    setMilestones(Array.isArray(response?.data) ? response.data : []);
+    const nextMilestones = Array.isArray(response?.data) ? response.data : [];
+    setMilestones(nextMilestones.filter((milestone) => !deletedMilestoneIds.current.has(Number(milestone.id))));
     return response;
   }, [fetchApi]);
 
@@ -807,7 +809,12 @@ export function useAdminEBookletTermsMilestones() {
   const activateTerm = useCallback((termId) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-terms/${termId}/activate`, method: "post", defaultSuccessMessage: i18n.t("eBooklets:toasts.termActivated") })), [fetchApi, runAction]);
   const createMilestone = useCallback((data) => runAction(() => fetchApi({ endpoint: "/admin/e-booklet-milestones", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneSaved") })), [fetchApi, runAction]);
   const updateMilestone = useCallback((milestoneId, data) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-milestones/${milestoneId}`, method: "patch", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneSaved") })), [fetchApi, runAction]);
-  const deleteMilestone = useCallback((milestoneId) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-milestones/${milestoneId}`, method: "delete", defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneDeleted") })), [fetchApi, runAction]);
+  const deleteMilestone = useCallback((milestoneId) => runAction(async () => {
+    const response = await fetchApi({ endpoint: `/admin/e-booklet-milestones/${milestoneId}`, method: "delete", defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneDeleted") });
+    deletedMilestoneIds.current.add(Number(milestoneId));
+    setMilestones((current) => current.filter((milestone) => Number(milestone.id) !== Number(milestoneId)));
+    return response;
+  }), [fetchApi, runAction]);
   const reorderMilestones = useCallback((termId, items) => runAction(() => fetchApi({ endpoint: "/admin/e-booklet-milestones/reorder", method: "post", data: { termId, items }, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestonesReordered") })), [fetchApi, runAction]);
 
   return {

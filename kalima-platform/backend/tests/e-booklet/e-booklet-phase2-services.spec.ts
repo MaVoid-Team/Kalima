@@ -173,6 +173,31 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     });
   });
 
+  test("access code service treats a zero-day default expiration as no default expiry", async () => {
+    const db = createDb({
+      e_booklet_global_settings: {
+        upsert: jest.fn().mockResolvedValue({
+          default_access_code_kind: "paid",
+          default_access_code_expiration_days: 0,
+          require_terms_for_code_generation: false,
+          max_bulk_access_codes: 100,
+        }),
+      },
+    });
+    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", template_id: 99 });
+    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, template_id: 99, status: "active", invite_quota: 1 });
+    db.e_booklet_access_codes.findUnique.mockResolvedValue(null);
+    db.e_booklet_access_codes.aggregate.mockResolvedValue({ _sum: { max_redemptions: 0 } });
+    db.e_booklet_access_codes.create.mockImplementation(async ({ data }: any) => ({ id: 23, ...data }));
+    const service = new EBookletAccessCodeService(db);
+
+    await service.generateCode({ bookletInstanceId: 10, teacherId: 9, termId: 1 });
+
+    expect(db.e_booklet_access_codes.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ expires_at: null }),
+    });
+  });
+
   test("access code service enforces configured bulk count maximum", async () => {
     const db = createDb({
       e_booklet_global_settings: {
@@ -337,6 +362,34 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     expect(db.e_booklet_access_code_redemptions.create).toHaveBeenCalledWith({ data: expect.objectContaining({ paid_redemption_guard: "paid-code-3", counted_for_progress: true }) });
     expect(db.e_booklet_access_codes.updateMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ id: 3, status: "active", bound_student_id: null }), data: expect.objectContaining({ bound_student_id: 55, redeemed_count: { increment: 1 }, status: "redeemed" }) }));
     expect(db.$transaction).toHaveBeenCalledWith(expect.any(Function), { isolationLevel: "Serializable" });
+  });
+
+  test("expired paid codes reopen access for the bound student but reject new redemption attempts", async () => {
+    const db = createDb();
+    const expiredRedeemedCode = {
+      id: 3,
+      booklet_instance_id: 10,
+      teacher_id: 9,
+      kind: "paid",
+      max_redemptions: 1,
+      redeemed_count: 1,
+      status: "redeemed",
+      expires_at: new Date("2026-01-01T00:00:00.000Z"),
+      bound_student_id: 55,
+      term_id: 1,
+    };
+    db.e_booklet_access_codes.findUnique.mockResolvedValue(expiredRedeemedCode);
+    db.e_booklet_access_code_redemptions.findFirst
+      .mockResolvedValueOnce({ id: 30, student_id: 55, access_id: null, counted_for_progress: true })
+      .mockResolvedValueOnce(null);
+    db.e_booklet_access.upsert.mockResolvedValue({ id: 88, user_id: 55, booklet_instance_id: 10, access_source: "teacher_code" });
+    const service = new EBookletRedemptionService(db);
+
+    await expect(service.redeemCode("KLM-ABCDEFGH123", 55, { termsAccepted: true })).resolves.toEqual(expect.objectContaining({ id: 30, accessId: 88, bookletInstanceId: 10 }));
+    await expect(service.redeemCode("KLM-ABCDEFGH123", 56, { termsAccepted: true })).rejects.toThrow("no longer active");
+    expect(db.e_booklet_access.upsert).toHaveBeenCalledTimes(1);
+    expect(db.e_booklet_access_code_redemptions.update).toHaveBeenCalledWith({ where: { id: 30 }, data: { access_id: 88 } });
+    expect(db.e_booklet_access_codes.updateMany).not.toHaveBeenCalled();
   });
 
   test("free shared codes track logged-in entry, grant viewer access, but do not count toward milestones", async () => {

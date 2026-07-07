@@ -1,27 +1,19 @@
-import { useState, useEffect, useRef } from "react";
+import { Suspense, lazy, useState, useEffect, useRef } from "react";
 import { Menu, X, Globe, ShoppingCart, ShoppingBag, FileText, Home, User, BookOpenCheck } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "@/components/ui/command";
 import logo from "../assets/Logo.webp";
-import CartPreview from "../components/cart/CartPreview";
 import useAuth from "../hooks/auth/useAuth";
 import { useCart } from "../contexts/CartContext";
 import { useRole } from "@/hooks/useRole";
-import NotificationBell from "../components/notifications/NotificationBell";
 import { E_BOOKLET_ORDERS_ROUTE } from "@/pages/e-booklets/eBookletOrdersContract.mjs";
 
+const CartPreview = lazy(() => import("../components/cart/CartPreview"));
+const NotificationBell = lazy(() => import("../components/notifications/NotificationBell"));
+const NavbarCommandPalette = lazy(() => import("./NavbarCommandPalette"));
 
 export default function Navbar() {
   const location = useLocation();
@@ -267,7 +259,9 @@ export default function Navbar() {
 
                 {/* Notifications Button Desktop */}
                 {isAuthenticated && (
-                  <NotificationBell />
+                  <Suspense fallback={null}>
+                    <NotificationBell />
+                  </Suspense>
                 )}
 
 
@@ -366,18 +360,24 @@ export default function Navbar() {
 
               {/* Notifications Button Mobile */}
               {isAuthenticated && (
-                <NotificationBell />
+                <Suspense fallback={null}>
+                  <NotificationBell />
+                </Suspense>
               )}
 
             </div>
           </div>
 
-          <CartPreview
-            open={isCartModalOpen}
-            onOpenChange={setIsCartModalOpen}
-            cart={cart}
-            onViewFullCart={handleViewFullCart}
-          />
+          {isCartModalOpen && (
+            <Suspense fallback={null}>
+              <CartPreview
+                open={isCartModalOpen}
+                onOpenChange={setIsCartModalOpen}
+                cart={cart}
+                onViewFullCart={handleViewFullCart}
+              />
+            </Suspense>
+          )}
         </motion.header>
       </div>
 
@@ -532,44 +532,27 @@ export default function Navbar() {
       </div>
 
 
-      <CommandDialog
-        open={open}
-        onOpenChange={setOpen}
-        commandProps={{ value: commandValue, onValueChange: setCommandValue }}
-      >
-        <CommandInput placeholder={t("navbar.searchPlaceholder")} />
-        <CommandList>
-          <CommandEmpty>{t("navbar.noResults")}</CommandEmpty>
-          <CommandGroup heading={t("navbar.pages")}>
-            {hasStoreAccess && (
-              <CommandItem value="/samples" onSelect={() => runCommand(() => navigate("/samples"))}>
-                {t("navbar.samples")}
-              </CommandItem>
-            )}
-            {canShowMarketToUser && (
-              <CommandItem value="/market" onSelect={() => runCommand(() => navigate("/market"))}>
-                {t("navbar.market")}
-              </CommandItem>
-            )}
-            {canShowEBookletStoreToUser && (
-              <CommandItem value="/e-booklets" onSelect={() => runCommand(() => navigate("/e-booklets"))}>
-                {t("navbar.eBooklets")}
-              </CommandItem>
-            )}
-            {isAuthenticated && isTeacher && !hasAdminAccess && (
-              <CommandItem value={E_BOOKLET_ORDERS_ROUTE} onSelect={() => runCommand(() => navigate(E_BOOKLET_ORDERS_ROUTE))}>
-                {t("navbar.eBookletOrders")}
-              </CommandItem>
-            )}
-          </CommandGroup>
-          <CommandSeparator />
-          <CommandGroup heading={t("navbar.settings")}>
-            <CommandItem onSelect={() => runCommand(() => toggleLanguage())}>
-              {t("navbar.toggleLanguageAction")}
-            </CommandItem>
-          </CommandGroup>
-        </CommandList>
-      </CommandDialog>
+      {open && (
+        <Suspense fallback={null}>
+          <NavbarCommandPalette
+            open={open}
+            setOpen={setOpen}
+            commandValue={commandValue}
+            setCommandValue={setCommandValue}
+            t={t}
+            runCommand={runCommand}
+            navigate={navigate}
+            hasStoreAccess={hasStoreAccess}
+            canShowMarketToUser={canShowMarketToUser}
+            canShowEBookletStoreToUser={canShowEBookletStoreToUser}
+            isAuthenticated={isAuthenticated}
+            isTeacher={isTeacher}
+            hasAdminAccess={hasAdminAccess}
+            eBookletOrdersRoute={E_BOOKLET_ORDERS_ROUTE}
+            toggleLanguage={toggleLanguage}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

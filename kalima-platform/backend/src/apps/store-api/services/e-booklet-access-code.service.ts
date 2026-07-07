@@ -158,7 +158,7 @@ export class EBookletAccessCodeService {
 
   private defaultExpiresAt(settings: any): Date | null {
     const days = Number(settings.default_access_code_expiration_days);
-    if (!Number.isInteger(days) || days < 0) return null;
+    if (!Number.isInteger(days) || days <= 0) return null;
     return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
   }
 

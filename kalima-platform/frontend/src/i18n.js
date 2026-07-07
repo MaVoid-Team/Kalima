@@ -16,7 +16,7 @@ i18n
         interpolation: {
             escapeValue: false, // not needed for react as it escapes by default
         },
-        ns: ['common', 'landing', 'admin', 'auth', 'cart', 'checkout', 'market', 'parent', 'PDFViewer', 'product', 'student', 'teacher', 'userManagement', 'notifications', 'appreciation', 'eBooklets'],
+        ns: ['common', 'landing'],
         defaultNS: 'landing',
 
         detection: {
