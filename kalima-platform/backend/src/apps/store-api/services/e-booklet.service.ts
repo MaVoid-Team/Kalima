@@ -16,7 +16,7 @@ import { generateInviteToken, hashInviteToken } from "../utils/e-booklet-token";
 import { normalizeOriginalFilename } from "../utils/filename";
 import { EBookletPagePreviewService } from "./e-booklet-page-preview.service";
 import { emitNotificationToUser } from "../../../libs/redis/socketNotificationEmitter";
-import { resolveEBookletUploadRoot } from "../../../libs/uploadsRoot";
+import { resolveEBookletStoragePath, resolveEBookletUploadRoot } from "../../../libs/uploadsRoot";
 
 type EBookletDb = PrismaClient | any;
 const execFileAsync = promisify(execFile);
@@ -1140,8 +1140,7 @@ export class EBookletService {
     });
     if (!asset) throw new NotFoundError("E-booklet file asset not found");
 
-    const filename = path.basename(asset.storage_key || "");
-    const absolutePath = path.join(E_BOOKLET_UPLOAD_DIR, filename);
+    const absolutePath = resolveEBookletStoragePath(asset.storage_key || "");
     await fsPromises.access(absolutePath);
     const pageBuffer = pageNumber && asset.mime_type === "application/pdf"
       ? await this.extractSinglePagePdf(absolutePath, pageNumber)

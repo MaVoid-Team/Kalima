@@ -482,6 +482,7 @@ export default function AdminEBookletInstancesPage() {
 
 
   return (
+    <TooltipProvider delayDuration={150}>
     <motion.div className="space-y-4" data-testid="admin-e-booklet-instances-page" variants={pageMotion} initial="hidden" animate="show">
       <motion.section className="rounded-2xl border bg-background p-4 shadow-sm" layout>
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
@@ -635,6 +636,9 @@ export default function AdminEBookletInstancesPage() {
                     const accessExpanded = expandedAccessKey === instance.id;
                     const instanceExpanded = expandedInstanceKey === instance.id;
                     const eBookletTitle = getEBookletTitle(instance, t("common.eBooklet"));
+                    const unusedActivePaidCodes = (existingCodes[instance.id] || []).filter((code) => code.kind === "paid" && code.status === "active" && Number(code.redeemed_count || 0) === 0).length;
+                    const remainingSeats = Math.max(0, quota - usedSeats);
+                    const showSeatWarning = unusedActivePaidCodes > remainingSeats;
 
                     return (
                       <motion.article key={instance.id} className="bg-card" variants={rowMotion} layout="position">
@@ -836,6 +840,11 @@ export default function AdminEBookletInstancesPage() {
                                       {printWarnings[instance.id].message || t("admin.instances.printSeatWarning", { defaultValue: "Remaining student seats are below unused active paid codes. Codes do not reserve seats." })}
                                     </div>
                                   )}
+                                  {showSeatWarning && (
+                                    <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+                                      {t("admin.instances.unusedCodeSeatWarning", { defaultValue: "Remaining student seats are below unused active paid codes. Codes do not reserve seats; redemption will re-check capacity." })}
+                                    </div>
+                                  )}
                                   {printPreviewUrls[instance.id] && (
                                     <div className="rounded-xl border bg-background p-3">
                                       <div className="mb-2 text-xs font-semibold text-muted-foreground">{t("admin.instances.backendPreview", { defaultValue: "Backend-rendered preview" })}</div>
@@ -893,5 +902,6 @@ export default function AdminEBookletInstancesPage() {
         <Button type="button" variant="outline" className="rounded-xl" disabled={pagination.page * pagination.limit >= pagination.total || loading} onClick={() => { setPage(pagination.page + 1); fetchInstances({ page: pagination.page + 1 }); }}>{t("common.next")}</Button>
       </div>
     </motion.div>
+    </TooltipProvider>
   );
 }

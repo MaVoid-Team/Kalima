@@ -3,11 +3,13 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { BookOpenCheck, Loader2, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import api from "@/api/axios";
 import useAuth from "@/hooks/auth/useAuth";
 import { useStudentEBooklets } from "@/hooks/useEBookletAccess";
 import { useTranslation } from "react-i18next";
 
 const TERMS_VERSION = "e-booklet-invite-v1";
+const apiOrigin = (import.meta.env.VITE_API_URL || "").replace(/\/api\/v\d+\/?$/, "");
 
 const normalizePayload = (payload) => payload?.data && !Array.isArray(payload.data) ? payload.data : payload;
 const redemptionInstanceId = (payload) => {
@@ -22,9 +24,13 @@ export default function EBookletPrintedCodeQrPage() {
   const { isAuthenticated, loading: authLoading } = useAuth() || {};
   const { getPrintQrPrefill, redeemAccessCode } = useStudentEBooklets();
   const [prefill, setPrefill] = useState(null);
+  const [teacherImageObjectUrl, setTeacherImageObjectUrl] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [state, setState] = useState({ status: "idle", message: "" });
   const redirectPath = `/e-booklet-code/qr/${encodeURIComponent(ref || "")}`;
+  const teacherImageUrl = prefill?.teacherImageUrl?.startsWith("/api/")
+    ? `${apiOrigin}${prefill.teacherImageUrl}`
+    : prefill?.teacherImageUrl;
 
   useEffect(() => {
     if (!ref || !isAuthenticated) return;
@@ -38,6 +44,27 @@ export default function EBookletPrintedCodeQrPage() {
         setState({ status: "error", message: error?.response?.data?.message || t("inviteAccept.codeRedemption.error") });
       });
   }, [getPrintQrPrefill, isAuthenticated, ref, t]);
+
+  useEffect(() => {
+    if (!teacherImageUrl) {
+      setTeacherImageObjectUrl("");
+      return undefined;
+    }
+    let active = true;
+    api.get(teacherImageUrl.replace(apiOrigin, ""), { responseType: "blob" })
+      .then((response) => {
+        if (!active) return;
+        const objectUrl = URL.createObjectURL(response.data);
+        setTeacherImageObjectUrl((current) => {
+          if (current) URL.revokeObjectURL(current);
+          return objectUrl;
+        });
+      })
+      .catch(() => setTeacherImageObjectUrl(""));
+    return () => {
+      active = false;
+    };
+  }, [teacherImageUrl]);
 
   const submit = async () => {
     if (!prefill?.code) return;
@@ -109,10 +136,10 @@ export default function EBookletPrintedCodeQrPage() {
               </div>
             </div>
 
-            {prefill?.teacherImageUrl && (
+            {teacherImageObjectUrl && (
               <div className="rounded-lg border bg-muted/30 p-3">
                 <div className="mb-2 text-xs text-muted-foreground">{t("admin.instances.teacherImageAssetId", { defaultValue: "Teacher image" })}</div>
-                <img src={prefill.teacherImageUrl} alt={prefill?.teacher?.name || t("common.teacher")} className="h-36 w-28 rounded-md object-cover" />
+                <img src={teacherImageObjectUrl} alt={prefill?.teacher?.name || t("common.teacher")} className="h-36 w-28 rounded-md object-cover" />
               </div>
             )}
 
