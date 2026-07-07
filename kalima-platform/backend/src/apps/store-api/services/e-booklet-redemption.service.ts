@@ -1,4 +1,4 @@
-import { BadRequestError, ForbiddenError, NotFoundError } from "../../../libs/errors";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../../../libs/errors";
 import { notification_key_enum } from "../generated/prisma/client";
 import { hashEBookletAccessCode } from "./e-booklet-access-code.service";
 
@@ -83,6 +83,24 @@ export class EBookletRedemptionService {
     return tx.e_booklet_access_code_redemptions.findFirst({
       where: { access_code_id: codeId, student_id: studentId },
     });
+  }
+
+  private async assertPaidSeatAvailable(tx: any, code: any, isPaid: boolean) {
+    if (!isPaid) return;
+    const instance = await tx.e_booklet_instances.findFirst({
+      where: { id: code.booklet_instance_id },
+      select: { id: true, invite_quota: true },
+    });
+    if (!instance || instance.invite_quota === null || instance.invite_quota === undefined) return;
+    const usedSeats = await tx.e_booklet_access_code_redemptions.count({
+      where: {
+        booklet_instance_id: code.booklet_instance_id,
+        counted_for_progress: true,
+      },
+    });
+    if (usedSeats >= Number(instance.invite_quota)) {
+      throw new ConflictError("E-booklet student seat limit reached.");
+    }
   }
 
   private isUniqueConflict(error: any) {
@@ -197,6 +215,8 @@ export class EBookletRedemptionService {
       if (isPaid && code.bound_student_id && Number(code.bound_student_id) !== Number(studentId)) {
         throw new ForbiddenError("This e-booklet access code has already been redeemed.");
       }
+
+      await this.assertPaidSeatAvailable(tx, code, isPaid);
 
       try {
         await this.reserveCapacity(tx, code, studentId, isPaid);

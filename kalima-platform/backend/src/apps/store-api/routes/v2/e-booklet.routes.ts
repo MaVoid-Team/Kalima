@@ -377,6 +377,71 @@ router.post(
   eBookletController.adminGenerateFreeCode,
 );
 router.get(
+  "/admin/e-booklet-access-code-print/templates",
+  ...adminManagerAuth,
+  eBookletController.adminListPrintTemplates,
+);
+router.post(
+  "/admin/e-booklet-access-code-print/templates",
+  ...adminManagerAuth,
+  eBookletController.adminCreatePrintTemplate,
+);
+router.patch(
+  "/admin/e-booklet-access-code-print/templates/:templateId",
+  ...adminManagerAuth,
+  eBookletController.adminUpdatePrintTemplate,
+);
+router.patch(
+  "/admin/e-booklet-access-code-print/templates/:templateId/archive",
+  ...adminManagerAuth,
+  eBookletController.adminArchivePrintTemplate,
+);
+router.patch(
+  "/admin/e-booklet-access-code-print/templates/:templateId/activate",
+  ...adminManagerAuth,
+  eBookletController.adminActivatePrintTemplate,
+);
+router.delete(
+  "/admin/e-booklet-access-code-print/templates/:templateId",
+  ...adminManagerAuth,
+  eBookletController.adminDeletePrintTemplate,
+);
+router.get(
+  "/admin/e-booklet-access-code-print/presets",
+  ...adminManagerAuth,
+  eBookletController.adminListPrintPresets,
+);
+router.post(
+  "/admin/e-booklet-access-code-print/presets",
+  ...adminManagerAuth,
+  eBookletController.adminCreatePrintPreset,
+);
+router.post(
+  "/admin/e-booklet-access-code-print/batches/snapshot",
+  ...adminManagerAuth,
+  eBookletController.adminCreatePrintBatchSnapshot,
+);
+router.get(
+  "/admin/e-booklet-access-code-print/batches",
+  ...adminManagerAuth,
+  eBookletController.adminListPrintBatches,
+);
+router.post(
+  "/admin/e-booklet-access-code-print/batches",
+  ...adminManagerAuth,
+  eBookletController.adminGeneratePrintBatch,
+);
+router.post(
+  "/admin/e-booklet-access-code-print/preview",
+  ...adminManagerAuth,
+  eBookletController.adminPreviewPrintCard,
+);
+router.get(
+  "/admin/e-booklet-access-code-print/batches/:batchId/pdf",
+  ...adminManagerAuth,
+  eBookletController.adminDownloadPrintBatchPdf,
+);
+router.get(
   "/admin/e-booklet-progress",
   ...adminManagerAuth,
   eBookletController.listAdminProgress,
@@ -477,6 +542,18 @@ router.get(
 
 // Student APIs.
 router.get("/student/e-booklets", ...studentAuth, eBookletController.listStudentEBooklets);
+router.get(
+  "/e-booklet-access-code-print/qr/:ref",
+  inviteAcceptanceLimiter,
+  ...studentAuth,
+  eBookletController.getPrintQrPrefill,
+);
+router.get(
+  "/e-booklet-access-code-print/qr/:ref/teacher-image",
+  inviteAcceptanceLimiter,
+  ...studentAuth,
+  eBookletController.getPrintQrTeacherImage,
+);
 router.post(
   "/e-booklet-access-codes/redeem",
   inviteAcceptanceLimiter,

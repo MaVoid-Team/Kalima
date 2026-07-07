@@ -103,6 +103,12 @@ model users {
   e_booklet_terms_updated             e_booklet_terms[]                     @relation("EBookletTermUpdater")
   e_booklet_access_codes_created      e_booklet_access_codes[]              @relation("EBookletAccessCodeCreator")
   e_booklet_access_codes_bound        e_booklet_access_codes[]              @relation("EBookletAccessCodeBoundStudent")
+  e_booklet_print_templates_created   e_booklet_access_code_print_templates[] @relation("EBookletPrintTemplateCreator")
+  e_booklet_print_templates_updated   e_booklet_access_code_print_templates[] @relation("EBookletPrintTemplateUpdater")
+  e_booklet_print_presets_created     e_booklet_access_code_print_presets[] @relation("EBookletPrintPresetCreator")
+  e_booklet_print_presets_updated     e_booklet_access_code_print_presets[] @relation("EBookletPrintPresetUpdater")
+  e_booklet_print_batches_teacher     e_booklet_access_code_print_batches[] @relation("EBookletPrintBatchTeacher")
+  e_booklet_print_batches_created     e_booklet_access_code_print_batches[] @relation("EBookletPrintBatchCreator")
   e_booklet_access_code_redemptions   e_booklet_access_code_redemptions[]   @relation("EBookletAccessCodeRedemptionStudent")
   e_booklet_milestone_achievements    e_booklet_milestone_achievements[]    @relation("EBookletMilestoneAchievementTeacher")
   teacher_wallet                      teacher_wallets?                      @relation("TeacherWalletOwner")
@@ -1130,6 +1136,7 @@ model e_booklet_terms {
   creator                   users                                 @relation("EBookletTermCreator", fields: [created_by], references: [id], onDelete: Restrict, onUpdate: NoAction)
   updater                   users?                                @relation("EBookletTermUpdater", fields: [updated_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
   access_codes              e_booklet_access_codes[]
+  access_code_print_batches e_booklet_access_code_print_batches[]
   milestones                e_booklet_milestones[]
   milestone_achievements    e_booklet_milestone_achievements[]
   teacher_terms_acceptances e_booklet_teacher_terms_acceptances[]
@@ -1194,6 +1201,7 @@ model e_booklet_instances {
   custom_document_file    e_booklet_file_assets?              @relation("EBookletInstanceCustomDocument", fields: [custom_document_file_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   access_records          e_booklet_access[]
   access_codes            e_booklet_access_codes[]
+  access_code_print_batches e_booklet_access_code_print_batches[]
   access_code_redemptions e_booklet_access_code_redemptions[]
   invites                 e_booklet_invites[]
   redemptions             e_booklet_invite_redemptions[]
@@ -1389,11 +1397,106 @@ model e_booklet_access_codes {
   teacher          users                               @relation("EBookletAccessCodeCreator", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   bound_student    users?                              @relation("EBookletAccessCodeBoundStudent", fields: [bound_student_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   redemptions      e_booklet_access_code_redemptions[]
+  print_batch_codes e_booklet_access_code_print_batch_codes[]
 
   @@index([booklet_instance_id, status], map: "ix_e_booklet_access_codes_instance_status")
   @@index([teacher_id, status], map: "ix_e_booklet_access_codes_teacher_status")
   @@index([term_id, kind, status], map: "ix_e_booklet_access_codes_term_kind_status")
   @@index([bound_student_id], map: "ix_e_booklet_access_codes_bound_student")
+}
+
+model e_booklet_access_code_print_templates {
+  id                           Int       @id @default(autoincrement())
+  name                         String    @db.VarChar(120)
+  background_file_asset_id     Int
+  width_px                     Int       @default(827)
+  height_px                    Int       @default(438)
+  ppi                          Int       @default(300)
+  status                       String    @default("active") @db.VarChar(20)
+  layout_json                  Json
+  default_required_fields_json Json?
+  created_by                   Int?
+  updated_by                   Int?
+  archived_at                  DateTime? @db.Timestamp(6)
+  created_at                   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at                   DateTime? @db.Timestamp(6)
+
+  background_file e_booklet_file_assets @relation("EBookletPrintTemplateBackground", fields: [background_file_asset_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  creator         users?                @relation("EBookletPrintTemplateCreator", fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  updater         users?                @relation("EBookletPrintTemplateUpdater", fields: [updated_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  batches         e_booklet_access_code_print_batches[]
+
+  @@index([status], map: "ix_e_booklet_print_templates_status")
+  @@index([background_file_asset_id], map: "ix_e_booklet_print_templates_background")
+}
+
+model e_booklet_access_code_print_presets {
+  id           Int       @id @default(autoincrement())
+  preset_type  String    @db.VarChar(40)
+  label        String    @db.VarChar(120)
+  display_text String    @db.Text
+  sort_order   Int       @default(0)
+  active       Boolean   @default(true)
+  created_by   Int?
+  updated_by   Int?
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at   DateTime? @db.Timestamp(6)
+
+  creator users? @relation("EBookletPrintPresetCreator", fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  updater users? @relation("EBookletPrintPresetUpdater", fields: [updated_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([preset_type, active, sort_order], map: "ix_e_booklet_print_presets_type_active_sort")
+}
+
+model e_booklet_access_code_print_batches {
+  id                          Int                         @id @default(autoincrement())
+  label                       String                      @db.VarChar(160)
+  teacher_id                  Int
+  booklet_instance_id         Int
+  template_id                 Int
+  term_id                     Int
+  kind                        e_booklet_access_code_kind_enum
+  count                       Int
+  status                      String                      @default("generated") @db.VarChar(20)
+  teacher_image_file_asset_id Int?
+  pdf_file_asset_id           Int?
+  snapshot_json               Json
+  expires_at                  DateTime?                   @db.Timestamp(6)
+  created_by                  Int?
+  generated_at                DateTime?                   @db.Timestamp(6)
+  created_at                  DateTime?                   @default(now()) @db.Timestamp(6)
+
+  teacher            users                                      @relation("EBookletPrintBatchTeacher", fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  booklet_instance   e_booklet_instances                        @relation(fields: [booklet_instance_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  template           e_booklet_access_code_print_templates      @relation(fields: [template_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  term               e_booklet_terms                            @relation(fields: [term_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  teacher_image_file e_booklet_file_assets?                     @relation("EBookletPrintBatchTeacherImage", fields: [teacher_image_file_asset_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  pdf_file           e_booklet_file_assets?                     @relation("EBookletPrintBatchPdf", fields: [pdf_file_asset_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  creator            users?                                     @relation("EBookletPrintBatchCreator", fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  codes              e_booklet_access_code_print_batch_codes[]
+
+  @@index([teacher_id, status], map: "ix_e_booklet_print_batches_teacher_status")
+  @@index([booklet_instance_id, status], map: "ix_e_booklet_print_batches_instance_status")
+  @@index([template_id], map: "ix_e_booklet_print_batches_template")
+  @@index([created_at], map: "ix_e_booklet_print_batches_created")
+}
+
+model e_booklet_access_code_print_batch_codes {
+  id             Int       @id @default(autoincrement())
+  batch_id       Int
+  access_code_id Int
+  card_index     Int
+  qr_ref_hash    String?   @db.VarChar(128)
+  access_code_ciphertext String? @db.Text
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+
+  batch       e_booklet_access_code_print_batches @relation(fields: [batch_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  access_code e_booklet_access_codes              @relation(fields: [access_code_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([batch_id, access_code_id], map: "ux_e_booklet_print_batch_code_once")
+  @@unique([batch_id, card_index], map: "ux_e_booklet_print_batch_card_index")
+  @@index([access_code_id], map: "ix_e_booklet_print_batch_codes_access_code")
+  @@index([qr_ref_hash], map: "ix_e_booklet_print_batch_codes_qr_ref")
 }
 
 model e_booklet_access_code_redemptions {
@@ -1567,6 +1670,9 @@ model e_booklet_file_assets {
   hotspot_assets             e_booklet_hotspots[]          @relation("EBookletHotspotAsset")
   hotspot_preset_assets      e_booklet_hotspot_presets[]   @relation("EBookletHotspotPresetAsset")
   instance_custom_documents  e_booklet_instances[]         @relation("EBookletInstanceCustomDocument")
+  print_template_backgrounds e_booklet_access_code_print_templates[] @relation("EBookletPrintTemplateBackground")
+  print_batch_teacher_images e_booklet_access_code_print_batches[]   @relation("EBookletPrintBatchTeacherImage")
+  print_batch_pdfs           e_booklet_access_code_print_batches[]   @relation("EBookletPrintBatchPdf")
   source_page_previews       e_booklet_page_previews[]     @relation("EBookletPagePreviewSourceDocument")
   image_page_previews        e_booklet_page_previews[]     @relation("EBookletPagePreviewImage")
 

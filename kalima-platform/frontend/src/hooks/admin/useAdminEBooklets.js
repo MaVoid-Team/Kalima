@@ -747,8 +747,92 @@ export function useAdminEBookletInstances() {
     return fetchApi({ endpoint: `/admin/e-booklet-access-codes?${query.toString()}`, method: "get" }, false);
   }, [fetchApi]);
   const generateAccessCodes = useCallback((data) => fetchApi({ endpoint: "/admin/e-booklet-access-codes/bulk", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.accessCodesGenerated") }), [fetchApi]);
+  const listAccessCodePrintTemplates = useCallback((filters = {}) => {
+    const query = new URLSearchParams();
+    if (filters.status && filters.status !== "all") query.set("status", filters.status);
+    return fetchApi({ endpoint: `/admin/e-booklet-access-code-print/templates${query.toString() ? `?${query.toString()}` : ""}`, method: "get" }, false);
+  }, [fetchApi]);
+  const createAccessCodePrintTemplate = useCallback((data) => fetchApi({ endpoint: "/admin/e-booklet-access-code-print/templates", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.printTemplateSaved", { defaultValue: "Print template saved" }) }), [fetchApi]);
+  const updateAccessCodePrintTemplate = useCallback((templateId, data) => fetchApi({ endpoint: `/admin/e-booklet-access-code-print/templates/${templateId}`, method: "patch", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.printTemplateSaved", { defaultValue: "Print template saved" }) }), [fetchApi]);
+  const archiveAccessCodePrintTemplate = useCallback((templateId) => fetchApi({ endpoint: `/admin/e-booklet-access-code-print/templates/${templateId}/archive`, method: "patch", defaultSuccessMessage: i18n.t("eBooklets:toasts.printTemplateArchived", { defaultValue: "Print template archived" }) }), [fetchApi]);
+  const activateAccessCodePrintTemplate = useCallback((templateId) => fetchApi({ endpoint: `/admin/e-booklet-access-code-print/templates/${templateId}/activate`, method: "patch", defaultSuccessMessage: i18n.t("eBooklets:toasts.printTemplateActivated", { defaultValue: "Print template activated" }) }), [fetchApi]);
+  const deleteAccessCodePrintTemplate = useCallback((templateId) => fetchApi({ endpoint: `/admin/e-booklet-access-code-print/templates/${templateId}`, method: "delete", defaultSuccessMessage: i18n.t("eBooklets:toasts.printTemplateDeleted", { defaultValue: "Print template deleted" }) }), [fetchApi]);
+  const listAccessCodePrintPresets = useCallback((filters = {}) => {
+    const query = new URLSearchParams();
+    if (filters.type && filters.type !== "all") query.set("presetType", filters.type);
+    if (filters.presetType && filters.presetType !== "all") query.set("presetType", filters.presetType);
+    if (filters.active !== undefined) query.set("active", String(filters.active));
+    return fetchApi({ endpoint: `/admin/e-booklet-access-code-print/presets${query.toString() ? `?${query.toString()}` : ""}`, method: "get" }, false);
+  }, [fetchApi]);
+  const createAccessCodePrintPreset = useCallback((data) => fetchApi({ endpoint: "/admin/e-booklet-access-code-print/presets", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.printPresetSaved", { defaultValue: "Print preset saved" }) }), [fetchApi]);
+  const createAccessCodePrintBatchSnapshot = useCallback((data) => fetchApi({ endpoint: "/admin/e-booklet-access-code-print/batches/snapshot", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.printBatchSnapshotSaved", { defaultValue: "Print batch snapshot saved" }) }), [fetchApi]);
+  const listAccessCodePrintBatches = useCallback((filters = {}) => {
+    const query = new URLSearchParams();
+    if (filters.bookletInstanceId) query.set("bookletInstanceId", String(filters.bookletInstanceId));
+    if (filters.teacherId) query.set("teacherId", String(filters.teacherId));
+    if (filters.templateId) query.set("templateId", String(filters.templateId));
+    return fetchApi({ endpoint: `/admin/e-booklet-access-code-print/batches${query.toString() ? `?${query.toString()}` : ""}`, method: "get" }, false);
+  }, [fetchApi]);
+  const generateAccessCodePrintBatch = useCallback((data) => fetchApi({ endpoint: "/admin/e-booklet-access-code-print/batches", method: "post", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.printBatchGenerated", { defaultValue: "Printable access-code PDF generated" }) }), [fetchApi]);
+  const uploadAccessCodePrintImage = useCallback((file, data = {}) => {
+    const formData = new FormData();
+    formData.append("cover", file);
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        formData.append(key, value);
+      }
+    });
+    return fetchApi({
+      endpoint: "/admin/e-booklet-files/cover",
+      method: "post",
+      data: formData,
+      defaultSuccessMessage: i18n.t("eBooklets:toasts.fileStored"),
+    });
+  }, [fetchApi]);
+  const previewAccessCodePrintCard = useCallback(async (data) => {
+    const response = await axiosInstance.post("/admin/e-booklet-access-code-print/preview", data, { responseType: "blob" });
+    return URL.createObjectURL(response.data);
+  }, []);
+  const downloadAccessCodePrintBatchPdf = useCallback(async (batchId, filename = "e-booklet-access-codes.pdf") => {
+    const response = await axiosInstance.get(`/admin/e-booklet-access-code-print/batches/${batchId}/pdf`, { responseType: "blob" });
+    const url = URL.createObjectURL(response.data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    return response;
+  }, []);
 
-  return { instances, pagination, status, loading, fetchInstances, setPage, setStatus, updateQuota, revokeTeacherAccess, listAccessCodes, generateAccessCodes };
+  return {
+    instances,
+    pagination,
+    status,
+    loading,
+    fetchInstances,
+    setPage,
+    setStatus,
+    updateQuota,
+    revokeTeacherAccess,
+    listAccessCodes,
+    generateAccessCodes,
+    listAccessCodePrintTemplates,
+    createAccessCodePrintTemplate,
+    updateAccessCodePrintTemplate,
+    archiveAccessCodePrintTemplate,
+    activateAccessCodePrintTemplate,
+    deleteAccessCodePrintTemplate,
+    listAccessCodePrintPresets,
+    createAccessCodePrintPreset,
+    createAccessCodePrintBatchSnapshot,
+    listAccessCodePrintBatches,
+    generateAccessCodePrintBatch,
+    uploadAccessCodePrintImage,
+    previewAccessCodePrintCard,
+    downloadAccessCodePrintBatchPdf,
+  };
 }
 
 export function useAdminEBookletTermsMilestones() {

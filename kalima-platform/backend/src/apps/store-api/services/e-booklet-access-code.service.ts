@@ -133,17 +133,16 @@ export class EBookletAccessCodeService {
     if (input.kind !== "paid") return;
     if (instance.invite_quota === null || instance.invite_quota === undefined) return;
     const inviteQuota = Number(instance.invite_quota ?? 0);
-    const reserved = await this.db.e_booklet_access_codes.aggregate({
+    const consumed = await this.db.e_booklet_access_codes.aggregate({
       where: {
         booklet_instance_id: input.bookletInstanceId,
         teacher_id: input.teacherId,
         kind: "paid",
-        status: { in: ["active", "redeemed"] },
       },
-      _sum: { max_redemptions: true },
+      _sum: { redeemed_count: true },
     });
-    const reservedSeats = Number(reserved?._sum?.max_redemptions ?? 0);
-    if (reservedSeats + input.requiredSeats > inviteQuota) {
+    const consumedSeats = Number(consumed?._sum?.redeemed_count ?? 0);
+    if (consumedSeats + input.requiredSeats > inviteQuota) {
       throw new ConflictError("Not enough available student seats to generate paid e-booklet access codes.");
     }
   }

@@ -484,6 +484,17 @@ export function useStudentEBooklets() {
     [fetchApi],
   );
 
+  const getPrintQrPrefill = useCallback(
+    (ref) => fetchApi(
+      {
+        endpoint: `/e-booklet-access-code-print/qr/${encodeURIComponent(ref)}`,
+        method: "get",
+      },
+      false,
+    ),
+    [fetchApi],
+  );
+
   return {
     items,
     loading,
@@ -491,5 +502,6 @@ export function useStudentEBooklets() {
     openInvite,
     acceptInvite,
     redeemAccessCode,
+    getPrintQrPrefill,
   };
 }

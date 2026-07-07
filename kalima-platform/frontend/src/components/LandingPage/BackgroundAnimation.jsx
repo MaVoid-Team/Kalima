@@ -1,7 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function BackgroundAnimation() {
+    const [hasDesktopPointer, setHasDesktopPointer] = useState(() =>
+        typeof window !== "undefined" &&
+        window.matchMedia("(min-width: 768px) and (hover: hover) and (pointer: fine)").matches
+    );
+
     // Native motion values (does not trigger React re-renders)
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
@@ -12,6 +17,22 @@ export default function BackgroundAnimation() {
     const smoothY = useSpring(mouseY, springConfig);
 
     useEffect(() => {
+        const pointerQuery = window.matchMedia("(min-width: 768px) and (hover: hover) and (pointer: fine)");
+        const updatePointerMode = () => setHasDesktopPointer(pointerQuery.matches);
+
+        updatePointerMode();
+        pointerQuery.addEventListener("change", updatePointerMode);
+
+        return () => {
+            pointerQuery.removeEventListener("change", updatePointerMode);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!hasDesktopPointer) {
+            return undefined;
+        }
+
         const handleMouseMove = (e) => {
             mouseX.set(e.clientX);
             mouseY.set(e.clientY);
@@ -21,7 +42,7 @@ export default function BackgroundAnimation() {
         return () => {
             window.removeEventListener("mousemove", handleMouseMove);
         };
-    }, [mouseX, mouseY]);
+    }, [hasDesktopPointer, mouseX, mouseY]);
 
     return (
         <div className="fixed inset-0 -z-50 overflow-hidden pointer-events-none bg-background">
@@ -66,14 +87,15 @@ export default function BackgroundAnimation() {
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[40vw] rounded-full bg-primary/20 blur-[80px] opacity-60 will-change-transform"
             />
 
-            {/* Mouse follower directly wired to smooth motion values */}
-            <motion.div
-                className="absolute top-0 left-0 w-96 h-96 -ml-48 -mt-48 rounded-full bg-primary/20 blur-[80px] will-change-transform"
-                style={{
-                    x: smoothX,
-                    y: smoothY,
-                }}
-            />
+            {hasDesktopPointer && (
+                <motion.div
+                    className="absolute top-0 left-0 w-96 h-96 -ml-48 -mt-48 rounded-full bg-primary/20 blur-[80px] will-change-transform"
+                    style={{
+                        x: smoothX,
+                        y: smoothY,
+                    }}
+                />
+            )}
 
             {/* Texture overlay (grain) for a modern feel */}
             <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>

@@ -53,6 +53,9 @@ const EBookletOrdersPage = lazy(
 const AcceptEBookletInvitePage = lazy(
   () => import("./pages/e-booklets/AcceptEBookletInvitePage"),
 );
+const EBookletPrintedCodeQrPage = lazy(
+  () => import("./pages/e-booklets/EBookletPrintedCodeQrPage"),
+);
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const CartPage = lazy(() => import("./pages/cart/CartPage"));
 
@@ -223,6 +226,7 @@ const router = createBrowserRouter(
         </Route>
         <Route path="/e-booklet-invite/:token" element={<AcceptEBookletInvitePage />} />
         <Route path="/e-booklet-code" element={<AcceptEBookletInvitePage mode="code" />} />
+        <Route path="/e-booklet-code/qr/:ref" element={<EBookletPrintedCodeQrPage />} />
 
         {/* 404 Fallback */}
         <Route path="*" element={<NotFoundPage />} />

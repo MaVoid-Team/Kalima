@@ -210,12 +210,12 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     expect(db.e_booklet_terms.findFirst).not.toHaveBeenCalled();
   });
 
-  test("access code service enforces paid seat quota and bulk-generates codes after approval", async () => {
+  test("access code service enforces paid seat quota from redeemed seats and bulk-generates codes after approval", async () => {
     const db = createDb();
     db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", template_id: 99 });
     db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue({ id: 2, term_id: 1, acceptance_type: "code_generation" });
     db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, template_id: 99, status: "active", invite_quota: 3 });
-    db.e_booklet_access_codes.aggregate.mockResolvedValue({ _sum: { max_redemptions: 2 } });
+    db.e_booklet_access_codes.aggregate.mockResolvedValue({ _sum: { redeemed_count: 2 } });
     db.e_booklet_access_codes.findUnique.mockResolvedValue(null);
     db.e_booklet_access_codes.create.mockImplementation(async ({ data }: any) => ({ id: Math.floor(Math.random() * 10000), ...data }));
     const service = new EBookletAccessCodeService(db);
@@ -224,10 +224,29 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     await expect(service.generateCodes({ bookletInstanceId: 10, teacherId: 9, kind: "paid", termId: 1, count: 1 })).resolves.toMatchObject({ count: 1 });
 
     expect(db.e_booklet_access_codes.aggregate).toHaveBeenCalledWith(expect.objectContaining({
-      where: expect.objectContaining({ booklet_instance_id: 10, teacher_id: 9, kind: "paid", status: { in: ["active", "redeemed"] } }),
-      _sum: { max_redemptions: true },
+      where: expect.objectContaining({ booklet_instance_id: 10, teacher_id: 9, kind: "paid" }),
+      _sum: { redeemed_count: true },
     }));
     expect(db.e_booklet_access_codes.create).toHaveBeenCalledTimes(1);
+  });
+
+  test("active generated paid codes do not reserve seats before redemption", async () => {
+    const db = createDb();
+    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", template_id: 99 });
+    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue({ id: 2, term_id: 1, acceptance_type: "code_generation" });
+    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, template_id: 99, status: "active", invite_quota: 3 });
+    db.e_booklet_access_codes.aggregate.mockResolvedValue({ _sum: { redeemed_count: 0 } });
+    db.e_booklet_access_codes.findUnique.mockResolvedValue(null);
+    db.e_booklet_access_codes.create.mockImplementation(async ({ data }: any) => ({ id: Math.floor(Math.random() * 10000), ...data }));
+    const service = new EBookletAccessCodeService(db);
+
+    await expect(service.generateCodes({ bookletInstanceId: 10, teacherId: 9, kind: "paid", termId: 1, count: 3 })).resolves.toMatchObject({ count: 3 });
+
+    expect(db.e_booklet_access_codes.aggregate).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ booklet_instance_id: 10, teacher_id: 9, kind: "paid" }),
+      _sum: { redeemed_count: true },
+    }));
+    expect(db.e_booklet_access_codes.create).toHaveBeenCalledTimes(3);
   });
 
   test("access code service lists sanitized teacher code statuses without hashes", async () => {
@@ -348,6 +367,8 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce({ id: 30, student_id: 55, access_id: null, counted_for_progress: true })
       .mockResolvedValueOnce(null);
+    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, invite_quota: 3 });
+    db.e_booklet_access_code_redemptions.count.mockResolvedValue(0);
     db.e_booklet_access.upsert.mockResolvedValue({ id: 88, user_id: 55, booklet_instance_id: 10, access_source: "teacher_code" });
     db.e_booklet_access_code_redemptions.create.mockResolvedValue({ id: 30, student_id: 55, access_id: 88, counted_for_progress: true });
     db.e_booklet_access_codes.updateMany.mockResolvedValue({ count: 1 });
@@ -362,6 +383,22 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     expect(db.e_booklet_access_code_redemptions.create).toHaveBeenCalledWith({ data: expect.objectContaining({ paid_redemption_guard: "paid-code-3", counted_for_progress: true }) });
     expect(db.e_booklet_access_codes.updateMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ id: 3, status: "active", bound_student_id: null }), data: expect.objectContaining({ bound_student_id: 55, redeemed_count: { increment: 1 }, status: "redeemed" }) }));
     expect(db.$transaction).toHaveBeenCalledWith(expect.any(Function), { isolationLevel: "Serializable" });
+  });
+
+  test("paid redemption rejects exhausted teacher seats without burning the active code", async () => {
+    const db = createDb();
+    const activeCode = { id: 3, booklet_instance_id: 10, teacher_id: 9, kind: "paid", max_redemptions: 1, redeemed_count: 0, status: "active", expires_at: null, bound_student_id: null, term_id: 1 };
+    db.e_booklet_access_codes.findUnique.mockResolvedValue(activeCode);
+    db.e_booklet_access_code_redemptions.findFirst.mockResolvedValue(null);
+    db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, invite_quota: 1 });
+    db.e_booklet_access_code_redemptions.count.mockResolvedValue(1);
+    const service = new EBookletRedemptionService(db);
+
+    await expect(service.redeemCode("KLM-ABCDEFGH123", 55, { termsAccepted: true })).rejects.toThrow("seat limit");
+
+    expect(db.e_booklet_access_codes.updateMany).not.toHaveBeenCalled();
+    expect(db.e_booklet_access_code_redemptions.create).not.toHaveBeenCalled();
+    expect(db.e_booklet_access.upsert).not.toHaveBeenCalled();
   });
 
   test("expired paid codes reopen access for the bound student but reject new redemption attempts", async () => {

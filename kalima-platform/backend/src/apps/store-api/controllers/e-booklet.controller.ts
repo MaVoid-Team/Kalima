@@ -148,6 +148,14 @@ function assertTeacherCanGenerateAccessCodeKind(kind: "paid" | "free") {
   }
 }
 
+function parsePrintPresetType(raw: unknown): "registration_method" | "grade_class" {
+  const value = String(Array.isArray(raw) ? raw[0] : raw || "").trim();
+  if (value !== "registration_method" && value !== "grade_class") {
+    throw new BadRequestError("Invalid print preset type.");
+  }
+  return value;
+}
+
 function parseOptionalIsoDate(raw: unknown, label: string): string | undefined {
   if (!raw) return undefined;
   const value = String(Array.isArray(raw) ? raw[0] : raw);
@@ -1178,6 +1186,224 @@ export const eBookletController = {
         userAgent: req.get("user-agent") ?? null,
       });
       res.status(201).json({ success: true, data: sanitizeAccessCodeResponse(data) });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminListPrintTemplates(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodePrint.listTemplates({
+        status: typeof req.query.status === "string" ? req.query.status : undefined,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminCreatePrintTemplate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodePrint.createTemplate({
+        name: String(req.body?.name || "").trim(),
+        backgroundFileAssetId: parseRequiredPositiveInt(req.body?.backgroundFileAssetId ?? req.body?.background_file_asset_id, "background file asset ID"),
+        widthPx: parseRequiredPositiveInt(req.body?.widthPx ?? req.body?.width_px, "template width"),
+        heightPx: parseRequiredPositiveInt(req.body?.heightPx ?? req.body?.height_px, "template height"),
+        ppi: parseRequiredPositiveInt(req.body?.ppi, "template PPI"),
+        layout: req.body?.layout ?? req.body?.layout_json,
+        defaultRequiredFields: req.body?.defaultRequiredFields ?? req.body?.default_required_fields_json ?? {},
+        createdBy: currentUserId(req),
+      });
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminUpdatePrintTemplate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodePrint.updateTemplate(parseId(req.params.templateId, "template ID"), {
+        name: req.body?.name === undefined ? undefined : String(req.body.name || "").trim(),
+        backgroundFileAssetId: req.body?.backgroundFileAssetId === undefined && req.body?.background_file_asset_id === undefined
+          ? undefined
+          : parseRequiredPositiveInt(req.body?.backgroundFileAssetId ?? req.body?.background_file_asset_id, "background file asset ID"),
+        layout: req.body?.layout ?? req.body?.layout_json,
+        defaultRequiredFields: req.body?.defaultRequiredFields ?? req.body?.default_required_fields_json,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminDeletePrintTemplate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodePrint.deleteTemplate(parseId(req.params.templateId, "template ID"));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminArchivePrintTemplate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodePrint.archiveTemplate(parseId(req.params.templateId, "template ID"), currentUserId(req));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminActivatePrintTemplate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodePrint.activateTemplate(parseId(req.params.templateId, "template ID"), currentUserId(req));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminListPrintPresets(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodePrint.listPresets({
+        presetType: req.query.presetType || req.query.preset_type ? parsePrintPresetType(req.query.presetType ?? req.query.preset_type) : undefined,
+        active: req.query.active === undefined ? undefined : parseBoolean(req.query.active),
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminCreatePrintPreset(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodePrint.createPreset({
+        presetType: parsePrintPresetType(req.body?.presetType ?? req.body?.preset_type),
+        label: String(req.body?.label || "").trim(),
+        displayText: String(req.body?.displayText ?? req.body?.display_text ?? "").trim(),
+        sortOrder: parseOptionalPositiveInt(req.body?.sortOrder ?? req.body?.sort_order, "sort order") ?? 0,
+        createdBy: currentUserId(req),
+      });
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminCreatePrintBatchSnapshot(req: Request, res: Response, next: NextFunction) {
+    try {
+      const rawAccessCodeIds = req.body?.accessCodeIds ?? req.body?.access_code_ids;
+      const accessCodes = Array.isArray(rawAccessCodeIds)
+        ? rawAccessCodeIds.map((id: unknown) => ({ id: parseRequiredPositiveInt(id, "access code ID") }))
+        : [];
+      const data = await domainServices().accessCodePrint.createBatchSnapshot({
+        label: String(req.body?.label || "").trim(),
+        templateId: parseRequiredPositiveInt(req.body?.templateId ?? req.body?.template_id, "template ID"),
+        teacherId: parseRequiredPositiveInt(req.body?.teacherId ?? req.body?.teacher_id, "teacher ID"),
+        bookletInstanceId: parseRequiredPositiveInt(req.body?.bookletInstanceId ?? req.body?.booklet_instance_id, "instance ID"),
+        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+        kind: req.body?.kind ? parseAccessCodeKind(req.body.kind) : "paid",
+        count: parseRequiredPositiveInt(req.body?.count, "access code count"),
+        createdBy: currentUserId(req),
+        batchValues: req.body?.batchValues ?? req.body?.batch_values ?? {},
+        requiredFields: req.body?.requiredFields ?? req.body?.required_fields ?? {},
+        teacherImageFileAssetId: parseOptionalPositiveInt(req.body?.teacherImageFileAssetId ?? req.body?.teacher_image_file_asset_id, "teacher image file asset ID") ?? null,
+        pdfFileAssetId: parseOptionalPositiveInt(req.body?.pdfFileAssetId ?? req.body?.pdf_file_asset_id, "PDF file asset ID") ?? null,
+        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+        accessCodes,
+      });
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminListPrintBatches(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodePrint.listBatches({
+        teacherId: parseOptionalPositiveInt(req.query.teacherId ?? req.query.teacher_id, "teacher ID") ?? undefined,
+        bookletInstanceId: parseOptionalPositiveInt(req.query.bookletInstanceId ?? req.query.booklet_instance_id, "instance ID") ?? undefined,
+        templateId: parseOptionalPositiveInt(req.query.templateId ?? req.query.template_id, "template ID") ?? undefined,
+      });
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminGeneratePrintBatch(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodePrint.generatePrintableBatch({
+        label: String(req.body?.label || "").trim(),
+        templateId: parseRequiredPositiveInt(req.body?.templateId ?? req.body?.template_id, "template ID"),
+        teacherId: parseRequiredPositiveInt(req.body?.teacherId ?? req.body?.teacher_id, "teacher ID"),
+        bookletInstanceId: parseRequiredPositiveInt(req.body?.bookletInstanceId ?? req.body?.booklet_instance_id, "instance ID"),
+        termId: parseRequiredPositiveInt(req.body?.termId ?? req.body?.term_id, "term ID"),
+        kind: req.body?.kind ? parseAccessCodeKind(req.body.kind) : "paid",
+        count: parseRequiredPositiveInt(req.body?.count, "access code count"),
+        createdBy: currentUserId(req),
+        batchValues: req.body?.batchValues ?? req.body?.batch_values ?? {},
+        requiredFields: req.body?.requiredFields ?? req.body?.required_fields ?? {},
+        teacherImageFileAssetId: parseOptionalPositiveInt(req.body?.teacherImageFileAssetId ?? req.body?.teacher_image_file_asset_id, "teacher image file asset ID") ?? null,
+        pdfFileAssetId: parseOptionalPositiveInt(req.body?.pdfFileAssetId ?? req.body?.pdf_file_asset_id, "PDF file asset ID") ?? null,
+        expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
+        ipAddress: req.ip,
+        userAgent: req.get("user-agent") ?? null,
+      });
+      res.status(201).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminPreviewPrintCard(req: Request, res: Response, next: NextFunction) {
+    try {
+      const buffer = await domainServices().accessCodePrint.renderPreviewCard({
+        templateId: parseRequiredPositiveInt(req.body?.templateId ?? req.body?.template_id, "template ID"),
+        code: String(req.body?.code || "KLM PREV IEW"),
+        qrRedeemUrl: String(req.body?.qrRedeemUrl ?? req.body?.qr_redeem_url ?? "https://kalima.test/e-booklet-code/qr/preview"),
+        teacherImageFileAssetId: parseOptionalPositiveInt(req.body?.teacherImageFileAssetId ?? req.body?.teacher_image_file_asset_id, "teacher image file asset ID") ?? null,
+        batchValues: req.body?.batchValues ?? req.body?.batch_values ?? {},
+      });
+      setPrivateNoStore(res);
+      res.type("image/png");
+      setInlineFilename(res, "access-code-preview.png", "access-code-preview.png");
+      res.send(buffer);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async adminDownloadPrintBatchPdf(req: Request, res: Response, next: NextFunction) {
+    try {
+      const assetId = await domainServices().accessCodePrint.getBatchPdfAssetId(parseId(req.params.batchId, "batch ID"));
+      const { asset, absolutePath } = await getEBookletService().getPrivateFileAssetForAdmin(assetId);
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "application/pdf");
+      res.set("Content-Disposition", buildContentDisposition("attachment", asset.original_filename, "access-code-batch.pdf"));
+      res.sendFile(absolutePath);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getPrintQrPrefill(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await domainServices().accessCodePrint.getQrPrefill(parseParam(req.params.ref, "QR reference"));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getPrintQrTeacherImage(req: Request, res: Response, next: NextFunction) {
+    try {
+      const assetId = await domainServices().accessCodePrint.getQrTeacherImageAssetId(parseParam(req.params.ref, "QR reference"));
+      const { asset, absolutePath } = await getEBookletService().getPrivateFileAssetForAdmin(assetId);
+      setPrivateNoStore(res);
+      res.type(asset.mime_type || "image/png");
+      setInlineFilename(res, asset.original_filename, "teacher-image");
+      res.sendFile(absolutePath);
     } catch (error) {
       next(error);
     }

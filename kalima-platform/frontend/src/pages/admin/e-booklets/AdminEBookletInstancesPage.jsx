@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { BookOpenCheck, ChevronRight, Copy, Download, Eye, HardDrive, HelpCircle, KeyRound, RefreshCcw, Save, ShieldOff, Users } from "lucide-react";
+import { BookOpenCheck, ChevronRight, Copy, Download, Eye, FileText, HardDrive, HelpCircle, KeyRound, Plus, Printer, RefreshCcw, Save, ShieldOff, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import { useAdminEBookletInstances, useAdminEBookletTermsMilestones } from "@/ho
 import useExport from "@/hooks/useExport";
 import { useTranslation } from "react-i18next";
 import AdminEBookletStudentDevicePanel from "./AdminEBookletStudentDevicePanel";
+import PrintTemplateLayoutEditor, { DEFAULT_PRINT_TEMPLATE_LAYOUT } from "./PrintTemplateLayoutEditor";
 
 const numberValue = (value, fallback = 0) => {
   const parsed = Number(value);
@@ -85,7 +86,32 @@ function AccessCodeFieldLabel({ children, tooltip }) {
 
 export default function AdminEBookletInstancesPage() {
   const { t, i18n } = useTranslation("eBooklets");
-  const { instances, pagination, status, loading, fetchInstances, setStatus, setPage, updateQuota, revokeTeacherAccess, listAccessCodes, generateAccessCodes } = useAdminEBookletInstances();
+  const {
+    instances,
+    pagination,
+    status,
+    loading,
+    fetchInstances,
+    setStatus,
+    setPage,
+    updateQuota,
+    revokeTeacherAccess,
+    listAccessCodes,
+    generateAccessCodes,
+    listAccessCodePrintTemplates,
+    createAccessCodePrintTemplate,
+    updateAccessCodePrintTemplate,
+    archiveAccessCodePrintTemplate,
+    activateAccessCodePrintTemplate,
+    deleteAccessCodePrintTemplate,
+    listAccessCodePrintPresets,
+    createAccessCodePrintPreset,
+    listAccessCodePrintBatches,
+    generateAccessCodePrintBatch,
+    uploadAccessCodePrintImage,
+    previewAccessCodePrintCard,
+    downloadAccessCodePrintBatchPdf,
+  } = useAdminEBookletInstances();
   const { terms, fetchTerms } = useAdminEBookletTermsMilestones();
   const { exportData, loading: exportLoading, exportProgress } = useExport();
   const [quotaDrafts, setQuotaDrafts] = useState({});
@@ -93,11 +119,32 @@ export default function AdminEBookletInstancesPage() {
   const [expandedDeviceKey, setExpandedDeviceKey] = useState(null);
   const [expandedAccessKey, setExpandedAccessKey] = useState(null);
   const [accessCodeDrafts, setAccessCodeDrafts] = useState({});
+  const [printDrafts, setPrintDrafts] = useState({});
+  const [printTemplates, setPrintTemplates] = useState([]);
+  const [printPresets, setPrintPresets] = useState([]);
+  const [presetDraft, setPresetDraft] = useState({ presetType: "registration_method", label: "", displayText: "" });
+  const [templateDraft, setTemplateDraft] = useState({ name: "", backgroundFileAssetId: "", layout: DEFAULT_PRINT_TEMPLATE_LAYOUT });
+  const [editingTemplateId, setEditingTemplateId] = useState(null);
+  const [printUploadState, setPrintUploadState] = useState({});
+  const [printBatches, setPrintBatches] = useState({});
+  const [printBatchHistory, setPrintBatchHistory] = useState({});
+  const [printWarnings, setPrintWarnings] = useState({});
+  const [printPreviewUrls, setPrintPreviewUrls] = useState({});
   const [generatedCodes, setGeneratedCodes] = useState({});
   const [existingCodes, setExistingCodes] = useState({});
 
   useEffect(() => { fetchInstances().catch(() => {}); }, [fetchInstances]);
   useEffect(() => { fetchTerms({ status: "active" }).catch(() => {}); }, [fetchTerms]);
+  useEffect(() => {
+    listAccessCodePrintTemplates()
+      .then((response) => setPrintTemplates(Array.isArray(response?.data) ? response.data : []))
+      .catch(() => {});
+  }, [listAccessCodePrintTemplates]);
+  useEffect(() => {
+    listAccessCodePrintPresets({ active: true })
+      .then((response) => setPrintPresets(Array.isArray(response?.data) ? response.data : []))
+      .catch(() => {});
+  }, [listAccessCodePrintPresets]);
   useEffect(() => {
     setQuotaDrafts(Object.fromEntries(instances.map((instance) => [instance.id, instance.invite_quota ?? 0])));
   }, [instances]);
@@ -114,7 +161,25 @@ export default function AdminEBookletInstancesPage() {
       });
       return next;
     });
-  }, [instances, terms]);
+    setPrintDrafts((current) => {
+      const next = { ...current };
+      instances.forEach((instance) => {
+        if (!next[instance.id]) {
+          next[instance.id] = {
+            templateId: "",
+            batchName: "",
+            teacherImageFileAssetId: "",
+            gradeClassText: instance.template?.grade_level || instance.grade_level || "",
+            registrationMethodText: t("admin.instances.defaultRegistrationMethod", { defaultValue: "كود أو منصة" }),
+            priceText: "",
+            redCustomText: "",
+            requiredFields: {},
+          };
+        }
+      });
+      return next;
+    });
+  }, [instances, terms, t]);
 
   const grouped = useMemo(() => instances.reduce((acc, instance) => {
     const key = instance.teacher?.id || "unknown";
@@ -162,6 +227,138 @@ export default function AdminEBookletInstancesPage() {
     }));
   };
 
+  const updatePrintDraft = (instanceId, field, value) => {
+    setPrintDrafts((current) => ({
+      ...current,
+      [instanceId]: { ...(current[instanceId] || {}), [field]: value },
+    }));
+  };
+
+  const updatePrintRequiredField = (instanceId, field, checked) => {
+    setPrintDrafts((current) => ({
+      ...current,
+      [instanceId]: {
+        ...(current[instanceId] || {}),
+        requiredFields: {
+          ...((current[instanceId] || {}).requiredFields || {}),
+          [field]: checked,
+        },
+      },
+    }));
+  };
+
+  const refreshPrintTemplates = async () => {
+    const response = await listAccessCodePrintTemplates();
+    const templates = Array.isArray(response?.data) ? response.data : [];
+    setPrintTemplates(templates);
+    return templates;
+  };
+
+  const templatePayload = () => ({
+      name: templateDraft.name || t("admin.instances.defaultPrintTemplateName", { defaultValue: "E-booklet access-code card" }),
+      backgroundFileAssetId: Number(templateDraft.backgroundFileAssetId),
+      widthPx: 827,
+      heightPx: 438,
+      ppi: 300,
+      layout: templateDraft.layout || DEFAULT_PRINT_TEMPLATE_LAYOUT,
+      defaultRequiredFields: { qr: true, codeNumber: true },
+    });
+
+  const handleSavePrintTemplate = async () => {
+    const response = editingTemplateId
+      ? await updateAccessCodePrintTemplate(editingTemplateId, templatePayload())
+      : await createAccessCodePrintTemplate(templatePayload());
+    const created = response?.data;
+    const templates = await refreshPrintTemplates();
+    if (created?.id) {
+      setPrintDrafts((current) => {
+        const next = { ...current };
+        instances.forEach((instance) => {
+          next[instance.id] = { ...(next[instance.id] || {}), templateId: String(created.id) };
+        });
+        return next;
+      });
+      if (!templates.some((template) => Number(template.id) === Number(created.id))) {
+        setPrintTemplates((current) => [created, ...current]);
+      }
+    }
+    setEditingTemplateId(null);
+    setTemplateDraft({ name: "", backgroundFileAssetId: "", layout: templateDraft.layout || DEFAULT_PRINT_TEMPLATE_LAYOUT });
+  };
+
+  const handleEditPrintTemplate = (template) => {
+    setEditingTemplateId(template.id);
+    setTemplateDraft({
+      name: template.name || "",
+      backgroundFileAssetId: String(template.background_file_asset_id || template.backgroundFileAssetId || ""),
+      layout: template.layout_json || template.layout || DEFAULT_PRINT_TEMPLATE_LAYOUT,
+    });
+  };
+
+  const handleDeletePrintTemplate = async (templateId) => {
+    if (!window.confirm(t("admin.instances.deletePrintTemplateConfirm", { defaultValue: "Delete this unused print template?" }))) return;
+    await deleteAccessCodePrintTemplate(templateId);
+    await refreshPrintTemplates();
+  };
+
+  const handleArchivePrintTemplate = async (template) => {
+    if (template.status === "archived") await activateAccessCodePrintTemplate(template.id);
+    else await archiveAccessCodePrintTemplate(template.id);
+    await refreshPrintTemplates();
+  };
+
+  const refreshPrintPresets = async () => {
+    const response = await listAccessCodePrintPresets({ active: true });
+    const presets = Array.isArray(response?.data) ? response.data : [];
+    setPrintPresets(presets);
+    return presets;
+  };
+
+  const handleCreatePrintPreset = async () => {
+    await createAccessCodePrintPreset({
+      presetType: presetDraft.presetType,
+      label: presetDraft.label || presetDraft.displayText,
+      displayText: presetDraft.displayText,
+    });
+    await refreshPrintPresets();
+    setPresetDraft((current) => ({ ...current, label: "", displayText: "" }));
+  };
+
+  const presetsByType = (type) => printPresets.filter((preset) => preset.preset_type === type || preset.presetType === type);
+
+  const uploadPrintImage = async (file, target) => {
+    if (!file) return null;
+    setPrintUploadState((current) => ({ ...current, [target]: "uploading" }));
+    try {
+      const response = await uploadAccessCodePrintImage(file, {
+        owner_type: "e_booklet_access_code_print",
+        file_type: "image",
+      });
+      const assetId = response?.data?.id;
+      setPrintUploadState((current) => ({ ...current, [target]: "done" }));
+      return assetId;
+    } catch (error) {
+      setPrintUploadState((current) => ({ ...current, [target]: "error" }));
+      throw error;
+    }
+  };
+
+  const handleBackgroundUpload = async (event) => {
+    const assetId = await uploadPrintImage(event.target.files?.[0], "background");
+    if (assetId) {
+      setTemplateDraft((current) => ({ ...current, backgroundFileAssetId: String(assetId) }));
+    }
+    event.target.value = "";
+  };
+
+  const handleTeacherImageUpload = async (instanceId, event) => {
+    const assetId = await uploadPrintImage(event.target.files?.[0], `teacher-${instanceId}`);
+    if (assetId) {
+      updatePrintDraft(instanceId, "teacherImageFileAssetId", String(assetId));
+    }
+    event.target.value = "";
+  };
+
   const loadAccessCodes = async (instance) => {
     const teacherId = instance.teacher?.id || instance.teacher_id;
     if (!teacherId) return;
@@ -169,11 +366,20 @@ export default function AdminEBookletInstancesPage() {
     setExistingCodes((current) => ({ ...current, [instance.id]: Array.isArray(response?.data) ? response.data : [] }));
   };
 
+  const loadPrintBatches = async (instance) => {
+    const teacherId = instance.teacher?.id || instance.teacher_id;
+    const response = await listAccessCodePrintBatches({ bookletInstanceId: instance.id, teacherId });
+    setPrintBatchHistory((current) => ({ ...current, [instance.id]: Array.isArray(response?.data) ? response.data : [] }));
+  };
+
   const toggleAccessPanel = async (instance) => {
     const nextKey = expandedAccessKey === instance.id ? null : instance.id;
     setExpandedInstanceKey(instance.id);
     setExpandedAccessKey(nextKey);
-    if (nextKey) await loadAccessCodes(instance);
+    if (nextKey) {
+      await loadAccessCodes(instance);
+      await loadPrintBatches(instance);
+    }
   };
 
   const toggleInstance = (instanceId) => {
@@ -200,6 +406,61 @@ export default function AdminEBookletInstancesPage() {
     const codes = Array.isArray(response?.data?.codes) ? response.data.codes : [];
     setGeneratedCodes((current) => ({ ...current, [instance.id]: codes }));
     await loadAccessCodes(instance);
+  };
+
+  const handleGeneratePrintableBatch = async (instance) => {
+    const accessDraft = accessCodeDrafts[instance.id] || {};
+    const printDraft = printDrafts[instance.id] || {};
+    const eBookletTitle = getEBookletTitle(instance, t("common.eBooklet"));
+    const payload = {
+      bookletInstanceId: Number(instance.id),
+      teacherId: Number(instance.teacher?.id || instance.teacher_id),
+      termId: Number(accessDraft.termId),
+      templateId: Number(printDraft.templateId),
+      kind: accessDraft.kind || "paid",
+      count: Number(accessDraft.count || 1),
+      maxRedemptions: 1,
+      expiresAt: accessDraft.expiresAt || null,
+      label: printDraft.batchName || `${eBookletTitle} - ${formatDate(new Date().toISOString(), true)}`,
+      batchValues: {
+        gradeClassText: printDraft.gradeClassText || eBookletTitle,
+        registrationMethodText: printDraft.registrationMethodText || t("admin.instances.defaultRegistrationMethod", { defaultValue: "كود أو منصة" }),
+        priceText: printDraft.priceText || null,
+        redCustomText: printDraft.redCustomText || null,
+      },
+      requiredFields: printDraft.requiredFields || {},
+      teacherImageFileAssetId: printDraft.teacherImageFileAssetId ? Number(printDraft.teacherImageFileAssetId) : null,
+    };
+    const response = await generateAccessCodePrintBatch(payload);
+    const batch = response?.data?.batch || response?.data;
+    const warning = response?.data?.warning;
+    setPrintWarnings((current) => ({ ...current, [instance.id]: warning || null }));
+    if (batch?.id) {
+      setPrintBatches((current) => ({ ...current, [instance.id]: batch }));
+      await downloadAccessCodePrintBatchPdf(batch.id, `e-booklet-access-codes-${batch.id}.pdf`);
+    }
+    await loadAccessCodes(instance);
+    await loadPrintBatches(instance);
+  };
+
+  const handlePreviewPrintableCard = async (instance) => {
+    const printDraft = printDrafts[instance.id] || {};
+    const eBookletTitle = getEBookletTitle(instance, t("common.eBooklet"));
+    const url = await previewAccessCodePrintCard({
+      templateId: Number(printDraft.templateId),
+      code: "KLM PREV IEW 001",
+      teacherImageFileAssetId: printDraft.teacherImageFileAssetId ? Number(printDraft.teacherImageFileAssetId) : null,
+      batchValues: {
+        gradeClassText: printDraft.gradeClassText || eBookletTitle,
+        registrationMethodText: printDraft.registrationMethodText || t("admin.instances.defaultRegistrationMethod", { defaultValue: "كود أو منصة" }),
+        priceText: printDraft.priceText || null,
+        redCustomText: printDraft.redCustomText || null,
+      },
+    });
+    setPrintPreviewUrls((current) => {
+      if (current[instance.id]) URL.revokeObjectURL(current[instance.id]);
+      return { ...current, [instance.id]: url };
+    });
   };
 
   const copyGeneratedCodes = async (instanceId) => {
@@ -274,6 +535,71 @@ export default function AdminEBookletInstancesPage() {
           <div className="rounded-xl bg-muted/50 px-3 py-2 text-sm"><span className="font-semibold text-emerald-600">{summary.active}</span> {t("statuses.active")}</div>
           <div className="rounded-xl bg-muted/50 px-3 py-2 text-sm"><span className="font-semibold">{summary.seats}/{summary.quota || 0}</span> {t("admin.instances.seats", { defaultValue: "seats" })}</div>
           <div className="rounded-xl bg-muted/50 px-3 py-2 text-sm"><span className="font-semibold">{summary.devices}</span> {t("teacher.invites.usedDevices")}</div>
+        </div>
+        <div className="mt-4 rounded-2xl border bg-muted/15 p-3">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 text-sm font-semibold"><Printer className="h-4 w-4 text-primary" />{t("admin.instances.printTemplates", { defaultValue: "Print templates" })}</div>
+              <p className="mt-1 text-xs text-muted-foreground">{t("admin.instances.printTemplatesDescription", { defaultValue: "Templates use a fixed 827 x 438 px card at 300 PPI. Create from a background file asset, then choose it per batch." })}</p>
+            </div>
+            <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-[minmax(160px,1fr)_180px_150px_auto] lg:max-w-3xl">
+              <Input className="h-10 rounded-xl text-foreground" value={templateDraft.name} placeholder={t("admin.instances.printTemplateName", { defaultValue: "Template name" })} onChange={(event) => setTemplateDraft((current) => ({ ...current, name: event.target.value }))} />
+              <Input className="h-10 rounded-xl text-foreground" type="file" accept="image/*" onChange={handleBackgroundUpload} disabled={printUploadState.background === "uploading"} />
+              <Input className="h-10 rounded-xl text-foreground" type="number" min="1" value={templateDraft.backgroundFileAssetId} placeholder={t("admin.instances.backgroundAssetId", { defaultValue: "Background asset ID" })} onChange={(event) => setTemplateDraft((current) => ({ ...current, backgroundFileAssetId: event.target.value }))} />
+              <Button type="button" className="rounded-xl" onClick={handleSavePrintTemplate} disabled={!templateDraft.backgroundFileAssetId}>
+                <Plus className="h-4 w-4" />
+                {editingTemplateId ? t("common.save", { defaultValue: "Save" }) : t("common.create", { defaultValue: "Create" })}
+              </Button>
+            </div>
+          </div>
+          {editingTemplateId && (
+            <div className="mt-3 flex items-center justify-between rounded-xl border bg-background px-3 py-2 text-xs">
+              <span>{t("admin.instances.editingPrintTemplate", { defaultValue: "Editing template" })} #{editingTemplateId}</span>
+              <Button type="button" size="sm" variant="ghost" className="h-8 rounded-xl" onClick={() => { setEditingTemplateId(null); setTemplateDraft({ name: "", backgroundFileAssetId: "", layout: DEFAULT_PRINT_TEMPLATE_LAYOUT }); }}>{t("common.cancel", { defaultValue: "Cancel" })}</Button>
+            </div>
+          )}
+          <div className="mt-4">
+            <PrintTemplateLayoutEditor
+              value={templateDraft.layout}
+              onChange={(layout) => setTemplateDraft((current) => ({ ...current, layout }))}
+            />
+          </div>
+          {printTemplates.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {printTemplates.slice(0, 6).map((template) => (
+                <Badge key={template.id} variant="outline" className="gap-2 rounded-xl px-2 py-1">
+                  <button type="button" className="max-w-[180px] truncate hover:text-primary" onClick={() => handleEditPrintTemplate(template)}>#{template.id} {template.name}</button>
+                  <span className={template.status === "archived" ? "text-amber-600" : "text-emerald-600"}>{template.status || "active"}</span>
+                  <button type="button" className="text-muted-foreground hover:text-primary" onClick={() => handleArchivePrintTemplate(template)}>
+                    {template.status === "archived" ? t("common.activate", { defaultValue: "Activate" }) : t("common.archive", { defaultValue: "Archive" })}
+                  </button>
+                  <button type="button" className="text-muted-foreground hover:text-destructive" onClick={() => handleDeletePrintTemplate(template.id)} aria-label={t("admin.instances.deletePrintTemplate", { defaultValue: "Delete print template" })}>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+          <div className="mt-4 rounded-xl border bg-background p-3">
+            <div className="mb-3 flex items-center gap-2 text-sm font-semibold"><FileText className="h-4 w-4 text-primary" />{t("admin.instances.printPresets", { defaultValue: "Print text presets" })}</div>
+            <div className="grid gap-2 md:grid-cols-[170px_minmax(140px,1fr)_minmax(180px,1fr)_auto]">
+              <select className="h-10 rounded-xl border bg-background px-3 text-sm text-foreground" value={presetDraft.presetType} onChange={(event) => setPresetDraft((current) => ({ ...current, presetType: event.target.value }))}>
+                <option value="registration_method">{t("admin.instances.registrationMethodText", { defaultValue: "Registration method" })}</option>
+                <option value="grade_class">{t("admin.instances.gradeClassText", { defaultValue: "Grade/class text" })}</option>
+              </select>
+              <Input className="h-10 rounded-xl text-foreground" value={presetDraft.label} placeholder={t("admin.instances.presetLabel", { defaultValue: "Preset label" })} onChange={(event) => setPresetDraft((current) => ({ ...current, label: event.target.value }))} />
+              <Input className="h-10 rounded-xl text-foreground" value={presetDraft.displayText} placeholder={t("admin.instances.presetDisplayText", { defaultValue: "Printed text" })} onChange={(event) => setPresetDraft((current) => ({ ...current, displayText: event.target.value }))} />
+              <Button type="button" variant="outline" className="rounded-xl" onClick={handleCreatePrintPreset} disabled={!presetDraft.displayText.trim()}>
+                <Plus className="h-4 w-4" />
+                {t("common.add", { defaultValue: "Add" })}
+              </Button>
+            </div>
+            {printPresets.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {printPresets.slice(0, 8).map((preset) => <Badge key={preset.id} variant="secondary" className="rounded-xl">{preset.label || preset.display_text}</Badge>)}
+              </div>
+            )}
+          </div>
         </div>
       </motion.section>
 
@@ -418,6 +744,129 @@ export default function AdminEBookletInstancesPage() {
                                 </div>
                                 </TooltipProvider>
                                 <div className="flex flex-wrap gap-2"><Button type="button" size="sm" className="rounded-xl" onClick={() => handleGenerateAccessCodes(instance)} disabled={!accessCodeDrafts[instance.id]?.termId || !(instance.teacher?.id || instance.teacher_id)}>{t("admin.instances.generateCodes", { defaultValue: "Generate codes" })}</Button>{(generatedCodes[instance.id] || []).length > 0 && <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => copyGeneratedCodes(instance.id)}><Copy className="h-4 w-4" />{t("admin.instances.copyGeneratedCodes", { defaultValue: "Copy generated codes" })}</Button>}</div>
+                                <div className="space-y-3 rounded-2xl border bg-muted/20 p-3">
+                                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                                    <div className="min-w-0">
+                                      <div className="flex items-center gap-2 text-sm font-semibold"><Printer className="h-4 w-4 text-primary" />{t("admin.instances.printableBatch", { defaultValue: "Printable PDF batch" })}</div>
+                                      <p className="mt-1 text-xs text-muted-foreground">{t("admin.instances.printableBatchDescription", { defaultValue: "Creates one printed access-code card per student with QR login prefill." })}</p>
+                                    </div>
+                                    {printBatches[instance.id]?.id && (
+                                      <Button type="button" size="sm" variant="outline" className="shrink-0 rounded-xl" onClick={() => downloadAccessCodePrintBatchPdf(printBatches[instance.id].id, `e-booklet-access-codes-${printBatches[instance.id].id}.pdf`)}>
+                                        <FileText className="h-4 w-4" />
+                                        {t("admin.instances.downloadLastPdf", { defaultValue: "Download last PDF" })}
+                                      </Button>
+                                    )}
+                                  </div>
+                                  <div className="grid gap-3 md:grid-cols-3">
+                                    <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                      <AccessCodeFieldLabel tooltip={t("admin.instances.printTemplateIdTooltip", { defaultValue: "Template ID controls the fixed 827 x 438 px card layout and background." })}>{t("admin.instances.printTemplateId", { defaultValue: "Template ID" })}</AccessCodeFieldLabel>
+                                      <select className="h-10 rounded-xl border bg-background px-3 text-sm text-foreground" value={printDrafts[instance.id]?.templateId || ""} onChange={(event) => updatePrintDraft(instance.id, "templateId", event.target.value)}>
+                                        <option value="">{t("admin.instances.selectPrintTemplate", { defaultValue: "Select template" })}</option>
+                                        {printTemplates.filter((template) => template.status !== "archived").map((template) => <option key={template.id} value={String(template.id)}>#{template.id} {template.name}</option>)}
+                                      </select>
+                                    </label>
+                                    <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                      <span>{t("admin.instances.printBatchName", { defaultValue: "Batch name" })}</span>
+                                      <Input className="h-10 rounded-xl text-foreground" value={printDrafts[instance.id]?.batchName || ""} onChange={(event) => updatePrintDraft(instance.id, "batchName", event.target.value)} />
+                                    </label>
+                                    <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                      <AccessCodeFieldLabel tooltip={t("admin.instances.teacherImageAssetTooltip", { defaultValue: "Optional uploaded teacher image file asset ID. This is supplied by the generator, not the teacher profile." })}>{t("admin.instances.teacherImageAssetId", { defaultValue: "Teacher image asset ID" })}</AccessCodeFieldLabel>
+                                      <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_110px]">
+                                        <Input className="h-10 rounded-xl text-foreground" type="file" accept="image/*" onChange={(event) => handleTeacherImageUpload(instance.id, event)} disabled={printUploadState[`teacher-${instance.id}`] === "uploading"} />
+                                        <Input className="h-10 rounded-xl text-foreground" type="number" min="1" value={printDrafts[instance.id]?.teacherImageFileAssetId || ""} onChange={(event) => updatePrintDraft(instance.id, "teacherImageFileAssetId", event.target.value)} />
+                                      </div>
+                                    </label>
+                                  </div>
+                                  <div className="grid gap-3 md:grid-cols-4">
+                                    <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                      <span>{t("admin.instances.gradeClassText", { defaultValue: "Grade/class text" })}</span>
+                                      <select className="h-10 rounded-xl border bg-background px-3 text-sm text-foreground" value="" onChange={(event) => updatePrintDraft(instance.id, "gradeClassText", event.target.value)}>
+                                        <option value="">{t("admin.instances.choosePresetOptional", { defaultValue: "Choose preset" })}</option>
+                                        {presetsByType("grade_class").map((preset) => <option key={preset.id} value={preset.display_text || preset.displayText}>{preset.label || preset.display_text}</option>)}
+                                      </select>
+                                      <Input className="h-10 rounded-xl text-foreground" value={printDrafts[instance.id]?.gradeClassText || ""} onChange={(event) => updatePrintDraft(instance.id, "gradeClassText", event.target.value)} />
+                                    </label>
+                                    <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                      <span>{t("admin.instances.registrationMethodText", { defaultValue: "Registration method" })}</span>
+                                      <select className="h-10 rounded-xl border bg-background px-3 text-sm text-foreground" value="" onChange={(event) => updatePrintDraft(instance.id, "registrationMethodText", event.target.value)}>
+                                        <option value="">{t("admin.instances.choosePresetOptional", { defaultValue: "Choose preset" })}</option>
+                                        {presetsByType("registration_method").map((preset) => <option key={preset.id} value={preset.display_text || preset.displayText}>{preset.label || preset.display_text}</option>)}
+                                      </select>
+                                      <Input className="h-10 rounded-xl text-foreground" value={printDrafts[instance.id]?.registrationMethodText || ""} onChange={(event) => updatePrintDraft(instance.id, "registrationMethodText", event.target.value)} />
+                                    </label>
+                                    <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                      <span>{t("admin.instances.priceText", { defaultValue: "Price text" })}</span>
+                                      <Input className="h-10 rounded-xl text-foreground" value={printDrafts[instance.id]?.priceText || ""} onChange={(event) => updatePrintDraft(instance.id, "priceText", event.target.value)} />
+                                    </label>
+                                    <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+                                      <AccessCodeFieldLabel tooltip={t("admin.instances.redCustomTextTooltip", { defaultValue: "The only blank card text field from the brief. It remains free optional text." })}>{t("admin.instances.redCustomText", { defaultValue: "Red custom text" })}</AccessCodeFieldLabel>
+                                      <Input className="h-10 rounded-xl text-foreground" value={printDrafts[instance.id]?.redCustomText || ""} onChange={(event) => updatePrintDraft(instance.id, "redCustomText", event.target.value)} />
+                                    </label>
+                                  </div>
+                                  <div className="rounded-xl border bg-background p-3">
+                                    <div className="mb-2 text-xs font-semibold text-muted-foreground">{t("admin.instances.requiredPrintFields", { defaultValue: "Batch required fields" })}</div>
+                                    <div className="grid gap-2 sm:grid-cols-5">
+                                      {[
+                                        ["gradeClass", t("admin.instances.gradeClassText", { defaultValue: "Grade/class text" })],
+                                        ["registrationMethod", t("admin.instances.registrationMethodText", { defaultValue: "Registration method" })],
+                                        ["price", t("admin.instances.priceText", { defaultValue: "Price text" })],
+                                        ["redCustomText", t("admin.instances.redCustomText", { defaultValue: "Red custom text" })],
+                                        ["teacherImage", t("admin.instances.teacherImageAssetId", { defaultValue: "Teacher image" })],
+                                      ].map(([field, label]) => (
+                                        <label key={field} className="flex items-center gap-2 text-xs text-muted-foreground">
+                                          <input type="checkbox" checked={Boolean(printDrafts[instance.id]?.requiredFields?.[field])} onChange={(event) => updatePrintRequiredField(instance.id, field, event.target.checked)} />
+                                          <span>{label}</span>
+                                        </label>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => handlePreviewPrintableCard(instance)} disabled={!printDrafts[instance.id]?.templateId}>
+                                      <Eye className="h-4 w-4" />
+                                      {t("admin.instances.previewPrintableCard", { defaultValue: "Preview card" })}
+                                    </Button>
+                                    <Button type="button" size="sm" className="rounded-xl" onClick={() => handleGeneratePrintableBatch(instance)} disabled={!accessCodeDrafts[instance.id]?.termId || !printDrafts[instance.id]?.templateId || !(instance.teacher?.id || instance.teacher_id)}>
+                                      <Printer className="h-4 w-4" />
+                                      {t("admin.instances.generatePrintablePdf", { defaultValue: "Generate printable PDF" })}
+                                    </Button>
+                                    <span className="text-xs text-muted-foreground">{t("admin.instances.printOneCodePerStudent", { defaultValue: "Print batches force one code per student." })}</span>
+                                  </div>
+                                  {printWarnings[instance.id] && (
+                                    <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+                                      {printWarnings[instance.id].message || t("admin.instances.printSeatWarning", { defaultValue: "Remaining student seats are below unused active paid codes. Codes do not reserve seats." })}
+                                    </div>
+                                  )}
+                                  {printPreviewUrls[instance.id] && (
+                                    <div className="rounded-xl border bg-background p-3">
+                                      <div className="mb-2 text-xs font-semibold text-muted-foreground">{t("admin.instances.backendPreview", { defaultValue: "Backend-rendered preview" })}</div>
+                                      <img src={printPreviewUrls[instance.id]} alt={t("admin.instances.backendPreview", { defaultValue: "Backend-rendered preview" })} className="h-auto w-full max-w-[827px] rounded-lg border" />
+                                    </div>
+                                  )}
+                                  {(printBatchHistory[instance.id] || []).length > 0 && (
+                                    <div className="rounded-xl border bg-background p-3">
+                                      <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-muted-foreground"><FileText className="h-3.5 w-3.5" />{t("admin.instances.printBatchHistory", { defaultValue: "Generated PDF batches" })}</div>
+                                      <div className="grid gap-2">
+                                        {(printBatchHistory[instance.id] || []).slice(0, 5).map((batch) => {
+                                          const snapshotValues = batch.snapshot_json?.batchValues || batch.snapshotJson?.batchValues || {};
+                                          return (
+                                            <div key={batch.id} className="grid gap-2 rounded-lg border p-2 text-xs md:grid-cols-[1fr_110px_110px_auto] md:items-center">
+                                              <div className="min-w-0">
+                                                <div className="truncate font-medium">#{batch.id} {batch.label}</div>
+                                                <div className="truncate text-muted-foreground">{snapshotValues.gradeClassText || "-"} / {snapshotValues.registrationMethodText || "-"}</div>
+                                              </div>
+                                              <div>{batch.kind}</div>
+                                              <div>{batch._count?.codes || batch.count} {t("admin.instances.cards", { defaultValue: "cards" })}</div>
+                                              <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => downloadAccessCodePrintBatchPdf(batch.id, `e-booklet-access-codes-${batch.id}.pdf`)}>
+                                                <Download className="h-4 w-4" />
+                                                PDF
+                                              </Button>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                                 {(generatedCodes[instance.id] || []).length > 0 && <div className="rounded-xl bg-muted p-3 text-xs"><div className="mb-2 font-semibold">{t("admin.instances.generatedNow", { defaultValue: "Generated now" })}</div><div className="grid gap-2 md:grid-cols-2">{generatedCodes[instance.id].map((item) => <code key={item.record?.id || item.code} className="break-all rounded-lg bg-background p-2">{item.code}</code>)}</div></div>}
                                 <div className="grid gap-2 md:grid-cols-2">{(existingCodes[instance.id] || []).slice(0, 10).map((code) => <div key={code.id} className="rounded-xl border p-3 text-xs"><div className="font-medium">{code.kind} - {code.status} - ****{code.code_hint}</div><div className="text-muted-foreground">{t("admin.instances.redemptions", { defaultValue: "Redemptions" })}: {code.redeemed_count}/{code.max_redemptions}</div></div>)}{(existingCodes[instance.id] || []).length === 0 && <div className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">{t("admin.instances.noAccessCodes", { defaultValue: "No access codes generated yet." })}</div>}</div>
                               </div>
