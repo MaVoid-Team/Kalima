@@ -343,6 +343,26 @@ export type teacher_wallet_spend_allocations = Prisma.teacher_wallet_spend_alloc
  */
 export type e_booklet_access_codes = Prisma.e_booklet_access_codesModel
 /**
+ * Model e_booklet_access_code_print_templates
+ * 
+ */
+export type e_booklet_access_code_print_templates = Prisma.e_booklet_access_code_print_templatesModel
+/**
+ * Model e_booklet_access_code_print_presets
+ * 
+ */
+export type e_booklet_access_code_print_presets = Prisma.e_booklet_access_code_print_presetsModel
+/**
+ * Model e_booklet_access_code_print_batches
+ * 
+ */
+export type e_booklet_access_code_print_batches = Prisma.e_booklet_access_code_print_batchesModel
+/**
+ * Model e_booklet_access_code_print_batch_codes
+ * 
+ */
+export type e_booklet_access_code_print_batch_codes = Prisma.e_booklet_access_code_print_batch_codesModel
+/**
  * Model e_booklet_access_code_redemptions
  * 
  */

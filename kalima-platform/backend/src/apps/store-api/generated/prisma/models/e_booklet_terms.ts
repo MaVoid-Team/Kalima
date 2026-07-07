@@ -304,6 +304,7 @@ export type e_booklet_termsWhereInput = {
   creator?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   updater?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   access_codes?: Prisma.E_booklet_access_codesListRelationFilter
+  access_code_print_batches?: Prisma.E_booklet_access_code_print_batchesListRelationFilter
   milestones?: Prisma.E_booklet_milestonesListRelationFilter
   milestone_achievements?: Prisma.E_booklet_milestone_achievementsListRelationFilter
   teacher_terms_acceptances?: Prisma.E_booklet_teacher_terms_acceptancesListRelationFilter
@@ -328,6 +329,7 @@ export type e_booklet_termsOrderByWithRelationInput = {
   creator?: Prisma.usersOrderByWithRelationInput
   updater?: Prisma.usersOrderByWithRelationInput
   access_codes?: Prisma.e_booklet_access_codesOrderByRelationAggregateInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesOrderByRelationAggregateInput
   milestones?: Prisma.e_booklet_milestonesOrderByRelationAggregateInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsOrderByRelationAggregateInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesOrderByRelationAggregateInput
@@ -355,6 +357,7 @@ export type e_booklet_termsWhereUniqueInput = Prisma.AtLeast<{
   creator?: Prisma.XOR<Prisma.UsersScalarRelationFilter, Prisma.usersWhereInput>
   updater?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
   access_codes?: Prisma.E_booklet_access_codesListRelationFilter
+  access_code_print_batches?: Prisma.E_booklet_access_code_print_batchesListRelationFilter
   milestones?: Prisma.E_booklet_milestonesListRelationFilter
   milestone_achievements?: Prisma.E_booklet_milestone_achievementsListRelationFilter
   teacher_terms_acceptances?: Prisma.E_booklet_teacher_terms_acceptancesListRelationFilter
@@ -417,6 +420,7 @@ export type e_booklet_termsCreateInput = {
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_terms_createdInput
   updater?: Prisma.usersCreateNestedOneWithoutE_booklet_terms_updatedInput
   access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutTermInput
@@ -438,6 +442,7 @@ export type e_booklet_termsUncheckedCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesUncheckedCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutTermInput
@@ -458,6 +463,7 @@ export type e_booklet_termsUpdateInput = {
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_terms_createdNestedInput
   updater?: Prisma.usersUpdateOneWithoutE_booklet_terms_updatedNestedInput
   access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutTermNestedInput
@@ -479,6 +485,7 @@ export type e_booklet_termsUncheckedUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUncheckedUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutTermNestedInput
@@ -797,6 +804,20 @@ export type e_booklet_termsUpdateOneRequiredWithoutAccess_codesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_termsUpdateToOneWithWhereWithoutAccess_codesInput, Prisma.e_booklet_termsUpdateWithoutAccess_codesInput>, Prisma.e_booklet_termsUncheckedUpdateWithoutAccess_codesInput>
 }
 
+export type e_booklet_termsCreateNestedOneWithoutAccess_code_print_batchesInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_termsCreateWithoutAccess_code_print_batchesInput, Prisma.e_booklet_termsUncheckedCreateWithoutAccess_code_print_batchesInput>
+  connectOrCreate?: Prisma.e_booklet_termsCreateOrConnectWithoutAccess_code_print_batchesInput
+  connect?: Prisma.e_booklet_termsWhereUniqueInput
+}
+
+export type e_booklet_termsUpdateOneRequiredWithoutAccess_code_print_batchesNestedInput = {
+  create?: Prisma.XOR<Prisma.e_booklet_termsCreateWithoutAccess_code_print_batchesInput, Prisma.e_booklet_termsUncheckedCreateWithoutAccess_code_print_batchesInput>
+  connectOrCreate?: Prisma.e_booklet_termsCreateOrConnectWithoutAccess_code_print_batchesInput
+  upsert?: Prisma.e_booklet_termsUpsertWithoutAccess_code_print_batchesInput
+  connect?: Prisma.e_booklet_termsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.e_booklet_termsUpdateToOneWithWhereWithoutAccess_code_print_batchesInput, Prisma.e_booklet_termsUpdateWithoutAccess_code_print_batchesInput>, Prisma.e_booklet_termsUncheckedUpdateWithoutAccess_code_print_batchesInput>
+}
+
 export type e_booklet_termsCreateWithoutCreatorInput = {
   name: string
   description?: string | null
@@ -811,6 +832,7 @@ export type e_booklet_termsCreateWithoutCreatorInput = {
   template?: Prisma.e_booklet_templatesCreateNestedOneWithoutTermsInput
   updater?: Prisma.usersCreateNestedOneWithoutE_booklet_terms_updatedInput
   access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutTermInput
@@ -831,6 +853,7 @@ export type e_booklet_termsUncheckedCreateWithoutCreatorInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesUncheckedCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutTermInput
@@ -860,6 +883,7 @@ export type e_booklet_termsCreateWithoutUpdaterInput = {
   template?: Prisma.e_booklet_templatesCreateNestedOneWithoutTermsInput
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_terms_createdInput
   access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutTermInput
@@ -880,6 +904,7 @@ export type e_booklet_termsUncheckedCreateWithoutUpdaterInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesUncheckedCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutTermInput
@@ -961,6 +986,7 @@ export type e_booklet_termsCreateWithoutTemplateInput = {
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_terms_createdInput
   updater?: Prisma.usersCreateNestedOneWithoutE_booklet_terms_updatedInput
   access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutTermInput
@@ -981,6 +1007,7 @@ export type e_booklet_termsUncheckedCreateWithoutTemplateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesUncheckedCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutTermInput
@@ -1027,6 +1054,7 @@ export type e_booklet_termsCreateWithoutMilestonesInput = {
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_terms_createdInput
   updater?: Prisma.usersCreateNestedOneWithoutE_booklet_terms_updatedInput
   access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutTermInput
 }
@@ -1047,6 +1075,7 @@ export type e_booklet_termsUncheckedCreateWithoutMilestonesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutTermInput
 }
@@ -1082,6 +1111,7 @@ export type e_booklet_termsUpdateWithoutMilestonesInput = {
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_terms_createdNestedInput
   updater?: Prisma.usersUpdateOneWithoutE_booklet_terms_updatedNestedInput
   access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutTermNestedInput
 }
@@ -1102,6 +1132,7 @@ export type e_booklet_termsUncheckedUpdateWithoutMilestonesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutTermNestedInput
 }
@@ -1121,6 +1152,7 @@ export type e_booklet_termsCreateWithoutMilestone_achievementsInput = {
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_terms_createdInput
   updater?: Prisma.usersCreateNestedOneWithoutE_booklet_terms_updatedInput
   access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutTermInput
 }
@@ -1141,6 +1173,7 @@ export type e_booklet_termsUncheckedCreateWithoutMilestone_achievementsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesUncheckedCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutTermInput
 }
@@ -1176,6 +1209,7 @@ export type e_booklet_termsUpdateWithoutMilestone_achievementsInput = {
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_terms_createdNestedInput
   updater?: Prisma.usersUpdateOneWithoutE_booklet_terms_updatedNestedInput
   access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutTermNestedInput
 }
@@ -1196,6 +1230,7 @@ export type e_booklet_termsUncheckedUpdateWithoutMilestone_achievementsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUncheckedUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutTermNestedInput
 }
@@ -1215,6 +1250,7 @@ export type e_booklet_termsCreateWithoutTeacher_terms_acceptancesInput = {
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_terms_createdInput
   updater?: Prisma.usersCreateNestedOneWithoutE_booklet_terms_updatedInput
   access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsCreateNestedManyWithoutTermInput
 }
@@ -1235,6 +1271,7 @@ export type e_booklet_termsUncheckedCreateWithoutTeacher_terms_acceptancesInput 
   created_at?: Date | string | null
   updated_at?: Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutTermInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesUncheckedCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedCreateNestedManyWithoutTermInput
 }
@@ -1270,6 +1307,7 @@ export type e_booklet_termsUpdateWithoutTeacher_terms_acceptancesInput = {
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_terms_createdNestedInput
   updater?: Prisma.usersUpdateOneWithoutE_booklet_terms_updatedNestedInput
   access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUpdateManyWithoutTermNestedInput
 }
@@ -1290,6 +1328,7 @@ export type e_booklet_termsUncheckedUpdateWithoutTeacher_terms_acceptancesInput 
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUncheckedUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedUpdateManyWithoutTermNestedInput
 }
@@ -1308,6 +1347,7 @@ export type e_booklet_termsCreateWithoutAccess_codesInput = {
   template?: Prisma.e_booklet_templatesCreateNestedOneWithoutTermsInput
   creator: Prisma.usersCreateNestedOneWithoutE_booklet_terms_createdInput
   updater?: Prisma.usersCreateNestedOneWithoutE_booklet_terms_updatedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutTermInput
@@ -1328,6 +1368,7 @@ export type e_booklet_termsUncheckedCreateWithoutAccess_codesInput = {
   updated_by?: number | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedCreateNestedManyWithoutTermInput
   milestones?: Prisma.e_booklet_milestonesUncheckedCreateNestedManyWithoutTermInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedCreateNestedManyWithoutTermInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutTermInput
@@ -1363,6 +1404,7 @@ export type e_booklet_termsUpdateWithoutAccess_codesInput = {
   template?: Prisma.e_booklet_templatesUpdateOneWithoutTermsNestedInput
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_terms_createdNestedInput
   updater?: Prisma.usersUpdateOneWithoutE_booklet_terms_updatedNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutTermNestedInput
@@ -1383,6 +1425,105 @@ export type e_booklet_termsUncheckedUpdateWithoutAccess_codesInput = {
   updated_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedUpdateManyWithoutTermNestedInput
+  milestones?: Prisma.e_booklet_milestonesUncheckedUpdateManyWithoutTermNestedInput
+  milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedUpdateManyWithoutTermNestedInput
+  teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutTermNestedInput
+}
+
+export type e_booklet_termsCreateWithoutAccess_code_print_batchesInput = {
+  name: string
+  description?: string | null
+  status?: $Enums.e_booklet_term_status_enum
+  active_guard?: string | null
+  starts_at: Date | string
+  ends_at?: Date | string | null
+  code_generation_terms?: string | null
+  reward_claim_terms?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  template?: Prisma.e_booklet_templatesCreateNestedOneWithoutTermsInput
+  creator: Prisma.usersCreateNestedOneWithoutE_booklet_terms_createdInput
+  updater?: Prisma.usersCreateNestedOneWithoutE_booklet_terms_updatedInput
+  access_codes?: Prisma.e_booklet_access_codesCreateNestedManyWithoutTermInput
+  milestones?: Prisma.e_booklet_milestonesCreateNestedManyWithoutTermInput
+  milestone_achievements?: Prisma.e_booklet_milestone_achievementsCreateNestedManyWithoutTermInput
+  teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesCreateNestedManyWithoutTermInput
+}
+
+export type e_booklet_termsUncheckedCreateWithoutAccess_code_print_batchesInput = {
+  id?: number
+  template_id?: number | null
+  name: string
+  description?: string | null
+  status?: $Enums.e_booklet_term_status_enum
+  active_guard?: string | null
+  starts_at: Date | string
+  ends_at?: Date | string | null
+  code_generation_terms?: string | null
+  reward_claim_terms?: string | null
+  created_by: number
+  updated_by?: number | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  access_codes?: Prisma.e_booklet_access_codesUncheckedCreateNestedManyWithoutTermInput
+  milestones?: Prisma.e_booklet_milestonesUncheckedCreateNestedManyWithoutTermInput
+  milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedCreateNestedManyWithoutTermInput
+  teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedCreateNestedManyWithoutTermInput
+}
+
+export type e_booklet_termsCreateOrConnectWithoutAccess_code_print_batchesInput = {
+  where: Prisma.e_booklet_termsWhereUniqueInput
+  create: Prisma.XOR<Prisma.e_booklet_termsCreateWithoutAccess_code_print_batchesInput, Prisma.e_booklet_termsUncheckedCreateWithoutAccess_code_print_batchesInput>
+}
+
+export type e_booklet_termsUpsertWithoutAccess_code_print_batchesInput = {
+  update: Prisma.XOR<Prisma.e_booklet_termsUpdateWithoutAccess_code_print_batchesInput, Prisma.e_booklet_termsUncheckedUpdateWithoutAccess_code_print_batchesInput>
+  create: Prisma.XOR<Prisma.e_booklet_termsCreateWithoutAccess_code_print_batchesInput, Prisma.e_booklet_termsUncheckedCreateWithoutAccess_code_print_batchesInput>
+  where?: Prisma.e_booklet_termsWhereInput
+}
+
+export type e_booklet_termsUpdateToOneWithWhereWithoutAccess_code_print_batchesInput = {
+  where?: Prisma.e_booklet_termsWhereInput
+  data: Prisma.XOR<Prisma.e_booklet_termsUpdateWithoutAccess_code_print_batchesInput, Prisma.e_booklet_termsUncheckedUpdateWithoutAccess_code_print_batchesInput>
+}
+
+export type e_booklet_termsUpdateWithoutAccess_code_print_batchesInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.Enume_booklet_term_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_term_status_enum
+  active_guard?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  starts_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  code_generation_terms?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reward_claim_terms?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  template?: Prisma.e_booklet_templatesUpdateOneWithoutTermsNestedInput
+  creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_terms_createdNestedInput
+  updater?: Prisma.usersUpdateOneWithoutE_booklet_terms_updatedNestedInput
+  access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutTermNestedInput
+  milestones?: Prisma.e_booklet_milestonesUpdateManyWithoutTermNestedInput
+  milestone_achievements?: Prisma.e_booklet_milestone_achievementsUpdateManyWithoutTermNestedInput
+  teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutTermNestedInput
+}
+
+export type e_booklet_termsUncheckedUpdateWithoutAccess_code_print_batchesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  template_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.Enume_booklet_term_status_enumFieldUpdateOperationsInput | $Enums.e_booklet_term_status_enum
+  active_guard?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  starts_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ends_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  code_generation_terms?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reward_claim_terms?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_by?: Prisma.IntFieldUpdateOperationsInput | number
+  updated_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUncheckedUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutTermNestedInput
@@ -1434,6 +1575,7 @@ export type e_booklet_termsUpdateWithoutCreatorInput = {
   template?: Prisma.e_booklet_templatesUpdateOneWithoutTermsNestedInput
   updater?: Prisma.usersUpdateOneWithoutE_booklet_terms_updatedNestedInput
   access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutTermNestedInput
@@ -1454,6 +1596,7 @@ export type e_booklet_termsUncheckedUpdateWithoutCreatorInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUncheckedUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutTermNestedInput
@@ -1489,6 +1632,7 @@ export type e_booklet_termsUpdateWithoutUpdaterInput = {
   template?: Prisma.e_booklet_templatesUpdateOneWithoutTermsNestedInput
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_terms_createdNestedInput
   access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutTermNestedInput
@@ -1509,6 +1653,7 @@ export type e_booklet_termsUncheckedUpdateWithoutUpdaterInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUncheckedUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutTermNestedInput
@@ -1560,6 +1705,7 @@ export type e_booklet_termsUpdateWithoutTemplateInput = {
   creator?: Prisma.usersUpdateOneRequiredWithoutE_booklet_terms_createdNestedInput
   updater?: Prisma.usersUpdateOneWithoutE_booklet_terms_updatedNestedInput
   access_codes?: Prisma.e_booklet_access_codesUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUpdateManyWithoutTermNestedInput
@@ -1580,6 +1726,7 @@ export type e_booklet_termsUncheckedUpdateWithoutTemplateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   access_codes?: Prisma.e_booklet_access_codesUncheckedUpdateManyWithoutTermNestedInput
+  access_code_print_batches?: Prisma.e_booklet_access_code_print_batchesUncheckedUpdateManyWithoutTermNestedInput
   milestones?: Prisma.e_booklet_milestonesUncheckedUpdateManyWithoutTermNestedInput
   milestone_achievements?: Prisma.e_booklet_milestone_achievementsUncheckedUpdateManyWithoutTermNestedInput
   teacher_terms_acceptances?: Prisma.e_booklet_teacher_terms_acceptancesUncheckedUpdateManyWithoutTermNestedInput
@@ -1608,6 +1755,7 @@ export type e_booklet_termsUncheckedUpdateManyWithoutTemplateInput = {
 
 export type E_booklet_termsCountOutputType = {
   access_codes: number
+  access_code_print_batches: number
   milestones: number
   milestone_achievements: number
   teacher_terms_acceptances: number
@@ -1615,6 +1763,7 @@ export type E_booklet_termsCountOutputType = {
 
 export type E_booklet_termsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   access_codes?: boolean | E_booklet_termsCountOutputTypeCountAccess_codesArgs
+  access_code_print_batches?: boolean | E_booklet_termsCountOutputTypeCountAccess_code_print_batchesArgs
   milestones?: boolean | E_booklet_termsCountOutputTypeCountMilestonesArgs
   milestone_achievements?: boolean | E_booklet_termsCountOutputTypeCountMilestone_achievementsArgs
   teacher_terms_acceptances?: boolean | E_booklet_termsCountOutputTypeCountTeacher_terms_acceptancesArgs
@@ -1635,6 +1784,13 @@ export type E_booklet_termsCountOutputTypeDefaultArgs<ExtArgs extends runtime.Ty
  */
 export type E_booklet_termsCountOutputTypeCountAccess_codesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.e_booklet_access_codesWhereInput
+}
+
+/**
+ * E_booklet_termsCountOutputType without action
+ */
+export type E_booklet_termsCountOutputTypeCountAccess_code_print_batchesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.e_booklet_access_code_print_batchesWhereInput
 }
 
 /**
@@ -1678,6 +1834,7 @@ export type e_booklet_termsSelect<ExtArgs extends runtime.Types.Extensions.Inter
   creator?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   updater?: boolean | Prisma.e_booklet_terms$updaterArgs<ExtArgs>
   access_codes?: boolean | Prisma.e_booklet_terms$access_codesArgs<ExtArgs>
+  access_code_print_batches?: boolean | Prisma.e_booklet_terms$access_code_print_batchesArgs<ExtArgs>
   milestones?: boolean | Prisma.e_booklet_terms$milestonesArgs<ExtArgs>
   milestone_achievements?: boolean | Prisma.e_booklet_terms$milestone_achievementsArgs<ExtArgs>
   teacher_terms_acceptances?: boolean | Prisma.e_booklet_terms$teacher_terms_acceptancesArgs<ExtArgs>
@@ -1747,6 +1904,7 @@ export type e_booklet_termsInclude<ExtArgs extends runtime.Types.Extensions.Inte
   creator?: boolean | Prisma.usersDefaultArgs<ExtArgs>
   updater?: boolean | Prisma.e_booklet_terms$updaterArgs<ExtArgs>
   access_codes?: boolean | Prisma.e_booklet_terms$access_codesArgs<ExtArgs>
+  access_code_print_batches?: boolean | Prisma.e_booklet_terms$access_code_print_batchesArgs<ExtArgs>
   milestones?: boolean | Prisma.e_booklet_terms$milestonesArgs<ExtArgs>
   milestone_achievements?: boolean | Prisma.e_booklet_terms$milestone_achievementsArgs<ExtArgs>
   teacher_terms_acceptances?: boolean | Prisma.e_booklet_terms$teacher_terms_acceptancesArgs<ExtArgs>
@@ -1770,6 +1928,7 @@ export type $e_booklet_termsPayload<ExtArgs extends runtime.Types.Extensions.Int
     creator: Prisma.$usersPayload<ExtArgs>
     updater: Prisma.$usersPayload<ExtArgs> | null
     access_codes: Prisma.$e_booklet_access_codesPayload<ExtArgs>[]
+    access_code_print_batches: Prisma.$e_booklet_access_code_print_batchesPayload<ExtArgs>[]
     milestones: Prisma.$e_booklet_milestonesPayload<ExtArgs>[]
     milestone_achievements: Prisma.$e_booklet_milestone_achievementsPayload<ExtArgs>[]
     teacher_terms_acceptances: Prisma.$e_booklet_teacher_terms_acceptancesPayload<ExtArgs>[]
@@ -2187,6 +2346,7 @@ export interface Prisma__e_booklet_termsClient<T, Null = never, ExtArgs extends 
   creator<T extends Prisma.usersDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.usersDefaultArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   updater<T extends Prisma.e_booklet_terms$updaterArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_terms$updaterArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   access_codes<T extends Prisma.e_booklet_terms$access_codesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_terms$access_codesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_access_codesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  access_code_print_batches<T extends Prisma.e_booklet_terms$access_code_print_batchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_terms$access_code_print_batchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_access_code_print_batchesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   milestones<T extends Prisma.e_booklet_terms$milestonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_terms$milestonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_milestonesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   milestone_achievements<T extends Prisma.e_booklet_terms$milestone_achievementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_terms$milestone_achievementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_milestone_achievementsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   teacher_terms_acceptances<T extends Prisma.e_booklet_terms$teacher_terms_acceptancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.e_booklet_terms$teacher_terms_acceptancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$e_booklet_teacher_terms_acceptancesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2697,6 +2857,30 @@ export type e_booklet_terms$access_codesArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.E_booklet_access_codesScalarFieldEnum | Prisma.E_booklet_access_codesScalarFieldEnum[]
+}
+
+/**
+ * e_booklet_terms.access_code_print_batches
+ */
+export type e_booklet_terms$access_code_print_batchesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the e_booklet_access_code_print_batches
+   */
+  select?: Prisma.e_booklet_access_code_print_batchesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the e_booklet_access_code_print_batches
+   */
+  omit?: Prisma.e_booklet_access_code_print_batchesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.e_booklet_access_code_print_batchesInclude<ExtArgs> | null
+  where?: Prisma.e_booklet_access_code_print_batchesWhereInput
+  orderBy?: Prisma.e_booklet_access_code_print_batchesOrderByWithRelationInput | Prisma.e_booklet_access_code_print_batchesOrderByWithRelationInput[]
+  cursor?: Prisma.e_booklet_access_code_print_batchesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.E_booklet_access_code_print_batchesScalarFieldEnum | Prisma.E_booklet_access_code_print_batchesScalarFieldEnum[]
 }
 
 /**

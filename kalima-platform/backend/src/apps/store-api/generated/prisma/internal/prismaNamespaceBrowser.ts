@@ -112,6 +112,10 @@ export const ModelName = {
   teacher_wallet_credit_lots: 'teacher_wallet_credit_lots',
   teacher_wallet_spend_allocations: 'teacher_wallet_spend_allocations',
   e_booklet_access_codes: 'e_booklet_access_codes',
+  e_booklet_access_code_print_templates: 'e_booklet_access_code_print_templates',
+  e_booklet_access_code_print_presets: 'e_booklet_access_code_print_presets',
+  e_booklet_access_code_print_batches: 'e_booklet_access_code_print_batches',
+  e_booklet_access_code_print_batch_codes: 'e_booklet_access_code_print_batch_codes',
   e_booklet_access_code_redemptions: 'e_booklet_access_code_redemptions',
   e_booklet_access: 'e_booklet_access',
   e_booklet_invites: 'e_booklet_invites',
@@ -1080,6 +1084,77 @@ export const E_booklet_access_codesScalarFieldEnum = {
 } as const
 
 export type E_booklet_access_codesScalarFieldEnum = (typeof E_booklet_access_codesScalarFieldEnum)[keyof typeof E_booklet_access_codesScalarFieldEnum]
+
+
+export const E_booklet_access_code_print_templatesScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  background_file_asset_id: 'background_file_asset_id',
+  width_px: 'width_px',
+  height_px: 'height_px',
+  ppi: 'ppi',
+  status: 'status',
+  layout_json: 'layout_json',
+  default_required_fields_json: 'default_required_fields_json',
+  created_by: 'created_by',
+  updated_by: 'updated_by',
+  archived_at: 'archived_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_access_code_print_templatesScalarFieldEnum = (typeof E_booklet_access_code_print_templatesScalarFieldEnum)[keyof typeof E_booklet_access_code_print_templatesScalarFieldEnum]
+
+
+export const E_booklet_access_code_print_presetsScalarFieldEnum = {
+  id: 'id',
+  preset_type: 'preset_type',
+  label: 'label',
+  display_text: 'display_text',
+  sort_order: 'sort_order',
+  active: 'active',
+  created_by: 'created_by',
+  updated_by: 'updated_by',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type E_booklet_access_code_print_presetsScalarFieldEnum = (typeof E_booklet_access_code_print_presetsScalarFieldEnum)[keyof typeof E_booklet_access_code_print_presetsScalarFieldEnum]
+
+
+export const E_booklet_access_code_print_batchesScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  teacher_id: 'teacher_id',
+  booklet_instance_id: 'booklet_instance_id',
+  template_id: 'template_id',
+  term_id: 'term_id',
+  kind: 'kind',
+  count: 'count',
+  status: 'status',
+  teacher_image_file_asset_id: 'teacher_image_file_asset_id',
+  pdf_file_asset_id: 'pdf_file_asset_id',
+  snapshot_json: 'snapshot_json',
+  expires_at: 'expires_at',
+  created_by: 'created_by',
+  generated_at: 'generated_at',
+  created_at: 'created_at'
+} as const
+
+export type E_booklet_access_code_print_batchesScalarFieldEnum = (typeof E_booklet_access_code_print_batchesScalarFieldEnum)[keyof typeof E_booklet_access_code_print_batchesScalarFieldEnum]
+
+
+export const E_booklet_access_code_print_batch_codesScalarFieldEnum = {
+  id: 'id',
+  batch_id: 'batch_id',
+  access_code_id: 'access_code_id',
+  card_index: 'card_index',
+  qr_ref_hash: 'qr_ref_hash',
+  access_code_ciphertext: 'access_code_ciphertext',
+  created_at: 'created_at'
+} as const
+
+export type E_booklet_access_code_print_batch_codesScalarFieldEnum = (typeof E_booklet_access_code_print_batch_codesScalarFieldEnum)[keyof typeof E_booklet_access_code_print_batch_codesScalarFieldEnum]
 
 
 export const E_booklet_access_code_redemptionsScalarFieldEnum = {
