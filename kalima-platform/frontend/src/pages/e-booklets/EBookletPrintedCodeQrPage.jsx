@@ -51,7 +51,10 @@ export default function EBookletPrintedCodeQrPage() {
       return undefined;
     }
     let active = true;
-    api.get(teacherImageUrl.replace(apiOrigin, ""), { responseType: "blob" })
+    const requestUrl = teacherImageUrl.startsWith("/api/")
+      ? `${apiOrigin}${teacherImageUrl}`
+      : teacherImageUrl;
+    api.get(requestUrl, { responseType: "blob" })
       .then((response) => {
         if (!active) return;
         const objectUrl = URL.createObjectURL(response.data);
