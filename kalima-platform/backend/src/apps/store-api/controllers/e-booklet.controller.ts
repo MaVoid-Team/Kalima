@@ -1380,7 +1380,7 @@ export const eBookletController = {
       const { asset, absolutePath } = await getEBookletService().getPrivateFileAssetForAdmin(assetId);
       setPrivateNoStore(res);
       res.type(asset.mime_type || "application/pdf");
-      res.set("Content-Disposition", buildContentDisposition("attachment", asset.orig_filename, "access-code-batch.pdf"));
+      res.set("Content-Disposition", buildContentDisposition("attachment", asset.original_filename, "access-code-batch.pdf"));
       res.sendFile(absolutePath);
     } catch (error) {
       next(error);
