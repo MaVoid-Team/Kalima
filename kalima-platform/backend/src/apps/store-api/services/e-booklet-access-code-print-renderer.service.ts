@@ -74,6 +74,21 @@ function isolateText(value: unknown, direction: "rtl" | "ltr"): string {
   return direction === "rtl" ? `\u202b${text}\u202c` : `\u202a${text}\u202c`;
 }
 
+function boundedField(field: FieldBox): FieldBox | null {
+  const left = Math.max(0, Math.round(field.x));
+  const top = Math.max(0, Math.round(field.y));
+  const maxWidth = E_BOOKLET_PRINT_CARD_WIDTH_PX - left;
+  const maxHeight = E_BOOKLET_PRINT_CARD_HEIGHT_PX - top;
+  if (maxWidth <= 0 || maxHeight <= 0) return null;
+  return {
+    ...field,
+    x: left,
+    y: top,
+    width: Math.max(1, Math.min(Math.round(field.width), maxWidth)),
+    height: Math.max(1, Math.min(Math.round(field.height), maxHeight)),
+  };
+}
+
 export class EBookletAccessCodePrintRendererService {
   private async renderTeacherImage(input: Buffer, field: FieldBox): Promise<Buffer> {
     try {
@@ -89,7 +104,8 @@ export class EBookletAccessCodePrintRendererService {
   private async renderTextOverlay(field: FieldBox | undefined, value: unknown, fallback: Partial<FieldBox> = {}): Promise<sharp.OverlayOptions | null> {
     if (value === undefined || value === null || value === "") return null;
     if (!field) return null;
-    const merged = { ...fallback, ...field };
+    const merged = boundedField({ ...fallback, ...field });
+    if (!merged) return null;
     const width = Math.max(1, Math.round(merged.width));
     const height = Math.max(1, Math.round(merged.height));
     const fontSize = Math.max(MIN_TEXT_FONT_SIZE, Math.round(merged.fontSize || 24));
@@ -141,26 +157,33 @@ export class EBookletAccessCodePrintRendererService {
     if (!fields.qr || !fields.codeNumber) {
       throw new Error("Print layout requires QR and code number fields.");
     }
+    const qrField = boundedField(fields.qr);
+    if (!qrField) {
+      throw new Error("Print layout QR field is outside the card bounds.");
+    }
     const qrBuffer = await QRCode.toBuffer(input.card.qrRedeemUrl, {
       type: "png",
       errorCorrectionLevel: "M",
       margin: 1,
-      width: Math.round(fields.qr.width),
+      width: Math.round(qrField.width),
     });
     const overlays: sharp.OverlayOptions[] = [
       {
         input: qrBuffer,
-        left: Math.round(fields.qr.x),
-        top: Math.round(fields.qr.y),
+        left: Math.round(qrField.x),
+        top: Math.round(qrField.y),
       },
     ];
     const teacherImageField = fields.teacherImage || fields.teacher_image;
     if (teacherImageField && input.card.teacherImage) {
-      overlays.push({
-        input: await this.renderTeacherImage(input.card.teacherImage, teacherImageField),
-        left: Math.round(teacherImageField.x),
-        top: Math.round(teacherImageField.y),
-      });
+      const boundedTeacherImageField = boundedField(teacherImageField);
+      if (boundedTeacherImageField) {
+        overlays.push({
+          input: await this.renderTeacherImage(input.card.teacherImage, boundedTeacherImageField),
+          left: Math.round(boundedTeacherImageField.x),
+          top: Math.round(boundedTeacherImageField.y),
+        });
+      }
     }
     const textOverlays = await Promise.all([
       this.renderTextOverlay(fields.codeNumber, input.card.code, { direction: "ltr", align: "center", fontSize: 22 }),

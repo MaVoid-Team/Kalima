@@ -452,6 +452,29 @@ describe("e-booklet access-code print service", () => {
     })).resolves.toEqual(expect.any(Buffer));
   });
 
+  test("bounds oversized print fields before compositing cards", async () => {
+    const renderer = new EBookletAccessCodePrintRendererService();
+    const backgroundImage = Buffer.from(
+      '<svg width="827" height="438" xmlns="http://www.w3.org/2000/svg"><rect width="827" height="438" fill="white"/></svg>',
+    );
+
+    await expect(renderer.renderCardPng({
+      backgroundImage,
+      layout: {
+        fields: {
+          qr: { x: 740, y: 320, width: 220, height: 220 },
+          codeNumber: { x: 760, y: 420, width: 160, height: 80, fontSize: 18, align: "center", direction: "ltr" },
+          gradeClass: { x: 700, y: 390, width: 240, height: 80, fontSize: 18, align: "center", direction: "rtl" },
+        },
+      },
+      card: {
+        code: "KLM PREVIEW 002",
+        qrRedeemUrl: "https://kalima.test/e-booklet-code/qr/preview",
+        batchValues: { gradeClassText: "E2E production group" },
+      },
+    })).resolves.toEqual(expect.any(Buffer));
+  });
+
   test("loads QR prefill data from a signed reference without exposing price text", async () => {
     const db = createDb();
     const accessCodeService = { generateCodes: jest.fn() };
