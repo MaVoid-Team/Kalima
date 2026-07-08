@@ -1,4 +1,3 @@
-import { readFileSync } from "fs";
 import sharp from "sharp";
 import QRCode from "qrcode";
 import { PDFDocument, rgb } from "pdf-lib";
@@ -20,7 +19,7 @@ type FieldBox = {
   width: number;
   height: number;
   direction?: "rtl" | "ltr" | "auto";
-  align?: "left" | "center" | "right";
+  align?: "left" | "center" | "right" | "start" | "end";
   fontSize?: number;
   color?: string;
 };
@@ -36,9 +35,8 @@ type PrintCardRenderInput = {
   batchValues?: Record<string, any>;
 };
 
-const CAIRO_ARABIC_FONT_DATA_URI = `data:font/woff2;base64,${readFileSync(
-  require.resolve("@fontsource/cairo/files/cairo-arabic-400-normal.woff2"),
-).toString("base64")}`;
+const CAIRO_ARABIC_FONT_FILE = require.resolve("@fontsource/cairo/files/cairo-arabic-400-normal.woff2");
+const RTL_TEXT_RE = /[\u0590-\u08ff\ufb1d-\ufdff\ufe70-\ufefc]/;
 
 function escapeXml(value: unknown): string {
   return String(value ?? "")
@@ -48,27 +46,21 @@ function escapeXml(value: unknown): string {
     .replace(/"/g, "&quot;");
 }
 
-function textAnchor(align: FieldBox["align"]): "start" | "middle" | "end" {
-  if (align === "center") return "middle";
-  if (align === "right") return "end";
-  return "start";
+function resolveDirection(field: FieldBox, value: unknown): "rtl" | "ltr" {
+  if (field.direction === "rtl" || field.direction === "ltr") return field.direction;
+  return RTL_TEXT_RE.test(String(value ?? "")) ? "rtl" : "ltr";
 }
 
-function textX(field: FieldBox): number {
-  if (field.align === "center") return field.x + field.width / 2;
-  if (field.align === "right") return field.x + field.width;
-  return field.x;
+function resolveTextAlign(field: FieldBox, direction: "rtl" | "ltr"): "left" | "center" | "right" {
+  if (field.align === "center") return "center";
+  if (field.align === "left" || field.align === "right") return field.align;
+  if (field.align === "end") return direction === "rtl" ? "left" : "right";
+  return direction === "rtl" ? "right" : "left";
 }
 
-function svgText(field: FieldBox, value: unknown, fallback: Partial<FieldBox> = {}) {
-  if (value === undefined || value === null || value === "") return "";
-  const merged = { ...fallback, ...field };
-  const fontSize = merged.fontSize || 24;
-  const direction = merged.direction || "rtl";
-  const anchor = textAnchor(merged.align);
-  const x = textX(merged);
-  const y = merged.y + Math.min(merged.height, fontSize * 1.35);
-  return `<text x="${x}" y="${y}" direction="${direction}" unicode-bidi="isolate" text-anchor="${anchor}" font-family="KalimaArabic, Arial, sans-serif" font-size="${fontSize}" fill="${escapeXml(merged.color || "#111827")}">${escapeXml(value)}</text>`;
+function isolateText(value: unknown, direction: "rtl" | "ltr"): string {
+  const text = String(value ?? "");
+  return direction === "rtl" ? `\u202b${text}\u202c` : `\u202a${text}\u202c`;
 }
 
 export class EBookletAccessCodePrintRendererService {
@@ -81,6 +73,33 @@ export class EBookletAccessCodePrintRendererService {
     } catch {
       throw new BadRequestError("Teacher image could not be processed. Upload a valid PNG, JPEG, WebP, GIF, or AVIF image.");
     }
+  }
+
+  private async renderTextOverlay(field: FieldBox | undefined, value: unknown, fallback: Partial<FieldBox> = {}): Promise<sharp.OverlayOptions | null> {
+    if (value === undefined || value === null || value === "") return null;
+    if (!field) return null;
+    const merged = { ...fallback, ...field };
+    const width = Math.max(1, Math.round(merged.width));
+    const height = Math.max(1, Math.round(merged.height));
+    const fontSize = Math.max(1, Math.round(merged.fontSize || 24));
+    const direction = resolveDirection(merged, value);
+    const align = resolveTextAlign(merged, direction);
+    const text = `<span foreground="${escapeXml(merged.color || "#111827")}">${escapeXml(isolateText(value, direction))}</span>`;
+    return {
+      input: await sharp({
+        text: {
+          text,
+          font: `Cairo ${fontSize}`,
+          fontfile: CAIRO_ARABIC_FONT_FILE,
+          width,
+          height,
+          align,
+          rgba: true,
+        },
+      }).png().toBuffer(),
+      left: Math.round(merged.x),
+      top: Math.round(merged.y),
+    };
   }
 
   async renderCardPng(input: {
@@ -113,24 +132,14 @@ export class EBookletAccessCodePrintRendererService {
         top: Math.round(teacherImageField.y),
       });
     }
-    const textSvg = `<svg width="${E_BOOKLET_PRINT_CARD_WIDTH_PX}" height="${E_BOOKLET_PRINT_CARD_HEIGHT_PX}" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <style>
-          @font-face {
-            font-family: "KalimaArabic";
-            src: url("${CAIRO_ARABIC_FONT_DATA_URI}") format("woff2");
-            font-weight: 400;
-            font-style: normal;
-          }
-        </style>
-      </defs>
-      ${svgText(fields.codeNumber, input.card.code, { direction: "ltr", align: "center", fontSize: 22 })}
-      ${svgText(fields.gradeClass || fields.grade_class || fields.className, input.card.batchValues?.gradeClassText, { direction: "rtl", align: "center", fontSize: 22 })}
-      ${svgText(fields.registrationMethod || fields.registration_method, input.card.batchValues?.registrationMethodText, { direction: "rtl", align: "center", fontSize: 18 })}
-      ${svgText(fields.price, input.card.batchValues?.priceText, { direction: "rtl", align: "center", fontSize: 18 })}
-      ${svgText(fields.redCustomText || fields.red_custom_text, input.card.batchValues?.redCustomText, { direction: "rtl", align: "center", fontSize: 18, color: "#dc2626" })}
-    </svg>`;
-    overlays.push({ input: Buffer.from(textSvg), left: 0, top: 0 });
+    const textOverlays = await Promise.all([
+      this.renderTextOverlay(fields.codeNumber, input.card.code, { direction: "ltr", align: "center", fontSize: 22 }),
+      this.renderTextOverlay(fields.gradeClass || fields.grade_class || fields.className, input.card.batchValues?.gradeClassText, { direction: "rtl", align: "center", fontSize: 22 }),
+      this.renderTextOverlay(fields.registrationMethod || fields.registration_method, input.card.batchValues?.registrationMethodText, { direction: "rtl", align: "center", fontSize: 18 }),
+      this.renderTextOverlay(fields.price, input.card.batchValues?.priceText, { direction: "rtl", align: "center", fontSize: 18 }),
+      this.renderTextOverlay(fields.redCustomText || fields.red_custom_text, input.card.batchValues?.redCustomText, { direction: "rtl", align: "center", fontSize: 18, color: "#dc2626" }),
+    ]);
+    overlays.push(...textOverlays.filter((overlay): overlay is sharp.OverlayOptions => Boolean(overlay)));
     return sharp(input.backgroundImage)
       .resize(E_BOOKLET_PRINT_CARD_WIDTH_PX, E_BOOKLET_PRINT_CARD_HEIGHT_PX, { fit: "fill" })
       .composite(overlays)

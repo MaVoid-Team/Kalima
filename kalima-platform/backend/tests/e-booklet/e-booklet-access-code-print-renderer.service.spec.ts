@@ -1,5 +1,4 @@
 import sharp from "sharp";
-import crypto from "crypto";
 import { PDFDocument } from "pdf-lib";
 import {
   EBookletAccessCodePrintRendererService,
@@ -13,6 +12,20 @@ const layout = {
     gradeClass: { x: 80, y: 280, width: 180, height: 60 },
   },
 };
+
+async function countDarkPixels(buffer: Buffer, width: number, height: number) {
+  const raw = await sharp(buffer)
+    .raw()
+    .toBuffer();
+  let darkPixels = 0;
+  for (let index = 0; index < width * height; index += 1) {
+    const offset = index * 4;
+    if (raw[offset] < 120 && raw[offset + 1] < 120 && raw[offset + 2] < 120 && raw[offset + 3] > 0) {
+      darkPixels += 1;
+    }
+  }
+  return darkPixels;
+}
 
 describe("e-booklet access-code print renderer", () => {
   async function background() {
@@ -56,7 +69,7 @@ describe("e-booklet access-code print renderer", () => {
     expect(png.length).toBeGreaterThan(5000);
   });
 
-  test("renders Arabic printable text with embedded glyphs instead of fallback boxes", async () => {
+  test("renders Arabic printable text inside the selected field box", async () => {
     const renderer = new EBookletAccessCodePrintRendererService();
     const png = await renderer.renderCardPng({
       backgroundImage: await background(),
@@ -67,12 +80,15 @@ describe("e-booklet access-code print renderer", () => {
         batchValues: { gradeClassText: "الصف الثالث" },
       },
     });
-    const arabicTextCrop = await sharp(png)
+    const fieldCrop = await sharp(png)
       .extract({ left: 80, top: 280, width: 180, height: 60 })
-      .raw()
+      .toBuffer();
+    const belowFieldCrop = await sharp(png)
+      .extract({ left: 80, top: 340, width: 180, height: 30 })
       .toBuffer();
 
-    expect(crypto.createHash("sha256").update(arabicTextCrop).digest("hex")).toBe("6e2d15b63e708425cc3beebacf4b290eff2e8cfd2f04d7ea511f659a4b360bbc");
+    expect(await countDarkPixels(fieldCrop, 180, 60)).toBeGreaterThan(150);
+    expect(await countDarkPixels(belowFieldCrop, 180, 30)).toBe(0);
   });
 
   test("rejects invalid teacher images with a controlled print error", async () => {
