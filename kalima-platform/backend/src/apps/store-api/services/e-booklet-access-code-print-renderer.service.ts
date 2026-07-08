@@ -89,6 +89,32 @@ function boundedField(field: FieldBox): FieldBox | null {
   };
 }
 
+async function boundedOverlay(overlay: sharp.OverlayOptions): Promise<sharp.OverlayOptions | null> {
+  const left = Math.max(0, Math.round(overlay.left || 0));
+  const top = Math.max(0, Math.round(overlay.top || 0));
+  const maxWidth = E_BOOKLET_PRINT_CARD_WIDTH_PX - left;
+  const maxHeight = E_BOOKLET_PRINT_CARD_HEIGHT_PX - top;
+  if (maxWidth <= 0 || maxHeight <= 0) return null;
+  if (!Buffer.isBuffer(overlay.input)) {
+    return { ...overlay, left, top };
+  }
+  const metadata = await sharp(overlay.input).metadata();
+  const width = metadata.width || maxWidth;
+  const height = metadata.height || maxHeight;
+  if (width <= maxWidth && height <= maxHeight) {
+    return { ...overlay, left, top };
+  }
+  return {
+    ...overlay,
+    input: await sharp(overlay.input)
+      .resize(maxWidth, maxHeight, { fit: "inside", withoutEnlargement: true })
+      .png()
+      .toBuffer(),
+    left,
+    top,
+  };
+}
+
 export class EBookletAccessCodePrintRendererService {
   private async renderTeacherImage(input: Buffer, field: FieldBox): Promise<Buffer> {
     try {
@@ -193,9 +219,11 @@ export class EBookletAccessCodePrintRendererService {
       this.renderTextOverlay(fields.redCustomText || fields.red_custom_text, input.card.batchValues?.redCustomText, { direction: "rtl", align: "center", fontSize: 18, color: "#dc2626" }),
     ]);
     overlays.push(...textOverlays.filter((overlay): overlay is sharp.OverlayOptions => Boolean(overlay)));
+    const boundedOverlays = (await Promise.all(overlays.map((overlay) => boundedOverlay(overlay))))
+      .filter((overlay): overlay is sharp.OverlayOptions => Boolean(overlay));
     return sharp(input.backgroundImage)
       .resize(E_BOOKLET_PRINT_CARD_WIDTH_PX, E_BOOKLET_PRINT_CARD_HEIGHT_PX, { fit: "fill" })
-      .composite(overlays)
+      .composite(boundedOverlays)
       .png()
       .toBuffer();
   }

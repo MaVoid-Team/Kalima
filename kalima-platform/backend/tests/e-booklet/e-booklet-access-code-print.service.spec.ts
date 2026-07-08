@@ -475,6 +475,38 @@ describe("e-booklet access-code print service", () => {
     })).resolves.toEqual(expect.any(Buffer));
   });
 
+  test("renders the production print template with all optional text fields", async () => {
+    const renderer = new EBookletAccessCodePrintRendererService();
+    const backgroundImage = Buffer.from(
+      '<svg width="827" height="438" xmlns="http://www.w3.org/2000/svg"><rect width="827" height="438" fill="white"/></svg>',
+    );
+
+    await expect(renderer.renderCardPng({
+      backgroundImage,
+      layout: {
+        fields: {
+          qr: { x: 604, y: 88, width: 96, height: 96 },
+          price: { x: 0, y: 36, align: "center", color: "#111827", width: 205, height: 48, fontSize: 16, direction: "rtl" },
+          codeNumber: { x: 601, y: 309, align: "center", color: "#111827", width: 125, height: 34, fontSize: 18, direction: "ltr" },
+          gradeClass: { x: 43, y: 296, align: "center", color: "#111827", width: 124, height: 48, fontSize: 17, direction: "rtl" },
+          teacherImage: { x: 345, y: 70, width: 118, height: 178 },
+          redCustomText: { x: 57, y: 95, align: "center", color: "#dc2626", width: 102, height: 75, fontSize: 16, direction: "rtl" },
+          registrationMethod: { x: 590, y: 74, align: "center", color: "#111827", width: 120, height: 28, fontSize: 15, direction: "rtl" },
+        },
+      },
+      card: {
+        code: "KLM PREVIEW 003",
+        qrRedeemUrl: "https://kalima.test/e-booklet-code/qr/preview",
+        batchValues: {
+          gradeClassText: "E2E production group",
+          registrationMethodText: "Code or platform",
+          priceText: "100 EGP",
+          redCustomText: "Read before redeeming",
+        },
+      },
+    })).resolves.toEqual(expect.any(Buffer));
+  });
+
   test("loads QR prefill data from a signed reference without exposing price text", async () => {
     const db = createDb();
     const accessCodeService = { generateCodes: jest.fn() };
