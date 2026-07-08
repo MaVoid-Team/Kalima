@@ -1,3 +1,4 @@
+import { readFileSync } from "fs";
 import sharp from "sharp";
 import QRCode from "qrcode";
 import { PDFDocument, rgb } from "pdf-lib";
@@ -7,6 +8,11 @@ import {
   E_BOOKLET_PRINT_CARD_PPI,
   E_BOOKLET_PRINT_CARD_WIDTH_PX,
 } from "./e-booklet-access-code-print.service";
+
+const A4_WIDTH_PT = 595.28;
+const A4_HEIGHT_PT = 841.89;
+const PRINT_MARGIN_PT = 18;
+const PRINT_GAP_PT = 10;
 
 type FieldBox = {
   x: number;
@@ -29,6 +35,10 @@ type PrintCardRenderInput = {
   teacherImage?: Buffer | null;
   batchValues?: Record<string, any>;
 };
+
+const CAIRO_ARABIC_FONT_DATA_URI = `data:font/woff2;base64,${readFileSync(
+  require.resolve("@fontsource/cairo/files/cairo-arabic-400-normal.woff2"),
+).toString("base64")}`;
 
 function escapeXml(value: unknown): string {
   return String(value ?? "")
@@ -58,7 +68,7 @@ function svgText(field: FieldBox, value: unknown, fallback: Partial<FieldBox> = 
   const anchor = textAnchor(merged.align);
   const x = textX(merged);
   const y = merged.y + Math.min(merged.height, fontSize * 1.35);
-  return `<text x="${x}" y="${y}" direction="${direction}" unicode-bidi="isolate" text-anchor="${anchor}" font-family="Cairo, Arial, sans-serif" font-size="${fontSize}" fill="${escapeXml(merged.color || "#111827")}">${escapeXml(value)}</text>`;
+  return `<text x="${x}" y="${y}" direction="${direction}" unicode-bidi="isolate" text-anchor="${anchor}" font-family="KalimaArabic, Arial, sans-serif" font-size="${fontSize}" fill="${escapeXml(merged.color || "#111827")}">${escapeXml(value)}</text>`;
 }
 
 export class EBookletAccessCodePrintRendererService {
@@ -104,6 +114,16 @@ export class EBookletAccessCodePrintRendererService {
       });
     }
     const textSvg = `<svg width="${E_BOOKLET_PRINT_CARD_WIDTH_PX}" height="${E_BOOKLET_PRINT_CARD_HEIGHT_PX}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          @font-face {
+            font-family: "KalimaArabic";
+            src: url("${CAIRO_ARABIC_FONT_DATA_URI}") format("woff2");
+            font-weight: 400;
+            font-style: normal;
+          }
+        </style>
+      </defs>
       ${svgText(fields.codeNumber, input.card.code, { direction: "ltr", align: "center", fontSize: 22 })}
       ${svgText(fields.gradeClass || fields.grade_class || fields.className, input.card.batchValues?.gradeClassText, { direction: "rtl", align: "center", fontSize: 22 })}
       ${svgText(fields.registrationMethod || fields.registration_method, input.card.batchValues?.registrationMethodText, { direction: "rtl", align: "center", fontSize: 18 })}
@@ -120,27 +140,27 @@ export class EBookletAccessCodePrintRendererService {
 
   async renderBatchPdf(cards: Array<{ png: Buffer }>): Promise<Uint8Array> {
     const pdf = await PDFDocument.create();
-    const a4WidthPt = 841.89;
-    const a4HeightPt = 595.28;
     const cardWidthPt = (E_BOOKLET_PRINT_CARD_WIDTH_PX / E_BOOKLET_PRINT_CARD_PPI) * 72;
     const cardHeightPt = (E_BOOKLET_PRINT_CARD_HEIGHT_PX / E_BOOKLET_PRINT_CARD_PPI) * 72;
-    const marginPt = 18;
-    const gapPt = 10;
-    const columns = Math.max(1, Math.floor((a4WidthPt - marginPt * 2 + gapPt) / (cardWidthPt + gapPt)));
-    const rows = Math.max(1, Math.floor((a4HeightPt - marginPt * 2 + gapPt) / (cardHeightPt + gapPt)));
+    const columns = Math.max(1, Math.floor((A4_WIDTH_PT - PRINT_MARGIN_PT * 2 + PRINT_GAP_PT) / (cardWidthPt + PRINT_GAP_PT)));
+    const rows = Math.max(1, Math.floor((A4_HEIGHT_PT - PRINT_MARGIN_PT * 2 + PRINT_GAP_PT) / (cardHeightPt + PRINT_GAP_PT)));
     const perPage = columns * rows;
+    const gridWidthPt = columns * cardWidthPt + (columns - 1) * PRINT_GAP_PT;
+    const gridHeightPt = rows * cardHeightPt + (rows - 1) * PRINT_GAP_PT;
+    const offsetXPt = (A4_WIDTH_PT - gridWidthPt) / 2;
+    const offsetYPt = (A4_HEIGHT_PT - gridHeightPt) / 2;
 
     for (let index = 0; index < cards.length; index += 1) {
       if (index % perPage === 0) {
-        pdf.addPage([a4WidthPt, a4HeightPt]);
+        pdf.addPage([A4_WIDTH_PT, A4_HEIGHT_PT]);
       }
       const page = pdf.getPage(pdf.getPageCount() - 1);
       const pageIndex = index % perPage;
       const col = pageIndex % columns;
       const row = Math.floor(pageIndex / columns);
       const image = await pdf.embedPng(cards[index].png);
-      const x = marginPt + col * (cardWidthPt + gapPt);
-      const y = a4HeightPt - marginPt - cardHeightPt - row * (cardHeightPt + gapPt);
+      const x = offsetXPt + col * (cardWidthPt + PRINT_GAP_PT);
+      const y = A4_HEIGHT_PT - offsetYPt - cardHeightPt - row * (cardHeightPt + PRINT_GAP_PT);
       page.drawRectangle({ x, y, width: cardWidthPt, height: cardHeightPt, color: rgb(1, 1, 1) });
       page.drawImage(image, { x, y, width: cardWidthPt, height: cardHeightPt });
     }
