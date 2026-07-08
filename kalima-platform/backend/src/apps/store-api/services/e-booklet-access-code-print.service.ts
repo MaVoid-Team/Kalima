@@ -502,66 +502,81 @@ export class EBookletAccessCodePrintService {
       bookletInstanceId: input.bookletInstanceId,
       kind: input.kind,
     });
-    const generated = await this.accessCodeService.generateCodes({
-      bookletInstanceId: input.bookletInstanceId,
-      teacherId: input.teacherId,
-      kind: input.kind,
-      termId: input.termId,
-      count: input.count,
-      expiresAt: input.expiresAt === null ? null : input.expiresAt ?? undefined,
-      maxRedemptions: 1,
-      adminActorId: input.createdBy,
-      ipAddress: input.ipAddress ?? undefined,
-      userAgent: input.userAgent ?? undefined,
-    });
-    const cards = generated.codes.map((generatedCode: any, index: number) => {
-      const qrRef = generatePrintQrRef();
-      return {
-        cardIndex: index,
-        accessCodeId: generatedCode.record.id,
-        code: generatedCode.code,
-        qrRef,
-        qrRefHash: hashPrintQrRef(qrRef),
-        qrRedeemUrl: printQrRedeemUrl(qrRef),
-      };
-    });
-    const renderedCards = await Promise.all(cards.map(async (card) => ({
-      png: await this.renderer.renderCardPng({
-        backgroundImage,
-        layout: template.layout_json,
-        card: {
-          code: card.code,
-          qrRedeemUrl: card.qrRedeemUrl,
-          teacherImage,
-          batchValues: input.batchValues || {},
-        },
-      }),
-    })));
-    const pdfBytes = await this.renderer.renderBatchPdf(renderedCards);
-    const pdfAsset = await this.createPdfAsset({
-      buffer: Buffer.from(pdfBytes),
-      label: input.label,
-      createdBy: input.createdBy,
-    });
-    const batch = await this.createBatchSnapshot({
-      label: input.label,
-      templateId: input.templateId,
-      teacherId: input.teacherId,
-      bookletInstanceId: input.bookletInstanceId,
-      termId: input.termId,
-      kind: input.kind,
-      count: input.count,
-      createdBy: input.createdBy,
-      batchValues: input.batchValues,
-      requiredFields,
-      teacherImageFileAssetId: input.teacherImageFileAssetId,
-      pdfFileAssetId: pdfAsset.id,
-      expiresAt: input.expiresAt,
-      accessCodes: cards.map((card) => ({ id: card.accessCodeId })),
-      qrRefs: cards.map((card) => ({ ref: card.qrRef, hash: card.qrRefHash })),
-      printedCodes: cards.map((card) => ({ code: card.code, ciphertext: this.encryptPrintedAccessCode(card.code) })),
-    });
-    return { batch, cards, pdfFileAssetId: pdfAsset.id, warning };
+    const generatedAccessCodeIds: number[] = [];
+    try {
+      const generated = await this.accessCodeService.generateCodes({
+        bookletInstanceId: input.bookletInstanceId,
+        teacherId: input.teacherId,
+        kind: input.kind,
+        termId: input.termId,
+        count: input.count,
+        expiresAt: input.expiresAt === null ? null : input.expiresAt ?? undefined,
+        maxRedemptions: 1,
+        adminActorId: input.createdBy,
+        ipAddress: input.ipAddress ?? undefined,
+        userAgent: input.userAgent ?? undefined,
+      });
+      const cards = generated.codes.map((generatedCode: any, index: number) => {
+        const qrRef = generatePrintQrRef();
+        const accessCodeId = Number(generatedCode.record.id);
+        if (Number.isInteger(accessCodeId)) generatedAccessCodeIds.push(accessCodeId);
+        return {
+          cardIndex: index,
+          accessCodeId,
+          code: generatedCode.code,
+          qrRef,
+          qrRefHash: hashPrintQrRef(qrRef),
+          qrRedeemUrl: printQrRedeemUrl(qrRef),
+        };
+      });
+      const renderedCards = await Promise.all(cards.map(async (card) => ({
+        png: await this.renderer.renderCardPng({
+          backgroundImage,
+          layout: template.layout_json,
+          card: {
+            code: card.code,
+            qrRedeemUrl: card.qrRedeemUrl,
+            teacherImage,
+            batchValues: input.batchValues || {},
+          },
+        }),
+      })));
+      const pdfBytes = await this.renderer.renderBatchPdf(renderedCards);
+      const pdfAsset = await this.createPdfAsset({
+        buffer: Buffer.from(pdfBytes),
+        label: input.label,
+        createdBy: input.createdBy,
+      });
+      const batch = await this.createBatchSnapshot({
+        label: input.label,
+        templateId: input.templateId,
+        teacherId: input.teacherId,
+        bookletInstanceId: input.bookletInstanceId,
+        termId: input.termId,
+        kind: input.kind,
+        count: input.count,
+        createdBy: input.createdBy,
+        batchValues: input.batchValues,
+        requiredFields,
+        teacherImageFileAssetId: input.teacherImageFileAssetId,
+        pdfFileAssetId: pdfAsset.id,
+        expiresAt: input.expiresAt,
+        accessCodes: cards.map((card) => ({ id: card.accessCodeId })),
+        qrRefs: cards.map((card) => ({ ref: card.qrRef, hash: card.qrRefHash })),
+        printedCodes: cards.map((card) => ({ code: card.code, ciphertext: this.encryptPrintedAccessCode(card.code) })),
+      });
+      return { batch, cards, pdfFileAssetId: pdfAsset.id, warning };
+    } catch (error) {
+      if (generatedAccessCodeIds.length > 0) {
+        await this.db.e_booklet_access_codes.deleteMany({
+          where: {
+            id: { in: generatedAccessCodeIds },
+            redeemed_count: 0,
+          },
+        });
+      }
+      throw error;
+    }
   }
 
   async renderPreviewCard(input: {

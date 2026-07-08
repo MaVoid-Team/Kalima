@@ -29,6 +29,7 @@ function createDb(overrides: Record<string, unknown> = {}) {
     },
     e_booklet_access_codes: {
       count: jest.fn().mockResolvedValue(0),
+      deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
     },
     e_booklet_file_assets: {
       findUnique: jest.fn(),
@@ -336,6 +337,61 @@ describe("e-booklet access-code print service", () => {
         { batch_id: 88, access_code_id: 32, card_index: 1, qr_ref_hash: hashPrintQrRef(result.cards[1].qrRef), access_code_ciphertext: expect.any(String) },
       ],
     });
+  });
+
+  test("removes just-created access codes when printable PDF rendering fails", async () => {
+    const db = createDb();
+    const template = {
+      id: 3,
+      name: "Arabic card",
+      background_file_asset_id: 100,
+      width_px: 827,
+      height_px: 438,
+      ppi: 300,
+      layout_json: validLayout,
+      default_required_fields_json: { qr: true, codeNumber: true },
+      status: "active",
+    };
+    db.e_booklet_access_codes.deleteMany.mockResolvedValue({ count: 1 });
+    db.e_booklet_access_code_print_templates.findUnique.mockResolvedValue(template);
+    db.e_booklet_file_assets.findUnique.mockResolvedValue({ id: 100, storage_key: "background.png" });
+    const accessCodeService = {
+      generateCodes: jest.fn().mockResolvedValue({
+        count: 1,
+        codes: [
+          { code: "KLM-AAAABBBBCCCC", record: { id: 31 } },
+        ],
+      }),
+    };
+    const renderer = {
+      renderCardPng: jest.fn().mockRejectedValue(new Error("bad teacher image")),
+      renderBatchPdf: jest.fn(),
+    };
+    const storage = {
+      readPrivateAsset: jest.fn().mockResolvedValue(Buffer.from("background")),
+      writePrivateFile: jest.fn(),
+    };
+    const service = new EBookletAccessCodePrintService(db, accessCodeService as any, renderer as any, storage);
+
+    await expect(service.generatePrintableBatch({
+      label: "Broken batch",
+      templateId: 3,
+      teacherId: 9,
+      bookletInstanceId: 10,
+      termId: 1,
+      kind: "paid",
+      count: 1,
+      createdBy: 5,
+      batchValues: { gradeClassText: "الصف الثالث" },
+    })).rejects.toThrow("bad teacher image");
+
+    expect(db.e_booklet_access_codes.deleteMany).toHaveBeenCalledWith({
+      where: {
+        id: { in: [31] },
+        redeemed_count: 0,
+      },
+    });
+    expect(db.e_booklet_access_code_print_batches.create).not.toHaveBeenCalled();
   });
 
   test("renders a backend preview card with the selected template", async () => {

@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import QRCode from "qrcode";
 import { PDFDocument, rgb } from "pdf-lib";
+import { BadRequestError } from "../../../libs/errors";
 import {
   E_BOOKLET_PRINT_CARD_HEIGHT_PX,
   E_BOOKLET_PRINT_CARD_PPI,
@@ -61,6 +62,17 @@ function svgText(field: FieldBox, value: unknown, fallback: Partial<FieldBox> = 
 }
 
 export class EBookletAccessCodePrintRendererService {
+  private async renderTeacherImage(input: Buffer, field: FieldBox): Promise<Buffer> {
+    try {
+      return await sharp(input)
+        .resize(Math.round(field.width), Math.round(field.height), { fit: "cover" })
+        .png()
+        .toBuffer();
+    } catch {
+      throw new BadRequestError("Teacher image could not be processed. Upload a valid PNG, JPEG, WebP, GIF, or AVIF image.");
+    }
+  }
+
   async renderCardPng(input: {
     backgroundImage: Buffer;
     layout: PrintLayout;
@@ -86,10 +98,7 @@ export class EBookletAccessCodePrintRendererService {
     const teacherImageField = fields.teacherImage || fields.teacher_image;
     if (teacherImageField && input.card.teacherImage) {
       overlays.push({
-        input: await sharp(input.card.teacherImage)
-          .resize(Math.round(teacherImageField.width), Math.round(teacherImageField.height), { fit: "cover" })
-          .png()
-          .toBuffer(),
+        input: await this.renderTeacherImage(input.card.teacherImage, teacherImageField),
         left: Math.round(teacherImageField.x),
         top: Math.round(teacherImageField.y),
       });

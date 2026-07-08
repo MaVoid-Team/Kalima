@@ -55,6 +55,21 @@ describe("e-booklet access-code print renderer", () => {
     expect(png.length).toBeGreaterThan(5000);
   });
 
+  test("rejects invalid teacher images with a controlled print error", async () => {
+    const renderer = new EBookletAccessCodePrintRendererService();
+
+    await expect(renderer.renderCardPng({
+      backgroundImage: await background(),
+      layout,
+      card: {
+        code: "KLM AAAA BBBB CCCC",
+        qrRedeemUrl: "https://kalima.test/e-booklet-code/qr/test",
+        teacherImage: Buffer.from("not an image"),
+        batchValues: { gradeClassText: "الصف الثالث" },
+      },
+    })).rejects.toThrow("Teacher image could not be processed.");
+  });
+
   test("packs rendered cards into an A4 PDF at true 300ppi physical size", async () => {
     const renderer = new EBookletAccessCodePrintRendererService();
     const png = await renderer.renderCardPng({

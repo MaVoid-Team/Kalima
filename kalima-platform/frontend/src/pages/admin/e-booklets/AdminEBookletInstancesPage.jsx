@@ -138,6 +138,7 @@ export default function AdminEBookletInstancesPage() {
   const [templateDraft, setTemplateDraft] = useState({ name: "", backgroundFileAssetId: "", layout: DEFAULT_PRINT_TEMPLATE_LAYOUT });
   const [editingTemplateId, setEditingTemplateId] = useState(null);
   const [printUploadState, setPrintUploadState] = useState({});
+  const [printUploadedAssets, setPrintUploadedAssets] = useState({});
   const [printBatches, setPrintBatches] = useState({});
   const [printBatchHistory, setPrintBatchHistory] = useState({});
   const [printWarnings, setPrintWarnings] = useState({});
@@ -374,17 +375,30 @@ export default function AdminEBookletInstancesPage() {
 
   const uploadPrintImage = async (file, target) => {
     if (!file) return null;
+    const uploadedName = file.name || "";
     setPrintUploadState((current) => ({ ...current, [target]: "uploading" }));
     try {
       const response = await uploadAccessCodePrintImage(file, {
         owner_type: "e_booklet_access_code_print",
         file_type: "image",
       });
-      const assetId = response?.data?.id;
+      const assetId = Number(response?.data?.id ?? response?.data?.data?.id ?? response?.id);
+      if (!Number.isInteger(assetId) || assetId <= 0) {
+        throw new Error("Upload completed without a saved file asset ID.");
+      }
       setPrintUploadState((current) => ({ ...current, [target]: "done" }));
+      setPrintUploadedAssets((current) => ({
+        ...current,
+        [target]: { assetId, name: uploadedName },
+      }));
       return assetId;
     } catch (error) {
       setPrintUploadState((current) => ({ ...current, [target]: "error" }));
+      setPrintUploadedAssets((current) => {
+        const next = { ...current };
+        delete next[target];
+        return next;
+      });
       throw error;
     }
   };
@@ -743,6 +757,20 @@ export default function AdminEBookletInstancesPage() {
                     const remainingSeats = Math.max(0, quota - usedSeats);
                     const showSeatWarning = unusedActivePaidCodes > remainingSeats;
                     const printSectionCollapsed = Boolean(collapsedPrintSections[instance.id]);
+                    const printDraft = printDrafts[instance.id] || {};
+                    const teacherUploadTarget = `teacher-${instance.id}`;
+                    const teacherUploadStatus = printUploadState[teacherUploadTarget];
+                    const teacherUploadedAsset = printUploadedAssets[teacherUploadTarget];
+                    const teacherImageUploading = teacherUploadStatus === "uploading";
+                    const teacherImageRequired = Boolean(printDraft.requiredFields?.teacherImage);
+                    const teacherImageMissing = teacherImageRequired && !printDraft.teacherImageFileAssetId;
+                    const canGeneratePrintableBatch = Boolean(
+                      accessCodeDrafts[instance.id]?.termId
+                      && printDraft.templateId
+                      && (instance.teacher?.id || instance.teacher_id)
+                      && !teacherImageUploading
+                      && !teacherImageMissing,
+                    );
 
                     return (
                       <motion.article key={instance.id} className="bg-card" variants={rowMotion} layout="position">
@@ -904,13 +932,37 @@ export default function AdminEBookletInstancesPage() {
                                       <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_110px]">
                                         <div className="grid gap-1">
                                           <span className="text-[11px] font-medium text-muted-foreground">{t("admin.instances.teacherImageUpload", { defaultValue: "Upload image" })}</span>
-                                          <Input className="h-10 rounded-xl text-foreground" type="file" accept="image/*" onChange={(event) => handleTeacherImageUpload(instance.id, event)} disabled={printUploadState[`teacher-${instance.id}`] === "uploading"} />
+                                          <Input className="h-10 rounded-xl text-foreground" type="file" accept="image/*" onChange={(event) => handleTeacherImageUpload(instance.id, event)} disabled={teacherImageUploading} />
                                         </div>
                                         <div className="grid gap-1">
                                           <span className="text-[11px] font-medium text-muted-foreground">{t("admin.instances.assetId", { defaultValue: "Asset ID" })}</span>
-                                          <Input className="h-10 rounded-xl text-foreground" type="number" min="1" value={printDrafts[instance.id]?.teacherImageFileAssetId || ""} onChange={(event) => updatePrintDraft(instance.id, "teacherImageFileAssetId", event.target.value)} />
+                                          <Input className="h-10 rounded-xl text-foreground" type="number" min="1" value={printDraft.teacherImageFileAssetId || ""} onChange={(event) => updatePrintDraft(instance.id, "teacherImageFileAssetId", event.target.value)} />
                                         </div>
                                       </div>
+                                      {teacherImageUploading && (
+                                        <div className="rounded-lg border border-sky-200 bg-sky-50 px-2 py-1 text-[11px] font-medium text-sky-800">
+                                          {t("admin.instances.teacherImageUploading", { defaultValue: "Uploading teacher image..." })}
+                                        </div>
+                                      )}
+                                      {teacherUploadStatus === "done" && printDraft.teacherImageFileAssetId && (
+                                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-800">
+                                          {t("admin.instances.teacherImageUploaded", {
+                                            defaultValue: "Teacher image saved: {{name}} (asset #{{id}})",
+                                            name: teacherUploadedAsset?.name || t("admin.instances.uploadedImage", { defaultValue: "uploaded image" }),
+                                            id: printDraft.teacherImageFileAssetId,
+                                          })}
+                                        </div>
+                                      )}
+                                      {teacherUploadStatus === "error" && (
+                                        <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-2 py-1 text-[11px] font-medium text-destructive">
+                                          {t("admin.instances.teacherImageUploadFailed", { defaultValue: "Teacher image upload failed. Try again before generating the PDF." })}
+                                        </div>
+                                      )}
+                                      {teacherImageMissing && (
+                                        <div className="rounded-lg border border-amber-300 bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-900">
+                                          {t("admin.instances.teacherImageRequiredMissing", { defaultValue: "Teacher image is required for this batch. Upload an image or enter its asset ID." })}
+                                        </div>
+                                      )}
                                     </PrintFormField>
                                   </div>
                                   <div className="grid gap-3 md:grid-cols-4">
@@ -957,7 +1009,7 @@ export default function AdminEBookletInstancesPage() {
                                       <Eye className="h-4 w-4" />
                                       {t("admin.instances.previewPrintableCard", { defaultValue: "Preview card" })}
                                     </Button>
-                                    <Button type="button" size="sm" className="rounded-xl" onClick={() => handleGeneratePrintableBatch(instance)} disabled={!accessCodeDrafts[instance.id]?.termId || !printDrafts[instance.id]?.templateId || !(instance.teacher?.id || instance.teacher_id)}>
+                                    <Button type="button" size="sm" className="rounded-xl" onClick={() => handleGeneratePrintableBatch(instance)} disabled={!canGeneratePrintableBatch}>
                                       <Printer className="h-4 w-4" />
                                       {t("admin.instances.generatePrintablePdf", { defaultValue: "Generate printable PDF" })}
                                     </Button>

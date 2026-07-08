@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { execFile } from "child_process";
 import { promisify } from "util";
 import { PDFDocument } from "pdf-lib";
+import sharp from "sharp";
 import type { Server as SocketIOServer } from "socket.io";
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { notification_key_enum } from "../generated/prisma/client";
@@ -53,6 +54,16 @@ const DEFAULT_E_BOOKLET_GLOBAL_SETTINGS = {
   notify_admins_on_delivery: true,
   notify_teacher_on_delivery: true,
 };
+
+async function assertReadableEBookletImage(file: Express.Multer.File): Promise<void> {
+  if (!file.mimetype?.startsWith("image/")) return;
+  try {
+    await sharp(file.path || file.buffer).metadata();
+  } catch {
+    await removeUploadedTempFile(file);
+    throw new BadRequestError("Uploaded image could not be processed. Use a valid PNG, JPEG, WebP, GIF, or AVIF image.");
+  }
+}
 
 export type EBookletPurchaseListFilters = {
   status?: string;
@@ -1058,6 +1069,7 @@ export class EBookletService {
       await removeUploadedTempFile(file);
       throw new BadRequestError(`Unsupported e-booklet file type: ${file.mimetype}`);
     }
+    await assertReadableEBookletImage(file);
     const requestedFileType = input.fileType === "document" ? "pdf" : input.fileType;
     const requestedSafeAttachment = requestedFileType === "file";
     const inferredStorageType =
