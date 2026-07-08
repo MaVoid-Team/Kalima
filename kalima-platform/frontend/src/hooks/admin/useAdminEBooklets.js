@@ -789,6 +789,11 @@ export function useAdminEBookletInstances() {
       defaultSuccessMessage: i18n.t("eBooklets:toasts.fileStored"),
     });
   }, [fetchApi]);
+  const fetchAccessCodePrintImageBlobUrl = useCallback(async (assetId) => {
+    if (!assetId) return "";
+    const response = await axiosInstance.get(`/admin/e-booklet-files/${assetId}/preview`, { responseType: "blob" });
+    return URL.createObjectURL(response.data);
+  }, []);
   const previewAccessCodePrintCard = useCallback(async (data) => {
     const response = await axiosInstance.post("/admin/e-booklet-access-code-print/preview", data, { responseType: "blob" });
     return URL.createObjectURL(response.data);
@@ -830,6 +835,7 @@ export function useAdminEBookletInstances() {
     listAccessCodePrintBatches,
     generateAccessCodePrintBatch,
     uploadAccessCodePrintImage,
+    fetchAccessCodePrintImageBlobUrl,
     previewAccessCodePrintCard,
     downloadAccessCodePrintBatchPdf,
   };

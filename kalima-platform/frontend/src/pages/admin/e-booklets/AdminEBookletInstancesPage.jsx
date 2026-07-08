@@ -120,6 +120,7 @@ export default function AdminEBookletInstancesPage() {
     listAccessCodePrintBatches,
     generateAccessCodePrintBatch,
     uploadAccessCodePrintImage,
+    fetchAccessCodePrintImageBlobUrl,
     previewAccessCodePrintCard,
     downloadAccessCodePrintBatchPdf,
   } = useAdminEBookletInstances();
@@ -141,6 +142,7 @@ export default function AdminEBookletInstancesPage() {
   const [printBatchHistory, setPrintBatchHistory] = useState({});
   const [printWarnings, setPrintWarnings] = useState({});
   const [printPreviewUrls, setPrintPreviewUrls] = useState({});
+  const [templateBackgroundPreviewUrl, setTemplateBackgroundPreviewUrl] = useState("");
   const [printTemplateCreationCollapsed, setPrintTemplateCreationCollapsed] = useState(false);
   const [collapsedPrintSections, setCollapsedPrintSections] = useState({});
   const [generatedCodes, setGeneratedCodes] = useState({});
@@ -193,6 +195,33 @@ export default function AdminEBookletInstancesPage() {
       return next;
     });
   }, [instances, terms, t]);
+
+  useEffect(() => {
+    const assetId = Number(templateDraft.backgroundFileAssetId);
+    if (!assetId) {
+      setTemplateBackgroundPreviewUrl("");
+      return undefined;
+    }
+    let cancelled = false;
+    let objectUrl = "";
+    setTemplateBackgroundPreviewUrl("");
+    fetchAccessCodePrintImageBlobUrl(assetId)
+      .then((url) => {
+        objectUrl = url;
+        if (cancelled) {
+          URL.revokeObjectURL(url);
+          return;
+        }
+        setTemplateBackgroundPreviewUrl(url);
+      })
+      .catch(() => {
+        if (!cancelled) setTemplateBackgroundPreviewUrl("");
+      });
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [fetchAccessCodePrintImageBlobUrl, templateDraft.backgroundFileAssetId]);
 
   const grouped = useMemo(() => instances.reduce((acc, instance) => {
     const key = instance.teacher?.id || "unknown";
@@ -620,6 +649,7 @@ export default function AdminEBookletInstancesPage() {
             </div>
             <PrintTemplateLayoutEditor
               value={templateDraft.layout}
+              backgroundImageUrl={templateBackgroundPreviewUrl}
               onChange={(layout) => setTemplateDraft((current) => ({ ...current, layout }))}
             />
           </div>

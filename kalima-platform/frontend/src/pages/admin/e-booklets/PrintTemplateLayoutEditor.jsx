@@ -46,7 +46,7 @@ const numberValue = (value, fallback) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
-export default function PrintTemplateLayoutEditor({ value, onChange }) {
+export default function PrintTemplateLayoutEditor({ value, onChange, backgroundImageUrl = "" }) {
   const { t } = useTranslation("eBooklets");
   const layout = value || DEFAULT_PRINT_TEMPLATE_LAYOUT;
   const fields = layout.fields || {};
@@ -159,7 +159,16 @@ export default function PrintTemplateLayoutEditor({ value, onChange }) {
           className="relative w-full overflow-hidden rounded-xl border bg-white shadow-inner"
           style={{ aspectRatio: `${PRINT_CARD_WIDTH_PX} / ${PRINT_CARD_HEIGHT_PX}` }}
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.14)_1px,transparent_0)] [background-size:16px_16px]" />
+          {backgroundImageUrl ? (
+            <img
+              src={backgroundImageUrl}
+              alt=""
+              className="pointer-events-none absolute inset-0 h-full w-full select-none object-fill"
+              draggable={false}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.14)_1px,transparent_0)] [background-size:16px_16px]" />
+          )}
           {fieldKeys.map((fieldKey) => {
             const field = fields[fieldKey];
             const active = selectedKey === fieldKey;

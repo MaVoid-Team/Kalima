@@ -1,21 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense } from 'react'
 import App from './App.jsx'
 import './index.css'
 import './i18n';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { CartProvider } from './contexts/CartContext.jsx';
+import { NotificationsProvider } from './contexts/NotificationsContext.jsx';
 
 const AgentationPanel = import.meta.env.DEV
   ? lazy(() => import('agentation').then((module) => ({ default: module.Agentation })))
   : null;
-const LazyNotificationsProvider = lazy(() =>
-  import('./contexts/NotificationsContext.jsx').then((module) => ({ default: module.NotificationsProvider })),
-);
-
-const hasAuthSession = () => Boolean(window.localStorage.getItem('accessToken'));
-
 window.setTimeout(async () => {
   const Sentry = await import('@sentry/react');
 
@@ -29,36 +24,10 @@ window.setTimeout(async () => {
   });
 }, 10000);
 
-function NotificationsBoundary({ children }) {
-  const [shouldLoadNotifications, setShouldLoadNotifications] = useState(hasAuthSession);
-
-  useEffect(() => {
-    const handleSessionChange = () => setShouldLoadNotifications(hasAuthSession());
-
-    window.addEventListener('storage', handleSessionChange);
-    window.addEventListener('auth-session-changed', handleSessionChange);
-
-    return () => {
-      window.removeEventListener('storage', handleSessionChange);
-      window.removeEventListener('auth-session-changed', handleSessionChange);
-    };
-  }, []);
-
-  if (!shouldLoadNotifications) {
-    return children;
-  }
-
-  return (
-    <Suspense fallback={children}>
-      <LazyNotificationsProvider>{children}</LazyNotificationsProvider>
-    </Suspense>
-  );
-}
-
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
-      <NotificationsBoundary>
+      <NotificationsProvider>
         <CartProvider>
           <App />
           {AgentationPanel && (
@@ -67,7 +36,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             </Suspense>
           )}
         </CartProvider>
-      </NotificationsBoundary>
+      </NotificationsProvider>
     </AuthProvider>
   </React.StrictMode>
 )
