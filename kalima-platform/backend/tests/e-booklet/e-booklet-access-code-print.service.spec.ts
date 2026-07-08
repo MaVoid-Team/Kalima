@@ -4,6 +4,7 @@ import {
   hashPrintQrRef,
   verifyPrintQrRef,
 } from "../../src/apps/store-api/services/e-booklet-access-code-print.service";
+import { EBookletAccessCodePrintRendererService } from "../../src/apps/store-api/services/e-booklet-access-code-print-renderer.service";
 
 function createDb(overrides: Record<string, unknown> = {}) {
   const db: any = {
@@ -428,6 +429,27 @@ describe("e-booklet access-code print service", () => {
       layout: validLayout,
       card: expect.objectContaining({ code: "KLM PREV IEW" }),
     }));
+  });
+
+  test("shrinks narrow access-code text instead of failing card rendering", async () => {
+    const renderer = new EBookletAccessCodePrintRendererService();
+    const backgroundImage = Buffer.from(
+      '<svg width="827" height="438" xmlns="http://www.w3.org/2000/svg"><rect width="827" height="438" fill="white"/></svg>',
+    );
+
+    await expect(renderer.renderCardPng({
+      backgroundImage,
+      layout: {
+        fields: {
+          qr: { x: 604, y: 88, width: 96, height: 96 },
+          codeNumber: { x: 601, y: 309, width: 125, height: 34, fontSize: 18, align: "center", direction: "ltr" },
+        },
+      },
+      card: {
+        code: "KLM PREVIEW 001",
+        qrRedeemUrl: "https://kalima.test/e-booklet-code/qr/preview",
+      },
+    })).resolves.toEqual(expect.any(Buffer));
   });
 
   test("loads QR prefill data from a signed reference without exposing price text", async () => {

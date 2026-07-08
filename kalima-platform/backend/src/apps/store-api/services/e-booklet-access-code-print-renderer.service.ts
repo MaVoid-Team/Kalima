@@ -37,6 +37,7 @@ type PrintCardRenderInput = {
 
 const CAIRO_ARABIC_FONT_FILE = require.resolve("@fontsource/cairo/files/cairo-arabic-400-normal.woff2");
 const RTL_TEXT_RE = /[\u0590-\u08ff\ufb1d-\ufdff\ufe70-\ufefc]/;
+const MIN_TEXT_FONT_SIZE = 9;
 
 function escapeXml(value: unknown): string {
   return String(value ?? "")
@@ -81,25 +82,33 @@ export class EBookletAccessCodePrintRendererService {
     const merged = { ...fallback, ...field };
     const width = Math.max(1, Math.round(merged.width));
     const height = Math.max(1, Math.round(merged.height));
-    const fontSize = Math.max(1, Math.round(merged.fontSize || 24));
+    const fontSize = Math.max(MIN_TEXT_FONT_SIZE, Math.round(merged.fontSize || 24));
     const direction = resolveDirection(merged, value);
     const align = resolveTextAlign(merged, direction);
     const text = `<span foreground="${escapeXml(merged.color || "#111827")}">${escapeXml(isolateText(value, direction))}</span>`;
-    return {
-      input: await sharp({
-        text: {
-          text,
-          font: `Cairo ${fontSize}`,
-          fontfile: CAIRO_ARABIC_FONT_FILE,
-          width,
-          height,
-          align,
-          rgba: true,
-        },
-      }).png().toBuffer(),
-      left: Math.round(merged.x),
-      top: Math.round(merged.y),
-    };
+    let lastError: unknown = null;
+    for (let currentFontSize = fontSize; currentFontSize >= MIN_TEXT_FONT_SIZE; currentFontSize -= 1) {
+      try {
+        return {
+          input: await sharp({
+            text: {
+              text,
+              font: `Cairo ${currentFontSize}`,
+              fontfile: CAIRO_ARABIC_FONT_FILE,
+              width,
+              height,
+              align,
+              rgba: true,
+            },
+          }).png().toBuffer(),
+          left: Math.round(merged.x),
+          top: Math.round(merged.y),
+        };
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw lastError;
   }
 
   async renderCardPng(input: {
