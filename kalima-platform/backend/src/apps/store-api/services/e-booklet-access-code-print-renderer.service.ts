@@ -59,6 +59,16 @@ function resolveTextAlign(field: FieldBox, direction: "rtl" | "ltr"): "left" | "
   return direction === "rtl" ? "right" : "left";
 }
 
+function svgTextAnchor(align: "left" | "center" | "right"): "start" | "middle" | "end" {
+  if (align === "center") return "middle";
+  return align === "right" ? "end" : "start";
+}
+
+function svgTextX(width: number, align: "left" | "center" | "right"): number {
+  if (align === "center") return width / 2;
+  return align === "right" ? width : 0;
+}
+
 function isolateText(value: unknown, direction: "rtl" | "ltr"): string {
   const text = String(value ?? "");
   return direction === "rtl" ? `\u202b${text}\u202c` : `\u202a${text}\u202c`;
@@ -108,7 +118,18 @@ export class EBookletAccessCodePrintRendererService {
         lastError = error;
       }
     }
-    throw lastError;
+    if (!lastError) return null;
+    const fallbackFontSize = Math.max(MIN_TEXT_FONT_SIZE, Math.min(fontSize, height));
+    const fallbackSvg = `
+      <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+        <text x="${svgTextX(width, align)}" y="${height / 2}" fill="${escapeXml(merged.color || "#111827")}" font-family="Arial, sans-serif" font-size="${fallbackFontSize}" text-anchor="${svgTextAnchor(align)}" dominant-baseline="middle" direction="${direction}">${escapeXml(String(value ?? ""))}</text>
+      </svg>
+    `;
+    return {
+      input: Buffer.from(fallbackSvg),
+      left: Math.round(merged.x),
+      top: Math.round(merged.y),
+    };
   }
 
   async renderCardPng(input: {
