@@ -796,6 +796,10 @@ export function useAdminEBookletInstances() {
   }, []);
   const previewAccessCodePrintCard = useCallback(async (data) => {
     const response = await axiosInstance.post("/admin/e-booklet-access-code-print/preview", data, { responseType: "blob" });
+    const contentType = response.headers?.["content-type"] || response.data?.type || "";
+    if (!contentType.includes("image/png")) {
+      throw new Error(i18n.t("eBooklets:toasts.printPreviewInvalidResponse", { defaultValue: "Preview did not return an image." }));
+    }
     return URL.createObjectURL(response.data);
   }, []);
   const downloadAccessCodePrintBatchPdf = useCallback(async (batchId, filename = "e-booklet-access-codes.pdf") => {

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { BookOpenCheck, ChevronRight, Copy, Download, Eye, FileText, HardDrive, HelpCircle, KeyRound, Maximize2, Minimize2, Plus, Printer, RefreshCcw, Save, ShieldOff, Trash2, Users } from "lucide-react";
+import { AlertCircle, BookOpenCheck, ChevronRight, Copy, Download, Eye, FileText, HardDrive, HelpCircle, KeyRound, Loader2, Maximize2, Minimize2, Plus, Printer, RefreshCcw, Save, ShieldOff, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -143,6 +143,8 @@ export default function AdminEBookletInstancesPage() {
   const [printBatchHistory, setPrintBatchHistory] = useState({});
   const [printWarnings, setPrintWarnings] = useState({});
   const [printPreviewUrls, setPrintPreviewUrls] = useState({});
+  const [printPreviewLoading, setPrintPreviewLoading] = useState({});
+  const [printPreviewErrors, setPrintPreviewErrors] = useState({});
   const [templateBackgroundPreviewUrl, setTemplateBackgroundPreviewUrl] = useState("");
   const [printTemplateCreationCollapsed, setPrintTemplateCreationCollapsed] = useState(false);
   const [collapsedPrintSections, setCollapsedPrintSections] = useState({});
@@ -506,21 +508,32 @@ export default function AdminEBookletInstancesPage() {
   const handlePreviewPrintableCard = async (instance) => {
     const printDraft = printDrafts[instance.id] || {};
     const eBookletTitle = getEBookletTitle(instance, t("common.eBooklet"));
-    const url = await previewAccessCodePrintCard({
-      templateId: Number(printDraft.templateId),
-      code: "KLM PREV IEW 001",
-      teacherImageFileAssetId: printDraft.teacherImageFileAssetId ? Number(printDraft.teacherImageFileAssetId) : null,
-      batchValues: {
-        gradeClassText: printDraft.gradeClassText || eBookletTitle,
-        registrationMethodText: printDraft.registrationMethodText || t("admin.instances.defaultRegistrationMethod", { defaultValue: "كود أو منصة" }),
-        priceText: printDraft.priceText || null,
-        redCustomText: printDraft.redCustomText || null,
-      },
-    });
-    setPrintPreviewUrls((current) => {
-      if (current[instance.id]) URL.revokeObjectURL(current[instance.id]);
-      return { ...current, [instance.id]: url };
-    });
+    setPrintPreviewLoading((current) => ({ ...current, [instance.id]: true }));
+    setPrintPreviewErrors((current) => ({ ...current, [instance.id]: "" }));
+    try {
+      const url = await previewAccessCodePrintCard({
+        templateId: Number(printDraft.templateId),
+        code: "KLM PREV IEW 001",
+        teacherImageFileAssetId: printDraft.teacherImageFileAssetId ? Number(printDraft.teacherImageFileAssetId) : null,
+        batchValues: {
+          gradeClassText: printDraft.gradeClassText || eBookletTitle,
+          registrationMethodText: printDraft.registrationMethodText || t("admin.instances.defaultRegistrationMethod", { defaultValue: "كود أو منصة" }),
+          priceText: printDraft.priceText || null,
+          redCustomText: printDraft.redCustomText || null,
+        },
+      });
+      setPrintPreviewUrls((current) => {
+        if (current[instance.id]) URL.revokeObjectURL(current[instance.id]);
+        return { ...current, [instance.id]: url };
+      });
+    } catch (error) {
+      setPrintPreviewErrors((current) => ({
+        ...current,
+        [instance.id]: error?.response?.data?.message || error?.message || t("admin.instances.printPreviewFailed", { defaultValue: "Preview failed. Check the template and try again." }),
+      }));
+    } finally {
+      setPrintPreviewLoading((current) => ({ ...current, [instance.id]: false }));
+    }
   };
 
   const copyGeneratedCodes = async (instanceId) => {
@@ -1005,9 +1018,11 @@ export default function AdminEBookletInstancesPage() {
                                     </div>
                                   </div>
                                   <div className="flex flex-wrap items-center gap-2">
-                                    <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => handlePreviewPrintableCard(instance)} disabled={!printDrafts[instance.id]?.templateId}>
-                                      <Eye className="h-4 w-4" />
-                                      {t("admin.instances.previewPrintableCard", { defaultValue: "Preview card" })}
+                                    <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => handlePreviewPrintableCard(instance)} disabled={!printDrafts[instance.id]?.templateId || Boolean(printPreviewLoading[instance.id])}>
+                                      {printPreviewLoading[instance.id] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
+                                      {printPreviewLoading[instance.id]
+                                        ? t("admin.instances.previewLoading", { defaultValue: "Previewing..." })
+                                        : t("admin.instances.previewPrintableCard", { defaultValue: "Preview card" })}
                                     </Button>
                                     <Button type="button" size="sm" className="rounded-xl" onClick={() => handleGeneratePrintableBatch(instance)} disabled={!canGeneratePrintableBatch}>
                                       <Printer className="h-4 w-4" />
@@ -1023,6 +1038,12 @@ export default function AdminEBookletInstancesPage() {
                                   {showSeatWarning && (
                                     <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
                                       {t("admin.instances.unusedCodeSeatWarning", { defaultValue: "Remaining student seats are below unused active paid codes. Codes do not reserve seats; redemption will re-check capacity." })}
+                                    </div>
+                                  )}
+                                  {printPreviewErrors[instance.id] && (
+                                    <div className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-medium text-destructive">
+                                      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                                      <span>{printPreviewErrors[instance.id]}</span>
                                     </div>
                                   )}
                                   {printPreviewUrls[instance.id] && (
