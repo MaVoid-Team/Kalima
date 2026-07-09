@@ -35,7 +35,7 @@ type PrintCardRenderInput = {
   batchValues?: Record<string, any>;
 };
 
-const CAIRO_ARABIC_FONT_FILE = require.resolve("@fontsource/cairo/files/cairo-arabic-400-normal.woff2");
+const ARABIC_TEXT_FONT_FAMILY = "Noto Naskh Arabic";
 const RTL_TEXT_RE = /[\u0590-\u08ff\ufb1d-\ufdff\ufe70-\ufefc]/;
 const MIN_TEXT_FONT_SIZE = 9;
 
@@ -145,8 +145,7 @@ export class EBookletAccessCodePrintRendererService {
           input: await sharp({
             text: {
               text,
-              font: `Cairo ${currentFontSize}`,
-              fontfile: CAIRO_ARABIC_FONT_FILE,
+              font: `${ARABIC_TEXT_FONT_FAMILY} ${currentFontSize}`,
               width,
               height,
               align,
