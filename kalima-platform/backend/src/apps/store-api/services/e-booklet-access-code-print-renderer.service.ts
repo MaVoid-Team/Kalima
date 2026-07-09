@@ -35,7 +35,7 @@ type PrintCardRenderInput = {
   batchValues?: Record<string, any>;
 };
 
-const ARABIC_TEXT_FONT_FAMILY = "Noto Naskh Arabic";
+const ARABIC_TEXT_FONT_FAMILY = "Noto Sans Arabic";
 const RTL_TEXT_RE = /[\u0590-\u08ff\ufb1d-\ufdff\ufe70-\ufefc]/;
 const MIN_TEXT_FONT_SIZE = 9;
 
