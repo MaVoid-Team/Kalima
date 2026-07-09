@@ -484,6 +484,17 @@ export function useStudentEBooklets() {
     [fetchApi],
   );
 
+  const previewAccessCode = useCallback(
+    (code) => fetchApi(
+      {
+        endpoint: `/e-booklet-access-codes/preview?code=${encodeURIComponent(code)}`,
+        method: "get",
+      },
+      false,
+    ),
+    [fetchApi],
+  );
+
   const getPrintQrPrefill = useCallback(
     (ref) => fetchApi(
       {
@@ -501,6 +512,7 @@ export function useStudentEBooklets() {
     fetchStudentEBooklets,
     openInvite,
     acceptInvite,
+    previewAccessCode,
     redeemAccessCode,
     getPrintQrPrefill,
   };

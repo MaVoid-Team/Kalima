@@ -543,6 +543,12 @@ router.get(
 // Student APIs.
 router.get("/student/e-booklets", ...studentAuth, eBookletController.listStudentEBooklets);
 router.get(
+  "/e-booklet-access-codes/preview",
+  inviteAcceptanceLimiter,
+  ...studentAuth,
+  eBookletController.previewAccessCode,
+);
+router.get(
   "/e-booklet-access-code-print/qr/:ref",
   inviteAcceptanceLimiter,
   ...studentAuth,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { BookOpenCheck, KeyRound, Loader2, Ticket } from "lucide-react";
+import { BookOpenCheck, CheckCircle2, KeyRound, Loader2, Search, Ticket, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,9 +25,10 @@ export default function AcceptEBookletInvitePage({ mode = "invite" }) {
   const { token } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, loading: authLoading } = useAuth() || {};
-  const { acceptInvite, openInvite, redeemAccessCode } = useStudentEBooklets();
+  const { acceptInvite, openInvite, previewAccessCode, redeemAccessCode } = useStudentEBooklets();
   const [state, setState] = useState({ status: "idle", message: "" });
   const [code, setCode] = useState("");
+  const [preview, setPreview] = useState(null);
   const [passcode, setPasscode] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const isCodeMode = mode === "code";
@@ -50,6 +51,10 @@ export default function AcceptEBookletInvitePage({ mode = "invite" }) {
       setState({ status: "error", message: t("inviteAccept.codeRedemption.codeRequired") });
       return;
     }
+    if (!preview || preview?.code !== trimmedCode) {
+      setState({ status: "error", message: t("inviteAccept.codeRedemption.previewRequired") });
+      return;
+    }
     if (requireTerms()) return;
     setState({ status: "loading", message: "" });
     try {
@@ -69,6 +74,31 @@ export default function AcceptEBookletInvitePage({ mode = "invite" }) {
     } catch (error) {
       setState({ status: "error", message: error?.response?.data?.message || t("inviteAccept.codeRedemption.error") });
     }
+  };
+
+  const previewCode = async () => {
+    const trimmedCode = code.trim();
+    if (!trimmedCode) {
+      setPreview(null);
+      setState({ status: "error", message: t("inviteAccept.codeRedemption.codeRequired") });
+      return;
+    }
+    setState({ status: "loading", message: "" });
+    try {
+      const response = await previewAccessCode(trimmedCode);
+      const data = normalizeRedemptionPayload(response?.data ?? response);
+      setPreview({ ...data, code: trimmedCode });
+      setState({ status: "idle", message: "" });
+    } catch (error) {
+      setPreview(null);
+      setState({ status: "error", message: error?.response?.data?.message || t("inviteAccept.codeRedemption.previewError") });
+    }
+  };
+
+  const updateCode = (event) => {
+    setCode(event.target.value.toUpperCase());
+    setPreview(null);
+    if (state.status === "error") setState({ status: "idle", message: "" });
   };
 
   const submit = async (accessPath) => {
@@ -117,9 +147,44 @@ export default function AcceptEBookletInvitePage({ mode = "invite" }) {
           <h2 className="flex items-center gap-2 font-semibold"><Ticket className="h-4 w-4" />{t("inviteAccept.codeRedemption.heading")}</h2>
           <p className="text-sm text-muted-foreground">{t("inviteAccept.codeRedemption.helper")}</p>
           <Label>{t("inviteAccept.codeRedemption.codeLabel")}</Label>
-          <Input value={code} onChange={(event) => setCode(event.target.value.toUpperCase())} placeholder={t("inviteAccept.codeRedemption.codePlaceholder")} />
-          <Button className="w-full" onClick={submitCode} disabled={state.status === "loading" || !code.trim()}>
-            {state.status === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ticket className="h-4 w-4" />}
+          <Input value={code} onChange={updateCode} placeholder={t("inviteAccept.codeRedemption.codePlaceholder")} dir="ltr" className="font-mono tracking-wide" />
+          <Button className="w-full" type="button" variant="outline" onClick={previewCode} disabled={state.status === "loading" || !code.trim()}>
+            {state.status === "loading" && !preview ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            {t("inviteAccept.codeRedemption.checkDetails")}
+          </Button>
+          {preview && (
+            <div className="space-y-3 rounded-lg border bg-muted/30 p-4" data-testid="e-booklet-code-redemption-preview">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-medium uppercase text-muted-foreground">{t("inviteAccept.codeRedemption.confirmTitle")}</p>
+                  <h3 className="mt-1 text-lg font-semibold">{preview?.eBooklet?.title || t("common.eBooklet")}</h3>
+                </div>
+                <span className="rounded-full bg-background px-3 py-1 text-xs font-semibold text-primary">{preview?.kind === "paid" ? t("inviteAccept.codeRedemption.paidCode") : t("inviteAccept.codeRedemption.freeCode")}</span>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-md bg-background p-3">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground"><UserRound className="h-3.5 w-3.5" />{t("common.teacher")}</div>
+                  <div className="mt-1 font-semibold">{preview?.teacher?.name || "-"}</div>
+                  {preview?.teacher?.phone && <div className="mt-1 text-xs text-muted-foreground" dir="ltr">{preview.teacher.phone}</div>}
+                </div>
+                <div className="rounded-md bg-background p-3">
+                  <div className="text-xs text-muted-foreground">{t("inviteAccept.codeRedemption.price")}</div>
+                  <div className="mt-1 font-semibold">{preview?.eBooklet?.studentMarketingPrice ? `${preview.eBooklet.studentMarketingPrice} ${t("common.currencyEGP")}` : t("inviteAccept.codeRedemption.freeIncluded")}</div>
+                </div>
+                <div className="rounded-md bg-background p-3">
+                  <div className="text-xs text-muted-foreground">{t("inviteAccept.codeRedemption.expiresAt")}</div>
+                  <div className="mt-1 font-semibold">{preview?.expiresAt ? new Date(preview.expiresAt).toLocaleDateString() : t("inviteAccept.codeRedemption.noExpiry")}</div>
+                </div>
+                <div className="rounded-md bg-background p-3">
+                  <div className="text-xs text-muted-foreground">{t("inviteAccept.codeRedemption.remainingUses")}</div>
+                  <div className="mt-1 font-semibold">{preview?.alreadyRedeemedByCurrentStudent ? t("inviteAccept.codeRedemption.alreadyRedeemedByYou") : `${preview?.remainingRedemptions ?? 0} / ${preview?.maxRedemptions ?? 1}`}</div>
+                </div>
+              </div>
+              <div className="rounded-md bg-background p-3 text-sm text-muted-foreground">{preview?.eBooklet?.description || t("inviteAccept.codeRedemption.confirmDescription")}</div>
+            </div>
+          )}
+          <Button className="w-full" onClick={submitCode} disabled={state.status === "loading" || !preview?.canRedeem}>
+            {state.status === "loading" && preview ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
             {t("inviteAccept.codeRedemption.submit")}
           </Button>
         </section>

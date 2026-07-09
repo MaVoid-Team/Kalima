@@ -186,6 +186,72 @@ export class EBookletRedemptionService {
     };
   }
 
+  async previewCode(rawCode: string, studentId: number) {
+    const normalizedCode = String(rawCode ?? "").trim();
+    if (!normalizedCode) throw new BadRequestError("E-booklet access code is required.");
+    const codeHash = hashEBookletAccessCode(normalizedCode);
+    const code = await this.db.e_booklet_access_codes.findUnique({
+      where: { code_hash: codeHash },
+      include: {
+        teacher: { select: { id: true, name: true, email: true, phone: true, profile_pic_url: true } },
+        term: { select: { id: true, name: true } },
+        booklet_instance: {
+          select: {
+            id: true,
+            display_title: true,
+            student_marketing_price: true,
+            access_expires_at: true,
+            invite_quota: true,
+            status: true,
+            template: { select: { id: true, title: true, description: true } },
+          },
+        },
+      },
+    });
+    this.assertCodeExistsAndRedeemable(code, studentId);
+    const existingForStudent = await this.findStudentRedemption(this.db, code.id, studentId);
+    const maxRedemptions = Number(code.max_redemptions ?? 1);
+    const redeemedCount = Number(code.redeemed_count ?? 0);
+    const isExpired = Boolean(code.expires_at && new Date(code.expires_at) <= new Date());
+    const isPaid = code.kind === "paid";
+    const remainingRedemptions = Math.max(0, maxRedemptions - redeemedCount);
+    const alreadyBoundToOtherStudent = isPaid && code.bound_student_id && Number(code.bound_student_id) !== Number(studentId);
+    const canRedeem = Boolean(existingForStudent) || (
+      code.status === "active" &&
+      !isExpired &&
+      !alreadyBoundToOtherStudent &&
+      remainingRedemptions > 0
+    );
+    return {
+      codeHint: code.code_hint,
+      kind: code.kind,
+      status: code.status,
+      expiresAt: code.expires_at,
+      maxRedemptions,
+      redeemedCount,
+      remainingRedemptions,
+      alreadyRedeemedByCurrentStudent: Boolean(existingForStudent),
+      canRedeem,
+      teacher: code.teacher ? {
+        id: code.teacher.id,
+        name: code.teacher.name,
+        email: code.teacher.email,
+        phone: code.teacher.phone,
+        profilePicUrl: code.teacher.profile_pic_url,
+      } : null,
+      eBooklet: code.booklet_instance ? {
+        id: code.booklet_instance.id,
+        title: code.booklet_instance.display_title || code.booklet_instance.template?.title,
+        templateName: code.booklet_instance.template?.title || null,
+        description: code.booklet_instance.template?.description || null,
+        studentMarketingPrice: code.booklet_instance.student_marketing_price?.toString?.() ?? code.booklet_instance.student_marketing_price ?? null,
+        accessExpiresAt: code.booklet_instance.access_expires_at,
+        status: code.booklet_instance.status,
+      } : null,
+      term: code.term ? { id: code.term.id, name: code.term.name } : null,
+    };
+  }
+
   async redeemCode(rawCode: string, studentId: number, input: RedeemCodeInput) {
     this.assertTermsAccepted(input);
     const normalizedCode = String(rawCode ?? "").trim();

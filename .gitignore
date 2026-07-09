@@ -174,3 +174,10 @@ artifacts/last-harness*.txt
 kalima-platform/.DS_Store
 kalima-platform/tmp-upload-fixtures/kalima-e2e-100mb-dense.pdf
 kalima-platform/tmp-upload-fixtures/kalima-e2e-100mb.pdf
+
+# Generated Codex / E2E proof artifacts
+.codex-screenshots/
+output/playwright/
+kalima-platform/output/e2e/
+tmp/pdfs/
+kalima-home-button-*.png

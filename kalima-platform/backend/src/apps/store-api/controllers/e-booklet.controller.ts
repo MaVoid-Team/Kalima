@@ -1425,6 +1425,17 @@ export const eBookletController = {
     }
   },
 
+  async previewAccessCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const code = String(req.query?.code || req.body?.code || "").trim();
+      if (!code) throw new BadRequestError("E-booklet access code is required.");
+      const data = await domainServices().redemptions.previewCode(code, currentUserId(req));
+      res.status(200).json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async listMilestones(req: Request, res: Response, next: NextFunction) {
     try {
       const isAdminRoute = req.path.startsWith("/admin/");
