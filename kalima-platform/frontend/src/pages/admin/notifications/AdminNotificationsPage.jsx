@@ -5,7 +5,7 @@ import { CATEGORY_COLORS, NOTIFICATION_CATEGORIES, useNotifications } from '@/co
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Bell, Send, Users, User, UserCheck, Calendar, Filter, Plus, Trash2, CheckCircle2, AlertCircle, RefreshCw, Activity } from 'lucide-react';
+import { Bell, BellRing, Send, Users, User, UserCheck, Calendar, Filter, Plus, Trash2, CheckCircle2, AlertCircle, RefreshCw, Activity } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -28,7 +28,12 @@ const TARGET_TYPES = {
 
 export default function AdminNotificationsPage() {
     const { t, i18n } = useTranslation('notifications');
-    const { adminListAllNotifications, adminSendNotification } = useNotifications();
+    const {
+        adminListAllNotifications,
+        adminSendNotification,
+        desktopNotifications,
+        requestDesktopNotifications
+    } = useNotifications();
 
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -48,13 +53,16 @@ export default function AdminNotificationsPage() {
     const fetchNotifications = async (pageNum = 1, append = false) => {
         setLoading(true);
         try {
-            const { data } = await adminListAllNotifications({ page: pageNum, limit: 20 });
+            const response = await adminListAllNotifications({ page: pageNum, limit: 20 });
+            const nextNotifications = response.data?.notifications || [];
+            const pagination = response.pagination;
+
             if (append) {
-                setNotifications(prev => [...prev, ...data.notifications]);
+                setNotifications(prev => [...prev, ...nextNotifications]);
             } else {
-                setNotifications(data.notifications);
+                setNotifications(nextNotifications);
             }
-            setHasMore(data.pagination.page < data.pagination.pages);
+            setHasMore(pagination ? pagination.page < pagination.pages : false);
         } catch (error) {
             console.error('Failed to fetch admin notifications:', error);
         } finally {
@@ -115,6 +123,17 @@ export default function AdminNotificationsPage() {
                     </p>
 
                 </div>
+                {desktopNotifications?.canRequest && (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={requestDesktopNotifications}
+                        className="h-12 rounded-2xl border-primary/30 px-5 font-bold text-primary hover:bg-primary/10"
+                    >
+                        <BellRing className="h-4 w-4 mr-2" />
+                        {t('desktop.enable')}
+                    </Button>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -216,7 +235,6 @@ export default function AdminNotificationsPage() {
                                 type="submit" 
                                 className="w-full h-14 rounded-2xl font-black text-lg shadow-lg shadow-primary/20"
                                 disabled={sending}
-                                loading={sending}
                             >
                                 <Send className="h-5 w-5 mr-2" />
                                 {t('admin.send_notification')}
@@ -314,12 +332,12 @@ export default function AdminNotificationsPage() {
                                 <Button 
                                     variant="outline" 
                                     className="rounded-xl font-bold"
+                                    disabled={loading}
                                     onClick={() => {
                                         const nextPage = page + 1;
                                         setPage(nextPage);
                                         fetchNotifications(nextPage, true);
                                     }}
-                                    loading={loading}
                                 >
                                     {t('admin.load_more', 'Load More Activity')}
                                 </Button>
