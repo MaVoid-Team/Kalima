@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
+import { getNotificationTarget } from '@/utils/notificationTarget';
 export default function NotificationsPage() {
     const { t, i18n } = useTranslation('notifications');
     const { markAsRead, markAllAsRead, getMyNotifications } = useNotifications();
@@ -22,12 +23,6 @@ export default function NotificationsPage() {
     const navigate = useNavigate();
 
     const dateLocale = i18n.language === 'ar' ? ar : enUS;
-    const getPurchaseTarget = (notification) => {
-        if (notification.target_link) return notification.target_link;
-        if (hasAdminAccess) return `/admin/orders/${notification.entity_id}`;
-        return isTeacher ? '/teacher/orders' : '/orders';
-    };
-
     const fetchNotifications = async (pageNum = 1, append = false) => {
         setLoading(true);
         try {
@@ -67,11 +62,8 @@ export default function NotificationsPage() {
             await handleMarkRead(notification.id);
         }
 
-        if (notification.target_link) {
-            navigate(notification.target_link);
-        } else if (notification.entity_type === 'purchase') {
-            navigate(getPurchaseTarget(notification));
-        }
+        const target = getNotificationTarget(notification, { hasAdminAccess, isTeacher });
+        if (target) navigate(target);
     };
 
     return (

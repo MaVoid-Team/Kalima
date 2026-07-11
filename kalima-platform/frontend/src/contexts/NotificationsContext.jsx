@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import useAuth from '@/hooks/auth/useAuth';
 import { useRole } from '@/hooks/useRole';
+import { getNotificationTarget as resolveNotificationTarget } from '@/utils/notificationTarget';
 import {
     getDesktopNotificationState,
     requestDesktopNotificationPermission,
@@ -81,11 +82,7 @@ export const NotificationsProvider = ({ children }) => {
     }, []);
 
     const getNotificationTarget = useCallback((notification) => {
-        if (notification.target_link) return notification.target_link;
-        if (notification.entity_type !== 'purchase') return null;
-
-        if (hasAdminAccess) return `/admin/orders/${notification.entity_id}`;
-        return isTeacher ? '/teacher/orders' : '/orders';
+        return resolveNotificationTarget(notification, { hasAdminAccess, isTeacher });
     }, [hasAdminAccess, isTeacher]);
 
     const showDesktopNotificationForNotification = useCallback((notification) => {

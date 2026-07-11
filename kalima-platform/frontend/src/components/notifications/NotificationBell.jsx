@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import { useRole } from '@/hooks/useRole';
+import { getNotificationTarget } from '@/utils/notificationTarget';
 
 export default function NotificationBell() {
     const { t, i18n } = useTranslation('notifications');
@@ -29,12 +30,6 @@ export default function NotificationBell() {
     const navigate = useNavigate();
 
     const dateLocale = i18n.language === 'ar' ? ar : enUS;
-    const getPurchaseTarget = (notification) => {
-        if (notification.target_link) return notification.target_link;
-        if (hasAdminAccess) return `/admin/orders/${notification.entity_id}`;
-        return isTeacher ? '/teacher/orders' : '/orders';
-    };
-
     const handleNotificationClick = async (notification) => {
         if (!notification.is_read) {
             await markAsRead(notification.id);
@@ -42,13 +37,8 @@ export default function NotificationBell() {
         
         setIsOpen(false);
         
-        if (notification.target_link) {
-            navigate(notification.target_link);
-        } else if (notification.entity_type === 'purchase') {
-            navigate(getPurchaseTarget(notification));
-        } else if (notification.entity_type === 'user') {
-            // navigate to user profile
-        }
+        const target = getNotificationTarget(notification, { hasAdminAccess, isTeacher });
+        if (target) navigate(target);
     };
 
     const handleEnableDesktopNotifications = async (event) => {

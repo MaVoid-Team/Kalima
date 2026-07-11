@@ -253,7 +253,7 @@ class NotificationService {
         {
           entityType: "purchase",
           entityId: purchase.id,
-          targetLink: `/orders/${purchase.id}`,
+          targetLink: `/admin/orders/${purchase.id}`,
         },
       ).catch((err) =>
         console.error(`[Notifications] Failed to notify ${role} of order:`, err),
@@ -275,7 +275,7 @@ class NotificationService {
         {
           entityType: "user",
           entityId: user.id,
-          targetLink: `/users/${user.id}`,
+          targetLink: `/admin/users/${user.id}`,
         },
       ).catch((err) =>
         console.error(`[Notifications] Failed to notify ${role} of user:`, err),
