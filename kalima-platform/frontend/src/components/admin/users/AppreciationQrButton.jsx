@@ -32,6 +32,34 @@ function canvasToBlob(canvas) {
     });
 }
 
+function waitForRenderedQrCanvas(canvasRef, timeoutMs = 2000) {
+    return new Promise((resolve, reject) => {
+        const deadline = performance.now() + timeoutMs;
+
+        const checkCanvas = () => {
+            const canvas = canvasRef.current;
+            const context = canvas?.getContext('2d');
+
+            if (canvas && context && canvas.width > 0 && canvas.height > 0) {
+                const [, , , alpha] = context.getImageData(0, 0, 1, 1).data;
+                if (alpha > 0) {
+                    resolve(canvas);
+                    return;
+                }
+            }
+
+            if (performance.now() >= deadline) {
+                reject(new Error('QR canvas did not render before copy'));
+                return;
+            }
+
+            requestAnimationFrame(checkCanvas);
+        };
+
+        requestAnimationFrame(checkCanvas);
+    });
+}
+
 export default function AppreciationQrButton({ userId }) {
     const { t } = useTranslation('userManagement');
     const canvasRef = useRef(null);
@@ -49,13 +77,13 @@ export default function AppreciationQrButton({ userId }) {
             }
 
             setPublicUrl(nextPublicUrl);
-            await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+            const canvas = await waitForRenderedQrCanvas(canvasRef);
 
-            if (!canvasRef.current || !navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
+            if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
                 throw new Error('Image clipboard is unavailable');
             }
 
-            const blob = await canvasToBlob(canvasRef.current);
+            const blob = await canvasToBlob(canvas);
             await navigator.clipboard.write([
                 new ClipboardItem({ 'image/png': blob }),
             ]);
@@ -88,7 +116,7 @@ export default function AppreciationQrButton({ userId }) {
                     size={512}
                     level="H"
                     includeMargin
-                    className="hidden"
+                    style={{ left: '-9999px', opacity: 0, pointerEvents: 'none', position: 'fixed', top: 0 }}
                     aria-hidden="true"
                 />
             )}
