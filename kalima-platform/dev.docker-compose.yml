@@ -64,7 +64,9 @@ services:
         condition: service_healthy
     restart: unless-stopped
     networks:
-      - dev-network
+      dev-network:
+        aliases:
+          - backend
     volumes:
       - dev-uploads:/app/uploads
 
