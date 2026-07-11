@@ -28,6 +28,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import AppreciationQrButton from './AppreciationQrButton';
 
 export default function UsersTable({
     users = [],
@@ -105,6 +106,7 @@ export default function UsersTable({
                     <TableBody>
                         {users.map((user) => {
                             const primaryRole = user.role || user.user_roles?.[0]?.role;
+                            const isTeacher = String(primaryRole).toLowerCase() === 'teacher';
                             const isCurrentUser = Number(user.id) === Number(currentUserId);
                             const displayEmail = user.email?.includes('_deleted_')
                                 ? user.email.split('_deleted_')[0]
@@ -196,6 +198,10 @@ export default function UsersTable({
                                                     <HeartHandshake className="h-4 w-4" />
                                                 </Link>
                                             </Button>
+
+                                            {isTeacher && !user.is_deleted && (
+                                                <AppreciationQrButton userId={user.id} />
+                                            )}
 
                                             {!user.is_deleted && onImpersonate && (
                                                 <Button
