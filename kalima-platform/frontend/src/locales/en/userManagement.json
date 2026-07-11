@@ -56,7 +56,8 @@
     "revokeRole": "Revoke Role",
     "cancel": "Cancel",
     "edit": "Edit",
-    "save": "Save"
+    "save": "Save",
+    "changePassword": "Change Password"
   },
   "messages": {
     "approveSuccess": "User approved successfully",
@@ -152,7 +153,12 @@
       "NORMAL": "Normal",
       "OBSERVER": "Observer",
       "Warned": "Warned"
-    }
+    },
+    "changePasswordTitle": "Change password",
+    "changePasswordDescription": "Set a new password for {{name}}. Their active sessions will be signed out.",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "passwordMinLength": "Password must be at least 8 characters."
   },
   "createDialog": {
     "title": "Create New User",

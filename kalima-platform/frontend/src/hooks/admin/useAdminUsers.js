@@ -94,6 +94,20 @@ export const useAdminUsers = () => {
         }
     }, []);
 
+    // ─── Admin Password Reset ───────────────────────────────────────────────
+    const resetUserPassword = useCallback(async (userId, password) => {
+        try {
+            return await mutate({
+                endpoint: `/admin/users/${userId}/password`,
+                method: 'patch',
+                data: { password },
+            });
+        } catch (error) {
+            console.error('Failed to reset user password:', error);
+            return null;
+        }
+    }, [mutate]);
+
     // ─── Delete User ─────────────────────────────────────────────────────────
     const deleteUser = async (userId) => {
         try {
@@ -194,6 +208,7 @@ export const useAdminUsers = () => {
         fetchUserById,
         updateUser,
         updateUserFlag,
+        resetUserPassword,
         deleteUser,
         approveUser,
         rejectUser,

@@ -63,6 +63,7 @@ services:
       - app-network
     volumes:
       - uploads:/app/uploads
+      - whatsapp-auth:/app/baileys_auth
 
   postgres:
     image: postgres:18-alpine
@@ -92,5 +93,6 @@ networks:
 
 volumes:
   uploads:
+  whatsapp-auth:
   postgres-data:
   redis-data:

@@ -128,7 +128,7 @@ export const NotificationsProvider = ({ children }) => {
         if (!isAuthenticated) return;
         try {
             const { data } = await getUnreadCount();
-            setUnreadCount(data.unread_count);
+            setUnreadCount((data.data ?? data).unread_count);
         } catch (error) {
             console.error('Failed to fetch unread count:', error);
         }
@@ -139,7 +139,7 @@ export const NotificationsProvider = ({ children }) => {
         setLoading(true);
         try {
             const { data } = await getMyNotifications({ is_read: false, limit: 20 });
-            const nextNotifications = data.notifications || [];
+            const nextNotifications = (data.data ?? data).notifications || [];
             const newlyDiscoveredNotifications = [];
 
             nextNotifications.forEach((notification) => {

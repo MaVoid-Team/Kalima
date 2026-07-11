@@ -13,6 +13,36 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
     path: "/socket.io",
   });
 
+  const whatsappCallbacks = {
+    onQr: (qr: string) => {
+      console.log(`[Socket] WhatsApp QR Code generated.`);
+      io.to("store_admins").emit("whatsappQr", { qr });
+    },
+    onReady: async (phoneNumber: string) => {
+      console.log(`[Socket] WhatsApp authenticated with number: ${phoneNumber}`);
+      await generalSettingsService.updateSendingNumber(phoneNumber);
+      io.to("store_admins").emit("whatsappAuthenticated", {
+        status: "accepted",
+        whatsapp_sending_number: phoneNumber,
+      });
+    },
+    onAuthFailure: (reason: string) => {
+      console.error(`[Socket] WhatsApp authentication failed:`, reason);
+      io.to("store_admins").emit("whatsappAuthFailed", {
+        status: "rejected",
+        reason,
+      });
+    },
+    onDisconnected: (reason: string) => {
+      console.log(`[Socket] WhatsApp disconnected:`, reason);
+      io.to("store_admins").emit("whatsappDisconnected", { reason });
+    },
+  };
+
+  void baileysClient.restore(whatsappCallbacks).catch((error) => {
+    console.error(`[Socket] Failed to restore WhatsApp session:`, error);
+  });
+
   io.on("connection", async (socket) => {
     console.log(`[Socket] New connection attempt: ${socket.id}`);
     
@@ -65,32 +95,7 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
           }
 
           console.log(`[Socket] Initializing WhatsApp Baileys Client...`);
-          await baileysClient.initialize({
-            onQr: (qr) => {
-              console.log(`[Socket] WhatsApp QR Code generated! Emitting 'whatsappQr' to store_admins.`);
-              io.to("store_admins").emit("whatsappQr", { qr });
-            },
-            onReady: async (phoneNumber) => {
-              console.log(`[Socket] WhatsApp Authenticated successfully with number: ${phoneNumber}`);
-              // Save sending number to DB
-              await generalSettingsService.updateSendingNumber(phoneNumber);
-              io.to("store_admins").emit("whatsappAuthenticated", {
-                status: "accepted",
-                whatsapp_sending_number: phoneNumber,
-              });
-            },
-            onAuthFailure: (reason) => {
-              console.error(`[Socket] WhatsApp Auth Failed:`, reason);
-              io.to("store_admins").emit("whatsappAuthFailed", {
-                status: "rejected",
-                reason,
-              });
-            },
-            onDisconnected: (reason) => {
-              console.log(`[Socket] WhatsApp Disconnected:`, reason);
-              io.to("store_admins").emit("whatsappDisconnected", { reason });
-            },
-          });
+          await baileysClient.initialize(whatsappCallbacks);
         });
       }
     } catch (err: any) {

@@ -12,7 +12,11 @@ import P from "pino";
 import path from "path";
 import fs from "fs/promises";
 
-const AUTH_DIR = path.join(process.cwd(), "baileys_auth");
+export const AUTH_DIR = process.env.WHATSAPP_AUTH_DIR
+  ? path.resolve(process.env.WHATSAPP_AUTH_DIR)
+  : path.join(process.cwd(), "baileys_auth");
+const CREDS_FILE = path.join(AUTH_DIR, "creds.json");
+const RECONNECT_DELAY_MS = 2_000;
 const logger = P({ level: "silent" }); // suppress Baileys internal logs
 
 // Suppress libsignal "Closing session" noise which bypasses Pino logger
@@ -34,6 +38,7 @@ class BaileysClient {
   private callbacks: BaileysCallbacks | null = null;
   private _status: "disconnected" | "qr_pending" | "ready" = "disconnected";
   private _phoneNumber: string | null = null;
+  private reconnectTimer: NodeJS.Timeout | null = null;
 
   get status() { return this._status; }
   get phoneNumber() { return this._phoneNumber; }
@@ -48,6 +53,17 @@ class BaileysClient {
     await this.connect();
   }
 
+  async restore(callbacks: BaileysCallbacks): Promise<boolean> {
+    try {
+      await fs.access(CREDS_FILE);
+    } catch {
+      return false;
+    }
+
+    await this.initialize(callbacks);
+    return true;
+  }
+
   private async clearAuthState(): Promise<void> {
     try {
       await fs.rm(AUTH_DIR, { recursive: true, force: true });
@@ -60,7 +76,7 @@ class BaileysClient {
     const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
     const { version } = await fetchLatestBaileysVersion();
 
-    this.sock = makeWASocket({
+    const sock = makeWASocket({
       version,
       auth: {
         creds: state.creds,
@@ -68,16 +84,20 @@ class BaileysClient {
       },
       logger,
       markOnlineOnConnect: false,
-      browser: Browsers.macOS('Desktop'),
+      browser: Browsers.macOS("Desktop"),
       syncFullHistory: false,
       getMessage: async () => proto.Message.create({}),
     });
+    this.sock = sock;
 
     // Save credentials whenever they update
-    this.sock.ev.on("creds.update", saveCreds);
+    sock.ev.on("creds.update", saveCreds);
 
     // Handle connection lifecycle
-    this.sock.ev.on("connection.update", (update) => {
+    sock.ev.on("connection.update", (update) => {
+      // Ignore lifecycle events from a socket superseded by a reconnect.
+      if (this.sock !== sock) return;
+
       const { connection, lastDisconnect, qr } = update;
 
       if (qr) {
@@ -86,9 +106,13 @@ class BaileysClient {
       }
 
       if (connection === "open") {
+        if (this.reconnectTimer) {
+          clearTimeout(this.reconnectTimer);
+          this.reconnectTimer = null;
+        }
         this._status = "ready";
         // Extract phone number from the connected user JID
-        const jid = this.sock?.user?.id;
+        const jid = sock.user?.id;
         this._phoneNumber = jid ? jid.split(":")[0].split("@")[0] : null;
         this.callbacks?.onReady(this._phoneNumber ?? "unknown");
       }
@@ -105,14 +129,33 @@ class BaileysClient {
           this.callbacks?.onDisconnected("Logged out");
         } else if (statusCode === reason.restartRequired) {
           // Normal reconnect after QR scan — re-create socket
-          this.connect();
+          this.reconnectNow();
         } else {
           this._status = "disconnected";
           this.callbacks?.onDisconnected(
             `Connection closed: ${lastDisconnect?.error?.message ?? "unknown"}`
           );
+          this.scheduleReconnect();
         }
       }
+    });
+  }
+
+  private scheduleReconnect(): void {
+    if (this.reconnectTimer) return;
+
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      this.reconnectNow();
+    }, RECONNECT_DELAY_MS);
+  }
+
+  private reconnectNow(): void {
+    void this.connect().catch((error) => {
+      this.callbacks?.onDisconnected(
+        `Reconnect failed: ${error instanceof Error ? error.message : "unknown"}`
+      );
+      this.scheduleReconnect();
     });
   }
 
@@ -141,6 +184,10 @@ class BaileysClient {
   }
 
   destroy(): void {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
     if (this.sock) {
       this.sock.end(undefined);
       this.sock = null;

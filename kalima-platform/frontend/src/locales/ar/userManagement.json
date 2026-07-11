@@ -56,7 +56,8 @@
     "revokeRole": "إلغاء الدور",
     "cancel": "إلغاء",
     "edit": "تعديل",
-    "save": "حفظ"
+    "save": "حفظ",
+    "changePassword": "تغيير كلمة المرور"
   },
   "messages": {
     "approveSuccess": "تم اعتماد المستخدم بنجاح",
@@ -148,7 +149,12 @@
       "Warned": "منذر"
     },
     "noAvailablePortals": "تم تعيين أدوار لهذا المستخدم في جميع البوابات المتاحة.",
-    "oneRolePerPortalMessage": "لا يمكن للمستخدم أن يحمل أكثر من دور نشط واحد في نفس البوابة."
+    "oneRolePerPortalMessage": "لا يمكن للمستخدم أن يحمل أكثر من دور نشط واحد في نفس البوابة.",
+    "changePasswordTitle": "تغيير كلمة المرور",
+    "changePasswordDescription": "قم بتعيين كلمة مرور جديدة للمستخدم {{name}}. سيتم تسجيل خروجه من الجلسات النشطة.",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "passwordMinLength": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل."
   },
   "createDialog": {
     "title": "إنشاء مستخدم جديد",

@@ -90,8 +90,8 @@ export class EBookletMilestoneNotificationService {
       const notifyTeacher = notificationRecipients === "teacher_and_admins" && settings.notify_teacher_on_milestone !== false;
       const notifyAdmins = (notificationRecipients === "admins" || notificationRecipients === "teacher_and_admins") && settings.notify_admins_on_milestone !== false;
       const milestoneTitle = milestone?.title ?? `Milestone #${achievement.milestone_id}`;
-      const teacherTargetLink = `/teacher/e-booklets/milestones/${achievement.id}`;
-      const adminTargetLink = `/admin/e-booklets/milestones/${achievement.id}`;
+      const teacherTargetLink = "/teacher/e-booklets";
+      const adminTargetLink = "/admin/e-booklets/settings/terms-milestones";
       let teacherNotificationResult: any = { notification: null, created: false };
       if (notifyTeacher) {
         teacherNotificationResult = await this.ensureTeacherNotification(achievement, teacherTargetLink);

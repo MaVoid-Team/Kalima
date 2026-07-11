@@ -138,7 +138,7 @@ export class EBookletRedemptionService {
             message_key: notification_key_enum.CUSTOM,
             entity_type: "e_booklet_access_code_redemption",
             entity_id: redemption.id,
-            target_link: `/admin/e-booklets/access-codes?teacherId=${code.teacher_id}&bookletInstanceId=${code.booklet_instance_id}`,
+            target_link: `/admin/e-booklets/access?teacherId=${code.teacher_id}&bookletInstanceId=${code.booklet_instance_id}`,
           },
         });
       } catch (error: any) {

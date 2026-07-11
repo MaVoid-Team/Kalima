@@ -32,12 +32,15 @@ export default function NotificationsPage() {
         setLoading(true);
         try {
             const { data } = await getMyNotifications({ page: pageNum, limit: 20 });
+            const notificationData = data.data ?? data;
+            const nextNotifications = notificationData.notifications ?? [];
+            const pagination = data.pagination ?? notificationData.pagination;
             if (append) {
-                setNotifications(prev => [...prev, ...data.notifications]);
+                setNotifications(prev => [...prev, ...nextNotifications]);
             } else {
-                setNotifications(data.notifications);
+                setNotifications(nextNotifications);
             }
-            setHasMore(data.pagination.page < data.pagination.pages);
+            setHasMore((pagination?.page ?? 1) < (pagination?.pages ?? 1));
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
         } finally {

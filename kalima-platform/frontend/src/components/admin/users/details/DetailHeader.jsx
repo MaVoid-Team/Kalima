@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Edit3, Save, X, Trash2, CheckCircle2, XCircle, Mail, Phone, Crown, Zap, ShieldCheck, Eye, AlertTriangle, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit3, Save, X, Trash2, CheckCircle2, XCircle, Mail, Phone, Crown, Zap, ShieldCheck, Eye, AlertTriangle, ChevronDown, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -15,6 +15,14 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -38,13 +46,19 @@ export default function DetailHeader({
     onReject,
     onDelete,
     onUpdateFlag,
+    onResetPassword,
     actionLoading,
+    canResetPassword,
     isRtl,
     t
 }) {
     const { i18n } = useTranslation();
     const [bannerColors, setBannerColors] = useState(null);
     const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
+    const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+    const [password, setPassword] = useState('');
+    const [passwordConfirmation, setPasswordConfirmation] = useState('');
+    const [passwordError, setPasswordError] = useState('');
 
 
     useEffect(() => {
@@ -66,6 +80,26 @@ export default function DetailHeader({
 
     const flagConfig = getFlagConfig(user.flag);
     const FlagIcon = flagConfig.icon;
+
+    const handlePasswordSubmit = async (event) => {
+        event.preventDefault();
+        if (password.length < 8) {
+            setPasswordError(t('details.passwordMinLength'));
+            return;
+        }
+        if (password !== passwordConfirmation) {
+            setPasswordError(t('createDialog.passwordMismatch'));
+            return;
+        }
+
+        const result = await onResetPassword(password);
+        if (result?.success) {
+            setPassword('');
+            setPasswordConfirmation('');
+            setPasswordError('');
+            setIsPasswordDialogOpen(false);
+        }
+    };
 
     return (
         <div className="sticky top-0 z-20 -mx-4 md:-mx-8 border-b bg-background/80 backdrop-blur-xl overflow-hidden transition-all duration-300">
@@ -224,6 +258,12 @@ export default function DetailHeader({
                                     <Edit3 className="h-4 w-4 me-2" />
                                     {t('actions.edit')}
                                 </Button>
+                                {canResetPassword && !user.is_deleted && (
+                                    <Button variant="outline" size="sm" onClick={() => setIsPasswordDialogOpen(true)}>
+                                        <KeyRound className="h-4 w-4 me-2" />
+                                        {t('actions.changePassword')}
+                                    </Button>
+                                )}
                                 {!user.is_deleted && (
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
@@ -266,6 +306,50 @@ export default function DetailHeader({
                 onOpenChange={setIsNotifModalOpen}
                 userId={user.id}
             />
+            <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+                <DialogContent>
+                    <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                        <DialogHeader>
+                            <DialogTitle>{t('details.changePasswordTitle')}</DialogTitle>
+                            <DialogDescription>{t('details.changePasswordDescription', { name: user.name })}</DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-2">
+                            <label htmlFor="admin-password" className="text-sm font-medium">{t('details.newPassword')}</label>
+                            <input
+                                id="admin-password"
+                                type="password"
+                                autoComplete="new-password"
+                                value={password}
+                                onChange={(event) => { setPassword(event.target.value); setPasswordError(''); }}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label htmlFor="admin-password-confirmation" className="text-sm font-medium">{t('details.confirmNewPassword')}</label>
+                            <input
+                                id="admin-password-confirmation"
+                                type="password"
+                                autoComplete="new-password"
+                                value={passwordConfirmation}
+                                onChange={(event) => { setPasswordConfirmation(event.target.value); setPasswordError(''); }}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                required
+                            />
+                        </div>
+                        {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsPasswordDialogOpen(false)} disabled={actionLoading}>
+                                {t('actions.cancel')}
+                            </Button>
+                            <Button type="submit" disabled={actionLoading}>
+                                {actionLoading && <LoadingSpinner className="h-4 w-4 me-2" />}
+                                {t('actions.changePassword')}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
 
     );

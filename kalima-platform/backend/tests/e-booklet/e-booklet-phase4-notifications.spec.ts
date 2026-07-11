@@ -44,7 +44,7 @@ describe("Phase 4 e-booklet milestone notifications and emails", () => {
     db.e_booklet_milestone_achievements.findUnique.mockResolvedValue(null);
     db.e_booklet_milestone_achievements.create.mockResolvedValue({ id: 7, teacher_id: 9, term_id: 1, milestone_id: 2, reward_amount: 40, paid_redemptions_snapshot: 10 });
     db.notifications.findFirst.mockResolvedValue(null);
-    db.notifications.create.mockResolvedValue({ id: 70, category: 8, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ACHIEVED, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/teacher/e-booklets/milestones/7", created_at: new Date("2026-06-14T00:00:00.000Z") });
+    db.notifications.create.mockResolvedValue({ id: 70, category: 8, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ACHIEVED, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/teacher/e-booklets", created_at: new Date("2026-06-14T00:00:00.000Z") });
     db.users.findUnique.mockResolvedValue({ id: 9, name: "Teacher One", email: "teacher@example.com" });
     db.users.findMany.mockResolvedValue([
       { id: 1, name: "Admin", email: "admin@example.com" },
@@ -58,15 +58,15 @@ describe("Phase 4 e-booklet milestone notifications and emails", () => {
     const result: any = await service.evaluateTeacherMilestones(9, 1, { io });
 
     expect(result.awarded).toHaveLength(1);
-    expect(db.notifications.create).toHaveBeenCalledWith({ data: expect.objectContaining({ user_id: 9, category: expect.any(Number), message_key: notification_key_enum.E_BOOKLET_MILESTONE_ACHIEVED, entity_type: "e_booklet_milestone_achievement", entity_id: 7 }) });
+    expect(db.notifications.create).toHaveBeenCalledWith({ data: expect.objectContaining({ user_id: 9, category: expect.any(Number), message_key: notification_key_enum.E_BOOKLET_MILESTONE_ACHIEVED, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/teacher/e-booklets" }) });
     expect(db.notifications.createMany).toHaveBeenCalledWith({ data: expect.arrayContaining([
-      expect.objectContaining({ user_id: 1, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ADMIN_ALERT, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/admin/e-booklets/milestones/7" }),
-      expect.objectContaining({ user_id: 2, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ADMIN_ALERT, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/admin/e-booklets/milestones/7" }),
+      expect.objectContaining({ user_id: 1, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ADMIN_ALERT, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/admin/e-booklets/settings/terms-milestones" }),
+      expect.objectContaining({ user_id: 2, message_key: notification_key_enum.E_BOOKLET_MILESTONE_ADMIN_ALERT, entity_type: "e_booklet_milestone_achievement", entity_id: 7, target_link: "/admin/e-booklets/settings/terms-milestones" }),
     ]), skipDuplicates: true });
     expect(emitNotificationToUser).toHaveBeenCalledWith(io, 9, expect.objectContaining({ id: 70, entity_id: 7 }));
-    expect(emitNotificationToUsers).toHaveBeenCalledWith(io, [1, 2], expect.objectContaining({ entity_id: 7, target_link: "/admin/e-booklets/milestones/7" }));
-    expect(emailService.sendEBookletMilestoneTeacherEmail).toHaveBeenCalledWith("teacher@example.com", expect.objectContaining({ teacherName: "Teacher One", milestoneTitle: "10 paid readers", rewardAmount: 40, dashboardUrl: "/teacher/e-booklets/milestones/7" }));
-    expect(emailService.sendEBookletMilestoneAdminEmail).toHaveBeenCalledWith("admin@example.com", expect.objectContaining({ dashboardUrl: "/admin/e-booklets/milestones/7" }));
+    expect(emitNotificationToUsers).toHaveBeenCalledWith(io, [1, 2], expect.objectContaining({ entity_id: 7, target_link: "/admin/e-booklets/settings/terms-milestones" }));
+    expect(emailService.sendEBookletMilestoneTeacherEmail).toHaveBeenCalledWith("teacher@example.com", expect.objectContaining({ teacherName: "Teacher One", milestoneTitle: "10 paid readers", rewardAmount: 40, dashboardUrl: "/teacher/e-booklets" }));
+    expect(emailService.sendEBookletMilestoneAdminEmail).toHaveBeenCalledWith("admin@example.com", expect.objectContaining({ dashboardUrl: "/admin/e-booklets/settings/terms-milestones" }));
     expect(emailService.sendEBookletMilestoneAdminEmail).toHaveBeenCalledTimes(2);
   });
 

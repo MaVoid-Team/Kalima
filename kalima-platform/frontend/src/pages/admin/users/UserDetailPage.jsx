@@ -27,7 +27,7 @@ export default function UserDetailPage() {
     const { id } = useParams();
     const { t, i18n } = useTranslation('userManagement');
     const isRtl = i18n.dir() === 'rtl';
-    const { hasAdminAccess } = useRole();
+    const { hasAdminAccess, isAdmin } = useRole();
     const { governments, zones, getZonesByGovernment, subjects, levels, zonesLoading } = useLookups();
 
     const {
@@ -37,6 +37,7 @@ export default function UserDetailPage() {
         fetchUserById,
         updateUser,
         updateUserFlag,
+        resetUserPassword,
         assignRole,
         revokeRole,
         deleteUser,
@@ -159,6 +160,8 @@ export default function UserDetailPage() {
         fetchUserById(id);
     };
 
+    const handleResetPassword = async (password) => resetUserPassword(id, password);
+
     /* ── loading / not-found states ── */
     if (loading && !selectedUser) {
         return (
@@ -231,7 +234,9 @@ export default function UserDetailPage() {
                 onReject={handleReject}
                 onDelete={handleDeleteUser}
                 onUpdateFlag={handleUpdateFlag}
+                onResetPassword={handleResetPassword}
                 actionLoading={actionLoading}
+                canResetPassword={isAdmin}
                 isRtl={isRtl}
                 t={t}
             />

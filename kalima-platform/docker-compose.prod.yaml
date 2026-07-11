@@ -64,6 +64,7 @@ services:
       - app-network
     volumes:
       - uploads:/app/uploads
+      - whatsapp-auth:/app/baileys_auth
 
   postgres:
     # Keep Postgres 17 until the existing data volume is explicitly upgraded.
@@ -94,5 +95,6 @@ networks:
 
 volumes:
   uploads:
+  whatsapp-auth:
   postgres-data:
   redis-data:

@@ -1,4 +1,4 @@
-import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet, Navigate, useParams } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route, Outlet, Navigate, useLocation, useParams } from "react-router-dom";
 import { useState, useEffect, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
@@ -157,11 +157,13 @@ function Root() {
 
 function LegacyEBookletRedirect({ type }) {
   const { purchaseId, instanceId } = useParams();
+  const { search } = useLocation();
   const targets = {
     purchaseDelivery: `/admin/e-booklets/orders/${purchaseId}/delivery`,
     instanceView: `/admin/e-booklets/access/${instanceId}/view`,
     instanceStudents: `/admin/e-booklets/access/${instanceId}/students`,
     instanceDevices: `/admin/e-booklets/access/${instanceId}/devices`,
+    accessCodes: `/admin/e-booklets/access${search}`,
   };
 
   return <Navigate to={targets[type] || "/admin/e-booklets"} replace />;
@@ -272,6 +274,8 @@ const router = createBrowserRouter(
           <Route path="/admin/e-booklet-instances/:instanceId/devices" element={<LegacyEBookletRedirect type="instanceDevices" />} />
           <Route path="/admin/e-booklet-analytics" element={<Navigate to="/admin/e-booklets/analytics" replace />} />
           <Route path="/admin/e-booklet-terms-milestones" element={<Navigate to="/admin/e-booklets/settings/terms-milestones" replace />} />
+          <Route path="/admin/e-booklets/milestones/:achievementId" element={<Navigate to="/admin/e-booklets/settings/terms-milestones" replace />} />
+          <Route path="/admin/e-booklets/access-codes" element={<LegacyEBookletRedirect type="accessCodes" />} />
           <Route path="/admin/payment-methods" element={<PaymentMethodsPage />} />
           <Route path="/admin/required-fields" element={<RequiredFieldsPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
@@ -292,6 +296,7 @@ const router = createBrowserRouter(
           <Route path="/teacher/profile" element={<TeacherProfilePage />} />
           <Route path="/teacher/settings" element={<TeacherSettingsPage />} />
           <Route path="/teacher/e-booklets" element={<TeacherEBookletsPage />} />
+          <Route path="/teacher/e-booklets/milestones/:achievementId" element={<Navigate to="/teacher/e-booklets" replace />} />
           <Route path="/e-booklet-orders" element={<EBookletOrdersPage />} />
           <Route path="/teacher/e-booklet-analytics" element={<TeacherEBookletAnalyticsPage />} />
           <Route path="/teacher/orders" element={<MyOrdersPage />} />

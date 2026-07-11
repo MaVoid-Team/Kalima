@@ -18,6 +18,7 @@ import {
   CreateParentDto,
   CreateLecturerDto,
   UpdateUserFlagDto,
+  AdminResetUserPasswordDto,
 } from "../dtos/admin.dto";
 import { role_enum, portal_enum } from "../generated/prisma/client";
 import {
@@ -35,6 +36,7 @@ import { CreatorContext } from "../interfaces/auth.interface";
 import { userProfileService } from "../services/user-profile.service";
 import { UpdateProfileDto } from "../dtos/user-profile.dto";
 import { SendNotificationDto, NotificationFilterDto } from "../dtos/notification.dto";
+import { revokeAllRefreshTokensForUser } from "../../../libs/auth/jwt";
 
 // ============================================
 // HELPER FUNCTIONS
@@ -532,6 +534,40 @@ export const adminController = {
         success: true,
         message: "User profile updated successfully",
         data: updated,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  // ============================================
+  // ADMIN PASSWORD RESET
+  // ============================================
+
+  async resetUserPassword(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = parseInt(req.params.userId as string, 10);
+      if (isNaN(userId)) {
+        throw new BadRequestError("Invalid user ID");
+      }
+
+      const targetUser = await userManagementService.findUserById(userId);
+      if (!targetUser) {
+        throw new BadRequestError("User not found");
+      }
+
+      const dto = await validateDto(AdminResetUserPasswordDto, req.body);
+      const passwordHash = await userManagementService.hashPassword(dto.password);
+      await userManagementService.updatePassword(userId, passwordHash);
+      await revokeAllRefreshTokensForUser(userId);
+
+      res.status(200).json({
+        success: true,
+        message: "User password updated successfully",
       });
     } catch (error) {
       _next(error);

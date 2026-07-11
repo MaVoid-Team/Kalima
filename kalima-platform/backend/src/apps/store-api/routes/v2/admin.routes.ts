@@ -20,6 +20,8 @@ const adminModeratorAuth = [
   requireRole([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator]),
 ];
 
+const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
+
 // ============================================
 // USER MANAGEMENT
 // ============================================
@@ -74,6 +76,11 @@ router.patch(
   "/users/:userId/profile",
   ...adminModeratorAuth,
   adminController.updateUserProfile,
+);
+router.patch(
+  "/users/:userId/password",
+  ...adminOnlyAuth,
+  adminController.resetUserPassword,
 );
 
 // Account review: approve / reject users (must be before :userId/roles to avoid conflict)

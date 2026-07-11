@@ -55,6 +55,13 @@ export class CreateSubAdminDto extends CreateAdminDto {
   // Same fields as admin
 }
 
+export class AdminResetUserPasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
+  password: string;
+}
+
 export class CreateModeratorDto extends CreateAdminDto {
   // Same fields as admin
 }
