@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import useApiMutation from './useApiMutation';
 import { buildQueryString } from '@/lib/queryUtils';
+import { getCairoDayRange } from '@/lib/cairoDayRange';
 
 export const useAnalytics = () => {
     const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
@@ -43,12 +44,9 @@ export const useAnalytics = () => {
             let finalEndDate = endDate;
 
             if (!startDate || !endDate) {
-                const today = new Date();
-                const yyyy = today.getFullYear();
-                const mm = String(today.getMonth() + 1).padStart(2, '0');
-                const dd = String(today.getDate()).padStart(2, '0');
-                finalStartDate = `${yyyy}-${mm}-${dd}T00:00:00Z`;
-                finalEndDate = `${yyyy}-${mm}-${dd}T23:59:59Z`;
+                const cairoDayRange = getCairoDayRange();
+                finalStartDate = cairoDayRange.startDate;
+                finalEndDate = cairoDayRange.endDate;
             }
 
             const queryString = buildQueryString({ filters: { startDate: finalStartDate, endDate: finalEndDate } });
