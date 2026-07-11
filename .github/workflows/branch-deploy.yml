@@ -3,7 +3,7 @@ name: Branch CI and deployment
 on:
   push:
     branches:
-      - dev
+      - staging
       - Rhiss
 permissions:
   contents: read
@@ -26,9 +26,9 @@ jobs:
       - name: Verify production came from staging
         if: github.ref_name == 'Rhiss'
         run: |
-          git fetch origin dev
-          git merge-base --is-ancestor origin/dev HEAD
-          git diff --quiet origin/dev HEAD
+          git fetch origin staging
+          git merge-base --is-ancestor origin/staging HEAD
+          git diff --quiet origin/staging HEAD
 
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020

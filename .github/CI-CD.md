@@ -1,9 +1,9 @@
 # Kalima CI/CD
 
-Pushes to `dev` run validation and deploy the GitHub `staging` environment.
+Pushes to `staging` run validation and deploy the GitHub `staging` environment at `https://dev.kalima-edu.com`.
 Pushes to `Rhiss` run validation and deploy the GitHub `production` environment.
 The deployment job starts only after frontend lint, translation audit, frontend build, backend build, and backend tests pass.
-Production validation requires the pushed `Rhiss` tree to match the current tested `dev` tree.
+Production validation requires the pushed `Rhiss` tree to match the current tested `staging` tree.
 
 Create `staging` and `production` GitHub environments without approval protection rules.
 Give each environment its own `COOLIFY_WEBHOOK` and `COOLIFY_TOKEN` secrets.
@@ -15,4 +15,4 @@ Disable Coolify GitHub App auto-deploy for these applications so Coolify does no
 The workflow separately proves Coolify completion and commit identity before checking endpoint reachability.
 
 The current production branch is `Rhiss`.
-The staging Coolify application must track `dev` and use isolated environment variables, storage, and database resources.
+The staging Coolify application tracks `staging` and uses isolated environment variables, storage, and database resources.
