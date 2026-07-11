@@ -3,7 +3,7 @@
 Pushes to `dev` run validation and deploy the GitHub `staging` environment.
 Pushes to `Rhiss` run validation and deploy the GitHub `production` environment.
 The deployment job starts only after frontend lint, translation audit, frontend build, backend build, and backend tests pass.
-Production validation also requires the current `dev` revision to be an ancestor of the pushed `Rhiss` revision.
+Production validation requires the pushed `Rhiss` tree to match the current tested `dev` tree.
 
 Create `staging` and `production` GitHub environments without approval protection rules.
 Give each environment its own `COOLIFY_WEBHOOK` and `COOLIFY_TOKEN` secrets.

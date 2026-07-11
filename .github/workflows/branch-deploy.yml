@@ -28,6 +28,7 @@ jobs:
         run: |
           git fetch origin dev
           git merge-base --is-ancestor origin/dev HEAD
+          git diff --quiet origin/dev HEAD
 
       - name: Set up Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
@@ -63,7 +64,7 @@ jobs:
     name: Deploy ${{ github.ref_name == 'Rhiss' && 'production' || 'staging' }}
     needs: validate
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     environment: ${{ github.ref_name == 'Rhiss' && 'production' || 'staging' }}
     steps:
       - name: Trigger Coolify deployment
