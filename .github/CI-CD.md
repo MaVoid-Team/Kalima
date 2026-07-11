@@ -2,9 +2,9 @@
 
 Pushes to `staging` run validation and deploy the GitHub `staging` environment at `https://dev.kalima-edu.com`.
 Pushes to `Rhiss` run validation and deploy the GitHub `production` environment.
-The workflow also supports a manual rerun for recovery without changing the branch policy.
+The workflow also supports a manual recovery run when the selected ref is `staging` or `Rhiss`.
 The deployment job starts only after frontend lint, translation audit, frontend build, backend build, and backend tests pass.
-Production validation requires the pushed `Rhiss` tree to match the current tested `staging` tree.
+Production validation requires the pushed `Rhiss` tree to match the current `staging` tree and requires a successful staging workflow for that exact commit.
 
 Create `staging` and `production` GitHub environments without approval protection rules.
 Give each environment its own `COOLIFY_WEBHOOK` and `COOLIFY_TOKEN` secrets.
