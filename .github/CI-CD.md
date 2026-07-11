@@ -2,6 +2,7 @@
 
 Pushes to `staging` run validation and deploy the GitHub `staging` environment at `https://dev.kalima-edu.com`.
 Pushes to `Rhiss` run validation and deploy the GitHub `production` environment.
+The workflow also supports a manual rerun for recovery without changing the branch policy.
 The deployment job starts only after frontend lint, translation audit, frontend build, backend build, and backend tests pass.
 Production validation requires the pushed `Rhiss` tree to match the current tested `staging` tree.
 

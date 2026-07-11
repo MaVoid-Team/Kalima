@@ -1,6 +1,7 @@
 name: Branch CI and deployment
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - staging
