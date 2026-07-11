@@ -1787,18 +1787,20 @@ describe("EBookletService", () => {
       const db = createMockDb();
       db.e_booklet_file_assets.create.mockResolvedValue({ id: 78, file_type: "image" });
       const service = new EBookletService(db);
+      const validPngBuffer = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADUlEQVR4nGNgYGD4DwABBAEAX+XDSwAAAABJRU5ErkJggg==", "base64");
 
       await expect(service.createFileAsset({
         ...baseFile,
         originalname: "photo.png",
         mimetype: "image/png",
+        buffer: validPngBuffer,
       } as any, { fileType: "video" })).rejects.toThrow("file_type=image");
 
       await expect(service.createFileAsset({
         ...baseFile,
         originalname: "photo.png",
         mimetype: "image/png",
-        buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Z6p8AAAAASUVORK5CYII=", "base64"),
+        buffer: validPngBuffer,
       } as any, { fileType: "image" })).resolves.toEqual({ id: 78, file_type: "image" });
     });
 
