@@ -1798,6 +1798,7 @@ describe("EBookletService", () => {
         ...baseFile,
         originalname: "photo.png",
         mimetype: "image/png",
+        buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Z6p8AAAAASUVORK5CYII=", "base64"),
       } as any, { fileType: "image" })).resolves.toEqual({ id: 78, file_type: "image" });
     });
 

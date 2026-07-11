@@ -1,0 +1,127 @@
+name: Branch CI and deployment
+
+on:
+  push:
+    branches:
+      - dev
+      - Rhiss
+permissions:
+  contents: read
+
+concurrency:
+  group: kalima-${{ github.ref_name }}
+  cancel-in-progress: ${{ github.ref_name != 'Rhiss' }}
+
+jobs:
+  validate:
+    name: Validate revision
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+
+      - name: Verify production came from staging
+        if: github.ref_name == 'Rhiss'
+        run: |
+          git fetch origin dev
+          git merge-base --is-ancestor origin/dev HEAD
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            kalima-platform/frontend/package-lock.json
+            kalima-platform/backend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix kalima-platform/frontend
+
+      - name: Install backend dependencies
+        run: npm ci --prefix kalima-platform/backend
+
+      - name: Lint frontend
+        run: npm --prefix kalima-platform/frontend run lint
+
+      - name: Audit translations
+        run: npm --prefix kalima-platform/frontend run i18n:audit
+
+      - name: Build frontend
+        run: npm --prefix kalima-platform/frontend run build
+
+      - name: Build backend
+        run: npm --prefix kalima-platform/backend run build
+
+      - name: Test backend
+        run: npm --prefix kalima-platform/backend test -- --runInBand
+
+  deploy:
+    name: Deploy ${{ github.ref_name == 'Rhiss' && 'production' || 'staging' }}
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ github.ref_name == 'Rhiss' && 'production' || 'staging' }}
+    steps:
+      - name: Trigger Coolify deployment
+        id: trigger
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
+        run: |
+          test -n "$COOLIFY_TOKEN"
+          test -n "$COOLIFY_WEBHOOK"
+          response=$(curl --fail-with-body --silent --show-error \
+            --request GET "$COOLIFY_WEBHOOK" \
+            --header "Authorization: Bearer $COOLIFY_TOKEN")
+          deployment_uuid=$(jq --raw-output '.deployments[0].deployment_uuid // .deployment_uuid // empty' <<< "$response")
+          test -n "$deployment_uuid"
+          echo "deployment_uuid=$deployment_uuid" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for Coolify deployment
+        env:
+          COOLIFY_API_BASE: ${{ vars.COOLIFY_API_BASE }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          DEPLOYMENT_UUID: ${{ steps.trigger.outputs.deployment_uuid }}
+        run: |
+          test -n "$COOLIFY_API_BASE"
+          for attempt in $(seq 1 90); do
+            response=$(curl --fail-with-body --silent --show-error \
+              "${COOLIFY_API_BASE%/}/deployments/$DEPLOYMENT_UUID" \
+              --header "Authorization: Bearer $COOLIFY_TOKEN")
+            status=$(jq --raw-output '.status // empty' <<< "$response")
+            if [ "$status" = "finished" ]; then
+              deployed_sha=$(jq --raw-output '.commit // .git_commit_sha // empty' <<< "$response")
+              test -n "$deployed_sha"
+              case "$GITHUB_SHA" in
+                "$deployed_sha"*) exit 0 ;;
+                *) echo "Coolify finished a different revision: $deployed_sha" >&2; exit 1 ;;
+              esac
+            fi
+            if [ "$status" = "failed" ] || [ "$status" = "cancelled" ]; then
+              echo "Coolify deployment ended with status: $status" >&2
+              exit 1
+            fi
+            echo "Coolify deployment status is ${status:-unknown} on attempt $attempt."
+            sleep 10
+          done
+          echo "Coolify deployment did not finish within 15 minutes." >&2
+          exit 1
+
+      - name: Check deployed endpoint reachability
+        env:
+          HEALTHCHECK_URL: ${{ vars.HEALTHCHECK_URL }}
+        run: |
+          test -n "$HEALTHCHECK_URL"
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error "$HEALTHCHECK_URL" > /dev/null; then
+              exit 0
+            fi
+            echo "Health check attempt $attempt failed; retrying."
+            sleep 10
+          done
+          echo "Health check did not pass within 10 minutes." >&2
+          exit 1
