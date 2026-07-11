@@ -169,6 +169,12 @@ function LegacyEBookletRedirect({ type }) {
   return <Navigate to={targets[type] || "/admin/e-booklets"} replace />;
 }
 
+function LegacyAdminNotificationRedirect({ type }) {
+  const { id } = useParams();
+  const target = type === "order" ? `/admin/orders/${id}` : `/admin/users/${id}`;
+  return <Navigate to={target} replace />;
+}
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<Root />}>
@@ -239,8 +245,9 @@ const router = createBrowserRouter(
           <Route path="/admin" element={<DashboardPage />} />
           <Route path="/admin/dashboard" element={<DashboardPage />} />
           <Route element={<AdminStoreWorkspaceLayout />}>
-            <Route path="/admin/orders" element={<OrdersPage />} />
-            <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
+          <Route path="/admin/orders" element={<OrdersPage />} />
+          <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
+          <Route path="/orders/:id" element={<LegacyAdminNotificationRedirect type="order" />} />
             <Route path="/admin/products" element={<ProductsPage />} />
             <Route path="/admin/products/create" element={<CreateProductPage />} />
             <Route path="/admin/products/:id" element={<ProductDetailPage />} />
@@ -280,6 +287,7 @@ const router = createBrowserRouter(
           <Route path="/admin/required-fields" element={<RequiredFieldsPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/admin/users/:id" element={<UserDetailPage />} />
+          <Route path="/users/:id" element={<LegacyAdminNotificationRedirect type="user" />} />
           <Route path="/admin/users/:id/appreciation" element={<UserAppreciationPage />} />
           <Route path="/admin/coupons" element={<CouponsPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
