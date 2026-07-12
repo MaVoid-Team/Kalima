@@ -106,7 +106,7 @@ describe("e-booklet access-code print renderer", () => {
     })).rejects.toThrow("Teacher image could not be processed.");
   });
 
-  test("packs rendered cards into portrait A4 PDF pages at true 300ppi physical size", async () => {
+  test("packs 24 established-size cards into a marginless three-column A4 grid", async () => {
     const renderer = new EBookletAccessCodePrintRendererService();
     const png = await renderer.renderCardPng({
       backgroundImage: await background(),
@@ -118,7 +118,9 @@ describe("e-booklet access-code print renderer", () => {
       },
     });
 
-    const pdfBytes = await renderer.renderBatchPdf(Array.from({ length: 15 }, () => ({ png })));
+    const fullPagePdfBytes = await renderer.renderBatchPdf(Array.from({ length: 24 }, () => ({ png })));
+    const fullPagePdf = await PDFDocument.load(fullPagePdfBytes);
+    const pdfBytes = await renderer.renderBatchPdf(Array.from({ length: 25 }, () => ({ png })));
     const pdf = await PDFDocument.load(pdfBytes);
     const firstPage = pdf.getPage(0);
     const { width, height } = firstPage.getSize();
@@ -128,6 +130,7 @@ describe("e-booklet access-code print renderer", () => {
     expect(height).toBeCloseTo(841.89, 1);
     expect(width / 72 * 25.4).toBeCloseTo(210, 0);
     expect(height / 72 * 25.4).toBeCloseTo(297, 0);
+    expect(fullPagePdf.getPageCount()).toBe(1);
     expect(pdf.getPageCount()).toBe(2);
     expect(pdfBytes.length).toBeGreaterThan(5000);
   });

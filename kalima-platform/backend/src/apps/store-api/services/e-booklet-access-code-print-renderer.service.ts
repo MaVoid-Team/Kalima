@@ -10,8 +10,8 @@ import {
 
 const A4_WIDTH_PT = 595.28;
 const A4_HEIGHT_PT = 841.89;
-const PRINT_MARGIN_PT = 18;
-const PRINT_GAP_PT = 10;
+const PRINT_COLUMNS = 3;
+const PRINT_ROWS = 8;
 
 type FieldBox = {
   x: number;
@@ -229,15 +229,12 @@ export class EBookletAccessCodePrintRendererService {
 
   async renderBatchPdf(cards: Array<{ png: Buffer }>): Promise<Uint8Array> {
     const pdf = await PDFDocument.create();
-    const cardWidthPt = (E_BOOKLET_PRINT_CARD_WIDTH_PX / E_BOOKLET_PRINT_CARD_PPI) * 72;
+    // The established 827 px card is 70.02 mm wide at 300 PPI. Three cards are
+    // 0.06 mm wider than A4, so fit the width by 0.03% rather than introducing
+    // page margins, gaps, or a material change to the printed card dimensions.
+    const cardWidthPt = A4_WIDTH_PT / PRINT_COLUMNS;
     const cardHeightPt = (E_BOOKLET_PRINT_CARD_HEIGHT_PX / E_BOOKLET_PRINT_CARD_PPI) * 72;
-    const columns = Math.max(1, Math.floor((A4_WIDTH_PT - PRINT_MARGIN_PT * 2 + PRINT_GAP_PT) / (cardWidthPt + PRINT_GAP_PT)));
-    const rows = Math.max(1, Math.floor((A4_HEIGHT_PT - PRINT_MARGIN_PT * 2 + PRINT_GAP_PT) / (cardHeightPt + PRINT_GAP_PT)));
-    const perPage = columns * rows;
-    const gridWidthPt = columns * cardWidthPt + (columns - 1) * PRINT_GAP_PT;
-    const gridHeightPt = rows * cardHeightPt + (rows - 1) * PRINT_GAP_PT;
-    const offsetXPt = (A4_WIDTH_PT - gridWidthPt) / 2;
-    const offsetYPt = (A4_HEIGHT_PT - gridHeightPt) / 2;
+    const perPage = PRINT_COLUMNS * PRINT_ROWS;
 
     for (let index = 0; index < cards.length; index += 1) {
       if (index % perPage === 0) {
@@ -245,11 +242,11 @@ export class EBookletAccessCodePrintRendererService {
       }
       const page = pdf.getPage(pdf.getPageCount() - 1);
       const pageIndex = index % perPage;
-      const col = pageIndex % columns;
-      const row = Math.floor(pageIndex / columns);
+      const col = pageIndex % PRINT_COLUMNS;
+      const row = Math.floor(pageIndex / PRINT_COLUMNS);
       const image = await pdf.embedPng(cards[index].png);
-      const x = offsetXPt + col * (cardWidthPt + PRINT_GAP_PT);
-      const y = A4_HEIGHT_PT - offsetYPt - cardHeightPt - row * (cardHeightPt + PRINT_GAP_PT);
+      const x = col * cardWidthPt;
+      const y = A4_HEIGHT_PT - cardHeightPt - row * cardHeightPt;
       page.drawRectangle({ x, y, width: cardWidthPt, height: cardHeightPt, color: rgb(1, 1, 1) });
       page.drawImage(image, { x, y, width: cardWidthPt, height: cardHeightPt });
     }
