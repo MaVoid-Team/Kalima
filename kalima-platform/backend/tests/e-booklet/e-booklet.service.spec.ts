@@ -449,6 +449,7 @@ describe("EBookletService", () => {
       const result: any = await service.listUserEBooklets(55, "student");
 
       expect(result[0].granted_at).toBe("2026-01-01T08:00:00.000Z");
+      expect(result[0].access_expires_at).toBe("2027-01-15T10:30:00.000Z");
       expect(result[0].booklet_instance.access_expires_at).toBe("2027-01-15T10:30:00.000Z");
       expect(result[0].booklet_instance.template.created_at).toBe("2026-01-01T08:00:00.000Z");
       expect(result[0].booklet_instance.student_marketing_price).toBe("50");

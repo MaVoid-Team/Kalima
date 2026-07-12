@@ -3630,6 +3630,10 @@ export class EBookletService {
       const { devices = [], ...safeInstance } = bookletInstance ?? {};
       return {
         ...record,
+        // Surface the instance deadline on the access record as the student-facing
+        // access contract. This keeps the portal independent of nested instance
+        // serialization details while retaining the nested value for existing clients.
+        access_expires_at: safeInstance.access_expires_at ?? null,
         booklet_instance: {
           ...safeInstance,
           used_devices_count: devices.filter((device: any) => device.status === "active").length,

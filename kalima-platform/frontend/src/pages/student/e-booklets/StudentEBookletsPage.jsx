@@ -49,7 +49,14 @@ export default function StudentEBookletsPage() {
           const instance = access.booklet_instance;
           const expiry = access.access_expires_at || instance?.access_expires_at || instance?.expires_at;
           const expired = expiry && new Date(expiry).getTime() <= Date.now();
-          const formatDate = (value) => value ? new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(new Date(value)) : t("teacher.invites.noExpiry");
+          const formatDate = (value) => {
+            if (!value) return t("teacher.invites.noExpiry");
+            const date = new Date(value);
+            if (i18n.language.startsWith("ar")) {
+              return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
+            }
+            return new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(date);
+          };
           return (
             <article key={access.id} className="rounded-lg border bg-background p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -70,7 +77,7 @@ export default function StudentEBookletsPage() {
                 </div>
                 <div className="rounded-md border px-3 py-2 text-sm">
                   <div className="text-xs text-muted-foreground">{t("student.expiry")}</div>
-                  <div className="text-sm font-semibold"><CalendarClock className="me-1 inline h-4 w-4" />{formatDate(expiry)}</div>
+                  <div className="text-sm font-semibold"><CalendarClock className="me-1 inline h-4 w-4" /><span dir="ltr">{formatDate(expiry)}</span></div>
                 </div>
               </div>
               {expired && <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">{t("student.expiredBlocked")}</div>}
