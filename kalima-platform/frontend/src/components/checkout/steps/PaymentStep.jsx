@@ -8,10 +8,13 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { Button } from '@/components/ui/button';
 import PrintableReceipt from '@/components/checkout/PrintableReceipt';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MessageCircle } from 'lucide-react';
 import { getBaseUrl, getImageUrl } from '@/lib/storeUtils';
+import { buildWhatsAppLink } from '@/lib/whatsappUtils';
 import { motion } from 'framer-motion';
 import useRole from '@/hooks/useRole';
+
+const ORDER_TRACKING_WHATSAPP_NUMBER = '201044067113';
 
 export default function PaymentStep({ onBack }) {
     const { cart, checkout, getPaymentMethods, loadCart } = useCart();
@@ -31,6 +34,10 @@ export default function PaymentStep({ onBack }) {
     const [paymentMethodName, setPaymentMethodName] = useState('');
     const [hasValidationErrors, setHasValidationErrors] = useState(false);
     const receiptRef = useRef(null);
+    const trackingMessage = purchase
+        ? `مرحباً، رقم طلبي المميز هو ${purchase.purchase_serial || `#${purchase.id}`} وأرغب في معرفة حالة الطلب`
+        : '';
+    const trackingLink = buildWhatsAppLink(ORDER_TRACKING_WHATSAPP_NUMBER, trackingMessage);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -241,6 +248,17 @@ export default function PaymentStep({ onBack }) {
                             data-testid="checkout-payment-step-receipt-orders-button"
                         >
                             {t('success.view_orders', 'View My Orders')}
+                        </Button>
+                        <Button
+                            asChild
+                            variant="outline"
+                            className="w-full border-success/30 text-success hover:bg-success/10 hover:text-success"
+                            data-testid="checkout-payment-step-receipt-track-order-button"
+                        >
+                            <a href={trackingLink} target="_blank" rel="noopener noreferrer">
+                                <MessageCircle className="h-4 w-4" />
+                                {t('receipt.trackOrder', 'Track your order')}
+                            </a>
                         </Button>
                         <AlertDialogCancel className="w-full" data-testid="checkout-payment-step-receipt-close-button">{t('cancel', 'Close')}</AlertDialogCancel>
                     </AlertDialogFooter>

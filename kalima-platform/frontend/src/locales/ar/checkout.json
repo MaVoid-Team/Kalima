@@ -134,6 +134,7 @@
     "paidOn": "تم الدفع في",
     "paymentMethod": "طريقة الدفع",
     "print": "طباعة",
+    "trackOrder": "تتبع طلبك",
     "unableToPrint": "تعذر طباعة الإيصال",
     "popupBlocked": "الرجاء السماح للنوافذ المنبثقة لطباعة الإيصال",
     "statuses": {

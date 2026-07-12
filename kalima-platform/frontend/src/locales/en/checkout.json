@@ -134,6 +134,7 @@
     "paidOn": "Paid on",
     "paymentMethod": "Payment Method",
     "print": "Print",
+    "trackOrder": "Track your order",
     "unableToPrint": "Unable to print receipt",
     "popupBlocked": "Please allow popups to print receipt",
     "statuses": {
