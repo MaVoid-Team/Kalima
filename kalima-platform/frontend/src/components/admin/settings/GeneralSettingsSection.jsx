@@ -26,7 +26,6 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
 const getGeneralSettingsSchema = (t) => z.object({
-    whatsapp_sending_number: egyptPhoneSchema(t).optional().or(z.literal('')),
     whatsapp_receiving_number: egyptPhoneSchema(t).optional().or(z.literal(''))
 });
 
@@ -41,7 +40,6 @@ export default function GeneralSettingsSection() {
     const form = useForm({
         resolver: zodResolver(getGeneralSettingsSchema(t)),
         defaultValues: {
-            whatsapp_sending_number: '',
             whatsapp_receiving_number: ''
         }
     });
@@ -49,7 +47,6 @@ export default function GeneralSettingsSection() {
     useEffect(() => {
         if (settings) {
             form.reset({
-                whatsapp_sending_number: settings.whatsapp_sending_number || '',
                 whatsapp_receiving_number: settings.whatsapp_receiving_number || ''
             });
         }
@@ -92,44 +89,34 @@ export default function GeneralSettingsSection() {
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormField
-                                control={form.control}
-                                name="whatsapp_sending_number"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <FormLabel 
-                                                className="mb-0"
-                                                data-search-content={`${t('settings.general.whatsappSendingNumber', { lng: 'en' })} ${t('settings.general.whatsappSendingNumber', { lng: 'ar' })}`}
-                                            >
-                                                {t('settings.general.whatsappSendingNumber', 'WhatsApp Sending Number')}
-                                            </FormLabel>
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p className="max-w-xs">
-                                                            {t('settings.general.whatsappSendingNumberHint')}
-                                                        </p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        </div>
-                                        <FormControl>
-                                            <Input
-                                                disabled={true}
-                                                className="bg-muted font-mono"
-                                                dir="ltr"
-                                                value={(sendingNumber || field.value) ? `+${(sendingNumber || field.value).toString().replace(/^\+/, '')}` : t('common:na', 'N/A')}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-
-                                    </FormItem>
-                                )}
-                            />
+                            <FormItem>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <FormLabel
+                                        className="mb-0"
+                                        data-search-content={`${t('settings.general.whatsappSendingNumber', { lng: 'en' })} ${t('settings.general.whatsappSendingNumber', { lng: 'ar' })}`}
+                                    >
+                                        {t('settings.general.whatsappSendingNumber', 'WhatsApp Sending Number')}
+                                    </FormLabel>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p className="max-w-xs">
+                                                    {t('settings.general.whatsappSendingNumberHint')}
+                                                </p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                                <Input
+                                    disabled={true}
+                                    className="bg-muted font-mono"
+                                    dir="ltr"
+                                    value={(sendingNumber || settings?.whatsapp_sending_number) ? `+${(sendingNumber || settings?.whatsapp_sending_number).toString().replace(/^\+/, '')}` : t('common:na', 'N/A')}
+                                />
+                            </FormItem>
 
                             <FormField
                                 control={form.control}
