@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, BookOpenCheck, ChevronRight, Copy, Download, Eye, FileText, HardDrive, HelpCircle, KeyRound, Loader2, Maximize2, Minimize2, Plus, Printer, RefreshCcw, Save, ShieldOff, Trash2, Users } from "lucide-react";
+import { AlertCircle, ArrowLeft, BookOpenCheck, ChevronRight, Copy, Download, Eye, FileText, HardDrive, HelpCircle, KeyRound, Loader2, Maximize2, Minimize2, Plus, Printer, RefreshCcw, Save, ShieldOff, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -95,7 +95,7 @@ function PrintFormField({ label, tooltip, children, className = "" }) {
   );
 }
 
-export default function AdminEBookletInstancesPage() {
+export default function AdminEBookletInstancesPage({ teacherId = null }) {
   const { t, i18n } = useTranslation("eBooklets");
   const {
     instances,
@@ -151,7 +151,11 @@ export default function AdminEBookletInstancesPage() {
   const [generatedCodes, setGeneratedCodes] = useState({});
   const [existingCodes, setExistingCodes] = useState({});
 
-  useEffect(() => { fetchInstances().catch(() => {}); }, [fetchInstances]);
+  const selectedTeacherId = teacherId ? String(teacherId) : null;
+
+  useEffect(() => {
+    fetchInstances({ limit: 100, ...(selectedTeacherId ? { teacher_id: selectedTeacherId } : {}) }).catch(() => {});
+  }, [fetchInstances, selectedTeacherId]);
   useEffect(() => { fetchTerms({ status: "active" }).catch(() => {}); }, [fetchTerms]);
   useEffect(() => {
     listAccessCodePrintTemplates()
@@ -245,6 +249,10 @@ export default function AdminEBookletInstancesPage() {
   }, { total: 0, active: 0, suspended: 0, seats: 0, quota: 0, devices: 0 }), [instances]);
 
   const teacherGroups = useMemo(() => Object.entries(grouped), [grouped]);
+  const selectedTeacherGroup = useMemo(
+    () => teacherGroups.find(([teacherId]) => String(teacherId) === selectedTeacherId) || null,
+    [selectedTeacherId, teacherGroups],
+  );
   const initialLoading = loading && instances.length === 0;
 
   const formatDate = (value, withTime = false) => {
@@ -256,13 +264,13 @@ export default function AdminEBookletInstancesPage() {
 
   const handleQuotaSave = async (instanceId) => {
     await updateQuota(instanceId, Number(quotaDrafts[instanceId] || 0));
-    fetchInstances();
+    fetchInstances({ limit: 100 });
   };
 
   const handleRevoke = async (instanceId) => {
     if (!window.confirm(t("admin.instances.revokeConfirm"))) return;
     await revokeTeacherAccess(instanceId);
-    fetchInstances();
+    fetchInstances({ limit: 100 });
   };
 
   const updateAccessCodeDraft = (instanceId, field, value) => {
@@ -589,7 +597,7 @@ export default function AdminEBookletInstancesPage() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button type="button" variant="outline" className="rounded-xl" onClick={() => fetchInstances()} disabled={loading}>
+            <Button type="button" variant="outline" className="rounded-xl" onClick={() => fetchInstances({ limit: 100 })} disabled={loading}>
               <RefreshCcw className="h-4 w-4" />
               {t("common.refresh")}
             </Button>
@@ -735,23 +743,82 @@ export default function AdminEBookletInstancesPage() {
       </motion.section>
 
       {initialLoading && <div className="rounded-2xl border bg-background p-8 text-center text-sm text-muted-foreground shadow-sm">{t("admin.instances.loading")}</div>}
-      {!initialLoading && instances.length === 0 && <div className="rounded-2xl border bg-background p-8 text-center text-sm text-muted-foreground shadow-sm">{t("admin.instances.empty")}</div>}
+      {!initialLoading && !selectedTeacherId && instances.length === 0 && <div className="rounded-2xl border bg-background p-8 text-center text-sm text-muted-foreground shadow-sm">{t("admin.instances.empty")}</div>}
 
-      {!initialLoading && teacherGroups.length > 0 && (
+      {!initialLoading && !selectedTeacherId && teacherGroups.length > 0 && (
+        <motion.section className="overflow-hidden rounded-2xl border bg-background shadow-sm" variants={listMotion} initial="hidden" animate="show">
+          <div className="grid gap-2 border-b bg-muted/25 px-4 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground md:grid-cols-[minmax(280px,1fr)_180px_230px_150px] md:items-center">
+            <span>{t("common.teacher", { defaultValue: "Teacher" })}</span>
+            <span>{t("admin.instances.eBooklets", { defaultValue: "E-booklets" })}</span>
+            <span>{t("admin.instances.seats", { defaultValue: "Seats" })}</span>
+            <span className="text-end">{t("common.actions", { defaultValue: "Actions" })}</span>
+          </div>
+          <div className="divide-y">
+            {teacherGroups.map(([teacherId, group]) => {
+              const groupSeats = group.rows.reduce((sum, instance) => sum + numberValue(instance.used_invites_count, instance._count?.access_records || 0), 0);
+              const groupQuota = group.rows.reduce((sum, instance) => sum + numberValue(instance.invite_quota), 0);
+              const activeCount = group.rows.filter((instance) => instance.status === "active").length;
+
+              return (
+                <motion.article key={teacherId} className="bg-card" variants={rowMotion}>
+                  <div className="grid gap-3 px-4 py-4 md:grid-cols-[minmax(280px,1fr)_180px_230px_150px] md:items-center">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-semibold">{group.teacher?.name || t("common.teacher")}</div>
+                      <div className="mt-0.5 truncate text-xs text-muted-foreground">{group.teacher?.email || t("admin.instances.teacherMissing")}</div>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-semibold text-foreground">{group.rows.length}</span>
+                      <span className="text-muted-foreground">{t("admin.instances.eBooklets", { defaultValue: "e-booklets" })}</span>
+                      <Badge variant={activeCount === group.rows.length ? "secondary" : "outline"} className="rounded-full text-[11px]">
+                        {activeCount} {t("statuses.active")}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      <span className="font-semibold text-foreground">{groupSeats}/{groupQuota || 0}</span> {t("admin.instances.seats", { defaultValue: "seats" })}
+                    </div>
+                    <div className="flex md:justify-end">
+                      <Button asChild variant="outline" size="sm" className="rounded-xl">
+                        <Link to={`/admin/e-booklets/access/teachers/${teacherId}`}>
+                          {t("admin.instances.viewTeacherDetails", { defaultValue: "View details" })}
+                          <ChevronRight className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                </motion.article>
+              );
+            })}
+          </div>
+        </motion.section>
+      )}
+
+      {!initialLoading && selectedTeacherId && !selectedTeacherGroup && (
+        <div className="rounded-2xl border bg-background p-8 text-center shadow-sm">
+          <p className="text-sm text-muted-foreground">{t("admin.instances.teacherNotFound", { defaultValue: "This teacher is not available in the current access list." })}</p>
+          <Button asChild variant="outline" className="mt-4 rounded-xl">
+            <Link to="/admin/e-booklets/access"><ArrowLeft className="h-4 w-4" />{t("admin.instances.backToTeachers", { defaultValue: "All teachers" })}</Link>
+          </Button>
+        </div>
+      )}
+
+      {!initialLoading && selectedTeacherGroup && (
         <motion.div className="space-y-3" variants={listMotion} initial="hidden" animate="show">
-          {teacherGroups.map(([teacherId, group]) => {
+          {[selectedTeacherGroup].map(([teacherId, group]) => {
             const groupSeats = group.rows.reduce((sum, instance) => sum + numberValue(instance.used_invites_count, instance._count?.access_records || 0), 0);
             const groupQuota = group.rows.reduce((sum, instance) => sum + numberValue(instance.invite_quota), 0);
 
             return (
               <motion.section key={teacherId} className="overflow-hidden rounded-2xl border bg-background shadow-sm" variants={rowMotion} layout>
-                <div className="flex flex-col gap-2 border-b bg-muted/25 px-4 py-3 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-col gap-3 border-b bg-muted/25 px-4 py-3 md:flex-row md:items-center md:justify-between">
                   <div className="min-w-0">
+                    <Button asChild variant="ghost" size="sm" className="-ms-2 mb-2 rounded-xl">
+                      <Link to="/admin/e-booklets/access"><ArrowLeft className="h-4 w-4" />{t("admin.instances.backToTeachers", { defaultValue: "All teachers" })}</Link>
+                    </Button>
                     <h2 className="truncate text-base font-semibold">{group.teacher?.name || t("common.teacher")}</h2>
                     <p className="truncate text-xs text-muted-foreground">{group.teacher?.email || t("admin.instances.teacherMissing")}</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline">{t("admin.instances.instanceCount", { count: group.rows.length })}</Badge>
+                    <Badge variant="outline">{group.rows.length} {t("admin.instances.eBooklets", { defaultValue: "e-booklets" })}</Badge>
                     <Badge variant="secondary">{t("admin.instances.seatsSummary", { defaultValue: "{{used}}/{{quota}} seats", used: groupSeats, quota: groupQuota || 0 })}</Badge>
                   </div>
                 </div>
@@ -855,7 +922,7 @@ export default function AdminEBookletInstancesPage() {
                                           <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => setExpandedDeviceKey(devicesExpanded ? null : devicePanelKey)}><HardDrive className="h-4 w-4" />{devicesExpanded ? t("admin.instances.hideDevicesInline") : t("admin.instances.manageDevicesInline")}</Button>
                                         </div>
                                         <div className="mt-2 grid gap-2 rounded-lg bg-muted/50 p-2 sm:grid-cols-3"><span>{t("admin.instances.devices", { defaultValue: "Devices" })}: {student.devices_summary?.active_count ?? 0}/{student.devices_summary?.allowed_devices ?? 1}</span><span>{t("admin.instances.viewerOpens", { defaultValue: "Viewer opens" })}: {student.analytics_summary?.viewer_opened ?? 0}</span><span>{t("admin.instances.source", { defaultValue: "Source" })}: {student.purchase_reference?.source || student.analytics_summary?.source || student.access_source || "-"}</span></div>
-                                        {devicesExpanded && <AdminEBookletStudentDevicePanel instanceId={instance.id} userId={studentUserId} student={student} expanded={devicesExpanded} onSummaryRefresh={() => fetchInstances()} />}
+                                        {devicesExpanded && <AdminEBookletStudentDevicePanel instanceId={instance.id} userId={studentUserId} student={student} expanded={devicesExpanded} onSummaryRefresh={() => fetchInstances({ limit: 100 })} />}
                                       </div>
                                     );
                                   })}
@@ -1100,11 +1167,11 @@ export default function AdminEBookletInstancesPage() {
         </motion.div>
       )}
 
-      <div className="flex flex-col gap-3 rounded-3xl border bg-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      {!selectedTeacherId && <div className="flex flex-col gap-3 rounded-3xl border bg-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <Button type="button" variant="outline" className="rounded-xl" disabled={pagination.page <= 1 || loading} onClick={() => { setPage(pagination.page - 1); fetchInstances({ page: pagination.page - 1 }); }}>{t("common.previous")}</Button>
         <span className="text-center text-sm text-muted-foreground">{t("admin.instances.pagination", { page: pagination.page, total: pagination.total })}</span>
         <Button type="button" variant="outline" className="rounded-xl" disabled={pagination.page * pagination.limit >= pagination.total || loading} onClick={() => { setPage(pagination.page + 1); fetchInstances({ page: pagination.page + 1 }); }}>{t("common.next")}</Button>
-      </div>
+      </div>}
     </motion.div>
     </TooltipProvider>
   );

@@ -92,6 +92,7 @@ const AdminEBookletPurchasesPage = lazy(() => import("./pages/admin/e-booklets/A
 const AdminEBookletPurchaseDetailPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchaseDetailPage"));
 const AdminEBookletPurchaseDeliveryPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchaseDeliveryPage"));
 const AdminEBookletInstancesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstancesPage"));
+const AdminEBookletTeacherAccessPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTeacherAccessPage"));
 const AdminEBookletDevicesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletDevicesPage"));
 const AdminEBookletInstanceStudentsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstanceStudentsPage"));
 const AdminEBookletAnalyticsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletAnalyticsPage"));
@@ -265,6 +266,7 @@ const router = createBrowserRouter(
             <Route path="orders/:purchaseId" element={<AdminEBookletPurchaseDetailPage />} />
             <Route path="orders/:purchaseId/delivery" element={<AdminEBookletPurchaseDeliveryPage />} />
             <Route path="access" element={<AdminEBookletInstancesPage />} />
+            <Route path="access/teachers/:teacherId" element={<AdminEBookletTeacherAccessPage />} />
             <Route path="access/:instanceId/view" element={<EBookletViewerPage />} />
             <Route path="access/:instanceId/students" element={<AdminEBookletInstanceStudentsPage />} />
             <Route path="access/:instanceId/devices" element={<AdminEBookletDevicesPage />} />

@@ -168,10 +168,6 @@ export default function AcceptEBookletInvitePage({ mode = "invite" }) {
                   {preview?.teacher?.phone && <div className="mt-1 text-xs text-muted-foreground" dir="ltr">{preview.teacher.phone}</div>}
                 </div>
                 <div className="rounded-md bg-background p-3">
-                  <div className="text-xs text-muted-foreground">{t("inviteAccept.codeRedemption.price")}</div>
-                  <div className="mt-1 font-semibold">{preview?.eBooklet?.studentMarketingPrice ? `${preview.eBooklet.studentMarketingPrice} ${t("common.currencyEGP")}` : t("inviteAccept.codeRedemption.freeIncluded")}</div>
-                </div>
-                <div className="rounded-md bg-background p-3">
                   <div className="text-xs text-muted-foreground">{t("inviteAccept.codeRedemption.expiresAt")}</div>
                   <div className="mt-1 font-semibold">{preview?.expiresAt ? new Date(preview.expiresAt).toLocaleDateString() : t("inviteAccept.codeRedemption.noExpiry")}</div>
                 </div>

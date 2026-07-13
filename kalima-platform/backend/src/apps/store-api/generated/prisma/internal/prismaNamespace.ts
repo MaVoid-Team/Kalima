@@ -6917,6 +6917,7 @@ export const PurchasesScalarFieldEnum = {
   received_by: 'received_by',
   confirmed_at: 'confirmed_at',
   confirmed_by: 'confirmed_by',
+  delivered_at: 'delivered_at',
   returned_at: 'returned_at',
   returned_by: 'returned_by',
   created_at: 'created_at',
