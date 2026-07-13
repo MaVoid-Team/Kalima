@@ -40,6 +40,14 @@ export default function StatusTimeline({ order }) {
             user: order.confirmed_by_user?.name,
             active: !!order.confirmed_at,
         });
+        if (order.status === 'delivered') {
+            steps.push({
+                key: 'delivered',
+                label: 'Delivered',
+                date: order.delivered_at,
+                active: !!order.delivered_at,
+            });
+        }
     }
 
     return (

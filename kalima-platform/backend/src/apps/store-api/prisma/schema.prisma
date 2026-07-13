@@ -557,6 +557,7 @@ model purchases {
   received_by                       Int?
   confirmed_at                      DateTime?                           @db.Timestamp(6)
   confirmed_by                      Int?
+  delivered_at                      DateTime?                           @db.Timestamp(6)
   returned_at                       DateTime?                           @db.Timestamp(6)
   returned_by                       Int?
   created_at                        DateTime?                           @default(now()) @db.Timestamp(6)
@@ -1792,6 +1793,7 @@ model general_settings {
 enum notification_key_enum {
   ORDER_STATUS_RECEIVED
   ORDER_STATUS_CONFIRMED
+  ORDER_STATUS_DELIVERED
   ORDER_STATUS_RETURNED
   ORDER_ITEM_DELETED
   ORDER_DELETED

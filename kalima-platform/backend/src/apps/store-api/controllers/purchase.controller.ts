@@ -179,6 +179,19 @@ export const purchaseController = {
     }
   },
 
+  /** PATCH /:id/deliver — confirmed → delivered */
+  async deliver(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = parseIntParam(req.params.id, "purchase ID");
+      const adminId = (req.user as any).userId;
+      const io = req.app.get("io");
+      const purchase = await purchasesService.deliver(id, adminId, io);
+      res.status(200).json({ success: true, message: "Purchase delivered successfully", data: { purchase } });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   /** PATCH /:id/return — received|confirmed → returned */
   async returnPurchase(req: Request, res: Response, next: NextFunction) {
     try {

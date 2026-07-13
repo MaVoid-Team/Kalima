@@ -17,6 +17,11 @@ jest.mock("../../src/libs/redis/socketNotificationEmitter", () => ({
 }));
 
 import { EBookletService } from "../../src/apps/store-api/services/e-booklet.service";
+import { getEmailService } from "../../src/apps/store-api/emails/email.service";
+
+jest.mock("../../src/apps/store-api/emails/email.service", () => ({
+  getEmailService: jest.fn(),
+}));
 import { hashInviteToken } from "../../src/apps/store-api/utils/e-booklet-token";
 import { buildContentDisposition, normalizeOriginalFilename } from "../../src/apps/store-api/utils/filename";
 import { emitNotificationToUser } from "../../src/libs/redis/socketNotificationEmitter";
@@ -636,6 +641,40 @@ describe("EBookletService", () => {
       expect(db.e_booklet_invites.create).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({ expires_at: expect.any(Date) }),
       }));
+    });
+
+    test("emails the teacher after an e-booklet is delivered", async () => {
+      const db = createMockDb();
+      const sendEBookletDeliveredEmail = jest.fn().mockResolvedValue(true);
+      (getEmailService as jest.Mock).mockReturnValue({ sendEBookletDeliveredEmail });
+      db.e_booklet_purchases.findUnique.mockResolvedValue({
+        id: 2,
+        teacher_id: 9,
+        template_id: 3,
+        template_version_id: 4,
+        status: "paid",
+        admin_notes: null,
+        instances: [],
+        teacher: { name: "Sara", email: "sara@example.com" },
+        template: { title: "Grade 6 Science Revision" },
+      });
+      db.e_booklet_template_versions.findUnique.mockResolvedValue({ id: 4, page_count: 2, page_dimensions_json: null });
+      db.e_booklet_instances.create.mockResolvedValue({ id: 10, display_title: "Sara's Science Revision" });
+      db.e_booklet_instances.findFirst.mockResolvedValue({ id: 10, teacher_id: 9, status: "active" });
+
+      const service = new EBookletService(db);
+      await service.deliverPurchase(2, {
+        custom_document_file_id: 99,
+        display_title: "Sara's Science Revision",
+        page_count: 2,
+        access_expires_at: "2026-12-31T00:00:00.000Z",
+      }, 1);
+
+      await Promise.resolve();
+      expect(sendEBookletDeliveredEmail).toHaveBeenCalledWith("sara@example.com", {
+        name: "Sara",
+        bookletTitle: "Sara's Science Revision",
+      });
     });
 
     test("uses marketing price as the teacher purchase price when admin deal omits or zeroes price", async () => {

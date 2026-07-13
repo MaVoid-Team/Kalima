@@ -8,6 +8,8 @@ export * from './order-received.template';
 export * from './order-pending.template';
 export * from './order-accepted.template';
 export * from './order-returned.template';
+export * from './order-delivered.template';
+export * from './e-booklet-delivered.template';
 export * from './order-deleted.template';
 export * from './order-item-deleted.template';
 export * from './e-booklet-milestone-achievement.template';

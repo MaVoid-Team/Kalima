@@ -56,6 +56,7 @@ const MyOrdersPage = () => {
         { value: 'pending', label: t('orders.status.pending', 'Pending') },
         { value: 'received', label: t('orders.status.received', 'Received') },
         { value: 'confirmed', label: t('orders.status.confirmed', 'Confirmed') },
+        { value: 'delivered', label: t('orders.status.delivered', 'Delivered') },
         { value: 'returned', label: t('orders.status.returned', 'Returned') },
     ];
 

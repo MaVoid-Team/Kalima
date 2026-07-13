@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MoreHorizontal, Eye, CheckCircle, RotateCcw, Package, Trash2, FileText, MessageCircle } from 'lucide-react';
+import { MoreHorizontal, Eye, CheckCircle, RotateCcw, Package, Trash2, FileText, MessageCircle, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
     DropdownMenu,
@@ -33,7 +33,7 @@ import useOrders from '@/hooks/useOrders';
 
 export default function OrderActions({ order, onActionSuccess }) {
     const { t, i18n } = useTranslation('admin');
-    const { receiveOrder, confirmOrder, returnOrder, deleteOrder } = useOrders();
+    const { receiveOrder, confirmOrder, deliverOrder, returnOrder, deleteOrder } = useOrders();
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [noteDialogOpen, setNoteDialogOpen] = useState(false);
@@ -227,8 +227,14 @@ export default function OrderActions({ order, onActionSuccess }) {
                             {t('orders.actions.confirm')}
                         </DropdownMenuItem>
                     )}
+                    {status === 'confirmed' && (
+                        <DropdownMenuItem onClick={() => handleAction(() => deliverOrder(order.id))} disabled={actionLoading}>
+                            <Truck className="me-2 h-4 w-4" />
+                            {t('orders.actions.deliver', 'Mark delivered')}
+                        </DropdownMenuItem>
+                    )}
 
-                    {(status === 'received' || status === 'confirmed') && (
+                    {(status === 'received' || status === 'confirmed' || status === 'delivered') && (
                         <DropdownMenuItem
                             onClick={() => handleAction(() => returnOrder(order.id))}
                             className="cursor-pointer flex items-center text-highlight focus:text-highlight"

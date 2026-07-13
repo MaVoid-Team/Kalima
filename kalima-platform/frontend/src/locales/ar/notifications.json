@@ -23,6 +23,7 @@
   "keys": {
     "ORDER_STATUS_RECEIVED": "تم استلام طلبك من قِبل فريقنا",
     "ORDER_STATUS_CONFIRMED": "تم تأكيد طلبك",
+    "ORDER_STATUS_DELIVERED": "تم تسليم طلبك",
     "ORDER_STATUS_RETURNED": "تم إرجاع طلبك",
     "ORDER_ITEM_DELETED": "تم إزالة منتج من طلبك",
     "ORDER_DELETED": "تم إلغاء طلبك",

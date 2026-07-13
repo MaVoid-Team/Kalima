@@ -544,7 +544,47 @@ class PurchasesService {
     return updated;
   }
 
-  /** received | confirmed → returned */
+  /** confirmed → delivered */
+  async deliver(purchaseId: number, adminId: number, io?: SocketIOServer | null) {
+    const purchase = await this.db.purchases.findUnique({
+      where: { id: purchaseId },
+      include: {
+        users: { select: { id: true, name: true, email: true } },
+        purchase_items: { where: { is_deleted: false }, include: { products: { select: { title: true } } } },
+      },
+    });
+    if (!purchase) throw new NotFoundError("Purchase not found");
+    if (purchase.status === "delivered") throw new BadRequestError("Purchase is already delivered");
+    if (purchase.status !== "confirmed") throw new BadRequestError("Only confirmed purchases can be delivered");
+
+    const updated = await this.db.purchases.update({
+      where: { id: purchaseId },
+      data: { status: "delivered", delivered_at: new Date(), updated_at: new Date() },
+      include: PURCHASE_INCLUDE,
+    });
+
+    const customer = purchase.users;
+    notificationService
+      .sendToUser(io ?? null, customer.id, NOTIFICATION_CATEGORY.ORDER_STATUS_CHANGE,
+        notification_key_enum.ORDER_STATUS_DELIVERED,
+        { entityType: "purchase", entityId: purchaseId, createdBy: adminId })
+      .catch((err) => console.error("[Purchases] Failed to send delivery notification:", err));
+
+    if (customer.email) {
+      getEmailService()
+        .sendOrderDeliveredEmail(customer.email, {
+          name: customer.name,
+          purchaseSerial: purchase.purchase_serial ?? "N/A",
+          totalItems: purchase.purchase_items.reduce((sum, item) => sum + item.quantity, 0),
+          productListHTML: this.#buildProductListHTML(purchase.purchase_items),
+        })
+        .catch((err) => console.error("[Purchases] Failed to send delivery email:", err));
+    }
+
+    return updated;
+  }
+
+  /** received | confirmed | delivered → returned */
   async returnPurchase(purchaseId: number, adminId: number, io?: SocketIOServer | null) {
     const purchase = await this.db.purchases.findUnique({
       where: { id: purchaseId },
@@ -554,9 +594,9 @@ class PurchasesService {
       },
     });
     if (!purchase) throw new NotFoundError("Purchase not found");
-    if (!["confirmed", "received"].includes(purchase.status)) {
+    if (!["confirmed", "received", "delivered"].includes(purchase.status)) {
       throw new BadRequestError(
-        purchase.status === "returned" ? "Purchase is already returned" : "Only confirmed or received purchases can be returned",
+        purchase.status === "returned" ? "Purchase is already returned" : "Only received, confirmed, or delivered purchases can be returned",
       );
     }
 

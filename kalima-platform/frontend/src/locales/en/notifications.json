@@ -23,6 +23,7 @@
   "keys": {
     "ORDER_STATUS_RECEIVED": "Your order has been received by our team",
     "ORDER_STATUS_CONFIRMED": "Your order has been confirmed",
+    "ORDER_STATUS_DELIVERED": "Your order has been delivered",
     "ORDER_STATUS_RETURNED": "Your order has been returned",
     "ORDER_ITEM_DELETED": "An item has been removed from your order",
     "ORDER_DELETED": "Your order has been cancelled",

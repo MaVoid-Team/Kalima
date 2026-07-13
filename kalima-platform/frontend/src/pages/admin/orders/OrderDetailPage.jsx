@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle, ExternalLink, MessageSquare, LogOut, RefreshCw, Copy } from 'lucide-react';
+import { ChevronLeft, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle, ExternalLink, MessageSquare, LogOut, RefreshCw, Copy, Truck } from 'lucide-react';
 import { toast } from 'sonner';
 import useOrders from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
@@ -48,6 +48,7 @@ export default function OrderDetailPage() {
         actionLoading,
         receiveOrder,
         confirmOrder,
+        deliverOrder,
         returnOrder,
         deleteOrder,
         addAdminNote,
@@ -380,7 +381,14 @@ export default function OrderDetailPage() {
                         </Button>
                     )}
 
-                    {(status === 'received' || status === 'confirmed') && (
+                    {status === 'confirmed' && (
+                        <Button onClick={() => deliverOrder(order.id)} disabled={actionLoading} variant="default" data-testid="order-detail-deliver-button">
+                            <Truck className="me-2 h-4 w-4" />
+                            {t('orders.actions.deliver', 'Mark delivered')}
+                        </Button>
+                    )}
+
+                    {(status === 'received' || status === 'confirmed' || status === 'delivered') && (
                         <Button
                             onClick={() => returnOrder(order.id)}
                             disabled={actionLoading}

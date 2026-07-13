@@ -16,6 +16,7 @@ import {
 import { generateInviteToken, hashInviteToken } from "../utils/e-booklet-token";
 import { normalizeOriginalFilename } from "../utils/filename";
 import { EBookletPagePreviewService } from "./e-booklet-page-preview.service";
+import { getEmailService } from "../emails/email.service";
 import { emitNotificationToUser } from "../../../libs/redis/socketNotificationEmitter";
 import { resolveEBookletStoragePath, resolveEBookletUploadRoot } from "../../../libs/uploadsRoot";
 
@@ -3200,7 +3201,11 @@ export class EBookletService {
   async deliverPurchase(purchaseId: number, dto: any, adminUserId: number) {
     const purchase = await this.db.e_booklet_purchases.findUnique({
       where: { id: purchaseId },
-      include: { instances: true },
+      include: {
+        instances: true,
+        teacher: { select: { name: true, email: true } },
+        template: { select: { title: true } },
+      },
     });
     if (!purchase) throw new NotFoundError("E-booklet purchase not found");
     if (!["paid", "ready"].includes(String(purchase.status))) {
@@ -3226,7 +3231,7 @@ export class EBookletService {
       uploadedPageDimensions: dto.page_dimensions,
     });
 
-    return this.transaction(async (tx: EBookletDb) => {
+    const instance: any = await this.transaction(async (tx: EBookletDb) => {
       const existingInstance = Array.isArray(purchase.instances) && purchase.instances.length > 0
         ? purchase.instances[0]
         : null;
@@ -3291,6 +3296,17 @@ export class EBookletService {
 
       return instance;
     });
+
+    if (purchase.teacher?.email) {
+      getEmailService()
+        .sendEBookletDeliveredEmail(purchase.teacher.email, {
+          name: purchase.teacher.name ?? "",
+          bookletTitle: instance.display_title ?? purchase.template?.title ?? "كتابك الإلكتروني",
+        })
+        .catch((err) => console.error("[EBooklet] Failed to send delivery email:", err));
+    }
+
+    return instance;
   }
 
   async listInstances(filters: {

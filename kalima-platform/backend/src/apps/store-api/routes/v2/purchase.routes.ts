@@ -34,6 +34,7 @@ router.get("/:id", ...adminAuth, purchaseController.getById);
 
 router.patch("/:id/receive", ...adminAuth, purchaseController.receive);
 router.patch("/:id/confirm", ...adminAuth, purchaseController.confirm);
+router.patch("/:id/deliver", ...adminAuth, purchaseController.deliver);
 router.patch("/:id/return", ...adminAuth, purchaseController.returnPurchase);
 router.patch("/:id/admin-note", ...adminAuth, purchaseController.addAdminNote);
 

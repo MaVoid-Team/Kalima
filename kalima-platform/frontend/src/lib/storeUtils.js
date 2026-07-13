@@ -182,7 +182,7 @@ export function formatCheckoutItems(cartItems = []) {
 /**
  * Valid order statuses for filters and general usage
  */
-export const ORDER_STATUSES = ['pending', 'received', 'confirmed', 'returned'];
+export const ORDER_STATUSES = ['pending', 'received', 'confirmed', 'delivered', 'returned'];
 
 /**
  * Formats amount into EGP currency string
@@ -224,6 +224,7 @@ export function getStatusColor(status) {
     case 'pending': return 'bg-highlight/10 text-highlight hover:bg-highlight/30 border-highlight/50';
     case 'received': return 'bg-primary/20 text-primary hover:bg-primary/30 border-primary/50';
     case 'confirmed': return 'bg-success/20 text-success hover:bg-success/30 border-success/50';
+    case 'delivered': return 'bg-success/20 text-success hover:bg-success/30 border-success/50';
     case 'returned': return 'bg-destructive/20 text-destructive hover:bg-destructive/30 border-destructive/50';
     default: return 'bg-muted/20 text-muted-foreground border-muted';
   }

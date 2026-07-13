@@ -53,6 +53,7 @@ const OrderCard = ({ order }) => {
             case 'pending': return <Clock className="h-4 w-4" />;
             case 'received': return <Package className="h-4 w-4" />;
             case 'confirmed': return <CheckCircle2 className="h-4 w-4" />;
+            case 'delivered': return <CheckCircle2 className="h-4 w-4" />;
             case 'returned': return <RefreshCw className="h-4 w-4" />;
             default: return <AlertCircle className="h-4 w-4" />;
         }

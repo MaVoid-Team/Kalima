@@ -58,6 +58,14 @@ import {
   getEBookletMilestoneAdminEmailText,
   getEBookletMilestoneAdminEmailSubject,
   EBookletMilestoneEmailData,
+  getEBookletDeliveredEmailHtml,
+  getEBookletDeliveredEmailText,
+  getEBookletDeliveredEmailSubject,
+  EBookletDeliveredEmailData,
+  getOrderDeliveredEmailHtml,
+  getOrderDeliveredEmailText,
+  getOrderDeliveredEmailSubject,
+  OrderDeliveredEmailData,
 } from './templates';
 
 export interface EmailConfig {
@@ -312,6 +320,30 @@ export class EmailService {
       subject: getOrderReturnedEmailSubject(),
       html: getOrderReturnedEmailHtml(data),
       text: getOrderReturnedEmailText(data),
+    });
+  }
+
+  async sendOrderDeliveredEmail(to: string, data: OrderDeliveredEmailData): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: getOrderDeliveredEmailSubject(),
+      html: getOrderDeliveredEmailHtml(data),
+      text: getOrderDeliveredEmailText(data),
+    });
+  }
+
+  /**
+   * Send e-booklet delivery confirmation.
+   */
+  async sendEBookletDeliveredEmail(
+    to: string,
+    data: EBookletDeliveredEmailData,
+  ): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: getEBookletDeliveredEmailSubject(),
+      html: getEBookletDeliveredEmailHtml(data),
+      text: getEBookletDeliveredEmailText(data),
     });
   }
 
