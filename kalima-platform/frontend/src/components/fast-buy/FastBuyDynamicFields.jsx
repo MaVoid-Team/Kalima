@@ -102,6 +102,7 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
             id={inputId}
             type="file"
             accept="image/*"
+            required={field.is_required}
             onChange={handleChange}
             className="hidden"
             data-testid="fastbuy-dynamic-fields-file-input"
@@ -111,6 +112,7 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
         <PhoneInput
           dir="ltr"
           value={value || "+20"}
+          required={field.is_required}
           onChange={handleChange}
           className="h-12 bg-background/50 backdrop-blur-xs rounded-xl focus-visible:ring-primary/20"
           data-testid="fastbuy-dynamic-fields-phone-input"
@@ -122,6 +124,7 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
             field: field?.label || "Field",
           })}
           value={value || ""}
+          required={field.is_required}
           onChange={handleChange}
           className="h-12 bg-background/50 backdrop-blur-xs rounded-xl border-border/30 focus-visible:ring-primary/20 mt-1"
           data-testid="fastbuy-dynamic-fields-text-input"

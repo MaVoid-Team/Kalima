@@ -110,17 +110,21 @@ export default function AdminEBookletPurchaseDeliveryForm({
   const handleDeliver = async () => {
     if (!purchase || !canDeliver) return;
     if (deliveryForm.validation_message || !deliveryForm.custom_document_file_id || !deliveryForm.access_expires_at) return;
-    await deliverPurchase(purchase.id, {
-      custom_document_file_id: Number(deliveryForm.custom_document_file_id),
-      display_title: deliveryForm.display_title,
-      invite_quota: asNumber(deliveryForm.invite_quota, 0),
-      access_expires_at: deliveryForm.access_expires_at,
-      student_marketing_price: asNumber(deliveryForm.student_marketing_price, 0),
-      internal_price: asNumber(deliveryForm.internal_price, 0),
-      page_count: asNumber(deliveryForm.page_count, 0),
-      page_dimensions: deliveryForm.page_dimensions,
-    });
-    onChanged?.();
+    try {
+      await deliverPurchase(purchase.id, {
+        custom_document_file_id: Number(deliveryForm.custom_document_file_id),
+        display_title: deliveryForm.display_title,
+        invite_quota: asNumber(deliveryForm.invite_quota, 0),
+        access_expires_at: deliveryForm.access_expires_at,
+        student_marketing_price: asNumber(deliveryForm.student_marketing_price, 0),
+        internal_price: asNumber(deliveryForm.internal_price, 0),
+        page_count: asNumber(deliveryForm.page_count, 0),
+        page_dimensions: deliveryForm.page_dimensions,
+      });
+      onChanged?.();
+    } catch {
+      // The shared API layer already displays the actionable server response.
+    }
   };
 
   const handleStatus = async (nextStatus) => {

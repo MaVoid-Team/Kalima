@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kalima - 48-hour Sentry fix priorities</title>
+    <style>
+      :root { --ink:#2b1a1d; --muted:#765c61; --paper:#fffaf7; --rose:#b52f4b; --peach:#f8e2d9; --gold:#ad7100; --line:#ead7d0; --green:#176f53; }
+      * { box-sizing:border-box; } body { margin:0; background:linear-gradient(145deg,#fff7f2,#f8ece7); color:var(--ink); font:16px/1.5 Inter,ui-sans-serif,system-ui,sans-serif; }
+      main { width:min(1060px,calc(100% - 32px)); margin:0 auto; padding:56px 0 72px; }
+      .eyebrow { color:var(--rose); font-weight:800; letter-spacing:.1em; text-transform:uppercase; font-size:.76rem; } h1 { font-size:clamp(2rem,5vw,3.7rem); line-height:1.02; letter-spacing:-.055em; max-width:800px; margin:12px 0 14px; } .lede { max-width:720px; color:var(--muted); font-size:1.13rem; }
+      .callout { margin:30px 0; padding:20px 22px; border:1px solid var(--line); border-left:5px solid var(--rose); border-radius:14px; background:rgba(255,255,255,.78); } .callout strong { color:var(--rose); }
+      h2 { margin:44px 0 12px; font-size:1.35rem; letter-spacing:-.025em; } .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; } .card { min-width:0; background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:22px; box-shadow:0 9px 28px rgba(88,37,38,.06); } .card.p0 { border-color:#e8a7b5; background:#fff6f7; } .tag { display:inline-block; padding:3px 9px; border-radius:999px; background:var(--peach); color:#824047; font-weight:800; font-size:.75rem; } .p0 .tag { background:#f7c9d1; color:#8c1731; } h3 { margin:13px 0 7px; font-size:1.18rem; letter-spacing:-.02em; } p { margin:8px 0; } .why { color:var(--muted); } .outcome { color:var(--green); font-weight:700; }
+      .steps { counter-reset:step; display:grid; gap:12px; margin-top:16px; } .step { counter-increment:step; padding:17px 18px 17px 55px; position:relative; background:rgba(255,255,255,.72); border:1px solid var(--line); border-radius:14px; } .step:before { content:counter(step); position:absolute; left:17px; top:16px; width:24px; height:24px; border-radius:50%; text-align:center; background:var(--rose); color:white; font-weight:800; line-height:24px; font-size:.8rem; }
+      .defer { color:var(--muted); padding:16px 18px; border-radius:14px; background:#f5eee9; } .footer { margin-top:30px; color:var(--muted); font-size:.9rem; }
+      @media (max-width:700px) { main { width:min(100% - 24px,1060px); padding-top:36px; } .grid { grid-template-columns:1fr; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="eyebrow">Kalima · Sentry triage · last 48 hours</div>
+      <h1>Make the live viewer resilient and keep local failures out of production triage.</h1>
+      <p class="lede">Live reproduction confirmed a third-party PDF fullscreen failure. The apparent account errors were emitted by localhost development sessions, while the e-booklet editor timeout happened during slow post-upload preview generation.</p>
+      <div class="callout"><strong>Recommended focus:</strong> remove the incompatible fullscreen action, return version creation before background preview work can time out, and stop development telemetry from polluting the production Sentry project.</div>
+
+      <h2>Proposed order of work</h2>
+      <section class="grid">
+        <article class="card p0"><span class="tag">P0 · first</span><h3>Remove PDF fullscreen where it is not reliable</h3><p>The external PDF viewer calls the browser fullscreen API without its own compatibility guard. Disable that menu action in the protected sample viewer, while retaining normal document viewing, zoom, paging, and download.</p><p class="outcome">Result: unsupported Android webviews no longer throw an unhandled error.</p></article>
+        <article class="card"><span class="tag">P1 · next</span><h3>Return e-booklet version creation before preview rendering</h3><p>Creating a version currently waits for page-preview preparation. Make preview preparation best-effort background work so large documents cannot hold the HTTP request open until the reverse proxy gives up.</p><p class="outcome">Result: admins receive a successful version-creation response instead of a 504.</p></article>
+        <article class="card"><span class="tag">P1 · next</span><h3>Make delivery failures clear and non-noisy</h3><p>Validate delivery requirements in the form before sending the request and surface the backend reason inline. Preserve the existing server-side validation and never change an order when the request is incomplete.</p><p class="outcome">Result: admins know what to correct without an unhandled Sentry error.</p></article>
+        <article class="card"><span class="tag">P2 · after</span><h3>Keep noise out of the production issue list</h3><p>Ignore the known benign resize-observer browser warning and remove hard-coded Sentry DSN fallbacks. Local development errors will no longer be sent to the production project by default.</p><p class="outcome">Result: Sentry reflects actionable production failures.</p></article>
+      </section>
+
+      <h2>Delivery sequence</h2>
+      <div class="steps">
+        <div class="step"><strong>Reproduce the account and admin paths in production-like conditions.</strong> Confirm the exact failure point before changing behavior.</div>
+        <div class="step"><strong>Ship the account-access repair with focused tests.</strong> Cover login, refresh, and student registration under a busy database.</div>
+        <div class="step"><strong>Ship fullscreen graceful fallback and admin recovery separately.</strong> These are contained changes with lower customer impact.</div>
+        <div class="step"><strong>Verify the live journeys and watch Sentry for 48 hours.</strong> Resolve only the reports that stop recurring after the release.</div>
+      </div>
+
+      <h2>What I would not prioritize yet</h2>
+      <p class="defer">The single unexplained browser report should be instrumented, not guessed at. The port-conflict report is also lower priority unless it reappears in production, because it commonly comes from a duplicate local or deploy process rather than a customer journey.</p>
+      <p class="footer">Based on the eight unresolved error groups with activity in the previous 48 hours. This review uses Kalima’s existing warm rose and neutral design tokens from the frontend stylesheet.</p>
+    </main>
+  </body>
+</html>

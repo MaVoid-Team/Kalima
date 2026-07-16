@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -10,11 +10,19 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { Video } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function ImageGallery({ images, badge }) {
   const { t, i18n } = useTranslation("product");
   const [thumbApi, setThumbApi] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerZoom, setViewerZoom] = useState(1);
 
   const imagesList = useMemo(
     () => {
@@ -59,6 +67,26 @@ export default function ImageGallery({ images, badge }) {
     if (imagesList.length < 2) return;
     setSelectedIndex((previous) => (previous + 1) % imagesList.length);
   }, [imagesList.length]);
+
+  const selectedMedia = imagesList[selectedIndex];
+  const selectedMediaIsImage = selectedMedia && (
+    typeof selectedMedia === "string" || selectedMedia.type !== "video"
+  );
+
+  const openViewer = useCallback(() => {
+    if (!selectedMediaIsImage) return;
+    setViewerZoom(1);
+    setViewerOpen(true);
+  }, [selectedMediaIsImage]);
+
+  const closeViewer = useCallback((open) => {
+    setViewerOpen(open);
+    if (!open) setViewerZoom(1);
+  }, []);
+
+  const adjustViewerZoom = useCallback((amount) => {
+    setViewerZoom((previousZoom) => Math.min(3, Math.max(1, previousZoom + amount)));
+  }, []);
 
   const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
 
@@ -183,7 +211,19 @@ export default function ImageGallery({ images, badge }) {
     <div className="flex flex-col gap-4">
       {/* Main Slider */}
       <div className="relative w-full aspect-square md:aspect-4/3 rounded-2xl overflow-hidden bg-muted group">
-        {renderMedia(imagesList[selectedIndex], false)}
+        {selectedMediaIsImage ? (
+          <button
+            type="button"
+            onClick={openViewer}
+            className="block h-full w-full cursor-zoom-in rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+            aria-label={t("actions.openImageViewer", { defaultValue: "Open image viewer" })}
+            data-testid="product-gallery-main-button"
+          >
+            {renderMedia(selectedMedia, false)}
+          </button>
+        ) : (
+          renderMedia(selectedMedia, false)
+        )}
 
         {imagesList.length > 1 && (
           <>
@@ -273,6 +313,73 @@ export default function ImageGallery({ images, badge }) {
           </Carousel>
         </div>
       )}
+
+      <Dialog open={viewerOpen} onOpenChange={closeViewer}>
+        <DialogContent
+          className="max-w-[min(96vw,1200px)] border-0 bg-black/95 p-3 text-white sm:p-5"
+          data-testid="product-image-viewer"
+        >
+          <DialogHeader className="sr-only">
+            <DialogTitle>
+              {t("actions.imageViewerTitle", { defaultValue: "Product image viewer" })}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex max-h-[76vh] min-h-[50vh] items-center justify-center overflow-auto rounded-lg bg-black/30 p-2">
+            {selectedMediaIsImage && (
+              <img
+                src={typeof selectedMedia === "string" ? selectedMedia : selectedMedia.url}
+                alt={t("info.view")}
+                className="max-h-[72vh] max-w-full object-contain transition-transform duration-200 ease-out"
+                style={{ transform: `scale(${viewerZoom})` }}
+                data-testid="product-image-viewer-image"
+              />
+            )}
+          </div>
+
+          <div className="flex items-center justify-center gap-2" aria-label={t("actions.imageZoom", { defaultValue: "Image zoom controls" })}>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => adjustViewerZoom(-0.25)}
+              disabled={viewerZoom === 1}
+              className="border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+              aria-label={t("actions.zoomOut", { defaultValue: "Zoom out" })}
+              data-testid="product-image-zoom-out"
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <span className="min-w-14 text-center text-sm tabular-nums" data-testid="product-image-zoom-level">
+              {Math.round(viewerZoom * 100)}%
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => adjustViewerZoom(0.25)}
+              disabled={viewerZoom === 3}
+              className="border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+              aria-label={t("actions.zoomIn", { defaultValue: "Zoom in" })}
+              data-testid="product-image-zoom-in"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setViewerZoom(1)}
+              disabled={viewerZoom === 1}
+              className="text-white hover:bg-white/20 hover:text-white"
+              aria-label={t("actions.resetZoom", { defaultValue: "Reset zoom" })}
+              data-testid="product-image-zoom-reset"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

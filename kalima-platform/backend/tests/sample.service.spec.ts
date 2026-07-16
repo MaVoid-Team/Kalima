@@ -6,6 +6,75 @@ import { SampleService } from "../src/apps/store-api/services/sample.service";
 import { sample_media_type_enum } from "../src/apps/store-api/generated/prisma/client";
 
 describe("SampleService", () => {
+  test("shifts later sections when creating at a positive display number", async () => {
+    const db: any = {
+      $transaction: jest.fn(async (callback) => callback(db)),
+      sample_sections: {
+        updateMany: jest.fn(),
+        create: jest.fn().mockResolvedValue({ id: 4, title: "Middle", sort_order: 2 }),
+      },
+    };
+    const service = new SampleService(db);
+
+    await service.createSection({ title: "Middle", sort_order: 2 });
+
+    expect(db.sample_sections.updateMany).toHaveBeenCalledWith({
+      where: { sort_order: { gte: 2 } },
+      data: { sort_order: { increment: 1 } },
+    });
+    expect(db.sample_sections.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ sort_order: 2 }),
+    }));
+  });
+
+  test("moves an edited section down and shifts only crossed sections", async () => {
+    const db: any = {
+      $transaction: jest.fn(async (callback) => callback(db)),
+      sample_sections: {
+        findUnique: jest.fn().mockResolvedValue({ id: 2, sort_order: 2 }),
+        updateMany: jest.fn(),
+        update: jest.fn().mockResolvedValue({ id: 2, title: "Moved", sort_order: 4 }),
+      },
+    };
+    const service = new SampleService(db);
+
+    await service.updateSection(2, { sort_order: 4 });
+
+    expect(db.sample_sections.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: { not: 2 },
+        sort_order: { gt: 2, lte: 4 },
+      },
+      data: { sort_order: { decrement: 1 } },
+    });
+    expect(db.sample_sections.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 2 },
+      data: expect.objectContaining({ sort_order: 4 }),
+    }));
+  });
+
+  test("moves an edited section up and shifts only crossed sections", async () => {
+    const db: any = {
+      $transaction: jest.fn(async (callback) => callback(db)),
+      sample_sections: {
+        findUnique: jest.fn().mockResolvedValue({ id: 4, sort_order: 4 }),
+        updateMany: jest.fn(),
+        update: jest.fn().mockResolvedValue({ id: 4, title: "Moved", sort_order: 2 }),
+      },
+    };
+    const service = new SampleService(db);
+
+    await service.updateSection(4, { sort_order: 2 });
+
+    expect(db.sample_sections.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: { not: 4 },
+        sort_order: { gte: 2, lt: 4 },
+      },
+      data: { sort_order: { increment: 1 } },
+    });
+  });
+
   test("keeps high-quality preview metadata when replacing only the low-quality file", async () => {
     const db: any = {
       samples: {

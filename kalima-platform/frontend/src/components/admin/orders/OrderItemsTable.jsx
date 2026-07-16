@@ -111,7 +111,11 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                                                 </Badge>
                                                             )}
                                                         </div>
-                                                        <div className="text-xs text-muted-foreground">{product?.product_serial}</div>
+                                                        {product?.serial && (
+                                                            <div className="text-xs text-muted-foreground whitespace-normal break-all" data-testid={`admin-orders-item-serial-${item.id}`}>
+                                                                {t('orders.items.serial', 'Serial number')}: {product.serial}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </TableCell>
@@ -165,8 +169,9 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                                     </Badge>
                                                 )}
                                             </div>
-                                            <div className="text-sm text-muted-foreground truncate">
-                                                {product?.product_serial} • {product?.type || item.item_type || t('common.na', 'N/A')}
+                                            <div className="text-sm text-muted-foreground whitespace-normal break-all">
+                                                {product?.serial ? `${t('orders.items.serial', 'Serial number')}: ${product.serial} • ` : ''}
+                                                {product?.type || item.item_type || t('common.na', 'N/A')}
                                             </div>
                                         </div>
                                         <Button

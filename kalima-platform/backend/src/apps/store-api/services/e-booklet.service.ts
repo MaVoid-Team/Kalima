@@ -880,6 +880,10 @@ export class EBookletService {
     }
   }
 
+  private schedulePagePreviews(asset: any, templateVersionId?: number | null): void {
+    void this.ensurePagePreviews(asset, templateVersionId).catch(() => undefined);
+  }
+
   private buildSlug(title: string): string {
     const base = title
       .trim()
@@ -1737,7 +1741,7 @@ export class EBookletService {
     const documentAssetId = version.base_document_file_id || version.rendered_document_file_id;
     if (documentAssetId) {
       const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: documentAssetId } });
-      await this.ensurePagePreviews(asset, version.id).catch(() => undefined);
+      this.schedulePagePreviews(asset, version.id);
     }
     return version;
   }
@@ -1768,7 +1772,7 @@ export class EBookletService {
     const documentAssetId = version.base_document_file_id || version.rendered_document_file_id;
     if (documentAssetId) {
       const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: documentAssetId } });
-      await this.ensurePagePreviews(asset, version.id).catch(() => undefined);
+      this.schedulePagePreviews(asset, version.id);
     }
     return version;
   }

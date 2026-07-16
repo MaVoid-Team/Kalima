@@ -83,6 +83,7 @@ export default function SampleSectionDialog({ open, onOpenChange, section, onSub
                         <Label htmlFor="sort_order">{t('samples.sections.sortOrderLabel', 'Sort Order')}</Label>
                         <Input
                             id="sort_order"
+                            data-testid="sample-section-sort-order-input"
                             type="number"
                             min="0"
                             value={formData.sort_order}

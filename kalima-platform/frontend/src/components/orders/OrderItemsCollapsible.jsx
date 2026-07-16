@@ -62,6 +62,11 @@ export default function OrderItemsCollapsible({ order }) {
                     <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-sm">
                       {product.type || 'Product'}
                     </span>
+                    {product.serial && (
+                      <span className="text-xs text-muted-foreground truncate" data-testid={`order-item-${item.id}-serial`}>
+                        {t('orders.productSerial', 'Product serial number')}: {product.serial}
+                      </span>
+                    )}
                     {isRemoved && (
                       <span
                         className="text-xs font-semibold text-destructive bg-destructive/10 px-2 py-0.5 rounded-sm"

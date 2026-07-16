@@ -188,7 +188,7 @@ export default function AdminSamplesPage() {
                         </thead>
                         <tbody>
                             {sections.map((section) => (
-                                <tr key={section.id}>
+                                <tr key={section.id} data-testid={`sample-section-row-${section.id}`}>
                                     <td className="kalima-number ps-4 py-3 text-muted-foreground">{section.id}</td>
                                     <td className="kalima-truncate py-3" title={section.title}>
                                         <div className="flex items-center gap-2">
@@ -208,7 +208,7 @@ export default function AdminSamplesPage() {
                                     <td className="kalima-truncate py-3 text-muted-foreground hidden md:table-cell" title={section.description || undefined}>
                                         {section.description || '—'}
                                     </td>
-                                    <td className="kalima-number py-3 hidden sm:table-cell">
+                                    <td className="kalima-number py-3 hidden sm:table-cell" data-testid={`sample-section-order-${section.id}`}>
                                         {section.sort_order}
                                     </td>
                                     <td className="py-3" data-cell="status">

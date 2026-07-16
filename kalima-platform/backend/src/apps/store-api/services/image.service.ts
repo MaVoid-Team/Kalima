@@ -26,7 +26,7 @@ const MIME_TO_ENUM: Record<string, image_mime_type_enum> = {
   "image/avif": image_mime_type_enum.avif,
 };
 
-/** Maps our DB enum → file extension (after compression most become .webp) */
+/** Maps our DB enum → file extension. */
 const ENUM_TO_EXT: Record<image_mime_type_enum, string> = {
   [image_mime_type_enum.jpeg]: ".jpeg",
   [image_mime_type_enum.png]: ".png",
@@ -36,12 +36,20 @@ const ENUM_TO_EXT: Record<image_mime_type_enum, string> = {
   [image_mime_type_enum.avif]: ".avif",
 };
 
+function extensionForImage(file: Express.Multer.File, mimeEnum: image_mime_type_enum): string {
+  const originalExt = path.extname(file.originalname).toLowerCase();
+  if (mimeEnum === image_mime_type_enum.jpeg && [".jpg", ".jpeg"].includes(originalExt)) {
+    return originalExt;
+  }
+  return ENUM_TO_EXT[mimeEnum];
+}
+
 // ============================================
 // TYPES
 // ============================================
 
 export interface UploadImageOptions {
-  /** Convert to WebP and compress. Default: false */
+  /** Compress while preserving the uploaded image format. Default: false */
   compress?: boolean;
   /** Sharp quality 1–100 (only when compress=true). Default: 75 */
   quality?: number;
@@ -55,7 +63,7 @@ export interface UploadImageOptions {
 // IMAGE SERVICE (internal — no controller)
 // ============================================
 
-class ImageService {
+export class ImageService {
   private initPromise: Promise<unknown> | null = null;
 
   constructor(private db: PrismaClient = prisma) {}
@@ -96,20 +104,40 @@ class ImageService {
     let finalMime: image_mime_type_enum;
     let ext: string;
 
-    if (compress) {
-      // Convert to WebP with optional resize
-      let pipeline = sharp(file.buffer).webp({ quality });
+    if (compress && file.mimetype !== "image/svg+xml") {
+      // Re-encode in the original format so compression never changes the
+      // file type advertised to callers or the extension used on disk.
+      let pipeline = sharp(file.buffer);
       if (width || height) {
         pipeline = pipeline.resize(width, height, { fit: "inside" });
       }
+
+      switch (file.mimetype) {
+        case "image/jpeg":
+          pipeline = pipeline.jpeg({ quality });
+          break;
+        case "image/png":
+          pipeline = pipeline.png({ compressionLevel: 9 });
+          break;
+        case "image/webp":
+          pipeline = pipeline.webp({ quality });
+          break;
+        case "image/gif":
+          pipeline = pipeline.gif();
+          break;
+        case "image/avif":
+          pipeline = pipeline.avif({ quality });
+          break;
+      }
+
       finalBuffer = await pipeline.toBuffer();
-      finalMime = image_mime_type_enum.webp;
-      ext = ".webp";
+      finalMime = mimeEnum;
+      ext = extensionForImage(file, mimeEnum);
     } else {
       // Store as-is
       finalBuffer = file.buffer;
       finalMime = mimeEnum;
-      ext = ENUM_TO_EXT[mimeEnum];
+      ext = extensionForImage(file, mimeEnum);
     }
 
     const filename = `${uniqueId}${ext}`;

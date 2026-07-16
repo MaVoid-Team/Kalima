@@ -299,7 +299,12 @@ export default function GeneralSettingsSection() {
                         {status === 'qr_pending' && qrCodeStr && (
                             <div className="flex flex-col md:flex-row items-center gap-8 p-6 bg-background rounded-xl border shadow-sm">
                                 <div className="p-4 bg-white rounded-xl border-2 border-primary/20 shadow-inner">
-                                    <QRCodeSVG value={qrCodeStr} size={220} includeMargin />
+                                    <QRCodeSVG
+                                        value={qrCodeStr}
+                                        size={220}
+                                        includeMargin
+                                        data-testid="whatsapp-qr-code"
+                                    />
                                 </div>
                                 <div className="flex-1 space-y-4 text-center md:text-left">
                                     <div className="space-y-2">

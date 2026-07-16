@@ -288,14 +288,25 @@ export class SampleService {
   async createSection(
     data: CreateSampleSectionInput,
   ): Promise<sample_sections> {
-    return this.db.sample_sections.create({
-      data: {
-        title: data.title,
-        description: data.description,
-        sort_order: data.sort_order ?? 0,
-        active: data.active ?? true,
-      },
-      select: SAMPLE_SECTION_SAFE_SELECT,
+    const sortOrder = data.sort_order ?? 0;
+
+    return this.db.$transaction(async (tx) => {
+      if (sortOrder > 0) {
+        await tx.sample_sections.updateMany({
+          where: { sort_order: { gte: sortOrder } },
+          data: { sort_order: { increment: 1 } },
+        });
+      }
+
+      return tx.sample_sections.create({
+        data: {
+          title: data.title,
+          description: data.description,
+          sort_order: sortOrder,
+          active: data.active ?? true,
+        },
+        select: SAMPLE_SECTION_SAFE_SELECT,
+      });
     });
   }
 
@@ -305,24 +316,47 @@ export class SampleService {
   ): Promise<sample_sections> {
     const section = await this.db.sample_sections.findUnique({
       where: { id },
-      select: { id: true },
+      select: { id: true, sort_order: true },
     });
     if (!section) {
       throw new NotFoundError("Sample section not found");
     }
 
-    return this.db.sample_sections.update({
-      where: { id },
-      data: {
-        ...(data.title !== undefined && { title: data.title }),
-        ...(data.description !== undefined && {
-          description: data.description,
-        }),
-        ...(data.sort_order !== undefined && { sort_order: data.sort_order }),
-        ...(data.active !== undefined && { active: data.active }),
-        updated_at: new Date(),
-      },
-      select: SAMPLE_SECTION_SAFE_SELECT,
+    const currentSortOrder = section.sort_order ?? 0;
+    const nextSortOrder = data.sort_order ?? currentSortOrder;
+
+    return this.db.$transaction(async (tx) => {
+      if (nextSortOrder > currentSortOrder) {
+        await tx.sample_sections.updateMany({
+          where: {
+            id: { not: id },
+            sort_order: { gt: currentSortOrder, lte: nextSortOrder },
+          },
+          data: { sort_order: { decrement: 1 } },
+        });
+      } else if (nextSortOrder < currentSortOrder) {
+        await tx.sample_sections.updateMany({
+          where: {
+            id: { not: id },
+            sort_order: { gte: nextSortOrder, lt: currentSortOrder },
+          },
+          data: { sort_order: { increment: 1 } },
+        });
+      }
+
+      return tx.sample_sections.update({
+        where: { id },
+        data: {
+          ...(data.title !== undefined && { title: data.title }),
+          ...(data.description !== undefined && {
+            description: data.description,
+          }),
+          ...(data.sort_order !== undefined && { sort_order: nextSortOrder }),
+          ...(data.active !== undefined && { active: data.active }),
+          updated_at: new Date(),
+        },
+        select: SAMPLE_SECTION_SAFE_SELECT,
+      });
     });
   }
 

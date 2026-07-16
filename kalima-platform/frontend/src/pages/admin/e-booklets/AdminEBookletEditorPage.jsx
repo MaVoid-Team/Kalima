@@ -1101,44 +1101,49 @@ export default function AdminEBookletEditorPage() {
   };
 
   const saveVersion = async () => {
-    const savedTemplate = templateId ? { id: templateId } : await saveBasicInfo();
-    if (!savedTemplate?.id) return null;
+    try {
+      const savedTemplate = templateId ? { id: templateId } : await saveBasicInfo();
+      if (!savedTemplate?.id) return null;
 
-    const dimensions = buildPageDimensions(versionForm);
-    if (!versionForm.base_document_file_id || !dimensions?.length) {
-      toast.error(t("admin.editor.file.saveRequired"));
+      const dimensions = buildPageDimensions(versionForm);
+      if (!versionForm.base_document_file_id || !dimensions?.length) {
+        toast.error(t("admin.editor.file.saveRequired"));
+        return null;
+      }
+
+      const payload = {
+        base_document_file_id: versionForm.base_document_file_id
+          ? Number(versionForm.base_document_file_id)
+          : undefined,
+        rendered_document_file_id: versionForm.rendered_document_file_id
+          ? Number(versionForm.rendered_document_file_id)
+          : undefined,
+        page_count: dimensions.length,
+        page_dimensions_json: dimensions,
+      };
+
+      const response = versionForm.id
+        ? await editor.updateVersion(versionForm.id, payload)
+        : await editor.createVersion(savedTemplate.id, payload);
+      const version = response?.data;
+      if (version?.id) {
+        setSelectedVersion(version);
+        setVersionForm((current) => ({
+          ...current,
+          id: version.id,
+          page_count: String(version.page_count || current.page_count),
+          page_dimensions: Array.isArray(version.page_dimensions_json)
+            ? version.page_dimensions_json
+            : current.page_dimensions,
+        }));
+        const versionResponse = await editor.fetchVersions(savedTemplate.id);
+        setVersions(Array.isArray(versionResponse?.data) ? versionResponse.data : [version]);
+      }
+      return version;
+    } catch {
+      // The shared API layer already displays the actionable server response.
       return null;
     }
-
-    const payload = {
-      base_document_file_id: versionForm.base_document_file_id
-        ? Number(versionForm.base_document_file_id)
-        : undefined,
-      rendered_document_file_id: versionForm.rendered_document_file_id
-        ? Number(versionForm.rendered_document_file_id)
-        : undefined,
-      page_count: dimensions.length,
-      page_dimensions_json: dimensions,
-    };
-
-    const response = versionForm.id
-      ? await editor.updateVersion(versionForm.id, payload)
-      : await editor.createVersion(savedTemplate.id, payload);
-    const version = response?.data;
-    if (version?.id) {
-      setSelectedVersion(version);
-      setVersionForm((current) => ({
-        ...current,
-        id: version.id,
-        page_count: String(version.page_count || current.page_count),
-        page_dimensions: Array.isArray(version.page_dimensions_json)
-          ? version.page_dimensions_json
-          : current.page_dimensions,
-      }));
-      const versionResponse = await editor.fetchVersions(savedTemplate.id);
-      setVersions(Array.isArray(versionResponse?.data) ? versionResponse.data : [version]);
-    }
-    return version;
   };
 
   const publishCurrentVersion = async () => {

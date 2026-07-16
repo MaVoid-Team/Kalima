@@ -123,6 +123,9 @@ export default function OrderDetailsDialog({ order }) {
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground">{product?.type || 'Product'}</p>
+                        <p className="text-xs mt-1" data-testid={`order-item-serial-${item.id}`}>
+                          {t('orders.productSerial', 'Product serial number')}: {product?.serial || '-'}
+                        </p>
                         <p className="text-xs mt-1">{t('orders.itemPrice', 'Item price')}: {formatCurrency(item?.price_at_purchase, t)}</p>
                       </div>
                     </div>

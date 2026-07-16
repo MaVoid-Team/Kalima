@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import socket, { connectSocket, disconnectSocket } from '@/api/socket';
+import socket, { connectSocket } from '@/api/socket';
 import axiosInstance from '@/api/axios';
 import { toast } from 'sonner';
 
@@ -82,6 +82,11 @@ export const useWhatsappStatus = () => {
         socket.on('whatsappDisconnected', onDisconnected);
         socket.on('connect_error', onConnectError);
 
+        // The shared socket is intentionally created with autoConnect disabled.
+        // Open it here so this hook works even when no other app context has
+        // already connected the socket.
+        connectSocket();
+
         return () => {
             socket.off('connect', onConnect);
             socket.off('whatsappQr', onQr);
@@ -97,6 +102,9 @@ export const useWhatsappStatus = () => {
         setIsActionLoading(true);
         console.log('Emitting requestWhatsappQr');
 
+        // Re-open the shared client when a previous connection dropped while
+        // the settings page was still mounted.
+        connectSocket();
         socket.emit('requestWhatsappQr');
     };
 

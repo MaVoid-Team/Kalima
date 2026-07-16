@@ -45,6 +45,7 @@ const PROTECTED_PDF_DISABLED_CATEGORIES = [
     'document-protect',
     'document-export',
     'document-capture',
+    'fullscreen',
     'selection',
 ];
 
