@@ -102,7 +102,7 @@ const PRODUCT_INCLUDE = {
 // PRODUCT SERVICE
 // ============================================
 
-class ProductService {
+export class ProductService {
   constructor(
     private db: PrismaClient = prisma,
     private sampleService = defaultSampleService,
@@ -275,8 +275,12 @@ class ProductService {
     }
 
     if (filters?.category_id) {
+      const categoryIds = await this.collectDescendantCategoryIds(
+        filters.category_id,
+      );
+
       where.product_categories = {
-        some: { category_id: filters.category_id },
+        some: { category_id: { in: categoryIds } },
       };
     }
 
@@ -321,6 +325,26 @@ class ProductService {
     );
 
     return { data: productsWithExtras, total, page, limit };
+  }
+
+  /**
+   * Collects a category and every nested category below it for hierarchical
+   * storefront filtering.
+   */
+  private async collectDescendantCategoryIds(
+    categoryId: number,
+  ): Promise<number[]> {
+    const ids: number[] = [categoryId];
+    const children = await this.db.categories.findMany({
+      where: { parent_id: categoryId },
+      select: { id: true },
+    });
+
+    for (const child of children) {
+      ids.push(...(await this.collectDescendantCategoryIds(child.id)));
+    }
+
+    return ids;
   }
 
   // ============================================
