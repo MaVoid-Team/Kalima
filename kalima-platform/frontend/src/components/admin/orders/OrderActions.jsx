@@ -33,7 +33,7 @@ import useOrders from '@/hooks/useOrders';
 
 export default function OrderActions({ order, onActionSuccess }) {
     const { t, i18n } = useTranslation('admin');
-    const { receiveOrder, confirmOrder, deliverOrder, returnOrder, deleteOrder } = useOrders();
+    const { receiveOrder, confirmOrder, deliverOrder, returnOrder, deleteOrder, actionLoading } = useOrders();
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [noteDialogOpen, setNoteDialogOpen] = useState(false);
