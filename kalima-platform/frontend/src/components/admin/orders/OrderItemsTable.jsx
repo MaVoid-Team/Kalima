@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
-    const { t, i18n } = useTranslation('admin');
+    const { t } = useTranslation('admin');
     const [deleteItemId, setDeleteItemId] = useState(null);
     const [isExpanded, setIsExpanded] = useState(true);
 
@@ -112,8 +112,15 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                                             )}
                                                         </div>
                                                         {product?.serial && (
-                                                            <div className="text-xs text-muted-foreground whitespace-normal break-all" data-testid={`admin-orders-item-serial-${item.id}`}>
-                                                                {t('orders.items.serial', 'Serial number')}: {product.serial}
+                                                            <div
+                                                                className="mt-1 inline-flex max-w-full items-baseline gap-1 rounded-md border border-primary/20 bg-primary/5 px-2 py-1 text-xs whitespace-normal break-all"
+                                                                data-testid={`admin-orders-item-serial-${item.id}`}
+                                                            >
+                                                                <span className="whitespace-nowrap font-semibold text-primary">
+                                                                    {t('orders.items.serial', 'Serial number')}:
+                                                                </span>
+                                                                {' '}
+                                                                <span className="font-mono text-foreground">{product.serial}</span>
                                                             </div>
                                                         )}
                                                     </div>
@@ -170,7 +177,13 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                                 )}
                                             </div>
                                             <div className="text-sm text-muted-foreground whitespace-normal break-all">
-                                                {product?.serial ? `${t('orders.items.serial', 'Serial number')}: ${product.serial} • ` : ''}
+                                                {product?.serial ? (
+                                                    <span className="inline-flex max-w-full items-baseline gap-1 rounded-md border border-primary/20 bg-primary/5 px-2 py-1 text-xs">
+                                                        <span className="whitespace-nowrap font-semibold text-primary">{t('orders.items.serial', 'Serial number')}: </span>
+                                                        <span className="font-mono text-foreground break-all">{product.serial}</span>
+                                                    </span>
+                                                ) : null}
+                                                {product?.serial ? ' • ' : ''}
                                                 {product?.type || item.item_type || t('common.na', 'N/A')}
                                             </div>
                                         </div>
