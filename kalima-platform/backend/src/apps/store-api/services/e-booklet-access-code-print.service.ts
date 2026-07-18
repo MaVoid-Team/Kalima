@@ -26,6 +26,7 @@ type PrintTemplateLayout = {
 };
 
 type RequiredFields = Record<string, boolean | undefined>;
+type VisibleFields = Record<string, boolean | undefined>;
 type BatchValues = Record<string, unknown>;
 type PrintStorageAdapter = {
   readPrivateAsset: (asset: any) => Promise<Buffer>;
@@ -421,6 +422,7 @@ export class EBookletAccessCodePrintService {
     createdBy: number;
     batchValues?: BatchValues | null;
     requiredFields?: RequiredFields | null;
+    visibleFields?: VisibleFields | null;
     teacherImageFileAssetId?: number | null;
     pdfFileAssetId?: number | null;
     expiresAt?: Date | string | null;
@@ -434,6 +436,7 @@ export class EBookletAccessCodePrintService {
     const snapshot = {
       template: this.templateSnapshot(template),
       requiredFields,
+      visibleFields: input.visibleFields || {},
       batchValues: input.batchValues || {},
       teacherImageFileAssetId: input.teacherImageFileAssetId ?? null,
       card: {
@@ -486,6 +489,7 @@ export class EBookletAccessCodePrintService {
     createdBy: number;
     batchValues?: BatchValues | null;
     requiredFields?: RequiredFields | null;
+    visibleFields?: VisibleFields | null;
     teacherImageFileAssetId?: number | null;
     pdfFileAssetId?: number | null;
     expiresAt?: Date | string | null;
@@ -538,6 +542,7 @@ export class EBookletAccessCodePrintService {
             qrRedeemUrl: card.qrRedeemUrl,
             teacherImage,
             batchValues: input.batchValues || {},
+            visibleFields: input.visibleFields || {},
           },
         }),
       })));
@@ -558,6 +563,7 @@ export class EBookletAccessCodePrintService {
         createdBy: input.createdBy,
         batchValues: input.batchValues,
         requiredFields,
+        visibleFields: input.visibleFields,
         teacherImageFileAssetId: input.teacherImageFileAssetId,
         pdfFileAssetId: pdfAsset.id,
         expiresAt: input.expiresAt,
@@ -585,6 +591,7 @@ export class EBookletAccessCodePrintService {
     qrRedeemUrl: string;
     teacherImageFileAssetId?: number | null;
     batchValues?: BatchValues | null;
+    visibleFields?: VisibleFields | null;
   }): Promise<Buffer> {
     const template = await this.loadTemplate(input.templateId);
     const backgroundImage = await this.readTemplateBackground(template);
@@ -597,6 +604,7 @@ export class EBookletAccessCodePrintService {
         qrRedeemUrl: input.qrRedeemUrl,
         teacherImage,
         batchValues: input.batchValues || {},
+        visibleFields: input.visibleFields || {},
       },
     });
   }

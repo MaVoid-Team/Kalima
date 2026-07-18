@@ -1307,6 +1307,7 @@ export const eBookletController = {
         createdBy: currentUserId(req),
         batchValues: req.body?.batchValues ?? req.body?.batch_values ?? {},
         requiredFields: req.body?.requiredFields ?? req.body?.required_fields ?? {},
+        visibleFields: req.body?.visibleFields ?? req.body?.visible_fields ?? {},
         teacherImageFileAssetId: parseOptionalPositiveInt(req.body?.teacherImageFileAssetId ?? req.body?.teacher_image_file_asset_id, "teacher image file asset ID") ?? null,
         pdfFileAssetId: parseOptionalPositiveInt(req.body?.pdfFileAssetId ?? req.body?.pdf_file_asset_id, "PDF file asset ID") ?? null,
         expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
@@ -1344,6 +1345,7 @@ export const eBookletController = {
         createdBy: currentUserId(req),
         batchValues: req.body?.batchValues ?? req.body?.batch_values ?? {},
         requiredFields: req.body?.requiredFields ?? req.body?.required_fields ?? {},
+        visibleFields: req.body?.visibleFields ?? req.body?.visible_fields ?? {},
         teacherImageFileAssetId: parseOptionalPositiveInt(req.body?.teacherImageFileAssetId ?? req.body?.teacher_image_file_asset_id, "teacher image file asset ID") ?? null,
         pdfFileAssetId: parseOptionalPositiveInt(req.body?.pdfFileAssetId ?? req.body?.pdf_file_asset_id, "PDF file asset ID") ?? null,
         expiresAt: parseOptionalFutureIsoDate(req.body?.expiresAt ?? req.body?.expires_at, "expiration date"),
@@ -1364,6 +1366,7 @@ export const eBookletController = {
         qrRedeemUrl: String(req.body?.qrRedeemUrl ?? req.body?.qr_redeem_url ?? "https://kalima.test/e-booklet-code/qr/preview"),
         teacherImageFileAssetId: parseOptionalPositiveInt(req.body?.teacherImageFileAssetId ?? req.body?.teacher_image_file_asset_id, "teacher image file asset ID") ?? null,
         batchValues: req.body?.batchValues ?? req.body?.batch_values ?? {},
+        visibleFields: req.body?.visibleFields ?? req.body?.visible_fields ?? {},
       });
       setPrivateNoStore(res);
       res.type("image/png");

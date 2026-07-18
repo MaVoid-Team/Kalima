@@ -194,6 +194,7 @@ describe("e-booklet access-code print service", () => {
         gradeClassText: "الصف الثالث",
       },
       requiredFields: { redCustomText: false },
+      visibleFields: { price: false, redCustomText: false },
       accessCodes: [{ id: 21 }, { id: 22 }],
     })).resolves.toEqual({ id: 77, label: "July batch" });
 
@@ -211,6 +212,7 @@ describe("e-booklet access-code print service", () => {
         snapshot_json: expect.objectContaining({
           template: expect.objectContaining({ id: 3, widthPx: 827, heightPx: 438, ppi: 300 }),
           requiredFields: expect.objectContaining({ qr: true, codeNumber: true, gradeClass: true, redCustomText: false }),
+          visibleFields: { price: false, redCustomText: false },
           batchValues: expect.objectContaining({ gradeClassText: "الصف الثالث" }),
         }),
       }),
@@ -306,6 +308,7 @@ describe("e-booklet access-code print service", () => {
       createdBy: 5,
       teacherImageFileAssetId: 200,
       batchValues: { gradeClassText: "الصف الثالث" },
+      visibleFields: { gradeClass: false, teacherImage: true },
     });
 
     expect(accessCodeService.generateCodes).toHaveBeenCalledWith({
@@ -326,7 +329,10 @@ describe("e-booklet access-code print service", () => {
     expect(storage.readPrivateAsset).toHaveBeenCalledTimes(2);
     expect(renderer.renderCardPng).toHaveBeenCalledTimes(2);
     expect(renderer.renderCardPng).toHaveBeenCalledWith(expect.objectContaining({
-      card: expect.objectContaining({ teacherImage: Buffer.from("teacher-image") }),
+      card: expect.objectContaining({
+        teacherImage: Buffer.from("teacher-image"),
+        visibleFields: { gradeClass: false, teacherImage: true },
+      }),
     }));
     expect(renderer.renderBatchPdf).toHaveBeenCalledTimes(1);
     expect(result.cards[0]).toEqual(expect.objectContaining({ accessCodeId: 31, code: "KLM-AAAABBBBCCCC", cardIndex: 0 }));
@@ -422,12 +428,13 @@ describe("e-booklet access-code print service", () => {
       code: "KLM PREV IEW",
       qrRedeemUrl: "https://kalima.test/e-booklet-code/qr/preview",
       batchValues: { gradeClassText: "الصف الثالث" },
+      visibleFields: { gradeClass: false },
     })).resolves.toEqual(Buffer.from("preview"));
 
     expect(renderer.renderCardPng).toHaveBeenCalledWith(expect.objectContaining({
       backgroundImage: Buffer.from("background"),
       layout: validLayout,
-      card: expect.objectContaining({ code: "KLM PREV IEW" }),
+      card: expect.objectContaining({ code: "KLM PREV IEW", visibleFields: { gradeClass: false } }),
     }));
   });
 

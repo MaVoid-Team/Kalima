@@ -33,6 +33,7 @@ type PrintCardRenderInput = {
   qrRedeemUrl: string;
   teacherImage?: Buffer | null;
   batchValues?: Record<string, any>;
+  visibleFields?: Record<string, boolean | undefined>;
 };
 
 const ARABIC_TEXT_FONT_FAMILY = "Noto Sans Arabic";
@@ -179,6 +180,7 @@ export class EBookletAccessCodePrintRendererService {
     card: PrintCardRenderInput;
   }): Promise<Buffer> {
     const fields = input.layout.fields || {};
+    const isVisible = (fieldName: string) => input.card.visibleFields?.[fieldName] !== false;
     if (!fields.qr || !fields.codeNumber) {
       throw new Error("Print layout requires QR and code number fields.");
     }
@@ -200,7 +202,7 @@ export class EBookletAccessCodePrintRendererService {
       },
     ];
     const teacherImageField = fields.teacherImage || fields.teacher_image;
-    if (teacherImageField && input.card.teacherImage) {
+    if (isVisible("teacherImage") && teacherImageField && input.card.teacherImage) {
       const boundedTeacherImageField = boundedField(teacherImageField);
       if (boundedTeacherImageField) {
         overlays.push({
@@ -212,10 +214,18 @@ export class EBookletAccessCodePrintRendererService {
     }
     const textOverlays = await Promise.all([
       this.renderTextOverlay(fields.codeNumber, input.card.code, { direction: "ltr", align: "center", fontSize: 22 }),
-      this.renderTextOverlay(fields.gradeClass || fields.grade_class || fields.className, input.card.batchValues?.gradeClassText, { direction: "rtl", align: "center", fontSize: 22 }),
-      this.renderTextOverlay(fields.registrationMethod || fields.registration_method, input.card.batchValues?.registrationMethodText, { direction: "rtl", align: "center", fontSize: 18 }),
-      this.renderTextOverlay(fields.price, input.card.batchValues?.priceText, { direction: "rtl", align: "center", fontSize: 18 }),
-      this.renderTextOverlay(fields.redCustomText || fields.red_custom_text, input.card.batchValues?.redCustomText, { direction: "rtl", align: "center", fontSize: 18, color: "#dc2626" }),
+      isVisible("gradeClass")
+        ? this.renderTextOverlay(fields.gradeClass || fields.grade_class || fields.className, input.card.batchValues?.gradeClassText, { direction: "rtl", align: "center", fontSize: 22 })
+        : null,
+      isVisible("registrationMethod")
+        ? this.renderTextOverlay(fields.registrationMethod || fields.registration_method, input.card.batchValues?.registrationMethodText, { direction: "rtl", align: "center", fontSize: 18 })
+        : null,
+      isVisible("price")
+        ? this.renderTextOverlay(fields.price, input.card.batchValues?.priceText, { direction: "rtl", align: "center", fontSize: 18 })
+        : null,
+      isVisible("redCustomText")
+        ? this.renderTextOverlay(fields.redCustomText || fields.red_custom_text, input.card.batchValues?.redCustomText, { direction: "rtl", align: "center", fontSize: 18, color: "#dc2626" })
+        : null,
     ]);
     overlays.push(...textOverlays.filter((overlay): overlay is sharp.OverlayOptions => Boolean(overlay)));
     const boundedOverlays = (await Promise.all(overlays.map((overlay) => boundedOverlay(overlay))))

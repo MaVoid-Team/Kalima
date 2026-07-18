@@ -9,7 +9,10 @@ const layout = {
     qr: { x: 610, y: 80, width: 112, height: 112 },
     codeNumber: { x: 580, y: 218, width: 180, height: 42 },
     teacherImage: { x: 330, y: 62, width: 118, height: 154 },
+    registrationMethod: { x: 80, y: 200, width: 180, height: 50 },
     gradeClass: { x: 80, y: 280, width: 180, height: 60 },
+    price: { x: 280, y: 280, width: 100, height: 50 },
+    redCustomText: { x: 400, y: 280, width: 120, height: 50 },
   },
 };
 
@@ -89,6 +92,46 @@ describe("e-booklet access-code print renderer", () => {
 
     expect(await countDarkPixels(fieldCrop, 180, 60)).toBeGreaterThan(150);
     expect(await countDarkPixels(belowFieldCrop, 180, 30)).toBe(0);
+  });
+
+  test("omits every optional printable field when its print visibility is turned off", async () => {
+    const renderer = new EBookletAccessCodePrintRendererService();
+    const png = await renderer.renderCardPng({
+      backgroundImage: await background(),
+      layout,
+      card: {
+        code: "KLM AAAA BBBB CCCC",
+        qrRedeemUrl: "https://kalima.test/e-booklet-code/qr/test",
+        teacherImage: await teacherImage(),
+        batchValues: {
+          gradeClassText: "الصف الثالث",
+          registrationMethodText: "كود أو منصة",
+          priceText: "100 جنيه",
+          redCustomText: "نص أحمر",
+        },
+        visibleFields: {
+          gradeClass: false,
+          registrationMethod: false,
+          price: false,
+          redCustomText: false,
+          teacherImage: false,
+        },
+      },
+    });
+    const hiddenFieldBoxes = [
+      layout.fields.teacherImage,
+      layout.fields.registrationMethod,
+      layout.fields.gradeClass,
+      layout.fields.price,
+      layout.fields.redCustomText,
+    ];
+
+    for (const field of hiddenFieldBoxes) {
+      const fieldCrop = await sharp(png)
+        .extract({ left: field.x, top: field.y, width: field.width, height: field.height })
+        .toBuffer();
+      expect(await countDarkPixels(fieldCrop, field.width, field.height)).toBe(0);
+    }
   });
 
   test("rejects invalid teacher images with a controlled print error", async () => {

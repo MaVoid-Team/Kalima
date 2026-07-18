@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   DropdownMenu,
@@ -29,6 +30,19 @@ const optionalNumberValue = (value) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 };
+
+const DEFAULT_PRINT_FIELD_VISIBILITY = Object.freeze({
+  gradeClass: true,
+  registrationMethod: true,
+  price: true,
+  redCustomText: true,
+  teacherImage: true,
+});
+
+const normalizePrintFieldVisibility = (visibleFields = {}) => ({
+  ...DEFAULT_PRINT_FIELD_VISIBILITY,
+  ...visibleFields,
+});
 
 const isGeneratedEBookletTitle = (value) => /^Teacher e-booklet #\d+$/i.test(String(value || "").trim());
 
@@ -195,7 +209,7 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
             registrationMethodText: t("admin.instances.defaultRegistrationMethod", { defaultValue: "كود أو منصة" }),
             priceText: "",
             redCustomText: "",
-            requiredFields: {},
+            visibleFields: { ...DEFAULT_PRINT_FIELD_VISIBILITY },
           };
         }
       });
@@ -287,14 +301,14 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
     }));
   };
 
-  const updatePrintRequiredField = (instanceId, field, checked) => {
+  const updatePrintFieldVisibility = (instanceId, field, visible) => {
     setPrintDrafts((current) => ({
       ...current,
       [instanceId]: {
         ...(current[instanceId] || {}),
-        requiredFields: {
-          ...((current[instanceId] || {}).requiredFields || {}),
-          [field]: checked,
+        visibleFields: {
+          ...normalizePrintFieldVisibility((current[instanceId] || {}).visibleFields),
+          [field]: visible,
         },
       },
     }));
@@ -498,7 +512,7 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
         priceText: printDraft.priceText || null,
         redCustomText: printDraft.redCustomText || null,
       },
-      requiredFields: printDraft.requiredFields || {},
+      visibleFields: normalizePrintFieldVisibility(printDraft.visibleFields),
       teacherImageFileAssetId: printDraft.teacherImageFileAssetId ? Number(printDraft.teacherImageFileAssetId) : null,
     };
     const response = await generateAccessCodePrintBatch(payload);
@@ -529,6 +543,7 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
           priceText: printDraft.priceText || null,
           redCustomText: printDraft.redCustomText || null,
         },
+        visibleFields: normalizePrintFieldVisibility(printDraft.visibleFields),
       });
       setPrintPreviewUrls((current) => {
         if (current[instance.id]) URL.revokeObjectURL(current[instance.id]);
@@ -842,14 +857,11 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
                     const teacherUploadStatus = printUploadState[teacherUploadTarget];
                     const teacherUploadedAsset = printUploadedAssets[teacherUploadTarget];
                     const teacherImageUploading = teacherUploadStatus === "uploading";
-                    const teacherImageRequired = Boolean(printDraft.requiredFields?.teacherImage);
-                    const teacherImageMissing = teacherImageRequired && !printDraft.teacherImageFileAssetId;
                     const canGeneratePrintableBatch = Boolean(
                       accessCodeDrafts[instance.id]?.termId
                       && printDraft.templateId
                       && (instance.teacher?.id || instance.teacher_id)
                       && !teacherImageUploading
-                      && !teacherImageMissing,
                     );
 
                     return (
@@ -1038,11 +1050,6 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
                                           {t("admin.instances.teacherImageUploadFailed", { defaultValue: "Teacher image upload failed. Try again before generating the PDF." })}
                                         </div>
                                       )}
-                                      {teacherImageMissing && (
-                                        <div className="rounded-lg border border-amber-300 bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-900">
-                                          {t("admin.instances.teacherImageRequiredMissing", { defaultValue: "Teacher image is required for this batch. Upload an image or enter its asset ID." })}
-                                        </div>
-                                      )}
                                     </PrintFormField>
                                   </div>
                                   <div className="grid gap-3 md:grid-cols-4">
@@ -1068,20 +1075,34 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
                                     </PrintFormField>
                                   </div>
                                   <div className="rounded-xl border bg-background p-3">
-                                    <div className="mb-2 text-xs font-semibold text-muted-foreground">{t("admin.instances.requiredPrintFields", { defaultValue: "Batch required fields" })}</div>
-                                    <div className="grid gap-2 sm:grid-cols-5">
+                                    <div className="mb-3">
+                                      <div className="text-xs font-semibold text-foreground">{t("admin.instances.printFieldVisibility", { defaultValue: "Print visibility" })}</div>
+                                      <p className="mt-1 text-[11px] leading-5 text-muted-foreground">{t("admin.instances.printFieldVisibilityDescription", { defaultValue: "Turn a field on to include it in the preview and PDF, or off to hide it from print." })}</p>
+                                    </div>
+                                    <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
                                       {[
                                         ["gradeClass", t("admin.instances.gradeClassText", { defaultValue: "Grade/class text" })],
                                         ["registrationMethod", t("admin.instances.registrationMethodText", { defaultValue: "Registration method" })],
                                         ["price", t("admin.instances.priceText", { defaultValue: "Price text" })],
                                         ["redCustomText", t("admin.instances.redCustomText", { defaultValue: "Red custom text" })],
                                         ["teacherImage", t("admin.instances.teacherImageAssetId", { defaultValue: "Teacher image" })],
-                                      ].map(([field, label]) => (
-                                        <label key={field} className="flex items-center gap-2 text-xs text-muted-foreground">
-                                          <input type="checkbox" checked={Boolean(printDrafts[instance.id]?.requiredFields?.[field])} onChange={(event) => updatePrintRequiredField(instance.id, field, event.target.checked)} />
-                                          <span>{label}</span>
-                                        </label>
-                                      ))}
+                                      ].map(([field, label]) => {
+                                        const isVisible = normalizePrintFieldVisibility(printDraft.visibleFields)[field];
+                                        const labelId = `print-visibility-${instance.id}-${field}`;
+                                        return (
+                                          <div key={field} className="flex min-w-0 items-center justify-between gap-3 rounded-lg border bg-muted/20 px-3 py-2">
+                                            <div id={labelId} className="min-w-0">
+                                              <div className="truncate text-xs font-medium text-foreground">{label}</div>
+                                              <div className="mt-0.5 text-[10px] text-muted-foreground">
+                                                {isVisible
+                                                  ? t("admin.instances.visibleOnPrint", { defaultValue: "Visible on print" })
+                                                  : t("admin.instances.hiddenOnPrint", { defaultValue: "Hidden from print" })}
+                                              </div>
+                                            </div>
+                                            <Switch checked={isVisible} onCheckedChange={(visible) => updatePrintFieldVisibility(instance.id, field, visible)} aria-labelledby={labelId} />
+                                          </div>
+                                        );
+                                      })}
                                     </div>
                                   </div>
                                   <div className="flex flex-wrap items-center gap-2">
