@@ -89,6 +89,8 @@ export const requiredFieldController = {
       res.status(200).json({
         success: true,
         results: list.count,
+        page: list.page,
+        limit: list.limit,
         data: list.data,
       });
     } catch (error) {

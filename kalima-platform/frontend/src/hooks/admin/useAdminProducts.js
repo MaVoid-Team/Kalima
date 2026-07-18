@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import useApiMutation from '../useApiMutation';
+import { REQUIRED_FIELDS_LOOKUP_LIMIT } from '@/utils/requiredFieldsPagination';
 
 export const useAdminProducts = () => {
     const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
@@ -122,7 +123,7 @@ export const useAdminProducts = () => {
     const fetchFieldDefinitions = useCallback(async () => {
         try {
             const data = await fetchApi({
-                endpoint: '/required-fields/definitions?active=true',
+                endpoint: `/required-fields/definitions?active=true&limit=${REQUIRED_FIELDS_LOOKUP_LIMIT}`,
                 method: 'get'
             });
             if (data?.success) {

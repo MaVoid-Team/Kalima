@@ -9,11 +9,17 @@ import RequiredFieldsTable from '@/components/admin/required-fields/RequiredFiel
 import CreateRequiredFieldDialog from '@/components/admin/required-fields/CreateRequiredFieldDialog';
 import EditRequiredFieldDialog from '@/components/admin/required-fields/EditRequiredFieldDialog';
 import DeleteRequiredFieldDialog from '@/components/admin/required-fields/DeleteRequiredFieldDialog';
+import RequiredFieldsPagination from '@/components/admin/required-fields/RequiredFieldsPagination';
+import {
+  getPageAfterRequiredFieldDelete,
+  REQUIRED_FIELDS_PAGE_SIZE,
+} from '@/utils/requiredFieldsPagination';
 
 export default function RequiredFieldsPage() {
-  const { t, i18n } = useTranslation('admin');
+  const { t } = useTranslation('admin');
   const {
     fields,
+    pagination,
     loading,
     fetchAllFields,
     createField,
@@ -22,15 +28,18 @@ export default function RequiredFieldsPage() {
   } = useAdminRequiredFields();
 
   const [statusFilter, setStatusFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editField, setEditField] = useState(null);
   const [deleteFieldItem, setDeleteFieldItem] = useState(null);
 
-  const loadFields = useCallback(async () => {
+  const loadFields = useCallback(async (page = currentPage) => {
     await fetchAllFields({
       active: statusFilter === 'all' ? undefined : statusFilter === 'true' ? true : false,
+      page,
+      limit: REQUIRED_FIELDS_PAGE_SIZE,
     });
-  }, [fetchAllFields, statusFilter]);
+  }, [currentPage, fetchAllFields, statusFilter]);
 
   useEffect(() => {
     loadFields();
@@ -38,13 +47,18 @@ export default function RequiredFieldsPage() {
 
   const handleStatusFilterChange = (newStatus) => {
     setStatusFilter(newStatus);
+    setCurrentPage(1);
   };
 
   const handleCreate = async (payload) => {
     const result = await createField(payload);
     if (result?.success) {
       setIsCreateDialogOpen(false);
-      await loadFields();
+      if (currentPage === 1) {
+        await loadFields(1);
+      } else {
+        setCurrentPage(1);
+      }
     }
     return result;
   };
@@ -72,7 +86,12 @@ export default function RequiredFieldsPage() {
     const result = await deleteField(deleteFieldItem.id);
     if (result?.success) {
       setDeleteFieldItem(null);
-      await loadFields();
+      const targetPage = getPageAfterRequiredFieldDelete(currentPage, fields.length);
+      if (targetPage === currentPage) {
+        await loadFields(targetPage);
+      } else {
+        setCurrentPage(targetPage);
+      }
     }
     return result;
   };
@@ -97,7 +116,7 @@ export default function RequiredFieldsPage() {
 
         <div className="flex items-center gap-3">
           <p className="text-sm text-muted-foreground hidden sm:block">
-            {t('requiredFields.totalFields', { count: fields.length })}
+            {t('requiredFields.totalFields', { count: pagination.total })}
           </p>
           
           <Button
@@ -121,6 +140,13 @@ export default function RequiredFieldsPage() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onToggleActivation={handleToggleActivation}
+      />
+
+      <RequiredFieldsPagination
+        page={pagination.page}
+        pages={pagination.pages}
+        loading={loading}
+        onPageChange={setCurrentPage}
       />
 
       <CreateRequiredFieldDialog

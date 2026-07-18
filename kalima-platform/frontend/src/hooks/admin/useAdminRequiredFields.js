@@ -1,5 +1,9 @@
 import { useCallback, useState } from 'react';
 import useApiMutation from '../useApiMutation';
+import {
+  normalizeRequiredFieldsPagination,
+  REQUIRED_FIELDS_PAGE_SIZE,
+} from '@/utils/requiredFieldsPagination';
 
 /**
  * Hook for managing required field definitions CRUD operations
@@ -11,6 +15,12 @@ export default function useAdminRequiredFields() {
   const [state, setState] = useState({
     fields: [],
     loading: false,
+    pagination: {
+      total: 0,
+      page: 1,
+      pages: 1,
+      limit: REQUIRED_FIELDS_PAGE_SIZE,
+    },
   });
 
   const fetchAllFields = useCallback(
@@ -35,6 +45,10 @@ export default function useAdminRequiredFields() {
           setState((prev) => ({
             ...prev,
             fields: res.data || [],
+            pagination: normalizeRequiredFieldsPagination(res, {
+              page: page || prev.pagination.page,
+              limit: limit || prev.pagination.limit,
+            }),
           }));
         }
         return res;
