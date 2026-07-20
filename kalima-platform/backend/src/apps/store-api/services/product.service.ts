@@ -25,6 +25,10 @@ import {
 import { normalizeOriginalFilename } from "../utils/filename";
 import { reviewService } from "./review.service";
 import { sampleService as defaultSampleService } from "./sample.service";
+import {
+  resolveUploadedUrlPath,
+  resolveUploadPath,
+} from "../../../libs/uploadsRoot";
 
 // ============================================
 // SHARED INCLUDES
@@ -717,27 +721,11 @@ export class ProductService {
   // GALLERY VIDEOS — UPLOAD
   // ============================================
 
-  private static readonly GALLERY_VIDEO_DIR = path.resolve(
-    __dirname,
-    "../../../../uploads/gallery_videos",
-  );
   private static readonly GALLERY_VIDEO_MIME_TYPES = new Set([
     "video/mp4",
     "video/webm",
     "video/quicktime",
   ]);
-  private videoDirInitPromise: Promise<unknown> | null = null;
-
-  private async ensureVideoDirExists(): Promise<void> {
-    if (!this.videoDirInitPromise) {
-      this.videoDirInitPromise = fsPromises.mkdir(
-        ProductService.GALLERY_VIDEO_DIR,
-        { recursive: true },
-      );
-    }
-    await this.videoDirInitPromise;
-  }
-
   async addVideoToGallery(
     productId: number,
     file: Express.Multer.File,
@@ -767,12 +755,13 @@ export class ProductService {
       throw new NotFoundError("Product not found");
     }
 
-    await this.ensureVideoDirExists();
+    const galleryVideoDir = resolveUploadPath("gallery_videos");
+    await fsPromises.mkdir(galleryVideoDir, { recursive: true });
 
     const ext = path.extname(file.originalname) || ".mp4";
     const uniqueId = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
     const filename = `${uniqueId}${ext}`;
-    const filePath = path.join(ProductService.GALLERY_VIDEO_DIR, filename);
+    const filePath = path.join(galleryVideoDir, filename);
     await fsPromises.writeFile(filePath, file.buffer);
 
     const url = `/uploads/gallery_videos/${filename}`;
@@ -845,11 +834,7 @@ export class ProductService {
     }
 
     if (video.source_type === video_source_type_enum.upload && video.url) {
-      const absolutePath = path.resolve(
-        __dirname,
-        "../../../..",
-        video.url.startsWith("/") ? video.url.slice(1) : video.url,
-      );
+      const absolutePath = resolveUploadedUrlPath(video.url);
       void fsPromises.unlink(absolutePath).catch(() => {});
     }
 

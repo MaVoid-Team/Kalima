@@ -22,6 +22,9 @@ jest.mock("./sample.service", () => ({
 }));
 
 import { ProductService } from "./product.service";
+import fsPromises from "fs/promises";
+import os from "os";
+import path from "path";
 
 describe("ProductService category filtering", () => {
   it("includes products attached to a selected category's descendants", async () => {
@@ -70,5 +73,60 @@ describe("ProductService category filtering", () => {
         },
       }),
     });
+  });
+});
+
+describe("ProductService gallery video uploads", () => {
+  it("stores uploaded videos inside the configured uploads directory", async () => {
+    const uploadsDir = await fsPromises.mkdtemp(
+      path.join(os.tmpdir(), "kalima-gallery-video-"),
+    );
+    const originalUploadsDir = process.env.UPLOADS_DIR;
+    process.env.UPLOADS_DIR = uploadsDir;
+
+    const create = jest.fn(async ({ data }) => ({ id: 1, ...data }));
+    const db = {
+      products: {
+        findFirst: jest.fn().mockResolvedValue({ id: 101 }),
+      },
+      product_gallery_videos: {
+        findFirst: jest.fn().mockResolvedValue(null),
+        create,
+      },
+    } as any;
+    const service = new ProductService(db);
+
+    try {
+      const result = await service.addVideoToGallery(101, {
+        buffer: Buffer.from("test-video"),
+        mimetype: "video/mp4",
+        originalname: "lesson.mp4",
+      } as Express.Multer.File);
+
+      const storedPath = path.join(
+        uploadsDir,
+        result.url.replace(/^\/uploads\//, ""),
+      );
+      await expect(fsPromises.readFile(storedPath, "utf8")).resolves.toBe(
+        "test-video",
+      );
+    } finally {
+      if (originalUploadsDir === undefined) {
+        delete process.env.UPLOADS_DIR;
+      } else {
+        process.env.UPLOADS_DIR = originalUploadsDir;
+      }
+      await fsPromises.rm(uploadsDir, { recursive: true, force: true });
+
+      const createdUrl = create.mock.calls[0]?.[0]?.data?.url;
+      if (createdUrl) {
+        const legacyPath = path.resolve(
+          __dirname,
+          "../../../..",
+          createdUrl.replace(/^\//, ""),
+        );
+        await fsPromises.rm(legacyPath, { force: true });
+      }
+    }
   });
 });
