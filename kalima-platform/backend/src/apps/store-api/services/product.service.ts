@@ -56,6 +56,7 @@ const PRODUCT_LIST_SELECT = {
   id: true,
   title: true,
   description: true,
+  serial: true,
   type: true,
   price: true,
   is_archived: true,

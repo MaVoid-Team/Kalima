@@ -92,7 +92,10 @@ describe("ProductService category filtering", () => {
       ]),
     });
     expect(db.products.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expectedWhere }),
+      expect.objectContaining({
+        where: expectedWhere,
+        select: expect.objectContaining({ serial: true }),
+      }),
     );
     expect(db.products.count).toHaveBeenCalledWith({ where: expectedWhere });
   });
