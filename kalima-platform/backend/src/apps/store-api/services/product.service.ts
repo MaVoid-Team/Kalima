@@ -275,6 +275,7 @@ export class ProductService {
       where.OR = [
         { title: { contains: filters.search, mode: "insensitive" } },
         { description: { contains: filters.search, mode: "insensitive" } },
+        { serial: { contains: filters.search, mode: "insensitive" } },
       ];
     }
 

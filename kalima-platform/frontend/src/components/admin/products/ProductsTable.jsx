@@ -74,6 +74,7 @@ export default function ProductsTable({
                         </TableHead>
                         <TableHead className="w-16">{t('products.table.thumbnail')}</TableHead>
                         <TableHead>{t('products.table.title')}</TableHead>
+                        <TableHead>{t('products.table.serial')}</TableHead>
                         <TableHead className="hidden md:table-cell">{t('products.table.type')}</TableHead>
                         <TableHead numeric>{t('products.table.price')}</TableHead>
                         <TableHead className="hidden lg:table-cell">{t('products.table.rating')}</TableHead>
@@ -124,9 +125,13 @@ export default function ProductsTable({
                                 {/* Title */}
                                 <TableCell truncate className="cursor-pointer" title={product.title} onClick={() => navigate(`/admin/products/${product.id}`)}>
                                     <p className="font-medium line-clamp-1">{product.title}</p>
-                                    {product.serial && (
-                                        <p className="text-xs text-muted-foreground">{product.serial}</p>
-                                    )}
+                                </TableCell>
+
+                                {/* Serial number: isolate Latin letters and digits from the RTL row. */}
+                                <TableCell className="whitespace-nowrap" data-testid={`products-table-serial-${product.id}`}>
+                                    <bdi dir="ltr" className="inline-block font-mono text-sm">
+                                        {product.serial || '—'}
+                                    </bdi>
                                 </TableCell>
 
                                 {/* Type */}

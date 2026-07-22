@@ -74,6 +74,28 @@ describe("ProductService category filtering", () => {
       }),
     });
   });
+
+  it("searches products by serial number", async () => {
+    const db = {
+      products: {
+        findMany: jest.fn().mockResolvedValue([]),
+        count: jest.fn().mockResolvedValue(0),
+      },
+    } as any;
+    const service = new ProductService(db);
+
+    await service.getAllProducts(undefined, { search: "TEST001" });
+
+    const expectedWhere = expect.objectContaining({
+      OR: expect.arrayContaining([
+        { serial: { contains: "TEST001", mode: "insensitive" } },
+      ]),
+    });
+    expect(db.products.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expectedWhere }),
+    );
+    expect(db.products.count).toHaveBeenCalledWith({ where: expectedWhere });
+  });
 });
 
 describe("ProductService gallery video uploads", () => {

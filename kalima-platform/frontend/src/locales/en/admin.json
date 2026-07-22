@@ -310,6 +310,7 @@
     "table": {
       "thumbnail": "Image",
       "title": "Title",
+      "serial": "Serial number",
       "type": "Type",
       "price": "Price",
       "rating": "Rating",
