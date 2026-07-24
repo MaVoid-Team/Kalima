@@ -17,7 +17,8 @@ class WhatsAppService {
   getStatus() {
     return {
       status: baileysClient.status,
-      whatsapp_sending_number: baileysClient.phoneNumber,
+      whatsapp_sending_number:
+        baileysClient.status === "ready" ? baileysClient.phoneNumber : null,
     };
   }
 

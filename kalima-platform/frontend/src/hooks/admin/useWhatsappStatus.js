@@ -59,6 +59,15 @@ export const useWhatsappStatus = () => {
             }
         };
 
+        const onStatusChanged = ({ status: nextStatus }) => {
+            if (nextStatus === 'ready') return;
+            setStatus(nextStatus);
+            if (nextStatus !== 'qr_pending') {
+                setQrCodeStr(null);
+            }
+            setIsActionLoading(['initializing', 'reconnecting'].includes(nextStatus));
+        };
+
         const onConnect = () => {
             console.log('Socket already connected or just connected, joining store_admins');
             socket.emit('join', 'store_admins');
@@ -80,6 +89,7 @@ export const useWhatsappStatus = () => {
         socket.on('whatsappAuthenticated', onAuth);
         socket.on('whatsappAuthFailed', onAuthFailed);
         socket.on('whatsappDisconnected', onDisconnected);
+        socket.on('whatsappStatusChanged', onStatusChanged);
         socket.on('connect_error', onConnectError);
 
         // The shared socket is intentionally created with autoConnect disabled.
@@ -93,6 +103,7 @@ export const useWhatsappStatus = () => {
             socket.off('whatsappAuthenticated', onAuth);
             socket.off('whatsappAuthFailed', onAuthFailed);
             socket.off('whatsappDisconnected', onDisconnected);
+            socket.off('whatsappStatusChanged', onStatusChanged);
             socket.off('connect_error', onConnectError);
         };
     }, [fetchStatus, t]);
@@ -100,6 +111,7 @@ export const useWhatsappStatus = () => {
 
     const requestQR = () => {
         setIsActionLoading(true);
+        setStatus('initializing');
         console.log('Emitting requestWhatsappQr');
 
         // Re-open the shared client when a previous connection dropped while

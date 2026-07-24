@@ -4,6 +4,7 @@ import { verifyAccessToken } from "../auth/jwt";
 import { prisma } from "../db/prisma";
 import { baileysClient } from "../whatsapp/client";
 import { generalSettingsService } from "../../apps/store-api/services/general-settings.service";
+import type { BaileysCallbacks } from "../whatsapp/client";
 
 const ADMIN_ROLES = ["Admin", "SubAdmin", "Moderator"];
 
@@ -13,7 +14,7 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
     path: "/socket.io",
   });
 
-  const whatsappCallbacks = {
+  const whatsappCallbacks: BaileysCallbacks = {
     onQr: (qr: string) => {
       console.log(`[Socket] WhatsApp QR Code generated.`);
       io.to("store_admins").emit("whatsappQr", { qr });
@@ -36,6 +37,9 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
     onDisconnected: (reason: string) => {
       console.log(`[Socket] WhatsApp disconnected:`, reason);
       io.to("store_admins").emit("whatsappDisconnected", { reason });
+    },
+    onStatusChange: (status) => {
+      io.to("store_admins").emit("whatsappStatusChanged", { status });
     },
   };
 
@@ -84,7 +88,7 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
         socket.on("requestWhatsappQr", async () => {
           console.log(`[Socket] Received 'requestWhatsappQr' from user ${userId}`);
 
-          // If already connected, notify immediately
+          // If already connected, notify immediately.
           if (baileysClient.status === "ready") {
             console.log(`[Socket] WhatsApp is already ready. Emitting 'whatsappAuthenticated' immediately.`);
             socket.emit("whatsappAuthenticated", {
@@ -94,6 +98,11 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
             return;
           }
 
+          socket.emit("whatsappStatusChanged", {
+            status: baileysClient.status === "disconnected"
+              ? "initializing"
+              : baileysClient.status,
+          });
           console.log(`[Socket] Initializing WhatsApp Baileys Client...`);
           await baileysClient.initialize(whatsappCallbacks);
         });

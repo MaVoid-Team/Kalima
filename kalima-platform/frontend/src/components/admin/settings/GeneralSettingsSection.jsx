@@ -95,7 +95,9 @@ export default function GeneralSettingsSection() {
                                         className="mb-0"
                                         data-search-content={`${t('settings.general.whatsappSendingNumber', { lng: 'en' })} ${t('settings.general.whatsappSendingNumber', { lng: 'ar' })}`}
                                     >
-                                        {t('settings.general.whatsappSendingNumber', 'WhatsApp Sending Number')}
+                                        {status === 'ready'
+                                            ? t('settings.general.whatsappSendingNumber', 'WhatsApp Sending Number')
+                                            : t('settings.general.whatsappLastLinkedNumber', 'Last Linked WhatsApp Number')}
                                     </FormLabel>
                                     <TooltipProvider>
                                         <Tooltip>
@@ -116,6 +118,14 @@ export default function GeneralSettingsSection() {
                                     dir="ltr"
                                     value={(sendingNumber || settings?.whatsapp_sending_number) ? `+${(sendingNumber || settings?.whatsapp_sending_number).toString().replace(/^\+/, '')}` : t('common:na', 'N/A')}
                                 />
+                                {status !== 'ready' && settings?.whatsapp_sending_number && (
+                                    <p className="text-xs text-amber-700 dark:text-amber-400">
+                                        {t(
+                                            'settings.general.whatsappHistoricalNumberNotice',
+                                            'Saved for reference only. The live connection status is shown below.'
+                                        )}
+                                    </p>
+                                )}
                             </FormItem>
 
                             <FormField
@@ -270,6 +280,26 @@ export default function GeneralSettingsSection() {
                                     {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
                                     {t('settings.general.whatsappConnect')}
                                 </Button>
+                            </div>
+                        )}
+
+                        {['initializing', 'reconnecting'].includes(status) && (
+                            <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl bg-muted/20 gap-4">
+                                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <LoadingSpinner className="h-6 w-6 text-primary" />
+                                </div>
+                                <div className="text-center space-y-1">
+                                    <p className="font-medium text-lg">
+                                        {status === 'reconnecting'
+                                            ? t('settings.general.whatsappReconnecting', 'Reconnecting WhatsApp...')
+                                            : t('settings.general.whatsappInitializing', 'Initializing Session...')}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {status === 'reconnecting'
+                                            ? t('settings.general.whatsappReconnectingDescription', 'The saved session is reconnecting automatically. No QR scan is needed yet.')
+                                            : t('settings.general.whatsappPreparing', 'The server is preparing the WhatsApp connection.')}
+                                    </p>
+                                </div>
                             </div>
                         )}
 

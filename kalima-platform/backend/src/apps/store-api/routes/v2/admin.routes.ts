@@ -22,6 +22,11 @@ const adminModeratorAuth = [
 
 const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
 
+const whatsappDisconnectAuth = [
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+];
+
 // ============================================
 // USER MANAGEMENT
 // ============================================
@@ -135,7 +140,11 @@ router.put(
 // ============================================
 router.get("/whatsapp/status", ...adminAuth, whatsappController.getStatus);
 router.post("/whatsapp/send", ...adminAuth, whatsappController.sendMessage);
-router.post("/whatsapp/logout", ...adminAuth, whatsappController.logout);
+router.post(
+  "/whatsapp/logout",
+  ...whatsappDisconnectAuth,
+  whatsappController.logout,
+);
 
 // ============================================
 // NOTIFICATIONS

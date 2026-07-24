@@ -15,66 +15,115 @@ import fs from "fs/promises";
 export const AUTH_DIR = process.env.WHATSAPP_AUTH_DIR
   ? path.resolve(process.env.WHATSAPP_AUTH_DIR)
   : path.join(process.cwd(), "baileys_auth");
-const CREDS_FILE = path.join(AUTH_DIR, "creds.json");
-const RECONNECT_DELAY_MS = 2_000;
-const logger = P({ level: "silent" }); // suppress Baileys internal logs
 
-// Suppress libsignal "Closing session" noise which bypasses Pino logger
+export type WhatsAppStatus =
+  | "disconnected"
+  | "initializing"
+  | "qr_pending"
+  | "reconnecting"
+  | "ready";
+
+export type BaileysCallbacks = {
+  onQr: (qr: string) => void;
+  onReady: (phoneNumber: string) => void | Promise<void>;
+  onAuthFailure: (reason: string) => void;
+  onDisconnected: (reason: string) => void;
+  onStatusChange?: (status: WhatsAppStatus) => void;
+};
+
+type BaileysClientOptions = {
+  authDir?: string;
+  reconnectDelaysMs?: number[];
+};
+
+const logger = P({ level: "silent" });
 const originalConsoleLog = console.log;
 console.log = function (...args: any[]) {
   if (typeof args[0] === "string" && args[0].startsWith("Closing session:")) return;
   originalConsoleLog.apply(console, args);
 };
 
-type BaileysCallbacks = {
-  onQr: (qr: string) => void;
-  onReady: (phoneNumber: string) => void;
-  onAuthFailure: (reason: string) => void;
-  onDisconnected: (reason: string) => void;
-};
-
-class BaileysClient {
+export class BaileysClient {
   private sock: WASocket | null = null;
   private callbacks: BaileysCallbacks | null = null;
-  private _status: "disconnected" | "qr_pending" | "ready" = "disconnected";
+  private _status: WhatsAppStatus = "disconnected";
   private _phoneNumber: string | null = null;
+  private connectPromise: Promise<void> | null = null;
   private reconnectTimer: NodeJS.Timeout | null = null;
+  private reconnectAttempt = 0;
+  private generation = 0;
+  private intentionalStop = false;
+  private readonly authDir: string;
+  private readonly reconnectDelaysMs: number[];
+
+  constructor(options: BaileysClientOptions = {}) {
+    this.authDir = options.authDir ?? AUTH_DIR;
+    this.reconnectDelaysMs =
+      options.reconnectDelaysMs ?? [1_000, 2_000, 4_000, 8_000, 16_000];
+  }
 
   get status() { return this._status; }
   get phoneNumber() { return this._phoneNumber; }
 
-  async initialize(callbacks: BaileysCallbacks): Promise<void> {
-    // Prevent double-init
-    if (this.sock) {
-      this.destroy();
-    }
-
-    this.callbacks = callbacks;
-    await this.connect();
-  }
-
   async restore(callbacks: BaileysCallbacks): Promise<boolean> {
+    this.callbacks = callbacks;
     try {
-      await fs.access(CREDS_FILE);
+      await fs.access(path.join(this.authDir, "creds.json"));
     } catch {
       return false;
     }
-
     await this.initialize(callbacks);
     return true;
   }
 
-  private async clearAuthState(): Promise<void> {
+  async initialize(callbacks: BaileysCallbacks): Promise<void> {
+    this.callbacks = callbacks;
+    this.intentionalStop = false;
+
+    if (this.sock || this._status === "ready") return;
+    if (this.connectPromise) return this.connectPromise;
+    if (this.reconnectTimer) return;
+
+    this.setStatus("initializing");
     try {
-      await fs.rm(AUTH_DIR, { recursive: true, force: true });
-    } catch {
-      // Best-effort cleanup; failures should not block logout.
+      await this.startConnection();
+    } catch (error: any) {
+      this.setStatus("disconnected");
+      this.callbacks?.onAuthFailure(error?.message ?? "Initialization failed");
     }
   }
 
+  private setStatus(status: WhatsAppStatus): void {
+    this._status = status;
+    this.callbacks?.onStatusChange?.(status);
+  }
+
+  private async prepareAuthDirectory(): Promise<void> {
+    await fs.mkdir(this.authDir, { recursive: true, mode: 0o700 });
+    await fs.chmod(this.authDir, 0o700);
+  }
+
+  private startConnection(): Promise<void> {
+    if (this.connectPromise) return this.connectPromise;
+
+    const connection = this.connect();
+    this.connectPromise = connection;
+    void connection.then(
+      () => {
+        if (this.connectPromise === connection) this.connectPromise = null;
+      },
+      () => {
+        if (this.connectPromise === connection) this.connectPromise = null;
+      },
+    );
+    return connection;
+  }
+
   private async connect(): Promise<void> {
-    const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
+    await this.prepareAuthDirectory();
+    const { state, saveCreds } = await useMultiFileAuthState(this.authDir);
     const { version } = await fetchLatestBaileysVersion();
+    const generation = ++this.generation;
 
     const sock = makeWASocket({
       version,
@@ -90,109 +139,118 @@ class BaileysClient {
     });
     this.sock = sock;
 
-    // Save credentials whenever they update
     sock.ev.on("creds.update", saveCreds);
-
-    // Handle connection lifecycle
-    sock.ev.on("connection.update", (update) => {
-      // Ignore lifecycle events from a socket superseded by a reconnect.
-      if (this.sock !== sock) return;
-
+    sock.ev.on("connection.update", async (update) => {
+      if (generation !== this.generation) return;
       const { connection, lastDisconnect, qr } = update;
 
       if (qr) {
-        this._status = "qr_pending";
+        this.setStatus("qr_pending");
         this.callbacks?.onQr(qr);
       }
 
       if (connection === "open") {
-        if (this.reconnectTimer) {
-          clearTimeout(this.reconnectTimer);
-          this.reconnectTimer = null;
-        }
-        this._status = "ready";
-        // Extract phone number from the connected user JID
+        this.reconnectAttempt = 0;
         const jid = sock.user?.id;
         this._phoneNumber = jid ? jid.split(":")[0].split("@")[0] : null;
-        this.callbacks?.onReady(this._phoneNumber ?? "unknown");
+        this.setStatus("ready");
+        try {
+          await this.callbacks?.onReady(this._phoneNumber ?? "unknown");
+        } catch (error: any) {
+          this.callbacks?.onAuthFailure(
+            error?.message ?? "Connected, but status persistence failed",
+          );
+        }
       }
 
       if (connection === "close") {
         const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
-        const reason = DisconnectReason;
+        this.sock = null;
+        this.connectPromise = null;
 
-        if (statusCode === reason.loggedOut) {
-          this._status = "disconnected";
-          this._phoneNumber = null;
-          this.sock = null;
-          this.clearAuthState();
-          this.callbacks?.onDisconnected("Logged out");
-        } else if (statusCode === reason.restartRequired) {
-          // Normal reconnect after QR scan — re-create socket
-          this.reconnectNow();
-        } else {
-          this._status = "disconnected";
-          this.callbacks?.onDisconnected(
-            `Connection closed: ${lastDisconnect?.error?.message ?? "unknown"}`
-          );
-          this.scheduleReconnect();
+        if (this.intentionalStop || statusCode === DisconnectReason.loggedOut) {
+          await this.handleLoggedOut("Logged out");
+          return;
         }
+
+        this.scheduleReconnect(
+          statusCode === DisconnectReason.restartRequired
+            ? "Restart required"
+            : lastDisconnect?.error?.message ?? "Connection closed",
+        );
       }
     });
   }
 
-  private scheduleReconnect(): void {
-    if (this.reconnectTimer) return;
+  private scheduleReconnect(reason: string): void {
+    if (this.intentionalStop || this.reconnectTimer) return;
+    const delay = this.reconnectDelaysMs[this.reconnectAttempt];
+    if (delay === undefined) {
+      this.setStatus("disconnected");
+      this.callbacks?.onDisconnected(`Reconnect attempts exhausted: ${reason}`);
+      return;
+    }
 
+    this.reconnectAttempt += 1;
+    this.setStatus("reconnecting");
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
-      this.reconnectNow();
-    }, RECONNECT_DELAY_MS);
+      this.startConnection().catch((error) => {
+        this.scheduleReconnect(error?.message ?? "Reconnect failed");
+      });
+    }, delay);
   }
 
-  private reconnectNow(): void {
-    void this.connect().catch((error) => {
-      this.callbacks?.onDisconnected(
-        `Reconnect failed: ${error instanceof Error ? error.message : "unknown"}`
-      );
-      this.scheduleReconnect();
-    });
+  private async clearAuthState(): Promise<void> {
+    await fs.rm(this.authDir, { recursive: true, force: true });
   }
 
-  /**
-   * Send a text message.
-   * @param phone - Phone number WITHOUT + prefix, e.g. "201234567890"
-   * @param text  - Message body
-   */
+  private async handleLoggedOut(reason: string): Promise<void> {
+    this.cancelReconnect();
+    this.generation += 1;
+    this.sock = null;
+    this._phoneNumber = null;
+    this.setStatus("disconnected");
+    await this.clearAuthState();
+    this.callbacks?.onDisconnected(reason);
+  }
+
   async sendMessage(phone: string, text: string): Promise<void> {
     if (!this.sock || this._status !== "ready") {
       throw new Error("WhatsApp client is not connected");
     }
-    // Baileys JID format: <number>@s.whatsapp.net
     const jid = `${phone.replace(/\D/g, "")}@s.whatsapp.net`;
     await this.sock.sendMessage(jid, { text });
   }
 
   async logout(): Promise<void> {
-    if (this.sock) {
-      await this.sock.logout();
-      this.sock = null;
-      this._status = "disconnected";
-      this._phoneNumber = null;
-      await this.clearAuthState();
-    }
+    this.intentionalStop = true;
+    this.cancelReconnect();
+    const sock = this.sock;
+    this.generation += 1;
+    this.sock = null;
+    this._phoneNumber = null;
+    this.setStatus("disconnected");
+    if (sock) await sock.logout();
+    await this.clearAuthState();
+    this.callbacks?.onDisconnected("logout");
   }
 
   destroy(): void {
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-    if (this.sock) {
-      this.sock.end(undefined);
-      this.sock = null;
-      this._status = "disconnected";
-    }
+    this.intentionalStop = true;
+    this.cancelReconnect();
+    this.generation += 1;
+    const sock = this.sock;
+    this.sock = null;
+    this._phoneNumber = null;
+    this.setStatus("disconnected");
+    sock?.end(undefined);
+  }
+
+  private cancelReconnect(): void {
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+    this.reconnectTimer = null;
+    this.reconnectAttempt = 0;
   }
 }
 
