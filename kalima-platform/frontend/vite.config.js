@@ -36,6 +36,9 @@ export default defineConfig(({ command, mode }) => {
       },
       cors: true,
     },
+    define: mode === 'production'
+      ? { 'import.meta.env.VITE_API_URL': JSON.stringify('https://kalima-edu.com/api/v2') }
+      : undefined,
     build: {
       chunkSizeWarningLimit: 1600,
       cssMinify: true,
