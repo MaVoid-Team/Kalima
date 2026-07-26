@@ -38,10 +38,12 @@ class BaileysClient {
   private callbacks: BaileysCallbacks | null = null;
   private _status: "disconnected" | "qr_pending" | "ready" = "disconnected";
   private _phoneNumber: string | null = null;
+  private _qrCode: string | null = null;
   private reconnectTimer: NodeJS.Timeout | null = null;
 
   get status() { return this._status; }
   get phoneNumber() { return this._phoneNumber; }
+  get qrCode() { return this._qrCode; }
 
   async initialize(callbacks: BaileysCallbacks): Promise<void> {
     // Prevent double-init
@@ -102,6 +104,7 @@ class BaileysClient {
 
       if (qr) {
         this._status = "qr_pending";
+        this._qrCode = qr;
         this.callbacks?.onQr(qr);
       }
 
@@ -111,6 +114,7 @@ class BaileysClient {
           this.reconnectTimer = null;
         }
         this._status = "ready";
+        this._qrCode = null;
         // Extract phone number from the connected user JID
         const jid = sock.user?.id;
         this._phoneNumber = jid ? jid.split(":")[0].split("@")[0] : null;
@@ -124,6 +128,7 @@ class BaileysClient {
         if (statusCode === reason.loggedOut) {
           this._status = "disconnected";
           this._phoneNumber = null;
+          this._qrCode = null;
           this.sock = null;
           this.clearAuthState();
           this.callbacks?.onDisconnected("Logged out");
@@ -132,6 +137,7 @@ class BaileysClient {
           this.reconnectNow();
         } else {
           this._status = "disconnected";
+          this._qrCode = null;
           this.callbacks?.onDisconnected(
             `Connection closed: ${lastDisconnect?.error?.message ?? "unknown"}`
           );
@@ -179,6 +185,7 @@ class BaileysClient {
       this.sock = null;
       this._status = "disconnected";
       this._phoneNumber = null;
+      this._qrCode = null;
       await this.clearAuthState();
     }
   }
@@ -192,6 +199,7 @@ class BaileysClient {
       this.sock.end(undefined);
       this.sock = null;
       this._status = "disconnected";
+      this._qrCode = null;
     }
   }
 }

@@ -95,7 +95,16 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
           }
 
           console.log(`[Socket] Initializing WhatsApp Baileys Client...`);
-          await baileysClient.initialize(whatsappCallbacks);
+          try {
+            await baileysClient.initialize(whatsappCallbacks);
+          } catch (error) {
+            const reason = error instanceof Error ? error.message : "Unknown initialization error";
+            console.error(`[Socket] Failed to initialize WhatsApp client:`, error);
+            socket.emit("whatsappAuthFailed", {
+              status: "rejected",
+              reason,
+            });
+          }
         });
       }
     } catch (err: any) {

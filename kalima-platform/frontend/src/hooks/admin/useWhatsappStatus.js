@@ -15,8 +15,11 @@ export const useWhatsappStatus = () => {
     const fetchStatus = useCallback(async () => {
         try {
             const response = await axiosInstance.get('/admin/whatsapp/status');
-            const { status: currentStatus, whatsapp_sending_number } = response.data.data;
-            setStatus(currentStatus);
+            const { status: currentStatus, whatsapp_sending_number, qr } = response.data.data;
+            setQrCodeStr(qr || null);
+            // A qr_pending state without a QR is stale and cannot make progress.
+            // Present a retryable failure instead of an infinite initialization screen.
+            setStatus(currentStatus === 'qr_pending' && !qr ? 'failed' : currentStatus);
             setSendingNumber(whatsapp_sending_number);
         } catch (error) {
             console.error('Failed to fetch WhatsApp status:', error);

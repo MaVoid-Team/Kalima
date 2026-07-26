@@ -18,6 +18,7 @@ class WhatsAppService {
     return {
       status: baileysClient.status,
       whatsapp_sending_number: baileysClient.phoneNumber,
+      qr: baileysClient.qrCode,
     };
   }
 
