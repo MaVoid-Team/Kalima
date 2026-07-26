@@ -19,6 +19,7 @@ class WhatsAppService {
       status: baileysClient.status,
       whatsapp_sending_number:
         baileysClient.status === "ready" ? baileysClient.phoneNumber : null,
+      qr: baileysClient.qrCode,
     };
   }
 

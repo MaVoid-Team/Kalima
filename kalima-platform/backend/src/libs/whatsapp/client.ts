@@ -49,6 +49,7 @@ export class BaileysClient {
   private _status: WhatsAppStatus = "disconnected";
   private _phoneNumber: string | null = null;
   private connectPromise: Promise<void> | null = null;
+  private _qrCode: string | null = null;
   private reconnectTimer: NodeJS.Timeout | null = null;
   private reconnectAttempt = 0;
   private generation = 0;
@@ -64,6 +65,7 @@ export class BaileysClient {
 
   get status() { return this._status; }
   get phoneNumber() { return this._phoneNumber; }
+  get qrCode() { return this._qrCode; }
 
   async restore(callbacks: BaileysCallbacks): Promise<boolean> {
     this.callbacks = callbacks;
@@ -95,6 +97,7 @@ export class BaileysClient {
 
   private setStatus(status: WhatsAppStatus): void {
     this._status = status;
+    if (status !== "qr_pending") this._qrCode = null;
     this.callbacks?.onStatusChange?.(status);
   }
 
@@ -145,6 +148,7 @@ export class BaileysClient {
       const { connection, lastDisconnect, qr } = update;
 
       if (qr) {
+        this._qrCode = qr;
         this.setStatus("qr_pending");
         this.callbacks?.onQr(qr);
       }
