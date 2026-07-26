@@ -105,7 +105,6 @@ export default function EmployeePerformancePage() {
                                     <th className="px-6 py-3 font-medium text-start">{t('table.email', 'Email')}</th>
                                     <th className="kalima-number px-6 py-3 font-medium">{t('table.totalHandled', 'Total Handled')}</th>
                                     <th className="kalima-number px-6 py-3 font-medium">{t('table.confirmed', 'Confirmed')}</th>
-                                    <th className="kalima-number px-6 py-3 font-medium">{t('table.pending', 'Pending')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -116,12 +115,11 @@ export default function EmployeePerformancePage() {
                                             <td className="kalima-truncate px-6 py-4" title={item.user?.email}>{item.user?.email}</td>
                                             <td className="kalima-number px-6 py-4">{item.totalHandled || 0}</td>
                                             <td className="kalima-number px-6 py-4 text-emerald-600">{item.byStatus?.confirmed || 0}</td>
-                                            <td className="kalima-number px-6 py-4 text-orange-500">{item.byStatus?.pending || 0}</td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="5" className="px-6 py-8 text-center text-muted-foreground">
+                                        <td colSpan="4" className="px-6 py-8 text-center text-muted-foreground">
                                             {t('table.noData', 'No data available')}
                                         </td>
                                     </tr>
