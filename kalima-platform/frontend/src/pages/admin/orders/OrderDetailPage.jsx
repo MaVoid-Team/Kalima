@@ -14,6 +14,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import SendNotificationModal from '@/components/admin/notifications/SendNotificationModal';
 import { Bell } from 'lucide-react';
+import AppreciationQrButton from '@/components/admin/users/AppreciationQrButton';
 
 import {
     AlertDialog,
@@ -79,6 +80,11 @@ export default function OrderDetailPage() {
     }
 
     const status = order.status?.toLowerCase();
+    const purchaserRoles = [
+        order.users?.role,
+        ...(order.users?.user_roles?.map((userRole) => userRole?.role) || []),
+    ];
+    const isTeacher = purchaserRoles.some((role) => String(role).toLowerCase() === 'teacher');
 
     const handleDelete = async () => {
         const res = await deleteOrder(order.id);
@@ -525,7 +531,12 @@ export default function OrderDetailPage() {
 
                     {/* Customer Info */}
                     <div className="border rounded-md p-4 space-y-3" data-testid="order-detail-customer-info-section">
-                        <h3 className="font-medium text-primary">{t('orders.details.customerInfo')}</h3>
+                        <div className="flex items-center justify-between gap-3">
+                            <h3 className="font-medium text-primary">{t('orders.details.customerInfo')}</h3>
+                            {isTeacher && order.users?.id ? (
+                                <AppreciationQrButton userId={order.users.id} />
+                            ) : null}
+                        </div>
                         <div className="space-y-1 text-sm overflow-hidden">
                             <div className="font-medium truncate" title={order.users?.name || 'N/A'}>{order.users?.name || 'N/A'}</div>
                             <div className="text-muted-foreground truncate" title={order.users?.email}>{order.users?.email}</div>
