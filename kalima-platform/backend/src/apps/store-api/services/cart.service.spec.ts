@@ -18,6 +18,9 @@ function getMockPrismaClient() {
         update: jest.fn(),
         delete: jest.fn(),
       },
+      purchase_items: {
+        findMany: jest.fn(),
+      },
       products: {
         findUnique: jest.fn(),
       },
@@ -86,6 +89,52 @@ describe("CartService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     cartService = new CartService(mockPrismaClient as unknown as PrismaClient);
+  });
+
+  describe("repeat purchase warning", () => {
+    it("returns each active prior product once for the authenticated user's active cart", async () => {
+      mockPrismaClient.carts.findFirst.mockResolvedValueOnce({
+        cart_items: [
+          { product_id: 10 },
+          { product_id: 10 },
+          { product_id: 20 },
+        ],
+      });
+      mockPrismaClient.purchase_items.findMany.mockResolvedValueOnce([
+        { product_id: 10, products: { id: 10, title: "Arabic Workbook" } },
+        { product_id: 10, products: { id: 10, title: "Arabic Workbook" } },
+        { product_id: 20, products: { id: 20, title: "Grammar Cards" } },
+      ]);
+
+      const result = await cartService.getRepeatPurchaseItems(42);
+
+      expect(result).toEqual([
+        { id: 10, title: "Arabic Workbook" },
+        { id: 20, title: "Grammar Cards" },
+      ]);
+      expect(mockPrismaClient.purchase_items.findMany).toHaveBeenCalledWith({
+        where: {
+          product_id: { in: [10, 20] },
+          is_deleted: false,
+          purchases: {
+            user_id: 42,
+            status: { in: ["pending", "received", "confirmed", "delivered"] },
+            is_deleted: false,
+          },
+        },
+        select: {
+          product_id: true,
+          products: { select: { id: true, title: true } },
+        },
+      });
+    });
+
+    it("does not query purchase history when the active cart is empty", async () => {
+      mockPrismaClient.carts.findFirst.mockResolvedValueOnce({ cart_items: [] });
+
+      await expect(cartService.getRepeatPurchaseItems(42)).resolves.toEqual([]);
+      expect(mockPrismaClient.purchase_items.findMany).not.toHaveBeenCalled();
+    });
   });
 
   describe("add item and recalculate totals", () => {

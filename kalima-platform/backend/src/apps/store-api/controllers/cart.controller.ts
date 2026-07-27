@@ -155,6 +155,16 @@ export const cartController = {
     }
   },
 
+  async getRepeatPurchaseItems(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req.user as any).userId;
+      const items = await cartService.getRepeatPurchaseItems(userId);
+      res.status(200).json({ success: true, data: { items } });
+    } catch (err) {
+      next(err);
+    }
+  },
+
   // ============================================
   // FAST BUY CART ENDPOINTS
   // ============================================
