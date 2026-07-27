@@ -1,0 +1,35 @@
+groups:
+  - name: kalima-production
+    rules:
+      - alert: KalimaTargetDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kalima monitoring target is down"
+      - alert: KalimaHighHostCPU
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 10m
+        labels:
+          severity: warning
+      - alert: KalimaHighHostMemory
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+      - alert: KalimaDiskAlmostFull
+        expr: (1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 > 85
+        for: 5m
+        labels:
+          severity: critical
+      - alert: KalimaBackendHighErrorRate
+        expr: sum(rate(kalima_http_requests_total{status_code=~"5.."}[5m])) / clamp_min(sum(rate(kalima_http_requests_total[5m])), 0.001) > 0.01
+        for: 5m
+        labels:
+          severity: critical
+      - alert: KalimaBackendHighP95Latency
+        expr: histogram_quantile(0.95, sum by(le) (rate(kalima_http_request_duration_seconds_bucket[5m]))) > 1.5
+        for: 5m
+        labels:
+          severity: warning

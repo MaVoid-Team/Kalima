@@ -1,0 +1,53 @@
+name: kalima-data
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: kalima-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    networks:
+      data-network:
+        aliases: [kalima-postgres]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    mem_limit: 2g
+    mem_reservation: 512m
+    cpu_shares: 1024
+    ulimits:
+      nofile: {soft: 65535, hard: 65535}
+  redis:
+    image: redis:8.6.0-alpine
+    container_name: kalima-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec"]
+    volumes: [redis-data:/data]
+    networks:
+      data-network:
+        aliases: [kalima-redis]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    mem_limit: 512m
+    mem_reservation: 64m
+    cpu_shares: 256
+    ulimits:
+      nofile: {soft: 65535, hard: 65535}
+networks:
+  data-network:
+    name: kalima-data-network
+volumes:
+  postgres-data:
+    name: kalima-postgres-data
+  redis-data:
+    name: kalima-redis-data
