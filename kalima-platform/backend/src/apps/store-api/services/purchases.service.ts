@@ -37,7 +37,16 @@ const PURCHASE_INCLUDE = {
       },
     },
   },
-  users: { select: { id: true, name: true, email: true, phone: true } },
+  users: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      role: true,
+      user_roles: { select: { role: true } },
+    },
+  },
   received_by_user: { select: { id: true, name: true } },
   confirmed_by_user: { select: { id: true, name: true } },
   returned_by_user: { select: { id: true, name: true } },
