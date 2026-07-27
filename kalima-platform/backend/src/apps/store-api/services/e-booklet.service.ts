@@ -2629,6 +2629,45 @@ export class EBookletService {
     return this.serializePublicInstance(instance);
   }
 
+  async getRepeatPurchaseTemplates(
+    teacherId: number,
+    templateIds: number[],
+  ): Promise<Array<{ id: number; title: string }>> {
+    const uniqueTemplateIds = [...new Set(templateIds)];
+    if (uniqueTemplateIds.length === 0) return [];
+
+    const purchases = await this.db.e_booklet_purchases.findMany({
+      where: {
+        teacher_id: teacherId,
+        template_id: { in: uniqueTemplateIds },
+        status: {
+          in: [
+            "pending",
+            "awaiting_payment",
+            "paid",
+            "needs_branding_info",
+            "customization_in_progress",
+            "ready",
+            "delivered",
+          ],
+        },
+      },
+      select: {
+        template_id: true,
+        template: { select: { id: true, title: true } },
+      },
+    });
+
+    return [
+      ...new Map(
+        purchases.map(({ template }: any) => [
+          template.id,
+          { id: template.id, title: template.title },
+        ]),
+      ).values(),
+    ] as Array<{ id: number; title: string }>;
+  }
+
   async createPublicCheckoutRequest(
     teacherId: number,
     dto: any,
