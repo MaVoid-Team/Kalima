@@ -219,7 +219,21 @@ export class BaileysClient {
   }
 
   private async clearAuthState(): Promise<void> {
-    await fs.rm(this.authDir, { recursive: true, force: true });
+    // The production auth directory is a Docker volume mount. Removing the
+    // mount root fails with EBUSY, so keep the directory and remove its saved
+    // session files instead.
+    let entries: string[];
+    try {
+      entries = await fs.readdir(this.authDir);
+    } catch (error: any) {
+      if (error?.code === "ENOENT") return;
+      throw error;
+    }
+    await Promise.all(
+      entries.map((entry) =>
+        fs.rm(path.join(this.authDir, entry), { recursive: true, force: true }),
+      ),
+    );
   }
 
   private async handleLoggedOut(reason: string): Promise<void> {

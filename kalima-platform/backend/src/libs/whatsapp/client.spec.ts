@@ -141,7 +141,8 @@ describe("BaileysClient lifecycle", () => {
     });
     await new Promise((resolve) => setTimeout(resolve, 10));
 
-    await expect(fs.access(authDir)).rejects.toBeDefined();
+    await expect(fs.access(path.join(authDir, "creds.json"))).rejects.toBeDefined();
+    await expect(fs.access(authDir)).resolves.toBeUndefined();
     expect(client.status).toBe("disconnected");
     expect(makeWASocket).toHaveBeenCalledTimes(1);
     expect(events.onDisconnected).toHaveBeenCalledWith("logout");
@@ -153,7 +154,8 @@ describe("BaileysClient lifecycle", () => {
 
     await client.logout();
 
-    await expect(fs.access(authDir)).rejects.toBeDefined();
+    await expect(fs.access(path.join(authDir, "creds.json"))).rejects.toBeDefined();
+    await expect(fs.access(authDir)).resolves.toBeUndefined();
     expect(client.status).toBe("disconnected");
   });
 });
