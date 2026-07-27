@@ -3,6 +3,7 @@ import { adminDashboardController } from "../../controllers/admin-dashboard.cont
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/client";
+import { employeePerformanceAuth } from "../../middleware/employeePerformanceAuth";
 
 const router = Router();
 
@@ -29,7 +30,7 @@ router.get("/product-performance", ...adminAuth, adminDashboardController.getPro
 router.get("/response-time", ...adminAuth, adminDashboardController.getResponseTimeAnalytics);
 
 // Staff Performance Tracking (Received/Confirmed/Returned/Response Times)
-router.get("/staff-report", ...adminAuth, adminDashboardController.getStaffPerformanceReport);
+router.get("/staff-report", ...employeePerformanceAuth, adminDashboardController.getStaffPerformanceReport);
 
 // User Stats (total users, by role, verified)
 router.get("/user-stats", ...adminAuth, adminDashboardController.getUserStats);
