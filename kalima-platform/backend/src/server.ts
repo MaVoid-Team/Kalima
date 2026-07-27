@@ -19,6 +19,11 @@ import corsOptions from "./config/corsOptions";
 import { registerAllExportResources } from "./apps/store-api/export";
 import { isProtectedSampleStaticPath } from "./libs/sampleStaticAccess";
 import { resolveUploadsRoot } from "./libs/uploadsRoot";
+import {
+  httpMetricsMiddleware,
+  metricsAccessMiddleware,
+  metricsHandler,
+} from "./libs/metrics";
 
 const sentryDsn = process.env.SENTRY_DSN
   || (process.env.NODE_ENV === "production"
@@ -41,6 +46,9 @@ registerAllExportResources();
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(httpMetricsMiddleware);
+
+app.get("/metrics", metricsAccessMiddleware, metricsHandler);
 app.use(
   "/uploads/samples",
   (req, res, next) => {
