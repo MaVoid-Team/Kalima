@@ -1062,6 +1062,13 @@ class UserManagementService {
     });
   }
 
+  async markPasswordResetTokenUsedByUserId(userId: number): Promise<void> {
+    await this.db.password_reset_tokens.updateMany({
+      where: { user_id: userId, used_at: null },
+      data: { used_at: new Date() },
+    });
+  }
+
   // ============================================
   // DELETE USER
   // ============================================

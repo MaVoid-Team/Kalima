@@ -26,12 +26,14 @@ import {
   generateSingleSessionRefreshToken,
   signAccessToken,
 } from "../../../libs/auth/jwt";
+import { getEmailService } from "../emails/email.service";
 import { portal_enum, role_enum } from "../generated/prisma/client";
 
 const mockedConsumeRefreshToken = consumeRefreshToken as jest.Mock;
 const mockedGenerateRefreshToken = generateRefreshToken as jest.Mock;
 const mockedGenerateSingleSessionRefreshToken = generateSingleSessionRefreshToken as jest.Mock;
 const mockedSignAccessToken = signAccessToken as jest.Mock;
+const mockedGetEmailService = getEmailService as jest.Mock;
 
 function createServiceWithRoles(roles: role_enum[]) {
   const service = new AuthService() as any;
@@ -155,5 +157,91 @@ describe("AuthService session issuance", () => {
     ).toBeLessThan(
       mockedGenerateSingleSessionRefreshToken.mock.invocationCallOrder[0],
     );
+  });
+});
+
+describe("AuthService password reset delivery", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("creates and emails a reset token for an existing user", async () => {
+    const sendPasswordResetEmail = jest.fn().mockResolvedValue(true);
+    mockedGetEmailService.mockReturnValue({ sendPasswordResetEmail });
+
+    const service = new AuthService() as any;
+    service.userService = {
+      normalizeEmail: jest.fn().mockReturnValue("student@example.com"),
+      findUserByEmail: jest.fn().mockResolvedValue({
+        id: 10,
+        name: "Student",
+        email: "student@example.com",
+      }),
+      generateSecureToken: jest.fn().mockReturnValue("reset-token"),
+      hashToken: jest.fn().mockResolvedValue("reset-token-hash"),
+      createPasswordResetToken: jest.fn().mockResolvedValue(undefined),
+      markPasswordResetTokenUsedByUserId: jest.fn(),
+    };
+
+    await service.forgotPassword("Student@Example.com");
+
+    expect(service.userService.createPasswordResetToken).toHaveBeenCalledWith(
+      10,
+      "reset-token-hash",
+      expect.any(Date),
+    );
+    expect(sendPasswordResetEmail).toHaveBeenCalledWith(
+      "student@example.com",
+      expect.objectContaining({ resetUrl: expect.stringContaining("reset-token") }),
+    );
+    expect(
+      service.userService.markPasswordResetTokenUsedByUserId,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("invalidates the token and reports a failure when email delivery fails", async () => {
+    mockedGetEmailService.mockReturnValue({
+      sendPasswordResetEmail: jest.fn().mockResolvedValue(false),
+    });
+
+    const service = new AuthService() as any;
+    service.userService = {
+      normalizeEmail: jest.fn().mockReturnValue("student@example.com"),
+      findUserByEmail: jest.fn().mockResolvedValue({
+        id: 10,
+        name: "Student",
+        email: "student@example.com",
+      }),
+      generateSecureToken: jest.fn().mockReturnValue("reset-token"),
+      hashToken: jest.fn().mockResolvedValue("reset-token-hash"),
+      createPasswordResetToken: jest.fn().mockResolvedValue(undefined),
+      markPasswordResetTokenUsedByUserId: jest.fn().mockResolvedValue(undefined),
+    };
+
+    await expect(service.forgotPassword("student@example.com")).rejects.toThrow(
+      "Unable to send the password reset email",
+    );
+    expect(
+      service.userService.markPasswordResetTokenUsedByUserId,
+    ).toHaveBeenCalledWith(10);
+  });
+
+  it("keeps the generic response for an unknown email address", async () => {
+    mockedGetEmailService.mockReturnValue({
+      sendPasswordResetEmail: jest.fn(),
+    });
+
+    const service = new AuthService() as any;
+    service.userService = {
+      normalizeEmail: jest.fn().mockReturnValue("missing@example.com"),
+      findUserByEmail: jest.fn().mockResolvedValue(null),
+    };
+
+    await expect(
+      service.forgotPassword("missing@example.com"),
+    ).resolves.toEqual({
+      message:
+        "If an account exists with this email, a reset link has been sent.",
+    });
   });
 });

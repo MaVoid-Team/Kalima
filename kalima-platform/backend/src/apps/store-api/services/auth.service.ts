@@ -53,6 +53,7 @@ import {
   NotFoundError,
   BadRequestError,
   ConflictError,
+  InternalServerError,
 } from "../../../libs/errors";
 
 // ============================================
@@ -473,11 +474,18 @@ class AuthService {
     );
 
     const resetUrl = `${APP_URL}/auth/reset-password?token=${resetToken}`;
-    await emailService.sendPasswordResetEmail(user.email!, {
+    const emailSent = await emailService.sendPasswordResetEmail(user.email!, {
       name: user.name,
       resetUrl,
       expiresInHours: RESET_TOKEN_EXPIRY_HOURS,
     });
+
+    if (!emailSent) {
+      await this.userService.markPasswordResetTokenUsedByUserId(user.id);
+      throw new InternalServerError(
+        "Unable to send the password reset email. Please try again later.",
+      );
+    }
 
     return {
       message:
