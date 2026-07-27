@@ -160,6 +160,83 @@ describe("AuthService session issuance", () => {
   });
 });
 
+describe("AuthService impersonation authorization", () => {
+  const subAdminActor = {
+    userId: 1,
+    roles: [{ portal: portal_enum.store, role: role_enum.SubAdmin }],
+  };
+
+  function createImpersonationService(targetRoles: role_enum[]) {
+    const service = new AuthService() as any;
+    const actorUser = {
+      id: 1,
+      user_roles: [{ portal: portal_enum.store, role: role_enum.SubAdmin }],
+    };
+    const targetUser = {
+      id: 2,
+      user_roles: targetRoles.map((role) => ({
+        portal: portal_enum.store,
+        role,
+      })),
+    };
+
+    service.userService = {
+      findUserById: jest
+        .fn()
+        .mockResolvedValueOnce(actorUser)
+        .mockResolvedValueOnce(targetUser),
+      mapToBaseUserData: jest.fn((user) => ({ id: user.id })),
+    };
+    service.issueTokens = jest.fn().mockResolvedValue({
+      accessToken: "access-token",
+      refreshToken: "refresh-token",
+    });
+    service.calculatePortalAccess = jest.fn().mockReturnValue({});
+
+    return service;
+  }
+
+  it.each([
+    role_enum.Admin,
+    role_enum.SubAdmin,
+    role_enum.Moderator,
+  ])("prevents a subadmin from impersonating a %s account", async (targetRole) => {
+    const service = createImpersonationService([targetRole]);
+
+    await expect(
+      service.startImpersonation(subAdminActor, 2),
+    ).rejects.toThrow("Subadmins cannot impersonate privileged accounts");
+    expect(service.issueTokens).not.toHaveBeenCalled();
+  });
+
+  it("prevents a subadmin from impersonating a multi-role account with any privileged role", async () => {
+    const service = createImpersonationService([
+      role_enum.Teacher,
+      role_enum.Moderator,
+    ]);
+
+    await expect(
+      service.startImpersonation(subAdminActor, 2),
+    ).rejects.toThrow("Subadmins cannot impersonate privileged accounts");
+    expect(service.issueTokens).not.toHaveBeenCalled();
+  });
+
+  it("allows a subadmin to impersonate a regular user account", async () => {
+    const service = createImpersonationService([role_enum.Teacher]);
+
+    await expect(
+      service.startImpersonation(subAdminActor, 2),
+    ).resolves.toMatchObject({ user: { id: 2 } });
+    expect(service.issueTokens).toHaveBeenCalledWith(
+      2,
+      expect.objectContaining({
+        actorUserId: 1,
+        targetUserId: 2,
+      }),
+    );
+  });
+});
+
 describe("AuthService password reset delivery", () => {
   beforeEach(() => {
     jest.clearAllMocks();
