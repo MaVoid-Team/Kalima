@@ -915,6 +915,12 @@
     "activeVersionMissing": "This e-booklet does not have an active published version.",
     "fieldRequired": "This field is required.",
     "submitError": "Checkout could not be submitted. Please review the form and try again.",
+    "repeatPurchase": {
+      "title": "Purchase this item again?",
+      "description": "You have purchased or already requested these items before. Do you want to purchase them again?",
+      "goBack": "Go back",
+      "continue": "Continue purchase"
+    },
     "successBadge": "Request created",
     "successTitle": "Your e-booklet request is pending admin delivery",
     "successDescription": "Kalima admin will confirm payment, collect or prepare the teacher-specific PDF, validate page count, set invite quota, and deliver the ready booklet to your account.",

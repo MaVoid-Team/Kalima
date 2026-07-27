@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -7,6 +7,12 @@ import useApiMutation from "@/hooks/useApiMutation";
 import { getImageUrl } from "@/lib/storeUtils";
 import { egyptPhoneSchema } from "@/components/ui/phone-input";
 import useRole from "@/hooks/useRole";
+import {
+  beginRepeatPurchaseCheck,
+  confirmRepeatPurchase,
+  dismissRepeatPurchase,
+  emptyRepeatPurchaseState,
+} from "@/lib/repeatPurchaseFlow";
 
 const separateRequiredFields = (itemFields) => {
   const imageUploads = [];
@@ -124,6 +130,9 @@ export function useFastBuy({ checkout = false } = {}) {
   const [isLoading, setIsLoading] = useState(checkout);
   const [error, setError] = useState(null);
   const [itemFields, setItemFields] = useState({});
+  const [repeatPurchase, setRepeatPurchase] = useState(emptyRepeatPurchaseState);
+  const [checkingRepeatPurchase, setCheckingRepeatPurchase] = useState(false);
+  const submissionInFlightRef = useRef(false);
   const [formData, setFormData] = useState({
     paymentMethodId: "",
     numberTransferredFrom: "",
@@ -282,27 +291,13 @@ export function useFastBuy({ checkout = false } = {}) {
     }
   };
 
-  const checkoutFastBuy = async () => {
+  const submitFastBuy = async (data) => {
     try {
       if (itemFields && Object.keys(itemFields).length > 0) {
         await submitItemFields();
       }
 
-      const data = new FormData();
-      if (!computed.isFreeOrder && formData.paymentMethodId) {
-        data.append("payment_method_id", Number(formData.paymentMethodId));
-      }
-      if (computed.needsTransferNumber && formData.numberTransferredFrom) {
-        data.append("numberTransferredFrom", formData.numberTransferredFrom);
-      }
-      if (computed.needsScreenshot && formData.paymentScreenshot) {
-        data.append("paymentScreenshot", formData.paymentScreenshot);
-      }
-      if (formData.notes) {
-        data.append("notes", formData.notes);
-      }
-
-      const res = await mutate({
+      await mutate({
         endpoint: "/cart/fast-buy/checkout",
         method: "post",
         data,
@@ -324,6 +319,55 @@ export function useFastBuy({ checkout = false } = {}) {
     }
   };
 
+  const checkoutFastBuy = async () => {
+    if (submissionInFlightRef.current) return;
+    submissionInFlightRef.current = true;
+
+    const data = new FormData();
+    if (!computed.isFreeOrder && formData.paymentMethodId) {
+      data.append("payment_method_id", Number(formData.paymentMethodId));
+    }
+    if (computed.needsTransferNumber && formData.numberTransferredFrom) {
+      data.append("numberTransferredFrom", formData.numberTransferredFrom);
+    }
+    if (computed.needsScreenshot && formData.paymentScreenshot) {
+      data.append("paymentScreenshot", formData.paymentScreenshot);
+    }
+    if (formData.notes) data.append("notes", formData.notes);
+
+    setCheckingRepeatPurchase(true);
+    let repeatedItems = [];
+    try {
+      const response = await axios.get("/cart/fast-buy/checkout/repeat-purchases");
+      repeatedItems = response?.data?.data?.items ?? [];
+    } catch {}
+
+    const decision = beginRepeatPurchaseCheck(repeatedItems, data);
+    setRepeatPurchase(decision.state);
+    setCheckingRepeatPurchase(false);
+    try {
+      if (decision.shouldSubmit) await submitFastBuy(decision.submission);
+    } finally {
+      submissionInFlightRef.current = false;
+    }
+  };
+
+  const confirmRepeatedPurchase = async () => {
+    if (submissionInFlightRef.current) return;
+    submissionInFlightRef.current = true;
+    const confirmation = confirmRepeatPurchase(repeatPurchase);
+    setRepeatPurchase(confirmation.state);
+    try {
+      if (confirmation.submission) await submitFastBuy(confirmation.submission);
+    } finally {
+      submissionInFlightRef.current = false;
+    }
+  };
+
+  const dismissRepeatedPurchase = () => {
+    setRepeatPurchase((current) => dismissRepeatPurchase(current));
+  };
+
   return {
     loading,
     startFastBuy,
@@ -339,6 +383,10 @@ export function useFastBuy({ checkout = false } = {}) {
       updateItemField,
       fetchCheckoutData,
       checkoutFastBuy,
+      repeatPurchase,
+      checkingRepeatPurchase,
+      confirmRepeatedPurchase,
+      dismissRepeatedPurchase,
       applyCoupon,
       clearFastBuyCart,
     },

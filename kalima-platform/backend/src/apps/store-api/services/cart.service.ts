@@ -686,6 +686,51 @@ class CartService {
     } as unknown as CartWithItems;
   }
 
+  async getRepeatPurchaseItems(
+    userId: number,
+    cartStatus: "active" | "fastbuy" = "active",
+  ): Promise<Array<{ id: number; title: string }>> {
+    const cart = await this.db.carts.findFirst({
+      where: { user_id: userId, status: cartStatus, is_deleted: false },
+      select: {
+        cart_items: {
+          where: { is_deleted: false },
+          select: { product_id: true },
+        },
+      },
+    });
+
+    const productIds = [
+      ...new Set((cart?.cart_items ?? []).map(({ product_id }) => product_id)),
+    ];
+    if (productIds.length === 0) return [];
+
+    const priorItems = await this.db.purchase_items.findMany({
+      where: {
+        product_id: { in: productIds },
+        is_deleted: false,
+        purchases: {
+          user_id: userId,
+          status: { in: ["pending", "received", "confirmed", "delivered"] },
+          is_deleted: false,
+        },
+      },
+      select: {
+        product_id: true,
+        products: { select: { id: true, title: true } },
+      },
+    });
+
+    return [
+      ...new Map(
+        priorItems.map(({ products }) => [
+          products.id,
+          { id: products.id, title: products.title },
+        ]),
+      ).values(),
+    ];
+  }
+
   // ============================================
   // CHECKOUT PREVIEW (batched — avoids N+1)
   // ============================================

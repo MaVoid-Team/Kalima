@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle, ExternalLink, MessageSquare, LogOut, RefreshCw, Copy, Truck } from 'lucide-react';
+import { ChevronLeft, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle, ExternalLink, Copy, Truck } from 'lucide-react';
 import { toast } from 'sonner';
 import useOrders from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
@@ -9,9 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import StatusTimeline from '@/components/admin/orders/StatusTimeline';
 import OrderItemsTable from '@/components/admin/orders/OrderItemsTable';
 import AdminNotesSection from '@/components/admin/orders/AdminNotesSection';
-import { useWhatsappStatus } from '@/hooks/admin/useWhatsappStatus';
-import { QRCodeSVG } from 'qrcode.react';
-import LoadingSpinner from '@/components/ui/loading-spinner';
 import SendNotificationModal from '@/components/admin/notifications/SendNotificationModal';
 import { Bell } from 'lucide-react';
 import AppreciationQrButton from '@/components/admin/users/AppreciationQrButton';
@@ -37,6 +34,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { formatCurrency, formatOrderDate, getImageUrl, getStatusColor, formatPhone } from '@/lib/storeUtils';
+import { openWhatsAppDraft } from '@/lib/whatsappDraft';
 
 export default function OrderDetailPage() {
     const { id } = useParams();
@@ -58,11 +56,9 @@ export default function OrderDetailPage() {
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
-    const [isWhatsAppConnectionOpen, setIsWhatsAppConnectionOpen] = useState(false);
     const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
     const [editableWhatsAppMessage, setEditableWhatsAppMessage] = useState('');
 
-    const { status: whatsappStatus, qrCodeStr, sendingNumber, isActionLoading, requestQR, logout, sendMessage } = useWhatsappStatus();
 
     if (loading) {
         return <div className="p-8 text-center text-muted-foreground">{t('orders.details.loading', 'Loading details...')}</div>;
@@ -104,8 +100,9 @@ export default function OrderDetailPage() {
     });
 
     const whatsappMessage = [
-        `هلاً بك أ/ ${order?.users?.name || '-'}`,
+        `اهلا بك أ/ ${order?.users?.name || '-'}`,
         'تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.',
+        'طلبك هيكون جاهز في أقل من 24 ساعة.',
         '',
         `رقم الطلب: ${order.purchase_serial || `#${order.id}`}`,
         '',
@@ -120,10 +117,6 @@ export default function OrderDetailPage() {
         'مع تحيات فريق عمل',
         'منصة كلمة',
     ].join('\n');
-
-    const whatsappHref = whatsappPhone
-        ? `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(editableWhatsAppMessage || whatsappMessage)}`
-        : '#';
 
     const buildTransferMemoText = () => {
         const valueOrDash = (value) => {
@@ -160,18 +153,21 @@ export default function OrderDetailPage() {
     };
 
     const openWhatsAppDialog = () => {
-        if (whatsappStatus !== 'ready') {
-            setIsWhatsAppConnectionOpen(true);
-            return;
-        }
         setEditableWhatsAppMessage(whatsappMessage);
         setIsWhatsAppDialogOpen(true);
     };
 
     const handleWhatsAppSend = () => {
         if (whatsappPhone) {
-            sendMessage(editableWhatsAppMessage || whatsappMessage, whatsappPhone);
-            setIsWhatsAppDialogOpen(false);
+            const opened = openWhatsAppDraft({
+                phone: whatsappPhone,
+                message: editableWhatsAppMessage || whatsappMessage,
+            });
+            if (opened) {
+                setIsWhatsAppDialogOpen(false);
+            } else {
+                toast.error(t('orders.messages.invalidWhatsAppPhone', 'The customer phone number is not valid for WhatsApp.'));
+            }
         }
     };
 
@@ -225,115 +221,6 @@ export default function OrderDetailPage() {
                 </DialogContent>
             </Dialog>
             
-            <Dialog open={isWhatsAppConnectionOpen} onOpenChange={setIsWhatsAppConnectionOpen}>
-                <DialogContent className="sm:max-w-[500px]">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <MessageSquare className="h-5 w-5 text-primary" />
-                            {t('settings.general.whatsappLinkAccount')}
-                        </DialogTitle>
-                        <DialogDescription>
-                            {t('settings.general.whatsappLinkDescription')}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="py-6">
-                        {whatsappStatus === 'disconnected' && (
-                            <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl bg-muted/20 gap-4">
-                                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                                    <MessageSquare className="h-8 w-8 text-primary" />
-                                </div>
-                                <p className="font-medium text-center">{t('settings.general.whatsappStatusDisconnected')}</p>
-                                <Button onClick={requestQR} className="w-full" disabled={isActionLoading}>
-                                    {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
-                                    {t('settings.general.whatsappConnect')}
-                                </Button>
-                            </div>
-                        )}
-
-                        {whatsappStatus === 'qr_pending' && !qrCodeStr && (
-                            <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl bg-muted/20 gap-4">
-                                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                                    <LoadingSpinner className="h-6 w-6 text-primary" />
-                                </div>
-                                <div className="text-center space-y-1">
-                                    <p className="font-medium">{t('settings.general.whatsappInitializing')}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {t('settings.general.whatsappPreparing')}
-                                    </p>
-                                </div>
-                                <Button onClick={requestQR} variant="outline" size="sm" disabled={isActionLoading}>
-                                    {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
-                                    {t('settings.general.whatsappRefreshQr')}
-                                </Button>
-                            </div>
-                        )}
-
-                        {whatsappStatus === 'qr_pending' && qrCodeStr && (
-                            <div className="flex flex-col items-center gap-6">
-                                <div className="p-3 bg-white rounded-xl border-2 border-primary/20 shadow-sm">
-                                    <QRCodeSVG value={qrCodeStr} size={200} includeMargin />
-                                </div>
-                                <div className="space-y-3 text-center">
-                                    <h4 className="font-bold text-lg">{t('settings.general.whatsappStatusQrPending')}</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                        {t('settings.general.whatsappScanInstructions')}
-                                    </p>
-                                    <div className="flex items-center justify-center gap-2 text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-2 rounded-lg border border-amber-200">
-                                        <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-ping" />
-                                        <span>{t('settings.general.whatsappQrRefreshNotice')}</span>
-                                    </div>
-                                    <Button variant="outline" size="sm" onClick={requestQR} disabled={isActionLoading}>
-                                        {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
-                                        {t('settings.general.whatsappRefreshQr')}
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-
-                        {whatsappStatus === 'failed' && (
-                            <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-destructive/30 rounded-xl bg-destructive/5 gap-4">
-                                <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
-                                    <LogOut className="h-6 w-6 text-destructive" />
-                                </div>
-                                <div className="text-center space-y-1">
-                                    <p className="font-medium text-destructive">{t('settings.general.whatsappStatusFailed')}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {t('settings.general.whatsappConnectionError')}
-                                    </p>
-                                </div>
-                                <Button variant="outline" size="sm" onClick={requestQR} disabled={isActionLoading}>
-                                    {isActionLoading ? <LoadingSpinner className="h-4 w-4 me-2" /> : <RefreshCw className="h-4 w-4 me-2" />}
-                                    {t('settings.general.whatsappTryAgain')}
-                                </Button>
-                            </div>
-                        )}
-
-                        {whatsappStatus === 'ready' && (
-                            <div className="flex flex-col items-center justify-center p-6 bg-green-50 dark:bg-green-900/10 rounded-xl border border-green-200 dark:border-green-900/30 gap-4">
-                                <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
-                                    <CheckCircle className="h-6 w-6 text-green-600" />
-                                </div>
-                                <div className="text-center">
-                                    <p className="font-medium text-green-600">{t('settings.general.whatsappAuthSuccess')}</p>
-                                    <p className="text-lg font-mono font-bold mt-1" dir="ltr">+{sendingNumber?.toString().replace(/^\+/, '')}</p>
-                                </div>
-                                <Button 
-                                    className="w-full mt-2" 
-                                    onClick={() => {
-                                        setIsWhatsAppConnectionOpen(false);
-                                        setEditableWhatsAppMessage(whatsappMessage);
-                                        setIsWhatsAppDialogOpen(true);
-                                    }}
-                                >
-                                    {t('orders.actions.sendOnWhatsApp')}
-                                </Button>
-                            </div>
-                        )}
-                    </div>
-                </DialogContent>
-            </Dialog>
-
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
                 <div className="flex items-center gap-4">

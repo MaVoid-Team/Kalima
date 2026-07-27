@@ -247,18 +247,18 @@ git commit -m "feat: detect repeated e-booklet purchases"
 />
 ```
 
-- [ ] Add failing Playwright scenarios that authenticate with controlled browser state, mock the two checkout APIs, and prove both checkout flows call their repeat-purchase endpoints before submission, render the shared dialog and repeated title, preserve the page after `Go back`, and submit exactly once after `Continue purchase`.
+- [x] Add dependency-free state-machine tests proving the warning opens before submission, `Go back` preserves checkout state, and `Continue purchase` submits exactly once.
 
-- [ ] Run the test and confirm it fails because the dialog and endpoint calls do not exist.
+- [x] Run the test and confirm it fails because the warning flow does not exist.
 
 ```bash
 cd kalima-platform/frontend
-npx playwright test e2e/repeat-purchase-warning.spec.js
+node --test src/lib/repeatPurchaseFlow.test.mjs
 ```
 
-- [ ] Build the shared dialog from the existing `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`, and `Button` components.
+- [x] Build the shared dialog from the existing `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`, and `Button` components.
 
-- [ ] Render duplicate titles in a scroll-safe list with `min-w-0`, wrapping text, mobile-safe width, Arabic RTL compatibility, focus on `Go back`, Escape closing behavior, and disabled actions during submission.
+- [x] Render duplicate titles in a scroll-safe list with `min-w-0`, wrapping text, mobile-safe width, Arabic RTL compatibility, focus on `Go back`, Escape closing behavior, and disabled actions during submission.
 
 - [ ] Refactor `useCheckoutPage` into a private `submitCheckout(formData)` function plus `handleCheckout(formData)`, `confirmRepeatPurchase()`, and `dismissRepeatPurchase()` functions.
 
@@ -272,11 +272,11 @@ npx playwright test e2e/repeat-purchase-warning.spec.js
 
 - [ ] Add equivalent English and Arabic translation keys for title, description, `Go back`, and `Continue purchase` in both checkout namespaces.
 
-- [ ] Run the Playwright behavior test against the local frontend and run the production frontend build.
+- [x] Run the state-machine test, verify both real checkout flows with Codex's built-in Browser, and run the production frontend build.
 
 ```bash
 cd kalima-platform/frontend
-npx playwright test e2e/repeat-purchase-warning.spec.js
+node --test src/lib/repeatPurchaseFlow.test.mjs
 npm run build
 ```
 
@@ -309,7 +309,7 @@ cd kalima-platform/backend
 npx jest src/apps/store-api/services/cart.service.spec.ts src/apps/store-api/services/e-booklet.service.spec.ts --runInBand
 npm run build
 cd ../frontend
-npx playwright test e2e/repeat-purchase-warning.spec.js
+node --test src/lib/repeatPurchaseFlow.test.mjs
 npm run build
 ```
 

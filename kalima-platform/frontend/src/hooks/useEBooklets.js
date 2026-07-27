@@ -352,6 +352,21 @@ export function useEBookletTemplate(templateId, options = {}) {
 export function useEBookletCheckout() {
   const { mutate, loading, error } = useApiMutation();
 
+  const checkRepeatPurchases = useCallback(
+    async (templateIds) => {
+      return mutate(
+        {
+          endpoint: "/e-booklet-checkout/repeat-purchases",
+          method: "post",
+          data: { template_ids: templateIds },
+          showToast: false,
+        },
+        false,
+      );
+    },
+    [mutate],
+  );
+
   const submitCheckout = useCallback(
     async (payload) => {
       return mutate({
@@ -365,6 +380,7 @@ export function useEBookletCheckout() {
   );
 
   return {
+    checkRepeatPurchases,
     submitCheckout,
     loading,
     error,

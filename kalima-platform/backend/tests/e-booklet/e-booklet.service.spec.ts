@@ -197,6 +197,54 @@ describe("EBookletService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     delete process.env.E_BOOKLET_PDFINFO_BIN;
+});
+
+  describe("repeat purchase warning", () => {
+    test("returns each active prior template once for the authenticated teacher", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.findMany.mockResolvedValue([
+        { template_id: 7, template: { id: 7, title: "Reading Skills" } },
+        { template_id: 7, template: { id: 7, title: "Reading Skills" } },
+        { template_id: 9, template: { id: 9, title: "Writing Skills" } },
+      ]);
+      const service = new EBookletService(db);
+
+      const result = await service.getRepeatPurchaseTemplates(42, [7, 7, 9]);
+
+      expect(result).toEqual([
+        { id: 7, title: "Reading Skills" },
+        { id: 9, title: "Writing Skills" },
+      ]);
+      expect(db.e_booklet_purchases.findMany).toHaveBeenCalledWith({
+        where: {
+          teacher_id: 42,
+          template_id: { in: [7, 9] },
+          status: {
+            in: [
+              "pending",
+              "awaiting_payment",
+              "paid",
+              "needs_branding_info",
+              "customization_in_progress",
+              "ready",
+              "delivered",
+            ],
+          },
+        },
+        select: {
+          template_id: true,
+          template: { select: { id: true, title: true } },
+        },
+      });
+    });
+
+    test("does not query purchase history when no template identifiers are supplied", async () => {
+      const db = createMockDb();
+      const service = new EBookletService(db);
+
+      await expect(service.getRepeatPurchaseTemplates(42, [])).resolves.toEqual([]);
+      expect(db.e_booklet_purchases.findMany).not.toHaveBeenCalled();
+    });
   });
 
   describe("filename utilities", () => {

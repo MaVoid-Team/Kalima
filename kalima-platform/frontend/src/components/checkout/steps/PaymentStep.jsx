@@ -1,21 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import PaymentMethod from '@/components/checkout/PaymentMethod';
 import OrderSummary from '@/components/checkout/OrderSummary';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogCancel } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import PrintableReceipt from '@/components/checkout/PrintableReceipt';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageCircle } from 'lucide-react';
-import { getImageUrl } from '@/lib/storeUtils';
+import { getBaseUrl, getImageUrl } from '@/lib/storeUtils';
 import { buildWhatsAppLink } from '@/lib/whatsappUtils';
 import { motion } from 'framer-motion';
+import api from '@/api/axios';
+import RepeatPurchaseWarningDialog from '@/components/checkout/RepeatPurchaseWarningDialog';
+import {
+    beginRepeatPurchaseCheck,
+    confirmRepeatPurchase,
+    dismissRepeatPurchase,
+    emptyRepeatPurchaseState,
+} from '@/lib/repeatPurchaseFlow';
+import useRole from '@/hooks/useRole';
 
 const ORDER_TRACKING_WHATSAPP_NUMBER = '201044067113';
 
 export default function PaymentStep({ onBack }) {
-    const { cart, checkout, getPaymentMethods } = useCart();
-    const { t } = useTranslation('checkout');
+    const { cart, checkout, getPaymentMethods, loadCart } = useCart();
+    const { t, i18n } = useTranslation('checkout');
+    const navigate = useNavigate();
+    const { isTeacher } = useRole();
+    const ordersPath = isTeacher ? '/teacher/orders' : '/orders';
+    const baseURL = React.useMemo(() => getBaseUrl(), []);
 
     const [numberTransferredFrom, setNumberTransferredFrom] = useState('');
     const [notes, setNotes] = useState('');
@@ -25,6 +40,9 @@ export default function PaymentStep({ onBack }) {
     const [showReceipt, setShowReceipt] = useState(false);
     const [paymentMethodName, setPaymentMethodName] = useState('');
     const [hasValidationErrors, setHasValidationErrors] = useState(false);
+    const [checkingRepeatPurchase, setCheckingRepeatPurchase] = useState(false);
+    const [repeatPurchase, setRepeatPurchase] = useState(emptyRepeatPurchaseState);
+    const receiptRef = useRef(null);
     const trackingMessage = purchase
         ? `مرحباً، رقم طلبي المميز هو ${purchase.purchase_serial || `#${purchase.id}`} وأرغب في معرفة حالة الطلب`
         : '';
@@ -33,6 +51,14 @@ export default function PaymentStep({ onBack }) {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
+
+    const submitValidatedCheckout = async (formData) => {
+        const data = await checkout(formData);
+        if (data?.purchase) {
+            setPurchase(data.purchase);
+            setShowReceipt(true);
+        }
+    };
 
     const handlePay = async () => {
         if (!isFreeOrder && !selectedPaymentMethod) {
@@ -66,14 +92,31 @@ export default function PaymentStep({ onBack }) {
         if (notes) formData.append('notes', notes);
         if (!isFreeOrder && screenshotFile) formData.append('paymentScreenshot', screenshotFile);
 
+        setCheckingRepeatPurchase(true);
+        let repeatedItems = [];
         try {
-            const data = await checkout(formData);
-            if (data && data.purchase) {
-                setPurchase(data.purchase);
-                setShowReceipt(true);
-            }
+            const response = await api.get('/cart/checkout/repeat-purchases');
+            repeatedItems = response?.data?.data?.items ?? [];
+        } catch {}
+
+        const decision = beginRepeatPurchaseCheck(repeatedItems, formData);
+        setRepeatPurchase(decision.state);
+        setCheckingRepeatPurchase(false);
+        if (decision.shouldSubmit) await submitValidatedCheckout(decision.submission);
+    };
+
+    const confirmRepeatedPurchase = async () => {
+        const confirmation = confirmRepeatPurchase(repeatPurchase);
+        setRepeatPurchase(confirmation.state);
+        if (!confirmation.submission) return;
+
+        setCheckingRepeatPurchase(true);
+        try {
+            await submitValidatedCheckout(confirmation.submission);
         } catch (e) {
             toast.error(t('failed', 'Checkout failed, please try again'), { description: e.message });
+        } finally {
+            setCheckingRepeatPurchase(false);
         }
     };
 
@@ -98,6 +141,38 @@ export default function PaymentStep({ onBack }) {
         discount: cart?.discount || 0,
     };
     const isFreeOrder = Number(pricing.total || 0) <= 0;
+
+    const handlePrintReceipt = () => {
+        const contentNode = receiptRef.current?.querySelector('[data-print-body]');
+        if (!contentNode) {
+            toast.error(t('receipt.unableToPrint', 'Unable to print receipt'));
+            return;
+        }
+
+        const printWindow = globalThis.open('', '_blank', 'width=900,height=1200');
+        if (!printWindow) {
+            toast.error(t('receipt.popupBlocked', 'Please allow popups to print receipt'));
+            return;
+        }
+
+        printWindow.document.open();
+        printWindow.document.write(`<!doctype html><html dir="${i18n.dir()}" lang="${i18n.language}"><head><meta charset="utf-8" /><title>${t('receipt.title', 'Purchase Receipt')}</title></head><body></body></html>`);
+        printWindow.document.close();
+
+        document.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => {
+            printWindow.document.head.appendChild(node.cloneNode(true));
+        });
+
+        const baseStyle = printWindow.document.createElement('style');
+        baseStyle.textContent = `* { box-sizing: border-box; } body { margin: 0; padding: 24px; background: #fff; color: #111; } @page { size: A4; margin: 14mm; } th, td { text-align: start; } th:last-child, td:last-child { text-align: end; }`;
+        printWindow.document.head.appendChild(baseStyle);
+        printWindow.document.body.replaceChildren(contentNode.cloneNode(true));
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.addEventListener('afterprint', () => printWindow.close(), { once: true });
+        }, 250);
+    };
 
     return (
         <motion.div 
@@ -139,7 +214,11 @@ export default function PaymentStep({ onBack }) {
                 </aside>
             </div>
 
-            <AlertDialog open={showReceipt}>
+            <AlertDialog open={showReceipt} onOpenChange={() => {
+                setShowReceipt(!showReceipt);
+                loadCart();
+                navigate('/cart');
+            }}>
                 <AlertDialogContent
                     className="max-w-xl p-6 print:hidden"
                     onEscapeKeyDown={(event) => event.preventDefault()}
@@ -177,7 +256,26 @@ export default function PaymentStep({ onBack }) {
                             </div>
                         )}
                     </div>
-                    <AlertDialogFooter className="flex-col sm:flex-col gap-3">
+                    <AlertDialogFooter className="flex-col sm:flex-col gap-2">
+                        <Button
+                            onClick={handlePrintReceipt}
+                            className="w-full"
+                            data-testid="checkout-payment-step-receipt-print-button"
+                        >
+                            {t('receipt.print', 'Print')}
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => {
+                                setShowReceipt(false);
+                                loadCart();
+                                navigate(ordersPath);
+                            }}
+                            data-testid="checkout-payment-step-receipt-orders-button"
+                        >
+                            {t('success.view_orders', 'View My Orders')}
+                        </Button>
                         <p className="text-center text-sm font-medium text-muted-foreground">
                             {t('receipt.trackOrderRequired')}
                         </p>
@@ -192,9 +290,22 @@ export default function PaymentStep({ onBack }) {
                                 {t('receipt.trackOrder', 'Track your order')}
                             </a>
                         </Button>
+                        <AlertDialogCancel className="w-full" data-testid="checkout-payment-step-receipt-close-button">{t('cancel', 'Close')}</AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <PrintableReceipt purchase={purchase} paymentMethodName={paymentMethodName} baseURL={baseURL} receiptRef={receiptRef} dir={i18n.dir()} />
+            <RepeatPurchaseWarningDialog
+                open={repeatPurchase.items.length > 0}
+                items={repeatPurchase.items}
+                loading={checkingRepeatPurchase}
+                title={t('repeatPurchase.title')}
+                description={t('repeatPurchase.description')}
+                backLabel={t('repeatPurchase.goBack')}
+                continueLabel={t('repeatPurchase.continue')}
+                onBack={() => setRepeatPurchase(dismissRepeatPurchase())}
+                onContinue={confirmRepeatedPurchase}
+            />
         </motion.div>
     );
 }
