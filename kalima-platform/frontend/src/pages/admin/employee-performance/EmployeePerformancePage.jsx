@@ -227,6 +227,7 @@ export default function EmployeePerformancePage() {
                                     <th className="px-6 py-3 font-medium text-start">{t('table.phone', 'Phone')}</th>
                                     <th className="px-6 py-3 font-medium text-start">{t('table.role', 'Role')}</th>
                                     <th className="kalima-number px-6 py-3 font-medium">{t('table.confirmedCount', 'Count')}</th>
+                                    <th className="kalima-number px-6 py-3 font-medium">{t('table.productsSold', 'Products Sold')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -240,12 +241,13 @@ export default function EmployeePerformancePage() {
                                                 <td className="px-6 py-4">{item.phone || '—'}</td>
                                                 <td className="px-6 py-4">{t(`roles.${item.role}`, item.role)}</td>
                                                 <td className="kalima-number px-6 py-4 text-primary">{item.count || 0}</td>
+                                                <td className="kalima-number px-6 py-4 text-primary">{item.productsSold || 0}</td>
                                             </tr>
                                         )
                                     })
                                 ) : (
                                     <tr>
-                                        <td colSpan="6" className="px-6 py-8 text-center text-muted-foreground">
+                                        <td colSpan="7" className="px-6 py-8 text-center text-muted-foreground">
                                             {t('table.noData', 'No data available')}
                                         </td>
                                     </tr>
