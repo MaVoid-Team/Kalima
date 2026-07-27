@@ -1,0 +1,16 @@
+{
+  "annotations":{"list":[]},
+  "editable":true,
+  "panels":[
+    {"type":"stat","title":"Backend up","targets":[{"expr":"up{job=\"kalima-backend\"}"}],"gridPos":{"h":6,"w":6,"x":0,"y":0}},
+    {"type":"stat","title":"PostgreSQL up","targets":[{"expr":"up{job=\"postgres\"}"}],"gridPos":{"h":6,"w":6,"x":6,"y":0}},
+    {"type":"stat","title":"Redis up","targets":[{"expr":"up{job=\"redis\"}"}],"gridPos":{"h":6,"w":6,"x":12,"y":0}},
+    {"type":"stat","title":"Host memory used %","targets":[{"expr":"(1-node_memory_MemAvailable_bytes/node_memory_MemTotal_bytes)*100"}],"gridPos":{"h":6,"w":6,"x":18,"y":0}},
+    {"type":"timeseries","title":"Backend request rate","targets":[{"expr":"sum(rate(kalima_http_requests_total[5m]))"}],"gridPos":{"h":8,"w":12,"x":0,"y":6}},
+    {"type":"timeseries","title":"Backend p95 latency","targets":[{"expr":"histogram_quantile(0.95,sum by(le)(rate(kalima_http_request_duration_seconds_bucket[5m])))"}],"gridPos":{"h":8,"w":12,"x":12,"y":6}}
+  ],
+  "schemaVersion":39,
+  "title":"Kalima Production Overview",
+  "uid":"kalima-production-overview",
+  "version":1
+}
