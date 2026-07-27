@@ -33,7 +33,7 @@ type BaileysCallbacks = {
   onDisconnected: (reason: string) => void;
 };
 
-class BaileysClient {
+export class BaileysClient {
   private sock: WASocket | null = null;
   private callbacks: BaileysCallbacks | null = null;
   private _status: "disconnected" | "qr_pending" | "ready" = "disconnected";
@@ -51,6 +51,16 @@ class BaileysClient {
       this.destroy();
     }
 
+    this.callbacks = callbacks;
+    await this.connect();
+  }
+
+  async startPairing(callbacks: BaileysCallbacks): Promise<void> {
+    // An explicit QR request means the admin wants a fresh pairing. Reusing a
+    // stale persisted session can leave Baileys reconnecting forever without
+    // producing either a QR code or a useful error.
+    this.destroy();
+    await this.clearAuthState();
     this.callbacks = callbacks;
     await this.connect();
   }
@@ -186,8 +196,10 @@ class BaileysClient {
       this._status = "disconnected";
       this._phoneNumber = null;
       this._qrCode = null;
-      await this.clearAuthState();
     }
+    // A failed or stale session can have credentials on disk without an active
+    // socket. Logout must still make the next pairing start cleanly.
+    await this.clearAuthState();
   }
 
   destroy(): void {
