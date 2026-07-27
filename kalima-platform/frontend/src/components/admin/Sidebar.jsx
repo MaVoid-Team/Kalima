@@ -4,13 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { Users, LogOut, Home, Globe, Moon, Sun, ChevronLeft, Menu, X, Package, Ticket, Settings, CreditCard, FormInput, BarChart3, Activity, Bell, BookOpenCheck } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 import { useRole } from '@/hooks/useRole';
+import { canAccessAdminAnalytics } from '@/lib/adminAnalyticsAccess';
+import { canAccessEmployeePerformance } from '@/lib/employeePerformanceAccess';
 
 const ADMIN_THEME_STORAGE_KEY = 'adminTheme';
 
 export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
   const { t, i18n } = useTranslation(['admin', 'userManagement']);
   const { logout } = useAuth();
-  const { isAdmin, isSubAdmin } = useRole();
+  const { isAdmin, isSubAdmin, storeRoles } = useRole();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [theme, setTheme] = useState('light');
@@ -41,8 +43,8 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
   // Using userManagement namespace explicitly for the users translation
   const navigation = [
     { name: t('nav.dashboard', 'Dashboard'), href: '/admin/dashboard', icon: Home, id: 'dashboard' },
-    { name: t('nav.analytics', 'Analytics'), href: '/admin/analytics', icon: BarChart3, id: 'analytics' },
-    { name: t('nav.employeePerformance', 'Employee Performance'), href: '/admin/employee-performance', icon: Activity, id: 'employee-performance' },
+    { name: t('nav.analytics', 'Analytics'), href: '/admin/analytics', icon: BarChart3, id: 'analytics', adminOnly: true },
+    { name: t('nav.employeePerformance', 'Employee Performance'), href: '/admin/employee-performance', icon: Activity, id: 'employee-performance', employeePerformanceOnly: true },
     {
       name: t('nav.store', 'Store'),
       href: '/admin/products',
@@ -109,7 +111,11 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
 
       {/* Navigation Links */}
       <nav className="flex-1 space-y-2 px-2 py-4 overflow-y-auto">
-        {navigation.filter((item) => !item.managerOnly || isAdmin || isSubAdmin).map((item) => {
+        {navigation
+          .filter((item) => !item.managerOnly || isAdmin || isSubAdmin)
+          .filter((item) => !item.adminOnly || canAccessAdminAnalytics(storeRoles))
+          .filter((item) => !item.employeePerformanceOnly || canAccessEmployeePerformance(storeRoles))
+          .map((item) => {
           const isActive = (item.matchPaths || [item.href]).some((href) => location.pathname.startsWith(href));
           return (
             <Link

@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import { Toaster } from 'sonner';
 import { E_BOOKLET_ORDERS_ALLOWED_ROLES } from "./pages/e-booklets/eBookletOrdersContract.mjs";
+import { ADMIN_ANALYTICS_ALLOWED_ROLES } from "./lib/adminAnalyticsAccess";
+import { EMPLOYEE_PERFORMANCE_ALLOWED_ROLES } from "./lib/employeePerformanceAccess";
 import ImpersonationBanner from "./components/auth/ImpersonationBanner";
 
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -293,8 +295,12 @@ const router = createBrowserRouter(
           <Route path="/admin/users/:id/appreciation" element={<UserAppreciationPage />} />
           <Route path="/admin/coupons" element={<CouponsPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
-          <Route path="/admin/analytics" element={<AnalyticsPage />} />
-          <Route path="/admin/employee-performance" element={<EmployeePerformancePage />} />
+          <Route element={<RoleRoute requiredRole={ADMIN_ANALYTICS_ALLOWED_ROLES} />}>
+            <Route path="/admin/analytics" element={<AnalyticsPage />} />
+          </Route>
+          <Route element={<RoleRoute requiredRole={EMPLOYEE_PERFORMANCE_ALLOWED_ROLES} />}>
+            <Route path="/admin/employee-performance" element={<EmployeePerformancePage />} />
+          </Route>
           <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
         </Route>
 
