@@ -158,7 +158,8 @@ export const cartController = {
   async getRepeatPurchaseItems(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = (req.user as any).userId;
-      const items = await cartService.getRepeatPurchaseItems(userId);
+      const cartStatus = req.path.includes("/fast-buy/") ? "fastbuy" : "active";
+      const items = await cartService.getRepeatPurchaseItems(userId, cartStatus);
       res.status(200).json({ success: true, data: { items } });
     } catch (err) {
       next(err);

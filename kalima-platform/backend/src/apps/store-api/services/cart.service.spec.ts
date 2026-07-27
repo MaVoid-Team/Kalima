@@ -135,6 +135,22 @@ describe("CartService", () => {
       await expect(cartService.getRepeatPurchaseItems(42)).resolves.toEqual([]);
       expect(mockPrismaClient.purchase_items.findMany).not.toHaveBeenCalled();
     });
+
+    it("checks the fast-buy cart when requested", async () => {
+      mockPrismaClient.carts.findFirst.mockResolvedValueOnce({ cart_items: [] });
+
+      await cartService.getRepeatPurchaseItems(42, "fastbuy");
+
+      expect(mockPrismaClient.carts.findFirst).toHaveBeenCalledWith({
+        where: { user_id: 42, status: "fastbuy", is_deleted: false },
+        select: {
+          cart_items: {
+            where: { is_deleted: false },
+            select: { product_id: true },
+          },
+        },
+      });
+    });
   });
 
   describe("add item and recalculate totals", () => {

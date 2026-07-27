@@ -6,6 +6,7 @@ import FastBuyClearDialog from "@/components/fast-buy/FastBuyClearDialog";
 import { useFastBuy } from "@/hooks/useFastBuy";
 import LoadingSpinner from "../../components/ui/loading-spinner";
 import { motion } from "framer-motion";
+import RepeatPurchaseWarningDialog from "@/components/checkout/RepeatPurchaseWarningDialog";
 
 export default function FastBuyCheckoutPage() {
   const { t } = useTranslation("checkout");
@@ -44,7 +45,7 @@ export default function FastBuyCheckoutPage() {
     blocker.proceed?.();
   };
 
-  const isLoadingAny = isLoading || isSubmitting;
+  const isLoadingAny = isLoading || isSubmitting || checkout.checkingRepeatPurchase;
 
   if (error && !isLoading) {
     const msg = error?.response?.data?.message || t("payment.error_loading");
@@ -85,6 +86,17 @@ export default function FastBuyCheckoutPage() {
       </div>
 
       <FastBuyClearDialog open={showClearDialog} onStay={handleStay} onConfirm={handleLeaveAndClear} />
+      <RepeatPurchaseWarningDialog
+        open={checkout.repeatPurchase.items.length > 0}
+        items={checkout.repeatPurchase.items}
+        loading={checkout.isSubmitting || checkout.checkingRepeatPurchase}
+        title={t("repeatPurchase.title")}
+        description={t("repeatPurchase.description")}
+        backLabel={t("repeatPurchase.goBack")}
+        continueLabel={t("repeatPurchase.continue")}
+        onBack={checkout.dismissRepeatedPurchase}
+        onContinue={checkout.confirmRepeatedPurchase}
+      />
     </>
   );
 }

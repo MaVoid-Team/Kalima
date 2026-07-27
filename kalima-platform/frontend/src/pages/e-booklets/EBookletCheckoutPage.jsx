@@ -18,8 +18,15 @@ import {
 } from "@/components/ui/dialog";
 import PaymentMethod from "@/components/checkout/PaymentMethod";
 import OrderSummary from "@/components/checkout/OrderSummary";
+import RepeatPurchaseWarningDialog from "@/components/checkout/RepeatPurchaseWarningDialog";
 import { useEBookletCart, useEBookletCheckout } from "@/hooks/useEBooklets";
 import { formatTimeUntilRelease } from "@/lib/storeUtils";
+import {
+  beginRepeatPurchaseCheck,
+  confirmRepeatPurchase,
+  dismissRepeatPurchase,
+  emptyRepeatPurchaseState,
+} from "@/lib/repeatPurchaseFlow";
 import api from "@/api/axios";
 import { useTranslation } from "react-i18next";
 
@@ -101,7 +108,7 @@ export default function EBookletCheckoutPage() {
   const formRef = useRef(null);
   const { t } = useTranslation("eBooklets");
   const { items, item, subtotal, discount, total, clear } = useEBookletCart();
-  const { submitCheckout, loading } = useEBookletCheckout();
+  const { checkRepeatPurchases, submitCheckout, loading } = useEBookletCheckout();
   const [paymentMethodId, setPaymentMethodId] = useState("");
   const [numberTransferredFrom, setNumberTransferredFrom] = useState("");
   const [paymentScreenshot, setPaymentScreenshot] = useState(null);
@@ -115,6 +122,9 @@ export default function EBookletCheckoutPage() {
   const [submittedPurchase, setSubmittedPurchase] = useState(null);
   const [formError, setFormError] = useState(null);
   const [hasValidationErrors, setHasValidationErrors] = useState(false);
+  const [repeatPurchase, setRepeatPurchase] = useState(
+    emptyRepeatPurchaseState,
+  );
 
   const isPaid = Number(total || 0) > 0;
   const unreleasedItem = items.find((cartItem) => cartItem.is_released === false);
@@ -195,6 +205,16 @@ export default function EBookletCheckoutPage() {
     return true;
   };
 
+  const submitValidatedCheckout = async (formData) => {
+    const response = await submitCheckout(formData);
+    const result = response?.data || true;
+    setSubmittedPurchase(result);
+    clear();
+    if (result?.next_url) {
+      navigate(result.next_url, { replace: true });
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setFormError(null);
@@ -227,12 +247,17 @@ export default function EBookletCheckoutPage() {
         formData.append("numberTransferredFrom", numberTransferredFrom.trim());
         formData.append("paymentScreenshot", paymentScreenshot);
       }
-      const response = await submitCheckout(formData);
-      const result = response?.data || true;
-      setSubmittedPurchase(result);
-      clear();
-      if (result?.next_url) {
-        navigate(result.next_url, { replace: true });
+      let repeatedItems = [];
+      try {
+        const response = await checkRepeatPurchases(
+          items.map((cartItem) => Number(cartItem.template_id)),
+        );
+        repeatedItems = response?.data?.items ?? [];
+      } catch {}
+      const decision = beginRepeatPurchaseCheck(repeatedItems, formData);
+      setRepeatPurchase(decision.state);
+      if (decision.shouldSubmit) {
+        await submitValidatedCheckout(decision.submission);
       }
     } catch (error) {
       setFormError(
@@ -240,6 +265,25 @@ export default function EBookletCheckoutPage() {
         t("checkout.submitError"),
       );
     }
+  };
+
+  const confirmRepeatedPurchase = async () => {
+    const confirmation = confirmRepeatPurchase(repeatPurchase);
+    setRepeatPurchase(confirmation.state);
+    if (!confirmation.submission) return;
+
+    try {
+      await submitValidatedCheckout(confirmation.submission);
+    } catch (error) {
+      setFormError(
+        error?.response?.data?.message ||
+        t("checkout.submitError"),
+      );
+    }
+  };
+
+  const dismissRepeatedPurchase = () => {
+    setRepeatPurchase(dismissRepeatPurchase());
   };
 
   const submitFromSummary = () => {
@@ -445,6 +489,17 @@ export default function EBookletCheckoutPage() {
           </div>
         </aside>
       </section>
+      <RepeatPurchaseWarningDialog
+        open={repeatPurchase.items.length > 0}
+        items={repeatPurchase.items}
+        loading={loading}
+        title={t("checkout.repeatPurchase.title")}
+        description={t("checkout.repeatPurchase.description")}
+        backLabel={t("checkout.repeatPurchase.goBack")}
+        continueLabel={t("checkout.repeatPurchase.continue")}
+        onBack={dismissRepeatedPurchase}
+        onContinue={confirmRepeatedPurchase}
+      />
     </main>
   );
 }

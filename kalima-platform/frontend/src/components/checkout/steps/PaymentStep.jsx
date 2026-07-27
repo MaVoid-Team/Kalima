@@ -12,6 +12,14 @@ import { ArrowLeft, MessageCircle } from 'lucide-react';
 import { getBaseUrl, getImageUrl } from '@/lib/storeUtils';
 import { buildWhatsAppLink } from '@/lib/whatsappUtils';
 import { motion } from 'framer-motion';
+import api from '@/api/axios';
+import RepeatPurchaseWarningDialog from '@/components/checkout/RepeatPurchaseWarningDialog';
+import {
+    beginRepeatPurchaseCheck,
+    confirmRepeatPurchase,
+    dismissRepeatPurchase,
+    emptyRepeatPurchaseState,
+} from '@/lib/repeatPurchaseFlow';
 import useRole from '@/hooks/useRole';
 
 const ORDER_TRACKING_WHATSAPP_NUMBER = '201044067113';
@@ -33,6 +41,8 @@ export default function PaymentStep({ onBack }) {
     const [showReceipt, setShowReceipt] = useState(false);
     const [paymentMethodName, setPaymentMethodName] = useState('');
     const [hasValidationErrors, setHasValidationErrors] = useState(false);
+    const [checkingRepeatPurchase, setCheckingRepeatPurchase] = useState(false);
+    const [repeatPurchase, setRepeatPurchase] = useState(emptyRepeatPurchaseState);
     const receiptRef = useRef(null);
     const trackingMessage = purchase
         ? `مرحباً، رقم طلبي المميز هو ${purchase.purchase_serial || `#${purchase.id}`} وأرغب في معرفة حالة الطلب`
@@ -42,6 +52,14 @@ export default function PaymentStep({ onBack }) {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
+
+    const submitValidatedCheckout = async (formData) => {
+        const data = await checkout(formData);
+        if (data?.purchase) {
+            setPurchase(data.purchase);
+            setShowReceipt(true);
+        }
+    };
 
     const handlePay = async () => {
         if (!isFreeOrder && !selectedPaymentMethod) {
@@ -75,14 +93,31 @@ export default function PaymentStep({ onBack }) {
         if (notes) formData.append('notes', notes);
         if (!isFreeOrder && screenshotFile) formData.append('paymentScreenshot', screenshotFile);
 
+        setCheckingRepeatPurchase(true);
+        let repeatedItems = [];
         try {
-            const data = await checkout(formData);
-            if (data && data.purchase) {
-                setPurchase(data.purchase);
-                setShowReceipt(true);
-            }
+            const response = await api.get('/cart/checkout/repeat-purchases');
+            repeatedItems = response?.data?.data?.items ?? [];
+        } catch {}
+
+        const decision = beginRepeatPurchaseCheck(repeatedItems, formData);
+        setRepeatPurchase(decision.state);
+        setCheckingRepeatPurchase(false);
+        if (decision.shouldSubmit) await submitValidatedCheckout(decision.submission);
+    };
+
+    const confirmRepeatedPurchase = async () => {
+        const confirmation = confirmRepeatPurchase(repeatPurchase);
+        setRepeatPurchase(confirmation.state);
+        if (!confirmation.submission) return;
+
+        setCheckingRepeatPurchase(true);
+        try {
+            await submitValidatedCheckout(confirmation.submission);
         } catch (e) {
             toast.error(t('failed', 'Checkout failed, please try again'), { description: e.message });
+        } finally {
+            setCheckingRepeatPurchase(false);
         }
     };
 
@@ -265,6 +300,17 @@ export default function PaymentStep({ onBack }) {
                 </AlertDialogContent>
             </AlertDialog>
             <PrintableReceipt purchase={purchase} paymentMethodName={paymentMethodName} baseURL={baseURL} receiptRef={receiptRef} dir={i18n.dir()} />
+            <RepeatPurchaseWarningDialog
+                open={repeatPurchase.items.length > 0}
+                items={repeatPurchase.items}
+                loading={checkingRepeatPurchase}
+                title={t('repeatPurchase.title')}
+                description={t('repeatPurchase.description')}
+                backLabel={t('repeatPurchase.goBack')}
+                continueLabel={t('repeatPurchase.continue')}
+                onBack={() => setRepeatPurchase(dismissRepeatPurchase())}
+                onContinue={confirmRepeatedPurchase}
+            />
         </motion.div>
     );
 }
