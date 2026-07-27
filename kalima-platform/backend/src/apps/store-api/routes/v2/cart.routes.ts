@@ -51,6 +51,10 @@ router.patch(
 // ============================================
 
 router.get("/checkout/preview", cartController.getCheckoutPreview);
+router.get(
+  "/checkout/repeat-purchases",
+  cartController.getRepeatPurchaseItems,
+);
 router.post(
   "/checkout",
   requireConfirmed,
