@@ -8,4 +8,3 @@
 - Avoid secrets: do not read, print, or commit credentials or `.env` files unless explicitly requested.
 - For project specifics, read README/package manifests/configs/tests instead of relying on this file.
 - Treat pushes to `staging` as staging deployment triggers and pushes to `Rhiss` as production deployment triggers.
-- Keep deployment behind the checks in `.github/workflows/branch-deploy.yml`; do not enable a parallel provider auto-deploy path that can race CI.
