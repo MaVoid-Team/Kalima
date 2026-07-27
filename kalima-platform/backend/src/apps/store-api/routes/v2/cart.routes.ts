@@ -55,6 +55,10 @@ router.get(
   "/checkout/repeat-purchases",
   cartController.getRepeatPurchaseItems,
 );
+router.get(
+  "/fast-buy/checkout/repeat-purchases",
+  cartController.getRepeatPurchaseItems,
+);
 router.post(
   "/checkout",
   requireConfirmed,
