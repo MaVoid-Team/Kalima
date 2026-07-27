@@ -95,6 +95,19 @@ export class BaileysClient {
     }
   }
 
+  async startPairing(callbacks: BaileysCallbacks): Promise<void> {
+    // An explicit QR request must not reuse a stale persisted session. Wait for
+    // any current initialization to settle, stop its reconnect lifecycle, and
+    // remove the saved credentials before creating the fresh pairing socket.
+    if (this.connectPromise) {
+      await this.connectPromise.catch(() => undefined);
+    }
+    this.destroy();
+    this.connectPromise = null;
+    await this.clearAuthState();
+    await this.initialize(callbacks);
+  }
+
   private setStatus(status: WhatsAppStatus): void {
     this._status = status;
     if (status !== "qr_pending") this._qrCode = null;

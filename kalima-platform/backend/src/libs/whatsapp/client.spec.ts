@@ -94,6 +94,20 @@ describe("BaileysClient lifecycle", () => {
     expect(client.status).toBe("initializing");
   });
 
+  it("clears stale credentials before starting an explicit QR pairing", async () => {
+    await fs.writeFile(path.join(authDir, "creds.json"), "{}");
+    const client = new BaileysClient({ authDir, reconnectDelaysMs: [1] });
+    const events = callbacks();
+    await client.restore(events);
+
+    await client.startPairing(events);
+
+    await expect(fs.access(path.join(authDir, "creds.json"))).rejects.toBeDefined();
+    expect(makeWASocket).toHaveBeenCalledTimes(2);
+    expect(sockets[0].end).toHaveBeenCalledTimes(1);
+    expect(client.status).toBe("initializing");
+  });
+
   it("reconnects after a transient close without deleting saved credentials", async () => {
     await fs.writeFile(path.join(authDir, "creds.json"), "{}");
     const client = new BaileysClient({ authDir, reconnectDelaysMs: [1] });
@@ -131,5 +145,15 @@ describe("BaileysClient lifecycle", () => {
     expect(client.status).toBe("disconnected");
     expect(makeWASocket).toHaveBeenCalledTimes(1);
     expect(events.onDisconnected).toHaveBeenCalledWith("logout");
+  });
+
+  it("clears stale credentials when logging out without an active socket", async () => {
+    await fs.writeFile(path.join(authDir, "creds.json"), "{}");
+    const client = new BaileysClient({ authDir, reconnectDelaysMs: [1] });
+
+    await client.logout();
+
+    await expect(fs.access(authDir)).rejects.toBeDefined();
+    expect(client.status).toBe("disconnected");
   });
 });
