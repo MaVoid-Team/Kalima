@@ -8,15 +8,15 @@ Tool: K6 v2.1.0
 
 ## Executive result
 
-Kalima sustained **15 campaign visitor journeys per second** during the complete measured soak with no failed requests, no dropped journeys, no container restart, and no health-check failure.
+Kalima sustained **15 campaign visitor journeys per second for 15 continuous minutes** with no failed requests, no dropped journeys, no container restart, and no health-check failure.
 
 That measured load equals:
 
 - **900 visitor journeys per minute**
 - **54,000 visitor journeys per hour**, if the same arrival rate is maintained
-- **44.18 HTTP requests per second** under the tested visitor mix
-- Approximately **159,000 HTTP requests per hour**
-- Up to **31 simultaneously active K6 users** under this journey timing
+- **44.51 HTTP requests per second** under the tested visitor mix
+- Approximately **160,000 HTTP requests per hour**
+- Up to **30 simultaneously active K6 users** under this journey timing
 
 A short two-minute stage also passed at **20 journeys per second**, equal to 58.06 HTTP requests per second.
 
@@ -68,24 +68,20 @@ Every generated request carried an identifiable load-test user agent and header.
 | Medium | 2 min | 1,201 | 9.83 | 29.05 | 64.07 ms | 164.78 ms | 210.78 ms | 411.42 ms | 0% | 0 | Pass |
 | High | 2 min | 2,401 | 19.62 | 58.06 | 62.28 ms | 149.66 ms | 192.21 ms | 364.68 ms | 0% | 0 | Pass |
 | Failure probe | Aborted after about 16 s | 438 | 27.38 | 93.22 | 62.15 ms | 160.56 ms | 199.31 ms | 273.54 ms before cliff | 6.71% | 35 | Fail |
-| Sustained soak | 8 min | 7,201 | 14.95 | 44.18 | 65.65 ms | 176.79 ms | 264.81 ms | 1,193.66 ms | 0% | 0 | Pass |
-
-An earlier 15-journey soak remained healthy for approximately 9 minutes 28 seconds before the local agent harness terminated its parent command at the harness execution limit.
-
-That partial run had 44 out of 44 successful external health samples, but it did not produce a final K6 summary and is therefore supporting evidence rather than the primary measured result.
+| Sustained soak | 15 min | 13,501 | 14.97 | 44.51 | 62.37 ms | 149.39 ms | 195.36 ms | 590.83 ms | 0% | 0 | Pass |
 
 ## Sustained-soak details
 
-The complete 8-minute soak generated:
+The complete 15-minute soak generated:
 
-- 7,201 visitor journeys
-- 21,280 HTTP requests
-- 224.95 MB received by the K6 generator
+- 13,501 visitor journeys
+- 40,147 HTTP requests
+- 424.18 MB received by the K6 generator
 - 0 failed HTTP requests
 - 0 dropped journeys
 - 100% successful K6 checks
-- 31 maximum simultaneously active K6 users
-- 347 ms p95 complete-journey request time, excluding simulated user think time
+- 30 maximum simultaneously active K6 users
+- 308 ms p95 complete-journey request time, excluding simulated user think time
 
 External production-health monitoring recorded:
 
@@ -149,7 +145,7 @@ Those invalid attempts were excluded and rerun after stabilization.
 
 ### Confirmed sustained capacity
 
-**15 visitor journeys per second for 8 continuous measured minutes**, with separate healthy observation for approximately 9.5 minutes at the same rate.
+**15 visitor journeys per second for 15 continuous measured minutes**.
 
 This corresponds to about 54,000 visitor journeys per hour if traffic and user behavior remain similar.
 
@@ -224,7 +220,7 @@ Real concurrent-user capacity varies with session duration, number of open tabs,
 
 ## Final conclusion
 
-Kalima is healthy and fast at the tested 15-journey sustained level.
+Kalima is healthy and fast at the tested 15-journey sustained level for the full 15-minute proof window.
 
 Latency remained excellent, failures stayed at zero, and application containers retained substantial CPU and memory headroom.
 
