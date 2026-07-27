@@ -135,6 +135,7 @@
     "paymentMethod": "Payment Method",
     "print": "Print",
     "trackOrder": "Track your order",
+    "trackOrderRequired": "Continue on WhatsApp to track your order.",
     "unableToPrint": "Unable to print receipt",
     "popupBlocked": "Please allow popups to print receipt",
     "statuses": {

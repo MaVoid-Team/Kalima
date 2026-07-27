@@ -4,7 +4,7 @@ import PaymentMethod from '@/components/checkout/PaymentMethod';
 import OrderSummary from '@/components/checkout/OrderSummary';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogCancel } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import PrintableReceipt from '@/components/checkout/PrintableReceipt';
 import { useNavigate } from 'react-router-dom';
@@ -226,12 +226,12 @@ export default function PaymentStep({ onBack }) {
                 </aside>
             </div>
 
-            <AlertDialog open={showReceipt} onOpenChange={() => {
-                setShowReceipt(!showReceipt);
-                loadCart();
-                navigate('/cart');
-            }}>
-                <AlertDialogContent className="max-w-xl p-6 print:hidden">
+            <AlertDialog open={showReceipt}>
+                <AlertDialogContent
+                    className="max-w-xl p-6 print:hidden"
+                    onEscapeKeyDown={(event) => event.preventDefault()}
+                    onPointerDownOutside={(event) => event.preventDefault()}
+                >
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-lg font-bold text-center">{t('receipt.title', 'Purchase Receipt')}</AlertDialogTitle>
                     </AlertDialogHeader>
@@ -264,38 +264,21 @@ export default function PaymentStep({ onBack }) {
                             </div>
                         )}
                     </div>
-                    <AlertDialogFooter className="flex-col sm:flex-col gap-2">
-                        <Button
-                            onClick={handlePrintReceipt}
-                            className="w-full"
-                            data-testid="checkout-payment-step-receipt-print-button"
-                        >
-                            {t('receipt.print', 'Print')}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="w-full"
-                            onClick={() => {
-                                setShowReceipt(false);
-                                loadCart();
-                                navigate(ordersPath);
-                            }}
-                            data-testid="checkout-payment-step-receipt-orders-button"
-                        >
-                            {t('success.view_orders', 'View My Orders')}
-                        </Button>
+                    <AlertDialogFooter className="flex-col sm:flex-col gap-3">
+                        <p className="text-center text-sm font-medium text-muted-foreground">
+                            {t('receipt.trackOrderRequired')}
+                        </p>
                         <Button
                             asChild
-                            variant="outline"
-                            className="w-full border-success/30 text-success hover:bg-success/10 hover:text-success"
+                            size="lg"
+                            className="w-full bg-success text-success-foreground hover:bg-success/90"
                             data-testid="checkout-payment-step-receipt-track-order-button"
                         >
                             <a href={trackingLink} target="_blank" rel="noopener noreferrer">
-                                <MessageCircle className="h-4 w-4" />
+                                <MessageCircle className="h-5 w-5" />
                                 {t('receipt.trackOrder', 'Track your order')}
                             </a>
                         </Button>
-                        <AlertDialogCancel className="w-full" data-testid="checkout-payment-step-receipt-close-button">{t('cancel', 'Close')}</AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
