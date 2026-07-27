@@ -10,6 +10,7 @@ import {
   CreateEBookletTemplateDto,
   DeliverEBookletDto,
   EBookletCheckoutDto,
+  EBookletRepeatPurchaseCheckDto,
   PublicEBookletCheckoutDto,
   EBookletDeviceAllowanceDto,
   EBookletDeviceBindDto,
@@ -431,6 +432,19 @@ export const eBookletController = {
       res.status(200).json({ success: true, data });
     } catch (error) {
       next(error);
+    }
+  },
+
+  async checkRepeatPurchases(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dto = await validateDto(EBookletRepeatPurchaseCheckDto, req.body);
+      const items = await getEBookletService().getRepeatPurchaseTemplates(
+        currentUserId(req),
+        dto.template_ids,
+      );
+      res.status(200).json({ success: true, data: { items } });
+    } catch (err) {
+      next(err);
     }
   },
 

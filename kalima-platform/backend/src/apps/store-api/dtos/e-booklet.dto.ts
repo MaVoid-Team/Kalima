@@ -1,4 +1,6 @@
 import {
+  ArrayMaxSize,
+  ArrayNotEmpty,
   IsArray,
   IsBoolean,
   IsDateString,
@@ -14,6 +16,7 @@ import {
   MaxLength,
   Min,
 } from "class-validator";
+import { Type } from "class-transformer";
 
 export enum EBookletTemplateStatusDto {
   draft = "draft",
@@ -299,6 +302,15 @@ export class PublicEBookletCheckoutItemDto {
   @IsOptional()
   @IsArray()
   required_field_values?: Array<{ field_definition_id: number; value: string }>;
+}
+
+export class EBookletRepeatPurchaseCheckDto {
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayMaxSize(100)
+  @Type(() => Number)
+  @IsInt({ each: true })
+  template_ids!: number[];
 }
 
 export class PublicEBookletCheckoutDto {

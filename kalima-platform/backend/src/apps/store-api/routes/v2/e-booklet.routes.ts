@@ -69,6 +69,11 @@ router.get("/e-booklet-store/:templateId/preview/hotspots/:hotspotId/assets/:ass
 router.get("/e-booklet-store/:templateId/preview/pages/:pageNumber", viewerLimiter, eBookletController.getStorePreviewPage);
 router.get("/e-booklet-store/instances/:instanceId", eBookletController.getStoreInstance);
 router.get("/e-booklet-store/:templateId", eBookletController.getStoreTemplate);
+router.post(
+  "/e-booklet-checkout/repeat-purchases",
+  ...teacherAuth,
+  eBookletController.checkRepeatPurchases,
+);
 router.post("/e-booklet-checkout", ...teacherAuth, uploadSingleImage("paymentScreenshot"), eBookletController.createPublicCheckout);
 router.get("/e-booklet-orders", ...teacherAuth, eBookletController.listPublicOrders);
 
