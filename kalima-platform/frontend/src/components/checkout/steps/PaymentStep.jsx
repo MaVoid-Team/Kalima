@@ -4,7 +4,7 @@ import PaymentMethod from '@/components/checkout/PaymentMethod';
 import OrderSummary from '@/components/checkout/OrderSummary';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogCancel } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import PrintableReceipt from '@/components/checkout/PrintableReceipt';
 import { useNavigate } from 'react-router-dom';
@@ -214,11 +214,7 @@ export default function PaymentStep({ onBack }) {
                 </aside>
             </div>
 
-            <AlertDialog open={showReceipt} onOpenChange={() => {
-                setShowReceipt(!showReceipt);
-                loadCart();
-                navigate('/cart');
-            }}>
+            <AlertDialog open={showReceipt}>
                 <AlertDialogContent
                     className="max-w-xl p-6 print:hidden"
                     onEscapeKeyDown={(event) => event.preventDefault()}
@@ -256,26 +252,7 @@ export default function PaymentStep({ onBack }) {
                             </div>
                         )}
                     </div>
-                    <AlertDialogFooter className="flex-col sm:flex-col gap-2">
-                        <Button
-                            onClick={handlePrintReceipt}
-                            className="w-full"
-                            data-testid="checkout-payment-step-receipt-print-button"
-                        >
-                            {t('receipt.print', 'Print')}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="w-full"
-                            onClick={() => {
-                                setShowReceipt(false);
-                                loadCart();
-                                navigate(ordersPath);
-                            }}
-                            data-testid="checkout-payment-step-receipt-orders-button"
-                        >
-                            {t('success.view_orders', 'View My Orders')}
-                        </Button>
+                    <AlertDialogFooter className="flex-col sm:flex-col gap-3">
                         <p className="text-center text-sm font-medium text-muted-foreground">
                             {t('receipt.trackOrderRequired')}
                         </p>
@@ -290,7 +267,6 @@ export default function PaymentStep({ onBack }) {
                                 {t('receipt.trackOrder', 'Track your order')}
                             </a>
                         </Button>
-                        <AlertDialogCancel className="w-full" data-testid="checkout-payment-step-receipt-close-button">{t('cancel', 'Close')}</AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
