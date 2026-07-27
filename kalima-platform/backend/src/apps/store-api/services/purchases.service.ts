@@ -67,7 +67,7 @@ const PURCHASE_INCLUDE = {
   },
 } as const;
 
-class PurchasesService {
+export class PurchasesService {
   constructor(private db: PrismaClient = prisma) {}
 
   // ---------------------------------------------------------------
@@ -432,6 +432,38 @@ class PurchasesService {
       grouped.map((g) => [g.confirmed_by, g._count._all]),
     );
 
+    const confirmedPurchases = await this.db.purchases.findMany({
+      where: {
+        confirmed_by: { in: adminIds },
+        status: "confirmed",
+        deleted_at: null,
+        confirmed_at: {
+          gte: startDate,
+          lt: endDate,
+        },
+      },
+      select: {
+        confirmed_by: true,
+        purchase_items: {
+          where: { is_deleted: false },
+          select: { quantity: true },
+        },
+      },
+    });
+
+    const productsSoldMap = new Map<number, number>();
+    for (const purchase of confirmedPurchases) {
+      if (purchase.confirmed_by === null) continue;
+      const quantity = purchase.purchase_items.reduce(
+        (total, item) => total + item.quantity,
+        0,
+      );
+      productsSoldMap.set(
+        purchase.confirmed_by,
+        (productsSoldMap.get(purchase.confirmed_by) || 0) + quantity,
+      );
+    }
+
     // 3. Merge data
     const stats = admins.map((admin) => ({
       id: admin.id,
@@ -440,6 +472,7 @@ class PurchasesService {
       phone: admin.phone,
       role: admin.user_roles[0]?.role || null,
       count: countsMap.get(admin.id) || 0,
+      productsSold: productsSoldMap.get(admin.id) || 0,
     }));
 
     return {
