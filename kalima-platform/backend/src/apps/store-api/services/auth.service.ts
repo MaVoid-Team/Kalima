@@ -405,6 +405,24 @@ class AuthService {
       throw new NotFoundError("User not found");
     }
 
+    const isSubAdmin =
+      actorRoles.some((role) => role.role === role_enum.SubAdmin) &&
+      !actorRoles.some((role) => role.role === role_enum.Admin);
+    const privilegedTargetRoles = new Set<role_enum>([
+      role_enum.Admin,
+      role_enum.SubAdmin,
+      role_enum.Moderator,
+    ]);
+    const targetIsPrivileged = targetUser.user_roles.some((role) =>
+      privilegedTargetRoles.has(role.role),
+    );
+
+    if (isSubAdmin && targetIsPrivileged) {
+      throw new ForbiddenError(
+        "Subadmins cannot impersonate privileged accounts",
+      );
+    }
+
     const startedAt = new Date().toISOString();
     const tokens = await this.issueTokens(targetUser.id, {
       actorUserId: actor.userId,

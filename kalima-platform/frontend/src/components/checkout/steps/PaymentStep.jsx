@@ -30,7 +30,6 @@ export default function PaymentStep({ onBack }) {
     const navigate = useNavigate();
     const { isTeacher } = useRole();
     const ordersPath = isTeacher ? '/teacher/orders' : '/orders';
-
     const baseURL = React.useMemo(() => getBaseUrl(), []);
 
     const [numberTransferredFrom, setNumberTransferredFrom] = useState('');
@@ -160,25 +159,14 @@ export default function PaymentStep({ onBack }) {
         printWindow.document.write(`<!doctype html><html dir="${i18n.dir()}" lang="${i18n.language}"><head><meta charset="utf-8" /><title>${t('receipt.title', 'Purchase Receipt')}</title></head><body></body></html>`);
         printWindow.document.close();
 
-        const styleNodes = document.querySelectorAll('style, link[rel="stylesheet"]');
-        styleNodes.forEach((node) => {
+        document.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => {
             printWindow.document.head.appendChild(node.cloneNode(true));
         });
 
         const baseStyle = printWindow.document.createElement('style');
-        baseStyle.textContent = `
-            * { box-sizing: border-box; }
-            body { margin: 0; padding: 24px; background: #fff; color: #111; }
-            @page { size: A4; margin: 14mm; }
-            th, td { text-align: start; }
-            th:last-child, td:last-child { text-align: end; }
-        `;
+        baseStyle.textContent = `* { box-sizing: border-box; } body { margin: 0; padding: 24px; background: #fff; color: #111; } @page { size: A4; margin: 14mm; } th, td { text-align: start; } th:last-child, td:last-child { text-align: end; }`;
         printWindow.document.head.appendChild(baseStyle);
-
-        const cloned = contentNode.cloneNode(true);
-        printWindow.document.body.innerHTML = '';
-        printWindow.document.body.appendChild(cloned);
-
+        printWindow.document.body.replaceChildren(contentNode.cloneNode(true));
         printWindow.focus();
         setTimeout(() => {
             printWindow.print();

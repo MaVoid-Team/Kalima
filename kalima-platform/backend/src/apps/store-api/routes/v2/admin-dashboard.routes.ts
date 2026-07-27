@@ -3,6 +3,8 @@ import { adminDashboardController } from "../../controllers/admin-dashboard.cont
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/client";
+import { adminAnalyticsAuth } from "../../middleware/adminAnalyticsAuth";
+import { employeePerformanceAuth } from "../../middleware/employeePerformanceAuth";
 
 const router = Router();
 
@@ -17,21 +19,21 @@ const adminAuth = [
 // ============================================
 
 // Overview, Monthly Trends, Daily stats
-router.get("/store-stats", ...adminAuth, adminDashboardController.getStoreStatistics);
+router.get("/store-stats", ...adminAnalyticsAuth, adminDashboardController.getStoreStatistics);
 
 // Confirmer Statistics
 router.get("/confirmer-stats", ...adminAuth, adminDashboardController.getConfirmerStatistics);
 
 // Product Performance Ranking
-router.get("/product-performance", ...adminAuth, adminDashboardController.getProductPerformance);
+router.get("/product-performance", ...adminAnalyticsAuth, adminDashboardController.getProductPerformance);
 
 // Response Time Analytics
-router.get("/response-time", ...adminAuth, adminDashboardController.getResponseTimeAnalytics);
+router.get("/response-time", ...adminAnalyticsAuth, adminDashboardController.getResponseTimeAnalytics);
 
 // Staff Performance Tracking (Received/Confirmed/Returned/Response Times)
-router.get("/staff-report", ...adminAuth, adminDashboardController.getStaffPerformanceReport);
+router.get("/staff-report", ...employeePerformanceAuth, adminDashboardController.getStaffPerformanceReport);
 
 // User Stats (total users, by role, verified)
-router.get("/user-stats", ...adminAuth, adminDashboardController.getUserStats);
+router.get("/user-stats", ...adminAnalyticsAuth, adminDashboardController.getUserStats);
 
 export default router;

@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 
 import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
 import useAuth from '@/hooks/auth/useAuth';
+import useRole from '@/hooks/useRole';
 import UserStatsCards from '@/components/admin/users/UserStatsCards';
 import UserFilters from '@/components/admin/users/UserFilters';
 import UsersTable from '@/components/admin/users/UsersTable';
@@ -16,6 +17,7 @@ export default function UsersPage() {
     const { t } = useTranslation('userManagement');
     const navigate = useNavigate();
     const { user: currentUser } = useAuth();
+    const { isSubAdmin, isAdmin } = useRole();
 
     const {
         users,
@@ -124,9 +126,10 @@ export default function UsersPage() {
                 onApprove={handleApprove}
                 onReject={handleReject}
                 onDelete={handleDelete}
-                onImpersonate={handleImpersonate}
-                currentUserId={currentUser?.id}
-                impersonatingUserId={impersonatingUserId}
+                 onImpersonate={handleImpersonate}
+                 currentUserId={currentUser?.id}
+                 actorIsSubAdmin={isSubAdmin && !isAdmin}
+                 impersonatingUserId={impersonatingUserId}
             />
         </div>
     );
