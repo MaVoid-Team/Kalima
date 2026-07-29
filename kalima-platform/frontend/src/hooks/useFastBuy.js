@@ -6,7 +6,6 @@ import axios from "@/api/axios";
 import useApiMutation from "@/hooks/useApiMutation";
 import { getImageUrl } from "@/lib/storeUtils";
 import { egyptPhoneSchema } from "@/components/ui/phone-input";
-import useRole from "@/hooks/useRole";
 import {
   beginRepeatPurchaseCheck,
   confirmRepeatPurchase,
@@ -123,8 +122,6 @@ export function useFastBuy({ checkout = false } = {}) {
   const { mutate, loading } = useApiMutation();
   const navigate = useNavigate();
   const { t } = useTranslation("checkout");
-  const { isTeacher } = useRole();
-  const ordersPath = isTeacher ? "/teacher/orders" : "/orders";
 
   const [preview, setPreview] = useState(null);
   const [isLoading, setIsLoading] = useState(checkout);
@@ -132,6 +129,7 @@ export function useFastBuy({ checkout = false } = {}) {
   const [itemFields, setItemFields] = useState({});
   const [repeatPurchase, setRepeatPurchase] = useState(emptyRepeatPurchaseState);
   const [checkingRepeatPurchase, setCheckingRepeatPurchase] = useState(false);
+  const [completedPurchase, setCompletedPurchase] = useState(null);
   const submissionInFlightRef = useRef(false);
   const [formData, setFormData] = useState({
     paymentMethodId: "",
@@ -297,7 +295,7 @@ export function useFastBuy({ checkout = false } = {}) {
         await submitItemFields();
       }
 
-      await mutate({
+      const result = await mutate({
         endpoint: "/cart/fast-buy/checkout",
         method: "post",
         data,
@@ -312,8 +310,12 @@ export function useFastBuy({ checkout = false } = {}) {
         });
       }
 
-      toast.success(t("fastBuy.checkoutSuccess", "Checkout successful! Redirecting to market..."));
-      navigate(ordersPath, { replace: true, state: { skipFastBuyClear: true } });
+      const purchase = result?.data?.purchase;
+      if (!purchase) {
+        throw new Error("Checkout succeeded without purchase details");
+      }
+      setCompletedPurchase(purchase);
+      toast.success(t("checkoutSuccess", "Checkout successful"));
     } catch {
       // Global error handler will trigger toasts
     }
@@ -385,6 +387,7 @@ export function useFastBuy({ checkout = false } = {}) {
       checkoutFastBuy,
       repeatPurchase,
       checkingRepeatPurchase,
+      completedPurchase,
       confirmRepeatedPurchase,
       dismissRepeatedPurchase,
       applyCoupon,

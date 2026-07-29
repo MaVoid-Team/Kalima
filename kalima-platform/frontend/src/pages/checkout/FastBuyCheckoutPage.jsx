@@ -7,6 +7,7 @@ import { useFastBuy } from "@/hooks/useFastBuy";
 import LoadingSpinner from "../../components/ui/loading-spinner";
 import { motion } from "framer-motion";
 import RepeatPurchaseWarningDialog from "@/components/checkout/RepeatPurchaseWarningDialog";
+import PurchaseTrackingDialog from "@/components/checkout/PurchaseTrackingDialog";
 
 export default function FastBuyCheckoutPage() {
   const { t } = useTranslation("checkout");
@@ -17,6 +18,7 @@ export default function FastBuyCheckoutPage() {
   const skipBlockRef = useRef(false);
 
   const blocker = useBlocker(({ currentLocation, nextLocation }) => {
+    if (checkout.completedPurchase) return false;
     if (skipBlockRef.current) return false;
     if (nextLocation.state?.skipFastBuyClear) return false;
     const leavingCheckout = currentLocation.pathname === "/fast-buy/checkout" && nextLocation.pathname !== "/fast-buy/checkout";
@@ -96,6 +98,14 @@ export default function FastBuyCheckoutPage() {
         continueLabel={t("repeatPurchase.continue")}
         onBack={checkout.dismissRepeatedPurchase}
         onContinue={checkout.confirmRepeatedPurchase}
+      />
+      <PurchaseTrackingDialog
+        purchase={checkout.completedPurchase}
+        paymentMethodName={
+          preview?.paymentMethods?.find(
+            (method) => String(method.id) === String(checkout.formData.paymentMethodId),
+          )?.name || ""
+        }
       />
     </>
   );
