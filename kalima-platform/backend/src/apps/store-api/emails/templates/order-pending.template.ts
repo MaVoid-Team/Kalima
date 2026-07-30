@@ -46,7 +46,7 @@ export function getOrderPendingEmailHtml(data: OrderPendingEmailData): string {
                   ${data.productListHTML}
                 </tbody>
               </table>
-              <p style="margin: 20px 0 0; color: #4b5563; font-size: 15px; line-height: 1.8;">نحن في انتظار تأكيد الدفع أو المراجعة الإدارية. بمجرد تأكيد ذلك، سيتم معالجة الطلب وإشعارك.</p>
+              <p style="margin: 20px 0 0; color: #4b5563; font-size: 15px; line-height: 1.8;">نحن في انتظار تأكيد الدفع أو المراجعة الإدارية. بمجرد تأكيد ذلك، سيتم إتمام طلبك خلال 24 ساعة وإشعارك.</p>
               ${
                 data.ordersUrl
                   ? `
@@ -83,7 +83,7 @@ export function getOrderPendingEmailText(data: OrderPendingEmailData): string {
 نود إعلامك أن طلبك (${data.purchaseSerial}) قيد الانتظار حاليًا.
 يحتوي طلبك على ${data.totalItems} منتجًا.
 
-نحن في انتظار الدفع أو المراجعة الإدارية. بمجرد تأكيد ذلك، سيتم معالجة الطلب وإشعارك.
+نحن في انتظار الدفع أو المراجعة الإدارية. بمجرد تأكيد ذلك، سيتم إتمام طلبك خلال 24 ساعة وإشعارك.
 ${
   data.ordersUrl
     ? `
