@@ -7,6 +7,7 @@ import { E_BOOKLET_ORDERS_ALLOWED_ROLES } from "./pages/e-booklets/eBookletOrder
 import { ADMIN_ANALYTICS_ALLOWED_ROLES } from "./lib/adminAnalyticsAccess";
 import { EMPLOYEE_PERFORMANCE_ALLOWED_ROLES } from "./lib/employeePerformanceAccess";
 import ImpersonationBanner from "./components/auth/ImpersonationBanner";
+import GlobalBackButton from "./components/GlobalBackButton";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -151,6 +152,7 @@ function Root() {
   return (
     <ErrorBoundary>
       <ImpersonationBanner />
+      <GlobalBackButton />
       <Suspense fallback={<PageLoader />}>
         <Outlet />
       </Suspense>
