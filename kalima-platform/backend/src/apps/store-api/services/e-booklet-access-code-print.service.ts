@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import path from "path";
 import { promises as fsPromises } from "fs";
-import { BadRequestError, ConflictError, NotFoundError } from "../../../libs/errors";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../../../libs/errors";
 import { resolveEBookletStoragePath, resolveEBookletUploadRoot } from "../../../libs/uploadsRoot";
 import { EBookletAccessCodeService, type EBookletAccessCodeKind } from "./e-booklet-access-code.service";
 import { EBookletAccessCodePrintRendererService } from "./e-booklet-access-code-print-renderer.service";
@@ -16,9 +16,10 @@ type PrintFieldLayout = {
   width: number;
   height: number;
   direction?: "rtl" | "ltr" | "auto";
-  align?: "left" | "center" | "right";
+  align?: "left" | "center" | "right" | "start" | "end";
   fontSize?: number;
   color?: string;
+  fontFamily?: "Noto Sans Arabic" | "Noto Kufi Arabic" | "Noto Naskh Arabic";
 };
 
 type PrintTemplateLayout = {
@@ -63,9 +64,25 @@ export function hashPrintQrRef(ref: string): string {
   return crypto.createHash("sha256").update(ref).digest("hex");
 }
 
+export function getPrintQrRedeemBaseUrl(): string {
+  const configuredBase = (process.env.FRONTEND_URL || process.env.APP_URL || "http://localhost:5173").trim();
+  let parsed: URL;
+  try {
+    parsed = new URL(configuredBase);
+  } catch {
+    throw new Error("FRONTEND_URL or APP_URL must be an absolute public frontend URL for printed e-booklet QR codes.");
+  }
+  if (!["http:", "https:"].includes(parsed.protocol)) {
+    throw new Error("FRONTEND_URL or APP_URL must use http or https for printed e-booklet QR codes.");
+  }
+  if (/\/api\/v\d+\/?$/i.test(parsed.pathname)) {
+    throw new Error("FRONTEND_URL or APP_URL must point to the frontend, not the API, for printed e-booklet QR codes.");
+  }
+  return `${parsed.origin}${parsed.pathname.replace(/\/$/, "")}`;
+}
+
 function printQrRedeemUrl(ref: string): string {
-  const base = (process.env.APP_URL || process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
-  return `${base}/e-booklet-code/qr/${encodeURIComponent(ref)}`;
+  return `${getPrintQrRedeemBaseUrl()}/e-booklet-code/qr/${encodeURIComponent(ref)}`;
 }
 
 function printQrTeacherImageUrl(ref: string): string {
@@ -616,6 +633,14 @@ export class EBookletAccessCodePrintService {
     const row = await this.db.e_booklet_access_code_print_batch_codes.findFirst({
       where: { qr_ref_hash: hashPrintQrRef(ref) },
       include: {
+        access_code: {
+          select: {
+            status: true,
+            redeemed_count: true,
+            max_redemptions: true,
+            expires_at: true,
+          },
+        },
         batch: {
           include: {
             teacher: { select: { id: true, name: true } },
@@ -625,6 +650,12 @@ export class EBookletAccessCodePrintService {
       },
     });
     if (!row) throw new NotFoundError("Printed access-code QR reference not found.");
+    const accessCode = row.access_code;
+    const expired = Boolean(accessCode?.expires_at && new Date(accessCode.expires_at) <= new Date());
+    const exhausted = Number(accessCode?.redeemed_count ?? 0) >= Number(accessCode?.max_redemptions ?? 1);
+    if (!accessCode || accessCode.status !== "active" || expired || exhausted) {
+      throw new ForbiddenError("This e-booklet access code is no longer active.");
+    }
     const code = this.decryptPrintedAccessCode(row.access_code_ciphertext);
     if (!code) throw new NotFoundError("Printed access-code data is unavailable.");
     const batchValues = row.batch?.snapshot_json?.batchValues || {};

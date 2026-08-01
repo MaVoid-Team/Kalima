@@ -100,7 +100,7 @@ export default function EBookletPrintedCodeQrPage() {
         <h1 className="mt-4 text-2xl font-bold">{t("inviteAccept.codeRedemption.title")}</h1>
         <p className="mt-3 text-sm text-muted-foreground">{t("inviteAccept.loginRequired")}</p>
         <div className="mt-5 flex gap-2">
-          <Button asChild><Link to={`/login?redirect=${encodeURIComponent(redirectPath)}`}>{t("inviteAccept.login")}</Link></Button>
+          <Button asChild><Link data-testid="e-booklet-printed-code-login" to={`/login?redirect=${encodeURIComponent(redirectPath)}`}>{t("inviteAccept.login")}</Link></Button>
           <Button asChild variant="outline"><Link to={`/signup?redirect=${encodeURIComponent(redirectPath)}`}>{t("inviteAccept.register")}</Link></Button>
         </div>
       </div>
@@ -148,13 +148,13 @@ export default function EBookletPrintedCodeQrPage() {
 
             <label className="grid gap-2 text-sm font-medium">
               <span>{t("inviteAccept.codeRedemption.codeLabel")}</span>
-              <Input value={prefill?.code || ""} readOnly className="font-mono tracking-wide" dir="ltr" />
+              <Input data-testid="e-booklet-printed-code" value={prefill?.code || ""} readOnly className="font-mono tracking-wide" dir="ltr" />
             </label>
             <label className="flex items-start gap-2 rounded-md border p-3 text-sm">
-              <input type="checkbox" className="mt-1" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
+              <input data-testid="e-booklet-printed-code-terms" type="checkbox" className="mt-1" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
               <span>{t("inviteAccept.terms")}</span>
             </label>
-            <Button className="w-full" onClick={submit} disabled={state.status === "loading" || !prefill?.code}>
+            <Button data-testid="e-booklet-printed-code-submit" className="w-full" onClick={submit} disabled={state.status === "loading" || !prefill?.code}>
               {state.status === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ticket className="h-4 w-4" />}
               {t("inviteAccept.codeRedemption.submit")}
             </Button>

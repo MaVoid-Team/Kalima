@@ -1,5 +1,6 @@
 import {
   EBookletAccessCodePrintService,
+  getPrintQrRedeemBaseUrl,
   generatePrintQrRef,
   hashPrintQrRef,
   verifyPrintQrRef,
@@ -67,6 +68,22 @@ describe("e-booklet access-code print service", () => {
     expect(hashPrintQrRef(ref)).toMatch(/^[a-f0-9]{64}$/);
     expect(verifyPrintQrRef(ref)).toBe(true);
     expect(verifyPrintQrRef(tamperQrRef(ref))).toBe(false);
+  });
+
+  test("uses the public frontend URL and rejects an API URL", () => {
+    const originalFrontendUrl = process.env.FRONTEND_URL;
+    const originalAppUrl = process.env.APP_URL;
+    process.env.FRONTEND_URL = "https://kalima-edu.example/store";
+    process.env.APP_URL = "https://api.kalima-edu.example/api/v2";
+    expect(getPrintQrRedeemBaseUrl()).toBe("https://kalima-edu.example/store");
+
+    delete process.env.FRONTEND_URL;
+    expect(() => getPrintQrRedeemBaseUrl()).toThrow("must point to the frontend, not the API");
+
+    if (originalFrontendUrl === undefined) delete process.env.FRONTEND_URL;
+    else process.env.FRONTEND_URL = originalFrontendUrl;
+    if (originalAppUrl === undefined) delete process.env.APP_URL;
+    else process.env.APP_URL = originalAppUrl;
   });
 
   test("creates only 827x438 300ppi templates with QR and code fields", async () => {
@@ -523,9 +540,15 @@ describe("e-booklet access-code print service", () => {
     db.e_booklet_access_code_print_batch_codes.findFirst.mockResolvedValue({
       id: 9,
       batch_id: 88,
-      access_code_id: 31,
-      card_index: 0,
-      access_code_ciphertext: encryptedCode,
+    access_code_id: 31,
+    card_index: 0,
+    access_code_ciphertext: encryptedCode,
+    access_code: {
+      status: "active",
+      redeemed_count: 0,
+      max_redemptions: 1,
+      expires_at: null,
+    },
       batch: {
         id: 88,
         label: "Generated batch",
@@ -560,5 +583,22 @@ describe("e-booklet access-code print service", () => {
       where: { qr_ref_hash: hashPrintQrRef(ref) },
     }));
     await expect(service.getQrPrefill(tamperQrRef(ref))).rejects.toThrow("Invalid printed access-code QR reference.");
+  });
+
+  test("does not prefill a QR reference for a redeemed access code", async () => {
+    const db = createDb();
+    const service = new EBookletAccessCodePrintService(db, {} as any);
+    const ref = generatePrintQrRef();
+    db.e_booklet_access_code_print_batch_codes.findFirst.mockResolvedValue({
+      access_code_ciphertext: service.encryptPrintedAccessCode("KLM-REDEEMED"),
+      access_code: { status: "redeemed", redeemed_count: 1, max_redemptions: 1, expires_at: null },
+      batch: {
+        teacher: { id: 9, name: "أستاذ أحمد" },
+        booklet_instance: { id: 10, display_title: "مذكرة النحو" },
+        snapshot_json: { batchValues: {} },
+      },
+    });
+
+    await expect(service.getQrPrefill(ref)).rejects.toThrow("This e-booklet access code is no longer active.");
   });
 });

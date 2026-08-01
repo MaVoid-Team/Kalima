@@ -22,6 +22,7 @@ type FieldBox = {
   align?: "left" | "center" | "right" | "start" | "end";
   fontSize?: number;
   color?: string;
+  fontFamily?: "Noto Sans Arabic" | "Noto Kufi Arabic" | "Noto Naskh Arabic";
 };
 
 type PrintLayout = {
@@ -36,9 +37,20 @@ type PrintCardRenderInput = {
   visibleFields?: Record<string, boolean | undefined>;
 };
 
-const ARABIC_TEXT_FONT_FAMILY = "Noto Sans Arabic";
 const RTL_TEXT_RE = /[\u0590-\u08ff\ufb1d-\ufdff\ufe70-\ufefc]/;
 const MIN_TEXT_FONT_SIZE = 9;
+const PRINT_TEXT_FONT_FAMILIES = {
+  "Noto Sans Arabic": "Noto Sans Arabic",
+  "Noto Kufi Arabic": "Noto Kufi Arabic",
+  "Noto Naskh Arabic": "Noto Naskh Arabic",
+} as const;
+
+export type PrintTextFontFamily = keyof typeof PRINT_TEXT_FONT_FAMILIES;
+export const PRINT_TEXT_FONT_FAMILY_VALUES = Object.freeze(Object.keys(PRINT_TEXT_FONT_FAMILIES) as PrintTextFontFamily[]);
+
+function resolvePrintFont(fontFamily: FieldBox["fontFamily"]) {
+  return PRINT_TEXT_FONT_FAMILIES[fontFamily || "Noto Sans Arabic"] || PRINT_TEXT_FONT_FAMILIES["Noto Sans Arabic"];
+}
 
 function escapeXml(value: unknown): string {
   return String(value ?? "")
@@ -138,6 +150,7 @@ export class EBookletAccessCodePrintRendererService {
     const fontSize = Math.max(MIN_TEXT_FONT_SIZE, Math.round(merged.fontSize || 24));
     const direction = resolveDirection(merged, value);
     const align = resolveTextAlign(merged, direction);
+    const fontFamily = resolvePrintFont(merged.fontFamily);
     const text = `<span foreground="${escapeXml(merged.color || "#111827")}">${escapeXml(isolateText(value, direction))}</span>`;
     let lastError: unknown = null;
     for (let currentFontSize = fontSize; currentFontSize >= MIN_TEXT_FONT_SIZE; currentFontSize -= 1) {
@@ -146,7 +159,7 @@ export class EBookletAccessCodePrintRendererService {
           input: await sharp({
             text: {
               text,
-              font: `${ARABIC_TEXT_FONT_FAMILY} ${currentFontSize}`,
+              font: `${fontFamily} ${currentFontSize}`,
               width,
               height,
               align,
@@ -164,7 +177,7 @@ export class EBookletAccessCodePrintRendererService {
     const fallbackFontSize = Math.max(MIN_TEXT_FONT_SIZE, Math.min(fontSize, height));
     const fallbackSvg = `
       <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-        <text x="${svgTextX(width, align)}" y="${height / 2}" fill="${escapeXml(merged.color || "#111827")}" font-family="Arial, sans-serif" font-size="${fallbackFontSize}" text-anchor="${svgTextAnchor(align)}" dominant-baseline="middle" direction="${direction}">${escapeXml(String(value ?? ""))}</text>
+        <text x="${svgTextX(width, align)}" y="${height / 2}" fill="${escapeXml(merged.color || "#111827")}" font-family="${escapeXml(fontFamily)}, sans-serif" font-size="${fallbackFontSize}" text-anchor="${svgTextAnchor(align)}" dominant-baseline="middle" direction="${direction}">${escapeXml(String(value ?? ""))}</text>
       </svg>
     `;
     return {

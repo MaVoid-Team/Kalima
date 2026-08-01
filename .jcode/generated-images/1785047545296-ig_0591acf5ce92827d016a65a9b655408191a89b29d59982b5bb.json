@@ -1,0 +1,23 @@
+{
+  "byte_count": 865646,
+  "created_at_unix_ms": 1785047545296,
+  "id": "ig_0591acf5ce92827d016a65a9b655408191a89b29d59982b5bb",
+  "image_path": "/Users/ziadnasreldin/Documents/GitHub/Kalima/.jcode/generated-images/1785047545296-ig_0591acf5ce92827d016a65a9b655408191a89b29d59982b5bb.png",
+  "native_tool": "image_generation",
+  "output_format": "png",
+  "provider": "openai",
+  "response_item": {
+    "action": "edit",
+    "background": "opaque",
+    "id": "ig_0591acf5ce92827d016a65a9b655408191a89b29d59982b5bb",
+    "output_format": "png",
+    "quality": "medium",
+    "revised_prompt": "Edit the latest attached browser screenshot only. Preserve the website exactly. Add three clean professional annotation callouts in Arabic with thin burgundy arrows and cream label boxes: 1) point to the date field and label it \"1. اختيار تاريخ دقيق من التقويم\"; 2) point to the diagonally shaded 12 - 3 card marked محجوزة and label it \"2. الفترة المحجوزة تظهر مظللة ولا يمكن اختيارها\"; 3) point to the other three time cards and label them \"3. الفترات الأخرى تظل متاحة لنفس التاريخ\". Keep annotations outside important controls where possible, use high contrast, no decorative changes, no cropping of the date and time-slot area.",
+    "size": "1490x1056",
+    "status": "generating",
+    "type": "image_generation_call"
+  },
+  "revised_prompt": "Edit the latest attached browser screenshot only. Preserve the website exactly. Add three clean professional annotation callouts in Arabic with thin burgundy arrows and cream label boxes: 1) point to the date field and label it \"1. اختيار تاريخ دقيق من التقويم\"; 2) point to the diagonally shaded 12 - 3 card marked محجوزة and label it \"2. الفترة المحجوزة تظهر مظللة ولا يمكن اختيارها\"; 3) point to the other three time cards and label them \"3. الفترات الأخرى تظل متاحة لنفس التاريخ\". Keep annotations outside important controls where possible, use high contrast, no decorative changes, no cropping of the date and time-slot area.",
+  "schema_version": 1,
+  "status": "generating"
+}

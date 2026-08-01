@@ -604,11 +604,17 @@
         "dragHint": "اسحب الطبقة لتحريكها. اسحب الزاوية السفلية لتغيير الحجم.",
         "selectedField": "الحقل المحدد",
         "textColor": "لون النص",
+        "fontFamily": "الخط العربي",
         "direction": "اتجاه النص",
         "align": "المحاذاة",
         "alignStart": "البداية",
         "alignCenter": "الوسط",
         "alignEnd": "النهاية",
+        "fonts": {
+          "Noto Sans Arabic": "نوتو سانس عربي",
+          "Noto Kufi Arabic": "نوتو كوفي عربي",
+          "Noto Naskh Arabic": "نوتو نسخ عربي"
+        },
         "fields": {
           "qr": "رمز QR",
           "codeNumber": "رقم الكود",

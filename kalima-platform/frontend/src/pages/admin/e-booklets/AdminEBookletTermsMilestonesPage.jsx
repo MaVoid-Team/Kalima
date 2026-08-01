@@ -307,7 +307,7 @@ export default function AdminEBookletTermsMilestonesPage() {
   };
 
   return (
-    <div className="space-y-5" data-testid="admin-e-booklet-terms-milestones-page">
+    <div className="min-w-0 max-w-full space-y-5 overflow-x-hidden" data-testid="admin-e-booklet-terms-milestones-page">
       <section className="rounded-lg border bg-background p-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex min-w-0 items-start gap-3">
@@ -340,8 +340,8 @@ export default function AdminEBookletTermsMilestonesPage() {
         <SummaryMetric icon={Medal} label={t("admin.termsMilestones.paidRedemptions")} value={progress?.paidRedemptions ?? 0} />
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
-        <aside className="space-y-3">
+      <div className="grid min-w-0 gap-5 2xl:grid-cols-[280px_minmax(0,1fr)]">
+        <aside className="min-w-0 space-y-3">
           <WorkspaceButton
             active={activePanel === "milestones"}
             icon={ListChecks}
@@ -382,33 +382,33 @@ export default function AdminEBookletTermsMilestonesPage() {
 
         <div className="min-w-0 space-y-5">
           {activePanel === "terms" && (
-            <section className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_440px]">
+            <section className="min-w-0 space-y-5">
               <div className="min-w-0 overflow-hidden rounded-lg border bg-background" data-testid="admin-e-booklet-terms-table">
                 <div className="border-b p-4">
                   <h2 className="font-semibold">{t("admin.termsMilestones.termsTitle")}</h2>
                   <p className="mt-1 text-sm text-muted-foreground">{t("admin.termsMilestones.termsHelp")}</p>
                 </div>
-                <div className="hidden md:block">
-                  <Table className="min-w-[840px]">
+                <div className="hidden max-w-full 2xl:block">
+                  <Table className="w-full table-fixed">
                     <TableHeader>
                       <TableRow>
-                        <TableHead>{t("admin.termsMilestones.termName")}</TableHead>
-                        <TableHead>{t("common.status")}</TableHead>
-                        <TableHead>{t("admin.termsMilestones.termWindow")}</TableHead>
-                        <TableHead actions>{t("common.actions")}</TableHead>
+                        <TableHead className="w-[45%] whitespace-normal">{t("admin.termsMilestones.termName")}</TableHead>
+                        <TableHead className="w-[12%] whitespace-normal">{t("common.status")}</TableHead>
+                        <TableHead className="w-[25%] whitespace-normal">{t("admin.termsMilestones.termWindow")}</TableHead>
+                        <TableHead actions className="w-[18%] whitespace-normal">{t("common.actions")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {terms.map((term) => (
                         <TableRow key={term.id}>
-                          <TableCell truncate className="max-w-[34rem] whitespace-normal" title={term.description ? `${term.name}: ${term.description}` : term.name}>
+                          <TableCell truncate className="w-[45%] max-w-[34rem] whitespace-normal break-words" title={term.description ? `${term.name}: ${term.description}` : term.name}>
                             <div className="max-w-md break-words font-medium">{term.name}</div>
                             <div className="line-clamp-2 max-w-md text-xs text-muted-foreground">{term.description || "—"}</div>
                           </TableCell>
                           <TableCell status><Badge variant={term.status === "active" ? "default" : "outline"}>{term.status}</Badge></TableCell>
-                          <TableCell date className="whitespace-normal">{formatDate(term.starts_at)} — {term.ends_at ? formatDate(term.ends_at) : t("admin.termsMilestones.openEnded")}</TableCell>
+                          <TableCell date className="w-[25%] whitespace-normal break-words">{formatDate(term.starts_at)} — {term.ends_at ? formatDate(term.ends_at) : t("admin.termsMilestones.openEnded")}</TableCell>
                           <TableCell actions>
-                            <div className="flex justify-end gap-2">
+                            <div className="flex flex-wrap justify-end gap-2">
                               <Button size="sm" variant="outline" onClick={() => editTerm(term)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
                               {term.status !== "active" && (
                                 <Button size="sm" onClick={() => activate(term.id)} disabled={actionLoading} data-testid="admin-e-booklet-set-active-term">
@@ -426,7 +426,7 @@ export default function AdminEBookletTermsMilestonesPage() {
                     </TableBody>
                   </Table>
                 </div>
-                <div className="divide-y md:hidden">
+                <div className="divide-y 2xl:hidden">
                   {terms.map((term) => (
                     <div key={term.id} className="space-y-3 p-4">
                       <div className="min-w-0">
@@ -479,15 +479,15 @@ export default function AdminEBookletTermsMilestonesPage() {
           )}
 
           {activePanel === "milestones" && (
-            <section className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_420px]">
+            <section className="grid min-w-0 gap-5 2xl:grid-cols-[minmax(0,1fr)_400px]">
               <div className="min-w-0 space-y-4 rounded-lg border bg-background p-4">
                 <div>
                   <h2 className="font-semibold">{t("admin.termsMilestones.milestonesTitle")}</h2>
                   <p className="mt-1 text-sm text-muted-foreground">{t("admin.termsMilestones.milestonesHelp")}</p>
                 </div>
                 <div className="overflow-hidden rounded-lg border" data-testid="admin-e-booklet-milestones-table">
-                  <div className="hidden md:block">
-                    <Table className="min-w-[900px]">
+                  <div className="hidden max-w-full overflow-x-auto overscroll-x-contain 2xl:block">
+                    <Table className="w-full min-w-[900px] table-fixed">
                       <TableHeader><TableRow><TableHead>{t("admin.termsMilestones.milestone")}</TableHead><TableHead numeric>{t("admin.termsMilestones.target")}</TableHead><TableHead numeric>{t("admin.termsMilestones.pricing")}</TableHead><TableHead numeric>{t("admin.termsMilestones.reward")}</TableHead><TableHead numeric>{t("admin.termsMilestones.rewardExpiryDays")}</TableHead><TableHead>{t("common.status")}</TableHead><TableHead actions>{t("common.actions")}</TableHead></TableRow></TableHeader>
                       <TableBody>
                         {scopedMilestones.map((milestone) => (
@@ -505,7 +505,7 @@ export default function AdminEBookletTermsMilestonesPage() {
                       </TableBody>
                     </Table>
                   </div>
-                  <div className="divide-y md:hidden">
+                  <div className="divide-y 2xl:hidden">
                     {scopedMilestones.map((milestone) => (
                       <div key={milestone.id} className="space-y-3 p-3">
                         <div>

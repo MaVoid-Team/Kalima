@@ -2,6 +2,7 @@ import sharp from "sharp";
 import { PDFDocument } from "pdf-lib";
 import {
   EBookletAccessCodePrintRendererService,
+  PRINT_TEXT_FONT_FAMILY_VALUES,
 } from "../../src/apps/store-api/services/e-booklet-access-code-print-renderer.service";
 
 const layout = {
@@ -92,6 +93,32 @@ describe("e-booklet access-code print renderer", () => {
 
     expect(await countDarkPixels(fieldCrop, 180, 60)).toBeGreaterThan(150);
     expect(await countDarkPixels(belowFieldCrop, 180, 30)).toBe(0);
+  });
+
+  test("renders Arabic text with each selectable print font", async () => {
+    const renderer = new EBookletAccessCodePrintRendererService();
+    const pngs = await Promise.all(PRINT_TEXT_FONT_FAMILY_VALUES.map(async (fontFamily) => renderer.renderCardPng({
+      backgroundImage: await background(),
+      layout: {
+        ...layout,
+        fields: {
+          ...layout.fields,
+          gradeClass: { ...layout.fields.gradeClass, fontFamily },
+        },
+      },
+      card: {
+        code: "KLM AAAA BBBB CCCC",
+        qrRedeemUrl: "https://kalima.test/e-booklet-code/qr/test",
+        batchValues: { gradeClassText: "الصف الثالث" },
+      },
+    })));
+
+    expect(pngs).toHaveLength(3);
+    expect(PRINT_TEXT_FONT_FAMILY_VALUES).toEqual([
+      "Noto Sans Arabic",
+      "Noto Kufi Arabic",
+      "Noto Naskh Arabic",
+    ]);
   });
 
   test("omits every optional printable field when its print visibility is turned off", async () => {

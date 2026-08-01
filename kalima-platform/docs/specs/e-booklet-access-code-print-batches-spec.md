@@ -237,8 +237,8 @@ If the existing file asset enum needs extension, add explicit print-template, pr
 `GET /admin/e-booklet-access-code-print/batches/:id` shows batch detail with snapshot values.
 `GET /admin/e-booklet-access-code-print/batches/:id/pdf` downloads the stored private PDF.
 `POST /admin/e-booklet-access-code-print/batches/:id/regenerate-pdf` regenerates from snapshot metadata if allowed.
-`GET /e-booklet-access-code-redemption/qr/:signedRef` validates the signed reference after login and returns prefill data.
-`POST /e-booklet-access-code-redemption/qr/:signedRef/redeem` redeems after confirmation.
+`GET /e-booklet-access-code-print/qr/:ref` validates the signed reference after login and returns prefill data.
+`POST /e-booklet-access-codes/redeem` redeems the prefilled code after the student confirms the terms.
 
 ## 21. Suggested Admin UI
 Add an access-code printing area inside admin e-booklets.
@@ -293,7 +293,7 @@ Add backend tests for code normalization with spaces and hyphens.
 Add backend tests for batch snapshot immutability.
 Add backend tests blocking deletion of used templates.
 Add frontend or source tests for template editor field config persistence.
-Add frontend tests for login redirect preserving the QR redemption return URL.
+Add browser tests for login redirect preservation and the complete QR prefill-to-redemption flow.
 Add browser verification for backend-rendered preview and generated PDF download.
 Add visual checks that Arabic text and LTR codes do not overlap or render in the wrong order.
 

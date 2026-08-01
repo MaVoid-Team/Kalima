@@ -7,16 +7,22 @@ import { Button } from "@/components/ui/button";
 export const PRINT_CARD_WIDTH_PX = 827;
 export const PRINT_CARD_HEIGHT_PX = 438;
 export const PRINT_CARD_PPI = 300;
+export const PRINT_TEXT_FONT_OPTIONS = [
+  { value: "Noto Sans Arabic", fallbackLabel: "Noto Sans Arabic" },
+  { value: "Noto Kufi Arabic", fallbackLabel: "Noto Kufi Arabic" },
+  { value: "Noto Naskh Arabic", fallbackLabel: "Noto Naskh Arabic" },
+];
+export const DEFAULT_PRINT_TEXT_FONT_FAMILY = PRINT_TEXT_FONT_OPTIONS[0].value;
 
 export const DEFAULT_PRINT_TEMPLATE_LAYOUT = {
   fields: {
     qr: { x: 604, y: 88, width: 96, height: 96 },
-    codeNumber: { x: 601, y: 309, width: 125, height: 34, direction: "ltr", align: "center", fontSize: 18, color: "#111827" },
+    codeNumber: { x: 601, y: 309, width: 125, height: 34, direction: "ltr", align: "center", fontSize: 18, color: "#111827", fontFamily: DEFAULT_PRINT_TEXT_FONT_FAMILY },
     teacherImage: { x: 345, y: 70, width: 118, height: 178 },
-    registrationMethod: { x: 590, y: 74, width: 120, height: 28, direction: "rtl", align: "center", fontSize: 15, color: "#111827" },
-    gradeClass: { x: 43, y: 296, width: 124, height: 48, direction: "rtl", align: "center", fontSize: 17, color: "#111827" },
-    price: { x: 0, y: 36, width: 205, height: 48, direction: "rtl", align: "center", fontSize: 16, color: "#111827" },
-    redCustomText: { x: 57, y: 95, width: 102, height: 75, direction: "rtl", align: "center", fontSize: 16, color: "#dc2626" },
+    registrationMethod: { x: 590, y: 74, width: 120, height: 28, direction: "rtl", align: "center", fontSize: 15, color: "#111827", fontFamily: DEFAULT_PRINT_TEXT_FONT_FAMILY },
+    gradeClass: { x: 43, y: 296, width: 124, height: 48, direction: "rtl", align: "center", fontSize: 17, color: "#111827", fontFamily: DEFAULT_PRINT_TEXT_FONT_FAMILY },
+    price: { x: 0, y: 36, width: 205, height: 48, direction: "rtl", align: "center", fontSize: 16, color: "#111827", fontFamily: DEFAULT_PRINT_TEXT_FONT_FAMILY },
+    redCustomText: { x: 57, y: 95, width: 102, height: 75, direction: "rtl", align: "center", fontSize: 16, color: "#dc2626", fontFamily: DEFAULT_PRINT_TEXT_FONT_FAMILY },
   },
 };
 
@@ -36,6 +42,7 @@ const FIELD_SETTING_LABEL_DEFAULTS = {
   width: "Width",
   height: "Height",
   fontSize: "Font size",
+  fontFamily: "Arabic font",
 };
 
 const FIELD_ORDER = ["qr", "codeNumber", "teacherImage", "registrationMethod", "gradeClass", "price", "redCustomText"];
@@ -47,7 +54,7 @@ const numberValue = (value, fallback) => {
 };
 
 export default function PrintTemplateLayoutEditor({ value, onChange, backgroundImageUrl = "" }) {
-  const { t } = useTranslation("eBooklets");
+  const { t, i18n } = useTranslation("eBooklets");
   const layout = value || DEFAULT_PRINT_TEMPLATE_LAYOUT;
   const fields = layout.fields || {};
   const fieldKeys = useMemo(() => {
@@ -61,7 +68,8 @@ export default function PrintTemplateLayoutEditor({ value, onChange, backgroundI
   const getFieldLabel = (fieldKey) => t(`admin.instances.printEditor.fields.${fieldKey}`, { defaultValue: FIELD_LABEL_DEFAULTS[fieldKey] || fieldKey });
   const getSettingLabel = (settingKey) => t(`admin.instances.printEditor.settings.${settingKey}`, { defaultValue: FIELD_SETTING_LABEL_DEFAULTS[settingKey] || settingKey });
   const selectedLabel = getFieldLabel(selectedKey);
-  const selectedHasTextControls = selected.fontSize !== undefined || selected.color !== undefined || selected.direction || selected.align;
+  const selectedHasTextControls = selected.fontSize !== undefined || selected.color !== undefined || selected.direction || selected.align || selected.fontFamily;
+  const selectedFontFamily = selected.fontFamily || DEFAULT_PRINT_TEXT_FONT_FAMILY;
   const numberFields = selectedHasTextControls ? ["x", "y", "width", "height", "fontSize"] : ["x", "y", "width", "height"];
 
   const updateField = (fieldKey, patch) => {
@@ -182,6 +190,7 @@ export default function PrintTemplateLayoutEditor({ value, onChange, backgroundI
                   top: `${(field.y / PRINT_CARD_HEIGHT_PX) * 100}%`,
                   width: `${(field.width / PRINT_CARD_WIDTH_PX) * 100}%`,
                   height: `${(field.height / PRINT_CARD_HEIGHT_PX) * 100}%`,
+                  ...(field.fontSize !== undefined || field.fontFamily ? { fontFamily: field.fontFamily || DEFAULT_PRINT_TEXT_FONT_FAMILY } : {}),
                 }}
                 onPointerDown={(event) => beginDrag(event, fieldKey, "move")}
                 onClick={() => setSelectedKey(fieldKey)}
@@ -227,11 +236,28 @@ export default function PrintTemplateLayoutEditor({ value, onChange, backgroundI
                 <Input className="h-9 rounded-xl text-foreground" type="text" value={selected.color || ""} onChange={(event) => updateField(selectedKey, { color: event.target.value })} />
               </label>
             )}
+            <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+              <span>{t("admin.instances.printEditor.fontFamily", { defaultValue: "Arabic font" })}</span>
+              <select
+                className="h-9 rounded-xl border bg-background px-3 text-sm text-foreground"
+                value={selectedFontFamily}
+                onChange={(event) => updateField(selectedKey, { fontFamily: event.target.value })}
+                data-testid={`print-template-font-family-${selectedKey}`}
+                aria-label={t("admin.instances.printEditor.fontFamily", { defaultValue: "Arabic font" })}
+                style={{ fontFamily: selectedFontFamily }}
+              >
+                {PRINT_TEXT_FONT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value} style={{ fontFamily: option.value }}>
+                    {t(`admin.instances.printEditor.fonts.${option.value}`, { defaultValue: option.fallbackLabel })}
+                  </option>
+                ))}
+              </select>
+            </label>
             <div className="grid grid-cols-2 gap-2">
               {selected.direction && (
                 <label className="grid gap-1 text-xs font-medium text-muted-foreground">
                   <span>{t("admin.instances.printEditor.direction", { defaultValue: "Direction" })}</span>
-                  <select className="h-9 rounded-xl border bg-background px-3 text-sm text-foreground" value={selected.direction || "rtl"} onChange={(event) => updateField(selectedKey, { direction: event.target.value })}>
+                  <select dir={i18n.dir()} className="h-9 rounded-xl border bg-background px-3 text-sm text-foreground" value={selected.direction || "rtl"} onChange={(event) => updateField(selectedKey, { direction: event.target.value })}>
                     <option value="rtl">RTL</option>
                     <option value="ltr">LTR</option>
                   </select>
@@ -240,7 +266,7 @@ export default function PrintTemplateLayoutEditor({ value, onChange, backgroundI
               {selected.align && (
                 <label className="grid gap-1 text-xs font-medium text-muted-foreground">
                   <span>{t("admin.instances.printEditor.align", { defaultValue: "Align" })}</span>
-                  <select className="h-9 rounded-xl border bg-background px-3 text-sm text-foreground" value={selected.align || "center"} onChange={(event) => updateField(selectedKey, { align: event.target.value })}>
+                  <select dir={i18n.dir()} className="h-9 rounded-xl border bg-background px-3 text-sm text-foreground" value={selected.align || "center"} onChange={(event) => updateField(selectedKey, { align: event.target.value })}>
                     <option value="start">{t("admin.instances.printEditor.alignStart", { defaultValue: "Start" })}</option>
                     <option value="center">{t("admin.instances.printEditor.alignCenter", { defaultValue: "Center" })}</option>
                     <option value="end">{t("admin.instances.printEditor.alignEnd", { defaultValue: "End" })}</option>

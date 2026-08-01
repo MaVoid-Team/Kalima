@@ -31,6 +31,17 @@ const optionalNumberValue = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const getPrintBatchPdfFilename = (batch) => {
+  const safeLabel = String(batch?.label || "")
+    .trim()
+    .replace(/[\u0000-\u001F<>:"/\\|?*]+/g, "-")
+    .replace(/\s+/g, " ")
+    .replace(/\.pdf$/i, "")
+    .replace(/\.+$/, "");
+  const fallback = `e-booklet-access-codes-${batch?.id || "batch"}`;
+  return `${safeLabel || fallback}.pdf`;
+};
+
 const DEFAULT_PRINT_FIELD_VISIBILITY = Object.freeze({
   gradeClass: true,
   registrationMethod: true,
@@ -521,7 +532,7 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
     setPrintWarnings((current) => ({ ...current, [instance.id]: warning || null }));
     if (batch?.id) {
       setPrintBatches((current) => ({ ...current, [instance.id]: batch }));
-      await downloadAccessCodePrintBatchPdf(batch.id, `e-booklet-access-codes-${batch.id}.pdf`);
+      await downloadAccessCodePrintBatchPdf(batch.id, getPrintBatchPdfFilename(batch));
     }
     await loadAccessCodes(instance);
     await loadPrintBatches(instance);
@@ -980,7 +991,7 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
                                     </div>
                                     <div className="flex shrink-0 flex-wrap gap-2">
                                       {printBatches[instance.id]?.id && (
-                                        <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => downloadAccessCodePrintBatchPdf(printBatches[instance.id].id, `e-booklet-access-codes-${printBatches[instance.id].id}.pdf`)}>
+                                        <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => downloadAccessCodePrintBatchPdf(printBatches[instance.id].id, getPrintBatchPdfFilename(printBatches[instance.id]))}>
                                           <FileText className="h-4 w-4" />
                                           {t("admin.instances.downloadLastPdf", { defaultValue: "Download last PDF" })}
                                         </Button>
@@ -1154,7 +1165,7 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
                                               </div>
                                               <div>{batch.kind}</div>
                                               <div>{batch._count?.codes || batch.count} {t("admin.instances.cards", { defaultValue: "cards" })}</div>
-                                              <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => downloadAccessCodePrintBatchPdf(batch.id, `e-booklet-access-codes-${batch.id}.pdf`)}>
+                                              <Button type="button" size="sm" variant="outline" className="rounded-xl" onClick={() => downloadAccessCodePrintBatchPdf(batch.id, getPrintBatchPdfFilename(batch))}>
                                                 <Download className="h-4 w-4" />
                                                 PDF
                                               </Button>

@@ -604,11 +604,17 @@
         "dragHint": "Drag a layer to move it. Drag the lower corner to resize.",
         "selectedField": "Selected field",
         "textColor": "Text color",
+        "fontFamily": "Arabic font",
         "direction": "Direction",
         "align": "Align",
         "alignStart": "Start",
         "alignCenter": "Center",
         "alignEnd": "End",
+        "fonts": {
+          "Noto Sans Arabic": "Noto Sans Arabic",
+          "Noto Kufi Arabic": "Noto Kufi Arabic",
+          "Noto Naskh Arabic": "Noto Naskh Arabic"
+        },
         "fields": {
           "qr": "QR code",
           "codeNumber": "Code number",
