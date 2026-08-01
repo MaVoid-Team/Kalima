@@ -16,14 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useAdminEBookletSettings, useAdminEBookletTermsMilestones } from "@/hooks/admin/useAdminEBooklets";
 import { cn } from "@/lib/utils";
 
@@ -65,13 +57,13 @@ function SummaryMetric({ label, value, icon }) {
   const IconComponent = icon;
 
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-lg border bg-background p-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-        <IconComponent className="h-4 w-4" />
+    <div className="group flex min-w-0 items-center gap-4 rounded-2xl border border-border/70 bg-background p-4 shadow-xs transition hover:border-primary/30 hover:shadow-sm">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+        <IconComponent className="h-5 w-5" />
       </span>
       <div className="min-w-0">
-        <div className="truncate text-xs text-muted-foreground">{label}</div>
-        <div className="mt-0.5 truncate text-xl font-semibold tabular-nums">{value}</div>
+        <div className="truncate text-sm text-muted-foreground">{label}</div>
+        <div className="mt-1 truncate text-3xl font-semibold tracking-tight tabular-nums">{value}</div>
       </div>
     </div>
   );
@@ -84,9 +76,10 @@ function WorkspaceButton({ active, icon, title, detail, onClick }) {
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={cn(
-        "flex w-full items-start gap-3 rounded-lg border bg-background p-3 text-start transition hover:border-primary/40",
-        active && "border-primary/60 bg-primary/5",
+        "flex min-w-0 items-center gap-3 rounded-2xl border border-border/70 bg-background p-3 text-start transition hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-sm",
+        active && "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/15",
       )}
     >
       <span className={cn("mt-0.5 rounded-md bg-muted p-2 text-muted-foreground", active && "bg-primary text-primary-foreground")}>
@@ -94,7 +87,7 @@ function WorkspaceButton({ active, icon, title, detail, onClick }) {
       </span>
       <span className="min-w-0">
         <span className="block truncate text-sm font-semibold">{title}</span>
-        <span className="mt-1 line-clamp-2 block text-xs leading-5 text-muted-foreground">{detail}</span>
+        <span className="mt-0.5 line-clamp-1 block text-xs leading-5 text-muted-foreground">{detail}</span>
       </span>
     </button>
   );
@@ -307,19 +300,20 @@ export default function AdminEBookletTermsMilestonesPage() {
   };
 
   return (
-    <div className="min-w-0 max-w-full space-y-5 overflow-x-hidden" data-testid="admin-e-booklet-terms-milestones-page">
-      <section className="rounded-lg border bg-background p-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="flex min-w-0 items-start gap-3">
-            <span className="rounded-lg bg-primary/10 p-2 text-primary">
-              <CalendarRange className="h-5 w-5" />
+    <div className="min-w-0 max-w-full space-y-6 overflow-x-hidden" data-testid="admin-e-booklet-terms-milestones-page">
+      <section className="relative overflow-hidden rounded-[1.75rem] border border-primary/15 bg-gradient-to-br from-primary/10 via-background to-amber-50/50 p-5 shadow-sm sm:p-7">
+        <div className="pointer-events-none absolute -end-12 -top-16 h-44 w-44 rounded-full bg-primary/10 blur-3xl" />
+        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 items-start gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+              <CalendarRange className="h-6 w-6" />
             </span>
             <div className="min-w-0">
-              <h1 className="text-2xl font-semibold tracking-tight">{t("admin.termsMilestones.title")}</h1>
-              <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{t("admin.termsMilestones.description")}</p>
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("admin.termsMilestones.title")}</h1>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{t("admin.termsMilestones.description")}</p>
             </div>
           </div>
-          <Button variant="outline" onClick={reload} disabled={loading}>
+          <Button variant="outline" className="shrink-0 rounded-xl bg-background/80" onClick={reload} disabled={loading}>
             <RefreshCcw className="me-2 h-4 w-4" />
             {t("common.refresh")}
           </Button>
@@ -340,8 +334,8 @@ export default function AdminEBookletTermsMilestonesPage() {
         <SummaryMetric icon={Medal} label={t("admin.termsMilestones.paidRedemptions")} value={progress?.paidRedemptions ?? 0} />
       </div>
 
-      <div className="grid min-w-0 gap-5 2xl:grid-cols-[280px_minmax(0,1fr)]">
-        <aside className="min-w-0 space-y-3">
+      <section className="rounded-[1.5rem] border border-border/70 bg-muted/20 p-2 shadow-xs">
+        <div className="grid gap-2 md:grid-cols-3">
           <WorkspaceButton
             active={activePanel === "milestones"}
             icon={ListChecks}
@@ -363,181 +357,142 @@ export default function AdminEBookletTermsMilestonesPage() {
             detail={`${t("admin.termsMilestones.achievementCount")}: ${progress?.achievements?.length ?? 0}`}
             onClick={() => setActivePanel("progress")}
           />
-
-          <div className="rounded-lg border bg-background p-3">
-            <Label>{t("admin.termsMilestones.termName")}</Label>
-            <Select value={selectedTermId} onValueChange={setSelectedTermId}>
-              <SelectTrigger className="mt-2 w-full min-w-0 max-w-full overflow-hidden [&_[data-slot=select-value]]:truncate">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("admin.termsMilestones.allTerms")}</SelectItem>
-                {terms.map((term) => (
-                  <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        </div>
+        <div className="mt-2 flex flex-col gap-2 rounded-xl bg-background/80 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <Label className="text-xs text-muted-foreground">{t("admin.termsMilestones.termName")}</Label>
+            <p className="mt-0.5 text-sm font-medium">{t("admin.termsMilestones.selectTerm", { defaultValue: "حدد نطاق الشروط لإدارة المراحل" })}</p>
           </div>
-        </aside>
+          <Select value={selectedTermId} onValueChange={setSelectedTermId}>
+            <SelectTrigger className="w-full min-w-0 sm:w-[18rem] [&_[data-slot=select-value]]:truncate">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("admin.termsMilestones.allTerms")}</SelectItem>
+              {terms.map((term) => (
+                <SelectItem key={term.id} value={String(term.id)}>{term.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </section>
 
+      <div className="min-w-0">
         <div className="min-w-0 space-y-5">
           {activePanel === "terms" && (
-            <section className="min-w-0 space-y-5">
-              <div className="min-w-0 overflow-hidden rounded-lg border bg-background" data-testid="admin-e-booklet-terms-table">
-                <div className="border-b p-4">
-                  <h2 className="font-semibold">{t("admin.termsMilestones.termsTitle")}</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{t("admin.termsMilestones.termsHelp")}</p>
+            <section className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+              <div className="min-w-0 space-y-4 rounded-[1.5rem] border border-border/70 bg-background p-4 shadow-xs sm:p-5" data-testid="admin-e-booklet-terms-table">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{t("admin.termsMilestones.termsTitle")}</p>
+                    <h2 className="mt-1 text-xl font-bold tracking-tight">{t("admin.termsMilestones.termsTitle")}</h2>
+                    <p className="mt-1 max-w-xl text-sm leading-6 text-muted-foreground">{t("admin.termsMilestones.termsHelp")}</p>
+                  </div>
+                  <Badge variant="outline" className="rounded-full px-3 py-1">{terms.length}</Badge>
                 </div>
-                <div className="hidden max-w-full 2xl:block">
-                  <Table className="w-full table-fixed">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[45%] whitespace-normal">{t("admin.termsMilestones.termName")}</TableHead>
-                        <TableHead className="w-[12%] whitespace-normal">{t("common.status")}</TableHead>
-                        <TableHead className="w-[25%] whitespace-normal">{t("admin.termsMilestones.termWindow")}</TableHead>
-                        <TableHead actions className="w-[18%] whitespace-normal">{t("common.actions")}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {terms.map((term) => (
-                        <TableRow key={term.id}>
-                          <TableCell truncate className="w-[45%] max-w-[34rem] whitespace-normal break-words" title={term.description ? `${term.name}: ${term.description}` : term.name}>
-                            <div className="max-w-md break-words font-medium">{term.name}</div>
-                            <div className="line-clamp-2 max-w-md text-xs text-muted-foreground">{term.description || "—"}</div>
-                          </TableCell>
-                          <TableCell status><Badge variant={term.status === "active" ? "default" : "outline"}>{term.status}</Badge></TableCell>
-                          <TableCell date className="w-[25%] whitespace-normal break-words">{formatDate(term.starts_at)} — {term.ends_at ? formatDate(term.ends_at) : t("admin.termsMilestones.openEnded")}</TableCell>
-                          <TableCell actions>
-                            <div className="flex flex-wrap justify-end gap-2">
-                              <Button size="sm" variant="outline" onClick={() => editTerm(term)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
-                              {term.status !== "active" && (
-                                <Button size="sm" onClick={() => activate(term.id)} disabled={actionLoading} data-testid="admin-e-booklet-set-active-term">
-                                  <ShieldCheck className="h-4 w-4" />
-                                  {t("admin.termsMilestones.setActive")}
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      {terms.length === 0 && (
-                        <TableRow><TableCell colSpan={4} className="h-20 text-center text-muted-foreground">{t("admin.termsMilestones.emptyTerms")}</TableCell></TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-                <div className="divide-y 2xl:hidden">
+                <div className="grid gap-3">
                   {terms.map((term) => (
-                    <div key={term.id} className="space-y-3 p-4">
-                      <div className="min-w-0">
-                        <div className="break-words font-medium">{term.name}</div>
-                        <div className="mt-1 break-words text-xs text-muted-foreground">{term.description || "—"}</div>
+                    <div key={term.id} className="rounded-2xl border border-border/70 bg-muted/15 p-4 transition hover:border-primary/25 hover:bg-primary/[0.03]">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="break-words font-semibold">{term.name}</div>
+                          <div className="mt-1 break-words text-sm leading-6 text-muted-foreground">{term.description || "—"}</div>
+                        </div>
+                        <Badge variant={term.status === "active" ? "default" : "outline"} className="shrink-0 rounded-full">{term.status}</Badge>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2 text-sm">
-                        <Badge variant={term.status === "active" ? "default" : "outline"}>{term.status}</Badge>
-                        <span className="break-words text-muted-foreground">{formatDate(term.starts_at)} — {term.ends_at ? formatDate(term.ends_at) : t("admin.termsMilestones.openEnded")}</span>
-                      </div>
-                      <div className="flex flex-wrap justify-end gap-2">
-                        <Button size="sm" variant="outline" onClick={() => editTerm(term)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
-                        {term.status !== "active" && (
-                          <Button size="sm" onClick={() => activate(term.id)} disabled={actionLoading} data-testid="admin-e-booklet-set-active-term">
-                            <ShieldCheck className="h-4 w-4" />
-                            {t("admin.termsMilestones.setActive")}
-                          </Button>
-                        )}
+                      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3 text-sm">
+                        <span className="text-muted-foreground">{formatDate(term.starts_at)} — {term.ends_at ? formatDate(term.ends_at) : t("admin.termsMilestones.openEnded")}</span>
+                        <div className="flex flex-wrap gap-2">
+                          <Button size="sm" variant="outline" className="rounded-lg" onClick={() => editTerm(term)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
+                          {term.status !== "active" && (
+                            <Button size="sm" className="rounded-lg" onClick={() => activate(term.id)} disabled={actionLoading} data-testid="admin-e-booklet-set-active-term">
+                              <ShieldCheck className="h-4 w-4" />
+                              {t("admin.termsMilestones.setActive")}
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
-                  {terms.length === 0 && (
-                    <div className="p-5 text-center text-sm text-muted-foreground">{t("admin.termsMilestones.emptyTerms")}</div>
-                  )}
+                  {terms.length === 0 && <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-muted-foreground">{t("admin.termsMilestones.emptyTerms")}</div>}
                 </div>
               </div>
 
-              <form className="min-w-0 space-y-4 rounded-lg border bg-background p-4" onSubmit={submitTerm} data-testid="admin-e-booklet-term-form">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="font-semibold">{editingTermId ? t("admin.termsMilestones.editTerm") : t("admin.termsMilestones.createTerm")}</h2>
-                  <Button size="sm" type="submit" disabled={actionLoading}>
+              <form className="min-w-0 space-y-5 rounded-[1.5rem] border border-primary/15 bg-primary/[0.03] p-4 shadow-xs sm:p-5" onSubmit={submitTerm} data-testid="admin-e-booklet-term-form">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{editingTermId ? t("admin.termsMilestones.editTerm") : t("admin.termsMilestones.createTerm")}</p>
+                    <h2 className="mt-1 text-xl font-bold tracking-tight">{editingTermId ? t("admin.termsMilestones.editTerm") : t("admin.termsMilestones.createTerm")}</h2>
+                  </div>
+                  <Button size="sm" type="submit" className="rounded-lg" disabled={actionLoading}>
                     <Save className="h-4 w-4" />
                     {t("common.save")}
                   </Button>
                 </div>
-                <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-1">
+                <div className="grid gap-3">
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.termName")}</Label><Input required value={termForm.name} onChange={(e) => updateTermField("name", e.target.value)} /></div>
                   <div className="space-y-2"><Label>{t("common.status")}</Label><Select value={termForm.status} onValueChange={(value) => updateTermField("status", value)} disabled={editingTerm?.status === "active"}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="draft">{t("statuses.draft")}</SelectItem><SelectItem value="active">{t("statuses.active")}</SelectItem><SelectItem value="archived">{t("statuses.archived")}</SelectItem></SelectContent></Select></div>
-                  <div className="space-y-2"><Label>{t("admin.termsMilestones.startsAt")}</Label><Input type="date" value={termForm.startsAt} onChange={(e) => updateTermField("startsAt", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
-                  <div className="space-y-2"><Label>{t("admin.termsMilestones.endsAt")}</Label><Input type="date" value={termForm.endsAt} onChange={(e) => updateTermField("endsAt", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+                  <div className="grid gap-3 sm:grid-cols-2"><div className="space-y-2"><Label>{t("admin.termsMilestones.startsAt")}</Label><Input type="date" value={termForm.startsAt} onChange={(e) => updateTermField("startsAt", e.target.value)} disabled={editingTerm?.status === "active"} /></div><div className="space-y-2"><Label>{t("admin.termsMilestones.endsAt")}</Label><Input type="date" value={termForm.endsAt} onChange={(e) => updateTermField("endsAt", e.target.value)} disabled={editingTerm?.status === "active"} /></div></div>
                 </div>
                 <div className="space-y-3">
-                  <div className="space-y-2"><Label>{t("admin.termsMilestones.checkoutTerms")}</Label><Textarea required className="min-h-28" value={termForm.description} onChange={(e) => updateTermField("description", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
-                  <div className="space-y-2"><Label>{t("admin.termsMilestones.codeGenerationTerms")}</Label><Textarea required className="min-h-28" value={termForm.codeGenerationTerms} onChange={(e) => updateTermField("codeGenerationTerms", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
-                  <div className="space-y-2"><Label>{t("admin.termsMilestones.rewardClaimTerms")}</Label><Textarea required className="min-h-28" value={termForm.rewardClaimTerms} onChange={(e) => updateTermField("rewardClaimTerms", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+                  <div className="space-y-2"><Label>{t("admin.termsMilestones.checkoutTerms")}</Label><Textarea required className="min-h-24" value={termForm.description} onChange={(e) => updateTermField("description", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+                  <div className="space-y-2"><Label>{t("admin.termsMilestones.codeGenerationTerms")}</Label><Textarea required className="min-h-24" value={termForm.codeGenerationTerms} onChange={(e) => updateTermField("codeGenerationTerms", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
+                  <div className="space-y-2"><Label>{t("admin.termsMilestones.rewardClaimTerms")}</Label><Textarea required className="min-h-24" value={termForm.rewardClaimTerms} onChange={(e) => updateTermField("rewardClaimTerms", e.target.value)} disabled={editingTerm?.status === "active"} /></div>
                 </div>
-                <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={resetTermForm}>{t("common.clear")}</Button></div>
+                <div className="flex justify-end gap-2 border-t border-border/60 pt-4"><Button type="button" variant="outline" className="rounded-lg" onClick={resetTermForm}>{t("common.clear")}</Button></div>
               </form>
             </section>
           )}
 
           {activePanel === "milestones" && (
-            <section className="grid min-w-0 gap-5 2xl:grid-cols-[minmax(0,1fr)_400px]">
-              <div className="min-w-0 space-y-4 rounded-lg border bg-background p-4">
-                <div>
-                  <h2 className="font-semibold">{t("admin.termsMilestones.milestonesTitle")}</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{t("admin.termsMilestones.milestonesHelp")}</p>
-                </div>
-                <div className="overflow-hidden rounded-lg border" data-testid="admin-e-booklet-milestones-table">
-                  <div className="hidden max-w-full overflow-x-auto overscroll-x-contain 2xl:block">
-                    <Table className="w-full min-w-[900px] table-fixed">
-                      <TableHeader><TableRow><TableHead>{t("admin.termsMilestones.milestone")}</TableHead><TableHead numeric>{t("admin.termsMilestones.target")}</TableHead><TableHead numeric>{t("admin.termsMilestones.pricing")}</TableHead><TableHead numeric>{t("admin.termsMilestones.reward")}</TableHead><TableHead numeric>{t("admin.termsMilestones.rewardExpiryDays")}</TableHead><TableHead>{t("common.status")}</TableHead><TableHead actions>{t("common.actions")}</TableHead></TableRow></TableHeader>
-                      <TableBody>
-                        {scopedMilestones.map((milestone) => (
-                          <TableRow key={milestone.id}>
-                            <TableCell truncate className="w-[42%] max-w-[34rem] whitespace-normal" title={milestone.description ? `${milestone.title}: ${milestone.description}` : milestone.title}><div className="break-words font-medium">{milestone.title}</div><div className="line-clamp-2 break-words text-xs text-muted-foreground">#{milestone.sort_order ?? 0} · {milestone.description || "—"}</div></TableCell>
-                            <TableCell numeric>{milestone.target_paid_redemptions}</TableCell>
-                            <TableCell numeric className="whitespace-nowrap">{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</TableCell>
-                            <TableCell numeric>{money(milestone.reward_amount_snapshot)}</TableCell>
-                            <TableCell numeric>{milestone.reward_expiry_days ?? 120}</TableCell>
-                            <TableCell status><Badge variant={milestone.active ? "default" : "outline"}>{milestone.active ? t("common.active") : t("statuses.disabled")}</Badge></TableCell>
-                            <TableCell actions className="whitespace-nowrap"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button><Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button><Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button><Button size="sm" variant="destructive" onClick={() => removeMilestone(milestone)} disabled={actionLoading} data-testid="admin-e-booklet-delete-milestone"><Trash2 className="h-4 w-4" />{t("common.delete", { defaultValue: "Delete" })}</Button></div></TableCell>
-                          </TableRow>
-                        ))}
-                        {scopedMilestones.length === 0 && (<TableRow><TableCell colSpan={7} className="h-20 text-center text-muted-foreground">{t("admin.termsMilestones.emptyMilestones")}</TableCell></TableRow>)}
-                      </TableBody>
-                    </Table>
+            <section className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+              <div className="min-w-0 space-y-4 rounded-[1.5rem] border border-border/70 bg-background p-4 shadow-xs sm:p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{t("admin.termsMilestones.milestonesTitle")}</p>
+                    <h2 className="mt-1 text-xl font-bold tracking-tight">{t("admin.termsMilestones.milestonesTitle")}</h2>
+                    <p className="mt-1 max-w-xl text-sm leading-6 text-muted-foreground">{t("admin.termsMilestones.milestonesHelp")}</p>
                   </div>
-                  <div className="divide-y 2xl:hidden">
-                    {scopedMilestones.map((milestone) => (
-                      <div key={milestone.id} className="space-y-3 p-3">
-                        <div>
-                          <div className="break-words font-medium">{milestone.title}</div>
-                          <div className="mt-1 break-words text-xs text-muted-foreground">#{milestone.sort_order ?? 0} · {milestone.description || "—"}</div>
+                  <Badge variant="outline" className="rounded-full px-3 py-1">{scopedMilestones.length}</Badge>
+                </div>
+                <div className="grid gap-3" data-testid="admin-e-booklet-milestones-table">
+                  {scopedMilestones.map((milestone) => (
+                    <div key={milestone.id} className="rounded-2xl border border-border/70 bg-muted/15 p-4 transition hover:border-primary/25 hover:bg-primary/[0.03]">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2"><span className="break-words font-semibold">{milestone.title}</span><span className="text-xs text-muted-foreground">#{milestone.sort_order ?? 0}</span></div>
+                          <div className="mt-1 break-words text-sm leading-6 text-muted-foreground">{milestone.description || "—"}</div>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.target")}</span>{milestone.target_paid_redemptions}</div>
-                          <div><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.reward")}</span>{money(milestone.reward_amount_snapshot)}</div>
-                          <div><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.rewardExpiryDays")}</span>{milestone.reward_expiry_days ?? 120}</div>
-                          <div className="col-span-2"><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.pricing")}</span>{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</div>
-                        </div>
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <Badge variant={milestone.active ? "default" : "outline"}>{milestone.active ? t("common.active") : t("statuses.disabled")}</Badge>
-                          <div className="flex flex-wrap justify-end gap-2">
-                            <Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button>
-                            <Button size="sm" variant="outline" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button>
-                            <Button size="sm" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
-                            <Button size="sm" variant="destructive" onClick={() => removeMilestone(milestone)} disabled={actionLoading} data-testid="admin-e-booklet-delete-milestone-mobile"><Trash2 className="h-4 w-4" />{t("common.delete", { defaultValue: "Delete" })}</Button>
-                          </div>
+                        <Badge variant={milestone.active ? "default" : "outline"} className="shrink-0 rounded-full">{milestone.active ? t("common.active") : t("statuses.disabled")}</Badge>
+                      </div>
+                      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="rounded-xl bg-background px-3 py-2"><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.target")}</span><span className="mt-1 block font-semibold tabular-nums">{milestone.target_paid_redemptions}</span></div>
+                        <div className="rounded-xl bg-background px-3 py-2"><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.pricing")}</span><span className="mt-1 block font-semibold tabular-nums">{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</span></div>
+                        <div className="rounded-xl bg-background px-3 py-2"><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.reward")}</span><span className="mt-1 block font-semibold tabular-nums">{money(milestone.reward_amount_snapshot)}</span></div>
+                        <div className="rounded-xl bg-background px-3 py-2"><span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.rewardExpiryDays")}</span><span className="mt-1 block font-semibold tabular-nums">{milestone.reward_expiry_days ?? 120}</span></div>
+                      </div>
+                      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3">
+                        <span className="text-xs text-muted-foreground">{t("admin.termsMilestones.sortOrder")}: {milestone.sort_order ?? 0}</span>
+                        <div className="flex flex-wrap justify-end gap-2">
+                          <Button size="sm" variant="outline" className="rounded-lg" onClick={() => moveMilestone(milestone, -1)} data-testid="admin-e-booklet-reorder-milestones"><GripVertical className="h-4 w-4" />↑</Button>
+                          <Button size="sm" variant="outline" className="rounded-lg" onClick={() => moveMilestone(milestone, 1)}><GripVertical className="h-4 w-4" />↓</Button>
+                          <Button size="sm" className="rounded-lg" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
+                          <Button size="sm" variant="destructive" className="rounded-lg" onClick={() => removeMilestone(milestone)} disabled={actionLoading} data-testid="admin-e-booklet-delete-milestone"><Trash2 className="h-4 w-4" />{t("common.delete", { defaultValue: "Delete" })}</Button>
                         </div>
                       </div>
-                    ))}
-                    {scopedMilestones.length === 0 && <div className="p-5 text-center text-sm text-muted-foreground">{t("admin.termsMilestones.emptyMilestones")}</div>}
-                  </div>
+                    </div>
+                  ))}
+                  {scopedMilestones.length === 0 && <div className="rounded-2xl border border-dashed p-8 text-center"><div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><ListChecks className="h-6 w-6" /></div><p className="mt-3 text-sm font-medium">{t("admin.termsMilestones.emptyMilestones")}</p><p className="mt-1 text-xs text-muted-foreground">{t("admin.termsMilestones.milestonesHelp")}</p></div>}
                 </div>
               </div>
 
-              <form className="min-w-0 space-y-4 rounded-lg border bg-background p-4" onSubmit={submitMilestone} data-testid="admin-e-booklet-milestone-form">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="font-semibold">{editingMilestoneId ? t("admin.termsMilestones.editMilestone") : t("admin.termsMilestones.createMilestone")}</h2>
-                  <Button size="sm" type="submit" disabled={actionLoading || !effectiveMilestoneTermId}>
+              <form className="min-w-0 space-y-5 rounded-[1.5rem] border border-primary/15 bg-primary/[0.03] p-4 shadow-xs sm:p-5" onSubmit={submitMilestone} data-testid="admin-e-booklet-milestone-form">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{editingMilestoneId ? t("admin.termsMilestones.editMilestone") : t("admin.termsMilestones.createMilestone")}</p>
+                    <h2 className="mt-1 text-xl font-bold tracking-tight">{editingMilestoneId ? t("admin.termsMilestones.editMilestone") : t("admin.termsMilestones.createMilestone")}</h2>
+                  </div>
+                  <Button size="sm" type="submit" className="rounded-lg" disabled={actionLoading || !effectiveMilestoneTermId}>
                     <Save className="h-4 w-4" />
                     {t("common.save")}
                   </Button>
@@ -547,7 +502,7 @@ export default function AdminEBookletTermsMilestonesPage() {
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.milestone")}</Label><Input required value={milestoneForm.title} onChange={(e) => updateMilestoneField("title", e.target.value)} /></div>
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.descriptionLabel")}</Label><Textarea className="min-h-24" value={milestoneForm.description} onChange={(e) => updateMilestoneField("description", e.target.value)} /></div>
                 </div>
-                <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-1">
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.target")}</Label><Input name="targetPaidRedemptions" type="number" min="1" value={milestoneForm.targetPaidRedemptions} onChange={(e) => updateMilestoneField("targetPaidRedemptions", e.target.value)} /></div>
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.sortOrder")}</Label><Input type="number" value={milestoneForm.sortOrder} onChange={(e) => updateMilestoneField("sortOrder", e.target.value)} /></div>
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.previousPrice")}</Label><Input type="number" value={milestoneForm.previousPriceSnapshot} onChange={(e) => updateMilestoneField("previousPriceSnapshot", e.target.value)} /></div>
@@ -556,26 +511,26 @@ export default function AdminEBookletTermsMilestonesPage() {
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.rewardExpiryDays")}</Label><Input type="number" min="1" value={milestoneForm.rewardExpiryDays} onChange={(e) => updateMilestoneField("rewardExpiryDays", e.target.value)} disabled={!milestoneForm.rewardEnabled} /></div>
                   <div className="space-y-2"><Label>{t("admin.termsMilestones.notificationRecipients")}</Label><Select value={milestoneForm.notificationRecipients} onValueChange={(value) => updateMilestoneField("notificationRecipients", value)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="admins">{t("admin.termsMilestones.recipientAdmins")}</SelectItem><SelectItem value="teacher_and_admins">{t("admin.termsMilestones.recipientTeacherAdmins")}</SelectItem></SelectContent></Select></div>
                 </div>
-                <div className="grid gap-2 rounded-lg border p-3">
+                <div className="grid gap-3 rounded-2xl border border-border/70 bg-background/70 p-3">
                   <label className="flex items-center gap-2 text-sm"><Checkbox checked={milestoneForm.active} onCheckedChange={(value) => updateMilestoneField("active", Boolean(value))} />{t("common.active")}</label>
                   <label className="flex items-center gap-2 text-sm"><Checkbox data-testid="admin-e-booklet-reward-enabled" checked={milestoneForm.rewardEnabled} onCheckedChange={(value) => updateMilestoneField("rewardEnabled", Boolean(value))} />{t("admin.termsMilestones.rewardEnabled")}</label>
                 </div>
-                <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={resetMilestoneForm}>{t("common.clear")}</Button></div>
+                <div className="flex justify-end gap-2 border-t border-border/60 pt-4"><Button type="button" variant="outline" className="rounded-lg" onClick={resetMilestoneForm}>{t("common.clear")}</Button></div>
               </form>
             </section>
           )}
 
           {activePanel === "progress" && (
-            <section className="rounded-lg border bg-background p-4" data-testid="admin-e-booklet-progress-view">
-              <div className="mb-4 flex items-center gap-2"><Medal className="h-5 w-5 text-primary" /><h2 className="font-semibold">{t("admin.termsMilestones.progressTitle")}</h2></div>
+            <section className="rounded-[1.5rem] border border-border/70 bg-background p-4 shadow-xs sm:p-5" data-testid="admin-e-booklet-progress-view">
+              <div className="mb-5 flex items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{t("admin.termsMilestones.progressTitle")}</p><h2 className="mt-1 text-xl font-bold tracking-tight">{t("admin.termsMilestones.progressTitle")}</h2></div><Medal className="h-6 w-6 text-primary" /></div>
               <div className="grid gap-3 md:grid-cols-3">
-                <div className="rounded-lg border p-3"><div className="text-sm text-muted-foreground">{t("admin.termsMilestones.paidRedemptions")}</div><div className="text-2xl font-semibold">{progress?.paidRedemptions ?? 0}</div></div>
-                <div className="rounded-lg border p-3"><div className="text-sm text-muted-foreground">{t("admin.termsMilestones.achievementCount")}</div><div className="text-2xl font-semibold">{progress?.achievements?.length ?? 0}</div></div>
-                <div className="rounded-lg border p-3"><div className="text-sm text-muted-foreground">{t("admin.termsMilestones.claimedCount")}</div><div className="text-2xl font-semibold">{(progress?.achievements || []).filter((item) => item.claimed_at).length}</div></div>
+                <div className="rounded-2xl border border-border/70 bg-muted/15 p-4"><div className="text-sm text-muted-foreground">{t("admin.termsMilestones.paidRedemptions")}</div><div className="mt-1 text-3xl font-semibold tracking-tight">{progress?.paidRedemptions ?? 0}</div></div>
+                <div className="rounded-2xl border border-border/70 bg-muted/15 p-4"><div className="text-sm text-muted-foreground">{t("admin.termsMilestones.achievementCount")}</div><div className="mt-1 text-3xl font-semibold tracking-tight">{progress?.achievements?.length ?? 0}</div></div>
+                <div className="rounded-2xl border border-border/70 bg-muted/15 p-4"><div className="text-sm text-muted-foreground">{t("admin.termsMilestones.claimedCount")}</div><div className="mt-1 text-3xl font-semibold tracking-tight">{(progress?.achievements || []).filter((item) => item.claimed_at).length}</div></div>
               </div>
               <div className="mt-4 space-y-2">
                 {(progress?.teacherProgress || []).slice(0, 8).map((row) => (
-                  <div key={row.teacherId} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-sm">
+                  <div key={row.teacherId} className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-border/70 bg-muted/15 p-4 text-sm">
                     <span>{t("admin.termsMilestones.teacherId", { id: row.teacherId })} · {t("admin.termsMilestones.paidRedemptions")}: {row.paidRedemptions}</span>
                     <span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4" />{t("admin.termsMilestones.achievementCount")}: {(row.achievements || []).length}</span>
                   </div>
