@@ -10,6 +10,10 @@ async function seedStudentSession(page) {
   await page.addInitScript(() => {
     localStorage.setItem('user', JSON.stringify({ id: 77, name: 'QR Student', role: 'student' }));
     localStorage.setItem('accessToken', 'e2e-student-token');
+    localStorage.setItem('portalAccess', JSON.stringify({
+      store: { hasAccess: true, roles: ['Student'] },
+      academy: { hasAccess: true, roles: ['Student'] },
+    }));
   });
 }
 

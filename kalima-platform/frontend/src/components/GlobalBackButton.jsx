@@ -29,7 +29,7 @@ export default function GlobalBackButton() {
       type="button"
       variant="ghost"
       size="sm"
-      className="fixed start-5 top-20 z-[110] h-11 gap-1.5 px-2 text-sm font-semibold text-muted-foreground hover:bg-transparent hover:text-foreground"
+      className="fixed start-5 top-20 z-[110] h-11 gap-1.5 px-2 text-sm font-semibold text-muted-foreground hover:bg-transparent hover:text-foreground lg:start-64"
       onClick={handleBack}
       aria-label={label}
       title={label}
