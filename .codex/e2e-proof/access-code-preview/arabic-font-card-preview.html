@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Arabic font card preview</title>
+    <style>
+      @font-face {
+        font-family: "Noto Sans Arabic Preview";
+        src: url("./fonts/NotoSansArabic-Regular.ttf") format("truetype");
+        font-display: block;
+      }
+
+      @font-face {
+        font-family: "Noto Kufi Arabic Preview";
+        src: url("./fonts/NotoKufiArabic-Regular.ttf") format("truetype");
+        font-display: block;
+      }
+
+      @font-face {
+        font-family: "Noto Naskh Arabic Preview";
+        src: url("./fonts/NotoNaskhArabic-Regular.ttf") format("truetype");
+        font-display: block;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        background: #f7f2f0;
+        color: #271f20;
+      }
+
+      body {
+        margin: 0;
+        min-width: 1240px;
+        background: #f7f2f0;
+      }
+
+      header {
+        padding: 22px 30px 12px;
+        text-align: center;
+        font-family: "Noto Sans Arabic Preview", sans-serif;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      header p {
+        margin: 5px 0 0;
+        color: #756866;
+        font-size: 14px;
+      }
+
+      .previews {
+        display: flex;
+        justify-content: center;
+        gap: 22px;
+        padding: 18px 30px 30px;
+        direction: ltr;
+      }
+
+      .preview {
+        width: 390px;
+        direction: rtl;
+        text-align: center;
+      }
+
+      .preview h2 {
+        margin: 0 0 8px;
+        color: #c9253d;
+        font-size: 17px;
+        font-weight: 700;
+      }
+
+      .card-shell {
+        width: 390px;
+        height: 207px;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 9px 22px rgba(52, 30, 30, 0.13);
+      }
+
+      .card {
+        position: relative;
+        width: 390px;
+        height: 207px;
+        overflow: hidden;
+        background: url("./card-background.png") center / 100% 100% no-repeat;
+        font-family: var(--preview-font), sans-serif;
+      }
+
+      .clean {
+        position: absolute;
+        z-index: 2;
+        background: #faeee9;
+      }
+
+      .clean-price {
+        top: 20px;
+        left: 20px;
+        width: 110px;
+        height: 39px;
+      }
+
+      .clean-logo {
+        top: 12px;
+        left: 14px;
+        width: 57px;
+        height: 16px;
+      }
+
+      .clean-title {
+        top: 70px;
+        left: 20px;
+        width: 150px;
+        height: 25px;
+      }
+
+      .clean-subtitle {
+        top: 87px;
+        left: 20px;
+        width: 142px;
+        height: 14px;
+      }
+
+      .clean-method {
+        top: 30px;
+        left: 190px;
+        width: 102px;
+        height: 34px;
+      }
+
+      .clean-red {
+        top: 96px;
+        left: 136px;
+        width: 174px;
+        height: 44px;
+        background: linear-gradient(to right, #fcf8f6 0 61%, #faeee9 61% 100%);
+      }
+
+      .clean-grade {
+        top: 130px;
+        left: 20px;
+        width: 142px;
+        height: 47px;
+      }
+
+      .clean-private {
+        top: 181px;
+        left: 20px;
+        width: 145px;
+        height: 16px;
+      }
+
+      .clean-qr-label {
+        top: 24px;
+        left: 299px;
+        width: 82px;
+        height: 12px;
+        background: #fff;
+      }
+
+      .clean-access {
+        top: 136px;
+        left: 270px;
+        width: 120px;
+        height: 38px;
+      }
+
+      .clean-circle {
+        position: absolute;
+        z-index: 3;
+        top: 143px;
+        left: 321px;
+        width: 69px;
+        height: 69px;
+        border-radius: 50%;
+        background: #f6ddd9;
+      }
+
+      .arabic {
+        position: absolute;
+        z-index: 4;
+        color: #271f20;
+        direction: rtl;
+        white-space: nowrap;
+      }
+
+      .logo {
+        top: 13px;
+        left: 14px;
+        width: 57px;
+        color: #c9253d;
+        font-size: 10px;
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .title {
+        top: 71px;
+        left: 20px;
+        width: 150px;
+        font-size: 10px;
+        text-align: center;
+      }
+
+      .subtitle {
+        top: 88px;
+        left: 20px;
+        width: 142px;
+        color: #756866;
+        font-size: 7px;
+        text-align: center;
+      }
+
+      .price {
+        top: 25px;
+        left: 22px;
+        width: 105px;
+        color: #271f20;
+        font-size: 22px;
+        text-align: center;
+      }
+
+      .method {
+        top: 31px;
+        left: 189px;
+        width: 108px;
+        font-size: 20px;
+        text-align: center;
+      }
+
+      .red {
+        top: 99px;
+        left: 137px;
+        width: 174px;
+        color: #c9253d;
+        font-size: 25px;
+        text-align: center;
+      }
+
+      .grade-label {
+        top: 132px;
+        left: 22px;
+        width: 45px;
+        color: #756866;
+        font-size: 9px;
+        text-align: left;
+      }
+
+      .grade {
+        top: 151px;
+        left: 20px;
+        width: 135px;
+        font-size: 16px;
+        text-align: left;
+      }
+
+      .access-label {
+        top: 139px;
+        left: 282px;
+        width: 108px;
+        color: #756866;
+        font-size: 11px;
+        text-align: center;
+      }
+
+      .access-sample {
+        top: 154px;
+        left: 278px;
+        width: 112px;
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .private {
+        top: 183px;
+        left: 20px;
+        width: 145px;
+        color: #756866;
+        font-size: 7px;
+        text-align: center;
+      }
+
+      .qr-label {
+        top: 25px;
+        left: 299px;
+        width: 82px;
+        color: #756866;
+        font-size: 6px;
+        text-align: center;
+      }
+
+      .sans {
+        --preview-font: "Noto Sans Arabic Preview";
+      }
+
+      .kufi {
+        --preview-font: "Noto Kufi Arabic Preview";
+      }
+
+      .naskh {
+        --preview-font: "Noto Naskh Arabic Preview";
+      }
+
+      .caption {
+        margin-top: 8px;
+        color: #756866;
+        font-family: "Noto Sans Arabic Preview", sans-serif;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>معاينة الخط العربي على بطاقة كود الوصول</h1>
+      <p>نفس التصميم، مع تغيير الخط العربي فقط</p>
+    </header>
+
+    <main class="previews">
+      <section class="preview">
+        <h2>نوتو سانس عربي</h2>
+        <div class="card-shell">
+          <div class="card sans">
+            <div class="clean clean-logo"></div>
+            <div class="clean clean-title"></div>
+            <div class="clean clean-subtitle"></div>
+            <div class="clean clean-price"></div>
+            <div class="clean clean-method"></div>
+            <div class="clean clean-red"></div>
+            <div class="clean clean-grade"></div>
+            <div class="clean clean-private"></div>
+            <div class="clean clean-qr-label"></div>
+            <div class="clean clean-access"></div>
+            <div class="clean-circle"></div>
+            <div class="arabic logo">كلمة</div>
+            <div class="arabic title">بطاقة وصول المذكرة</div>
+            <div class="arabic subtitle">بطاقة وصول آمنة</div>
+            <div class="arabic price">١٥٠ جنيه</div>
+            <div class="arabic method">كود أو منصة</div>
+            <div class="arabic red">نسخة الطالب</div>
+            <div class="arabic grade-label">الصف</div>
+            <div class="arabic grade">الصف الثالث الثانوي</div>
+            <div class="arabic private">احتفظ بالبطاقة خاصة</div>
+            <div class="arabic qr-label">امسح للدخول</div>
+            <div class="arabic access-label">كود الوصول</div>
+            <div class="arabic access-sample">رمز الطالب</div>
+          </div>
+        </div>
+        <div class="caption">مقروء وواضح</div>
+      </section>
+
+      <section class="preview">
+        <h2>نوتو كوفي عربي</h2>
+        <div class="card-shell">
+          <div class="card kufi">
+            <div class="clean clean-logo"></div>
+            <div class="clean clean-title"></div>
+            <div class="clean clean-subtitle"></div>
+            <div class="clean clean-price"></div>
+            <div class="clean clean-method"></div>
+            <div class="clean clean-red"></div>
+            <div class="clean clean-grade"></div>
+            <div class="clean clean-private"></div>
+            <div class="clean clean-qr-label"></div>
+            <div class="clean clean-access"></div>
+            <div class="clean-circle"></div>
+            <div class="arabic logo">كلمة</div>
+            <div class="arabic title">بطاقة وصول المذكرة</div>
+            <div class="arabic subtitle">بطاقة وصول آمنة</div>
+            <div class="arabic price">١٥٠ جنيه</div>
+            <div class="arabic method">كود أو منصة</div>
+            <div class="arabic red">نسخة الطالب</div>
+            <div class="arabic grade-label">الصف</div>
+            <div class="arabic grade">الصف الثالث الثانوي</div>
+            <div class="arabic private">احتفظ بالبطاقة خاصة</div>
+            <div class="arabic qr-label">امسح للدخول</div>
+            <div class="arabic access-label">كود الوصول</div>
+            <div class="arabic access-sample">رمز الطالب</div>
+          </div>
+        </div>
+        <div class="caption">هندسي ومنظم</div>
+      </section>
+
+      <section class="preview">
+        <h2>نوتو نسخ عربي</h2>
+        <div class="card-shell">
+          <div class="card naskh">
+            <div class="clean clean-logo"></div>
+            <div class="clean clean-title"></div>
+            <div class="clean clean-subtitle"></div>
+            <div class="clean clean-price"></div>
+            <div class="clean clean-method"></div>
+            <div class="clean clean-red"></div>
+            <div class="clean clean-grade"></div>
+            <div class="clean clean-private"></div>
+            <div class="clean clean-qr-label"></div>
+            <div class="clean clean-access"></div>
+            <div class="clean-circle"></div>
+            <div class="arabic logo">كلمة</div>
+            <div class="arabic title">بطاقة وصول المذكرة</div>
+            <div class="arabic subtitle">بطاقة وصول آمنة</div>
+            <div class="arabic price">١٥٠ جنيه</div>
+            <div class="arabic method">كود أو منصة</div>
+            <div class="arabic red">نسخة الطالب</div>
+            <div class="arabic grade-label">الصف</div>
+            <div class="arabic grade">الصف الثالث الثانوي</div>
+            <div class="arabic private">احتفظ بالبطاقة خاصة</div>
+            <div class="arabic qr-label">امسح للدخول</div>
+            <div class="arabic access-label">كود الوصول</div>
+            <div class="arabic access-sample">رمز الطالب</div>
+          </div>
+        </div>
+        <div class="caption">تقليدي ومناسب للمذكرات</div>
+      </section>
+    </main>
+  </body>
+</html>

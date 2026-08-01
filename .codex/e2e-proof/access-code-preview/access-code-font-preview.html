@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Arabic access code font preview</title>
+    <style>
+      @font-face {
+        font-family: "Noto Kufi Arabic Preview";
+        src: url("./fonts/NotoKufiArabic-Regular.ttf") format("truetype");
+        font-display: block;
+      }
+
+      @font-face {
+        font-family: "Noto Naskh Arabic Preview";
+        src: url("./fonts/NotoNaskhArabic-Regular.ttf") format("truetype");
+        font-display: block;
+      }
+
+      :root {
+        color: #271f20;
+        font-family: Arial, sans-serif;
+        background: #f7f2f0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-width: 1240px;
+        background: #f7f2f0;
+      }
+
+      header {
+        padding: 28px 36px 12px;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 25px;
+        font-weight: 700;
+      }
+
+      p {
+        margin: 7px 0 0;
+        color: #756866;
+        font-size: 15px;
+      }
+
+      .previews {
+        display: flex;
+        justify-content: center;
+        gap: 28px;
+        padding: 22px 36px 36px;
+        direction: ltr;
+      }
+
+      .preview {
+        width: 580px;
+        direction: rtl;
+      }
+
+      .preview h2 {
+        margin: 0 0 10px;
+        color: #c9253d;
+        font-size: 18px;
+        text-align: center;
+      }
+
+      .card-shell {
+        width: 580px;
+        height: 307px;
+        overflow: hidden;
+        border-radius: 15px;
+        box-shadow: 0 12px 28px rgba(52, 30, 30, 0.12);
+      }
+
+      .card {
+        position: relative;
+        width: 580px;
+        height: 307px;
+        overflow: hidden;
+        background: url("./card-background.png") center / 100% 100% no-repeat;
+      }
+
+      .access-patch {
+        position: absolute;
+        top: 62.6%;
+        left: 67.7%;
+        width: 30.2%;
+        height: 19.6%;
+        background: #faeee9;
+      }
+
+      .access-circle {
+        position: absolute;
+        top: 69.2%;
+        left: 82.5%;
+        width: 16.4%;
+        height: 31%;
+        border-radius: 50%;
+        background: #f6ddd9;
+      }
+
+      .access-label {
+        position: absolute;
+        top: 65.8%;
+        left: 72.6%;
+        width: 21.2%;
+        color: #756866;
+        direction: ltr;
+        font-family: Arial, sans-serif;
+        font-size: 9px;
+        text-align: left;
+      }
+
+      .access-code {
+        position: absolute;
+        top: 72.1%;
+        left: 69.4%;
+        width: 25.4%;
+        color: #2a2224;
+        direction: ltr;
+        font-family: var(--preview-font);
+        font-size: 20px;
+        font-weight: 500;
+        letter-spacing: 0;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .kufi {
+        --preview-font: "Noto Kufi Arabic Preview";
+      }
+
+      .naskh {
+        --preview-font: "Noto Naskh Arabic Preview";
+      }
+
+      .caption {
+        margin-top: 11px;
+        color: #756866;
+        font-size: 13px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>معاينة كود الوصول بعد الطباعة</h1>
+      <p>نفس البطاقة ونفس الكود، مع تغيير الخط فقط</p>
+    </header>
+
+    <main class="previews">
+      <section class="preview">
+        <h2>Noto Kufi Arabic</h2>
+        <div class="card-shell">
+          <div class="card kufi">
+            <div class="access-patch"></div>
+            <div class="access-circle"></div>
+            <div class="access-label">ACCESS CODE</div>
+            <div class="access-code">KLM-7Q2M-91XF</div>
+          </div>
+        </div>
+        <div class="caption">هندسي وواضح</div>
+      </section>
+
+      <section class="preview">
+        <h2>Noto Naskh Arabic</h2>
+        <div class="card-shell">
+          <div class="card naskh">
+            <div class="access-patch"></div>
+            <div class="access-circle"></div>
+            <div class="access-label">ACCESS CODE</div>
+            <div class="access-code">KLM-7Q2M-91XF</div>
+          </div>
+        </div>
+        <div class="caption">تقليدي وملائم للمذكرات</div>
+      </section>
+    </main>
+  </body>
+</html>

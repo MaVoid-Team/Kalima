@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { BookOpenCheck, CheckCircle2, KeyRound, Loader2, Search, Ticket, UserRound } from "lucide-react";
+import { BookOpenCheck, CheckCircle2, KeyRound, Loader2, ScanLine, Search, Ticket, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import EBookletQrScanner from "@/components/e-booklets/EBookletQrScanner";
 import { useStudentEBooklets } from "@/hooks/useEBookletAccess";
 import useAuth from "@/hooks/auth/useAuth";
 import { useTranslation } from "react-i18next";
@@ -31,6 +32,7 @@ export default function AcceptEBookletInvitePage({ mode = "invite" }) {
   const [preview, setPreview] = useState(null);
   const [passcode, setPasscode] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
   const isCodeMode = mode === "code";
   const loginRedirect = isCodeMode ? "/e-booklet-code" : `/e-booklet-invite/${token}`;
 
@@ -101,6 +103,26 @@ export default function AcceptEBookletInvitePage({ mode = "invite" }) {
     if (state.status === "error") setState({ status: "idle", message: "" });
   };
 
+  const handleQrDetected = useCallback((value) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return;
+
+    try {
+      const scannedUrl = new URL(trimmedValue, window.location.origin);
+      if (scannedUrl.pathname.startsWith("/e-booklet-code/qr/")) {
+        navigate(`${scannedUrl.pathname}${scannedUrl.search}${scannedUrl.hash}`);
+        return;
+      }
+    } catch {
+      // Treat non-URL QR values as raw access codes.
+    }
+
+    setCode(trimmedValue.toUpperCase());
+    setPreview(null);
+    setScannerOpen(false);
+    setState({ status: "idle", message: t("inviteAccept.codeRedemption.scannerDetected") });
+  }, [navigate, t]);
+
   const submit = async (accessPath) => {
     if (requireTerms()) return;
     setState({ status: "loading", message: "" });
@@ -147,6 +169,11 @@ export default function AcceptEBookletInvitePage({ mode = "invite" }) {
           <h2 className="flex items-center gap-2 font-semibold"><Ticket className="h-4 w-4" />{t("inviteAccept.codeRedemption.heading")}</h2>
           <p className="text-sm text-muted-foreground">{t("inviteAccept.codeRedemption.helper")}</p>
           <Label>{t("inviteAccept.codeRedemption.codeLabel")}</Label>
+          <Button className="w-full" type="button" variant="outline" onClick={() => setScannerOpen((open) => !open)} data-testid="e-booklet-code-scan-button">
+            <ScanLine className="h-4 w-4" />
+            {t("inviteAccept.codeRedemption.scanQrCode")}
+          </Button>
+          {scannerOpen && <EBookletQrScanner onDetected={handleQrDetected} onClose={() => setScannerOpen(false)} t={t} />}
           <Input value={code} onChange={updateCode} placeholder={t("inviteAccept.codeRedemption.codePlaceholder")} dir="ltr" className="font-mono tracking-wide" />
           <Button className="w-full" type="button" variant="outline" onClick={previewCode} disabled={state.status === "loading" || !code.trim()}>
             {state.status === "loading" && !preview ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}

@@ -18,6 +18,31 @@ async function seedStudentSession(page) {
 }
 
 test.describe('printed e-booklet QR redemption', () => {
+  test('opens the in-page camera scanner with a manual fallback', async ({ page }) => {
+    await seedStudentSession(page);
+    await page.addInitScript(() => {
+      navigator.mediaDevices.getUserMedia = async () => {
+        throw new Error('camera permission denied');
+      };
+    });
+
+    for (const endpoint of ['**/api/v2/notifications/my**', '**/api/v2/notifications/my/unread-count**', '**/api/v2/cart**']) {
+      await page.route(endpoint, async (route) => {
+        const data = endpoint.includes('unread-count') ? { unread_count: 0 } : endpoint.includes('/cart') ? { items: [] } : { notifications: [] };
+        await route.fulfill({ status: 200, contentType: 'app/json', body: JSON.stringify({ success: true, data }) });
+      });
+    }
+
+    await page.goto('/e-booklet-code');
+    const scanButton = page.getByTestId('e-booklet-code-scan-button');
+    await expect(scanButton).toBeVisible();
+    await scanButton.click();
+    await expect(page.getByTestId('e-booklet-code-qr-scanner')).toBeVisible();
+    await expect(page.getByText('We could not access your camera. Allow camera access or enter the code manually.')).toBeVisible();
+    fs.mkdirSync(proofDir, { recursive: true });
+    await page.screenshot({ path: path.join(proofDir, 'qr-camera-scanner-permission-fallback.png'), fullPage: false });
+  });
+
   test('keeps redeeming another e-booklet available from the student library', async ({ page }) => {
     await seedStudentSession(page);
     await page.route('**/api/v2/student/e-booklets', async (route) => {
