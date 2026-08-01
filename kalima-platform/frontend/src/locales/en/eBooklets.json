@@ -1255,6 +1255,7 @@
     "emptyTitle": "No assigned e-booklets yet",
     "emptyDescription": "Ask your teacher for an e-booklet invite link or access code.",
     "redeemCodeCta": "Redeem access code",
+    "redeemAnotherCta": "Redeem another e-booklet",
     "teacherLabel": "Teacher: {{value}}",
     "expiry": "Expiry",
     "expiredBlocked": "This e-booklet has expired and cannot be opened.",

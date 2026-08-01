@@ -1255,6 +1255,7 @@
     "emptyTitle": "لا توجد مذكرات معينة بعد",
     "emptyDescription": "اطلب من معلمك رابط دعوة المذكرة أو كود الوصول.",
     "redeemCodeCta": "استرداد كود الوصول",
+    "redeemAnotherCta": "استرداد مذكرة إلكترونية أخرى",
     "teacherLabel": "المعلم: {{value}}",
     "expiry": "الانتهاء",
     "expiredBlocked": "انتهى هذه المذكرة ولا يمكن فتحه.",

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BookOpenCheck, CalendarClock, Play } from "lucide-react";
+import { BookOpenCheck, CalendarClock, Play, TicketCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useStudentEBooklets } from "@/hooks/useEBookletAccess";
@@ -16,14 +16,22 @@ export default function StudentEBookletsPage() {
 
   return (
     <div className="space-y-6" data-testid="student-e-booklets-page">
-      <div>
-        <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
-          <BookOpenCheck className="h-8 w-8 text-primary" />
-          {t("student.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("student.description")}
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
+            <BookOpenCheck className="h-8 w-8 text-primary" />
+            {t("student.title")}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t("student.description")}
+          </p>
+        </div>
+        <Button asChild className="w-full sm:w-auto" data-testid="student-redeem-code-button">
+          <Link to="/e-booklet-code">
+            <TicketCheck className="h-4 w-4" />
+            {t("student.redeemAnotherCta")}
+          </Link>
+        </Button>
       </div>
 
       {loading && (

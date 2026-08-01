@@ -14,6 +14,35 @@ async function seedStudentSession(page) {
 }
 
 test.describe('printed e-booklet QR redemption', () => {
+  test('keeps redeeming another e-booklet available from the student library', async ({ page }) => {
+    await seedStudentSession(page);
+    await page.route('**/api/v2/student/e-booklets', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'app/json',
+        body: JSON.stringify({
+          success: true,
+          data: [{
+            id: 12,
+            status: 'active',
+            booklet_instance: {
+              id: 91,
+              display_title: 'Science Essentials',
+              teacher: { name: 'Nour Academy' },
+            },
+          }],
+        }),
+      });
+    });
+
+    await page.goto('/student/e-booklets');
+    const redeemButton = page.getByTestId('student-redeem-code-button');
+    await expect(redeemButton).toBeVisible();
+    await expect(redeemButton).toHaveAttribute('href', '/e-booklet-code');
+    fs.mkdirSync(proofDir, { recursive: true });
+    await page.screenshot({ path: path.join(proofDir, 'student-library-redeem-button.png'), fullPage: false });
+  });
+
   test('preserves the QR return URL through login', async ({ page }) => {
     await page.goto(`/e-booklet-code/qr/${qrRef}`);
 
