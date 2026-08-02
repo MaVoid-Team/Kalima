@@ -56,6 +56,15 @@ class AppreciationService {
             user_appreciation_comments: true,
           },
         },
+        user_appreciation_comments: {
+          orderBy: [{ created_at: "desc" }, { id: "desc" }],
+          select: {
+            id: true,
+            author_name: true,
+            comment: true,
+            created_at: true,
+          },
+        },
       },
     });
 
@@ -71,6 +80,15 @@ class AppreciationService {
         _count: {
           select: {
             user_appreciation_comments: true,
+          },
+        },
+        user_appreciation_comments: {
+          orderBy: [{ created_at: "desc" }, { id: "desc" }],
+          select: {
+            id: true,
+            author_name: true,
+            comment: true,
+            created_at: true,
           },
         },
       },
@@ -133,6 +151,54 @@ class AppreciationService {
     };
   }
 
+  async updateComment(
+    userId: number,
+    commentId: number,
+    input: { authorName: string; comment: string },
+  ) {
+    const page = await this.findAdminPage(userId);
+    const existing = await this.db.user_appreciation_comments.findFirst({
+      where: { id: commentId, page_id: page.id },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      throw new NotFoundError("Appreciation comment not found");
+    }
+
+    const updated = await this.db.user_appreciation_comments.update({
+      where: { id: commentId },
+      data: {
+        author_name: input.authorName.trim(),
+        comment: input.comment.trim(),
+      },
+      select: {
+        id: true,
+        author_name: true,
+        comment: true,
+        created_at: true,
+      },
+    });
+
+    return this.mapComment(updated);
+  }
+
+  async deleteComment(userId: number, commentId: number) {
+    const page = await this.findAdminPage(userId);
+    const existing = await this.db.user_appreciation_comments.findFirst({
+      where: { id: commentId, page_id: page.id },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      throw new NotFoundError("Appreciation comment not found");
+    }
+
+    await this.db.user_appreciation_comments.delete({
+      where: { id: commentId },
+    });
+  }
+
   private async findPageByToken(token: string, includeComments = true) {
     const normalizedToken = token?.trim();
 
@@ -187,7 +253,39 @@ class AppreciationService {
       token: page.token,
       publicUrl: this.buildPublicUrl(page.token),
       commentCount: page._count?.user_appreciation_comments ?? 0,
+      comments: (page.user_appreciation_comments ?? []).map((comment) =>
+        this.mapComment(comment),
+      ),
     };
+  }
+
+  private mapComment(comment: {
+    id: number;
+    author_name: string;
+    comment: string;
+    created_at: Date | null;
+  }) {
+    return {
+      id: comment.id,
+      authorName: comment.author_name,
+      comment: comment.comment,
+      createdAt: comment.created_at,
+    };
+  }
+
+  private async findAdminPage(userId: number) {
+    this.ensureValidUserId(userId);
+
+    const page = await this.db.user_appreciation_pages.findUnique({
+      where: { user_id: userId },
+      select: { id: true },
+    });
+
+    if (!page) {
+      throw new NotFoundError("Appreciation page not found");
+    }
+
+    return page;
   }
 
   private buildPublicUrl(token: string) {

@@ -2,7 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { appreciationService } from "../services/appreciation.service";
-import { CreateAppreciationCommentDto } from "../dtos/appreciation.dto";
+import {
+  CreateAppreciationCommentDto,
+  UpdateAppreciationCommentDto,
+} from "../dtos/appreciation.dto";
 import {
   BadRequestError,
   ValidationError,
@@ -33,6 +36,16 @@ function parseUserId(rawUserId: string) {
   }
 
   return userId;
+}
+
+function parseCommentId(rawCommentId: string) {
+  const commentId = parseInt(rawCommentId, 10);
+
+  if (isNaN(commentId)) {
+    throw new BadRequestError("Invalid comment ID");
+  }
+
+  return commentId;
 }
 
 export const appreciationController = {
@@ -88,6 +101,41 @@ export const appreciationController = {
         success: true,
         message: "Comment submitted successfully",
         data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async updateComment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dto = await validateDto(UpdateAppreciationCommentDto, req.body);
+      const data = await appreciationService.updateComment(
+        parseUserId(req.params.userId as string),
+        parseCommentId(req.params.commentId as string),
+        dto,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Comment updated successfully",
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async deleteComment(req: Request, res: Response, next: NextFunction) {
+    try {
+      await appreciationService.deleteComment(
+        parseUserId(req.params.userId as string),
+        parseCommentId(req.params.commentId as string),
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Comment deleted successfully",
       });
     } catch (error) {
       next(error);

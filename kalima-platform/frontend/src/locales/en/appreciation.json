@@ -13,6 +13,21 @@
     "shareDescription": "Use this public link to share the page and gather messages of sincere thanks and appreciation.",
     "publicLink": "Public link",
     "commentCount": "Appreciation messages",
+    "commentCountLabel": "{{count}} messages",
+    "commentsTitle": "Manage appreciation messages",
+    "commentsSubtitle": "Review, correct, or remove messages from the public page.",
+    "commentsEmpty": "No appreciation messages have been shared yet.",
+    "editComment": "Edit",
+    "deleteComment": "Delete",
+    "editCommentTitle": "Edit appreciation message",
+    "editCommentDescription": "Update the author name or message. Only admin users can make this change.",
+    "authorName": "Author name",
+    "commentBody": "Message",
+    "cancel": "Cancel",
+    "saveComment": "Save changes",
+    "deleteCommentTitle": "Delete appreciation message?",
+    "deleteCommentDescription": "This removes the message from the public page for every visitor.",
+    "confirmDelete": "Delete message",
     "pageStatus": "Page status",
     "activeStatus": "Active",
     "notesTitle": "How it works",
@@ -63,7 +78,9 @@
     "submit": "Send message"
   },
   "messages": {
-    "commentSubmitted": "Your message has been shared successfully."
+    "commentSubmitted": "Your message has been shared successfully.",
+    "commentUpdated": "The appreciation message was updated.",
+    "commentDeleted": "The appreciation message was deleted."
   },
   "seo": {
     "title": "A Page of Thanks and Appreciation for {{name}}",

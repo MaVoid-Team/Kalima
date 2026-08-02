@@ -21,3 +21,17 @@ export class CreateAppreciationCommentDto {
   @MaxLength(1000)
   comment: string;
 }
+
+export class UpdateAppreciationCommentDto {
+  @Transform(trimString)
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(80)
+  authorName: string;
+
+  @Transform(trimString)
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(1000)
+  comment: string;
+}

@@ -8,6 +8,8 @@ jest.mock("../services/appreciation.service", () => ({
     getOrCreateAdminPage: jest.fn(),
     getPublicPage: jest.fn(),
     createComment: jest.fn(),
+    updateComment: jest.fn(),
+    deleteComment: jest.fn(),
   },
 }));
 
@@ -48,5 +50,61 @@ describe("appreciationController", () => {
 
     expect(next).toHaveBeenCalledWith(expect.any(ValidationError));
     expect(appreciationService.createComment).not.toHaveBeenCalled();
+  });
+
+  it("rejects invalid admin comment ids", async () => {
+    const req: any = {
+      params: { userId: "42", commentId: "abc" },
+      body: { authorName: "Student", comment: "Edited" },
+    };
+    const res = createRes();
+    const next = jest.fn();
+
+    await appreciationController.updateComment(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(expect.any(BadRequestError));
+    expect(appreciationService.updateComment).not.toHaveBeenCalled();
+  });
+
+  it("validates admin comment edits before calling the service", async () => {
+    const req: any = {
+      params: { userId: "42", commentId: "3" },
+      body: { authorName: "", comment: "" },
+    };
+    const res = createRes();
+    const next = jest.fn();
+
+    await appreciationController.updateComment(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(expect.any(ValidationError));
+    expect(appreciationService.updateComment).not.toHaveBeenCalled();
+  });
+
+  it("forwards a valid admin edit and returns the updated comment", async () => {
+    appreciationService.updateComment.mockResolvedValue({
+      id: 3,
+      authorName: "Student",
+      comment: "Edited",
+      createdAt: null,
+    });
+    const req: any = {
+      params: { userId: "42", commentId: "3" },
+      body: { authorName: "Student", comment: "Edited" },
+    };
+    const res = createRes();
+    const next = jest.fn();
+
+    await appreciationController.updateComment(req, res, next);
+
+    expect(next).not.toHaveBeenCalled();
+    expect(appreciationService.updateComment).toHaveBeenCalledWith(42, 3, {
+      authorName: "Student",
+      comment: "Edited",
+    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      success: true,
+      data: expect.objectContaining({ id: 3 }),
+    }));
   });
 });

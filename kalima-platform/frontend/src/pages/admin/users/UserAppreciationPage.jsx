@@ -1,15 +1,39 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { ArrowLeft, Copy, ExternalLink, HeartHandshake, MessageSquareQuote } from 'lucide-react';
+import { format } from 'date-fns';
+import { arSA } from 'date-fns/locale';
+import { ArrowLeft, Copy, ExternalLink, HeartHandshake, MessageSquareQuote, Pencil, Trash2 } from 'lucide-react';
 
 import useAdminAppreciationPage from '@/hooks/admin/useAdminAppreciationPage';
 import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 
 function resolvePublicUrl(publicUrl) {
     if (!publicUrl) {
@@ -26,9 +50,12 @@ function resolvePublicUrl(publicUrl) {
 export default function UserAppreciationPage() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { t } = useTranslation(['appreciation', 'userManagement']);
-    const { page, loading, loadPage } = useAdminAppreciationPage();
+    const { t, i18n } = useTranslation(['appreciation', 'userManagement']);
+    const { page, loading, loadPage, updateComment, deleteComment, mutating } = useAdminAppreciationPage();
     const { selectedUser, fetchUserById, loading: userLoading } = useAdminUsers();
+    const [editingComment, setEditingComment] = useState(null);
+    const [pendingDelete, setPendingDelete] = useState(null);
+    const [editForm, setEditForm] = useState({ authorName: '', comment: '' });
 
     useEffect(() => {
         if (!id) return;
@@ -53,6 +80,37 @@ export default function UserAppreciationPage() {
         await navigator.clipboard.writeText(publicUrl);
         toast.success(t('admin.copySuccess'));
     };
+
+    const handleEdit = (comment) => {
+        setEditingComment(comment);
+        setEditForm({ authorName: comment.authorName, comment: comment.comment });
+    };
+
+    const handleUpdate = async (event) => {
+        event.preventDefault();
+        if (!editingComment || !id) {
+            return;
+        }
+
+        const updated = await updateComment(id, editingComment.id, editForm);
+        if (updated) {
+            setEditingComment(null);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!pendingDelete || !id) {
+            return;
+        }
+
+        await deleteComment(id, pendingDelete.id);
+        setPendingDelete(null);
+    };
+
+    const comments = page?.comments || [];
+    const formatCommentDate = (createdAt) => createdAt
+        ? format(new Date(createdAt), 'PPp', { locale: i18n.language?.startsWith('ar') ? arSA : undefined })
+        : '';
 
     return (
         <div className="space-y-6 p-4 md:p-6">
@@ -155,6 +213,145 @@ export default function UserAppreciationPage() {
                     </Card>
                 </div>
             </div>
+
+            <Card data-testid="admin-appreciation-comments">
+                <CardHeader className="border-b border-border/70">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <CardTitle className="flex items-center gap-2">
+                                <MessageSquareQuote className="h-5 w-5 text-primary" />
+                                {t('admin.commentsTitle')}
+                            </CardTitle>
+                            <CardDescription className="mt-1">{t('admin.commentsSubtitle')}</CardDescription>
+                        </div>
+                        <Badge variant="secondary" className="w-fit">
+                            {t('admin.commentCountLabel', { count: comments.length })}
+                        </Badge>
+                    </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                    {comments.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+                            {t('admin.commentsEmpty')}
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {comments.map((comment) => (
+                                <article
+                                    key={comment.id}
+                                    data-testid={`admin-comment-${comment.id}`}
+                                    className="rounded-2xl border bg-muted/20 p-4 transition-colors hover:bg-muted/35"
+                                >
+                                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                        <div className="min-w-0 space-y-2">
+                                            <div>
+                                                <p className="font-semibold text-foreground">{comment.authorName}</p>
+                                                <p className="text-xs text-muted-foreground">{formatCommentDate(comment.createdAt)}</p>
+                                            </div>
+                                            <p className="whitespace-pre-wrap text-sm leading-7 text-foreground/80">{comment.comment}</p>
+                                        </div>
+                                        <div className="flex shrink-0 gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                data-testid={`edit-comment-${comment.id}`}
+                                                aria-label={t('admin.editComment')}
+                                                onClick={() => handleEdit(comment)}
+                                                disabled={mutating}
+                                            >
+                                                <Pencil className="h-3.5 w-3.5" />
+                                                {t('admin.editComment')}
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                data-testid={`delete-comment-${comment.id}`}
+                                                aria-label={t('admin.deleteComment')}
+                                                onClick={() => setPendingDelete(comment)}
+                                                disabled={mutating}
+                                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                                {t('admin.deleteComment')}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            <Dialog
+                open={Boolean(editingComment)}
+                onOpenChange={(open) => {
+                    if (!open && !mutating) {
+                        setEditingComment(null);
+                    }
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t('admin.editCommentTitle')}</DialogTitle>
+                        <DialogDescription>{t('admin.editCommentDescription')}</DialogDescription>
+                    </DialogHeader>
+                    <form className="space-y-4" onSubmit={handleUpdate}>
+                        <div className="space-y-2">
+                            <Label htmlFor="admin-comment-author">{t('admin.authorName')}</Label>
+                            <Input
+                                id="admin-comment-author"
+                                value={editForm.authorName}
+                                onChange={(event) => setEditForm((current) => ({ ...current, authorName: event.target.value }))}
+                                maxLength={80}
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="admin-comment-body">{t('admin.commentBody')}</Label>
+                            <Textarea
+                                id="admin-comment-body"
+                                value={editForm.comment}
+                                onChange={(event) => setEditForm((current) => ({ ...current, comment: event.target.value }))}
+                                maxLength={1000}
+                                required
+                                className="min-h-32 resize-y"
+                            />
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setEditingComment(null)} disabled={mutating}>
+                                {t('admin.cancel')}
+                            </Button>
+                            <Button type="submit" disabled={mutating}>
+                                {mutating ? <LoadingSpinner className="h-4 w-4" /> : null}
+                                {t('admin.saveComment')}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <AlertDialog open={Boolean(pendingDelete)} onOpenChange={(open) => !open && !mutating && setPendingDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('admin.deleteCommentTitle')}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('admin.deleteCommentDescription')}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={mutating}>{t('admin.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDelete}
+                            disabled={mutating}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            {mutating ? <LoadingSpinner className="h-4 w-4" /> : null}
+                            {t('admin.confirmDelete')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

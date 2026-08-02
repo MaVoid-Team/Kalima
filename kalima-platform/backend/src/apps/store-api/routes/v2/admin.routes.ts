@@ -73,6 +73,16 @@ router.post(
   appreciationController.createAdminPage,
 );
 router.patch(
+  "/users/:userId/appreciation-page/comments/:commentId",
+  ...adminModeratorAuth,
+  appreciationController.updateComment,
+);
+router.delete(
+  "/users/:userId/appreciation-page/comments/:commentId",
+  ...adminModeratorAuth,
+  appreciationController.deleteComment,
+);
+router.patch(
   "/users/:userId/flag",
   ...adminModeratorAuth,
   adminController.updateUserFlag,

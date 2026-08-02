@@ -17,6 +17,9 @@ function getMockPrismaClient() {
       },
       user_appreciation_comments: {
         create: jest.fn(),
+        findFirst: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
       },
     };
   }
@@ -47,6 +50,9 @@ describe("AppreciationService", () => {
     mockPrismaClient.user_appreciation_pages.findUnique.mockReset();
     mockPrismaClient.user_appreciation_pages.upsert.mockReset();
     mockPrismaClient.user_appreciation_comments.create.mockReset();
+    mockPrismaClient.user_appreciation_comments.findFirst.mockReset();
+    mockPrismaClient.user_appreciation_comments.update.mockReset();
+    mockPrismaClient.user_appreciation_comments.delete.mockReset();
     process.env.APP_URL = "https://kalima.test";
     service = new AppreciationService(mockPrismaClient as unknown as PrismaClient);
   });
@@ -167,6 +173,64 @@ describe("AppreciationService", () => {
         },
       });
       expect(result.authorName).toBe("Karim");
+    });
+  });
+
+  describe("admin comment management", () => {
+    it("updates a comment only when it belongs to the requested user's page", async () => {
+      mockPrismaClient.user_appreciation_pages.findUnique.mockResolvedValue({ id: 9 });
+      mockPrismaClient.user_appreciation_comments.findFirst.mockResolvedValue({ id: 3 });
+      mockPrismaClient.user_appreciation_comments.update.mockResolvedValue({
+        id: 3,
+        author_name: "Edited Student",
+        comment: "Edited message",
+        created_at: new Date("2026-05-02T12:00:00Z"),
+      });
+
+      const result = await service.updateComment(42, 3, {
+        authorName: " Edited Student ",
+        comment: " Edited message ",
+      });
+
+      expect(mockPrismaClient.user_appreciation_comments.update).toHaveBeenCalledWith({
+        where: { id: 3 },
+        data: {
+          author_name: "Edited Student",
+          comment: "Edited message",
+        },
+        select: {
+          id: true,
+          author_name: true,
+          comment: true,
+          created_at: true,
+        },
+      });
+      expect(result.comment).toBe("Edited message");
+    });
+
+    it("does not update a comment owned by another appreciation page", async () => {
+      mockPrismaClient.user_appreciation_pages.findUnique.mockResolvedValue({ id: 9 });
+      mockPrismaClient.user_appreciation_comments.findFirst.mockResolvedValue(null);
+
+      await expect(
+        service.updateComment(42, 99, {
+          authorName: "Edited Student",
+          comment: "Edited message",
+        }),
+      ).rejects.toBeInstanceOf(NotFoundError);
+
+      expect(mockPrismaClient.user_appreciation_comments.update).not.toHaveBeenCalled();
+    });
+
+    it("deletes a comment only after the page ownership check", async () => {
+      mockPrismaClient.user_appreciation_pages.findUnique.mockResolvedValue({ id: 9 });
+      mockPrismaClient.user_appreciation_comments.findFirst.mockResolvedValue({ id: 3 });
+
+      await service.deleteComment(42, 3);
+
+      expect(mockPrismaClient.user_appreciation_comments.delete).toHaveBeenCalledWith({
+        where: { id: 3 },
+      });
     });
   });
 });

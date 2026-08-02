@@ -13,6 +13,21 @@
     "shareDescription": "استخدِم هذا الرابطَ العامَّ لمشاركةِ صفحةِ الشكرِ والتقديرِ وجمعِ الكلماتِ الصادقة.",
     "publicLink": "الرابطُ العام",
     "commentCount": "عددُ الرسائل",
+    "commentCountLabel": "{{count}} رسائل",
+    "commentsTitle": "إدارةُ رسائلِ الشكرِ والتقديرِ",
+    "commentsSubtitle": "راجِع الرسائلَ المنشورةَ أو صحِّحها أو احذفها من الصفحةِ العامَّة.",
+    "commentsEmpty": "لم تُنشَر أيُّ رسالةِ شكرٍ وتقديرٍ بعد.",
+    "editComment": "تعديل",
+    "deleteComment": "حذف",
+    "editCommentTitle": "تعديلُ رسالةِ الشكرِ والتقديرِ",
+    "editCommentDescription": "عدِّل اسمَ صاحبِ الرسالةِ أو نصَّها. يقتصرُ هذا الإجراءُ على المسؤولين.",
+    "authorName": "اسمُ صاحبِ الرسالةِ",
+    "commentBody": "نصُّ الرسالةِ",
+    "cancel": "إلغاء",
+    "saveComment": "حفظُ التعديلاتِ",
+    "deleteCommentTitle": "حذفُ رسالةِ الشكرِ والتقديرِ؟",
+    "deleteCommentDescription": "ستُحذَف الرسالةُ من الصفحةِ العامَّةِ لجميعِ الزوّار.",
+    "confirmDelete": "حذفُ الرسالةِ",
     "pageStatus": "حالةُ الصفحة",
     "activeStatus": "نشِطة",
     "notesTitle": "آليَّةُ العمل",
@@ -63,7 +78,9 @@
     "submit": "إرسالُ كلمةِ التقديرِ"
   },
   "messages": {
-    "commentSubmitted": "تمَّ نشرُ رسالتِك بنجاحٍ."
+    "commentSubmitted": "تمَّ نشرُ رسالتِك بنجاحٍ.",
+    "commentUpdated": "تمَّ تعديلُ رسالةِ الشكرِ والتقديرِ.",
+    "commentDeleted": "تمَّ حذفُ رسالةِ الشكرِ والتقديرِ."
   },
   "seo": {
     "title": "صفحةُ شكرٍ وتقديرٍ إلى {{name}}",
