@@ -3,18 +3,49 @@ const path = require("path");
 const dotenv = require("dotenv");
 const { Pool } = require("pg");
 
+const net = require("net");
+
 dotenv.config({ path: path.resolve(__dirname, "..", ".env.local") });
 dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
 const defaultDatabaseUrl = "postgresql://postgres:postgres@127.0.0.1:55432/postgres?schema=kalima";
-const databaseUrl = process.env.DATABASE_URL || defaultDatabaseUrl;
+const configuredDatabaseUrl = process.env.DATABASE_URL || defaultDatabaseUrl;
 
 const email = (process.env.LOCAL_SUBADMIN_EMAIL || "subadmin@kalima.local").toLowerCase();
 const password = process.env.LOCAL_SUBADMIN_PASSWORD || "pass1234";
 const name = process.env.LOCAL_SUBADMIN_NAME || "Local SubAdmin";
 
+const canConnect = (dbUrl, timeoutMs = 1500) =>
+  new Promise((resolve) => {
+    try {
+      const url = new URL(dbUrl);
+      const host = url.hostname;
+      const port = Number(url.port || 5432);
+      const socket = net.createConnection({ host, port });
+      const timer = setTimeout(() => {
+        socket.destroy();
+        resolve(false);
+      }, timeoutMs);
+      socket.once("connect", () => {
+        clearTimeout(timer);
+        socket.destroy();
+        resolve(true);
+      });
+      socket.once("error", () => {
+        clearTimeout(timer);
+        resolve(false);
+      });
+    } catch {
+      resolve(false);
+    }
+  });
+
 async function main() {
-  const pool = new Pool({ connectionString: databaseUrl });
+  let effectiveDbUrl = configuredDatabaseUrl;
+  if (!(await canConnect(effectiveDbUrl))) {
+    effectiveDbUrl = defaultDatabaseUrl;
+  }
+  const pool = new Pool({ connectionString: effectiveDbUrl });
   const client = await pool.connect();
 
   try {
