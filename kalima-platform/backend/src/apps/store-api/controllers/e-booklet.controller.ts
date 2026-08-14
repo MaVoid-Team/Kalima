@@ -120,7 +120,7 @@ function pagination(req: Request) {
   };
 }
 
-const ANALYTICS_SOURCES = new Set(["free_invite", "offline_passcode", "online_purchase", "invite_link", "qr_code", "teacher_share"]);
+const ANALYTICS_SOURCES = new Set(["free_invite", "offline_passcode", "online_purchase", "invite_link", "qr_code", "teacher_share", "teacher_code", "access_code", "public_store"]);
 
 function parseOptionalPositiveInt(raw: unknown, label: string, max?: number): number | undefined {
   if (raw === undefined || raw === null || raw === "") return undefined;
@@ -206,6 +206,7 @@ function analyticsFilters(req: Request) {
   return {
     teacherId: parseOptionalPositiveInt(req.query.teacher_id, "teacher_id"),
     instanceId: parseOptionalPositiveInt(req.query.instance_id, "instance_id"),
+    templateId: parseOptionalPositiveInt(req.query.template_id, "template_id"),
     studentId: parseOptionalPositiveInt(req.query.student_id, "student_id"),
     startDate,
     endDate,

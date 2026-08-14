@@ -32,6 +32,7 @@ import useRole from "@/hooks/useRole";
 import { useEBookletViewer } from "@/hooks/useEBookletAccess";
 import { normalizeHotspotGeometry } from "@/utils/eBookletHotspotGeometry";
 import { DEFAULT_E_BOOKLET_HOTSPOT_COLOR, getHotspotGlowLayerStyle } from "@/utils/eBookletHotspotStyle";
+import { getEBookletDisplayTitle } from "@/utils/eBookletTitleUtils";
 import { useTranslation } from "react-i18next";
 import { MediaPlayer, MediaProvider } from "@vidstack/react";
 import {
@@ -973,7 +974,7 @@ export default function EBookletViewerPage({ previewMode = false }) {
               </Link>
             </Button>
             <h1 className="truncate text-xl font-semibold">
-              {instance?.display_title || instance?.template?.title || t("viewer.titleFallback")}
+              {getEBookletDisplayTitle(instance, t("viewer.titleFallback"))}
             </h1>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               {adminMode && (

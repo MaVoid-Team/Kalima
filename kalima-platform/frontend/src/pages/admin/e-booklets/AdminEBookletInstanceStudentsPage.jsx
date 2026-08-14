@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAdminEBookletDevices, useAdminEBookletInstances } from "@/hooks/admin/useAdminEBooklets";
 import { useTranslation } from "react-i18next";
+import { getEBookletDisplayTitle } from "@/utils/eBookletTitleUtils";
 
 const numberValue = (value, fallback = 0) => {
   const parsed = Number(value);
@@ -33,7 +34,7 @@ export default function AdminEBookletInstanceStudentsPage() {
     return new Intl.DateTimeFormat(i18n.language, withTime ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" }).format(date);
   };
 
-  const title = instance?.display_title || instance?.template?.title || t("common.eBooklet");
+  const title = getEBookletDisplayTitle(instance, t("common.eBooklet"));
   const teacherName = instance?.teacher?.name || instance?.teacher?.email;
 
   return (

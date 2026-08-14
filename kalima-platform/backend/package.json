@@ -22,6 +22,7 @@
     "seed:governments": "node utils/seeds/seedGovernments.js",
     "cleanup:watermarks": "node scripts/cleanupOldWatermarks.js",
     "archive:e-booklet-expired": "node scripts/archiveExpiredEBookletInstances.js",
+    "repair:e-booklet-titles": "node scripts/repairEBookletInstanceTitles.js",
     "repair:arabic-filenames": "node scripts/repairArabicFilenames.js",
     "audit:uploads": "node dist/src/scripts/auditUploadStorage.js",
     "repair:uploads": "node dist/src/scripts/repairMissingUploadRefs.js",

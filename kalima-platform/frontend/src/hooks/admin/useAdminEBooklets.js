@@ -16,6 +16,7 @@ const ANALYTICS_QUERY_KEYS = {
   endDate: "end_date",
   teacherId: "teacher_id",
   instanceId: "instance_id",
+  templateId: "template_id",
   studentId: "student_id",
 };
 

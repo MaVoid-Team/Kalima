@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTeacherEBookletAnalytics, useTeacherEBooklets } from "@/hooks/useEBookletAccess";
+import { getEBookletDisplayTitle } from "@/utils/eBookletTitleUtils";
 
 const DATE_RANGES = ["7d", "30d", "all", "custom"];
 const SOURCES = ["all", "offline_passcode", "online_purchase", "free_invite"];
@@ -111,7 +112,7 @@ export default function TeacherEBookletAnalyticsPage() {
     chips.push(t(`analytics.dateRanges.${filters.range}`));
     if (filters.instanceId !== "all") {
       const selected = rows.find(({ instance }) => String(instance.id) === String(filters.instanceId));
-      chips.push(selected?.instance?.display_title || selected?.instance?.template?.title || t("analytics.filters.instanceValue", { id: filters.instanceId }));
+      chips.push(getEBookletDisplayTitle(selected?.instance, t("analytics.filters.instanceValue", { id: filters.instanceId })));
     }
     if (filters.source !== "all") chips.push(t(`analytics.sources.${filters.source}`));
     if (filters.range === "custom" && (filters.startDate || filters.endDate)) chips.push([filters.startDate, filters.endDate].filter(Boolean).join(" - "));
@@ -187,7 +188,7 @@ export default function TeacherEBookletAnalyticsPage() {
               <SelectTrigger className="h-11 rounded-xl bg-background"><SelectValue /></SelectTrigger>
               <SelectContent position="popper" align="start" className="z-[9999] max-w-[min(34rem,calc(100vw-2rem))] border-primary/20 bg-background text-foreground shadow-2xl">
                 <SelectItem value="all">{t("analytics.filters.allInstances")}</SelectItem>
-                {rows.map(({ instance }) => <SelectItem key={instance.id} value={String(instance.id)}>{instance.display_title || instance.template?.title || t("common.eBooklet")}</SelectItem>)}
+                {rows.map(({ instance }) => <SelectItem key={instance.id} value={String(instance.id)}>{getEBookletDisplayTitle(instance, t("common.eBooklet"))}</SelectItem>)}
               </SelectContent>
             </Select>
           </FieldShell>
@@ -271,7 +272,7 @@ export default function TeacherEBookletAnalyticsPage() {
             <tbody>
               {selectedRows.map(({ access, instance, expiry, expired }) => (
                 <tr key={access.id}>
-                  <td className="kalima-truncate px-4 py-3 font-medium" title={instance.display_title || instance.template?.title || t("common.eBooklet")}>{instance.display_title || instance.template?.title || t("common.eBooklet")}</td>
+                  <td className="kalima-truncate px-4 py-3 font-medium" title={getEBookletDisplayTitle(instance, t("common.eBooklet"))}>{getEBookletDisplayTitle(instance, t("common.eBooklet"))}</td>
                   <td className="px-4 py-3"><Badge variant="outline" className="rounded-full">{t(`statuses.${instance.status || "active"}`)}</Badge></td>
                   <td className="kalima-number px-4 py-3">{numberValue(instance.invite_quota)}</td>
                   <td className="kalima-number px-4 py-3">{numberValue(instance.used_invites_count)}</td>

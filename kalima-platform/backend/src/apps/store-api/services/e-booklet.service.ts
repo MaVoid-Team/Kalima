@@ -143,6 +143,28 @@ function serializeEBookletPurchase(purchase: any): any {
   };
 }
 
+export function isGeneratedEBookletTitle(value: unknown): boolean {
+  const str = String(value || "").trim();
+  return (
+    /^Teacher e-booklet #\d+$/i.test(str) ||
+    /^e-booklet #\d+$/i.test(str) ||
+    /^كتاب إلكتروني #\d+$/i.test(str) ||
+    /^مذكرة إلكترونية #\d+$/i.test(str)
+  );
+}
+
+export function resolveInstanceDisplayTitle(instance: any): string {
+  const displayTitle = instance?.display_title?.trim?.() ?? "";
+  if (displayTitle && !isGeneratedEBookletTitle(displayTitle)) {
+    return displayTitle;
+  }
+  const templateTitle = instance?.template?.title?.trim?.() ?? "";
+  if (templateTitle) {
+    return templateTitle;
+  }
+  return displayTitle;
+}
+
 function enrichTemplateWithReleaseInfo<T extends { release_at?: Date | string | null }>(
   template: T,
 ): T & { is_released: boolean; time_until_release_ms: number | null; exact_minute: number | null } {
@@ -3200,7 +3222,7 @@ export class EBookletService {
             teacher_id: purchase.teacher_id,
             template_id: purchase.template_id,
             template_version_id: purchase.template_version_id,
-            display_title: purchase.template?.title || `Teacher e-booklet #${purchase.id}`,
+            display_title: (purchase.branding_json as any)?.bookletTitle || purchase.template?.title || `Teacher e-booklet #${purchase.id}`,
             branding_json: purchase.branding_json,
             invite_quota: 0,
             access_expires_at: purchase.access_expires_at ?? undefined,
@@ -3335,6 +3357,17 @@ export class EBookletService {
           entity_id: instance.id,
           metadata_json: { purchase_id: purchase.id },
         },
+      });
+
+      await this.recordAnalyticsEvent(tx, {
+        event_type: "teacher_purchase_delivered",
+        teacher_id: purchase.teacher_id,
+        template_id: purchase.template_id,
+        booklet_instance_id: instance.id,
+        purchase_id: purchase.id,
+        source: "public_store",
+        marketing_price_snapshot: Number(purchase.price ?? purchase.marketing_price ?? 0),
+        internal_price_snapshot: Number(purchase.internal_price ?? 0),
       });
 
       return instance;
@@ -3687,6 +3720,7 @@ export class EBookletService {
     });
     const withDeviceCounts = access.map(({ booklet_instance: bookletInstance, ...record }: any) => {
       const { devices = [], ...safeInstance } = bookletInstance ?? {};
+      const resolvedTitle = resolveInstanceDisplayTitle(safeInstance);
       return {
         ...record,
         // Surface the instance deadline on the access record as the student-facing
@@ -3695,6 +3729,7 @@ export class EBookletService {
         access_expires_at: safeInstance.access_expires_at ?? null,
         booklet_instance: {
           ...safeInstance,
+          display_title: resolvedTitle || safeInstance.display_title,
           used_devices_count: devices.filter((device: any) => device.status === "active").length,
         },
       };
@@ -3743,6 +3778,12 @@ export class EBookletService {
         },
       });
       throw new ForbiddenError("This e-booklet has expired.");
+    }
+    if (access.booklet_instance) {
+      const resolvedTitle = resolveInstanceDisplayTitle(access.booklet_instance);
+      if (resolvedTitle) {
+        access.booklet_instance.display_title = resolvedTitle;
+      }
     }
     return this.sanitizeViewerAccess(access);
   }
@@ -4621,10 +4662,11 @@ export class EBookletService {
     return "unknown";
   }
 
-  private analyticsWhere(filters: { teacherId?: number; instanceId?: number; studentId?: number; startDate?: string; endDate?: string; source?: string }) {
+  private analyticsWhere(filters: { teacherId?: number; instanceId?: number; templateId?: number; studentId?: number; startDate?: string; endDate?: string; source?: string }) {
     const where: Record<string, any> = {};
     if (filters.teacherId) where.teacher_id = filters.teacherId;
     if (filters.instanceId) where.booklet_instance_id = filters.instanceId;
+    if (filters.templateId) where.template_id = filters.templateId;
     if (filters.studentId) where.student_id = filters.studentId;
     if (filters.source) where.source = filters.source;
     if (filters.startDate || filters.endDate) {
@@ -4639,7 +4681,7 @@ export class EBookletService {
     const seatUsage = this.db.e_booklet_instances.findMany
       ? ((await this.db.e_booklet_instances.findMany({
           where: { teacher_id: teacherId, ...(filters.instanceId ? { id: filters.instanceId } : {}) },
-          select: { id: true, invite_quota: true, used_invites_count: true, status: true, access_expires_at: true },
+          select: { id: true, invite_quota: true, used_invites_count: true, status: true, access_expires_at: true, student_marketing_price: true, internal_price: true },
         })) || [])
       : [];
     if (filters.instanceId && !seatUsage.some((instance: any) => instance.id === filters.instanceId)) {
@@ -4649,44 +4691,100 @@ export class EBookletService {
     const where = this.analyticsWhere({ teacherId, startDate: filters.startDate, endDate: filters.endDate, source: filters.source });
     where.booklet_instance_id = { in: ownedInstanceIds };
     const [events, sources, offlineRevenue, onlineRevenue, openAgg, uniqueAnon, failedPasscodes] = await Promise.all([
-      this.db.e_booklet_analytics_events.groupBy({ by: ["event_type"], where, _count: { _all: true } }),
-      this.db.e_booklet_analytics_events.groupBy({ by: ["source"], where, _count: { _all: true } }),
-      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "offline_passcode" }, _sum: { marketing_price_snapshot: true } }),
-      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "online_purchase" }, _sum: { marketing_price_snapshot: true } }),
-      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "invite_opened" }, _count: { _all: true }, _min: { created_at: true }, _max: { created_at: true } }),
-      this.db.e_booklet_analytics_events.groupBy({ by: ["anonymous_session_id"], where: { ...where, event_type: "invite_opened", anonymous_session_id: { not: null } }, _count: { _all: true } }),
-      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: { in: ["passcode_failed", "passcode_blocked"] } }, _count: { _all: true } }),
+      this.db.e_booklet_analytics_events?.groupBy ? this.db.e_booklet_analytics_events.groupBy({ by: ["event_type"], where, _count: { _all: true } }) : Promise.resolve([]),
+      this.db.e_booklet_analytics_events?.groupBy ? this.db.e_booklet_analytics_events.groupBy({ by: ["source"], where, _count: { _all: true } }) : Promise.resolve([]),
+      this.db.e_booklet_analytics_events?.aggregate ? this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "offline_passcode" }, _sum: { marketing_price_snapshot: true } }) : Promise.resolve(null),
+      this.db.e_booklet_analytics_events?.aggregate ? this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "online_purchase" }, _sum: { marketing_price_snapshot: true } }) : Promise.resolve(null),
+      this.db.e_booklet_analytics_events?.aggregate ? this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "invite_opened" }, _count: { _all: true }, _min: { created_at: true }, _max: { created_at: true } }) : Promise.resolve(null),
+      this.db.e_booklet_analytics_events?.groupBy ? this.db.e_booklet_analytics_events.groupBy({ by: ["anonymous_session_id"], where: { ...where, event_type: "invite_opened", anonymous_session_id: { not: null } }, _count: { _all: true } }) : Promise.resolve([]),
+      this.db.e_booklet_analytics_events?.aggregate ? this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: { in: ["passcode_failed", "passcode_blocked"] } }, _count: { _all: true } }) : Promise.resolve(null),
     ]);
+
+    const totalUsedSeats = seatUsage.reduce((sum: number, row: any) => sum + Number(row.used_invites_count || 0), 0);
+    const estimatedSeatRevenue = seatUsage.reduce((sum: number, row: any) => sum + (Number(row.used_invites_count || 0) * Number(row.student_marketing_price || 0)), 0);
+
+    const eventOffline = Number(offlineRevenue?._sum?.marketing_price_snapshot ?? 0);
+    const eventOnline = Number(onlineRevenue?._sum?.marketing_price_snapshot ?? 0);
+    const offlineEstimated = eventOffline > 0 ? eventOffline : estimatedSeatRevenue;
+
+    const eventMap: Record<string, number> = Object.fromEntries((events || []).map((row: any) => [row.event_type, row._count?._all ?? 0]));
+    if (totalUsedSeats > 0 && !eventMap.access_created) {
+      eventMap.access_created = totalUsedSeats;
+    }
+
     return {
-      events: Object.fromEntries((events || []).map((row: any) => [row.event_type, row._count?._all ?? 0])),
+      events: eventMap,
       inviteOpens: { total: openAgg?._count?._all ?? 0, first: openAgg?._min?.created_at ?? null, last: openAgg?._max?.created_at ?? null, approximateUniqueAnonymousVisitors: (uniqueAnon || []).length },
       sourceBreakdown: Object.fromEntries((sources || []).filter((row: any) => row.source).map((row: any) => [row.source, row._count?._all ?? 0])),
       access: { failedPasscodes: failedPasscodes?._count?._all ?? 0, status: "sanitized_teacher_scope" },
       seatUsage,
       devices: { accessStatus: "aggregated", securityDetails: "hidden_from_teacher" },
       revenue: {
-        offlineEstimated: Number(offlineRevenue?._sum?.marketing_price_snapshot ?? 0),
-        onlineApproved: Number(onlineRevenue?._sum?.marketing_price_snapshot ?? 0),
+        offlineEstimated,
+        onlineApproved: eventOnline,
         purchaseFunnelPending: 0,
       },
     };
   }
 
-  async getAdminAnalytics(filters: { teacherId?: number; instanceId?: number; studentId?: number; startDate?: string; endDate?: string; source?: string } = {}) {
+  async getAdminAnalytics(filters: { teacherId?: number; instanceId?: number; templateId?: number; studentId?: number; startDate?: string; endDate?: string; source?: string } = {}) {
     const where = this.analyticsWhere(filters);
-    const [events, sources, revenue, offline, online, failures, instances] = await Promise.all([
-      this.db.e_booklet_analytics_events.groupBy({ by: ["event_type"], where, _count: { _all: true } }),
-      this.db.e_booklet_analytics_events.groupBy({ by: ["source"], where, _count: { _all: true } }),
-      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created" }, _sum: { marketing_price_snapshot: true, internal_price_snapshot: true } }),
-      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "offline_passcode" }, _sum: { marketing_price_snapshot: true } }),
-      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "online_purchase" }, _sum: { marketing_price_snapshot: true } }),
-      this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: { in: ["passcode_failed", "passcode_blocked"] } }, _count: { _all: true } }),
-      this.db.e_booklet_instances.groupBy ? this.db.e_booklet_instances.groupBy({ by: ["status"], _count: { _all: true } }) : Promise.resolve([]),
+
+    const purchasesWhere: Record<string, any> = {};
+    if (filters.teacherId) purchasesWhere.teacher_id = filters.teacherId;
+    if (filters.templateId) purchasesWhere.template_id = filters.templateId;
+    if (filters.startDate || filters.endDate) {
+      purchasesWhere.created_at = {};
+      if (filters.startDate) purchasesWhere.created_at.gte = new Date(filters.startDate);
+      if (filters.endDate) purchasesWhere.created_at.lte = new Date(filters.endDate);
+    }
+
+    const instancesWhere: Record<string, any> = {};
+    if (filters.teacherId) instancesWhere.teacher_id = filters.teacherId;
+    if (filters.templateId) instancesWhere.template_id = filters.templateId;
+    if (filters.instanceId) instancesWhere.id = filters.instanceId;
+    if (filters.startDate || filters.endDate) {
+      instancesWhere.created_at = {};
+      if (filters.startDate) instancesWhere.created_at.gte = new Date(filters.startDate);
+      if (filters.endDate) instancesWhere.created_at.lte = new Date(filters.endDate);
+    }
+
+    const [events, sources, revenue, offline, online, failures, instances, purchasesAgg, activeAccessCount, activeDevicesCount] = await Promise.all([
+      this.db.e_booklet_analytics_events?.groupBy ? this.db.e_booklet_analytics_events.groupBy({ by: ["event_type"], where, _count: { _all: true } }) : Promise.resolve([]),
+      this.db.e_booklet_analytics_events?.groupBy ? this.db.e_booklet_analytics_events.groupBy({ by: ["source"], where, _count: { _all: true } }) : Promise.resolve([]),
+      this.db.e_booklet_analytics_events?.aggregate ? this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created" }, _sum: { marketing_price_snapshot: true, internal_price_snapshot: true } }) : Promise.resolve(null),
+      this.db.e_booklet_analytics_events?.aggregate ? this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "offline_passcode" }, _sum: { marketing_price_snapshot: true } }) : Promise.resolve(null),
+      this.db.e_booklet_analytics_events?.aggregate ? this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: "access_created", source: "online_purchase" }, _sum: { marketing_price_snapshot: true } }) : Promise.resolve(null),
+      this.db.e_booklet_analytics_events?.aggregate ? this.db.e_booklet_analytics_events.aggregate({ where: { ...where, event_type: { in: ["passcode_failed", "passcode_blocked"] } }, _count: { _all: true } }) : Promise.resolve(null),
+      this.db.e_booklet_instances?.groupBy ? this.db.e_booklet_instances.groupBy({ by: ["status"], where: instancesWhere, _count: { _all: true } }) : Promise.resolve([]),
+      this.db.e_booklet_purchases?.aggregate ? this.db.e_booklet_purchases.aggregate({ where: { ...purchasesWhere, status: { in: ["paid", "ready", "delivered"] } }, _sum: { price: true, marketing_price: true, internal_price: true }, _count: { _all: true } }) : Promise.resolve(null),
+      this.db.e_booklet_access?.count ? this.db.e_booklet_access.count({ where: { role: "student", status: "active", ...(filters.teacherId ? { booklet_instance: { teacher_id: filters.teacherId } } : {}), ...(filters.instanceId ? { booklet_instance_id: filters.instanceId } : {}) } }) : Promise.resolve(0),
+      this.db.e_booklet_devices?.count ? this.db.e_booklet_devices.count({ where: { status: "active", ...(filters.instanceId ? { booklet_instance_id: filters.instanceId } : {}) } }) : Promise.resolve(0),
     ]);
-    const marketing = Number(revenue?._sum?.marketing_price_snapshot ?? 0);
-    const internal = Number(revenue?._sum?.internal_price_snapshot ?? 0);
+
+    const eventMap: Record<string, number> = Object.fromEntries((events || []).map((row: any) => [row.event_type, row._count?._all ?? 0]));
+
+    const ordersRevenue = Number(purchasesAgg?._sum?.price ?? purchasesAgg?._sum?.marketing_price ?? 0);
+    const ordersInternal = Number(purchasesAgg?._sum?.internal_price ?? 0);
+    const eventMarketing = Number(revenue?._sum?.marketing_price_snapshot ?? 0);
+    const eventInternal = Number(revenue?._sum?.internal_price_snapshot ?? 0);
+
+    const marketing = eventMarketing > 0 ? (eventMarketing + ordersRevenue) : ordersRevenue;
+    const internal = eventInternal > 0 ? (eventInternal + ordersInternal) : ordersInternal;
+    const margin = marketing - internal;
+
+    if (activeAccessCount && !eventMap.access_created) {
+      eventMap.access_created = activeAccessCount;
+    }
+    if (activeDevicesCount && !eventMap.device_bound) {
+      eventMap.device_bound = activeDevicesCount;
+    }
+    if (purchasesAgg?._count?._all) {
+      eventMap.teacher_orders = Number(purchasesAgg._count._all);
+    }
+
     return {
-      events: Object.fromEntries((events || []).map((row: any) => [row.event_type, row._count?._all ?? 0])),
+      events: eventMap,
       launchMetrics: { teacher: {}, template: {}, instance: { byStatus: instances || [] }, studentAccess: {}, operationalHealth: { analyticsRetention: "Sanitized security metadata only; purge/export analytics rows per retention policy via database maintenance job." } },
       sourceBreakdown: Object.fromEntries((sources || []).filter((row: any) => row.source).map((row: any) => [row.source, row._count?._all ?? 0])),
       deviceSecurity: { failedPasscodes: failures?._count?._all ?? 0 },
@@ -4694,7 +4792,9 @@ export class EBookletService {
       revenue: {
         marketing,
         internal,
-        margin: marketing - internal,
+        margin,
+        ordersRevenue,
+        ordersInternal,
         offlineEstimated: Number(offline?._sum?.marketing_price_snapshot ?? 0),
         onlineApproved: Number(online?._sum?.marketing_price_snapshot ?? 0),
         purchaseFunnelPending: 0,

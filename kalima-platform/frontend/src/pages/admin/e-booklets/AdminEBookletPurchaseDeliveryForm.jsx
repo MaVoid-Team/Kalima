@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { isGeneratedEBookletTitle } from "@/utils/eBookletTitleUtils";
 
 const asNumber = (value, fallback = 0) => {
   const parsed = Number(value);
@@ -57,9 +58,11 @@ export default function AdminEBookletPurchaseDeliveryForm({
     setDeliveryForm((current) => ({
       ...current,
       display_title:
-        purchase.branding_json?.bookletTitle ||
+        (purchase.branding_json?.bookletTitle && !isGeneratedEBookletTitle(purchase.branding_json?.bookletTitle) && purchase.branding_json?.bookletTitle) ||
         purchase.template?.title ||
-        current.display_title,
+        (current.display_title && !isGeneratedEBookletTitle(current.display_title) ? current.display_title : "") ||
+        purchase.template?.title ||
+        "",
       student_marketing_price: String(purchase.marketing_price ?? purchase.price ?? current.student_marketing_price ?? ""),
       internal_price: String(purchase.internal_price ?? current.internal_price ?? ""),
       page_count: "",

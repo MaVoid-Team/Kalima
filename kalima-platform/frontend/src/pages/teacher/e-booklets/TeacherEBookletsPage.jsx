@@ -4,6 +4,7 @@ import { ArrowRight, Banknote, BookOpenCheck, CalendarClock, Coins, Play, BarCha
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useTeacherEBooklets } from "@/hooks/useEBookletAccess";
+import { getEBookletDisplayTitle } from "@/utils/eBookletTitleUtils";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -280,7 +281,7 @@ export default function TeacherEBookletsPage() {
                     })}
                   </Badge>
                   <h2 className="text-xl font-semibold">
-                    {instance?.display_title || instance?.template?.title || t("common.eBooklet")}
+                    {getEBookletDisplayTitle(instance, t("common.eBooklet"))}
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {t("teacher.templateLabel", {

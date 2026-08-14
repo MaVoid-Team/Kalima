@@ -97,6 +97,7 @@ const AdminEBookletPurchaseDetailPage = lazy(() => import("./pages/admin/e-bookl
 const AdminEBookletPurchaseDeliveryPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPurchaseDeliveryPage"));
 const AdminEBookletInstancesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstancesPage"));
 const AdminEBookletTeacherAccessPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletTeacherAccessPage"));
+const AdminEBookletPrintTemplatesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletPrintTemplatesPage"));
 const AdminEBookletDevicesPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletDevicesPage"));
 const AdminEBookletInstanceStudentsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletInstanceStudentsPage"));
 const AdminEBookletAnalyticsPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletAnalyticsPage"));
@@ -275,6 +276,7 @@ const router = createBrowserRouter(
             <Route path="access/:instanceId/view" element={<EBookletViewerPage />} />
             <Route path="access/:instanceId/students" element={<AdminEBookletInstanceStudentsPage />} />
             <Route path="access/:instanceId/devices" element={<AdminEBookletDevicesPage />} />
+            <Route path="print-templates" element={<AdminEBookletPrintTemplatesPage />} />
             <Route path="analytics" element={<AdminEBookletAnalyticsPage />} />
             <Route path="hotspot-library" element={<AdminEBookletHotspotLibraryPage />} />
             <Route path="settings" element={<AdminEBookletSettingsPage />} />

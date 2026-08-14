@@ -132,7 +132,7 @@ export default function PrintTemplateLayoutEditor({ value, onChange, backgroundI
   };
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]" data-testid="print-template-layout-editor">
+    <div className="@container grid gap-4 @3xl:grid-cols-[minmax(0,1fr)_320px]" data-testid="print-template-layout-editor">
       <div className="min-w-0 rounded-2xl border bg-background p-3 shadow-sm">
         <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
@@ -258,8 +258,8 @@ export default function PrintTemplateLayoutEditor({ value, onChange, backgroundI
                 <label className="grid gap-1 text-xs font-medium text-muted-foreground">
                   <span>{t("admin.instances.printEditor.direction", { defaultValue: "Direction" })}</span>
                   <select dir={i18n.dir()} className="h-9 rounded-xl border bg-background px-3 text-sm text-foreground" value={selected.direction || "rtl"} onChange={(event) => updateField(selectedKey, { direction: event.target.value })}>
-                    <option value="rtl">RTL</option>
-                    <option value="ltr">LTR</option>
+                    <option value="rtl">{t("admin.instances.printEditor.rtl", { defaultValue: "RTL (Right to Left)" })}</option>
+                    <option value="ltr">{t("admin.instances.printEditor.ltr", { defaultValue: "LTR (Left to Right)" })}</option>
                   </select>
                 </label>
               )}

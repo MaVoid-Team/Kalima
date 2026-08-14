@@ -1,3 +1,5 @@
+import { getEBookletDisplayTitle } from "@/utils/eBookletTitleUtils";
+
 export const E_BOOKLET_ORDER_TRACKING_WHATSAPP_NUMBER = "201044067113";
 
 export const E_BOOKLET_ORDER_STATUS_TONES = {
@@ -49,10 +51,7 @@ export const getEBookletOrderLinks = (order) => {
 };
 
 export const getEBookletOrderTitle = (link, fallback) => (
-  link?.booklet_instance?.display_title ||
-  link?.booklet_instance?.template?.title ||
-  link?.template?.title ||
-  fallback
+  getEBookletDisplayTitle(link, fallback)
 );
 
 export const getEBookletOrderManagementPath = (link) => {

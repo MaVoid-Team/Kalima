@@ -4,6 +4,7 @@ import { BookOpenCheck, CalendarClock, Play, TicketCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useStudentEBooklets } from "@/hooks/useEBookletAccess";
+import { getEBookletDisplayTitle } from "@/utils/eBookletTitleUtils";
 import { useTranslation } from "react-i18next";
 
 export default function StudentEBookletsPage() {
@@ -75,7 +76,7 @@ export default function StudentEBookletsPage() {
                     })}
                   </Badge>
                   <h2 className="text-xl font-semibold">
-                    {instance?.display_title || instance?.template?.title || t("common.eBooklet")}
+                    {getEBookletDisplayTitle(instance, t("common.eBooklet"))}
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {t("student.teacherLabel", {

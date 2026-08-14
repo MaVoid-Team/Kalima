@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { BarChart3, Download, FileArchive, Filter, HardDrive, HeartPulse, Percent, Search, ShieldCheck, Wallet } from "lucide-react";
+import { BarChart3, Download, FileArchive, Filter, HardDrive, HeartPulse, Percent, RotateCcw, Search, ShieldCheck, Wallet } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -61,6 +61,7 @@ export default function AdminEBookletAnalyticsPage() {
     const next = { ...getDateRange(filters.range) };
     if (filters.teacherId) next.teacherId = filters.teacherId;
     if (filters.instanceId) next.instanceId = filters.instanceId;
+    if (filters.templateId) next.templateId = filters.templateId;
     if (filters.source !== "all") next.source = filters.source;
     return next;
   };
@@ -68,7 +69,7 @@ export default function AdminEBookletAnalyticsPage() {
   useEffect(() => {
     fetchAnalytics(apiFilters()).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.range, filters.teacherId, filters.instanceId, filters.source]);
+  }, [filters.range, filters.teacherId, filters.instanceId, filters.templateId, filters.source]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -87,13 +88,28 @@ export default function AdminEBookletAnalyticsPage() {
     setSelectedTeacher(nextTeacher);
     updateFilter("teacherId", teacherId);
   };
+  const hasActiveFilters = Boolean(
+    filters.range !== "30d" ||
+    filters.teacherId ||
+    filters.templateId ||
+    filters.instanceId ||
+    filters.source !== "all" ||
+    teacherSearch
+  );
+
+  const resetFilters = () => {
+    setFilters({ range: "30d", teacherId: "", templateId: "", instanceId: "", source: "all" });
+    setTeacherSearch("");
+    setSelectedTeacher(null);
+  };
+
   const marketing = Number(analytics?.revenue?.marketing ?? 0);
   const internal = Number(analytics?.revenue?.internal ?? 0);
   const margin = marketing - internal;
 
   return (
     <div className="space-y-6" data-testid="admin-e-booklet-analytics-page">
-      <section className="relative overflow-hidden rounded-3xl border border-primary/15 bg-background p-5 shadow-sm sm:p-6">
+      <section className="relative overflow-hidden rounded-2xl border border-primary/15 bg-background p-4 shadow-sm sm:p-6">
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-primary/30 to-transparent" />
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex min-w-0 items-start gap-4">
@@ -101,8 +117,8 @@ export default function AdminEBookletAnalyticsPage() {
               <BarChart3 className="h-6 w-6" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("admin.analytics.title")}</h1>
-              <p className="mt-2 max-w-4xl text-sm leading-6 text-muted-foreground">{t("admin.analytics.description")}</p>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{t("admin.analytics.title")}</h1>
+              <p className="mt-1 max-w-4xl text-sm leading-6 text-muted-foreground">{t("admin.analytics.description")}</p>
             </div>
           </div>
           <Button className="self-start rounded-full px-5 lg:self-center" onClick={() => exportCsv(apiFilters())} disabled={loading}>
@@ -112,19 +128,32 @@ export default function AdminEBookletAnalyticsPage() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-primary/15 bg-background p-4 shadow-sm sm:p-5">
-        <div className="mb-4 flex items-center justify-between gap-3 border-b pb-4">
+      <section className="@container rounded-2xl border border-primary/15 bg-background p-4 shadow-sm sm:p-5">
+        <div className="mb-3 flex items-center justify-between gap-3 border-b pb-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <Filter className="h-4 w-4 text-primary" />
             {t("analytics.filters.title", "Analytics filters")}
           </div>
-          <Badge variant="outline" className="rounded-full">{t("analytics.filters.live", "Live query")}</Badge>
+          <div className="flex items-center gap-2">
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                onClick={resetFilters}
+              >
+                <RotateCcw className="me-1 h-3 w-3" />
+                {t("common.reset", "Reset")}
+              </Button>
+            )}
+            <Badge variant="outline" className="rounded-full text-xs font-normal">{t("analytics.filters.live", "Live query")}</Badge>
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-12">
-          <FieldShell label={t("analytics.filters.dateRange")} className="xl:col-span-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 @sm:grid-cols-2 @md:grid-cols-3 @xl:grid-cols-6">
+          <FieldShell label={t("analytics.filters.dateRange")}>
             <Select value={filters.range} onValueChange={(value) => updateFilter("range", value)}>
-              <SelectTrigger className="h-11 w-full rounded-xl bg-background">
+              <SelectTrigger className="h-9.5 w-full rounded-xl bg-background">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent position="popper" align="start" className="z-[9999] border-primary/20 bg-background text-foreground shadow-2xl">
@@ -133,16 +162,16 @@ export default function AdminEBookletAnalyticsPage() {
             </Select>
           </FieldShell>
 
-          <FieldShell label={t("analytics.filters.teacherSearch", "Teacher search")} className="xl:col-span-3">
+          <FieldShell label={t("analytics.filters.teacherSearch", "Teacher search")}>
             <div className="relative">
-              <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="h-11 rounded-xl ps-10" value={teacherSearch} onChange={(event) => setTeacherSearch(event.target.value)} placeholder={t("analytics.filters.teacherSearchPlaceholder")} />
+              <Search className="pointer-events-none absolute start-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input className="h-9.5 rounded-xl ps-9 text-sm" value={teacherSearch} onChange={(event) => setTeacherSearch(event.target.value)} placeholder={t("analytics.filters.teacherSearchPlaceholder")} />
             </div>
           </FieldShell>
 
-          <FieldShell label={t("analytics.filters.teacher")} className="xl:col-span-3">
+          <FieldShell label={t("analytics.filters.teacher")}>
             <Select value={filters.teacherId || "all"} onValueChange={(value) => updateTeacherFilter(value === "all" ? "" : value)} disabled={teachersLoading && teacherOptions.length === 0}>
-              <SelectTrigger className="h-11 w-full rounded-xl bg-background">
+              <SelectTrigger className="h-9.5 w-full rounded-xl bg-background">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent position="popper" align="start" className="z-[9999] max-w-[min(34rem,calc(100vw-2rem))] border-primary/20 bg-background text-foreground shadow-2xl">
@@ -152,13 +181,13 @@ export default function AdminEBookletAnalyticsPage() {
             </Select>
           </FieldShell>
 
-          <FieldShell label={t("analytics.filters.instance")} className="xl:col-span-2">
-            <Input className="h-11 rounded-xl" value={filters.instanceId} onChange={(event) => updateFilter("instanceId", event.target.value)} placeholder={t("analytics.filters.instancePlaceholder")} />
+          <FieldShell label={t("analytics.filters.instance")}>
+            <Input className="h-9.5 rounded-xl text-sm" value={filters.instanceId} onChange={(event) => updateFilter("instanceId", event.target.value)} placeholder={t("analytics.filters.instancePlaceholder")} />
           </FieldShell>
 
-          <FieldShell label={t("analytics.filters.source")} className="xl:col-span-2">
+          <FieldShell label={t("analytics.filters.source")}>
             <Select value={filters.source} onValueChange={(value) => updateFilter("source", value)}>
-              <SelectTrigger className="h-11 w-full rounded-xl bg-background">
+              <SelectTrigger className="h-9.5 w-full rounded-xl bg-background">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent position="popper" align="start" className="z-[9999] border-primary/20 bg-background text-foreground shadow-2xl">
@@ -167,8 +196,8 @@ export default function AdminEBookletAnalyticsPage() {
             </Select>
           </FieldShell>
 
-          <FieldShell label={t("analytics.filters.template")} className="md:col-span-2 xl:col-span-12">
-            <Input className="h-11 rounded-xl bg-muted/40" value={filters.templateId} onChange={(event) => updateFilter("templateId", event.target.value)} placeholder={t("analytics.filters.templatePlaceholder")} disabled />
+          <FieldShell label={t("analytics.filters.template", "Template ID")}>
+            <Input className="h-9.5 rounded-xl text-sm" value={filters.templateId} onChange={(event) => updateFilter("templateId", event.target.value)} placeholder={t("analytics.filters.templatePlaceholder", "Filter by template ID")} />
           </FieldShell>
         </div>
       </section>

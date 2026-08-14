@@ -1,6 +1,7 @@
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../../../libs/errors";
 import { notification_key_enum } from "../generated/prisma/client";
 import { hashEBookletAccessCode } from "./e-booklet-access-code.service";
+import { resolveInstanceDisplayTitle } from "./e-booklet.service";
 import { EBookletMilestoneService } from "./e-booklet-milestone.service";
 
 const DEFAULT_REDEMPTION_SETTINGS = {
@@ -242,7 +243,7 @@ export class EBookletRedemptionService {
       } : null,
       eBooklet: code.booklet_instance ? {
         id: code.booklet_instance.id,
-        title: code.booklet_instance.display_title || code.booklet_instance.template?.title,
+        title: resolveInstanceDisplayTitle(code.booklet_instance) || code.booklet_instance.template?.title || null,
         templateName: code.booklet_instance.template?.title || null,
         description: code.booklet_instance.template?.description || null,
         studentMarketingPrice: code.booklet_instance.student_marketing_price?.toString?.() ?? code.booklet_instance.student_marketing_price ?? null,
@@ -319,6 +320,29 @@ export class EBookletRedemptionService {
             user_agent: input.userAgent,
           },
         });
+        if (typeof tx.e_booklet_analytics_events?.create === "function") {
+          try {
+            await tx.e_booklet_analytics_events.create({
+              data: {
+                event_type: "access_created",
+                teacher_id: code.teacher_id,
+                student_id: studentId,
+                booklet_instance_id: code.booklet_instance_id,
+                access_id: access?.id ?? null,
+                purchase_id: input.purchaseId ?? null,
+                source: isPaid ? "offline_passcode" : "free_invite",
+                metadata: {
+                  code_id: code.id,
+                  code_hint: code.code_hint,
+                  kind: code.kind,
+                  source_flow: "access_code_redemption",
+                },
+              },
+            });
+          } catch {
+            // Analytics logging should never block code redemption
+          }
+        }
         await this.notifyAdminsOnRedemption(tx, redemption, code);
         return this.redemptionDto(redemption, access, code);
       } catch (error) {

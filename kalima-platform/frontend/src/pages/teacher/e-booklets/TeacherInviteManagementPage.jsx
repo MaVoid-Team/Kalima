@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useTeacherEBooklets } from "@/hooks/useEBookletAccess";
+import { getEBookletDisplayTitle } from "@/utils/eBookletTitleUtils";
 import { useTranslation } from "react-i18next";
 
 const numberOrFallback = (value, fallback = 0) => {
@@ -49,7 +50,7 @@ export default function TeacherInviteManagementPage() {
       .find((booklet) => String(booklet?.id) === String(instanceId));
   }, [instanceId, items]);
 
-  const title = instance?.display_title || instance?.template?.title || t("common.eBooklet");
+  const title = getEBookletDisplayTitle(instance, t("common.eBooklet"));
   const templateId = instance?.template_id || instance?.template?.id;
   const termId = currentTerms?.id;
 

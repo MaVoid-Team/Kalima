@@ -93,8 +93,8 @@ export default function AdminEBookletTemplatesPage() {
   };
 
   return (
-    <div className="space-y-6" data-testid="admin-e-booklet-templates-page">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="@container space-y-6" data-testid="admin-e-booklet-templates-page">
+      <div className="flex flex-col gap-4 @md:flex-row @md:items-center @md:justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
             <BookOpenCheck className="h-8 w-8 text-primary" />
@@ -112,7 +112,7 @@ export default function AdminEBookletTemplatesPage() {
         </Button>
       </div>
 
-      <div className="grid gap-3 rounded-lg border bg-background p-4 md:grid-cols-[1fr_220px_auto]">
+      <div className="grid gap-3 rounded-lg border bg-background p-4 @md:grid-cols-[1fr_220px_auto]">
         <div className="relative">
           <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -139,7 +139,8 @@ export default function AdminEBookletTemplatesPage() {
         </Button>
       </div>
 
-      <div className="overflow-hidden rounded-lg border bg-background">
+      {/* Desktop / Wide Container Table View */}
+      <div className="hidden @4xl:block overflow-hidden rounded-2xl border bg-background shadow-xs">
         <Table>
           <TableHeader>
             <TableRow>
@@ -154,18 +155,18 @@ export default function AdminEBookletTemplatesPage() {
           </TableHeader>
           <TableBody>
             {loading && (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                    {t("admin.templates.loading")}
-                  </TableCell>
-                </TableRow>
+              <TableRow>
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
+                  {t("admin.templates.loading")}
+                </TableCell>
+              </TableRow>
             )}
             {!loading && templates.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                    {t("admin.templates.empty")}
-                  </TableCell>
-                </TableRow>
+              <TableRow>
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
+                  {t("admin.templates.empty")}
+                </TableCell>
+              </TableRow>
             )}
             {!loading &&
               templates.map((template) => {
@@ -174,12 +175,12 @@ export default function AdminEBookletTemplatesPage() {
                 const isReleased = template.is_released !== false;
                 return (
                   <TableRow key={template.id}>
-                    <TableCell truncate className="min-w-[260px]" title={template.description ? `${template.title}: ${template.description}` : template.title}>
+                    <TableCell truncate className="min-w-[240px]" title={template.description ? `${template.title}: ${template.description}` : template.title}>
                       <div className="font-semibold text-foreground">{template.title}</div>
                       <div className="mt-1 line-clamp-2 max-w-[420px] whitespace-normal text-xs text-muted-foreground">
                         {template.description || t("admin.templates.noDescription")}
                       </div>
-                      <div className="mt-2 text-xs text-muted-foreground">
+                      <div className="mt-2 text-xs font-medium text-muted-foreground">
                         {Number(template.price || 0).toLocaleString()} {template.currency || "EGP"}
                       </div>
                       {template.release_at && (
@@ -208,7 +209,7 @@ export default function AdminEBookletTemplatesPage() {
                     <TableCell>
                       {latestVersion ? (
                         <div className="text-sm">
-                          v{latestVersion.version_number}
+                          <span className="font-semibold">v{latestVersion.version_number}</span>
                           <div className="text-xs text-muted-foreground">
                             {t(`statuses.${latestVersion.status}`, {
                               defaultValue: latestVersion.status,
@@ -231,7 +232,7 @@ export default function AdminEBookletTemplatesPage() {
                       )}
                     </TableCell>
                     <TableCell actions>
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-1.5">
                         {latestVersion?.id && status !== "published" && (
                           <Button
                             size="sm"
@@ -239,17 +240,18 @@ export default function AdminEBookletTemplatesPage() {
                             onClick={() => handlePublish(template)}
                             disabled={actionLoading}
                             data-testid={`admin-publish-e-booklet-${template.id}`}
+                            title={t("common.publishVersion", { defaultValue: "Publish" })}
                           >
                             <ShieldCheck className="h-4 w-4" />
                           </Button>
                         )}
-                        <Button asChild size="sm" variant="outline">
+                        <Button asChild size="sm" variant="outline" title={t("common.edit", { defaultValue: "Edit" })}>
                           <Link to={`/admin/e-booklets/${template.id}/edit`}>
                             <FilePenLine className="h-4 w-4" />
                           </Link>
                         </Button>
                         {template.id && status === "published" && latestVersion?.id && (
-                          <Button asChild size="sm" variant="outline">
+                          <Button asChild size="sm" variant="outline" title={t("common.browse", { defaultValue: "Preview" })}>
                             <Link to={`/e-booklets/${template.id}/preview`}>
                               <Eye className="h-4 w-4" />
                             </Link>
@@ -261,6 +263,7 @@ export default function AdminEBookletTemplatesPage() {
                             variant="outline"
                             onClick={() => handleArchive(template)}
                             disabled={actionLoading}
+                            title={t("common.archive", { defaultValue: "Archive" })}
                           >
                             <Archive className="h-4 w-4" />
                           </Button>
@@ -274,7 +277,158 @@ export default function AdminEBookletTemplatesPage() {
         </Table>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      {/* Adaptive Container Cards View (< @4xl) */}
+      <div className="@4xl:hidden">
+        {loading && (
+          <div className="rounded-2xl border bg-background p-8 text-center text-sm text-muted-foreground shadow-xs">
+            {t("admin.templates.loading")}
+          </div>
+        )}
+        {!loading && templates.length === 0 && (
+          <div className="rounded-2xl border bg-background p-8 text-center text-sm text-muted-foreground shadow-xs">
+            {t("admin.templates.empty")}
+          </div>
+        )}
+        {!loading && templates.length > 0 && (
+          <div className="grid grid-cols-1 gap-3.5 @md:grid-cols-2">
+            {templates.map((template) => {
+              const latestVersion = getLatestVersion(template);
+              const status = template.status || "draft";
+              const isReleased = template.is_released !== false;
+              return (
+                <div
+                  key={template.id}
+                  className="flex flex-col justify-between rounded-2xl border bg-card p-4 shadow-xs transition hover:shadow-sm"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-2.5">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-foreground leading-snug">
+                          {template.title}
+                        </div>
+                        {template.description && (
+                          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                            {template.description}
+                          </p>
+                        )}
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className={`shrink-0 ${statusStyles[status] || statusStyles.draft}`}
+                      >
+                        {t(`statuses.${status}`, { defaultValue: status })}
+                      </Badge>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <Badge variant="secondary" className="rounded-lg font-medium">
+                        {Number(template.price || 0).toLocaleString()} {template.currency || "EGP"}
+                      </Badge>
+                      {template.release_at && (
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          {!isReleased && (
+                            <Badge className="rounded-md bg-amber-100 text-amber-900 hover:bg-amber-100">
+                              {t("common.comingSoon")}
+                            </Badge>
+                          )}
+                          <span>
+                            {t("admin.templates.releaseAt", {
+                              value: formatDate(template.release_at, i18n.language, ""),
+                            })}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 rounded-xl bg-muted/40 p-2.5 text-xs text-muted-foreground @sm:grid-cols-4">
+                      <div>
+                        <span className="block text-[11px] text-muted-foreground/80">
+                          {t("admin.templates.table.version")}
+                        </span>
+                        <span className="font-medium text-foreground">
+                          {latestVersion ? `v${latestVersion.version_number}` : "-"}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="block text-[11px] text-muted-foreground/80">
+                          {t("common.pages")}
+                        </span>
+                        <span className="font-medium text-foreground">
+                          {latestVersion?.page_count || 0}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="block text-[11px] text-muted-foreground/80">
+                          {t("admin.templates.table.purchases")}
+                        </span>
+                        <span className="font-medium text-foreground">
+                          {template._count?.purchases || 0}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="block text-[11px] text-muted-foreground/80">
+                          {t("admin.templates.table.lastEdited")}
+                        </span>
+                        <span className="font-medium text-foreground truncate block">
+                          {formatDate(
+                            template.updated_at || template.created_at,
+                            i18n.language,
+                            "-",
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-end gap-2 border-t pt-3">
+                    {latestVersion?.id && status !== "published" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handlePublish(template)}
+                        disabled={actionLoading}
+                        data-testid={`admin-publish-e-booklet-${template.id}`}
+                        className="rounded-xl text-xs"
+                      >
+                        <ShieldCheck className="h-3.5 w-3.5 me-1" />
+                        {t("common.publish", { defaultValue: "Publish" })}
+                      </Button>
+                    )}
+                    <Button asChild size="sm" variant="outline" className="rounded-xl text-xs">
+                      <Link to={`/admin/e-booklets/${template.id}/edit`}>
+                        <FilePenLine className="h-3.5 w-3.5 me-1" />
+                        {t("common.edit", { defaultValue: "Edit" })}
+                      </Link>
+                    </Button>
+                    {template.id && status === "published" && latestVersion?.id && (
+                      <Button asChild size="sm" variant="outline" className="rounded-xl text-xs">
+                        <Link to={`/e-booklets/${template.id}/preview`}>
+                          <Eye className="h-3.5 w-3.5 me-1" />
+                          {t("common.browse", { defaultValue: "Preview" })}
+                        </Link>
+                      </Button>
+                    )}
+                    {status !== "archived" && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleArchive(template)}
+                        disabled={actionLoading}
+                        className="rounded-xl text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        <Archive className="h-3.5 w-3.5 me-1" />
+                        {t("common.archive", { defaultValue: "Archive" })}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-3 @sm:flex-row @sm:items-center @sm:justify-between">
         <p className="text-sm text-muted-foreground">
           {t("admin.templates.totalTemplates", { count: pagination.total })}
         </p>

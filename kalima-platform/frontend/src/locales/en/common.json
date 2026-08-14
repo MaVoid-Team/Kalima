@@ -38,5 +38,12 @@
         "cartCheckoutHeader": "Hello, I'd like to complete my order.",
         "generalQuery": "Hello, I have a query regarding the platform.",
         "link": "Link"
+    },
+    "fileUpload": {
+        "chooseFile": "Choose file",
+        "upload": "Upload",
+        "uploading": "Uploading...",
+        "noFileSelected": "No file selected",
+        "filesSelected": "{{count}} files selected"
     }
 }

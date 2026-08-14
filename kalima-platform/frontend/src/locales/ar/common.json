@@ -38,5 +38,12 @@
         "cartCheckoutHeader": "مرحباً، أود إتمام الطلب الخاص بي.",
         "generalQuery": "مرحباً، لدي استفسار بخصوص المنصة.",
         "link": "الرابط"
+    },
+    "fileUpload": {
+        "chooseFile": "اختر ملفاً",
+        "upload": "رفع",
+        "uploading": "جاري الرفع...",
+        "noFileSelected": "لم يتم اختيار ملف",
+        "filesSelected": "تم اختيار {{count}} ملفات"
     }
 }
