@@ -40,7 +40,7 @@ export default function GlobalBackButton({ className, variant = "default" }) {
         title={label}
         data-testid="global-back-button"
       >
-        <ArrowLeft className="h-4 w-4 rtl:rotate-180 transition-transform group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5" aria-hidden="true" />
+        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5" aria-hidden="true" />
         <span className="hidden sm:inline">{label}</span>
       </Button>
     );
@@ -60,7 +60,7 @@ export default function GlobalBackButton({ className, variant = "default" }) {
       title={label}
       data-testid="global-back-button"
     >
-      <ArrowLeft className="h-4 w-4 rtl:rotate-180 transition-transform group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5" aria-hidden="true" />
+      <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5" aria-hidden="true" />
       <span>{label}</span>
     </Button>
   );

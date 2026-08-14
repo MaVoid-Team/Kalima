@@ -215,7 +215,7 @@ export default function ProductBuyersPage() {
                         className="hover:text-foreground transition-colors flex items-center gap-1"
                         data-testid="product-buyers-back-link"
                     >
-                        <ChevronLeft className={cn("h-4 w-4", isRtl && "rotate-180")} />
+                        <ChevronLeft className="h-4 w-4" />
                         {t('products.backToProducts', 'Back to Products')}
                     </Link>
                     <span>/</span>

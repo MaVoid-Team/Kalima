@@ -51,7 +51,7 @@ export default function CategoryTreeNode({
       );
     }
     if (isExpanded) return <ChevronDown className="h-4 w-4" />;
-    return <ChevronRight className="h-4 w-4 rtl:rotate-180" />;
+    return <ChevronRight className="h-4 w-4" />;
   };
 
   return (

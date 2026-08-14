@@ -4,6 +4,8 @@ import {
   ArrowRight,
   CalendarRange,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   FileText,
   GripVertical,
   HelpCircle,
@@ -224,7 +226,7 @@ function MilestoneRoadmap({ milestones = [], t }) {
               )}
             </div>
             {idx < milestones.length - 1 && (
-              <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/40 rtl:rotate-180" />
+              <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/40" />
             )}
           </div>
         ))}
@@ -686,7 +688,11 @@ export default function AdminEBookletTermsMilestonesPage() {
                             </div>
                             <div className="rounded-xl bg-background px-3 py-2">
                               <span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.pricing")}</span>
-                              <span className="mt-1 block font-semibold tabular-nums">{money(milestone.previous_price_snapshot)} → {money(milestone.milestone_price)}</span>
+                              <div className="mt-1 flex items-center gap-1.5 font-semibold tabular-nums">
+                                <span className="text-muted-foreground/80 line-through text-xs">{money(milestone.previous_price_snapshot)}</span>
+                                <ArrowRight className="h-3.5 w-3.5 shrink-0 text-primary" />
+                                <span className="text-primary">{money(milestone.milestone_price)}</span>
+                              </div>
                             </div>
                             <div className="rounded-xl bg-background px-3 py-2">
                               <span className="block text-xs text-muted-foreground">{t("admin.termsMilestones.reward")}</span>
@@ -705,11 +711,27 @@ export default function AdminEBookletTermsMilestonesPage() {
                               <span className="text-xs text-muted-foreground">{t("admin.termsMilestones.autoSequenced")}</span>
                             </div>
                             <div className="flex flex-wrap justify-end gap-2">
-                              <Button size="sm" variant="outline" className="rounded-lg" onClick={() => moveMilestone(milestone, -1)} disabled={index === 0 || actionLoading} data-testid="admin-e-booklet-reorder-milestones">
-                                <GripVertical className="h-4 w-4" />↑
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 w-8 p-0 rounded-lg"
+                                onClick={() => moveMilestone(milestone, -1)}
+                                disabled={index === 0 || actionLoading}
+                                data-testid="admin-e-booklet-reorder-milestones-up"
+                                title={t("admin.termsMilestones.moveUp", { defaultValue: "Move Up" })}
+                              >
+                                <ChevronUp className="h-4 w-4 no-flip" />
                               </Button>
-                              <Button size="sm" variant="outline" className="rounded-lg" onClick={() => moveMilestone(milestone, 1)} disabled={index === sortedScopedMilestones.length - 1 || actionLoading}>
-                                <GripVertical className="h-4 w-4" />↓
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 w-8 p-0 rounded-lg"
+                                onClick={() => moveMilestone(milestone, 1)}
+                                disabled={index === sortedScopedMilestones.length - 1 || actionLoading}
+                                data-testid="admin-e-booklet-reorder-milestones-down"
+                                title={t("admin.termsMilestones.moveDown", { defaultValue: "Move Down" })}
+                              >
+                                <ChevronDown className="h-4 w-4 no-flip" />
                               </Button>
                               <Button size="sm" className="rounded-lg" onClick={() => editMilestone(milestone)}>{t("common.edit", { defaultValue: "Edit" })}</Button>
                               <Button size="sm" variant="destructive" className="rounded-lg" onClick={() => removeMilestone(milestone)} disabled={actionLoading} data-testid="admin-e-booklet-delete-milestone">

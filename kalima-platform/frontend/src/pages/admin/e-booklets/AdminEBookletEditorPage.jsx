@@ -5,6 +5,7 @@ import {
   BookOpenCheck,
   CheckCircle2,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   CircleDot,
   ClipboardPaste,
@@ -2409,7 +2410,7 @@ export default function AdminEBookletEditorPage() {
                         disabled={selectedPage <= 1}
                         aria-label={t("admin.editor.hotspots.previousPage", { defaultValue: "Previous page" })}
                       >
-                        <ChevronRight className="h-3.5 w-3.5 rotate-180" />
+                        <ChevronLeft className="h-3.5 w-3.5" />
                       </Button>
                     </HotspotEditorTooltip>
                     <Label htmlFor="ebooklet-hotspot-page-input" className="sr-only">

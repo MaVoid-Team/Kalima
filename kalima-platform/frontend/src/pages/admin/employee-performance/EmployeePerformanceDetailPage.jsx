@@ -229,7 +229,7 @@ export default function EmployeePerformanceDetailPage() {
                                     }}
                                     aria-label={t('dashboard.prevYear', 'Previous year')}
                                 >
-                                    <ChevronLeft className={cn("h-4 w-4", isRtl && "rotate-180")} />
+                                    <ChevronLeft className="h-4 w-4" />
                                 </Button>
                                 <div className="font-semibold text-sm select-none tabular-nums">
                                     {activeYear}
@@ -244,7 +244,7 @@ export default function EmployeePerformanceDetailPage() {
                                     }}
                                     aria-label={t('dashboard.nextYear', 'Next year')}
                                 >
-                                    <ChevronRight className={cn("h-4 w-4", isRtl && "rotate-180")} />
+                                    <ChevronRight className="h-4 w-4" />
                                 </Button>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
@@ -603,7 +603,7 @@ export default function EmployeePerformanceDetailPage() {
                             disabled={currentPage <= 1}
                             className="h-8 text-xs"
                         >
-                            <ChevronLeft className={cn("h-4 w-4", isRtl && "rotate-180")} />
+                            <ChevronLeft className="h-4 w-4" />
                         </Button>
                         <span className="tabular-nums">
                             {currentPage} / {totalPages}
@@ -615,7 +615,7 @@ export default function EmployeePerformanceDetailPage() {
                             disabled={currentPage >= totalPages}
                             className="h-8 text-xs"
                         >
-                            <ChevronRight className={cn("h-4 w-4", isRtl && "rotate-180")} />
+                            <ChevronRight className="h-4 w-4" />
                         </Button>
                     </div>
                 </div>

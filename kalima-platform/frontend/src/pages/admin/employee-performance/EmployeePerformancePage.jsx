@@ -166,7 +166,7 @@ export default function EmployeePerformancePage() {
                                         }}
                                         aria-label={t('dashboard.prevYear', 'Previous year')}
                                     >
-                                        <ChevronLeft className={cn("h-4 w-4", i18n.dir() === 'rtl' && "rotate-180")} />
+                                        <ChevronLeft className="h-4 w-4" />
                                     </Button>
                                     <div className="font-semibold text-sm select-none tabular-nums">
                                         {activeYear}
@@ -181,7 +181,7 @@ export default function EmployeePerformancePage() {
                                         }}
                                         aria-label={t('dashboard.nextYear', 'Next year')}
                                     >
-                                        <ChevronRight className={cn("h-4 w-4", i18n.dir() === 'rtl' && "rotate-180")} />
+                                        <ChevronRight className="h-4 w-4" />
                                     </Button>
                                 </div>
                                 <div className="grid grid-cols-3 gap-2">

@@ -76,7 +76,7 @@ export default function StudentSidebar({ isMobileOpen, setIsMobileOpen }) {
             title={isCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
             data-testid="student-sidebar-mobile-toggle-button"
           >
-            {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} className={isRtl ? "rotate-180" : ""} />}
+            {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
           </button>
 
           {/* Mobile Close Toggle */}
