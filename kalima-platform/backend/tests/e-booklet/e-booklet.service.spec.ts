@@ -632,6 +632,34 @@ describe("EBookletService", () => {
       expect(db.e_booklet_invites.create.mock.calls[0][0].data.passcode_ciphertext).not.toBe("123456");
     });
 
+    test("updateTemplate synchronizes unbranded instance display titles with the new template title", async () => {
+      const db = createMockDb();
+      db.e_booklet_templates.update.mockResolvedValue({ id: 1, title: "Renamed Title" });
+      db.e_booklet_templates.findUnique.mockResolvedValue({ id: 1, title: "Renamed Title", versions: [] });
+      db.e_booklet_instances.findMany.mockResolvedValue([
+        { id: 101, display_title: "Old Title", branding_json: null },
+        { id: 102, display_title: "Old Title", branding_json: { bookletTitle: "Teacher Custom Title" } },
+        { id: 103, display_title: "Teacher e-booklet #103", branding_json: {} },
+      ]);
+      db.e_booklet_instances.update.mockResolvedValue({ id: 101 });
+
+      const service = new EBookletService(db);
+      await service.updateTemplate(1, { title: "Renamed Title" });
+
+      expect(db.e_booklet_instances.update).toHaveBeenCalledWith({
+        where: { id: 101 },
+        data: expect.objectContaining({ display_title: "Renamed Title" }),
+      });
+      expect(db.e_booklet_instances.update).toHaveBeenCalledWith({
+        where: { id: 103 },
+        data: expect.objectContaining({ display_title: "Renamed Title" }),
+      });
+      expect(db.e_booklet_instances.update).not.toHaveBeenCalledWith({
+        where: { id: 102 },
+        data: expect.anything(),
+      });
+    });
+
     test("delivery and invites use global defaults when optional values are omitted", async () => {
       const db = createMockDb({
         e_booklet_global_settings: {

@@ -25,38 +25,45 @@ async function repairEBookletInstanceTitles() {
     await client.query(`SET search_path TO ${schema}, public`);
     console.log(`Connected to database (schema: ${schema})`);
 
-    // 1. Update e_booklet_instances having placeholder / default generated titles
-    // Prefer purchase branding title if present, otherwise use template title.
+    // 1. Synchronize all instances linked to purchases without custom branding to their latest template title
     const resultWithPurchases = await client.query(`
       UPDATE e_booklet_instances i
       SET display_title = COALESCE(
+            NULLIF(TRIM(i.branding_json->>'bookletTitle'), ''),
             NULLIF(TRIM(p.branding_json->>'bookletTitle'), ''),
             NULLIF(TRIM(t.title), ''),
             i.display_title
           ),
           updated_at = NOW()
-      FROM e_booklet_purchases p, e_booklet_templates t
-      WHERE i.purchase_id = p.id
-        AND i.template_id = t.id
+      FROM e_booklet_templates t
+      LEFT JOIN e_booklet_purchases p ON i.purchase_id = p.id
+      WHERE i.template_id = t.id
+        AND t.title IS NOT NULL
+        AND TRIM(t.title) <> ''
         AND (
-          i.display_title ~* '^Teacher e-booklet #\\d+$'
+          NULLIF(TRIM(COALESCE(i.branding_json->>'bookletTitle', p.branding_json->>'bookletTitle', '')), '') IS NULL
+          OR i.display_title ~* '^Teacher e-booklet #\\d+$'
           OR i.display_title ~* '^e-booklet #\\d+$'
           OR i.display_title ~* '^كتاب إلكتروني #\\d+$'
           OR i.display_title ~* '^مذكرة إلكترونية #\\d+$'
           OR TRIM(i.display_title) = ''
           OR i.display_title IS NULL
         )
+        AND i.display_title <> TRIM(t.title)
     `);
 
-    console.log(`Updated ${resultWithPurchases.rowCount} instances linked to purchases.`);
+    console.log(`Synchronized ${resultWithPurchases.rowCount} instances with current template titles.`);
 
-    // 2. Update any standalone instances that have placeholder titles but no purchase record
+    // 2. Update any standalone instances that have placeholder titles or outdated titles without custom branding
     const resultStandalone = await client.query(`
       UPDATE e_booklet_instances i
       SET display_title = TRIM(t.title),
           updated_at = NOW()
       FROM e_booklet_templates t
       WHERE i.template_id = t.id
+        AND NULLIF(TRIM(COALESCE(i.branding_json->>'bookletTitle', '')), '') IS NULL
+        AND t.title IS NOT NULL
+        AND TRIM(t.title) <> ''
         AND (
           i.display_title ~* '^Teacher e-booklet #\\d+$'
           OR i.display_title ~* '^e-booklet #\\d+$'
@@ -64,12 +71,11 @@ async function repairEBookletInstanceTitles() {
           OR i.display_title ~* '^مذكرة إلكترونية #\\d+$'
           OR TRIM(i.display_title) = ''
           OR i.display_title IS NULL
+          OR i.display_title <> TRIM(t.title)
         )
-        AND t.title IS NOT NULL
-        AND TRIM(t.title) <> ''
     `);
 
-    console.log(`Updated ${resultStandalone.rowCount} standalone instances from template titles.`);
+    console.log(`Synchronized ${resultStandalone.rowCount} standalone instances from template titles.`);
     console.log("E-booklet instance titles repair completed successfully.");
   } catch (error) {
     console.error("Error repairing e-booklet instance titles:", error);

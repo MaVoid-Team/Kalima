@@ -154,13 +154,20 @@ export function isGeneratedEBookletTitle(value: unknown): boolean {
 }
 
 export function resolveInstanceDisplayTitle(instance: any): string {
-  const displayTitle = instance?.display_title?.trim?.() ?? "";
-  if (displayTitle && !isGeneratedEBookletTitle(displayTitle)) {
-    return displayTitle;
+  const customTeacherTitle =
+    (instance?.branding_json as any)?.bookletTitle?.trim?.() ||
+    (instance?.purchase?.branding_json as any)?.bookletTitle?.trim?.() ||
+    "";
+  if (customTeacherTitle && !isGeneratedEBookletTitle(customTeacherTitle)) {
+    return customTeacherTitle;
   }
   const templateTitle = instance?.template?.title?.trim?.() ?? "";
   if (templateTitle) {
     return templateTitle;
+  }
+  const displayTitle = instance?.display_title?.trim?.() ?? "";
+  if (displayTitle && !isGeneratedEBookletTitle(displayTitle)) {
+    return displayTitle;
   }
   return displayTitle;
 }
@@ -1736,6 +1743,30 @@ export class EBookletService {
       if (releaseAt !== undefined) data.release_at = releaseAt;
       await tx.e_booklet_templates.update({ where: { id }, data });
       await this.replaceTemplateCheckoutConfig(tx, id, dto);
+
+      if (typeof dto.title === "string" && dto.title.trim()) {
+        const nextTitle = dto.title.trim();
+        const instances = typeof tx.e_booklet_instances?.findMany === "function"
+          ? await tx.e_booklet_instances.findMany({
+              where: { template_id: id },
+              select: { id: true, display_title: true, branding_json: true },
+            })
+          : [];
+
+        for (const instance of instances || []) {
+          const customTitle = (instance.branding_json as any)?.bookletTitle?.trim?.();
+          const hasCustomTeacherTitle = customTitle && !isGeneratedEBookletTitle(customTitle);
+          if (!hasCustomTeacherTitle && instance.display_title !== nextTitle && typeof tx.e_booklet_instances?.update === "function") {
+            await tx.e_booklet_instances.update({
+              where: { id: instance.id },
+              data: {
+                display_title: nextTitle,
+                updated_at: new Date(),
+              },
+            });
+          }
+        }
+      }
       const updated = await tx.e_booklet_templates.findUnique({
         where: { id },
         include: {

@@ -13,12 +13,21 @@ test("isGeneratedEBookletTitle detects various generated formats", () => {
   assert.equal(isGeneratedEBookletTitle(null), false);
 });
 
-test("getEBookletDisplayTitle prefers custom title over template title when custom is not generated", () => {
+test("getEBookletDisplayTitle prefers custom branding title over template title", () => {
   const custom = {
-    display_title: "Mr. Ahmed's Arabic Booklet",
+    branding_json: { bookletTitle: "Mr. Ahmed's Arabic Booklet" },
+    display_title: "Old Template Title",
     template: { title: "General Arabic Prep" },
   };
   assert.equal(getEBookletDisplayTitle(custom), "Mr. Ahmed's Arabic Booklet");
+});
+
+test("getEBookletDisplayTitle prefers updated template title when no custom branding exists", () => {
+  const unbranded = {
+    display_title: "Old Template Title Snapshot",
+    template: { title: "Updated Arabic Prep 2027" },
+  };
+  assert.equal(getEBookletDisplayTitle(unbranded), "Updated Arabic Prep 2027");
 });
 
 test("getEBookletDisplayTitle falls back to template title when display_title is generated placeholder", () => {
@@ -27,6 +36,13 @@ test("getEBookletDisplayTitle falls back to template title when display_title is
     template: { title: "Science Term 1" },
   };
   assert.equal(getEBookletDisplayTitle(generated), "Science Term 1");
+});
+
+test("getEBookletDisplayTitle falls back to display_title when template is not joined", () => {
+  const standalone = {
+    display_title: "Standalone Arabic Booklet",
+  };
+  assert.equal(getEBookletDisplayTitle(standalone), "Standalone Arabic Booklet");
 });
 
 test("getEBookletDisplayTitle handles wrapped booklet_instance and link objects", () => {
