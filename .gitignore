@@ -37,9 +37,24 @@ android/
 kalima-platform/android/
 kalima-platform/frontend/android/
 
-# Vite
+# Mobile & Android artifacts
+local.properties
+**/local.properties
+.gradle/
+**/.gradle/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Vite & Build tool caches
 .vite/
 **/.vite/
+*.tsbuildinfo
+.turbo/
+**/.turbo/
+.rollup.cache/
+.swc/
 
 # Cache and temp folders
 .cache/
@@ -95,9 +110,17 @@ out/
 .serverless/
 public/ # (only if needed)
 
-# Testing
+# Testing & E2E harnesses
 coverage/
 **/coverage/
+test-results/
+**/test-results/
+playwright-report/
+**/playwright-report/
+blob-report/
+**/blob-report/
+.last-run.json
+**/.last-run.json
 .screenshots/
 kalima-platform/reports/e-booklet-viewer-screenshots.html
 kalima-platform/reports/e-booklet-viewer-screenshots/
@@ -113,9 +136,12 @@ kalima-platform/reports/e-booklet-viewer-screenshots/
 *.sln
 *.sw?
 
-# macOS metadata
+# macOS metadata & OS junk
 .DS_Store
 **/.DS_Store
+Thumbs.db
+**/*.db
+$null
 
 # Archives
 *.tgz
@@ -135,6 +161,24 @@ kalima-platform/CONTEXT.md
 .opencode/node_modules/
 .playwright-cli/
 kalima-platform/.playwright-cli/
+.hermes/
+**/.hermes/
+.jcode/
+**/.jcode/
+.lavish/
+**/.lavish/
+.claude/
+**/.claude/
+.cursor/
+**/.cursor/
+.antigravity/
+**/.antigravity/
+.gemini/
+**/.gemini/
+.codex/
+**/.codex/
+.codex-screenshots/
+**/.codex-screenshots/
 
 # Local backups
 .backups/
@@ -170,14 +214,11 @@ eval-artifacts/
 eval-results/
 benchmark-results/
 artifacts/last-harness*.txt
-.DS_Store
-kalima-platform/.DS_Store
-kalima-platform/tmp-upload-fixtures/kalima-e2e-100mb-dense.pdf
-kalima-platform/tmp-upload-fixtures/kalima-e2e-100mb.pdf
+kalima-platform/tmp-upload-fixtures/
 
-# Generated Codex / E2E proof artifacts
-.codex-screenshots/
-output/playwright/
-kalima-platform/output/e2e/
-tmp/pdfs/
+# General outputs, temporary files & generated proof artifacts
+output/
+**/output/
+tmp/
+**/tmp/
 kalima-home-button-*.png
