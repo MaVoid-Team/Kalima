@@ -1749,21 +1749,66 @@ export class EBookletService {
         const instances = typeof tx.e_booklet_instances?.findMany === "function"
           ? await tx.e_booklet_instances.findMany({
               where: { template_id: id },
-              select: { id: true, display_title: true, branding_json: true },
+              select: { id: true, display_title: true, branding_json: true, purchase_id: true },
             })
           : [];
 
         for (const instance of instances || []) {
-          const customTitle = (instance.branding_json as any)?.bookletTitle?.trim?.();
-          const hasCustomTeacherTitle = customTitle && !isGeneratedEBookletTitle(customTitle);
-          if (!hasCustomTeacherTitle && instance.display_title !== nextTitle && typeof tx.e_booklet_instances?.update === "function") {
+          const nextBranding = instance.branding_json && typeof instance.branding_json === "object"
+            ? { ...(instance.branding_json as Record<string, unknown>), bookletTitle: nextTitle }
+            : { bookletTitle: nextTitle };
+
+          if (typeof tx.e_booklet_instances?.update === "function") {
             await tx.e_booklet_instances.update({
               where: { id: instance.id },
               data: {
                 display_title: nextTitle,
+                branding_json: nextBranding,
                 updated_at: new Date(),
               },
             });
+          }
+
+          if (instance.purchase_id && typeof tx.e_booklet_purchases?.update === "function") {
+            const purchase = typeof tx.e_booklet_purchases?.findUnique === "function"
+              ? await tx.e_booklet_purchases.findUnique({
+                  where: { id: instance.purchase_id },
+                  select: { branding_json: true },
+                })
+              : null;
+            const nextPurchaseBranding = purchase?.branding_json && typeof purchase.branding_json === "object"
+              ? { ...(purchase.branding_json as Record<string, unknown>), bookletTitle: nextTitle }
+              : { bookletTitle: nextTitle };
+
+            await tx.e_booklet_purchases.update({
+              where: { id: instance.purchase_id },
+              data: {
+                branding_json: nextPurchaseBranding,
+                updated_at: new Date(),
+              },
+            });
+          }
+        }
+
+        if (typeof tx.e_booklet_purchases?.findMany === "function") {
+          const purchases = await tx.e_booklet_purchases.findMany({
+            where: { template_id: id },
+            select: { id: true, branding_json: true },
+          });
+          for (const purchase of purchases || []) {
+            const nextPurchaseBranding = purchase.branding_json && typeof purchase.branding_json === "object"
+              ? { ...(purchase.branding_json as Record<string, unknown>), bookletTitle: nextTitle }
+              : { bookletTitle: nextTitle };
+
+            if (typeof tx.e_booklet_purchases?.update === "function") {
+              await tx.e_booklet_purchases.update({
+                where: { id: purchase.id },
+                data: {
+                  branding_json: nextPurchaseBranding,
+                  updated_at: new Date(),
+                },
+              });
+            }
           }
         }
       }

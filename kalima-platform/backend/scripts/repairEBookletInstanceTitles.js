@@ -25,57 +25,45 @@ async function repairEBookletInstanceTitles() {
     await client.query(`SET search_path TO ${schema}, public`);
     console.log(`Connected to database (schema: ${schema})`);
 
-    // 1. Synchronize all instances linked to purchases without custom branding to their latest template title
+    // 1. Synchronize all instances linked to templates to their latest template title and update branding_json
     const resultWithPurchases = await client.query(`
       UPDATE e_booklet_instances i
-      SET display_title = COALESCE(
-            NULLIF(TRIM(i.branding_json->>'bookletTitle'), ''),
-            NULLIF(TRIM(p.branding_json->>'bookletTitle'), ''),
-            NULLIF(TRIM(t.title), ''),
-            i.display_title
+      SET display_title = TRIM(t.title),
+          branding_json = jsonb_set(
+            COALESCE(i.branding_json::jsonb, '{}'::jsonb),
+            '{bookletTitle}',
+            to_jsonb(TRIM(t.title))
           ),
           updated_at = NOW()
       FROM e_booklet_templates t
-      LEFT JOIN e_booklet_purchases p ON i.purchase_id = p.id
       WHERE i.template_id = t.id
         AND t.title IS NOT NULL
         AND TRIM(t.title) <> ''
         AND (
-          NULLIF(TRIM(COALESCE(i.branding_json->>'bookletTitle', p.branding_json->>'bookletTitle', '')), '') IS NULL
-          OR i.display_title ~* '^Teacher e-booklet #\\d+$'
-          OR i.display_title ~* '^e-booklet #\\d+$'
-          OR i.display_title ~* '^كتاب إلكتروني #\\d+$'
-          OR i.display_title ~* '^مذكرة إلكترونية #\\d+$'
-          OR TRIM(i.display_title) = ''
-          OR i.display_title IS NULL
+          i.display_title <> TRIM(t.title)
+          OR COALESCE(i.branding_json->>'bookletTitle', '') <> TRIM(t.title)
         )
-        AND i.display_title <> TRIM(t.title)
     `);
 
     console.log(`Synchronized ${resultWithPurchases.rowCount} instances with current template titles.`);
 
-    // 2. Update any standalone instances that have placeholder titles or outdated titles without custom branding
-    const resultStandalone = await client.query(`
-      UPDATE e_booklet_instances i
-      SET display_title = TRIM(t.title),
+    // 2. Synchronize all purchases linked to templates to match the latest template title in branding_json
+    const resultPurchases = await client.query(`
+      UPDATE e_booklet_purchases p
+      SET branding_json = jsonb_set(
+            COALESCE(p.branding_json::jsonb, '{}'::jsonb),
+            '{bookletTitle}',
+            to_jsonb(TRIM(t.title))
+          ),
           updated_at = NOW()
       FROM e_booklet_templates t
-      WHERE i.template_id = t.id
-        AND NULLIF(TRIM(COALESCE(i.branding_json->>'bookletTitle', '')), '') IS NULL
+      WHERE p.template_id = t.id
         AND t.title IS NOT NULL
         AND TRIM(t.title) <> ''
-        AND (
-          i.display_title ~* '^Teacher e-booklet #\\d+$'
-          OR i.display_title ~* '^e-booklet #\\d+$'
-          OR i.display_title ~* '^كتاب إلكتروني #\\d+$'
-          OR i.display_title ~* '^مذكرة إلكترونية #\\d+$'
-          OR TRIM(i.display_title) = ''
-          OR i.display_title IS NULL
-          OR i.display_title <> TRIM(t.title)
-        )
+        AND COALESCE(p.branding_json->>'bookletTitle', '') <> TRIM(t.title)
     `);
 
-    console.log(`Synchronized ${resultStandalone.rowCount} standalone instances from template titles.`);
+    console.log(`Synchronized ${resultPurchases.rowCount} purchases with current template titles.`);
     console.log("E-booklet instance titles repair completed successfully.");
   } catch (error) {
     console.error("Error repairing e-booklet instance titles:", error);
