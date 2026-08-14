@@ -38,7 +38,7 @@ This creates or resets a dev-only admin user in the shared dev database:
 
 ```text
 Email: admin@kalima.local
-Password: KalimaLocalAdmin!2026
+Password: pass1234
 ```
 
 ### 4. Start backend
@@ -120,7 +120,7 @@ This runs Prisma migrations, syncs the local schema, seeds lookup data, and crea
 
 ```text
 Email: admin@kalima.local
-Password: KalimaLocalAdmin!2026
+Password: pass1234
 ```
 
 These credentials are local-dev only.

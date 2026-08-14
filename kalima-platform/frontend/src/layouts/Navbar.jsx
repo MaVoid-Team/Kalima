@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import GlobalBackButton from "@/components/GlobalBackButton";
 import logo from "../assets/Logo.webp";
 import useAuth from "../hooks/auth/useAuth";
 import { useCart } from "../contexts/CartContext";
@@ -170,17 +171,23 @@ export default function Navbar() {
             "h-full flex items-center justify-between transition-all duration-700 w-full relative",
             (scrolled && !isMobile) ? "px-8 md:px-10" : "container md:px-6"
           )}>
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 decoration-0 shrink-0">
-              <img
-                src={logo}
-                alt="Kalima Logo"
-                className="h-8 w-auto object-contain"
-              />
-              <span className="text-xl font-bold text-foreground tracking-tight">
-                {t("navbar.brand")}
-              </span>
-            </Link>
+            {/* Brand & Back Button */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              {location.pathname !== "/" && (
+                <GlobalBackButton variant="navbar" />
+              )}
+              {/* Logo */}
+              <Link to="/" className="flex items-center gap-3 decoration-0 shrink-0">
+                <img
+                  src={logo}
+                  alt="Kalima Logo"
+                  className="h-8 w-auto object-contain"
+                />
+                <span className="text-xl font-bold text-foreground tracking-tight">
+                  {t("navbar.brand")}
+                </span>
+              </Link>
+            </div>
 
             {/* Desktop Navigation & Actions */}
             <div className="hidden md:flex items-center gap-4 lg:gap-8">

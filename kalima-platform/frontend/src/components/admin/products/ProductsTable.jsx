@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { MoreHorizontal, Eye, Pencil, ArchiveRestore, Archive, Trash2, ImageOff, Clock, PackageX } from 'lucide-react';
+import { MoreHorizontal, Eye, Pencil, ArchiveRestore, Archive, Trash2, ImageOff, Clock, PackageX, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getImageUrl, formatCurrency } from '@/lib/storeUtils';
 import { format } from 'date-fns';
@@ -34,6 +34,7 @@ export default function ProductsTable({
     selectedIds = [],
     onSelect,
     onSelectAll,
+    viewMode = 'catalog',
 }) {
     const { t, i18n } = useTranslation('admin');
     const navigate = useNavigate();
@@ -89,6 +90,9 @@ export default function ProductsTable({
                         const isArchived = product.is_archived;
                         const isComingSoon = product.release_at && new Date(product.release_at) > new Date();
 
+                        const isBuyersMode = viewMode === 'buyers';
+                        const targetUrl = isBuyersMode ? `/admin/products/${product.id}/buyers` : `/admin/products/${product.id}`;
+
                         return (
                             <TableRow
                                 key={product.id}
@@ -108,7 +112,7 @@ export default function ProductsTable({
                                 </TableCell>
 
                                 {/* Thumbnail */}
-                                <TableCell className="cursor-pointer" onClick={() => navigate(`/admin/products/${product.id}`)}>
+                                <TableCell className="cursor-pointer" onClick={() => navigate(targetUrl)}>
                                     {thumbnailUrl ? (
                                         <img
                                             src={thumbnailUrl}
@@ -123,7 +127,7 @@ export default function ProductsTable({
                                 </TableCell>
 
                                 {/* Title */}
-                                <TableCell truncate className="cursor-pointer" title={product.title} onClick={() => navigate(`/admin/products/${product.id}`)}>
+                                <TableCell truncate className="cursor-pointer" title={product.title} onClick={() => navigate(targetUrl)}>
                                     <p className="font-medium line-clamp-1">{product.title}</p>
                                 </TableCell>
 
@@ -140,20 +144,18 @@ export default function ProductsTable({
                                 </TableCell>
 
                                 {/* Price */}
-                                {product.price_after_discount && product.price_after_discount !== product.price ? (
-                                    <TableCell numeric>
+                                <TableCell numeric>
+                                    {product.price_after_discount && product.price_after_discount !== product.price ? (
                                         <div>
                                             <p className="font-semibold text-sm">{formatCurrency(product.price_after_discount, t)}</p>
                                             <p className="text-xs text-muted-foreground line-through">{formatCurrency(product.price, t)}</p>
                                         </div>
-                                    </TableCell>
-                                ) : (
-                                    <TableCell numeric>
+                                    ) : (
                                         <div>
                                             <p className="font-semibold text-sm">{formatCurrency(product.price, t)}</p>
                                         </div>
-                                    </TableCell>
-                                )}
+                                    )}
+                                </TableCell>
 
                                 {/* Rating */}
                                 <TableCell className="hidden lg:table-cell">
@@ -211,58 +213,77 @@ export default function ProductsTable({
 
                                 {/* Actions */}
                                 <TableCell actions onClick={(e) => e.stopPropagation()}>
-                                    <DropdownMenu dir={i18n.dir()}>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                data-testid={`products-table-actions-${product.id}`}
-                                            >
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align={i18n.dir() === 'rtl' ? 'start' : 'end'}>
-                                            <DropdownMenuItem
-                                                onClick={() => navigate(`/admin/products/${product.id}`)}
-                                                data-testid={`products-action-view-${product.id}`}
-                                            >
-                                                <Eye className="me-2 h-4 w-4" />
-                                                {t('products.actions.view')}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={() => navigate(`/admin/products/${product.id}/edit`)}
-                                                data-testid={`products-action-edit-${product.id}`}
-                                            >
-                                                <Pencil className="me-2 h-4 w-4" />
-                                                {t('products.actions.edit')}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem
-                                                onClick={() => onArchiveToggle(product)}
-                                                data-testid={`products-action-archive-${product.id}`}
-                                            >
-                                                {isArchived ? (
-                                                    <>
-                                                        <ArchiveRestore className="me-2 h-4 w-4" />
-                                                        {t('products.actions.unarchive')}
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Archive className="me-2 h-4 w-4" />
-                                                        {t('products.actions.archive')}
-                                                    </>
-                                                )}
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={() => onDelete(product)}
-                                                className="text-destructive focus:text-destructive"
-                                                data-testid={`products-action-delete-${product.id}`}
-                                            >
-                                                <Trash2 className="me-2 h-4 w-4 text-destructive" />
-                                                {t('products.actions.delete')}
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    {isBuyersMode ? (
+                                        <Button
+                                            size="sm"
+                                            className="h-8 gap-1.5 text-xs font-medium"
+                                            onClick={() => navigate(`/admin/products/${product.id}/buyers`)}
+                                            data-testid={`products-action-view-buyers-${product.id}`}
+                                        >
+                                            <Users className="h-3.5 w-3.5" />
+                                            {t('products.actions.viewBuyers', 'View Buyers')}
+                                        </Button>
+                                    ) : (
+                                        <DropdownMenu dir={i18n.dir()}>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    data-testid={`products-table-actions-${product.id}`}
+                                                >
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align={i18n.dir() === 'rtl' ? 'start' : 'end'}>
+                                                <DropdownMenuItem
+                                                    onClick={() => navigate(`/admin/products/${product.id}`)}
+                                                    data-testid={`products-action-view-${product.id}`}
+                                                >
+                                                    <Eye className="me-2 h-4 w-4" />
+                                                    {t('products.actions.view')}
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onClick={() => navigate(`/admin/products/${product.id}/buyers`)}
+                                                    data-testid={`products-action-buyers-${product.id}`}
+                                                >
+                                                    <Users className="me-2 h-4 w-4" />
+                                                    {t('products.actions.viewBuyers', 'View Buyers')}
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onClick={() => navigate(`/admin/products/${product.id}/edit`)}
+                                                    data-testid={`products-action-edit-${product.id}`}
+                                                >
+                                                    <Pencil className="me-2 h-4 w-4" />
+                                                    {t('products.actions.edit')}
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem
+                                                    onClick={() => onArchiveToggle(product)}
+                                                    data-testid={`products-action-archive-${product.id}`}
+                                                >
+                                                    {isArchived ? (
+                                                        <>
+                                                            <ArchiveRestore className="me-2 h-4 w-4" />
+                                                            {t('products.actions.unarchive')}
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Archive className="me-2 h-4 w-4" />
+                                                            {t('products.actions.archive')}
+                                                        </>
+                                                    )}
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onClick={() => onDelete(product)}
+                                                    className="text-destructive focus:text-destructive"
+                                                    data-testid={`products-action-delete-${product.id}`}
+                                                >
+                                                    <Trash2 className="me-2 h-4 w-4 text-destructive" />
+                                                    {t('products.actions.delete')}
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    )}
                                 </TableCell>
                             </TableRow>
                         );

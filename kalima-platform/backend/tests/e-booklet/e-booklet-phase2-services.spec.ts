@@ -12,9 +12,9 @@ function createDb(overrides: Record<string, unknown> = {}) {
     e_booklet_access_codes: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn(), updateMany: jest.fn(), findFirst: jest.fn(), findMany: jest.fn(), aggregate: jest.fn() },
     e_booklet_access_code_redemptions: { findFirst: jest.fn(), findMany: jest.fn(), create: jest.fn(), update: jest.fn(), count: jest.fn() },
     e_booklet_access: { findFirst: jest.fn(), create: jest.fn(), upsert: jest.fn() },
-    e_booklet_milestones: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), findFirst: jest.fn() },
+    e_booklet_milestones: { findMany: jest.fn(), create: jest.fn(), update: jest.fn(), delete: jest.fn(), findFirst: jest.fn() },
     e_booklet_global_settings: { findUnique: jest.fn() },
-    e_booklet_milestone_achievements: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn(), updateMany: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
+    e_booklet_milestone_achievements: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn(), updateMany: jest.fn(), findMany: jest.fn(), findFirst: jest.fn(), count: jest.fn() },
     teacher_wallets: { findUnique: jest.fn(), upsert: jest.fn(), update: jest.fn(), updateMany: jest.fn() },
     teacher_wallet_ledger: { create: jest.fn(), aggregate: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
     teacher_wallet_credit_lots: {
@@ -736,6 +736,57 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
     expect(db.e_booklet_milestones.update).not.toHaveBeenCalled();
   });
 
+  test("milestone service hard-deletes when no achievements exist and re-sequences remaining milestones", async () => {
+    const db = createDb();
+    db.e_booklet_milestones.findFirst.mockResolvedValue({ id: 2, term_id: 1, sort_order: 2 });
+    db.e_booklet_milestone_achievements.count.mockResolvedValue(0);
+    db.e_booklet_milestones.delete.mockResolvedValue({ id: 2, term_id: 1 });
+    db.e_booklet_milestones.findMany.mockResolvedValue([
+      { id: 1, term_id: 1, sort_order: 1 },
+      { id: 3, term_id: 1, sort_order: 3 },
+    ]);
+    db.e_booklet_milestones.update.mockResolvedValue({ id: 3, sort_order: 2 });
+    const service = new EBookletMilestoneService(db);
+
+    const result = await service.deleteMilestone(2);
+
+    expect(db.e_booklet_milestones.findFirst).toHaveBeenCalledWith({ where: { id: 2 } });
+    expect(db.e_booklet_milestone_achievements.count).toHaveBeenCalledWith({ where: { milestone_id: 2 } });
+    expect(db.e_booklet_milestones.delete).toHaveBeenCalledWith({ where: { id: 2 } });
+    expect(db.e_booklet_milestones.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 3 },
+      data: expect.objectContaining({ sort_order: 2 }),
+    }));
+    expect(result).toEqual({ id: 2, term_id: 1 });
+  });
+
+  test("milestone service soft-deactivates when achievements exist to protect financial records", async () => {
+    const db = createDb();
+    db.e_booklet_milestones.findFirst.mockResolvedValue({ id: 2, term_id: 1, sort_order: 2 });
+    db.e_booklet_milestone_achievements.count.mockResolvedValue(3);
+    db.e_booklet_milestones.update.mockResolvedValue({ id: 2, term_id: 1, active: false });
+    const service = new EBookletMilestoneService(db);
+
+    const result = await service.deleteMilestone(2);
+
+    expect(db.e_booklet_milestones.findFirst).toHaveBeenCalledWith({ where: { id: 2 } });
+    expect(db.e_booklet_milestone_achievements.count).toHaveBeenCalledWith({ where: { milestone_id: 2 } });
+    expect(db.e_booklet_milestones.delete).not.toHaveBeenCalled();
+    expect(db.e_booklet_milestones.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 2 },
+      data: expect.objectContaining({ active: false }),
+    }));
+    expect(result).toEqual(expect.objectContaining({ active: false }));
+  });
+
+  test("milestone service throws NotFoundError if milestone to delete does not exist", async () => {
+    const db = createDb();
+    db.e_booklet_milestones.findFirst.mockResolvedValue(null);
+    const service = new EBookletMilestoneService(db);
+
+    await expect(service.deleteMilestone(999)).rejects.toThrow("Milestone not found.");
+  });
+
   test("claim reward requires explicit reward terms acceptance", async () => {
     const db = createDb();
     const service = new EBookletMilestoneService(db);
@@ -863,5 +914,40 @@ describe("Phase 2 e-booklet terms/codes/redemptions/milestones/wallet services",
 
   test("hash lookup normalizes codes without persisting plaintext", () => {
     expect(hashEBookletAccessCode(" klm-abc123 ")).toBe(hashEBookletAccessCode("KLM-ABC123"));
+  });
+
+  test("listMilestones auto-evaluates milestones for teacher", async () => {
+    const db = createDb();
+    const milestone = { id: 1, term_id: 1, target_paid_redemptions: 10, milestone_price: 20, reward_amount_snapshot: 50, active: true };
+    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, status: "active", starts_at: new Date(Date.now() - 10000), ends_at: null });
+    db.e_booklet_access_code_redemptions.count.mockResolvedValue(10);
+    db.e_booklet_milestones.findMany.mockResolvedValue([milestone]);
+    db.e_booklet_milestone_achievements.findUnique.mockResolvedValue(null);
+    db.e_booklet_milestone_achievements.create.mockResolvedValue({ id: 10, teacher_id: 9, term_id: 1, milestone_id: 1, reward_amount: 50 });
+    db.e_booklet_milestone_achievements.findMany.mockResolvedValue([{ id: 10, teacher_id: 9, term_id: 1, milestone_id: 1, reward_amount: 50 }]);
+
+    const service = new EBookletMilestoneService(db);
+    const result = await service.listMilestones(1, 9);
+    expect(result[0].achievement_id).toBe(10);
+    expect(db.e_booklet_milestone_achievements.create).toHaveBeenCalled();
+  });
+
+  test("claimReward succeeds with null wallet credit when milestone has zero reward amount", async () => {
+    const db = createDb();
+    const achievement = { id: 7, teacher_id: 9, term_id: 1, reward_amount: 0, reward_expiry_days_snapshot: 120, claimed_at: null, reward_terms_accepted_at: null };
+    db.e_booklet_milestone_achievements.findFirst
+      .mockResolvedValueOnce(achievement)
+      .mockResolvedValueOnce({ ...achievement, claimed_at: new Date(), reward_terms_accepted_at: new Date() });
+    db.e_booklet_milestone_achievements.updateMany.mockResolvedValue({ count: 1 });
+    db.e_booklet_terms.findFirst.mockResolvedValue({ id: 1, reward_claim_terms: "Reward claim terms" });
+    db.e_booklet_teacher_terms_acceptances.findFirst.mockResolvedValue(null);
+    db.e_booklet_teacher_terms_acceptances.create.mockResolvedValue({ id: 72, acceptance_type: "reward_claim" });
+
+    const service = new EBookletMilestoneService(db);
+    const result = await service.claimReward(9, 7, { termsAccepted: true });
+    expect(result.claimed).toBe(true);
+    expect(result.walletCredit).toBeNull();
+    expect(db.teacher_wallet_ledger.create).not.toHaveBeenCalled();
+    expect(db.teacher_wallets.upsert).not.toHaveBeenCalled();
   });
 });

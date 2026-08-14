@@ -9,11 +9,14 @@ export const useOrders = (optionsOrId = null) => {
     let initialLimit = 8;
     let autoFetch = true;
 
+    let initialProductId = null;
+
     if (optionsOrId !== null) {
         if (typeof optionsOrId === 'object') {
             id = optionsOrId.id || null;
             initialLimit = optionsOrId.limit || 8;
             if (optionsOrId.autoFetch !== undefined) autoFetch = optionsOrId.autoFetch;
+            if (optionsOrId.productId !== undefined) initialProductId = optionsOrId.productId;
         } else {
             id = optionsOrId;
         }
@@ -31,7 +34,8 @@ export const useOrders = (optionsOrId = null) => {
         search: '',
         status: '',
         startDate: null,
-        endDate: null
+        endDate: null,
+        productId: initialProductId,
     });
 
     // Single order state

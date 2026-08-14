@@ -156,7 +156,9 @@ axiosInstance.interceptors.response.use(
                         errorMessage = i18n.t('auth:errors.invalid_credentials', 'البريد الإلكتروني أو كلمة المرور غير صحيحة. يرجى المحاولة مرة أخرى.');
                     } else {
                         errorMessage = i18n.t('auth:errors.unauthorized', "لست مخولاً للقيام بهذا الإجراء.");
-                        performLocalLogout();
+                        if (!import.meta.env.DEV || import.meta.env.VITE_DEV_BYPASS_AUTH === 'false') {
+                            performLocalLogout();
+                        }
                         // Final fallback logout if 401 occurs despite proactive refresh
                     }
                     break;

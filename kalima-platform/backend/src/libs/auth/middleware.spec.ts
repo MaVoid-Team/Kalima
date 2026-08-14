@@ -120,4 +120,50 @@ describe("auth middleware session validation", () => {
     expect(next).toHaveBeenCalledWith(error);
     expect(res.status).not.toHaveBeenCalled();
   });
+
+  describe("local dev auth bypass", () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+      process.env = { ...originalEnv };
+    });
+
+    afterAll(() => {
+      process.env = originalEnv;
+    });
+
+    it("attaches dev admin payload when bypass is enabled and no token is provided", async () => {
+      process.env.NODE_ENV = "development";
+      process.env.LOCAL_DEV_BYPASS_AUTH = "true";
+
+      const req: any = { headers: {} };
+      const res = createResponse();
+      const next = jest.fn();
+
+      await authenticateToken(req, res as any, next);
+
+      expect(next).toHaveBeenCalledTimes(1);
+      expect(req.user).toBeDefined();
+      expect(req.user.userId).toBe(1);
+      expect(req.user.roles).toEqual(
+        expect.arrayContaining([{ portal: "store", role: "Admin" }])
+      );
+      expect(res.status).not.toHaveBeenCalled();
+    });
+
+    it("NEVER bypasses auth in production even if LOCAL_DEV_BYPASS_AUTH=true", async () => {
+      process.env.NODE_ENV = "production";
+      process.env.LOCAL_DEV_BYPASS_AUTH = "true";
+
+      const req: any = { headers: {} };
+      const res = createResponse();
+      const next = jest.fn();
+
+      await authenticateToken(req, res as any, next);
+
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(next).not.toHaveBeenCalled();
+      expect(req.user).toBeUndefined();
+    });
+  });
 });

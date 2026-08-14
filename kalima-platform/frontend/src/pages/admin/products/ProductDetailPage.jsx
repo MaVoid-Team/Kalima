@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { arSA } from 'react-day-picker/locale';
-import { ChevronLeft, Package, Pencil, Trash2, Clock } from 'lucide-react';
+import { ChevronLeft, Package, Pencil, Trash2, Clock, Users } from 'lucide-react';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useAdminCoupons } from '@/hooks/admin/useAdminCoupons';
 import { useAdminSampleSections } from '@/hooks/admin/useAdminSampleSections';
@@ -382,6 +382,17 @@ export default function ProductDetailPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        asChild
+                        data-testid="product-detail-buyers-button"
+                    >
+                        <Link to={`/admin/products/${id}/buyers`}>
+                            <Users className="me-2 h-4 w-4" />
+                            {t('products.actions.viewBuyers', 'View Buyers')}
+                        </Link>
+                    </Button>
                     <Button
                         variant="outline"
                         size="sm"

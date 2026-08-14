@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/storeUtils";
 import LoadingSpinner from "../ui/loading-spinner";
+import OrderReviewWarning from "./OrderReviewWarning";
 
 export default function OrderSummaryCard({
   items,
@@ -80,6 +81,8 @@ export default function OrderSummaryCard({
                 </span>
               </div>
             </div>
+
+            <OrderReviewWarning />
 
             <Button
               onClick={onSubmit}

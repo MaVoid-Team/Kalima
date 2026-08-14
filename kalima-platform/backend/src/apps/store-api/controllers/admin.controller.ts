@@ -107,6 +107,26 @@ function canViewOrEditUserProfile(
   return false;
 }
 
+function canResetUserPassword(
+  caller: any,
+  userRoles: role_enum[],
+): boolean {
+  const callerRoles: role_enum[] = (caller?.roles ?? []).map(
+    (r: any) => r.role,
+  );
+
+  if (callerRoles.includes(role_enum.Admin)) {
+    return true;
+  }
+
+  if (callerRoles.includes(role_enum.SubAdmin)) {
+    if (userRoles.includes(role_enum.Admin)) return false;
+    return true;
+  }
+
+  return false;
+}
+
 function validateEnums(
   portal: string,
   role: string,
@@ -558,6 +578,28 @@ export const adminController = {
       const targetUser = await userManagementService.findUserById(userId);
       if (!targetUser) {
         throw new BadRequestError("User not found");
+      }
+
+      const roles: role_enum[] = [
+        ...(targetUser.role ? [targetUser.role] : []),
+        ...((targetUser.user_roles || []).map((r) => r.role)),
+      ];
+
+      if (!canResetUserPassword((req as any).user, roles)) {
+        const callerRoles: role_enum[] = ((req as any).user?.roles ?? []).map(
+          (r: any) => r.role,
+        );
+        if (
+          callerRoles.includes(role_enum.SubAdmin) &&
+          roles.includes(role_enum.Admin)
+        ) {
+          throw new ForbiddenError(
+            "Sub-admins cannot reset passwords for admin accounts",
+          );
+        }
+        throw new ForbiddenError(
+          "You don't have permission to reset this user's password",
+        );
       }
 
       const dto = await validateDto(AdminResetUserPasswordDto, req.body);

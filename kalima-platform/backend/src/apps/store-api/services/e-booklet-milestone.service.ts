@@ -116,6 +116,14 @@ export class EBookletMilestoneService {
   }
 
   async listMilestones(termId?: number, teacherId?: number, includeInactive = false) {
+    if (teacherId) {
+      try {
+        await this.evaluateTeacherMilestones(teacherId, termId);
+      } catch {
+        // Continue if evaluation encounters an error (e.g. no active terms)
+      }
+    }
+
     const milestones = await this.db.e_booklet_milestones.findMany({
       where: { ...(termId ? { term_id: termId } : {}), ...(includeInactive ? {} : { active: true }) },
       orderBy: [{ term_id: "asc" }, { sort_order: "asc" }, { target_paid_redemptions: "asc" }],
@@ -216,9 +224,44 @@ export class EBookletMilestoneService {
   }
 
   async deleteMilestone(id: number) {
-    return this.db.e_booklet_milestones.update({
-      where: { id },
-      data: { active: false, updated_at: new Date() },
+    const milestoneId = this.positiveInt(id, "milestone ID");
+    const milestone = await this.db.e_booklet_milestones.findFirst({
+      where: { id: milestoneId },
+    });
+    if (!milestone) throw new NotFoundError("Milestone not found.");
+
+    const achievementCount = await this.db.e_booklet_milestone_achievements.count({
+      where: { milestone_id: milestoneId },
+    });
+
+    if (achievementCount > 0) {
+      return this.db.e_booklet_milestones.update({
+        where: { id: milestoneId },
+        data: { active: false, updated_at: new Date() },
+      });
+    }
+
+    return this.transaction(async (tx) => {
+      const deleted = await tx.e_booklet_milestones.delete({
+        where: { id: milestoneId },
+      });
+
+      const remaining = await tx.e_booklet_milestones.findMany({
+        where: { term_id: milestone.term_id },
+        orderBy: [{ sort_order: "asc" }, { target_paid_redemptions: "asc" }],
+      });
+
+      for (let i = 0; i < remaining.length; i++) {
+        const expectedSortOrder = i + 1;
+        if (remaining[i].sort_order !== expectedSortOrder) {
+          await tx.e_booklet_milestones.update({
+            where: { id: remaining[i].id },
+            data: { sort_order: expectedSortOrder, updated_at: new Date() },
+          });
+        }
+      }
+
+      return deleted;
     });
   }
 
@@ -361,14 +404,17 @@ export class EBookletMilestoneService {
         claimed_at: claimedAt,
         reward_expires_at: rewardExpiresAt,
       };
-      const walletCredit = await new TeacherWalletService(tx).creditMilestone({
-        teacherId,
-        amount: this.number(achievement.reward_amount),
-        milestoneAchievementId: achievement.id,
-        rewardExpiryDays: this.rewardExpiryDays(achievement.reward_expiry_days_snapshot),
-        claimedAt: updatedAchievement.claimed_at ?? new Date(),
-        notes: `E-booklet milestone reward claim ${achievement.id}`,
-      });
+      const rewardAmount = this.number(achievement.reward_amount);
+      const walletCredit = rewardAmount > 0
+        ? await new TeacherWalletService(tx).creditMilestone({
+            teacherId,
+            amount: rewardAmount,
+            milestoneAchievementId: achievement.id,
+            rewardExpiryDays: this.rewardExpiryDays(achievement.reward_expiry_days_snapshot),
+            claimedAt: updatedAchievement.claimed_at ?? new Date(),
+            notes: `E-booklet milestone reward claim ${achievement.id}`,
+          })
+        : null;
       return { claimed: true, alreadyClaimed: false, achievement: updatedAchievement, walletCredit };
     });
   }

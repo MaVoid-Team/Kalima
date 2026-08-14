@@ -9,6 +9,8 @@ export const useEmployeePerformance = () => {
     const [confirmedCount, setConfirmedCount] = useState(null);
     const [createdAccounts, setCreatedAccounts] = useState(null);
 
+    const [employeeSalesDetails, setEmployeeSalesDetails] = useState(null);
+
     const fetchConfirmerStats = useCallback(async () => {
         setLoading(true);
         try {
@@ -36,14 +38,42 @@ export const useEmployeePerformance = () => {
         } finally { setLoading(false); }
     }, [fetchApi]);
 
+    const fetchEmployeeProducts = useCallback(async (employeeId, params = {}) => {
+        setLoading(true);
+        try {
+            const queries = new URLSearchParams();
+            if (params.month) queries.append('month', params.month);
+            if (params.year) queries.append('year', params.year);
+            if (params.type && params.type !== 'all') queries.append('type', params.type);
+            if (params.search) queries.append('search', params.search);
+            if (params.page) queries.append('page', params.page);
+            if (params.limit) queries.append('limit', params.limit);
+
+            const queryString = queries.toString() ? `?${queries.toString()}` : '';
+            const data = await fetchApi({
+                endpoint: `/purchases/confirmed-items/${employeeId}${queryString}`,
+                method: 'get'
+            });
+            if (data?.success) {
+                setEmployeeSalesDetails(data.data);
+                return data.data;
+            }
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, [fetchApi]);
+
     return {
         loading: loading || apiLoading,
         confirmerStats,
         confirmedCount,
         createdAccounts,
+        employeeSalesDetails,
         fetchConfirmerStats,
         fetchConfirmedCount,
-        fetchCreatedAccounts
+        fetchCreatedAccounts,
+        fetchEmployeeProducts
     };
 };
 

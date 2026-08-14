@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Menu } from 'lucide-react';
 import TeacherSidebar from '../components/teacher/TeacherSidebar';
+import GlobalBackButton from '../components/GlobalBackButton';
 
 export default function TeacherLayout() {
     const { t } = useTranslation('teacher');
@@ -41,6 +42,9 @@ export default function TeacherLayout() {
 
                 {/* Main Content Area */}
                 <main className="flex-1 bg-gradient-to-br from-background via-background to-primary/5 p-4 sm:p-8 lg:p-10 xl:p-12">
+                    <div className="mb-6">
+                        <GlobalBackButton />
+                    </div>
                     <Outlet />
                 </main>
             </div>

@@ -27,7 +27,7 @@ export default function UserDetailPage() {
     const { id } = useParams();
     const { t, i18n } = useTranslation('userManagement');
     const isRtl = i18n.dir() === 'rtl';
-    const { hasAdminAccess, isAdmin } = useRole();
+    const { hasAdminAccess, isAdmin, isSubAdmin } = useRole();
     const { governments, zones, getZonesByGovernment, subjects, levels, zonesLoading } = useLookups();
 
     const {
@@ -220,6 +220,10 @@ export default function UserDetailPage() {
     const displayPhone = selectedUser.phone?.includes('_deleted_') ? selectedUser.phone.split('_deleted_')[0] : selectedUser.phone;
     const displaySecondaryPhone = selectedUser.secondary_phone?.includes('_deleted_') ? selectedUser.secondary_phone.split('_deleted_')[0] : selectedUser.secondary_phone;
 
+    const targetRoles = selectedUser?.user_roles?.map(r => r.role) || (selectedUser?.role ? [selectedUser.role] : []);
+    const isTargetAdmin = targetRoles.some(r => String(r).toLowerCase() === 'admin');
+    const canResetPassword = !selectedUser.is_deleted && (isAdmin || (isSubAdmin && !isTargetAdmin));
+
     return (
         <div className="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500" dir={isRtl ? 'rtl' : 'ltr'}>
 
@@ -236,7 +240,7 @@ export default function UserDetailPage() {
                 onUpdateFlag={handleUpdateFlag}
                 onResetPassword={handleResetPassword}
                 actionLoading={actionLoading}
-                canResetPassword={isAdmin}
+                canResetPassword={canResetPassword}
                 isRtl={isRtl}
                 t={t}
             />

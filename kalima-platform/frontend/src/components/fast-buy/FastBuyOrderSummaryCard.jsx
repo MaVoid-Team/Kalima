@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { formatPrice } from "@/lib/storeUtils";
 import LoadingSpinner from "../ui/loading-spinner";
 import { cn } from "@/lib/utils";
+import OrderReviewWarning from "../checkout/OrderReviewWarning";
 
 export default function FastBuyOrderSummaryCard({
   items,
@@ -117,6 +118,8 @@ export default function FastBuyOrderSummaryCard({
               </div>
             </div>
           </div>
+
+          <OrderReviewWarning />
 
           <Button
             onClick={onSubmit}

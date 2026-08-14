@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-    Activity, CheckCircle, Users, BarChart3, Filter, Calendar as CalendarIcon, X, ChevronLeft, ChevronRight
+    Activity, CheckCircle, Users, BarChart3, Filter, Calendar as CalendarIcon, X, ChevronLeft, ChevronRight, ShoppingBag
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useEmployeePerformance } from '@/hooks/admin/useEmployeePerformance';
@@ -17,6 +18,7 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import SectionTitle from '@/components/admin/dashboard/SectionTitle';
 
 export default function EmployeePerformancePage() {
+    const navigate = useNavigate();
     const { t, i18n } = useTranslation('admin');
     const {
         loading,
@@ -228,6 +230,7 @@ export default function EmployeePerformancePage() {
                                     <th className="px-6 py-3 font-medium text-start">{t('table.role', 'Role')}</th>
                                     <th className="kalima-number px-6 py-3 font-medium">{t('table.confirmedCount', 'Count')}</th>
                                     <th className="kalima-number px-6 py-3 font-medium">{t('table.productsSold', 'Products Sold')}</th>
+                                    <th className="px-6 py-3 font-medium text-center">{t('table.actions', 'Actions')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -242,12 +245,26 @@ export default function EmployeePerformancePage() {
                                                 <td className="px-6 py-4">{t(`roles.${item.role}`, item.role)}</td>
                                                 <td className="kalima-number px-6 py-4 text-primary">{item.count || 0}</td>
                                                 <td className="kalima-number px-6 py-4 text-primary">{item.productsSold || 0}</td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 gap-1.5 text-xs font-medium"
+                                                        onClick={() => {
+                                                            const query = date ? `?month=${date.getMonth() + 1}&year=${date.getFullYear()}` : '';
+                                                            navigate(`/admin/employee-performance/${item.id}${query}`);
+                                                        }}
+                                                    >
+                                                        <ShoppingBag className="h-3.5 w-3.5" />
+                                                        <span>{t('employeePerformanceDetails.viewSales', 'View Sales')}</span>
+                                                    </Button>
+                                                </td>
                                             </tr>
                                         )
                                     })
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="px-6 py-8 text-center text-muted-foreground">
+                                        <td colSpan="8" className="px-6 py-8 text-center text-muted-foreground">
                                             {t('table.noData', 'No data available')}
                                         </td>
                                     </tr>

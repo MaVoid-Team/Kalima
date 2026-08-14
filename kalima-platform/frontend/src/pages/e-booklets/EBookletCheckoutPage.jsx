@@ -3,8 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   BookOpenCheck,
   CheckCircle2,
+  Coins,
   Loader2,
   ShieldCheck,
+  WalletCards,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -109,6 +111,8 @@ export default function EBookletCheckoutPage() {
   const { t } = useTranslation("eBooklets");
   const { items, item, subtotal, discount, total, clear } = useEBookletCart();
   const { checkRepeatPurchases, submitCheckout, loading } = useEBookletCheckout();
+  const [wallet, setWallet] = useState(null);
+  const [applyWalletCredit, setApplyWalletCredit] = useState(false);
   const [paymentMethodId, setPaymentMethodId] = useState("");
   const [numberTransferredFrom, setNumberTransferredFrom] = useState("");
   const [paymentScreenshot, setPaymentScreenshot] = useState(null);
@@ -126,7 +130,26 @@ export default function EBookletCheckoutPage() {
     emptyRepeatPurchaseState,
   );
 
-  const isPaid = Number(total || 0) > 0;
+  const fetchWallet = useCallback(async () => {
+    try {
+      const response = await api.get("/teacher/e-booklet-wallet");
+      setWallet(response?.data?.data?.wallet || null);
+    } catch {
+      setWallet(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchWallet();
+  }, [fetchWallet]);
+
+  const walletBalance = Number(wallet?.balance || 0);
+  const rawTotal = Math.max(0, Number(subtotal || 0) - Number(discount || 0));
+  const walletCreditApplied = applyWalletCredit && walletBalance > 0 && !discount
+    ? Math.min(walletBalance, rawTotal)
+    : 0;
+  const finalPayableTotal = Math.max(0, rawTotal - walletCreditApplied);
+  const isPaid = finalPayableTotal > 0;
   const unreleasedItem = items.find((cartItem) => cartItem.is_released === false);
 
   const templatePaymentMethods = useMemo(() => normalizeTemplatePaymentMethods(items), [items]);
@@ -144,8 +167,9 @@ export default function EBookletCheckoutPage() {
   const checkoutPricing = useMemo(() => ({
     subtotal,
     discount,
-    total,
-  }), [discount, subtotal, total]);
+    walletCredit: walletCreditApplied,
+    total: finalPayableTotal,
+  }), [discount, finalPayableTotal, subtotal, walletCreditApplied]);
 
   const fetchPurchaseTerms = useCallback(async () => {
     setTermsLoading(true);
@@ -359,6 +383,49 @@ export default function EBookletCheckoutPage() {
           </p>
 
           <form ref={formRef} onSubmit={handleSubmit} className="mt-8 grid gap-5">
+            {walletBalance > 0 && (
+              <section className="rounded-[1.25rem] border border-emerald-200/80 bg-emerald-50/50 p-5 shadow-sm dark:border-emerald-900/50 dark:bg-emerald-950/20" data-testid="checkout-wallet-reward-panel">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-11 w-11 place-items-center rounded-xl bg-emerald-600 text-white shadow-md shadow-emerald-700/20">
+                      <WalletCards className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-bold text-foreground">
+                        {t("teacher.wallet.title", { defaultValue: "رصيد المحفظة" })}
+                      </h2>
+                      <p className="text-xs text-muted-foreground">
+                        {t("checkout.walletBalanceAvailable", { defaultValue: "الرصيد المتاح" })}: <span className="font-bold text-emerald-700 dark:text-emerald-400">{walletBalance} ج.م</span>
+                      </p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      checked={applyWalletCredit}
+                      disabled={discount > 0}
+                      onChange={(e) => setApplyWalletCredit(e.target.checked)}
+                      className="peer sr-only"
+                    />
+                    <div className="peer h-6 w-11 rounded-full bg-muted-foreground/30 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-emerald-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50 rtl:peer-checked:after:-translate-x-full" />
+                  </label>
+                </div>
+
+                {applyWalletCredit && walletCreditApplied > 0 && (
+                  <div className="mt-3 flex items-center justify-between rounded-xl border border-emerald-200 bg-white/90 p-3 text-xs font-semibold text-emerald-900 shadow-sm dark:border-emerald-800 dark:bg-card dark:text-emerald-300">
+                    <span>{t("checkout.walletAppliedSuccess", { defaultValue: "سيتم خصم من المحفظة" })}:</span>
+                    <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">-{walletCreditApplied} ج.م</span>
+                  </div>
+                )}
+
+                {discount > 0 && (
+                  <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
+                    {t("teacher.wallet.noStacking", { defaultValue: "لا يمكن الجمع بين رصيد المحفظة وقسائم الخصم." })}
+                  </p>
+                )}
+              </section>
+            )}
+
             <PaymentMethod
               getPaymentMethods={getPaymentMethods}
               selectedId={paymentMethodId}

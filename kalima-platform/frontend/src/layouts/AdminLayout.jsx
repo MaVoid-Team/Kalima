@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import Sidebar from '../components/admin/Sidebar';
+import GlobalBackButton from '../components/GlobalBackButton';
 
 export default function AdminLayout() {
     const location = useLocation();
@@ -39,9 +40,13 @@ export default function AdminLayout() {
 
                 {/* Main Content Area */}
                 <main className="flex-1 p-4 sm:p-12 lg:p-16" data-testid="admin-layout-main-content">
+                    <div className="mb-6">
+                        <GlobalBackButton />
+                    </div>
                     <Outlet />
                 </main>
             </div>
         </div>
     );
 }
+

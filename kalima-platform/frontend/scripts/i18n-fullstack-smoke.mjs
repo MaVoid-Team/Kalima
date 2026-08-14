@@ -266,6 +266,7 @@ const discoverRealAdminRoutes = async (adminSession) => {
     (id) => ({ route: `/product/${id}`, expectedPathPrefix: `/product/${id}` }),
     (id) => ({ route: `/booklet/${id}`, expectedPathPrefix: `/booklet/${id}` }),
     (id) => ({ route: `/admin/products/${id}`, expectedPathPrefix: `/admin/products/${id}` }),
+    (id) => ({ route: `/admin/products/${id}/buyers`, expectedPathPrefix: `/admin/products/${id}/buyers` }),
     (id) => ({ route: `/admin/products/${id}/edit`, expectedPathPrefix: `/admin/products/${id}/edit` }),
   ]);
 

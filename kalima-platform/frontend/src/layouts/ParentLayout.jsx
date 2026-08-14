@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Menu } from 'lucide-react';
 import ParentSidebar from '../components/parent/ParentSidebar';
+import GlobalBackButton from '../components/GlobalBackButton';
 
 export default function ParentLayout() {
     const { t } = useTranslation('parent');
@@ -41,6 +42,9 @@ export default function ParentLayout() {
 
                 {/* Main Content Area */}
                 <main className="flex-1 p-4 sm:p-12 lg:p-16" data-testid="parent-layout-main-content">
+                    <div className="mb-6">
+                        <GlobalBackButton />
+                    </div>
                     <Outlet />
                 </main>
             </div>

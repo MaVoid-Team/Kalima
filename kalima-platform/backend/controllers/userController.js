@@ -118,6 +118,16 @@ const updateUser = catchAsync(async (req, res, next) => {
 
   if (!foundUser) return next(new AppError("User not found", 404));
 
+  if (
+    req.user?.role === "SubAdmin" &&
+    foundUser.role === "Admin" &&
+    password
+  ) {
+    return next(
+      new AppError("Sub-admins cannot change passwords for admin accounts", 403),
+    );
+  }
+
   /*
   BUG -->> if the array here is empty, no err occured!!!!!!,
   the for loop runs but does nothing, we sould reject it because empty array is invalid input,

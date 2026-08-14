@@ -52,6 +52,7 @@ export default function ProductsPage() {
 
     const { exportData, loading: exportLoading, exportProgress } = useExport();
     const [selectedIds, setSelectedIds] = useState([]);
+    const [viewMode, setViewMode] = useState('catalog');
 
     const [editProduct, setEditProduct] = useState(null);
     const [editOpen, setEditOpen] = useState(false);
@@ -190,12 +191,14 @@ export default function ProductsPage() {
                 </div>
             )}
 
-            {/* Filters */}
+            {/* Filters & View Mode Toggle */}
             <ProductFilters
                 filters={filters}
                 onSearchChange={setSearch}
                 onCategoryChange={setCategoryFilter}
                 onArchivedChange={setArchivedFilter}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
             />
 
             {/* Table */}
@@ -208,6 +211,7 @@ export default function ProductsPage() {
                 selectedIds={selectedIds}
                 onSelect={handleSelect}
                 onSelectAll={handleSelectAll}
+                viewMode={viewMode}
             />
 
             {/* Pagination */}

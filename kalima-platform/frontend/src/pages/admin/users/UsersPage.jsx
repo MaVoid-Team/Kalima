@@ -28,6 +28,7 @@ export default function UsersPage() {
         approveUser,
         rejectUser,
         deleteUser,
+        resetUserPassword,
     } = useAdminUsers();
 
     const [page, setPage]       = useState(1);
@@ -69,6 +70,10 @@ export default function UsersPage() {
     const handleDelete = async (userId) => {
         await deleteUser(userId);
         loadUsers();
+    };
+
+    const handleResetPassword = async (userId, password) => {
+        return await resetUserPassword(userId, password);
     };
 
     const handleImpersonate = async (userId) => {
@@ -126,10 +131,12 @@ export default function UsersPage() {
                 onApprove={handleApprove}
                 onReject={handleReject}
                 onDelete={handleDelete}
-                 onImpersonate={handleImpersonate}
-                 currentUserId={currentUser?.id}
-                 actorIsSubAdmin={isSubAdmin && !isAdmin}
-                 impersonatingUserId={impersonatingUserId}
+                onImpersonate={handleImpersonate}
+                onResetPassword={handleResetPassword}
+                currentUserId={currentUser?.id}
+                actorIsSubAdmin={isSubAdmin && !isAdmin}
+                actorIsAdmin={isAdmin}
+                impersonatingUserId={impersonatingUserId}
             />
         </div>
     );

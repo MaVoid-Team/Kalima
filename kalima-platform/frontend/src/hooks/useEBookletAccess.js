@@ -178,6 +178,25 @@ export function useTeacherEBooklets() {
     [fetchApi],
   );
 
+  const previewTeacherWallet = useCallback(
+    (data) => fetchApi({
+      endpoint: "/teacher/e-booklet-wallet/preview",
+      method: "post",
+      data,
+    }, false),
+    [fetchApi],
+  );
+
+  const applyTeacherWallet = useCallback(
+    (data) => fetchApi({
+      endpoint: "/teacher/e-booklet-wallet/apply",
+      method: "post",
+      data,
+      defaultSuccessMessage: i18n.t("eBooklets:toasts.walletApplied", { defaultValue: "تم تطبيق رصيد المحفظة بنجاح" }),
+    }),
+    [fetchApi],
+  );
+
   return {
     items,
     invites,
@@ -204,6 +223,8 @@ export function useTeacherEBooklets() {
     evaluateTeacherMilestones,
     fetchTeacherWallet,
     claimMilestoneReward,
+    previewTeacherWallet,
+    applyTeacherWallet,
   };
 }
 

@@ -25,14 +25,18 @@ function getMockPrismaClient() {
         findUnique: jest.fn(),
       },
       product_required_fields: {
-        findMany: jest.fn(),
+        findMany: jest.fn().mockResolvedValue([]),
       },
       images: {
-        findMany: jest.fn(),
+        findMany: jest.fn().mockResolvedValue([]),
       },
       coupons: {
         findUnique: jest.fn(),
-        findMany: jest.fn(),
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+      cart_item_required_fields: {
+        findMany: jest.fn().mockResolvedValue([]),
+        delete: jest.fn(),
       },
     };
   }
@@ -81,6 +85,15 @@ jest.mock("./image.service", () => ({
 
 jest.mock("./coupon.service", () => ({
   couponService: { validateCoupon: jest.fn(), recordCouponUsage: jest.fn() }
+}));
+
+jest.mock("../emails/email.service", () => ({
+  getEmailService: () => ({
+    sendOrderPendingEmail: jest.fn().mockResolvedValue(true),
+    sendOrderConfirmationEmail: jest.fn().mockResolvedValue(true),
+    sendOrderDeletedEmail: jest.fn().mockResolvedValue(true),
+    sendOrderItemDeletedEmail: jest.fn().mockResolvedValue(true),
+  }),
 }));
 
 describe("CartService", () => {
@@ -369,5 +382,59 @@ describe("CartService", () => {
       expect(flattenedItems[0].discount).toBe(10);
       expect(flattenedItems[0].price_at_purchase).toBe(100);
     });
+
+    it("increments user analytics total_spent by exactly total (not doubled) and purchases by 1 without duplicate user_analytics updates", async () => {
+      const mockCart = {
+        id: 5,
+        user_id: 101,
+        status: "active",
+        subtotal: 500,
+        discount: 50,
+        total: 450,
+        cart_items: [
+          {
+            id: 1,
+            cart_id: 5,
+            product_id: 10,
+            quantity: 2,
+            price_at_add: 250,
+            discount: 50,
+            cart_item_required_fields: [],
+          },
+        ],
+      };
+
+      const { userManagementService } = require("./user-management.service");
+      const { purchasesService } = require("./purchases.service");
+      const { imageService } = require("./image.service");
+
+      mockPrismaClient.carts.findFirst.mockResolvedValue(mockCart);
+      mockPrismaClient.users = { findUnique: jest.fn().mockResolvedValue({ id: 101, name: "Test User", email: "test@example.com" }) };
+      mockPrismaClient.user_analytics = { update: jest.fn() };
+      mockPrismaClient.carts.update = jest.fn().mockResolvedValue({});
+      mockPrismaClient.cart_items.deleteMany = jest.fn().mockResolvedValue({});
+      purchasesService.createPurchase.mockResolvedValueOnce({ id: 999, purchase_serial: "TEST-001" });
+      imageService.uploadImage.mockResolvedValueOnce({ id: 123 });
+
+      mockPrismaClient.$transaction = jest.fn(async (cb) => cb(mockPrismaClient));
+
+      await cartService.checkout(
+        101,
+        { payment_method_id: 1, numberTransferredFrom: "01000000000" },
+        { buffer: Buffer.from("test") } as any,
+      );
+
+      // Verify incrementUserAnalytics was called with exact total (450) and 1 purchase count
+      expect(userManagementService.incrementUserAnalytics).toHaveBeenCalledWith(
+        101,
+        450,
+        1,
+        expect.anything(),
+      );
+
+      // Verify direct duplicate user_analytics.update was NOT called
+      expect(mockPrismaClient.user_analytics.update).not.toHaveBeenCalled();
+    });
   });
 });
+

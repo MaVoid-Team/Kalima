@@ -53,7 +53,7 @@ const main = async () => {
   await waitForServer(frontendUrl);
 
   const email = process.env.LOCAL_ADMIN_EMAIL || 'admin@kalima.local';
-  const password = process.env.LOCAL_ADMIN_PASSWORD || 'KalimaLocalAdmin!2026';
+  const password = process.env.LOCAL_ADMIN_PASSWORD || 'pass1234';
   const login = await apiFetch('/auth/login', { method: 'POST', body: { email, password } });
   const payload = login.data || login;
   const session = {

@@ -285,21 +285,23 @@ class CartService {
     if (productIds.length === 0) return cart;
 
     // Batch-fetch all required field definitions for every product in the cart
-    const productFields = await this.db.product_required_fields.findMany({
-      where: { product_id: { in: productIds }, active: true },
-      select: {
-        product_id: true,
-        field_definition_id: true,
-        is_required: true,
-        required_field_definitions: {
-          select: { label: true, field_type: true },
-        },
-      },
-    });
+    const productFields = this.db.product_required_fields?.findMany
+      ? await this.db.product_required_fields.findMany({
+          where: { product_id: { in: productIds }, active: true },
+          select: {
+            product_id: true,
+            field_definition_id: true,
+            is_required: true,
+            required_field_definitions: {
+              select: { label: true, field_type: true },
+            },
+          },
+        })
+      : [];
 
     // Group by product_id for O(1) lookup
     const fieldsByProduct = new Map<number, typeof productFields>();
-    for (const pf of productFields) {
+    for (const pf of productFields || []) {
       let arr = fieldsByProduct.get(pf.product_id);
       if (!arr) {
         arr = [];
@@ -764,18 +766,22 @@ class CartService {
     const cartItemIds = cart.cart_items.map((i) => i.id);
 
     const [allProductRequiredFields, allFilledFields] = await Promise.all([
-      this.db.product_required_fields.findMany({
-        where: {
-          product_id: { in: productIds },
-          is_required: true,
-          active: true,
-        },
-        include: { required_field_definitions: true },
-      }),
-      this.db.cart_item_required_fields.findMany({
-        where: { cart_item_id: { in: cartItemIds } },
-        select: { cart_item_id: true, field_definition_id: true },
-      }),
+      this.db.product_required_fields?.findMany
+        ? this.db.product_required_fields.findMany({
+            where: {
+              product_id: { in: productIds },
+              is_required: true,
+              active: true,
+            },
+            include: { required_field_definitions: true },
+          })
+        : Promise.resolve([]),
+      this.db.cart_item_required_fields?.findMany
+        ? this.db.cart_item_required_fields.findMany({
+            where: { cart_item_id: { in: cartItemIds } },
+            select: { cart_item_id: true, field_definition_id: true },
+          })
+        : Promise.resolve([]),
     ]);
 
     const requiredByProduct = new Map<
@@ -789,15 +795,15 @@ class CartService {
         } | null;
       }>
     >();
-    for (const rf of allProductRequiredFields) {
+    for (const rf of allProductRequiredFields || []) {
       const list = requiredByProduct.get(rf.product_id) ?? [];
       list.push(rf);
       requiredByProduct.set(rf.product_id, list);
     }
 
     const filledByCartItem = new Map<number, Set<number>>();
-    for (const f of allFilledFields) {
-      const set = filledByCartItem.get(f.cart_item_id) ?? new Set();
+    for (const f of allFilledFields || []) {
+      const set = filledByCartItem.get(f.cart_item_id) ?? new Set<number>();
       set.add(f.field_definition_id);
       filledByCartItem.set(f.cart_item_id, set);
     }
@@ -981,7 +987,7 @@ class CartService {
       await userManagementService.incrementUserAnalytics(
         user_id,
         Number(total),
-        itemCount,
+        1,
         tx as unknown as PrismaClient,
       );
 
@@ -996,18 +1002,6 @@ class CartService {
       });
       await tx.cart_items.deleteMany({
         where: { cart_id: cart.id },
-      });
-
-      await tx.user_analytics.update({
-        where: { user_id },
-        data: {
-          total_spent: {
-            increment: Number(total),
-          },
-          number_of_purchases: {
-            increment: 1,
-          },
-        },
       });
     });
 

@@ -29,6 +29,11 @@ router.get(
   ...adminAuth,
   purchaseController.getConfirmedCount,
 );
+router.get(
+  "/confirmed-items/:employeeId",
+  ...adminAuth,
+  purchaseController.getConfirmedEmployeeProducts,
+);
 router.get("/", ...adminAuth, purchaseController.getAll);
 router.get("/:id", ...adminAuth, purchaseController.getById);
 

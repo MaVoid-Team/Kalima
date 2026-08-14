@@ -39,7 +39,9 @@ async function main() {
     onError: writeLog,
   });
 
-  await pg.initialise();
+  if (!fs.existsSync(path.join(databaseDir, "PG_VERSION"))) {
+    await pg.initialise();
+  }
   await pg.start();
 
   console.log(`Local Postgres started on 127.0.0.1:${port}`);

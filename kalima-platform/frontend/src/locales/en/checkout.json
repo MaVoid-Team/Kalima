@@ -92,7 +92,9 @@
     "total": "Total",
     "currency": "USD",
     "pay": "Pay",
-    "qty": "Qty"
+    "qty": "Qty",
+    "reviewWarningTitle": "Important Notice Before Confirming",
+    "reviewWarningMessage": "Please review all your order details and payment information carefully before confirming. Any modification requested later will incur an additional 50 EGP fee."
   },
   "footer": {
     "returnToCart": "Return to Cart",

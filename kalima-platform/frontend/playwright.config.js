@@ -9,5 +9,10 @@ export default defineConfig({
         headless: true,
         screenshot: 'only-on-failure',
     },
+    webServer: {
+        command: 'npm run preview -- --port 5176 --host 127.0.0.1',
+        port: 5176,
+        reuseExistingServer: true,
+    },
     reporter: [['line']],
 });

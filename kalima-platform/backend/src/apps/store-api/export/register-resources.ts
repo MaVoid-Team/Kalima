@@ -206,6 +206,15 @@ export function registerAllExportResources(): void {
         ...(ids ? { id: { in: ids } } : {}),
       };
 
+      if (filters?.productId) {
+        where.purchase_items = {
+          some: {
+            product_id: Number(filters.productId),
+            is_deleted: false,
+          },
+        };
+      }
+
       if (filters?.status) {
         where.status = filters.status as string;
       }

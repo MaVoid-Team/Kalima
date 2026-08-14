@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Banknote, BookOpenCheck, CalendarClock, Coins, Play, BarChart3, Trophy, WalletCards } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useTeacherEBooklets } from "@/hooks/useEBookletAccess";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 const numberOrFallback = (value, fallback = 0) => {
   const parsed = Number(value);
@@ -18,6 +19,7 @@ const milestonePaidCount = (milestones) => Math.max(0, ...milestones.map((milest
 
 export default function TeacherEBookletsPage() {
   const { t, i18n } = useTranslation("eBooklets");
+  const [rewardTermsAchievement, setRewardTermsAchievement] = useState(null);
   const {
     items,
     milestones,
@@ -29,6 +31,7 @@ export default function TeacherEBookletsPage() {
     fetchTeacherMilestones,
     fetchTeacherWallet,
     fetchCurrentTerms,
+    claimMilestoneReward,
   } = useTeacherEBooklets();
 
   useEffect(() => {
@@ -54,6 +57,32 @@ export default function TeacherEBookletsPage() {
 
   const formatDate = (value) => value ? new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(new Date(value)) : t("teacher.invites.noExpiry");
   const formatMoney = (value) => new Intl.NumberFormat(i18n.language, { style: "currency", currency: "EGP", maximumFractionDigits: 2 }).format(numberOrFallback(value));
+
+  const rewardTermsMilestone = milestones.find((milestone) => {
+    const achievementId = milestoneAchievementId(milestone);
+    return String(achievementId || "") === String(rewardTermsAchievement || "");
+  });
+
+  const rewardExpiryPreviewDate = (milestone) => {
+    const days = numberOrFallback(milestone?.reward_expiry_days_snapshot ?? milestone?.achievement?.reward_expiry_days_snapshot ?? milestone?.reward_expiry_days, 120);
+    const date = new Date();
+    date.setUTCDate(date.getUTCDate() + Math.max(1, days));
+    return formatDate(date);
+  };
+
+  const claimRewardAfterTerms = async () => {
+    try {
+      if (!rewardTermsAchievement) return;
+      const response = await claimMilestoneReward(rewardTermsAchievement);
+      setRewardTermsAchievement(null);
+      await fetchTeacherWallet();
+      await fetchTeacherMilestones(currentTerms?.id);
+      toast.success(t("toasts.rewardClaimed"));
+      return response;
+    } catch {
+      // The shared API layer already shows the translated error toast.
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl space-y-8" data-testid="teacher-e-booklets-page">
@@ -195,8 +224,11 @@ export default function TeacherEBookletsPage() {
 
           <p className="relative mt-4 rounded-xl border border-white/10 bg-red-950/25 p-3 text-sm text-white/85 backdrop-blur">{t("teacher.wallet.noStacking")}</p>
           {claimableMilestone && (
-            <Button asChild className="relative mt-4 w-full bg-white text-primary hover:bg-white/90">
-              <Link to={`/teacher/e-booklets/${items[0]?.booklet_instance?.id || ""}/invites`}>{t("teacher.milestones.claimCta")}</Link>
+            <Button
+              className="relative mt-4 w-full bg-white text-primary hover:bg-white/90"
+              onClick={() => setRewardTermsAchievement(milestoneAchievementId(claimableMilestone))}
+            >
+              {t("teacher.milestones.claimCta")}
             </Button>
           )}
         </div>
@@ -272,6 +304,24 @@ export default function TeacherEBookletsPage() {
           );
         })}
       </div>
+
+      {rewardTermsAchievement && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" data-testid="reward-claim-terms-modal">
+          <div className="max-w-lg rounded-2xl border bg-background p-6 shadow-2xl">
+            <h2 className="text-xl font-bold">{t("teacher.milestones.rewardTermsTitle")}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{currentTerms?.reward_claim_terms || t("teacher.milestones.rewardTermsDescription")}</p>
+            <div className="mt-4 rounded-xl border bg-muted/40 p-3 text-sm font-medium">
+              {t("teacher.milestones.rewardExpiryPreview", {
+                date: rewardExpiryPreviewDate(rewardTermsMilestone),
+              })}
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setRewardTermsAchievement(null)}>{t("common.close")}</Button>
+              <Button onClick={claimRewardAfterTerms}>{t("teacher.milestones.claimCta")}</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -50,6 +50,7 @@ export const purchaseController = {
         endDate: dto.endDate,
         minTotal: dto.minTotal,
         maxTotal: dto.maxTotal,
+        productId: dto.productId,
         page: dto.page || 1,
         limit: dto.limit || 10,
       });
@@ -109,6 +110,43 @@ export const purchaseController = {
           pages: result.pages,
           limit: result.limit,
         },
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /** GET /confirmed-items/:employeeId — detailed product sales confirmed by an employee */
+  async getConfirmedEmployeeProducts(req: Request, res: Response, next: NextFunction) {
+    try {
+      const employeeId = parseInt(req.params.employeeId as string, 10);
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 20;
+
+      const month = req.query.month
+        ? parseInt(req.query.month as string, 10)
+        : undefined;
+      const year = req.query.year
+        ? parseInt(req.query.year as string, 10)
+        : undefined;
+      const type = req.query.type as "all" | "normal" | "ebooklet" | undefined;
+      const search = req.query.search as string | undefined;
+
+      const result = await purchasesService.getConfirmedEmployeeProducts(
+        employeeId,
+        {
+          page,
+          limit,
+          month,
+          year,
+          type,
+          search,
+        },
+      );
+
+      res.status(200).json({
+        success: true,
+        data: result,
       });
     } catch (err) {
       next(err);

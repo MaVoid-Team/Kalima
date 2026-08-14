@@ -1,6 +1,7 @@
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../../../libs/errors";
 import { notification_key_enum } from "../generated/prisma/client";
 import { hashEBookletAccessCode } from "./e-booklet-access-code.service";
+import { EBookletMilestoneService } from "./e-booklet-milestone.service";
 
 const DEFAULT_REDEMPTION_SETTINGS = {
   notify_admins_on_access_code_redemption: false,
@@ -14,7 +15,7 @@ export interface RedeemCodeInput {
 }
 
 export class EBookletRedemptionService {
-  constructor(private readonly db: any) {}
+  constructor(private readonly db: any, private readonly milestoneService?: Pick<EBookletMilestoneService, "evaluateTeacherMilestones"> | null) {}
 
   private transaction<T>(callback: (tx: any) => Promise<T>): Promise<T> {
     if (typeof this.db.$transaction === "function") {
@@ -258,9 +259,17 @@ export class EBookletRedemptionService {
     if (!normalizedCode) throw new BadRequestError("E-booklet access code is required.");
     const codeHash = hashEBookletAccessCode(normalizedCode);
 
-    return this.transaction(async (tx) => {
+    let redeemedTeacherId: number | null = null;
+    let redeemedTermId: number | null = null;
+    let isPaidRedemption = false;
+
+    const result = await this.transaction(async (tx) => {
       const code = await tx.e_booklet_access_codes.findUnique({ where: { code_hash: codeHash } });
       this.assertCodeExistsAndRedeemable(code, studentId);
+
+      redeemedTeacherId = code.teacher_id ?? null;
+      redeemedTermId = code.term_id ?? null;
+      isPaidRedemption = code.kind === "paid";
 
       const existingForStudent = await this.findStudentRedemption(tx, code.id, studentId);
       if (existingForStudent) {
@@ -321,5 +330,18 @@ export class EBookletRedemptionService {
         throw error;
       }
     });
+
+    if (isPaidRedemption && redeemedTeacherId) {
+      try {
+        const milestoneEvaluator = this.milestoneService ?? new EBookletMilestoneService(this.db);
+        await milestoneEvaluator.evaluateTeacherMilestones(redeemedTeacherId, redeemedTermId ?? undefined);
+      } catch (milestoneError: any) {
+        if (milestoneError?.statusCode !== 404 && milestoneError?.name !== "NotFoundError") {
+          console.error("Failed to evaluate teacher milestones after redemption", milestoneError);
+        }
+      }
+    }
+
+    return result;
   }
 }

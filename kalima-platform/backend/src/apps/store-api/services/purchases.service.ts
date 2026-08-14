@@ -243,6 +243,7 @@ export class PurchasesService {
     endDate?: string;
     minTotal?: number;
     maxTotal?: number;
+    productId?: number;
     page: number;
     limit: number;
   }) {
@@ -250,6 +251,15 @@ export class PurchasesService {
     const skip = (page - 1) * limit;
 
     const where: Prisma.purchasesWhereInput = { deleted_at: null };
+
+    if (filters.productId) {
+      where.purchase_items = {
+        some: {
+          product_id: filters.productId,
+          is_deleted: false,
+        },
+      };
+    }
 
     if (filters.status) {
       where.status = filters.status;
@@ -481,6 +491,252 @@ export class PurchasesService {
       page,
       pages: Math.ceil(totalAdmins / limit),
       limit,
+    };
+  }
+
+  /** Retrieve detailed product sales confirmed by a specific employee */
+  async getConfirmedEmployeeProducts(
+    employeeId: number,
+    options: {
+      page?: number;
+      limit?: number;
+      month?: number;
+      year?: number;
+      type?: "all" | "normal" | "ebooklet";
+      search?: string;
+    } = {},
+  ) {
+    const page = Math.max(1, options.page || 1);
+    const limit = Math.max(1, Math.min(100, options.limit || 20));
+    const skip = (page - 1) * limit;
+
+    const employee = await this.db.users.findUnique({
+      where: { id: employeeId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        user_roles: { select: { role: true }, take: 1 },
+      },
+    });
+
+    if (!employee) {
+      throw new NotFoundError("Employee not found");
+    }
+
+    let dateFilter: { gte?: Date; lt?: Date } | undefined;
+    if (options.month && options.year) {
+      dateFilter = {
+        gte: new Date(options.year, options.month - 1, 1),
+        lt: new Date(options.year, options.month, 1),
+      };
+    } else if (options.year) {
+      dateFilter = {
+        gte: new Date(options.year, 0, 1),
+        lt: new Date(options.year + 1, 0, 1),
+      };
+    }
+
+    const purchaseWhere: Prisma.purchasesWhereInput = {
+      confirmed_by: employeeId,
+      status: "confirmed",
+      deleted_at: null,
+      ...(dateFilter ? { confirmed_at: dateFilter } : {}),
+    };
+
+    const allConfirmedPurchases = await this.db.purchases.findMany({
+      where: purchaseWhere,
+      select: {
+        id: true,
+        purchase_serial: true,
+        total: true,
+        confirmed_at: true,
+        created_at: true,
+        users: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+          },
+        },
+        e_booklet_student_purchase_link: {
+          select: {
+            id: true,
+            booklet_instance: {
+              select: {
+                id: true,
+                template: {
+                  select: {
+                    id: true,
+                    title: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        purchase_items: {
+          where: { is_deleted: false },
+          select: {
+            id: true,
+            quantity: true,
+            price_at_purchase: true,
+            discount: true,
+            final_price: true,
+            created_at: true,
+            products: {
+              select: {
+                id: true,
+                title: true,
+                type: true,
+                serial: true,
+                price: true,
+                thumbnail_image: {
+                  select: { id: true, url: true },
+                },
+                product_categories: {
+                  select: {
+                    categories: {
+                      select: { id: true, title: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { confirmed_at: "desc" },
+    });
+
+    const allItems: Array<{
+      id: number;
+      purchaseId: number;
+      purchaseSerial: string | null;
+      customer: { id: number; name: string | null; email: string | null; phone: string | null };
+      product: {
+        id: number;
+        title: string;
+        type: string;
+        serial: string | null;
+        price: number;
+        thumbnailUrl: string | null;
+        categories: string[];
+      };
+      itemType: "normal" | "ebooklet";
+      quantity: number;
+      unitPrice: number;
+      finalPrice: number;
+      confirmedAt: Date | null;
+      createdAt: Date | null;
+    }> = [];
+
+    let totalRevenue = 0;
+    let totalProductsSold = 0;
+    let normalProductsCount = 0;
+    let ebookletsCount = 0;
+
+    for (const purchase of allConfirmedPurchases) {
+      const isEBookletPurchase = Boolean(purchase.e_booklet_student_purchase_link);
+
+      for (const item of purchase.purchase_items) {
+        const prod = item.products;
+        const categories =
+          prod?.product_categories
+            ?.map((pc) => pc.categories?.title)
+            .filter((title): title is string => Boolean(title)) || [];
+        const isEBookletItem =
+          isEBookletPurchase ||
+          prod?.type === "Book" ||
+          categories.some((c) => /مذكرة|مذكرات|تفاعلية|كراسة|كتيب|e-booklet|ebooklet/i.test(c)) ||
+          /مذكرة تفاعلية|e-booklet|ebooklet/i.test(prod?.title || "");
+
+        const itemType: "normal" | "ebooklet" = isEBookletItem ? "ebooklet" : "normal";
+        const quantity = item.quantity || 0;
+        const unitPrice = Number(item.price_at_purchase || 0);
+        const finalPrice = Number(item.final_price || 0);
+
+        totalProductsSold += quantity;
+        totalRevenue += finalPrice;
+        if (itemType === "ebooklet") {
+          ebookletsCount += quantity;
+        } else {
+          normalProductsCount += quantity;
+        }
+
+        allItems.push({
+          id: item.id,
+          purchaseId: purchase.id,
+          purchaseSerial: purchase.purchase_serial,
+          customer: purchase.users || { id: 0, name: "Unknown", email: null, phone: null },
+          product: {
+            id: prod?.id || 0,
+            title:
+              isEBookletPurchase &&
+              purchase.e_booklet_student_purchase_link?.booklet_instance?.template?.title
+                ? purchase.e_booklet_student_purchase_link.booklet_instance.template.title
+                : prod?.title || "Unknown Product",
+            type: prod?.type || "Product",
+            serial: prod?.serial || null,
+            price: Number(prod?.price || 0),
+            thumbnailUrl: prod?.thumbnail_image?.url || null,
+            categories,
+          },
+          itemType,
+          quantity,
+          unitPrice,
+          finalPrice,
+          confirmedAt: purchase.confirmed_at,
+          createdAt: item.created_at || purchase.created_at,
+        });
+      }
+    }
+
+    let filteredItems = allItems;
+    if (options.type && options.type !== "all") {
+      filteredItems = filteredItems.filter((item) => item.itemType === options.type);
+    }
+
+    if (options.search && options.search.trim()) {
+      const q = options.search.trim().toLowerCase();
+      filteredItems = filteredItems.filter(
+        (item) =>
+          item.product.title.toLowerCase().includes(q) ||
+          (item.product.serial && item.product.serial.toLowerCase().includes(q)) ||
+          (item.purchaseSerial && item.purchaseSerial.toLowerCase().includes(q)) ||
+          (item.customer.name && item.customer.name.toLowerCase().includes(q)) ||
+          (item.customer.email && item.customer.email.toLowerCase().includes(q)) ||
+          (item.customer.phone && item.customer.phone.includes(q)),
+      );
+    }
+
+    const totalFiltered = filteredItems.length;
+    const paginatedItems = filteredItems.slice(skip, skip + limit);
+
+    return {
+      employee: {
+        id: employee.id,
+        name: employee.name,
+        email: employee.email,
+        phone: employee.phone,
+        role: employee.user_roles[0]?.role || null,
+      },
+      summary: {
+        totalOrders: allConfirmedPurchases.length,
+        totalProductsSold,
+        totalRevenue,
+        normalProductsCount,
+        ebookletsCount,
+      },
+      items: paginatedItems,
+      pagination: {
+        total: totalFiltered,
+        page,
+        pages: Math.ceil(totalFiltered / limit) || 1,
+        limit,
+      },
     };
   }
 
@@ -737,7 +993,10 @@ export class PurchasesService {
       });
       await tx.user_analytics.update({
         where: { user_id: purchase.user_id },
-        data: { number_of_purchases: { decrement: 1 } },
+        data: {
+          total_spent: { decrement: Number(purchase.total) },
+          number_of_purchases: { decrement: 1 },
+        },
       });
     });
 
@@ -756,7 +1015,7 @@ export class PurchasesService {
           totalItems: purchase.purchase_items.reduce((s, i) => s + i.quantity, 0),
           productListHTML: this.#buildProductListHTML(purchase.purchase_items),
         })
-        .catch((err) => console.error("[Purchases] Failed to send delete email:", err));
+      .catch((err) => console.error("[Purchases] Failed to send delete email:", err));
     }
   }
 
@@ -784,22 +1043,32 @@ export class PurchasesService {
       throw new BadRequestError("Cannot remove the last item. Delete the entire purchase instead.");
     }
 
-    await this.db.purchase_items.update({
-      where: { id: itemId },
-      data: { deleted_at: new Date(), is_deleted: true },
-    });
-
     const remaining = activeItems.filter((i) => i.id !== itemId);
     const newSubtotal = remaining.reduce(
       (sum, i) => sum + Number(i.price_at_purchase) * i.quantity,
       0,
     );
     const newTotal = Math.max(0, newSubtotal - Number(purchase.discount));
+    const priceDiff = Number(purchase.total) - newTotal;
 
-    const updated = await this.db.purchases.update({
-      where: { id: purchaseId },
-      data: { subtotal: newSubtotal, total: newTotal, has_admin_edits: true, updated_at: new Date() },
-      include: PURCHASE_INCLUDE,
+    const updated = await this.db.$transaction(async (tx) => {
+      await tx.purchase_items.update({
+        where: { id: itemId },
+        data: { deleted_at: new Date(), is_deleted: true },
+      });
+
+      if (priceDiff > 0) {
+        await tx.user_analytics.update({
+          where: { user_id: purchase.user_id },
+          data: { total_spent: { decrement: priceDiff } },
+        });
+      }
+
+      return tx.purchases.update({
+        where: { id: purchaseId },
+        data: { subtotal: newSubtotal, total: newTotal, has_admin_edits: true, updated_at: new Date() },
+        include: PURCHASE_INCLUDE,
+      });
     });
 
     const customer = purchase.users;

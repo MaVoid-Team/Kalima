@@ -851,8 +851,6 @@ export function useAdminEBookletTermsMilestones() {
   const [milestones, setMilestones] = useState([]);
   const [progress, setProgress] = useState({ paidRedemptions: 0, achievements: [] });
   const [actionLoading, setActionLoading] = useState(false);
-  const deletedMilestoneIds = useRef(new Set());
-
   const runAction = useCallback(async (action) => {
     setActionLoading(true);
     try {
@@ -883,7 +881,7 @@ export function useAdminEBookletTermsMilestones() {
       suppressErrorToast: Boolean(options.suppressErrorToast),
     }, false);
     const nextMilestones = Array.isArray(response?.data) ? response.data : [];
-    setMilestones(nextMilestones.filter((milestone) => !deletedMilestoneIds.current.has(Number(milestone.id))));
+    setMilestones(nextMilestones);
     return response;
   }, [fetchApi]);
 
@@ -905,7 +903,6 @@ export function useAdminEBookletTermsMilestones() {
   const updateMilestone = useCallback((milestoneId, data) => runAction(() => fetchApi({ endpoint: `/admin/e-booklet-milestones/${milestoneId}`, method: "patch", data, defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneSaved") })), [fetchApi, runAction]);
   const deleteMilestone = useCallback((milestoneId) => runAction(async () => {
     const response = await fetchApi({ endpoint: `/admin/e-booklet-milestones/${milestoneId}`, method: "delete", defaultSuccessMessage: i18n.t("eBooklets:toasts.milestoneDeleted") });
-    deletedMilestoneIds.current.add(Number(milestoneId));
     setMilestones((current) => current.filter((milestone) => Number(milestone.id) !== Number(milestoneId)));
     return response;
   }), [fetchApi, runAction]);

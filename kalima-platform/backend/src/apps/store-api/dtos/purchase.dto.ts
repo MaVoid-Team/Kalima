@@ -150,4 +150,10 @@ export class PurchaseFilterDto {
   @Min(0)
   @Type(() => Number)
   maxTotal?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  productId?: number;
 }

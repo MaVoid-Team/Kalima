@@ -7,7 +7,6 @@ import { E_BOOKLET_ORDERS_ALLOWED_ROLES } from "./pages/e-booklets/eBookletOrder
 import { ADMIN_ANALYTICS_ALLOWED_ROLES } from "./lib/adminAnalyticsAccess";
 import { EMPLOYEE_PERFORMANCE_ALLOWED_ROLES } from "./lib/employeePerformanceAccess";
 import ImpersonationBanner from "./components/auth/ImpersonationBanner";
-import GlobalBackButton from "./components/GlobalBackButton";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -72,6 +71,7 @@ const OrderDetailPage = lazy(
 const ProductsPage = lazy(() => import("./pages/admin/products/ProductsPage"));
 const CreateProductPage = lazy(() => import("./pages/admin/products/CreateProductPage"));
 const ProductDetailPage = lazy(() => import("./pages/admin/products/ProductDetailPage"));
+const ProductBuyersPage = lazy(() => import("./pages/admin/products/ProductBuyersPage"));
 const EditProductPage = lazy(() => import("./pages/admin/products/EditProductPage"));
 const CategoriesPage = lazy(
   () => import("./pages/admin/categories/CategoriesPage"),
@@ -86,6 +86,7 @@ const PaymentMethodsPage = lazy(() => import("./pages/admin/payment-methods/Paym
 const RequiredFieldsPage = lazy(() => import("./pages/admin/required-fields/RequiredFieldsPage"));
 const AnalyticsPage = lazy(() => import("./pages/admin/analytics/AnalyticsPage"));
 const EmployeePerformancePage = lazy(() => import("./pages/admin/employee-performance/EmployeePerformancePage"));
+const EmployeePerformanceDetailPage = lazy(() => import("./pages/admin/employee-performance/EmployeePerformanceDetailPage"));
 const AdminStoreWorkspaceLayout = lazy(() => import("./pages/admin/store/AdminStoreWorkspaceLayout"));
 const AdminEBookletsWorkspaceLayout = lazy(() => import("./pages/admin/e-booklets/AdminEBookletsWorkspaceLayout"));
 const AdminEBookletsOverviewPage = lazy(() => import("./pages/admin/e-booklets/AdminEBookletsOverviewPage"));
@@ -152,7 +153,6 @@ function Root() {
   return (
     <ErrorBoundary>
       <ImpersonationBanner />
-      <GlobalBackButton />
       <Suspense fallback={<PageLoader />}>
         <Outlet />
       </Suspense>
@@ -256,6 +256,7 @@ const router = createBrowserRouter(
             <Route path="/admin/products" element={<ProductsPage />} />
             <Route path="/admin/products/create" element={<CreateProductPage />} />
             <Route path="/admin/products/:id" element={<ProductDetailPage />} />
+            <Route path="/admin/products/:id/buyers" element={<ProductBuyersPage />} />
             <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
             <Route path="/admin/categories" element={<CategoriesPage />} />
             <Route path="/admin/samples" element={<AdminSamplesPage />} />
@@ -302,6 +303,7 @@ const router = createBrowserRouter(
           </Route>
           <Route element={<RoleRoute requiredRole={EMPLOYEE_PERFORMANCE_ALLOWED_ROLES} />}>
             <Route path="/admin/employee-performance" element={<EmployeePerformancePage />} />
+            <Route path="/admin/employee-performance/:id" element={<EmployeePerformanceDetailPage />} />
           </Route>
           <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
         </Route>

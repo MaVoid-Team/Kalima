@@ -22,6 +22,11 @@ const adminModeratorAuth = [
 
 const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
 
+const adminSubAdminAuth = [
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+];
+
 const whatsappDisconnectAuth = [
   authenticateToken,
   requireRole([role_enum.Admin, role_enum.SubAdmin]),
@@ -94,7 +99,7 @@ router.patch(
 );
 router.patch(
   "/users/:userId/password",
-  ...adminOnlyAuth,
+  ...adminSubAdminAuth,
   adminController.resetUserPassword,
 );
 

@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { arSA } from 'date-fns/locale';
-import { Eye, CheckCircle2, XCircle, Trash2, ChevronLeft, ChevronRight, HeartHandshake, UserCog } from 'lucide-react';
+import { Eye, CheckCircle2, XCircle, Trash2, ChevronLeft, ChevronRight, HeartHandshake, UserCog, KeyRound } from 'lucide-react';
 
 import {
     Table,
@@ -23,12 +24,21 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import { canImpersonateUser } from '@/utils/impersonationPermissions';
+import { useRole } from '@/hooks/useRole';
 import AppreciationQrButton from './AppreciationQrButton';
 
 export default function UsersTable({
@@ -41,12 +51,54 @@ export default function UsersTable({
     onReject,
     onDelete,
     onImpersonate,
+    onResetPassword,
     currentUserId,
     actorIsSubAdmin,
+    actorIsAdmin,
     impersonatingUserId,
 }) {
     const { t, i18n } = useTranslation('userManagement');
     const isRtl = i18n.dir() === 'rtl';
+
+    const { isAdmin: isRoleAdmin, isSubAdmin: isRoleSubAdmin } = useRole();
+    const isAdmin = actorIsAdmin ?? isRoleAdmin;
+    const isSubAdmin = actorIsSubAdmin ?? isRoleSubAdmin;
+
+    const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+    const [selectedUserForPassword, setSelectedUserForPassword] = useState(null);
+    const [newPassword, setNewPassword] = useState('');
+    const [newPasswordConfirmation, setNewPasswordConfirmation] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+
+    const handleOpenPasswordDialog = (user) => {
+        setSelectedUserForPassword(user);
+        setNewPassword('');
+        setNewPasswordConfirmation('');
+        setPasswordError('');
+        setPasswordDialogOpen(true);
+    };
+
+    const handlePasswordSubmit = async (e) => {
+        e.preventDefault();
+        if (!newPassword || newPassword.length < 8) {
+            setPasswordError(t('details.passwordMinLength', 'Password must be at least 8 characters.'));
+            return;
+        }
+        if (newPassword !== newPasswordConfirmation) {
+            setPasswordError(t('createDialog.passwordMismatch', 'Passwords do not match'));
+            return;
+        }
+        if (!selectedUserForPassword?.id || !onResetPassword) return;
+
+        const result = await onResetPassword(selectedUserForPassword.id, newPassword);
+        if (result?.success) {
+            setPasswordDialogOpen(false);
+            setSelectedUserForPassword(null);
+            setNewPassword('');
+            setNewPasswordConfirmation('');
+            setPasswordError('');
+        }
+    };
 
     // ── Skeleton rows ──────────────────────────────────────────────────────
     if (loading && users.length === 0) {
@@ -108,16 +160,18 @@ export default function UsersTable({
                     <TableBody>
                         {users.map((user) => {
                             const primaryRole = user.role || user.user_roles?.[0]?.role;
-                             const isTeacher = String(primaryRole).toLowerCase() === 'teacher';
-                             const isCurrentUser = Number(user.id) === Number(currentUserId);
-                             const targetRoles = [
-                                 user.role,
-                                 ...(user.user_roles?.map(({ role }) => role) ?? []),
-                             ].filter(Boolean);
-                             const canImpersonate = canImpersonateUser({
-                                 actorIsSubAdmin,
-                                 targetRoles,
-                             });
+                            const isTeacher = String(primaryRole).toLowerCase() === 'teacher';
+                            const isCurrentUser = Number(user.id) === Number(currentUserId);
+                            const targetRoles = [
+                                user.role,
+                                ...(user.user_roles?.map(({ role }) => role) ?? []),
+                            ].filter(Boolean);
+                            const isTargetAdmin = targetRoles.some(r => String(r).toLowerCase() === 'admin');
+                            const canEditPassword = !user.is_deleted && (isAdmin || (isSubAdmin && !isTargetAdmin));
+                            const canImpersonate = canImpersonateUser({
+                                actorIsSubAdmin,
+                                targetRoles,
+                            });
                             const displayEmail = user.email?.includes('_deleted_')
                                 ? user.email.split('_deleted_')[0]
                                 : user.email;
@@ -227,6 +281,21 @@ export default function UsersTable({
                                                 </Button>
                                             )}
 
+                                            {/* Edit Password */}
+                                            {!user.is_deleted && canEditPassword && onResetPassword && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10"
+                                                    onClick={() => handleOpenPasswordDialog(user)}
+                                                    disabled={actionLoading}
+                                                    title={t('actions.changePassword')}
+                                                    data-testid={`users-table-password-${user.id}`}
+                                                >
+                                                    <KeyRound className="h-4 w-4" />
+                                                </Button>
+                                            )}
+
                                             {/* Approve */}
                                             {!user.is_deleted && !user.confirmed && (
                                                 <Button
@@ -264,11 +333,11 @@ export default function UsersTable({
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
-                                                             className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                             disabled={actionLoading}
-                                                             title={t('actions.delete')}
-                                                             data-testid={`users-table-delete-${user.id}`}
-                                                         >
+                                                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                            disabled={actionLoading}
+                                                            title={t('actions.delete')}
+                                                            data-testid={`users-table-delete-${user.id}`}
+                                                        >
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
                                                     </AlertDialogTrigger>
@@ -334,6 +403,80 @@ export default function UsersTable({
                     </div>
                 </div>
             )}
+
+            {/* Change Password Dialog */}
+            <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
+                <DialogContent dir={i18n.dir()}>
+                    <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                        <DialogHeader>
+                            <DialogTitle>{t('details.changePasswordTitle')}</DialogTitle>
+                            <DialogDescription>
+                                {t('details.changePasswordDescription', { name: selectedUserForPassword?.name || '' })}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-2">
+                            <label htmlFor="user-table-new-password" className="text-sm font-medium">
+                                {t('details.newPassword')}
+                            </label>
+                            <input
+                                id="user-table-new-password"
+                                type="password"
+                                autoComplete="new-password"
+                                value={newPassword}
+                                onChange={(e) => {
+                                    setNewPassword(e.target.value);
+                                    setPasswordError('');
+                                }}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                required
+                                data-testid="users-table-password-input"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label htmlFor="user-table-confirm-password" className="text-sm font-medium">
+                                {t('details.confirmNewPassword')}
+                            </label>
+                            <input
+                                id="user-table-confirm-password"
+                                type="password"
+                                autoComplete="new-password"
+                                value={newPasswordConfirmation}
+                                onChange={(e) => {
+                                    setNewPasswordConfirmation(e.target.value);
+                                    setPasswordError('');
+                                }}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                required
+                                data-testid="users-table-confirm-password-input"
+                            />
+                        </div>
+                        {passwordError && (
+                            <p className="text-sm text-destructive" data-testid="users-table-password-error">
+                                {passwordError}
+                            </p>
+                        )}
+                        <DialogFooter>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setPasswordDialogOpen(false)}
+                                disabled={actionLoading}
+                                data-testid="users-table-password-cancel"
+                            >
+                                {t('actions.cancel')}
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={actionLoading}
+                                data-testid="users-table-password-submit"
+                            >
+                                {actionLoading && <LoadingSpinner className="h-4 w-4 me-2" />}
+                                {t('actions.changePassword')}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
