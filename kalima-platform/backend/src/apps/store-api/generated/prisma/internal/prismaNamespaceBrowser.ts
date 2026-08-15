@@ -193,7 +193,6 @@ export type User_rolesScalarFieldEnum = (typeof User_rolesScalarFieldEnum)[keyof
 
 export const UsersScalarFieldEnum = {
   id: 'id',
-  mongo_id: 'mongo_id',
   name: 'name',
   email: 'email',
   password: 'password',
@@ -425,7 +424,6 @@ export const CategoriesScalarFieldEnum = {
   active: 'active',
   description: 'description',
   parent_id: 'parent_id',
-  mongo_id: 'mongo_id',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
@@ -457,7 +455,6 @@ export const CouponsScalarFieldEnum = {
   updated_at: 'updated_at',
   deleted_at: 'deleted_at',
   is_deleted: 'is_deleted',
-  mongo_id: 'mongo_id',
   type: 'type'
 } as const
 
@@ -498,7 +495,6 @@ export const ProductsScalarFieldEnum = {
   sample_url: 'sample_url',
   is_archived: 'is_archived',
   release_at: 'release_at',
-  mongo_id: 'mongo_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
   deleted_at: 'deleted_at',

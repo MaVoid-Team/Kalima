@@ -101,7 +101,6 @@ export interface LinkedProvider {
 
 export interface BaseUserData {
   id: number;
-  mongo_id?: string | null;
   name: string;
   email: string;
   phone: string;

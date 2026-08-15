@@ -1,1 +1,1 @@
-Academy API - Legacy. MongoDB. Not refactored yet.
+Academy API - Legacy reference. Platform fully migrated to PostgreSQL (Store API).

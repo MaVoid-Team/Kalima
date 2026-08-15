@@ -1836,6 +1836,18 @@ export class EBookletService {
         status: dto.status,
       },
     });
+    if (dto.sync_delivered_instance_document === true && version.base_document_file_id) {
+      await this.db.e_booklet_instances.updateMany({
+        where: {
+          template_version_id: versionId,
+          custom_document_file_id: { not: null },
+        },
+        data: {
+          custom_document_file_id: version.base_document_file_id,
+          updated_at: new Date(),
+        },
+      });
+    }
     const documentAssetId = version.base_document_file_id || version.rendered_document_file_id;
     if (documentAssetId) {
       const asset = await this.db.e_booklet_file_assets.findUnique({ where: { id: documentAssetId } });

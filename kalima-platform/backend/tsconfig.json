@@ -2,31 +2,26 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
-
     "rootDir": ".",
     "outDir": "dist",
-
     "strict": false,
-
     "esModuleInterop": true,
     "allowJs": true,
     "checkJs": false,
-
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "useDefineForClassFields": false,
-
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
   "include": [
     "src/**/*",
-    "routes/**/*",
-    "controllers/**/*",
-    "models/**/*",
-    "middleware/**/*",
-    "*.ts",
-    "*.js"
+    "scripts/**/*",
+    "*.ts"
   ],
-  "exclude": ["node_modules", "dist", "**/*.spec.ts"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.spec.ts"
+  ]
 }

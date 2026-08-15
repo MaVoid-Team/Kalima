@@ -1076,7 +1076,7 @@ class UserManagementService {
   async deleteUser(userId: number): Promise<void> {
     const user = await this.db.users.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, phone: true, mongo_id: true },
+      select: { id: true, email: true, phone: true },
     });
 
     if (!user) {
@@ -1089,8 +1089,7 @@ class UserManagementService {
       data: {
         email: user.email ? `${user.email}_deleted_${ts}` : null,
         phone: user.phone ? `${user.phone}_deleted_${ts}` : null,
-        mongo_id: user.mongo_id ? `${user.mongo_id}_deleted_${ts}` : null,
-        password: null,
+                password: null,
         // we leave 'name' and relations intact for order history
         updated_at: new Date(),
         deleted_at: new Date(),
@@ -1481,8 +1480,7 @@ class UserManagementService {
   mapToBaseUserData(user: any): BaseUserData {
     return {
       id: user.id,
-      mongo_id: user.mongo_id,
-      name: user.name,
+            name: user.name,
       email: user.email,
       phone: user.phone,
       secondary_phone: user.secondary_phone,

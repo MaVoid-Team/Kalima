@@ -1121,6 +1121,7 @@ export default function AdminEBookletEditorPage() {
           : undefined,
         page_count: dimensions.length,
         page_dimensions_json: dimensions,
+        sync_delivered_instance_document: isTeacherTemplateMode,
       };
 
       const response = versionForm.id

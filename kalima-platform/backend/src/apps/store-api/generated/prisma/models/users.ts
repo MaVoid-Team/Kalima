@@ -38,7 +38,6 @@ export type UsersSumAggregateOutputType = {
 
 export type UsersMinAggregateOutputType = {
   id: number | null
-  mongo_id: string | null
   name: string | null
   email: string | null
   password: string | null
@@ -63,7 +62,6 @@ export type UsersMinAggregateOutputType = {
 
 export type UsersMaxAggregateOutputType = {
   id: number | null
-  mongo_id: string | null
   name: string | null
   email: string | null
   password: string | null
@@ -88,7 +86,6 @@ export type UsersMaxAggregateOutputType = {
 
 export type UsersCountAggregateOutputType = {
   id: number
-  mongo_id: number
   name: number
   email: number
   password: number
@@ -125,7 +122,6 @@ export type UsersSumAggregateInputType = {
 
 export type UsersMinAggregateInputType = {
   id?: true
-  mongo_id?: true
   name?: true
   email?: true
   password?: true
@@ -150,7 +146,6 @@ export type UsersMinAggregateInputType = {
 
 export type UsersMaxAggregateInputType = {
   id?: true
-  mongo_id?: true
   name?: true
   email?: true
   password?: true
@@ -175,7 +170,6 @@ export type UsersMaxAggregateInputType = {
 
 export type UsersCountAggregateInputType = {
   id?: true
-  mongo_id?: true
   name?: true
   email?: true
   password?: true
@@ -287,7 +281,6 @@ export type usersGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 
 export type UsersGroupByOutputType = {
   id: number
-  mongo_id: string | null
   name: string
   email: string | null
   password: string | null
@@ -335,7 +328,6 @@ export type usersWhereInput = {
   OR?: Prisma.usersWhereInput[]
   NOT?: Prisma.usersWhereInput | Prisma.usersWhereInput[]
   id?: Prisma.IntFilter<"users"> | number
-  mongo_id?: Prisma.StringNullableFilter<"users"> | string | null
   name?: Prisma.StringFilter<"users"> | string
   email?: Prisma.StringNullableFilter<"users"> | string | null
   password?: Prisma.StringNullableFilter<"users"> | string | null
@@ -419,7 +411,6 @@ export type usersWhereInput = {
 
 export type usersOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  mongo_id?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   password?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -503,7 +494,6 @@ export type usersOrderByWithRelationInput = {
 
 export type usersWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  mongo_id?: string
   email?: string
   AND?: Prisma.usersWhereInput | Prisma.usersWhereInput[]
   OR?: Prisma.usersWhereInput[]
@@ -586,11 +576,10 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   e_booklet_devices?: Prisma.E_booklet_devicesListRelationFilter
   e_booklet_device_allowances?: Prisma.E_booklet_device_allowancesListRelationFilter
   e_booklet_student_purchase_links?: Prisma.E_booklet_student_purchase_linksListRelationFilter
-}, "id" | "mongo_id" | "email">
+}, "id" | "email">
 
 export type usersOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  mongo_id?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   password?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -623,7 +612,6 @@ export type usersScalarWhereWithAggregatesInput = {
   OR?: Prisma.usersScalarWhereWithAggregatesInput[]
   NOT?: Prisma.usersScalarWhereWithAggregatesInput | Prisma.usersScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"users"> | number
-  mongo_id?: Prisma.StringNullableWithAggregatesFilter<"users"> | string | null
   name?: Prisma.StringWithAggregatesFilter<"users"> | string
   email?: Prisma.StringNullableWithAggregatesFilter<"users"> | string | null
   password?: Prisma.StringNullableWithAggregatesFilter<"users"> | string | null
@@ -647,7 +635,6 @@ export type usersScalarWhereWithAggregatesInput = {
 }
 
 export type usersCreateInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -730,7 +717,6 @@ export type usersCreateInput = {
 
 export type usersUncheckedCreateInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -812,7 +798,6 @@ export type usersUncheckedCreateInput = {
 }
 
 export type usersUpdateInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -895,7 +880,6 @@ export type usersUpdateInput = {
 
 export type usersUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -978,7 +962,6 @@ export type usersUncheckedUpdateInput = {
 
 export type usersCreateManyInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -1002,7 +985,6 @@ export type usersCreateManyInput = {
 }
 
 export type usersUpdateManyMutationInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1026,7 +1008,6 @@ export type usersUpdateManyMutationInput = {
 
 export type usersUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1071,7 +1052,6 @@ export type usersOrderByRelationAggregateInput = {
 
 export type usersCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  mongo_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
@@ -1101,7 +1081,6 @@ export type usersAvgOrderByAggregateInput = {
 
 export type usersMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  mongo_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
@@ -1126,7 +1105,6 @@ export type usersMaxOrderByAggregateInput = {
 
 export type usersMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  mongo_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
@@ -2059,7 +2037,6 @@ export type usersUpdateOneWithoutNotifications_createdNestedInput = {
 }
 
 export type usersCreateWithoutAuth_identitiesInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -2141,7 +2118,6 @@ export type usersCreateWithoutAuth_identitiesInput = {
 
 export type usersUncheckedCreateWithoutAuth_identitiesInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -2238,7 +2214,6 @@ export type usersUpdateToOneWithWhereWithoutAuth_identitiesInput = {
 }
 
 export type usersUpdateWithoutAuth_identitiesInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2320,7 +2295,6 @@ export type usersUpdateWithoutAuth_identitiesInput = {
 
 export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2401,7 +2375,6 @@ export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
 }
 
 export type usersCreateWithoutUser_analyticsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -2483,7 +2456,6 @@ export type usersCreateWithoutUser_analyticsInput = {
 
 export type usersUncheckedCreateWithoutUser_analyticsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -2580,7 +2552,6 @@ export type usersUpdateToOneWithWhereWithoutUser_analyticsInput = {
 }
 
 export type usersUpdateWithoutUser_analyticsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2662,7 +2633,6 @@ export type usersUpdateWithoutUser_analyticsInput = {
 
 export type usersUncheckedUpdateWithoutUser_analyticsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2743,7 +2713,6 @@ export type usersUncheckedUpdateWithoutUser_analyticsInput = {
 }
 
 export type usersCreateWithoutUser_rolesInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -2825,7 +2794,6 @@ export type usersCreateWithoutUser_rolesInput = {
 
 export type usersUncheckedCreateWithoutUser_rolesInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -2922,7 +2890,6 @@ export type usersUpdateToOneWithWhereWithoutUser_rolesInput = {
 }
 
 export type usersUpdateWithoutUser_rolesInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3004,7 +2971,6 @@ export type usersUpdateWithoutUser_rolesInput = {
 
 export type usersUncheckedUpdateWithoutUser_rolesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3085,7 +3051,6 @@ export type usersUncheckedUpdateWithoutUser_rolesInput = {
 }
 
 export type usersCreateWithoutCreated_usersInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -3167,7 +3132,6 @@ export type usersCreateWithoutCreated_usersInput = {
 
 export type usersUncheckedCreateWithoutCreated_usersInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -3253,7 +3217,6 @@ export type usersCreateOrConnectWithoutCreated_usersInput = {
 }
 
 export type usersCreateWithoutCreator_userInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -3335,7 +3298,6 @@ export type usersCreateWithoutCreator_userInput = {
 
 export type usersUncheckedCreateWithoutCreator_userInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -3437,7 +3399,6 @@ export type usersUpdateToOneWithWhereWithoutCreated_usersInput = {
 }
 
 export type usersUpdateWithoutCreated_usersInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3519,7 +3480,6 @@ export type usersUpdateWithoutCreated_usersInput = {
 
 export type usersUncheckedUpdateWithoutCreated_usersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3620,7 +3580,6 @@ export type usersScalarWhereInput = {
   OR?: Prisma.usersScalarWhereInput[]
   NOT?: Prisma.usersScalarWhereInput | Prisma.usersScalarWhereInput[]
   id?: Prisma.IntFilter<"users"> | number
-  mongo_id?: Prisma.StringNullableFilter<"users"> | string | null
   name?: Prisma.StringFilter<"users"> | string
   email?: Prisma.StringNullableFilter<"users"> | string | null
   password?: Prisma.StringNullableFilter<"users"> | string | null
@@ -3644,7 +3603,6 @@ export type usersScalarWhereInput = {
 }
 
 export type usersCreateWithoutUser_appreciation_pageInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -3726,7 +3684,6 @@ export type usersCreateWithoutUser_appreciation_pageInput = {
 
 export type usersUncheckedCreateWithoutUser_appreciation_pageInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -3823,7 +3780,6 @@ export type usersUpdateToOneWithWhereWithoutUser_appreciation_pageInput = {
 }
 
 export type usersUpdateWithoutUser_appreciation_pageInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3905,7 +3861,6 @@ export type usersUpdateWithoutUser_appreciation_pageInput = {
 
 export type usersUncheckedUpdateWithoutUser_appreciation_pageInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3986,7 +3941,6 @@ export type usersUncheckedUpdateWithoutUser_appreciation_pageInput = {
 }
 
 export type usersCreateWithoutAccount_review_settings_updatedInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -4068,7 +4022,6 @@ export type usersCreateWithoutAccount_review_settings_updatedInput = {
 
 export type usersUncheckedCreateWithoutAccount_review_settings_updatedInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -4165,7 +4118,6 @@ export type usersUpdateToOneWithWhereWithoutAccount_review_settings_updatedInput
 }
 
 export type usersUpdateWithoutAccount_review_settings_updatedInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4247,7 +4199,6 @@ export type usersUpdateWithoutAccount_review_settings_updatedInput = {
 
 export type usersUncheckedUpdateWithoutAccount_review_settings_updatedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4328,7 +4279,6 @@ export type usersUncheckedUpdateWithoutAccount_review_settings_updatedInput = {
 }
 
 export type usersCreateWithoutRefresh_tokensInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -4410,7 +4360,6 @@ export type usersCreateWithoutRefresh_tokensInput = {
 
 export type usersUncheckedCreateWithoutRefresh_tokensInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -4507,7 +4456,6 @@ export type usersUpdateToOneWithWhereWithoutRefresh_tokensInput = {
 }
 
 export type usersUpdateWithoutRefresh_tokensInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4589,7 +4537,6 @@ export type usersUpdateWithoutRefresh_tokensInput = {
 
 export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4670,7 +4617,6 @@ export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
 }
 
 export type usersCreateWithoutAssistantsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -4752,7 +4698,6 @@ export type usersCreateWithoutAssistantsInput = {
 
 export type usersUncheckedCreateWithoutAssistantsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -4849,7 +4794,6 @@ export type usersUpdateToOneWithWhereWithoutAssistantsInput = {
 }
 
 export type usersUpdateWithoutAssistantsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4931,7 +4875,6 @@ export type usersUpdateWithoutAssistantsInput = {
 
 export type usersUncheckedUpdateWithoutAssistantsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5012,7 +4955,6 @@ export type usersUncheckedUpdateWithoutAssistantsInput = {
 }
 
 export type usersCreateWithoutLecturersInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -5094,7 +5036,6 @@ export type usersCreateWithoutLecturersInput = {
 
 export type usersUncheckedCreateWithoutLecturersInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -5191,7 +5132,6 @@ export type usersUpdateToOneWithWhereWithoutLecturersInput = {
 }
 
 export type usersUpdateWithoutLecturersInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5273,7 +5213,6 @@ export type usersUpdateWithoutLecturersInput = {
 
 export type usersUncheckedUpdateWithoutLecturersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5354,7 +5293,6 @@ export type usersUncheckedUpdateWithoutLecturersInput = {
 }
 
 export type usersCreateWithoutParentsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -5436,7 +5374,6 @@ export type usersCreateWithoutParentsInput = {
 
 export type usersUncheckedCreateWithoutParentsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -5533,7 +5470,6 @@ export type usersUpdateToOneWithWhereWithoutParentsInput = {
 }
 
 export type usersUpdateWithoutParentsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5615,7 +5551,6 @@ export type usersUpdateWithoutParentsInput = {
 
 export type usersUncheckedUpdateWithoutParentsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5696,7 +5631,6 @@ export type usersUncheckedUpdateWithoutParentsInput = {
 }
 
 export type usersCreateWithoutSocial_mediaInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -5778,7 +5712,6 @@ export type usersCreateWithoutSocial_mediaInput = {
 
 export type usersUncheckedCreateWithoutSocial_mediaInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -5875,7 +5808,6 @@ export type usersUpdateToOneWithWhereWithoutSocial_mediaInput = {
 }
 
 export type usersUpdateWithoutSocial_mediaInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5957,7 +5889,6 @@ export type usersUpdateWithoutSocial_mediaInput = {
 
 export type usersUncheckedUpdateWithoutSocial_mediaInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6038,7 +5969,6 @@ export type usersUncheckedUpdateWithoutSocial_mediaInput = {
 }
 
 export type usersCreateWithoutStudentsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -6120,7 +6050,6 @@ export type usersCreateWithoutStudentsInput = {
 
 export type usersUncheckedCreateWithoutStudentsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -6217,7 +6146,6 @@ export type usersUpdateToOneWithWhereWithoutStudentsInput = {
 }
 
 export type usersUpdateWithoutStudentsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6299,7 +6227,6 @@ export type usersUpdateWithoutStudentsInput = {
 
 export type usersUncheckedUpdateWithoutStudentsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6380,7 +6307,6 @@ export type usersUncheckedUpdateWithoutStudentsInput = {
 }
 
 export type usersCreateWithoutTeachersInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -6462,7 +6388,6 @@ export type usersCreateWithoutTeachersInput = {
 
 export type usersUncheckedCreateWithoutTeachersInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -6559,7 +6484,6 @@ export type usersUpdateToOneWithWhereWithoutTeachersInput = {
 }
 
 export type usersUpdateWithoutTeachersInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6641,7 +6565,6 @@ export type usersUpdateWithoutTeachersInput = {
 
 export type usersUncheckedUpdateWithoutTeachersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6722,7 +6645,6 @@ export type usersUncheckedUpdateWithoutTeachersInput = {
 }
 
 export type usersCreateWithoutTeaches_atInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -6804,7 +6726,6 @@ export type usersCreateWithoutTeaches_atInput = {
 
 export type usersUncheckedCreateWithoutTeaches_atInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -6901,7 +6822,6 @@ export type usersUpdateToOneWithWhereWithoutTeaches_atInput = {
 }
 
 export type usersUpdateWithoutTeaches_atInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6983,7 +6903,6 @@ export type usersUpdateWithoutTeaches_atInput = {
 
 export type usersUncheckedUpdateWithoutTeaches_atInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7064,7 +6983,6 @@ export type usersUncheckedUpdateWithoutTeaches_atInput = {
 }
 
 export type usersCreateWithoutEmail_verification_tokensInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -7146,7 +7064,6 @@ export type usersCreateWithoutEmail_verification_tokensInput = {
 
 export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -7243,7 +7160,6 @@ export type usersUpdateToOneWithWhereWithoutEmail_verification_tokensInput = {
 }
 
 export type usersUpdateWithoutEmail_verification_tokensInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7325,7 +7241,6 @@ export type usersUpdateWithoutEmail_verification_tokensInput = {
 
 export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7406,7 +7321,6 @@ export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
 }
 
 export type usersCreateWithoutPassword_reset_tokensInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -7488,7 +7402,6 @@ export type usersCreateWithoutPassword_reset_tokensInput = {
 
 export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -7585,7 +7498,6 @@ export type usersUpdateToOneWithWhereWithoutPassword_reset_tokensInput = {
 }
 
 export type usersUpdateWithoutPassword_reset_tokensInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7667,7 +7579,6 @@ export type usersUpdateWithoutPassword_reset_tokensInput = {
 
 export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7748,7 +7659,6 @@ export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
 }
 
 export type usersCreateWithoutCoupon_usagesInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -7830,7 +7740,6 @@ export type usersCreateWithoutCoupon_usagesInput = {
 
 export type usersUncheckedCreateWithoutCoupon_usagesInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -7927,7 +7836,6 @@ export type usersUpdateToOneWithWhereWithoutCoupon_usagesInput = {
 }
 
 export type usersUpdateWithoutCoupon_usagesInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8009,7 +7917,6 @@ export type usersUpdateWithoutCoupon_usagesInput = {
 
 export type usersUncheckedUpdateWithoutCoupon_usagesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8090,7 +7997,6 @@ export type usersUncheckedUpdateWithoutCoupon_usagesInput = {
 }
 
 export type usersCreateWithoutProduct_reviewsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -8172,7 +8078,6 @@ export type usersCreateWithoutProduct_reviewsInput = {
 
 export type usersUncheckedCreateWithoutProduct_reviewsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -8269,7 +8174,6 @@ export type usersUpdateToOneWithWhereWithoutProduct_reviewsInput = {
 }
 
 export type usersUpdateWithoutProduct_reviewsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8351,7 +8255,6 @@ export type usersUpdateWithoutProduct_reviewsInput = {
 
 export type usersUncheckedUpdateWithoutProduct_reviewsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8432,7 +8335,6 @@ export type usersUncheckedUpdateWithoutProduct_reviewsInput = {
 }
 
 export type usersCreateWithoutCartsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -8514,7 +8416,6 @@ export type usersCreateWithoutCartsInput = {
 
 export type usersUncheckedCreateWithoutCartsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -8611,7 +8512,6 @@ export type usersUpdateToOneWithWhereWithoutCartsInput = {
 }
 
 export type usersUpdateWithoutCartsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8693,7 +8593,6 @@ export type usersUpdateWithoutCartsInput = {
 
 export type usersUncheckedUpdateWithoutCartsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8774,7 +8673,6 @@ export type usersUncheckedUpdateWithoutCartsInput = {
 }
 
 export type usersCreateWithoutPurchasesInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -8856,7 +8754,6 @@ export type usersCreateWithoutPurchasesInput = {
 
 export type usersUncheckedCreateWithoutPurchasesInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -8942,7 +8839,6 @@ export type usersCreateOrConnectWithoutPurchasesInput = {
 }
 
 export type usersCreateWithoutPurchases_receivedInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -9024,7 +8920,6 @@ export type usersCreateWithoutPurchases_receivedInput = {
 
 export type usersUncheckedCreateWithoutPurchases_receivedInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -9110,7 +9005,6 @@ export type usersCreateOrConnectWithoutPurchases_receivedInput = {
 }
 
 export type usersCreateWithoutPurchases_confirmedInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -9192,7 +9086,6 @@ export type usersCreateWithoutPurchases_confirmedInput = {
 
 export type usersUncheckedCreateWithoutPurchases_confirmedInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -9278,7 +9171,6 @@ export type usersCreateOrConnectWithoutPurchases_confirmedInput = {
 }
 
 export type usersCreateWithoutPurchases_returnedInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -9360,7 +9252,6 @@ export type usersCreateWithoutPurchases_returnedInput = {
 
 export type usersUncheckedCreateWithoutPurchases_returnedInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -9457,7 +9348,6 @@ export type usersUpdateToOneWithWhereWithoutPurchasesInput = {
 }
 
 export type usersUpdateWithoutPurchasesInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9539,7 +9429,6 @@ export type usersUpdateWithoutPurchasesInput = {
 
 export type usersUncheckedUpdateWithoutPurchasesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9631,7 +9520,6 @@ export type usersUpdateToOneWithWhereWithoutPurchases_receivedInput = {
 }
 
 export type usersUpdateWithoutPurchases_receivedInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9713,7 +9601,6 @@ export type usersUpdateWithoutPurchases_receivedInput = {
 
 export type usersUncheckedUpdateWithoutPurchases_receivedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9805,7 +9692,6 @@ export type usersUpdateToOneWithWhereWithoutPurchases_confirmedInput = {
 }
 
 export type usersUpdateWithoutPurchases_confirmedInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9887,7 +9773,6 @@ export type usersUpdateWithoutPurchases_confirmedInput = {
 
 export type usersUncheckedUpdateWithoutPurchases_confirmedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9979,7 +9864,6 @@ export type usersUpdateToOneWithWhereWithoutPurchases_returnedInput = {
 }
 
 export type usersUpdateWithoutPurchases_returnedInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10061,7 +9945,6 @@ export type usersUpdateWithoutPurchases_returnedInput = {
 
 export type usersUncheckedUpdateWithoutPurchases_returnedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10142,7 +10025,6 @@ export type usersUncheckedUpdateWithoutPurchases_returnedInput = {
 }
 
 export type usersCreateWithoutE_booklet_templates_createdInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -10224,7 +10106,6 @@ export type usersCreateWithoutE_booklet_templates_createdInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_templates_createdInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -10321,7 +10202,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_templates_createdInput = {
 }
 
 export type usersUpdateWithoutE_booklet_templates_createdInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10403,7 +10283,6 @@ export type usersUpdateWithoutE_booklet_templates_createdInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_templates_createdInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10484,7 +10363,6 @@ export type usersUncheckedUpdateWithoutE_booklet_templates_createdInput = {
 }
 
 export type usersCreateWithoutE_booklet_template_versions_createdInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -10566,7 +10444,6 @@ export type usersCreateWithoutE_booklet_template_versions_createdInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_template_versions_createdInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -10663,7 +10540,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_template_versions_createdI
 }
 
 export type usersUpdateWithoutE_booklet_template_versions_createdInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10745,7 +10621,6 @@ export type usersUpdateWithoutE_booklet_template_versions_createdInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_template_versions_createdInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10826,7 +10701,6 @@ export type usersUncheckedUpdateWithoutE_booklet_template_versions_createdInput 
 }
 
 export type usersCreateWithoutE_booklet_hotspots_createdInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -10908,7 +10782,6 @@ export type usersCreateWithoutE_booklet_hotspots_createdInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_hotspots_createdInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -10994,7 +10867,6 @@ export type usersCreateOrConnectWithoutE_booklet_hotspots_createdInput = {
 }
 
 export type usersCreateWithoutE_booklet_hotspots_updatedInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -11076,7 +10948,6 @@ export type usersCreateWithoutE_booklet_hotspots_updatedInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_hotspots_updatedInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -11173,7 +11044,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_hotspots_createdInput = {
 }
 
 export type usersUpdateWithoutE_booklet_hotspots_createdInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11255,7 +11125,6 @@ export type usersUpdateWithoutE_booklet_hotspots_createdInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_hotspots_createdInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11347,7 +11216,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_hotspots_updatedInput = {
 }
 
 export type usersUpdateWithoutE_booklet_hotspots_updatedInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11429,7 +11297,6 @@ export type usersUpdateWithoutE_booklet_hotspots_updatedInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_hotspots_updatedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11510,7 +11377,6 @@ export type usersUncheckedUpdateWithoutE_booklet_hotspots_updatedInput = {
 }
 
 export type usersCreateWithoutE_booklet_hotspot_presets_createdInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -11592,7 +11458,6 @@ export type usersCreateWithoutE_booklet_hotspot_presets_createdInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_hotspot_presets_createdInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -11678,7 +11543,6 @@ export type usersCreateOrConnectWithoutE_booklet_hotspot_presets_createdInput = 
 }
 
 export type usersCreateWithoutE_booklet_hotspot_presets_updatedInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -11760,7 +11624,6 @@ export type usersCreateWithoutE_booklet_hotspot_presets_updatedInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_hotspot_presets_updatedInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -11857,7 +11720,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_hotspot_presets_createdInp
 }
 
 export type usersUpdateWithoutE_booklet_hotspot_presets_createdInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11939,7 +11801,6 @@ export type usersUpdateWithoutE_booklet_hotspot_presets_createdInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_hotspot_presets_createdInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12031,7 +11892,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_hotspot_presets_updatedInp
 }
 
 export type usersUpdateWithoutE_booklet_hotspot_presets_updatedInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12113,7 +11973,6 @@ export type usersUpdateWithoutE_booklet_hotspot_presets_updatedInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_hotspot_presets_updatedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12194,7 +12053,6 @@ export type usersUncheckedUpdateWithoutE_booklet_hotspot_presets_updatedInput = 
 }
 
 export type usersCreateWithoutE_booklet_hotspot_preset_usagesInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -12276,7 +12134,6 @@ export type usersCreateWithoutE_booklet_hotspot_preset_usagesInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_hotspot_preset_usagesInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -12373,7 +12230,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_hotspot_preset_usagesInput
 }
 
 export type usersUpdateWithoutE_booklet_hotspot_preset_usagesInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12455,7 +12311,6 @@ export type usersUpdateWithoutE_booklet_hotspot_preset_usagesInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_hotspot_preset_usagesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12536,7 +12391,6 @@ export type usersUncheckedUpdateWithoutE_booklet_hotspot_preset_usagesInput = {
 }
 
 export type usersCreateWithoutE_booklet_purchasesInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -12618,7 +12472,6 @@ export type usersCreateWithoutE_booklet_purchasesInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_purchasesInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -12715,7 +12568,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_purchasesInput = {
 }
 
 export type usersUpdateWithoutE_booklet_purchasesInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12797,7 +12649,6 @@ export type usersUpdateWithoutE_booklet_purchasesInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_purchasesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -12878,7 +12729,6 @@ export type usersUncheckedUpdateWithoutE_booklet_purchasesInput = {
 }
 
 export type usersCreateWithoutE_booklet_terms_createdInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -12960,7 +12810,6 @@ export type usersCreateWithoutE_booklet_terms_createdInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_terms_createdInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -13046,7 +12895,6 @@ export type usersCreateOrConnectWithoutE_booklet_terms_createdInput = {
 }
 
 export type usersCreateWithoutE_booklet_terms_updatedInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -13128,7 +12976,6 @@ export type usersCreateWithoutE_booklet_terms_updatedInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_terms_updatedInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -13225,7 +13072,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_terms_createdInput = {
 }
 
 export type usersUpdateWithoutE_booklet_terms_createdInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13307,7 +13153,6 @@ export type usersUpdateWithoutE_booklet_terms_createdInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_terms_createdInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13399,7 +13244,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_terms_updatedInput = {
 }
 
 export type usersUpdateWithoutE_booklet_terms_updatedInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13481,7 +13325,6 @@ export type usersUpdateWithoutE_booklet_terms_updatedInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_terms_updatedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13562,7 +13405,6 @@ export type usersUncheckedUpdateWithoutE_booklet_terms_updatedInput = {
 }
 
 export type usersCreateWithoutE_booklet_instancesInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -13644,7 +13486,6 @@ export type usersCreateWithoutE_booklet_instancesInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_instancesInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -13741,7 +13582,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_instancesInput = {
 }
 
 export type usersUpdateWithoutE_booklet_instancesInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13823,7 +13663,6 @@ export type usersUpdateWithoutE_booklet_instancesInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_instancesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -13904,7 +13743,6 @@ export type usersUncheckedUpdateWithoutE_booklet_instancesInput = {
 }
 
 export type usersCreateWithoutE_booklet_milestone_achievementsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -13986,7 +13824,6 @@ export type usersCreateWithoutE_booklet_milestone_achievementsInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_milestone_achievementsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -14083,7 +13920,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_milestone_achievementsInpu
 }
 
 export type usersUpdateWithoutE_booklet_milestone_achievementsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14165,7 +14001,6 @@ export type usersUpdateWithoutE_booklet_milestone_achievementsInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_milestone_achievementsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14246,7 +14081,6 @@ export type usersUncheckedUpdateWithoutE_booklet_milestone_achievementsInput = {
 }
 
 export type usersCreateWithoutTeacher_terms_acceptancesInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -14328,7 +14162,6 @@ export type usersCreateWithoutTeacher_terms_acceptancesInput = {
 
 export type usersUncheckedCreateWithoutTeacher_terms_acceptancesInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -14425,7 +14258,6 @@ export type usersUpdateToOneWithWhereWithoutTeacher_terms_acceptancesInput = {
 }
 
 export type usersUpdateWithoutTeacher_terms_acceptancesInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14507,7 +14339,6 @@ export type usersUpdateWithoutTeacher_terms_acceptancesInput = {
 
 export type usersUncheckedUpdateWithoutTeacher_terms_acceptancesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14588,7 +14419,6 @@ export type usersUncheckedUpdateWithoutTeacher_terms_acceptancesInput = {
 }
 
 export type usersCreateWithoutTeacher_walletInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -14670,7 +14500,6 @@ export type usersCreateWithoutTeacher_walletInput = {
 
 export type usersUncheckedCreateWithoutTeacher_walletInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -14767,7 +14596,6 @@ export type usersUpdateToOneWithWhereWithoutTeacher_walletInput = {
 }
 
 export type usersUpdateWithoutTeacher_walletInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14849,7 +14677,6 @@ export type usersUpdateWithoutTeacher_walletInput = {
 
 export type usersUncheckedUpdateWithoutTeacher_walletInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -14930,7 +14757,6 @@ export type usersUncheckedUpdateWithoutTeacher_walletInput = {
 }
 
 export type usersCreateWithoutTeacher_wallet_ledgerInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -15012,7 +14838,6 @@ export type usersCreateWithoutTeacher_wallet_ledgerInput = {
 
 export type usersUncheckedCreateWithoutTeacher_wallet_ledgerInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -15109,7 +14934,6 @@ export type usersUpdateToOneWithWhereWithoutTeacher_wallet_ledgerInput = {
 }
 
 export type usersUpdateWithoutTeacher_wallet_ledgerInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15191,7 +15015,6 @@ export type usersUpdateWithoutTeacher_wallet_ledgerInput = {
 
 export type usersUncheckedUpdateWithoutTeacher_wallet_ledgerInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15272,7 +15095,6 @@ export type usersUncheckedUpdateWithoutTeacher_wallet_ledgerInput = {
 }
 
 export type usersCreateWithoutTeacher_wallet_credit_lotsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -15354,7 +15176,6 @@ export type usersCreateWithoutTeacher_wallet_credit_lotsInput = {
 
 export type usersUncheckedCreateWithoutTeacher_wallet_credit_lotsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -15451,7 +15272,6 @@ export type usersUpdateToOneWithWhereWithoutTeacher_wallet_credit_lotsInput = {
 }
 
 export type usersUpdateWithoutTeacher_wallet_credit_lotsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15533,7 +15353,6 @@ export type usersUpdateWithoutTeacher_wallet_credit_lotsInput = {
 
 export type usersUncheckedUpdateWithoutTeacher_wallet_credit_lotsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15614,7 +15433,6 @@ export type usersUncheckedUpdateWithoutTeacher_wallet_credit_lotsInput = {
 }
 
 export type usersCreateWithoutTeacher_wallet_spend_allocationsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -15696,7 +15514,6 @@ export type usersCreateWithoutTeacher_wallet_spend_allocationsInput = {
 
 export type usersUncheckedCreateWithoutTeacher_wallet_spend_allocationsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -15793,7 +15610,6 @@ export type usersUpdateToOneWithWhereWithoutTeacher_wallet_spend_allocationsInpu
 }
 
 export type usersUpdateWithoutTeacher_wallet_spend_allocationsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15875,7 +15691,6 @@ export type usersUpdateWithoutTeacher_wallet_spend_allocationsInput = {
 
 export type usersUncheckedUpdateWithoutTeacher_wallet_spend_allocationsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -15956,7 +15771,6 @@ export type usersUncheckedUpdateWithoutTeacher_wallet_spend_allocationsInput = {
 }
 
 export type usersCreateWithoutE_booklet_access_codes_createdInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -16038,7 +15852,6 @@ export type usersCreateWithoutE_booklet_access_codes_createdInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_access_codes_createdInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -16124,7 +15937,6 @@ export type usersCreateOrConnectWithoutE_booklet_access_codes_createdInput = {
 }
 
 export type usersCreateWithoutE_booklet_access_codes_boundInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -16206,7 +16018,6 @@ export type usersCreateWithoutE_booklet_access_codes_boundInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_access_codes_boundInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -16303,7 +16114,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_access_codes_createdInput 
 }
 
 export type usersUpdateWithoutE_booklet_access_codes_createdInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -16385,7 +16195,6 @@ export type usersUpdateWithoutE_booklet_access_codes_createdInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_access_codes_createdInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -16477,7 +16286,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_access_codes_boundInput = 
 }
 
 export type usersUpdateWithoutE_booklet_access_codes_boundInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -16559,7 +16367,6 @@ export type usersUpdateWithoutE_booklet_access_codes_boundInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_access_codes_boundInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -16640,7 +16447,6 @@ export type usersUncheckedUpdateWithoutE_booklet_access_codes_boundInput = {
 }
 
 export type usersCreateWithoutE_booklet_print_templates_createdInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -16722,7 +16528,6 @@ export type usersCreateWithoutE_booklet_print_templates_createdInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_print_templates_createdInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -16808,7 +16613,6 @@ export type usersCreateOrConnectWithoutE_booklet_print_templates_createdInput = 
 }
 
 export type usersCreateWithoutE_booklet_print_templates_updatedInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -16890,7 +16694,6 @@ export type usersCreateWithoutE_booklet_print_templates_updatedInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_print_templates_updatedInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -16987,7 +16790,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_print_templates_createdInp
 }
 
 export type usersUpdateWithoutE_booklet_print_templates_createdInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17069,7 +16871,6 @@ export type usersUpdateWithoutE_booklet_print_templates_createdInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_print_templates_createdInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17161,7 +16962,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_print_templates_updatedInp
 }
 
 export type usersUpdateWithoutE_booklet_print_templates_updatedInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17243,7 +17043,6 @@ export type usersUpdateWithoutE_booklet_print_templates_updatedInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_print_templates_updatedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17324,7 +17123,6 @@ export type usersUncheckedUpdateWithoutE_booklet_print_templates_updatedInput = 
 }
 
 export type usersCreateWithoutE_booklet_print_presets_createdInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -17406,7 +17204,6 @@ export type usersCreateWithoutE_booklet_print_presets_createdInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_print_presets_createdInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -17492,7 +17289,6 @@ export type usersCreateOrConnectWithoutE_booklet_print_presets_createdInput = {
 }
 
 export type usersCreateWithoutE_booklet_print_presets_updatedInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -17574,7 +17370,6 @@ export type usersCreateWithoutE_booklet_print_presets_updatedInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_print_presets_updatedInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -17671,7 +17466,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_print_presets_createdInput
 }
 
 export type usersUpdateWithoutE_booklet_print_presets_createdInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17753,7 +17547,6 @@ export type usersUpdateWithoutE_booklet_print_presets_createdInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_print_presets_createdInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17845,7 +17638,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_print_presets_updatedInput
 }
 
 export type usersUpdateWithoutE_booklet_print_presets_updatedInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -17927,7 +17719,6 @@ export type usersUpdateWithoutE_booklet_print_presets_updatedInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_print_presets_updatedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -18008,7 +17799,6 @@ export type usersUncheckedUpdateWithoutE_booklet_print_presets_updatedInput = {
 }
 
 export type usersCreateWithoutE_booklet_print_batches_teacherInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -18090,7 +17880,6 @@ export type usersCreateWithoutE_booklet_print_batches_teacherInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_print_batches_teacherInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -18176,7 +17965,6 @@ export type usersCreateOrConnectWithoutE_booklet_print_batches_teacherInput = {
 }
 
 export type usersCreateWithoutE_booklet_print_batches_createdInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -18258,7 +18046,6 @@ export type usersCreateWithoutE_booklet_print_batches_createdInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_print_batches_createdInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -18355,7 +18142,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_print_batches_teacherInput
 }
 
 export type usersUpdateWithoutE_booklet_print_batches_teacherInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -18437,7 +18223,6 @@ export type usersUpdateWithoutE_booklet_print_batches_teacherInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_print_batches_teacherInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -18529,7 +18314,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_print_batches_createdInput
 }
 
 export type usersUpdateWithoutE_booklet_print_batches_createdInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -18611,7 +18395,6 @@ export type usersUpdateWithoutE_booklet_print_batches_createdInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_print_batches_createdInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -18692,7 +18475,6 @@ export type usersUncheckedUpdateWithoutE_booklet_print_batches_createdInput = {
 }
 
 export type usersCreateWithoutE_booklet_access_code_redemptionsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -18774,7 +18556,6 @@ export type usersCreateWithoutE_booklet_access_code_redemptionsInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_access_code_redemptionsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -18871,7 +18652,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_access_code_redemptionsInp
 }
 
 export type usersUpdateWithoutE_booklet_access_code_redemptionsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -18953,7 +18733,6 @@ export type usersUpdateWithoutE_booklet_access_code_redemptionsInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_access_code_redemptionsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19034,7 +18813,6 @@ export type usersUncheckedUpdateWithoutE_booklet_access_code_redemptionsInput = 
 }
 
 export type usersCreateWithoutE_booklet_accessInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -19116,7 +18894,6 @@ export type usersCreateWithoutE_booklet_accessInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_accessInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -19213,7 +18990,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_accessInput = {
 }
 
 export type usersUpdateWithoutE_booklet_accessInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19295,7 +19071,6 @@ export type usersUpdateWithoutE_booklet_accessInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_accessInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19376,7 +19151,6 @@ export type usersUncheckedUpdateWithoutE_booklet_accessInput = {
 }
 
 export type usersCreateWithoutE_booklet_invitesInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -19458,7 +19232,6 @@ export type usersCreateWithoutE_booklet_invitesInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_invitesInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -19555,7 +19328,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_invitesInput = {
 }
 
 export type usersUpdateWithoutE_booklet_invitesInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19637,7 +19409,6 @@ export type usersUpdateWithoutE_booklet_invitesInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_invitesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19718,7 +19489,6 @@ export type usersUncheckedUpdateWithoutE_booklet_invitesInput = {
 }
 
 export type usersCreateWithoutE_booklet_devicesInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -19800,7 +19570,6 @@ export type usersCreateWithoutE_booklet_devicesInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_devicesInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -19897,7 +19666,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_devicesInput = {
 }
 
 export type usersUpdateWithoutE_booklet_devicesInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -19979,7 +19747,6 @@ export type usersUpdateWithoutE_booklet_devicesInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_devicesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20060,7 +19827,6 @@ export type usersUncheckedUpdateWithoutE_booklet_devicesInput = {
 }
 
 export type usersCreateWithoutE_booklet_device_allowancesInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -20142,7 +19908,6 @@ export type usersCreateWithoutE_booklet_device_allowancesInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_device_allowancesInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -20239,7 +20004,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_device_allowancesInput = {
 }
 
 export type usersUpdateWithoutE_booklet_device_allowancesInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20321,7 +20085,6 @@ export type usersUpdateWithoutE_booklet_device_allowancesInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_device_allowancesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20402,7 +20165,6 @@ export type usersUncheckedUpdateWithoutE_booklet_device_allowancesInput = {
 }
 
 export type usersCreateWithoutE_booklet_student_purchase_linksInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -20484,7 +20246,6 @@ export type usersCreateWithoutE_booklet_student_purchase_linksInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_student_purchase_linksInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -20581,7 +20342,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_student_purchase_linksInpu
 }
 
 export type usersUpdateWithoutE_booklet_student_purchase_linksInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20663,7 +20423,6 @@ export type usersUpdateWithoutE_booklet_student_purchase_linksInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_student_purchase_linksInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -20744,7 +20503,6 @@ export type usersUncheckedUpdateWithoutE_booklet_student_purchase_linksInput = {
 }
 
 export type usersCreateWithoutE_booklet_invite_redemptionsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -20826,7 +20584,6 @@ export type usersCreateWithoutE_booklet_invite_redemptionsInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_invite_redemptionsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -20923,7 +20680,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_invite_redemptionsInput = 
 }
 
 export type usersUpdateWithoutE_booklet_invite_redemptionsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21005,7 +20761,6 @@ export type usersUpdateWithoutE_booklet_invite_redemptionsInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_invite_redemptionsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21086,7 +20841,6 @@ export type usersUncheckedUpdateWithoutE_booklet_invite_redemptionsInput = {
 }
 
 export type usersCreateWithoutE_booklet_audit_logsInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -21168,7 +20922,6 @@ export type usersCreateWithoutE_booklet_audit_logsInput = {
 
 export type usersUncheckedCreateWithoutE_booklet_audit_logsInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -21265,7 +21018,6 @@ export type usersUpdateToOneWithWhereWithoutE_booklet_audit_logsInput = {
 }
 
 export type usersUpdateWithoutE_booklet_audit_logsInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21347,7 +21099,6 @@ export type usersUpdateWithoutE_booklet_audit_logsInput = {
 
 export type usersUncheckedUpdateWithoutE_booklet_audit_logsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21428,7 +21179,6 @@ export type usersUncheckedUpdateWithoutE_booklet_audit_logsInput = {
 }
 
 export type usersCreateWithoutNotifications_receivedInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -21510,7 +21260,6 @@ export type usersCreateWithoutNotifications_receivedInput = {
 
 export type usersUncheckedCreateWithoutNotifications_receivedInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -21596,7 +21345,6 @@ export type usersCreateOrConnectWithoutNotifications_receivedInput = {
 }
 
 export type usersCreateWithoutNotifications_createdInput = {
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -21678,7 +21426,6 @@ export type usersCreateWithoutNotifications_createdInput = {
 
 export type usersUncheckedCreateWithoutNotifications_createdInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -21775,7 +21522,6 @@ export type usersUpdateToOneWithWhereWithoutNotifications_receivedInput = {
 }
 
 export type usersUpdateWithoutNotifications_receivedInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21857,7 +21603,6 @@ export type usersUpdateWithoutNotifications_receivedInput = {
 
 export type usersUncheckedUpdateWithoutNotifications_receivedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -21949,7 +21694,6 @@ export type usersUpdateToOneWithWhereWithoutNotifications_createdInput = {
 }
 
 export type usersUpdateWithoutNotifications_createdInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22031,7 +21775,6 @@ export type usersUpdateWithoutNotifications_createdInput = {
 
 export type usersUncheckedUpdateWithoutNotifications_createdInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22113,7 +21856,6 @@ export type usersUncheckedUpdateWithoutNotifications_createdInput = {
 
 export type usersCreateManyCreator_userInput = {
   id?: number
-  mongo_id?: string | null
   name: string
   email?: string | null
   password?: string | null
@@ -22136,7 +21878,6 @@ export type usersCreateManyCreator_userInput = {
 }
 
 export type usersUpdateWithoutCreator_userInput = {
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22218,7 +21959,6 @@ export type usersUpdateWithoutCreator_userInput = {
 
 export type usersUncheckedUpdateWithoutCreator_userInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22300,7 +22040,6 @@ export type usersUncheckedUpdateWithoutCreator_userInput = {
 
 export type usersUncheckedUpdateManyWithoutCreator_userInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -22787,7 +22526,6 @@ export type UsersCountOutputTypeCountE_booklet_student_purchase_linksArgs<ExtArg
 
 export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  mongo_id?: boolean
   name?: boolean
   email?: boolean
   password?: boolean
@@ -22872,7 +22610,6 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 
 export type usersSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  mongo_id?: boolean
   name?: boolean
   email?: boolean
   password?: boolean
@@ -22898,7 +22635,6 @@ export type usersSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 
 export type usersSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  mongo_id?: boolean
   name?: boolean
   email?: boolean
   password?: boolean
@@ -22924,7 +22660,6 @@ export type usersSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 
 export type usersSelectScalar = {
   id?: boolean
-  mongo_id?: boolean
   name?: boolean
   email?: boolean
   password?: boolean
@@ -22947,7 +22682,7 @@ export type usersSelectScalar = {
   flag?: boolean
 }
 
-export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mongo_id" | "name" | "email" | "password" | "phone" | "gender" | "is_email_verified" | "created_at" | "updated_at" | "deleted_at" | "is_deleted" | "secondary_phone" | "profile_pic_url" | "password_changed_at" | "confirmed" | "hasPromoCode" | "hasUsedPromoCode" | "email_verified_at" | "role" | "created_by" | "flag", ExtArgs["result"]["users"]>
+export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "phone" | "gender" | "is_email_verified" | "created_at" | "updated_at" | "deleted_at" | "is_deleted" | "secondary_phone" | "profile_pic_url" | "password_changed_at" | "confirmed" | "hasPromoCode" | "hasUsedPromoCode" | "email_verified_at" | "role" | "created_by" | "flag", ExtArgs["result"]["users"]>
 export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assistants?: boolean | Prisma.users$assistantsArgs<ExtArgs>
   auth_identities?: boolean | Prisma.users$auth_identitiesArgs<ExtArgs>
@@ -23082,7 +22817,6 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    mongo_id: string | null
     name: string
     email: string | null
     password: string | null
@@ -23586,7 +23320,6 @@ export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Ty
  */
 export interface usersFieldRefs {
   readonly id: Prisma.FieldRef<"users", 'Int'>
-  readonly mongo_id: Prisma.FieldRef<"users", 'String'>
   readonly name: Prisma.FieldRef<"users", 'String'>
   readonly email: Prisma.FieldRef<"users", 'String'>
   readonly password: Prisma.FieldRef<"users", 'String'>

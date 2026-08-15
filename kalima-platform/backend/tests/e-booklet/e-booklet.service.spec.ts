@@ -56,6 +56,7 @@ function createMockDb(overrides: Record<string, unknown> = {}) {
     e_booklet_template_versions: {
       findUnique: jest.fn(),
       findMany: jest.fn(),
+      update: jest.fn(),
     },
     e_booklet_hotspots: {
       findMany: jest.fn(),
@@ -198,6 +199,58 @@ describe("EBookletService", () => {
     jest.clearAllMocks();
     delete process.env.E_BOOKLET_PDFINFO_BIN;
 });
+
+  describe("teacher-specific document updates", () => {
+    test("updates the delivered document used by the client when an order-specific version changes", async () => {
+      const db = createMockDb();
+      db.e_booklet_template_versions.update.mockResolvedValue({
+        id: 22,
+        base_document_file_id: 101,
+        rendered_document_file_id: null,
+      });
+      db.e_booklet_file_assets.findUnique.mockResolvedValue({ id: 101 });
+      db.e_booklet_instances.updateMany.mockResolvedValue({ count: 1 });
+      const service = new EBookletService(db);
+
+      await service.updateTemplateVersion(22, {
+        base_document_file_id: 101,
+        rendered_document_file_id: null,
+        page_count: 3,
+        page_dimensions_json: [],
+        sync_delivered_instance_document: true,
+      });
+
+      expect(db.e_booklet_instances.updateMany).toHaveBeenCalledWith({
+        where: {
+          template_version_id: 22,
+          custom_document_file_id: { not: null },
+        },
+        data: expect.objectContaining({
+          custom_document_file_id: 101,
+        }),
+      });
+    });
+
+    test("does not alter delivered documents for ordinary template edits", async () => {
+      const db = createMockDb();
+      db.e_booklet_template_versions.update.mockResolvedValue({
+        id: 22,
+        base_document_file_id: 101,
+        rendered_document_file_id: null,
+      });
+      db.e_booklet_file_assets.findUnique.mockResolvedValue({ id: 101 });
+      const service = new EBookletService(db);
+
+      await service.updateTemplateVersion(22, {
+        base_document_file_id: 101,
+        rendered_document_file_id: null,
+        page_count: 3,
+        page_dimensions_json: [],
+      });
+
+      expect(db.e_booklet_instances.updateMany).not.toHaveBeenCalled();
+    });
+  });
 
   describe("repeat purchase warning", () => {
     test("returns each active prior template once for the authenticated teacher", async () => {

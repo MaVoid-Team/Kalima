@@ -73,7 +73,6 @@ Returns all product samples, ordered by creation date (newest first). Each sampl
         "thumbnail_id": 12,
         "sample_url": null,
         "is_archived": false,
-        "mongo_id": null,
         "created_at": "2026-02-20T10:00:00.000Z",
         "updated_at": null,
         "deleted_at": null
@@ -98,7 +97,6 @@ Returns all product samples, ordered by creation date (newest first). Each sampl
         "thumbnail_id": 15,
         "sample_url": null,
         "is_archived": false,
-        "mongo_id": null,
         "created_at": "2026-02-19T13:45:00.000Z",
         "updated_at": null,
         "deleted_at": null
@@ -147,7 +145,6 @@ Returns a single sample by its ID. Includes the linked product. Returns 404 if t
       "thumbnail_id": 12,
       "sample_url": null,
       "is_archived": false,
-      "mongo_id": null,
       "created_at": "2026-02-20T10:00:00.000Z",
       "updated_at": null,
       "deleted_at": null

@@ -33,7 +33,7 @@ enum: [
 Added `metadata` field to store rich purchase data:
 ```javascript
 metadata: {
-  type: mongoose.Schema.Types.Mixed,
+  type: Object,
   default: {},
 }
 ```
@@ -286,7 +286,7 @@ Once permission is granted, admins will receive desktop notifications automatica
 ### What Happens When Admin is Offline?
 
 1. **Notification is created** in the database with `isSent: false`
-2. **Stored in MongoDB** with complete metadata
+2. **Stored in Database** with complete metadata
 3. **When admin comes online:**
    - Socket.io connection established
    - Admin emits `subscribe` event
@@ -414,8 +414,8 @@ console.log("Socket connected:", socket?.connected);
 ### Check Notification Template
 
 ```javascript
-// In MongoDB
-db.notificationtemplates.findOne({type: "store_purchase"})
+// In Database
+// Query database for notification template of type store_purchase
 ```
 
 Should return:

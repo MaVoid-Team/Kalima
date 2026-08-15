@@ -240,6 +240,5 @@ http://127.0.0.1:5173
 ## Notes
 
 - The TypeScript backend requires `DATABASE_URL` for Postgres.
-- The legacy backend and legacy scripts may still use `DATABASE_URI` for MongoDB.
 - Backend env loading checks `backend/.env` first, then `kalima-platform/.env`.
 - Do not commit real `.env` files.

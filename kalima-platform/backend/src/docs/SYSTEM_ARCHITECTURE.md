@@ -51,7 +51,7 @@ architecture-beta
 - **Runtime**: Node.js
 - **Framework**: Express.js
 - **Language**: TypeScript (Ensures compile-time type safety preventing runtime null references)
-- **Database ORM**: Prisma (Primary DB for relational data & migrations) & Mongoose (for any isolated MongoDB metrics/usage)
+- **Database ORM**: Prisma (Primary DB for relational data & migrations)
 - **Caching & Optimization**: Redis (via `ioredis` library) for rapid temporary data access, session state, and messaging.
 - **Real-time Communication**: Socket.io (Facilitating bidirectional events between the backend and browser clients).
 - **Media Management**: Cloudinary coupled with Multer for handling seamless multipart-form data image uploads and transformation.

@@ -137,7 +137,6 @@ Creates a new coupon. The code must be unique. Only **one** discount type is all
     "created_at": "2026-02-18T10:00:00.000Z",
     "updated_at": null,
     "deleted_at": null,
-    "mongo_id": null
   }
 }
 ```
@@ -187,7 +186,6 @@ Returns a paginated list of all non-deleted coupons. Supports filtering by activ
         "created_at": "2026-02-18T10:00:00.000Z",
         "updated_at": null,
         "deleted_at": null,
-        "mongo_id": null
       }
     ],
     "total": 1,
@@ -227,7 +225,6 @@ Returns a single coupon by its ID. Returns 404 if the coupon does not exist or h
     "created_at": "2026-02-18T10:00:00.000Z",
     "updated_at": null,
     "deleted_at": null,
-    "mongo_id": null
   }
 }
 ```
@@ -293,7 +290,6 @@ Updates one or more fields on an existing coupon. All fields are optional. If `d
     "created_at": "2026-02-18T10:00:00.000Z",
     "updated_at": "2026-02-18T12:00:00.000Z",
     "deleted_at": null,
-    "mongo_id": null
   }
 }
 ```
@@ -378,7 +374,6 @@ Checks whether a coupon code is valid (exists, is active, and has not expired). 
       "created_at": "2026-02-18T10:00:00.000Z",
       "updated_at": null,
       "deleted_at": null,
-      "mongo_id": null
     }
   }
 }
@@ -427,7 +422,6 @@ Applies a coupon code. The coupon is deactivated (`active = false`) after use an
     "created_at": "2026-02-18T10:00:00.000Z",
     "updated_at": "2026-02-18T14:00:00.000Z",
     "deleted_at": null,
-    "mongo_id": null
   }
 }
 ```
@@ -465,7 +459,6 @@ Applies a coupon code. The coupon is deactivated (`active = false`) after use an
   "created_at": "timestamp",
   "updated_at": "timestamp | null",
   "deleted_at": "timestamp | null (soft delete marker)",
-  "mongo_id": "string | null (legacy migration ID)"
 }
 ```
 

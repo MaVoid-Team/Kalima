@@ -73,13 +73,7 @@ export class PurchasesService {
   // ---------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------
-  private buildUserSerialFrom(userRecord: {
-    mongo_id?: string;
-    id: number;
-  }): string {
-    if (userRecord.mongo_id && userRecord.mongo_id.length >= 8) {
-      return userRecord.mongo_id.slice(-8).toUpperCase();
-    }
+  private buildUserSerialFrom(userRecord: { id: number }): string {
     return userRecord.id.toString().slice(-8).toUpperCase();
   }
 
@@ -153,10 +147,7 @@ export class PurchasesService {
       });
     }
 
-    const userSerial = this.buildUserSerialFrom({
-      mongo_id: user.mongo_id ?? undefined,
-      id: user.id,
-    });
+    const userSerial = this.buildUserSerialFrom({ id: user.id });
     const purchaseSerial = await this.generatePurchaseSerial(
       client,
       userSerial,

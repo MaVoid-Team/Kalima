@@ -42,7 +42,6 @@ export type CategoriesMinAggregateOutputType = {
   active: boolean | null
   description: string | null
   parent_id: number | null
-  mongo_id: string | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -53,7 +52,6 @@ export type CategoriesMaxAggregateOutputType = {
   active: boolean | null
   description: string | null
   parent_id: number | null
-  mongo_id: string | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -64,7 +62,6 @@ export type CategoriesCountAggregateOutputType = {
   active: number
   description: number
   parent_id: number
-  mongo_id: number
   created_at: number
   updated_at: number
   _all: number
@@ -87,7 +84,6 @@ export type CategoriesMinAggregateInputType = {
   active?: true
   description?: true
   parent_id?: true
-  mongo_id?: true
   created_at?: true
   updated_at?: true
 }
@@ -98,7 +94,6 @@ export type CategoriesMaxAggregateInputType = {
   active?: true
   description?: true
   parent_id?: true
-  mongo_id?: true
   created_at?: true
   updated_at?: true
 }
@@ -109,7 +104,6 @@ export type CategoriesCountAggregateInputType = {
   active?: true
   description?: true
   parent_id?: true
-  mongo_id?: true
   created_at?: true
   updated_at?: true
   _all?: true
@@ -207,7 +201,6 @@ export type CategoriesGroupByOutputType = {
   active: boolean | null
   description: string | null
   parent_id: number | null
-  mongo_id: string | null
   created_at: Date | null
   updated_at: Date | null
   _count: CategoriesCountAggregateOutputType | null
@@ -241,7 +234,6 @@ export type categoriesWhereInput = {
   active?: Prisma.BoolNullableFilter<"categories"> | boolean | null
   description?: Prisma.StringNullableFilter<"categories"> | string | null
   parent_id?: Prisma.IntNullableFilter<"categories"> | number | null
-  mongo_id?: Prisma.StringNullableFilter<"categories"> | string | null
   created_at?: Prisma.DateTimeNullableFilter<"categories"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"categories"> | Date | string | null
   parent?: Prisma.XOR<Prisma.CategoriesNullableScalarRelationFilter, Prisma.categoriesWhereInput> | null
@@ -257,7 +249,6 @@ export type categoriesOrderByWithRelationInput = {
   active?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   parent_id?: Prisma.SortOrderInput | Prisma.SortOrder
-  mongo_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   parent?: Prisma.categoriesOrderByWithRelationInput
@@ -269,7 +260,6 @@ export type categoriesOrderByWithRelationInput = {
 
 export type categoriesWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  mongo_id?: string
   AND?: Prisma.categoriesWhereInput | Prisma.categoriesWhereInput[]
   OR?: Prisma.categoriesWhereInput[]
   NOT?: Prisma.categoriesWhereInput | Prisma.categoriesWhereInput[]
@@ -284,7 +274,7 @@ export type categoriesWhereUniqueInput = Prisma.AtLeast<{
   product_categories?: Prisma.Product_categoriesListRelationFilter
   sub_categories?: Prisma.CategoriesListRelationFilter
   e_booklet_templates?: Prisma.E_booklet_templatesListRelationFilter
-}, "id" | "mongo_id">
+}, "id">
 
 export type categoriesOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -292,7 +282,6 @@ export type categoriesOrderByWithAggregationInput = {
   active?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   parent_id?: Prisma.SortOrderInput | Prisma.SortOrder
-  mongo_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.categoriesCountOrderByAggregateInput
@@ -311,7 +300,6 @@ export type categoriesScalarWhereWithAggregatesInput = {
   active?: Prisma.BoolNullableWithAggregatesFilter<"categories"> | boolean | null
   description?: Prisma.StringNullableWithAggregatesFilter<"categories"> | string | null
   parent_id?: Prisma.IntNullableWithAggregatesFilter<"categories"> | number | null
-  mongo_id?: Prisma.StringNullableWithAggregatesFilter<"categories"> | string | null
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"categories"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"categories"> | Date | string | null
 }
@@ -320,7 +308,6 @@ export type categoriesCreateInput = {
   title: string
   active?: boolean | null
   description?: string | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   parent?: Prisma.categoriesCreateNestedOneWithoutSub_categoriesInput
@@ -336,7 +323,6 @@ export type categoriesUncheckedCreateInput = {
   active?: boolean | null
   description?: string | null
   parent_id?: number | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutCategoryInput
@@ -349,7 +335,6 @@ export type categoriesUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parent?: Prisma.categoriesUpdateOneWithoutSub_categoriesNestedInput
@@ -365,7 +350,6 @@ export type categoriesUncheckedUpdateInput = {
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parent_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutCategoryNestedInput
@@ -380,7 +364,6 @@ export type categoriesCreateManyInput = {
   active?: boolean | null
   description?: string | null
   parent_id?: number | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
 }
@@ -389,7 +372,6 @@ export type categoriesUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -400,7 +382,6 @@ export type categoriesUncheckedUpdateManyInput = {
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parent_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -426,7 +407,6 @@ export type categoriesCountOrderByAggregateInput = {
   active?: Prisma.SortOrder
   description?: Prisma.SortOrder
   parent_id?: Prisma.SortOrder
-  mongo_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -442,7 +422,6 @@ export type categoriesMaxOrderByAggregateInput = {
   active?: Prisma.SortOrder
   description?: Prisma.SortOrder
   parent_id?: Prisma.SortOrder
-  mongo_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -453,7 +432,6 @@ export type categoriesMinOrderByAggregateInput = {
   active?: Prisma.SortOrder
   description?: Prisma.SortOrder
   parent_id?: Prisma.SortOrder
-  mongo_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -576,7 +554,6 @@ export type categoriesCreateWithoutSub_categoriesInput = {
   title: string
   active?: boolean | null
   description?: string | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   parent?: Prisma.categoriesCreateNestedOneWithoutSub_categoriesInput
@@ -591,7 +568,6 @@ export type categoriesUncheckedCreateWithoutSub_categoriesInput = {
   active?: boolean | null
   description?: string | null
   parent_id?: number | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutCategoryInput
@@ -608,7 +584,6 @@ export type categoriesCreateWithoutParentInput = {
   title: string
   active?: boolean | null
   description?: string | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   coupons?: Prisma.couponsCreateNestedManyWithoutCategoryInput
@@ -622,7 +597,6 @@ export type categoriesUncheckedCreateWithoutParentInput = {
   title: string
   active?: boolean | null
   description?: string | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutCategoryInput
@@ -656,7 +630,6 @@ export type categoriesUpdateWithoutSub_categoriesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parent?: Prisma.categoriesUpdateOneWithoutSub_categoriesNestedInput
@@ -671,7 +644,6 @@ export type categoriesUncheckedUpdateWithoutSub_categoriesInput = {
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parent_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutCategoryNestedInput
@@ -704,7 +676,6 @@ export type categoriesScalarWhereInput = {
   active?: Prisma.BoolNullableFilter<"categories"> | boolean | null
   description?: Prisma.StringNullableFilter<"categories"> | string | null
   parent_id?: Prisma.IntNullableFilter<"categories"> | number | null
-  mongo_id?: Prisma.StringNullableFilter<"categories"> | string | null
   created_at?: Prisma.DateTimeNullableFilter<"categories"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"categories"> | Date | string | null
 }
@@ -713,7 +684,6 @@ export type categoriesCreateWithoutProduct_categoriesInput = {
   title: string
   active?: boolean | null
   description?: string | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   parent?: Prisma.categoriesCreateNestedOneWithoutSub_categoriesInput
@@ -728,7 +698,6 @@ export type categoriesUncheckedCreateWithoutProduct_categoriesInput = {
   active?: boolean | null
   description?: string | null
   parent_id?: number | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutCategoryInput
@@ -756,7 +725,6 @@ export type categoriesUpdateWithoutProduct_categoriesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parent?: Prisma.categoriesUpdateOneWithoutSub_categoriesNestedInput
@@ -771,7 +739,6 @@ export type categoriesUncheckedUpdateWithoutProduct_categoriesInput = {
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parent_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutCategoryNestedInput
@@ -783,7 +750,6 @@ export type categoriesCreateWithoutCouponsInput = {
   title: string
   active?: boolean | null
   description?: string | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   parent?: Prisma.categoriesCreateNestedOneWithoutSub_categoriesInput
@@ -798,7 +764,6 @@ export type categoriesUncheckedCreateWithoutCouponsInput = {
   active?: boolean | null
   description?: string | null
   parent_id?: number | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutCategoriesInput
@@ -826,7 +791,6 @@ export type categoriesUpdateWithoutCouponsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parent?: Prisma.categoriesUpdateOneWithoutSub_categoriesNestedInput
@@ -841,7 +805,6 @@ export type categoriesUncheckedUpdateWithoutCouponsInput = {
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parent_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutCategoriesNestedInput
@@ -853,7 +816,6 @@ export type categoriesCreateWithoutE_booklet_templatesInput = {
   title: string
   active?: boolean | null
   description?: string | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   parent?: Prisma.categoriesCreateNestedOneWithoutSub_categoriesInput
@@ -868,7 +830,6 @@ export type categoriesUncheckedCreateWithoutE_booklet_templatesInput = {
   active?: boolean | null
   description?: string | null
   parent_id?: number | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutCategoryInput
@@ -896,7 +857,6 @@ export type categoriesUpdateWithoutE_booklet_templatesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   parent?: Prisma.categoriesUpdateOneWithoutSub_categoriesNestedInput
@@ -911,7 +871,6 @@ export type categoriesUncheckedUpdateWithoutE_booklet_templatesInput = {
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parent_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutCategoryNestedInput
@@ -924,7 +883,6 @@ export type categoriesCreateManyParentInput = {
   title: string
   active?: boolean | null
   description?: string | null
-  mongo_id?: string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
 }
@@ -933,7 +891,6 @@ export type categoriesUpdateWithoutParentInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   coupons?: Prisma.couponsUpdateManyWithoutCategoryNestedInput
@@ -947,7 +904,6 @@ export type categoriesUncheckedUpdateWithoutParentInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutCategoryNestedInput
@@ -961,7 +917,6 @@ export type categoriesUncheckedUpdateManyWithoutParentInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -1030,7 +985,6 @@ export type categoriesSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   active?: boolean
   description?: boolean
   parent_id?: boolean
-  mongo_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   parent?: boolean | Prisma.categories$parentArgs<ExtArgs>
@@ -1047,7 +1001,6 @@ export type categoriesSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   active?: boolean
   description?: boolean
   parent_id?: boolean
-  mongo_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   parent?: boolean | Prisma.categories$parentArgs<ExtArgs>
@@ -1059,7 +1012,6 @@ export type categoriesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   active?: boolean
   description?: boolean
   parent_id?: boolean
-  mongo_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   parent?: boolean | Prisma.categories$parentArgs<ExtArgs>
@@ -1071,12 +1023,11 @@ export type categoriesSelectScalar = {
   active?: boolean
   description?: boolean
   parent_id?: boolean
-  mongo_id?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type categoriesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "active" | "description" | "parent_id" | "mongo_id" | "created_at" | "updated_at", ExtArgs["result"]["categories"]>
+export type categoriesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "active" | "description" | "parent_id" | "created_at" | "updated_at", ExtArgs["result"]["categories"]>
 export type categoriesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   parent?: boolean | Prisma.categories$parentArgs<ExtArgs>
   coupons?: boolean | Prisma.categories$couponsArgs<ExtArgs>
@@ -1107,7 +1058,6 @@ export type $categoriesPayload<ExtArgs extends runtime.Types.Extensions.Internal
     active: boolean | null
     description: string | null
     parent_id: number | null
-    mongo_id: string | null
     created_at: Date | null
     updated_at: Date | null
   }, ExtArgs["result"]["categories"]>
@@ -1543,7 +1493,6 @@ export interface categoriesFieldRefs {
   readonly active: Prisma.FieldRef<"categories", 'Boolean'>
   readonly description: Prisma.FieldRef<"categories", 'String'>
   readonly parent_id: Prisma.FieldRef<"categories", 'Int'>
-  readonly mongo_id: Prisma.FieldRef<"categories", 'String'>
   readonly created_at: Prisma.FieldRef<"categories", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"categories", 'DateTime'>
 }
