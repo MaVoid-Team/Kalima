@@ -3478,10 +3478,12 @@ export class EBookletService {
     status?: string;
     page?: number;
     limit?: number;
+    includeStudents?: boolean;
   }) {
-    const page = filters.page ?? 1;
-    const limit = filters.limit ?? 20;
+    const page = Math.max(Number(filters.page) || 1, 1);
+    const limit = Math.min(Math.max(Number(filters.limit) || 20, 1), 200);
     const skip = (page - 1) * limit;
+    const includeStudents = filters.includeStudents !== false;
     const where: Record<string, unknown> = {};
     if (filters.teacherId) where.teacher_id = filters.teacherId;
     const status = normalizeEBookletInstanceStatus(filters.status);
@@ -3503,14 +3505,15 @@ export class EBookletService {
       }),
       this.db.e_booklet_instances.count({ where }),
     ]);
-    const studentRowsByInstance = await this.getInstanceStudentRowsByInstanceId(
-      data.map((instance: any) => Number(instance.id)).filter((id: number) => Number.isInteger(id)),
-    );
+    const instanceIds = data.map((instance: any) => Number(instance.id)).filter((id: number) => Number.isInteger(id));
+    const studentRowsByInstance = includeStudents
+      ? await this.getInstanceStudentRowsByInstanceId(instanceIds)
+      : new Map<number, any[]>();
     return {
       data: data.map(({ devices = [], ...instance }: any) => ({
         ...instance,
         used_devices_count: devices.filter((device: any) => device.status === "active").length,
-        students: studentRowsByInstance.get(Number(instance.id)) || [],
+        students: includeStudents ? (studentRowsByInstance.get(Number(instance.id)) || []) : [],
       })),
       total,
       page,

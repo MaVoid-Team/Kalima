@@ -725,6 +725,8 @@ export function useAdminEBookletInstances() {
       const nextStatus = overrides.status ?? status;
       if (nextStatus && nextStatus !== "all") query.set("status", nextStatus);
       if (overrides.teacher_id) query.set("teacher_id", String(overrides.teacher_id));
+      if (overrides.include_students === false) query.set("include_students", "false");
+      if (overrides.include_students === true) query.set("include_students", "true");
       const response = await fetchApi({ endpoint: `/admin/e-booklet-instances?${query.toString()}`, method: "get" }, false);
       const normalized = normalizeListResponse(response);
       setInstances(normalized.data);
@@ -734,6 +736,39 @@ export function useAdminEBookletInstances() {
       setLoading(false);
     }
   }, [fetchApi, pagination.limit, pagination.page, status]);
+
+  const fetchAllInstances = useCallback(async (overrides = {}) => {
+    setLoading(true);
+    try {
+      const pageSize = Number(overrides.limit) > 0 ? Number(overrides.limit) : 200;
+      const nextStatus = overrides.status ?? status;
+      let page = 1;
+      let all = [];
+      let total = Infinity;
+      let lastLimit = pageSize;
+      while (all.length < total && page <= 50) {
+        const query = new URLSearchParams();
+        query.set("page", String(page));
+        query.set("limit", String(pageSize));
+        if (nextStatus && nextStatus !== "all") query.set("status", nextStatus);
+        if (overrides.teacher_id) query.set("teacher_id", String(overrides.teacher_id));
+        if (overrides.include_students === false) query.set("include_students", "false");
+        if (overrides.include_students === true) query.set("include_students", "true");
+        const response = await fetchApi({ endpoint: `/admin/e-booklet-instances?${query.toString()}`, method: "get" }, false);
+        const normalized = normalizeListResponse(response);
+        all = all.concat(normalized.data);
+        total = Number(normalized.total || 0);
+        lastLimit = normalized.limit;
+        if (!normalized.data.length) break;
+        page += 1;
+      }
+      setInstances(all);
+      setPagination((current) => ({ ...current, total, page: 1, limit: lastLimit }));
+      return { data: all, total, page: 1, limit: lastLimit };
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchApi, status]);
 
   const setPage = useCallback((page) => setPagination((current) => ({ ...current, page })), []);
   const setStatus = useCallback((value) => { setStatusState(value); setPagination((current) => ({ ...current, page: 1 })); }, []);
@@ -822,6 +857,7 @@ export function useAdminEBookletInstances() {
     status,
     loading,
     fetchInstances,
+    fetchAllInstances,
     setPage,
     setStatus,
     updateQuota,

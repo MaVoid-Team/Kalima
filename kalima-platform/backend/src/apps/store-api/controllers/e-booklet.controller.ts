@@ -829,6 +829,9 @@ export const eBookletController = {
           ? parseInt(req.query.teacher_id as string, 10)
           : undefined,
         status: req.query.status as string | undefined,
+        includeStudents: req.query.include_students === undefined
+          ? undefined
+          : parseBoolean(req.query.include_students),
         ...pagination(req),
       });
       res.status(200).json({ success: true, ...result });

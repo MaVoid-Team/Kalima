@@ -149,7 +149,7 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
     pagination,
     status,
     loading,
-    fetchInstances,
+    fetchAllInstances,
     setStatus,
     setPage,
     updateQuota,
@@ -208,9 +208,14 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
     setTeacherListPage(1);
   }, [searchQuery, quotaFilter, deviceFilter, sortBy, perPage, status]);
 
+  const reloadInstances = () => fetchAllInstances({
+    ...(selectedTeacherId ? { teacher_id: selectedTeacherId, include_students: true } : { include_students: false }),
+  });
+
   useEffect(() => {
-    fetchInstances({ limit: 100, ...(selectedTeacherId ? { teacher_id: selectedTeacherId } : {}) }).catch(() => {});
-  }, [fetchInstances, selectedTeacherId]);
+    reloadInstances().catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchAllInstances, selectedTeacherId]);
   useEffect(() => { fetchTerms({ status: "active" }).catch(() => {}); }, [fetchTerms]);
   useEffect(() => {
     listAccessCodePrintTemplates()
@@ -458,13 +463,13 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
 
   const handleQuotaSave = async (instanceId) => {
     await updateQuota(instanceId, Number(quotaDrafts[instanceId] || 0));
-    fetchInstances({ limit: 100 });
+    reloadInstances();
   };
 
   const handleRevoke = async (instanceId) => {
     if (!window.confirm(t("admin.instances.revokeConfirm"))) return;
     await revokeTeacherAccess(instanceId);
-    fetchInstances({ limit: 100 });
+    reloadInstances();
   };
 
   const updateAccessCodeDraft = (instanceId, field, value) => {
@@ -729,7 +734,7 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button type="button" variant="outline" className="rounded-xl" onClick={() => fetchInstances({ limit: 100 })} disabled={loading}>
+            <Button type="button" variant="outline" className="rounded-xl" onClick={() => reloadInstances()} disabled={loading}>
               <RefreshCcw className="h-4 w-4" />
               {t("common.refresh")}
             </Button>
@@ -1280,7 +1285,7 @@ export default function AdminEBookletInstancesPage({ teacherId = null }) {
                                             userId={studentUserId}
                                             student={student}
                                             expanded={devicesExpanded}
-                                            onSummaryRefresh={() => fetchInstances({ limit: 100 })}
+                                            onSummaryRefresh={() => reloadInstances()}
                                           />
                                         )}
                                       </div>

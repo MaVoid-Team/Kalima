@@ -526,6 +526,40 @@ describe("EBookletService", () => {
       expect(result.data[0].students[0].analytics_summary).toMatchObject({ viewer_opened: 1, source: "access_code", marketing_price_snapshot: "75" });
       expect(result.data[0].students[0].purchase_reference).toMatchObject({ source: "access_code", access_code_id: 77, counted_for_progress: false });
     });
+
+    test("skips student hydration when includeStudents is false", async () => {
+      const db = createMockDb();
+      db.e_booklet_instances.findMany.mockResolvedValue([
+        {
+          id: 10,
+          teacher_id: 8,
+          status: "active",
+          teacher: { id: 8, name: "Teacher One", email: "teacher@example.com" },
+          devices: [{ id: 1, status: "active" }],
+          _count: { access_records: 1, invites: 0 },
+        },
+      ]);
+      db.e_booklet_instances.count.mockResolvedValue(1);
+
+      const service = new EBookletService(db);
+      const result: any = await service.listInstances({ page: 1, limit: 20, includeStudents: false });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].students).toEqual([]);
+      expect(db.e_booklet_access.findMany).not.toHaveBeenCalled();
+    });
+
+    test("clamps instance page size so a single request cannot hide later teachers", async () => {
+      const db = createMockDb();
+      db.e_booklet_instances.findMany.mockResolvedValue([]);
+      db.e_booklet_instances.count.mockResolvedValue(641);
+
+      const service = new EBookletService(db);
+      const result: any = await service.listInstances({ page: 1, limit: 10000, includeStudents: false });
+
+      expect(result.limit).toBe(200);
+      expect(db.e_booklet_instances.findMany).toHaveBeenCalledWith(expect.objectContaining({ take: 200, skip: 0 }));
+    });
   });
 
   describe("listUserEBooklets", () => {
