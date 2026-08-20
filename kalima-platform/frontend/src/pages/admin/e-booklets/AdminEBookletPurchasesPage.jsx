@@ -33,6 +33,7 @@ import {
 import { useAdminEBookletPurchases } from "@/hooks/admin/useAdminEBooklets";
 import useExport from "@/hooks/useExport";
 import { formatCurrency, formatOrderDate } from "@/lib/storeUtils";
+import { getEBookletOrderAmount } from "@/components/e-booklets/eBookletOrderUtils";
 import { E_BOOKLET_ORDER_FILTER_STATUSES } from "@/pages/e-booklets/eBookletOrdersContract.mjs";
 import AdminEBookletPurchaseActions from "./components/AdminEBookletPurchaseActions";
 import AdminEBookletPurchasesToolbar from "./components/AdminEBookletPurchasesToolbar";
@@ -52,7 +53,7 @@ const statusTone = {
 };
 
 const prettyStatus = (status) => String(status || "").replaceAll("_", " ");
-const purchaseAmount = (purchase) => purchase?.final_payable_price ?? purchase?.price ?? 0;
+const purchaseAmount = (purchase) => getEBookletOrderAmount(purchase);
 
 export default function AdminEBookletPurchasesPage() {
   const { t, i18n } = useTranslation("eBooklets");

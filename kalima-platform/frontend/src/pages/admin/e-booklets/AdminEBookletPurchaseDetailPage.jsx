@@ -80,7 +80,7 @@ export default function AdminEBookletPurchaseDetailPage() {
   const screenshotUrl = getImageUrl(screenshotSource);
   const requiredFields = purchase.required_fields || [];
   const instance = Array.isArray(purchase.instances) ? purchase.instances[0] : null;
-  const basePrice = positiveAmount(purchase.price) || purchase.marketing_price || purchase.student_marketing_price || purchase.total || 0;
+  const basePrice = positiveAmount(purchase.price) || positiveAmount(purchase.marketing_price) || positiveAmount(purchase.student_marketing_price) || positiveAmount(purchase.template?.price) || purchase.total || 0;
   const totalAmount = getEBookletOrderAmount(purchase);
   const paymentMethod = purchase.payment_methods?.name || purchase.payment_method?.name || purchase.payment_method;
   const paymentReference = purchase.payment_reference || purchase.numberTransferredFrom || purchase.payment_number;

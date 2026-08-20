@@ -126,13 +126,30 @@ function parseFilterMoney(value: unknown, label: string): number | undefined {
   return amount;
 }
 
+function firstPositiveMoney(...values: unknown[]): number {
+  for (const value of values) {
+    if (value === null || value === undefined || value === "") continue;
+    const amount = Number(value);
+    if (Number.isFinite(amount) && amount > 0) return amount;
+  }
+  return 0;
+}
+
 function eBookletPurchaseAmount(purchase: any): unknown {
   if (!purchase || typeof purchase !== "object") return 0;
+  const amount = firstPositiveMoney(
+    purchase.final_payable_price,
+    purchase.price,
+    purchase.marketing_price,
+    purchase.student_marketing_price,
+    purchase.template?.price,
+    purchase.total,
+  );
+  if (amount > 0) return amount;
   if (purchase.final_payable_price !== null && purchase.final_payable_price !== undefined) {
     return purchase.final_payable_price;
   }
-  if (Number(purchase.price) > 0) return purchase.price;
-  return purchase.marketing_price ?? purchase.student_marketing_price ?? purchase.total ?? purchase.price ?? 0;
+  return purchase.price ?? 0;
 }
 
 function serializeEBookletPurchase(purchase: any): any {
@@ -2845,7 +2862,7 @@ export class EBookletService {
           throw new NotFoundError("E-booklet template version not found");
         }
         assertTemplateReleased(template);
-        const price = Number((template as any).marketing_price ?? (template as any).price ?? 0);
+        const price = firstPositiveMoney((template as any).marketing_price, (template as any).price);
         const requiredFieldValues = await this.validateEBookletRequiredFields(
           template,
           item.required_field_values ?? dto.required_field_values,

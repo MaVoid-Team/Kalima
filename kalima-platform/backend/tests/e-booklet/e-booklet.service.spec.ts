@@ -1483,6 +1483,30 @@ describe("EBookletService", () => {
       }));
     });
 
+    test("admin purchase detail falls back to template price when stored money fields are zero", async () => {
+      const db = createMockDb();
+      db.e_booklet_purchases.findUnique.mockResolvedValue({
+        id: 679,
+        status: "delivered",
+        price: 0,
+        marketing_price: 0,
+        final_payable_price: null,
+        payment_method: null,
+        payment_reference: null,
+        template: { id: 3, title: "Math booklet", price: 150 },
+      });
+
+      const service = new EBookletService(db);
+      const result: any = await service.getPurchase(679);
+
+      expect(result).toEqual(expect.objectContaining({
+        id: 679,
+        price: 0,
+        marketing_price: 0,
+        total: 150,
+      }));
+    });
+
     test("treats admin purchase date-only endDate as the end of that day", async () => {
       const db = createMockDb();
       db.e_booklet_purchases.findMany.mockResolvedValue([]);
@@ -1642,6 +1666,41 @@ describe("EBookletService", () => {
       }));
       expect(db.purchases.create).not.toHaveBeenCalled();
       expect(result).toEqual(expect.objectContaining({ purchase_id: 91, item_count: 2, total: 250, next_url: "/e-booklet-orders" }));
+    });
+
+    test("public teacher checkout uses template price when marketing_price is the zero default", async () => {
+      const db = createMockDb();
+      db.e_booklet_templates.findFirst.mockResolvedValue({
+        id: 3,
+        title: "Math booklet",
+        price: 150,
+        marketing_price: 0,
+        currency: "EGP",
+        versions: [{ id: 8, status: "active" }],
+      });
+      db.e_booklet_purchases.create.mockResolvedValue({ id: 679, status: "pending", price: 150, currency: "EGP" });
+
+      const service = new EBookletService(db);
+      const result: any = await service.createPublicCheckoutRequest(55, {
+        items: [{ template_id: 3, template_version_id: 8 }],
+        terms_accepted: true,
+        payment_method_id: 1,
+        numberTransferredFrom: "01012345678",
+      }, { buffer: Buffer.from("png"), mimetype: "image/png", originalname: "proof.png" } as any);
+
+      expect(db.e_booklet_purchases.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({
+          teacher_id: 55,
+          template_id: 3,
+          price: 150,
+          marketing_price: 150,
+          status: "pending",
+          payment_method: expect.any(String),
+          payment_reference: "01012345678",
+          payment_screenshot_id: expect.any(Number),
+        }),
+      }));
+      expect(result).toEqual(expect.objectContaining({ purchase_id: 679, total: 150 }));
     });
 
     test("public checkout creates teacher purchase for the selected instance without student order links", async () => {
