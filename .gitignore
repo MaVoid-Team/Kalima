@@ -268,6 +268,7 @@ blob-report/
 playwright/.cache/
 test-results/
 pr-proof/
+**/proof/
 **/*proof*.png
 **/*proof*.jpg
 **/*proof*.jpeg
