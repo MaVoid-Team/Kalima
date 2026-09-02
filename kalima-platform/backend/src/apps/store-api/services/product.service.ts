@@ -512,7 +512,7 @@ export class ProductService {
   // SOFT DELETE
   // ============================================
 
-  async deleteProduct(id: number): Promise<void> {
+  async deleteProduct(id: number, deletedBy?: number): Promise<void> {
     const product = await this.db.products.findFirst({
       where: { id, deleted_at: null },
     });
@@ -525,6 +525,7 @@ export class ProductService {
       data: {
         deleted_at: new Date(),
         is_deleted: true,
+        deleted_by: deletedBy ?? null,
         updated_at: new Date(),
       },
     });

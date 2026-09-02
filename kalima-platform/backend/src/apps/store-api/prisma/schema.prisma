@@ -121,6 +121,7 @@ model users {
   e_booklet_devices                   e_booklet_devices[]
   e_booklet_device_allowances         e_booklet_device_allowances[]
   e_booklet_student_purchase_links    e_booklet_student_purchase_links[]    @relation("EBookletStudentPurchaseStudent")
+  products_deleted                    products[]                            @relation("ProductDeletedBy")
 }
 
 model user_appreciation_pages {
@@ -411,6 +412,7 @@ model products {
   updated_at           DateTime?         @db.Timestamp(6)
   deleted_at           DateTime?         @db.Timestamp(6)
   is_deleted           Boolean?          @default(false)
+  deleted_by           Int?
   perks                String?
 
   product_required_fields product_required_fields[]
@@ -420,6 +422,7 @@ model products {
   cart_items              cart_items[] // <-- Add this line for the relation
   purchase_items          purchase_items[] // <-- Add this line for the opposite relation
   thumbnail_image         images?                   @relation("ProductThumbnail", fields: [thumbnail_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  deleted_by_user         users?                    @relation("ProductDeletedBy", fields: [deleted_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
   coupons                 coupons[]
   samples                 samples[]
   product_reviews         product_reviews[]

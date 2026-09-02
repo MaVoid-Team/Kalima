@@ -242,7 +242,7 @@ export const productController = {
       const id = parseInt(req.params.id as string, 10);
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
-      await productService.deleteProduct(id);
+      await productService.deleteProduct(id, req.user?.userId);
 
       res.status(200).json({
         success: true,
